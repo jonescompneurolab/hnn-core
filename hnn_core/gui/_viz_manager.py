@@ -297,15 +297,15 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
 
         target_sim_name = target_simulations.value
         target_sim = data['simulations'][target_sim_name]
+
         # plot the target dipole.
-        target_plot_config = copy.deepcopy(plot_config)
         # disable scaling for the target dipole.
-        target_plot_config['dipole_scaling'] = 1.
+        plot_config['dipole_scaling'] = 1.
 
         # plot the target dipole.
         target_dpl_processed = _update_ax(
             fig, ax, target_sim, target_sim_name, plot_type,
-            target_plot_config)[0]  # we assume there is only one dipole.
+            plot_config)[0]  # we assume there is only one dipole.
 
         # calculate the RMSE between the two dipoles.
         t0 = 0.0
@@ -364,7 +364,7 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
     simulation_selection = Dropdown(
         options=simulation_names,
         value=sim_name_default,
-        description='Simulation:',
+        description='Simulation Data:',
         disabled=False,
         layout=layout,
         style=analysis_style,
@@ -387,9 +387,9 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
     )
 
     target_data_selection = Dropdown(
-        options=simulation_names + ('None',),
+        options=simulation_names[:-1] + ('None',),
         value='None',
-        description='Target data:',
+        description='Data to Compare:',
         disabled=False,
         layout=layout,
         style=analysis_style,
