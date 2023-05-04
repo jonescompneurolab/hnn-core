@@ -249,25 +249,40 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
                   max_spectral_frequency, dipole_scaling, widgets, data,
                   fig_idx, fig, ax, existing_plots):
     """Plotting different types of data on the given axes.
+
     Now this function is also responsible for comparing multiple simulations,
     or simulations vs. experimental data.
+
     Parameters
     ----------
     b : ipywidgets.Button
     widgets_simulation : ipywidgets.Dropdown
+        A dropdown widget that contains all the simulation names.
     widgets_plot_type : ipywidgets.Dropdown
+        A dropdown widget that contains all the plot types.
     target_simulations : ipywidgets.Dropdown
         The target data we want to compare with. Note that this could be 'None'
     spectrogram_colormap_selection : ipywidgets.Dropdown
+        A dropdown widget that contains all the colormaps for spectrogram.
     dipole_smooth : ipywidgets.FloatText
+        A textfield widget that specifies the smoothing window size.
     max_spectral_frequency : ipywidgets.FloatText
+        A textfield that specifies the max frequency for spectrogram plot.
     dipole_scaling : ipywidgets.FloatText
+        A textfield that specifies the scaling factor for dipole object.
     widgets : dict
+        A dict that contains all the widgets.
     data : dict
+        A dict that contains all the simulation data. Can be accessed by names
+        specified in widgets_simulation and target_simulations weidgets.
     fig_idx : int
+        The index of the figure we want to plot on.
     fig : matplotlib.figure.Figure
+        The figure we want to plot on.
     ax : matplotlib.axes._subplots.AxesSubplot
+        The axes we want to operate.
     existing_plots : ipywidgets.VBox
+        A VBox widget that contains all the existing plots.
     """
     sim_name = widgets_simulation.value
     plot_type = widgets_plot_type.value
