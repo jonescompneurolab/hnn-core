@@ -1162,8 +1162,6 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
     drive_names = sorted(drive_specs.keys())
     for idx, drive_name in enumerate(drive_names):  # order matters
         specs = drive_specs[drive_name]
-        # should_render = idx == (len(drive_names) -
-        #                         1) and len(bias_specs['tonic']) > 0
         if bias_is_present:
             should_render = False
         else:
