@@ -372,7 +372,7 @@ class CellResponse(object):
             | Ex: ``'ev'`` is equivalent to ``['evdist', 'evprox']``
         color : str | list of str | None
             String input defining color of histograms plotted. If list of str
-            provided, histograms for each cell type will be plotted by cycling
+            provided, histograms for each spike type will be plotted by cycling
             through colors in the list.
 
             | Ex: ``'r'``, ``['r', 'g']``
