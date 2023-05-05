@@ -384,8 +384,8 @@ class NetworkBuilder(object):
                         if src_gid in gid_pairs:
                             target_gids.update(self.net.connectivity[conn_idx]
                                                ['gid_pairs'][src_gid])
-                    # sort to ensure consistency
-                    for target_gid in sorted(target_gids):
+
+                    for target_gid in target_gids:
                         if (target_gid in self._gid_list and
                                 src_gid not in self._gid_list):
                             self._gid_list.append(src_gid)
