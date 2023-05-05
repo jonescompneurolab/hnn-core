@@ -377,15 +377,15 @@ class NetworkBuilder(object):
                 # assigned to this rank
                 for src_gid in self.net.gid_ranges[drive['name']]:
                     conn_idxs = pick_connection(self.net, src_gids=src_gid)
-                    target_gids = list()
+                    target_gids = set()
                     for conn_idx in conn_idxs:
                         gid_pairs = self.net.connectivity[
                             conn_idx]['gid_pairs']
                         if src_gid in gid_pairs:
-                            target_gids += (self.net.connectivity[conn_idx]
-                                            ['gid_pairs'][src_gid])
-
-                    for target_gid in set(target_gids):
+                            target_gids.update(self.net.connectivity[conn_idx]
+                                               ['gid_pairs'][src_gid])
+                    # sort to ensure consistency
+                    for target_gid in sorted(target_gids):
                         if (target_gid in self._gid_list and
                                 src_gid not in self._gid_list):
                             self._gid_list.append(src_gid)

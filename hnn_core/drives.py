@@ -264,7 +264,7 @@ def _drive_cell_event_times(drive_type, dynamics, tstop, target_type='any',
     elif len(matches) > 1:
         raise ValueError('Ambiguous external drive: %s' % drive_type)
 
-    event_times = list()
+    event_times = np.array([])
     if drive_type == 'poisson':
         if target_type == 'any':
             rate_constant = dynamics['rate_constant']

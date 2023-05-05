@@ -9,6 +9,7 @@
 
 import itertools as it
 from copy import deepcopy
+from collections import OrderedDict
 
 import numpy as np
 import warnings
@@ -270,9 +271,7 @@ def pick_connection(net, src_gids=None, target_gids=None,
         else:
             conn_set = conn_set.union(inner_set)
 
-    conn_set = list(conn_set)
-    conn_set.sort()
-    return conn_set
+    return sorted(conn_set)
 
 
 class Network(object):
@@ -348,8 +347,9 @@ class Network(object):
         # We want it to remain in each Network object, so that the user can
         # interrogate a built and simulated net. In addition, CellResponse is
         # attached to a Network during simulation---Network is the natural
-        # place to keep this information
-        self.gid_ranges = dict()
+        # place to keep this information. Order matters: cell gids first, then
+        # artifical drive cells
+        self.gid_ranges = OrderedDict()
         self._n_gids = 0  # utility: keep track of last GID
 
         # XXX this can be removed once tests are made independent of HNN GUI
@@ -396,6 +396,8 @@ class Network(object):
         self.set_cell_positions(inplane_distance=self._inplane_distance,
                                 layer_separation=self._layer_separation)
 
+        # populates self.gid_ranges for the 1st time: order matters for
+        # NetworkBuilder!
         for cell_name in cell_types:
             self._add_cell_type(cell_name, self.pos_dict[cell_name],
                                 cell_template=cell_types[cell_name])
@@ -936,7 +938,8 @@ class Network(object):
         # seed_increment increased by 1 for each target cell type,
         # added to conn_seed to ensure statistical independence of random
         # connections when probability < 1.0
-        for seed_increment, target_cell_type in enumerate(target_populations):
+        for seed_increment, target_cell_type in enumerate(
+                sorted(target_populations)):
             target_gids = list(self.gid_ranges[target_cell_type])
             delays = delays_by_type[target_cell_type]
             probability = probability_by_type[target_cell_type]
@@ -1017,9 +1020,9 @@ class Network(object):
                         # population) and create event times
                         conn_idxs = pick_connection(self,
                                                     src_gids=drive_cell_gid)
-                        target_types = set([self.connectivity[conn_idx]
-                                            ['target_type'] for conn_idx in
-                                            conn_idxs])
+                        target_types = np.unique([self.connectivity[conn_idx]
+                                                 ['target_type'] for conn_idx
+                                                 in conn_idxs])
                         for target_type in target_types:
                             event_times.append(_drive_cell_event_times(
                                 drive['type'],
@@ -1191,7 +1194,7 @@ class Network(object):
                 raise AssertionError(
                     'All target_gids must be of the same type')
         conn['target_type'] = target_type
-        conn['target_gids'] = list(target_set)
+        conn['target_gids'] = sorted(set(target_set))
         conn['num_targets'] = len(target_set)
 
         if len(target_gids) != len(src_gids):
@@ -1206,7 +1209,7 @@ class Network(object):
             gid_pairs[src_gid] = target_src_pair
 
         conn['src_type'] = self.gid_to_type(src_gids[0])
-        conn['src_gids'] = list(set(src_gids))
+        conn['src_gids'] = sorted(set(src_gids))
         conn['num_srcs'] = len(src_gids)
 
         conn['gid_pairs'] = gid_pairs
