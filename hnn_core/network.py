@@ -1020,9 +1020,9 @@ class Network(object):
                         # population) and create event times
                         conn_idxs = pick_connection(self,
                                                     src_gids=drive_cell_gid)
-                        target_types = np.unique([self.connectivity[conn_idx]
-                                                 ['target_type'] for conn_idx
-                                                 in conn_idxs])
+                        target_types = set([self.connectivity[conn_idx]
+                                            ['target_type'] for conn_idx in
+                                            conn_idxs])
                         for target_type in target_types:
                             event_times.append(_drive_cell_event_times(
                                 drive['type'],
@@ -1194,7 +1194,7 @@ class Network(object):
                 raise AssertionError(
                     'All target_gids must be of the same type')
         conn['target_type'] = target_type
-        conn['target_gids'] = sorted(set(target_set))
+        conn['target_gids'] = sorted(target_set)
         conn['num_targets'] = len(target_set)
 
         if len(target_gids) != len(src_gids):
