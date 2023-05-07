@@ -1253,23 +1253,46 @@ class Network(object):
 
         self.connectivity.append(deepcopy(conn))
 
+    def _get_expected_connectivities(self, src_types='all'):
+        """Return expected connectivities left after clearng connections.
+
+        Parameters
+        ----------
+        src_types : list | all
+            Connection source types to be cleared
+
+        Returns
+        -------
+        int
+            Number of connections left after the deletion
+            operation
+        """
+        if src_types == 'all':
+            return 0
+        deleted_connectivities = 0
+        for src_type in src_types:
+            deleted_connectivities += len(pick_connection(self,
+                                          src_gids=src_type))
+        return len(self.connectivity) - deleted_connectivities
+
     def clear_connectivity(self, src_types="all"):
         """Remove connections with src_type in Network.connectivity.
 
         Parameters
         ----------
-        src_types : list | 'all' | 'drives' | 'local'
+        src_types : list | 'all' | 'external' | 'internal'
             Source types of connections to be cleared
             'all' - Clear all connections (Default)
-            'drives' - Clear connections originating from external drives
-            'local' - Clear connections within cells
+            'external' - Clear connections from the external drives to the
+                         local network
+            'internal' - Clear connections between cells of the local network
 
         """
         if src_types == "all":
             src_types = list(self.gid_ranges.keys())
-        elif src_types == "drives":
+        elif src_types == "external":
             src_types = self.drive_names
-        elif src_types == "local":
+        elif src_types == "internal":
             src_types = list((src_type for src_type in self.gid_ranges.keys()
                              if src_type not in self.drive_names))
         _validate_type(src_types, list, 'src_types', 'list, drives, local')

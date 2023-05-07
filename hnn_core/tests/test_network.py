@@ -510,30 +510,6 @@ def test_network_drives_legacy():
                                                  n_bursty_sources)
 
 
-def get_expected_connectivities(net, src_types='all'):
-    """Return expected connectivities left after clearng connections.
-
-    Parameters
-    ----------
-    net
-        The network instance
-    src_types : list | all
-        Connection source types to be cleared
-
-    Returns
-    -------
-    int
-        Number of connections left after the deletion
-        operation
-    """
-    if src_types == 'all':
-        return 0
-    deleted_connectivities = 0
-    for src_type in src_types:
-        deleted_connectivities += len(pick_connection(net, src_gids=src_type))
-    return len(net.connectivity) - deleted_connectivities
-
-
 def test_network_connectivity():
     """Test manipulation of local network connectivity."""
     params = read_params(params_fname)
@@ -812,7 +788,7 @@ def test_network_connectivity():
     # Test Clearing connections of local src_types
 
     # Deleting all connections with src_type as 'L2_pyramidal'
-    expected_connectivities = (get_expected_connectivities(net,
+    expected_connectivities = (net._get_expected_connectivities(
                                src_types=['L2_pyramidal']))
     net.clear_connectivity(src_types=['L2_pyramidal'])
     assert len(net.connectivity) == expected_connectivities
@@ -824,9 +800,9 @@ def test_network_connectivity():
         if (conn['src_type'] not in src_types and
            conn['src_type'] not in external_drives):
             src_types.append(conn['src_type'])
-    expected_connectivities = (get_expected_connectivities(net,
+    expected_connectivities = (net._get_expected_connectivities(
                                src_types=src_types))
-    net.clear_connectivity(src_types='local')
+    net.clear_connectivity(src_types='internal')
     assert len(net.connectivity) == expected_connectivities
 
     # Testing deletion of a custom number of drives
@@ -834,14 +810,14 @@ def test_network_connectivity():
     # Deleting one external drive
     all_drives = net.drive_names
     drives_to_be_deleted = all_drives[0:1]
-    expected_connectivities = (get_expected_connectivities(net,
+    expected_connectivities = (net._get_expected_connectivities(
                                src_types=drives_to_be_deleted))
     net.clear_drives(drive_names=drives_to_be_deleted)
     assert len(net.connectivity) == expected_connectivities
 
     # Deleting all external drives
     net.clear_drives()
-    # All local and external connections are deleted
+    # All internal and external connections are deleted
     assert len(net.connectivity) == 0
 
     with pytest.warns(UserWarning, match='No connections'):
