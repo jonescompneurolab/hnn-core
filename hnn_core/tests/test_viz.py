@@ -105,13 +105,19 @@ def test_dipole_visualization():
     params.update({'N_pyr_x': 3,
                    'N_pyr_y': 3})
     net = jones_2009_model(params)
-    weights_ampa_p = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
-    syn_delays_p = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
+    weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
+    syn_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
 
     net.add_bursty_drive(
         'beta_prox', tstart=0., burst_rate=25, burst_std=5,
         numspikes=1, spike_isi=0, n_drive_cells=11, location='proximal',
-        weights_ampa=weights_ampa_p, synaptic_delays=syn_delays_p,
+        weights_ampa=weights_ampa, synaptic_delays=syn_delays,
+        event_seed=14)
+
+    net.add_bursty_drive(
+        'beta_dist', tstart=0., burst_rate=25, burst_std=5,
+        numspikes=1, spike_isi=0, n_drive_cells=11, location='distal',
+        weights_ampa=weights_ampa, synaptic_delays=syn_delays,
         event_seed=14)
 
     dpls = simulate_dipole(net, tstop=100., n_trials=2)
@@ -181,8 +187,20 @@ def test_dipole_visualization():
     net.cell_response.plot_spikes_hist(trial_idx=[0, 1], show=False)
     net.cell_response.plot_spikes_hist(color='r')
     net.cell_response.plot_spikes_hist(color=['C0', 'C1'])
+    net.cell_response.plot_spikes_hist(color={'beta_prox': 'r',
+                                              'beta_dist': 'g'})
 
     with pytest.raises(TypeError, match="color must be an instance of"):
         net.cell_response.plot_spikes_hist(color=123)
+    with pytest.raises(ValueError, match="'z' is not a valid color value"):
+        net.cell_response.plot_spikes_hist(color='z')
+    with pytest.raises(ValueError, match="'z' is not a valid color value"):
+        net.cell_response.plot_spikes_hist(color={'beta_prox': 'z',
+                                                  'beta_dist': 'g'})
+    with pytest.raises(TypeError, match="Dictionary values of color must"):
+        net.cell_response.plot_spikes_hist(color={'beta_prox': 123,
+                                                  'beta_dist': 'g'})
+    with pytest.raises(ValueError, match="'beta_dist' must be"):
+        net.cell_response.plot_spikes_hist(color={'beta_prox': 'r'})
 
     plt.close('all')
