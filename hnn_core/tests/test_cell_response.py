@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import pytest
 import numpy as np
 
-from hnn_core import CellResponse, read_spikes
+from hnn_core import CellResponse, read_spikes, read_spikes_hdf5
 
 
 def test_cell_response(tmpdir):
@@ -27,6 +27,12 @@ def test_cell_response(tmpdir):
     cell_response.plot_spikes_hist(show=False)
     cell_response.write(tmpdir.join('spk_%d.txt'))
     assert cell_response == read_spikes(tmpdir.join('spk_*.txt'))
+
+    # Write using hdf5
+    cell_response.write_hdf5(tmpdir.join('spk.hdf5'))
+    # Test read using hdf5
+    assert cell_response == read_spikes_hdf5(tmpdir.join('spk.hdf5'))
+
     assert ("CellResponse | 2 simulation trials" in repr(cell_response))
 
     # reset clears all recorded variables, but leaves simulation time intact
