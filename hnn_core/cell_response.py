@@ -6,6 +6,8 @@
 
 from glob import glob
 import numpy as np
+import os
+from h5io import write_hdf5, read_hdf5
 
 from .viz import plot_spikes_hist, plot_spikes_raster
 
@@ -423,6 +425,33 @@ class CellResponse(object):
                         int(self._spike_gids[trial_idx][spike_idx]),
                         self._spike_types[trial_idx][spike_idx]))
 
+    def write_hdf5(self, fname):
+        """Write spiking activity to a hdf5 file.
+
+        Parameters
+        ----------
+        fname : str
+            String format (e.g., 'spk.hdf5') of the
+            path to the output spike file.
+
+        Outputs
+        -------
+        A hdf5 file containing the cell response object
+        """
+        fname = str(fname)
+        # Hardcoded fname for test purposes
+        # Write code to check available file names
+        # upon discussion of the file name and location
+        print(f'Writing file {fname}')
+        data = {}
+        data['spike_times'] = self.spike_times
+        data['spike_gids'] = self.spike_gids
+        data['spike_types'] = self.spike_types
+        data['vsec'] = self.vsec
+        data['isec'] = self.isec
+        data['times'] = self.times
+        write_hdf5(fname, data, overwrite=True)
+
 
 def read_spikes(fname, gid_ranges=None):
     """Read spiking activity from a collection of spike trial files.
@@ -475,4 +504,38 @@ def read_spikes(fname, gid_ranges=None):
     if gid_ranges is not None:
         cell_response.update_types(gid_ranges)
 
+    return cell_response
+
+
+def read_spikes_hdf5(fname, gid_ranges=None):
+    """Read spiking activity from a hdf5 file.
+
+    Parameters
+    ----------
+    fname : str
+        Path to the hdf5 file (e.g., '<pathname>/spk.hdf5') to be read.
+    gid_ranges : dict of lists or range objects | None
+        Dictionary with keys 'evprox1', 'evdist1' etc.
+        containing the range of Cell or input IDs of different
+        cell or input types. If None, data object should contain
+        spike type.
+
+    Returns
+    ----------
+    cell_response : CellResponse
+        An instance of the CellResponse object.
+    """
+
+    # A check to ensure file exists
+    if not os.path.exists(fname):
+        raise NameError("File not found at path %s" % (fname,))
+    data = read_hdf5(fname)
+    # Write checks to ensure data object contain all required
+    # attributes
+    print(data)
+    cell_response = CellResponse(spike_times=data['spike_times'],
+                                 spike_gids=data['spike_gids'],
+                                 spike_types=data['spike_types'])
+    if gid_ranges is not None:
+        cell_response.update_types(gid_ranges)
     return cell_response
