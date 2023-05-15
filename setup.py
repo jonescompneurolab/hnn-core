@@ -102,7 +102,8 @@ if __name__ == "__main__":
               'numpy >=1.14',
               'NEURON >=7.7; platform_system != "Windows"',
               'matplotlib>=3.5.3',
-              'scipy'
+              'scipy',
+              'h5io'
           ],
           extras_require={
               'gui': ['ipywidgets <=7.7.1', 'ipympl<0.9', 'voila<=0.3.6']

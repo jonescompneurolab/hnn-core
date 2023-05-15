@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import pytest
 import numpy as np
 
-from hnn_core import CellResponse, read_spikes, read_spikes_hdf5
+from hnn_core import CellResponse, read_spikes
 
 
 def test_cell_response(tmpdir):
@@ -25,13 +25,40 @@ def test_cell_response(tmpdir):
                                  spike_types=spike_types,
                                  times=sim_times)
     cell_response.plot_spikes_hist(show=False)
-    cell_response.write(tmpdir.join('spk_%d.txt'))
+
+    # Testing writing using txt files
+    with pytest.warns(DeprecationWarning,
+                      match="Writing cell response to txt files is "
+                      "deprecated."):
+        cell_response.write(tmpdir.join('spk_%d.txt'))
+
+    # Testing reading from txt files
     assert cell_response == read_spikes(tmpdir.join('spk_*.txt'))
 
-    # Write using hdf5
-    cell_response.write_hdf5(tmpdir.join('spk.hdf5'))
+    # Testing write using hdf5
+    cell_response.write(tmpdir.join('spk.hdf5'))
+
+    # Testing when overwrite is False and same filename is used
+    with pytest.raises(FileExistsError,
+                       match="File already exists at path %s. Rename the "
+                             "file or set overwrite=True."
+                             % (tmpdir.join('spk.hdf5'),)):
+        cell_response.write(tmpdir.join('spk.hdf5'), overwrite=False)
+
+    # Testing for wrong extension provided
+    with pytest.raises(NameError,
+                       match="File extension should be either txt or hdf5, "
+                             "but the given extension is xls"):
+        cell_response.write(tmpdir.join('spk.xls'))
+
     # Test read using hdf5
-    assert cell_response == read_spikes_hdf5(tmpdir.join('spk.hdf5'))
+    assert cell_response == read_spikes(tmpdir.join('spk.hdf5'))
+
+    # Testing File Not Found Error
+    with pytest.raises(FileNotFoundError,
+                       match="File not found at "
+                       "path %s." % (tmpdir.join('spk1.hdf5'),)):
+        assert cell_response == read_spikes(tmpdir.join('spk1.hdf5'))
 
     assert ("CellResponse | 2 simulation trials" in repr(cell_response))
 
