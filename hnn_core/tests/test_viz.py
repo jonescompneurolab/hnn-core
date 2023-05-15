@@ -189,6 +189,11 @@ def test_dipole_visualization():
     net.cell_response.plot_spikes_hist(color=['C0', 'C1'])
     net.cell_response.plot_spikes_hist(color={'beta_prox': 'r',
                                               'beta_dist': 'g'})
+    net.cell_response.plot_spikes_hist(
+        spike_types={'group1': ['beta_prox', 'beta_dist']},
+        color={'group1': 'r'})
+    net.cell_response.plot_spikes_hist(
+        spike_types={'group1': ['beta']}, color={'group1': 'r'})
 
     with pytest.raises(TypeError, match="color must be an instance of"):
         net.cell_response.plot_spikes_hist(color=123)
