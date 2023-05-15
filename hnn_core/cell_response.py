@@ -370,13 +370,20 @@ class CellResponse(object):
             Valid strings also include leading characters of spike types
 
             | Ex: ``'ev'`` is equivalent to ``['evdist', 'evprox']``
-        color : str | list of str | None
-            String input defining color of histograms plotted. If list of str
-            provided, histograms for each spike type will be plotted by cycling
+        color : str | dict | None
+            Input defining colors of plotted histograms. If str, all
+            histograms plotted with same color. If list of str provided,
+            histograms for each spike type will be plotted by cycling
             through colors in the list.
 
-            | Ex: ``'r'``, ``['r', 'g']``
-        If None, default color cycle used.
+            If dict, colors must be specified for all spike_types as a key.
+            If a group of spike types is defined by the `spike_types`
+            parameter (see dictionary example for `spike_types`),
+            the name of this group must be used to specify the colors.
+
+            | Ex: ``{'evdist': 'g', 'evprox': 'r'}``, ``{'Tonic': 'b'}``
+
+            If None, default color cycle used.
         show : bool
             If True, show the figure.
 
