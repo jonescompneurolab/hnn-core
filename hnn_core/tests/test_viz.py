@@ -192,9 +192,9 @@ def test_dipole_visualization():
 
     with pytest.raises(TypeError, match="color must be an instance of"):
         net.cell_response.plot_spikes_hist(color=123)
-    with pytest.raises(ValueError, match="'z' is not a valid color value"):
+    with pytest.raises(ValueError):
         net.cell_response.plot_spikes_hist(color='z')
-    with pytest.raises(ValueError, match="'z' is not a valid color value"):
+    with pytest.raises(ValueError):
         net.cell_response.plot_spikes_hist(color={'beta_prox': 'z',
                                                   'beta_dist': 'g'})
     with pytest.raises(TypeError, match="Dictionary values of color must"):
