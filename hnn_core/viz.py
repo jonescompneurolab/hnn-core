@@ -353,7 +353,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         Valid strings also include leading characters of spike types
 
         | Ex: ``'ev'`` is equivalent to ``['evdist', 'evprox']``
-    color : str | dict | None
+    color : str | list of str | dict | None
         Input defining colors of plotted histograms. If str, all
         histograms plotted with same color. If list of str provided,
         histograms for each spike type will be plotted by cycling
