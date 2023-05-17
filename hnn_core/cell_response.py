@@ -406,7 +406,10 @@ class CellResponse(object):
         data['vsec'] = self.vsec
         data['isec'] = self.isec
         data['times'] = self.times
-        write_hdf5(fname, data, overwrite=True)
+        # h5py cannot handle np.array(None)
+        if data['times'].shape == np.array(None).shape:
+            data['times'] = list()
+        write_hdf5(fname, data, overwrite=True, use_json=True)
 
     def _write_txt(self, fname):
         """Write spiking activity per trial to a collection of files.
@@ -558,6 +561,9 @@ def _read_spikes_hdf5(fname):
     cell_response = CellResponse(spike_times=data['spike_times'],
                                  spike_gids=data['spike_gids'],
                                  spike_types=data['spike_types'])
+
+    if data['times'] == list():
+        data['times'] = np.array(None)
 
     return cell_response
 
