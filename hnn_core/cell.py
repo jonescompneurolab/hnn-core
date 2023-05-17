@@ -655,13 +655,20 @@ class Cell:
 
         return nc
 
-    def plot_morphology(self, ax=None, cell_types=None, show=True):
+    def plot_morphology(self, ax=None, color=None, show=True):
         """Plot the cell morphology.
 
         Parameters
         ----------
         ax : instance of Axes3D
             Matplotlib 3D axis
+        color : str | dict | None
+            Color of cell. If str, entire cell plotted with
+            color indicated by str. If dict, colors of individual sections
+            can be specified. Must have a key for every section in cell as
+            defined in the `Cell.sections` attribute.
+        | Ex: ``{'apical_trunk': 'r', 'soma': 'b', ...}``
+
         show : bool
             If True, show the plot
 
@@ -670,7 +677,7 @@ class Cell:
         axes : instance of Axes3D
             The matplotlib 3D axis handle.
         """
-        return plot_cell_morphology(self, ax=ax, show=show)
+        return plot_cell_morphology(self, ax=ax, color=color, show=show)
 
     def _update_end_pts(self):
         """"Create cell and copy coordinates to Section.end_pts"""
