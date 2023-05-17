@@ -60,6 +60,16 @@ def test_network_visualization():
     with pytest.raises(ValueError, match='src_gid -1 not a valid cell ID'):
         plot_cell_connectivity(net, conn_idx, src_gid=-1)
 
+    # Test morphology plotting
+    for cell_type in net.cell_types.values():
+        cell_type.plot_morphology()
+        cell_type.plot_morphology(color='r')
+
+        sections = list(cell_type.sections.keys())
+        section_color = {sect_name: f'C{idx}' for
+                         idx, sect_name in enumerate(sections)}
+        cell_type.plot_morphology(color=section_color)
+
     plt.close('all')
 
     # test interactive clicking updates the position of src_cell in plot
