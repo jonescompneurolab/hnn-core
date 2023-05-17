@@ -810,7 +810,7 @@ def _linewidth_from_data_units(ax, linewidth):
     return linewidth * (length / value_range)
 
 
-def plot_cell_morphology(cell, ax, show=True):
+def plot_cell_morphology(cell, ax, color=None, show=True):
     """Plot the cell morphology.
 
     Parameters
@@ -821,6 +821,13 @@ def plot_cell_morphology(cell, ax, show=True):
         Matplotlib 3D axis
     show : bool
         If True, show the plot
+    color : str | dict | None
+        Color of cell. If str, entire cell plotted with
+        color indicated by str. If dict, colors of individual sections
+        can be specified. Must have a key for every section in cell as
+        defined in the `Cell.sections` attribute.
+
+        | Ex: ``{'apical_trunk': 'r', 'soma': 'b', ...}``
 
     Returns
     -------
@@ -833,6 +840,13 @@ def plot_cell_morphology(cell, ax, show=True):
     if ax is None:
         plt.figure()
         ax = plt.axes(projection='3d')
+
+    if color is None:
+        section_colors = {section: 'b' for section in cell.sections.keys()}
+    if isinstance(color, str):
+        section_colors = {section: color for section in cell.sections.keys()}
+    if isinstance(color, dict):
+        section_colors = color
 
     # Cell is in XZ plane
     ax.set_xlim((cell.pos[1] - 250, cell.pos[1] + 150))
@@ -849,7 +863,8 @@ def plot_cell_morphology(cell, ax, show=True):
             xs.append(pt[0] + dx)
             ys.append(pt[1] + dz)
             zs.append(pt[2] + dy)
-        ax.plot(xs, ys, zs, 'b-', linewidth=linewidth)
+        ax.plot(xs, ys, zs, 'b-', linewidth=linewidth,
+                color=section_colors[sec_name])
     ax.view_init(0, -90)
     ax.axis('off')
 
