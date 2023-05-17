@@ -12,6 +12,8 @@ Current
 
 Changelog
 ~~~~~~~~~
+- Add ability to customize plot colors for each cell section in
+  :func:`~hnn_core.Cell.plot_morphology`, by `Nick Tolley`_ in :gh:`646`
 
 Bug
 ~~~
