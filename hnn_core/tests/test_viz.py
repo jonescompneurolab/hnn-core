@@ -70,6 +70,12 @@ def test_network_visualization():
                          idx, sect_name in enumerate(sections)}
         cell_type.plot_morphology(color=section_color)
 
+    cell_type = net.cell_response
+    with pytest.raises(ValueError):
+        cell_type.plot_morphology(color='z')
+    with pytest.raises(TypeError, match='color must be'):
+        cell_type.plot_morphology(color=123)
+
     plt.close('all')
 
     # test interactive clicking updates the position of src_cell in plot
