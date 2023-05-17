@@ -841,6 +841,8 @@ def plot_cell_morphology(cell, ax, color=None, show=True):
         plt.figure()
         ax = plt.axes(projection='3d')
 
+    _validate_type(color, (str, dict, None), 'color')
+
     if color is None:
         section_colors = {section: 'b' for section in cell.sections.keys()}
     if isinstance(color, str):
@@ -863,7 +865,7 @@ def plot_cell_morphology(cell, ax, color=None, show=True):
             xs.append(pt[0] + dx)
             ys.append(pt[1] + dz)
             zs.append(pt[2] + dy)
-        ax.plot(xs, ys, zs, 'b-', linewidth=linewidth,
+        ax.plot(xs, ys, zs, '-', linewidth=linewidth,
                 color=section_colors[sec_name])
     ax.view_init(0, -90)
     ax.axis('off')
