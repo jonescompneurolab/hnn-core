@@ -152,16 +152,24 @@
 <h1>hnn_core.viz.plot_cell_morphology<a class="headerlink" href="#hnn-core-viz-plot-cell-morphology" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hnn_core.viz.plot_cell_morphology">
-<span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">plot_cell_morphology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#plot_cell_morphology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.plot_cell_morphology" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">plot_cell_morphology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#plot_cell_morphology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.plot_cell_morphology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the cell morphology.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
+<dd class="field-odd"><dl>
 <dt><strong>cell</strong><span class="classifier">instance of Cell</span></dt><dd><p>The cell object</p>
 </dd>
 <dt><strong>ax</strong><span class="classifier">instance of Axes3D</span></dt><dd><p>Matplotlib 3D axis</p>
 </dd>
 <dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the plot</p>
+</dd>
+<dt><strong>color</strong><span class="classifier">str | dict | None</span></dt><dd><p>Color of cell. If str, entire cell plotted with
+color indicated by str. If dict, colors of individual sections
+can be specified. Must have a key for every section in cell as
+defined in the <em class="xref py py-obj">Cell.sections</em> attribute.</p>
+<div class="line-block">
+<div class="line">Ex: <code class="docutils literal notranslate"><span class="pre">{'apical_trunk':</span> <span class="pre">'r',</span> <span class="pre">'soma':</span> <span class="pre">'b',</span> <span class="pre">...}</span></code></div>
+</div>
 </dd>
 </dl>
 </dd>

@@ -258,7 +258,7 @@ names of section locations that are proximal or distal.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.parconnect_from_src" title="hnn_core.Cell.parconnect_from_src"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect_from_src</span></code></a>(gid_presyn, nc_dict, ...)</p></td>
 <td><p>Parallel receptor-centric connect FROM presyn TO this cell,</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.plot_morphology" title="hnn_core.Cell.plot_morphology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_morphology</span></code></a>([ax, cell_types, show])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.plot_morphology" title="hnn_core.Cell.plot_morphology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_morphology</span></code></a>([ax, color, show])</p></td>
 <td><p>Plot the cell morphology.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.record" title="hnn_core.Cell.record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record</span></code></a>([record_vsec, record_isec])</p></td>
@@ -377,13 +377,19 @@ square grid.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Cell.plot_morphology">
-<span class="sig-name descname"><span class="pre">plot_morphology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.plot_morphology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.plot_morphology" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">plot_morphology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.plot_morphology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.plot_morphology" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the cell morphology.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>ax</strong><span class="classifier">instance of Axes3D</span></dt><dd><p>Matplotlib 3D axis</p>
 </dd>
+<dt><strong>color</strong><span class="classifier">str | dict | None</span></dt><dd><p>Color of cell. If str, entire cell plotted with
+color indicated by str. If dict, colors of individual sections
+can be specified. Must have a key for every section in cell as
+defined in the <em class="xref py py-obj">Cell.sections</em> attribute.</p>
+</dd>
+<dt><strong>| Ex: ``{‘apical_trunk’: ‘r’, ‘soma’: ‘b’, …}``</strong></dt><dd></dd>
 <dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the plot</p>
 </dd>
 </dl>

@@ -950,7 +950,7 @@
     <span class="k">return</span> <span class="n">linewidth</span> <span class="o">*</span> <span class="p">(</span><span class="n">length</span> <span class="o">/</span> <span class="n">value_range</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="plot_cell_morphology"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_cell_morphology.html#hnn_core.viz.plot_cell_morphology">[docs]</a><span class="k">def</span> <span class="nf">plot_cell_morphology</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_cell_morphology"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_cell_morphology.html#hnn_core.viz.plot_cell_morphology">[docs]</a><span class="k">def</span> <span class="nf">plot_cell_morphology</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the cell morphology.</span>
 
 <span class="sd">    Parameters</span>
@@ -961,6 +961,13 @@
 <span class="sd">        Matplotlib 3D axis</span>
 <span class="sd">    show : bool</span>
 <span class="sd">        If True, show the plot</span>
+<span class="sd">    color : str | dict | None</span>
+<span class="sd">        Color of cell. If str, entire cell plotted with</span>
+<span class="sd">        color indicated by str. If dict, colors of individual sections</span>
+<span class="sd">        can be specified. Must have a key for every section in cell as</span>
+<span class="sd">        defined in the `Cell.sections` attribute.</span>
+
+<span class="sd">        | Ex: ``{&#39;apical_trunk&#39;: &#39;r&#39;, &#39;soma&#39;: &#39;b&#39;, ...}``</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -973,6 +980,15 @@
     <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axes</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="s1">&#39;color&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">section_colors</span> <span class="o">=</span> <span class="p">{</span><span class="n">section</span><span class="p">:</span> <span class="s1">&#39;b&#39;</span> <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">cell</span><span class="o">.</span><span class="n">sections</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">section_colors</span> <span class="o">=</span> <span class="p">{</span><span class="n">section</span><span class="p">:</span> <span class="n">color</span> <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">cell</span><span class="o">.</span><span class="n">sections</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">section_colors</span> <span class="o">=</span> <span class="n">color</span>
 
     <span class="c1"># Cell is in XZ plane</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="n">cell</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">250</span><span class="p">,</span> <span class="n">cell</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">150</span><span class="p">))</span>
@@ -989,7 +1005,8 @@
             <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">dx</span><span class="p">)</span>
             <span class="n">ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">dz</span><span class="p">)</span>
             <span class="n">zs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">dy</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">zs</span><span class="p">,</span> <span class="s1">&#39;b-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">zs</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">linewidth</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">section_colors</span><span class="p">[</span><span class="n">sec_name</span><span class="p">])</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">90</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
 

@@ -795,13 +795,20 @@
 
         <span class="k">return</span> <span class="n">nc</span></div>
 
-<div class="viewcode-block" id="Cell.plot_morphology"><a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.plot_morphology">[docs]</a>    <span class="k">def</span> <span class="nf">plot_morphology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cell_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Cell.plot_morphology"><a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.plot_morphology">[docs]</a>    <span class="k">def</span> <span class="nf">plot_morphology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the cell morphology.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        ax : instance of Axes3D</span>
 <span class="sd">            Matplotlib 3D axis</span>
+<span class="sd">        color : str | dict | None</span>
+<span class="sd">            Color of cell. If str, entire cell plotted with</span>
+<span class="sd">            color indicated by str. If dict, colors of individual sections</span>
+<span class="sd">            can be specified. Must have a key for every section in cell as</span>
+<span class="sd">            defined in the `Cell.sections` attribute.</span>
+<span class="sd">        | Ex: ``{&#39;apical_trunk&#39;: &#39;r&#39;, &#39;soma&#39;: &#39;b&#39;, ...}``</span>
+
 <span class="sd">        show : bool</span>
 <span class="sd">            If True, show the plot</span>
 
@@ -810,7 +817,7 @@
 <span class="sd">        axes : instance of Axes3D</span>
 <span class="sd">            The matplotlib 3D axis handle.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">plot_cell_morphology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">plot_cell_morphology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_update_end_pts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;&quot;Create cell and copy coordinates to Section.end_pts&quot;&quot;&quot;</span>
