@@ -70,9 +70,11 @@ def test_network_visualization():
                          idx, sect_name in enumerate(sections)}
         cell_type.plot_morphology(color=section_color)
 
-    cell_type = net.cell_response
+    cell_type = net.cell_types['L2_basket']
     with pytest.raises(ValueError):
         cell_type.plot_morphology(color='z')
+    with pytest.raises(ValueError):
+        cell_type.plot_morphology(color={'soma': 'z'})
     with pytest.raises(TypeError, match='color must be'):
         cell_type.plot_morphology(color=123)
 
