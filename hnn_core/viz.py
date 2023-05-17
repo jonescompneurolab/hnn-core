@@ -829,30 +829,58 @@ def plot_cell_morphology(cell, ax, show=True):
     """
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D  # noqa
+    cell_list = list()
+    colors = ['b', 'c', 'r', 'm']
+    clr_index = 0
 
     if ax is None:
         plt.figure()
         ax = plt.axes(projection='3d')
 
+    if type(cell) is dict:
+        for ind_cell in cell:
+            cell_list = list(cell.values())
+    else:
+        cell_list[0] = cell
+
     # Cell is in XZ plane
-    ax.set_xlim((cell.pos[1] - 250, cell.pos[1] + 150))
-    ax.set_zlim((cell.pos[2] - 100, cell.pos[2] + 1200))
+    # ax.set_xlim((cell_list[0].pos[1] - 250, cell_list[0].pos[1] + 150))
+    # ax.set_zlim((cell_list[0].pos[2] - 100, cell_list[0].pos[2] + 1200))
+    cell_radii = list()
+    cell_radii.append(clr_index)
+    for clr_index, cell in enumerate(cell_list):
 
-    for sec_name, section in cell.sections.items():
-        linewidth = _linewidth_from_data_units(ax, section.diam)
-        end_pts = section.end_pts
-        xs, ys, zs = list(), list(), list()
-        for pt in end_pts:
-            dx = cell.pos[0] - cell.sections['soma'].end_pts[0][0]
-            dy = cell.pos[1] - cell.sections['soma'].end_pts[0][1]
-            dz = cell.pos[2] - cell.sections['soma'].end_pts[0][2]
-            xs.append(pt[0] + dx)
-            ys.append(pt[1] + dz)
-            zs.append(pt[2] + dy)
-        ax.plot(xs, ys, zs, 'b-', linewidth=linewidth)
-    ax.view_init(0, -90)
-    ax.axis('off')
+        # Calculating the radius for cell offset
+        radius = 0
+        for sec_name, section in cell.sections.items():
+            end_pts = section.end_pts
+            xs, ys, zs = list(), list(), list()
+            for pt in end_pts:
+                dx = cell.pos[0] - cell.sections['soma'].end_pts[0][0]
+                dy = cell.pos[1] - cell.sections['soma'].end_pts[0][1]
+                dz = cell.pos[2] - cell.sections['soma'].end_pts[0][2]
+                if radius < pt[0]:
+                    radius = pt[0]
+        cell_radii.append(radius)
 
+        # Plotting the cell
+        for sec_name, section in cell.sections.items():
+            ax.set_xlim((sum(cell_radii, 100)))
+            ax.set_zlim((cell.pos[2] - 100, cell.pos[2] + 1200))
+            linewidth = _linewidth_from_data_units(ax, section.diam)
+            end_pts = section.end_pts
+            xs, ys, zs = list(), list(), list()
+            for pt in end_pts:
+                dx = cell.pos[0] - cell.sections['soma'].end_pts[0][0]
+                dy = cell.pos[1] - cell.sections['soma'].end_pts[0][1]
+                dz = cell.pos[2] - cell.sections['soma'].end_pts[0][2]
+                xs.append(pt[0] + dx + (radius + cell_radii[-1] + 100))
+                ys.append(pt[1] + dz)
+                zs.append(pt[2] + dy)
+            ax.plot(xs, ys, zs, color=colors[clr_index], linewidth=linewidth)
+        ax.view_init(0, -90)
+        ax.axis('on')
+        ax.grid('off')
     plt.tight_layout()
     plt_show(show)
     return ax
@@ -1030,7 +1058,6 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
     it will appear as a smaller black cross.
     Source cell is plotted as a red square. Source cell will not be plotted if
     the connection corresponds to a drive, ex: poisson, bursty, etc.
-
     """
     import matplotlib.pyplot as plt
     from .network import Network

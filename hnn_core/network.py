@@ -18,7 +18,7 @@ from .drives import _get_target_properties, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
 from .cells_default import pyramidal, basket
 from .params import _long_name, _short_name
-from .viz import plot_cells
+from .viz import plot_cells, plot_cell_morphology
 from .externals.mne import _validate_type, _check_option
 from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
@@ -1334,6 +1334,10 @@ class Network(object):
             The matplotlib figure handle.
         """
         return plot_cells(net=self, ax=ax, show=show)
+
+
+    def plot_cell_morphologies(self, ax=None, show=True):
+        return plot_cell_morphology(self.cell_types, ax=ax, show=show)
 
 
 class _Connectivity(dict):

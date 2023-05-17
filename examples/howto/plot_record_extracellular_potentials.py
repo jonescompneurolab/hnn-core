@@ -45,6 +45,10 @@ net.set_cell_positions(inplane_distance=30.)
 net.plot_cells()
 
 ###############################################################################
+# Plotting the cell morphologies of the network cells
+net.plot_cell_morphologies()
+
+###############################################################################
 # The default network consists of 2 layers (L2 and L5), within which the cell
 # somas are arranged in a regular grid, and apical dendrites are aligned along
 # the z-axis. We can simulate a linear multielectrode array with 100 um
