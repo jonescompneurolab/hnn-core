@@ -51,10 +51,14 @@ def test_cell_response(tmpdir):
     # Test read using hdf5
     assert cell_response == read_spikes(tmpdir.join('spk.hdf5'))
 
+    # Smoke test for visualization functions upon reading hdf5 file
+    cell_response_hdf5 = read_spikes(tmpdir.join('spk.hdf5'))
+    cell_response_hdf5.plot_spikes_hist(show=False)
+
     # Testing File Not Found Error
     with pytest.raises(FileNotFoundError,
                        match="File not found at "):
-        assert cell_response == read_spikes(tmpdir.join('spk1.hdf5'))
+        read_spikes(tmpdir.join('spk1.hdf5'))
 
     assert ("CellResponse | 2 simulation trials" in repr(cell_response))
 
@@ -76,6 +80,10 @@ def test_cell_response(tmpdir):
     empty_spike.write(tmpdir.join('empty_spk.txt'))
     empty_spike.write(tmpdir.join('empty_spk_{0}.txt'))
     assert empty_spike == read_spikes(tmpdir.join('empty_spk_*.txt'))
+
+    # Test recovery of empty spike file using hdf5
+    empty_spike.write(tmpdir.join('empty_spk.hdf5'))
+    assert empty_spike == read_spikes(tmpdir.join('empty_spk.hdf5'))
 
     assert ("CellResponse | 2 simulation trials" in repr(empty_spike))
 
