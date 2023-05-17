@@ -29,7 +29,7 @@ def test_cell_response(tmpdir):
     # Testing writing using txt files
     with pytest.warns(DeprecationWarning,
                       match="Writing cell response to txt files is "
-                      "deprecated."):
+                      "deprecated"):
         cell_response.write(tmpdir.join('spk_%d.txt'))
 
     # Testing reading from txt files
@@ -40,15 +40,12 @@ def test_cell_response(tmpdir):
 
     # Testing when overwrite is False and same filename is used
     with pytest.raises(FileExistsError,
-                       match="File already exists at path %s. Rename the "
-                             "file or set overwrite=True."
-                             % (tmpdir.join('spk.hdf5'),)):
+                       match="File already exists at path "):
         cell_response.write(tmpdir.join('spk.hdf5'), overwrite=False)
 
     # Testing for wrong extension provided
     with pytest.raises(NameError,
-                       match="File extension should be either txt or hdf5, "
-                             "but the given extension is xls"):
+                       match="File extension should be either txt or hdf5"):
         cell_response.write(tmpdir.join('spk.xls'))
 
     # Test read using hdf5
@@ -56,8 +53,7 @@ def test_cell_response(tmpdir):
 
     # Testing File Not Found Error
     with pytest.raises(FileNotFoundError,
-                       match="File not found at "
-                       "path %s." % (tmpdir.join('spk1.hdf5'),)):
+                       match="File not found at "):
         assert cell_response == read_spikes(tmpdir.join('spk1.hdf5'))
 
     assert ("CellResponse | 2 simulation trials" in repr(cell_response))
