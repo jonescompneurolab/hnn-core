@@ -8,7 +8,7 @@ hnn-core
 This is a leaner and cleaner version of the code based off the `HNN repository <https://github.com/jonescompneurolab/hnn>`_.
 
 Contributors are very welcome. Please read our
-:doc:`contributing guide <contributing>` if you are interested.
+`contributing guide`_ if you are interested.
 
 Dependencies
 ------------
@@ -123,7 +123,7 @@ report bugs. For user questions and scientific discussions, please join the
 Interested in Contributing?
 ===========================
 
-Read our :doc:`contributing guide <contributing>`.
+Read our `contributing guide`_.
 
 Roadmap
 =======
@@ -132,6 +132,8 @@ Read our `roadmap`_.
 
 .. _precompiled installers: https://www.neuron.yale.edu/neuron/download
 .. _NEURON forum: https://www.neuron.yale.edu/phpbb/
+.. _contributing guide: https://jonescompneurolab.github.io/hnn-core/dev/contributing.html
+.. _parallel backend guide: https://jonescompneurolab.github.io/hnn-core/dev/parallel.html
 
 .. |tests| image:: https://github.com/jonescompneurolab/hnn-core/actions/workflows/unit_tests.yml/badge.svg?branch=master
    :target: https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:master+event:push
@@ -145,7 +147,7 @@ Read our `roadmap`_.
 .. |PyPI| image:: https://img.shields.io/pypi/dm/hnn-core.svg?label=PyPI%20downloads
    :target: https://pypi.org/project/hnn-core/
 
-.. |HNN-GUI| image:: https://user-images.githubusercontent.com/11160442/197026635-39b6564a-f529-4caf-870e-af9ca4d2fb75.png
+.. |HNN-GUI| image:: https://user-images.githubusercontent.com/11160442/226248652-1711cdf4-f72b-439e-b4bb-15677fbe6ea5.png
 
 .. |Gitter| image:: https://badges.gitter.im/jonescompneurolab/hnn_core.svg
    :target: https://gitter.im/jonescompneurolab/hnn-core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge

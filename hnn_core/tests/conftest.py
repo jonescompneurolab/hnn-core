@@ -84,6 +84,7 @@ def run_hnn_core_fixture():
         params = read_params(params_fname)
 
         tstop = 170.
+        legacy_mode = True
         if reduced:
             params.update({'N_pyr_x': 3,
                            'N_pyr_y': 3,
@@ -92,7 +93,10 @@ def run_hnn_core_fixture():
                            't_evprox_2': 20,
                            'N_trials': 2})
             tstop = 40.
-        net = jones_2009_model(params, add_drives_from_params=True)
+            legacy_mode = False
+        # Legacy mode necessary for exact dipole comparison test
+        net = jones_2009_model(params, add_drives_from_params=True,
+                               legacy_mode=legacy_mode)
         if electrode_array is not None:
             for name, positions in electrode_array.items():
                 net.add_electrode_array(name, positions)

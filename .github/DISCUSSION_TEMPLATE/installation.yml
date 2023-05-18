@@ -1,0 +1,40 @@
+title: "[Installation] "
+
+body:
+
+  - type: markdown
+    attributes:
+      value: |
+        Tell us more about your installation problem.
+  - type: textarea
+    attributes:
+      label: Describe the problem to us.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: What steps did you follow to install?
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Error message
+      description: |
+        Paste here the error message you got
+      render: shell
+    validations:
+      required: true
+
+  - type: dropdown
+    attributes:
+      label: OS
+      description: What operating system are you running?
+      multiple: false
+      options:
+        - Linux
+        - Mac
+        - Windows
+    validations:
+      required: true

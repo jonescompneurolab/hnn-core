@@ -11,13 +11,11 @@ import urllib.parse
 import urllib.request
 from collections import defaultdict
 from pathlib import Path
-
 from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload, VBox,
                         HBox, IntText, Layout, Output, RadioButtons, Tab, Text)
 from ipywidgets.embed import embed_minimal_html
-
 import hnn_core
 from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
                       simulate_dipole)
@@ -228,6 +226,11 @@ class HNNGUI:
                                             max=multiprocessing.cpu_count(),
                                             description='Cores:',
                                             disabled=False)
+        self.load_data_button = FileUpload(
+            accept='.txt', multiple=False,
+            style={'button_color': self.layout['theme_color']},
+            description='Load data',
+            button_style='success')
 
         # Drive selection
         self.widget_drive_type_selection = RadioButtons(
@@ -310,8 +313,9 @@ class HNNGUI:
             value=self._simulation_status_contents['not_running'])
 
         self._log_window = HBox([self._log_out], layout=self.layout['log_out'])
-        self._operation_buttons = HBox([self.run_button],
-                                       layout=self.layout['operation_box'])
+        self._operation_buttons = HBox(
+            [self.run_button, self.load_data_button],
+            layout=self.layout['operation_box'])
         # title
         self._header = HTML(value=f"""<div
             style='background:{self.layout['theme_color']};
@@ -368,22 +372,24 @@ class HNNGUI:
                 self.drive_boxes.pop()
 
         def _on_upload_connectivity(change):
-            return on_upload_change(change, self.params, self.widget_tstop,
-                                    self.widget_dt, self._log_out,
-                                    self.drive_boxes, self.drive_widgets,
-                                    self._drives_out, self._connectivity_out,
-                                    self.connectivity_widgets,
-                                    self.layout['drive_textbox'],
-                                    "connectivity")
+            return on_upload_params_change(
+                change, self.params, self.widget_tstop, self.widget_dt,
+                self._log_out, self.drive_boxes, self.drive_widgets,
+                self._drives_out, self._connectivity_out,
+                self.connectivity_widgets, self.layout['drive_textbox'],
+                "connectivity")
 
         def _on_upload_drives(change):
-            return on_upload_change(change, self.params, self.widget_tstop,
-                                    self.widget_dt, self._log_out,
-                                    self.drive_boxes, self.drive_widgets,
-                                    self._drives_out, self._connectivity_out,
-                                    self.connectivity_widgets,
-                                    self.layout['drive_textbox'],
-                                    "drives")
+            return on_upload_params_change(
+                change, self.params, self.widget_tstop, self.widget_dt,
+                self._log_out, self.drive_boxes, self.drive_widgets,
+                self._drives_out, self._connectivity_out,
+                self.connectivity_widgets, self.layout['drive_textbox'],
+                "drives")
+
+        def _on_upload_data(change):
+            return on_upload_data_change(change, self.data, self.viz_manager,
+                                         self._log_out)
 
         def _run_button_clicked(b):
             return run_button_clicked(
@@ -402,6 +408,8 @@ class HNNGUI:
         self.load_drives_button.observe(_on_upload_drives, names='value')
         self.run_button.on_click(_run_button_clicked)
 
+        self.load_data_button.observe(_on_upload_data, names='value')
+
     def compose(self, return_layout=True):
         """Compose widgets.
 
@@ -415,8 +423,7 @@ class HNNGUI:
             VBox([
                 self.widget_simulation_name, self.widget_tstop, self.widget_dt,
                 self.widget_ntrials, self.widget_backend_selection,
-                self._backend_config_out
-            ]),
+                self._backend_config_out]),
         ], layout=self.layout['config_box'])
 
         connectivity_box = VBox([
@@ -596,6 +603,10 @@ class HNNGUI:
         return js_string
 
     # below are a series of methods that are used to manipulate the GUI
+    def _simulate_upload_data(self, file_url):
+        uploaded_value = _prepare_upload_file_from_url(file_url)
+        self.load_data_button.set_trait('value', uploaded_value)
+
     def _simulate_upload_connectivity(self, file_url):
         uploaded_value = _prepare_upload_file_from_url(file_url)
         self.load_connectivity_button.set_trait('value', uploaded_value)
@@ -1072,8 +1083,7 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
                   layout):
     net = jones_2009_model(params)
     drive_specs = _extract_drive_specs_from_hnn_params(
-        params,
-        list(net.cell_types.keys()))
+        params, list(net.cell_types.keys()), legacy_mode=net._legacy_mode)
 
     # clear before adding drives
     drives_out.clear_output()
@@ -1118,9 +1128,37 @@ def load_drive_and_connectivity(params, log_out, drives_out,
                       layout)
 
 
-def on_upload_change(change, params, tstop, dt, log_out, drive_boxes,
-                     drive_widgets, drives_out, connectivity_out,
-                     connectivity_textfields, layout, load_type):
+def on_upload_data_change(change, data, viz_manager, log_out):
+    if len(change['owner'].value) == 0:
+        logger.info("Empty change")
+        return
+
+    key = list(change['new'].keys())[0]
+
+    data_fname = change['new'][key]['metadata']['name'].rstrip('.txt')
+    if data_fname in data['simulation_data'].keys():
+        logger.error(f"Found existing data: {data_fname}.")
+        return
+
+    ext_content = change['new'][key]['content']
+    ext_content = codecs.decode(ext_content, encoding="utf-8")
+    with log_out:
+        data['simulation_data'][data_fname] = {'net': None, 'dpls': [
+            hnn_core.read_dipole(io.StringIO(ext_content))
+        ]}
+        logger.info(f'External data {data_fname} loaded.')
+        viz_manager.reset_fig_config_tabs(template_name='single figure')
+        viz_manager.add_figure()
+        fig_name = _idx2figname(viz_manager.data['fig_idx']['idx'] - 1)
+        ax_plots = [("ax0", "current dipole")]
+        for ax_name, plot_type in ax_plots:
+            viz_manager._simulate_edit_figure(
+                fig_name, ax_name, data_fname, plot_type, {}, "plot")
+
+
+def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
+                            drive_widgets, drives_out, connectivity_out,
+                            connectivity_textfields, layout, load_type):
     if len(change['owner'].value) == 0:
         logger.info("Empty change")
         return
@@ -1264,8 +1302,7 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
     with log_out:
         # clear empty trash simulations
         for _name in tuple(simulation_data.keys()):
-            if simulation_data[_name]['net'] is None or len(
-                    simulation_data[_name]['dpls']) == 0:
+            if len(simulation_data[_name]['dpls']) == 0:
                 del simulation_data[_name]
 
         _sim_name = widget_simulation_name.value

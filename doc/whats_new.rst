@@ -12,6 +12,22 @@ Current
 
 Changelog
 ~~~~~~~~~
+- Add ability to customize plot colors for each cell section in
+  :func:`~hnn_core.Cell.plot_morphology`, by `Nick Tolley`_ in :gh:`646`
+
+Bug
+~~~
+
+API
+~~~
+
+.. _0.3:
+
+0.3
+---
+
+Changelog
+~~~~~~~~~
 - Add option to select drives using argument 'which_drives' in
   :func:`~hnn_core.optimization.optimize_evoked`, by `Mohamed A. Sherif`_ in :gh:`478`.
 
@@ -75,6 +91,12 @@ Bug
 - Fix bug where :func:`~hnn_core.network.add_evoked_drive` failed when adding
   a drive with just NMDA weights, by `Nick Tolley`_ in :gh:`611`
 
+- Fix bug where :func:`~hnn_core.params.read_params` failed to create a network when
+  legacy mode is False, by `Nick Tolley`_ in :gh:`614`
+
+- Fix bug where :func:`~hnn_core.viz.plot_dipole` failed to check the instance
+  type of Dipole, by `Rajat Partani`_ in :gh:`606`
+
 API
 ~~~
 - Optimization of the evoked drives can be conducted on any :class:`~hnn_core.Network`
@@ -98,6 +120,27 @@ API
   in :func:`~hnn_core.simulate_dipole`. Recordings are now accessed through
   :class:`~hnn_core.CellResponse.vsec` and :class:`~hnn_core.CellResponse.isec`,
   by `Nick Tolley`_ in :gh:`502`.
+
+- legacy_mode is now set to False by default in all for all
+  :class:`~hnn_core.Network` objects, 
+  by `Nick Tolley`_ and `Ryan Thorpe`_ in :gh:`619`.
+
+People who contributed to this release (in alphabetical order):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- `Christopher Bailey`_
+- `Huzi Cheng`_
+- `Kaisu Lankinen`_
+- `Mainak Jas`_
+- `Mattan Pelah`_
+- `Mohamed A. Sherif`_
+- `Mostafa Khalil`_
+- `Nick Tolley`_
+- `Orsolya Beatrix Kolozsvari`_
+- `Rajat Partani`_
+- `Ryan Thorpe`_
+- `Stephanie R. Jones`_
+- `Steven Brandt`_
 
 .. _0.2:
 
@@ -362,6 +405,7 @@ People who contributed to this release (in alphabetical order):
 .. _Mainak Jas: http://jasmainak.github.io/
 .. _Mattan Pelah: https://github.com/mjpelah
 .. _Mohamed A. Sherif: https://github.com/mohdsherif/
+.. _Mostafa Khalil: https://github.com/mkhalil8
 .. _Nick Tolley: https://github.com/ntolley
 .. _Orsolya Beatrix Kolozsvari: http://github.com/orbekolo/
 .. _Ryan Thorpe: https://github.com/rythorpe
@@ -370,3 +414,4 @@ People who contributed to this release (in alphabetical order):
 .. _Stephanie R. Jones: https://github.com/stephanie-r-jones
 .. _Steven Brandt: https://github.com/spbrandt
 .. _Kaisu Lankinen: https://github.com/klankinen
+.. _Rajat Partani: https://github.com/raj1701

@@ -126,7 +126,7 @@ def _check_poisson_rates(rate_constant, target_populations, all_cell_types):
 
 def _add_drives_from_params(net):
     drive_specs = _extract_drive_specs_from_hnn_params(
-        net._params, list(net.cell_types.keys()))
+        net._params, list(net.cell_types.keys()), net._legacy_mode)
     bias_specs = _extract_bias_specs_from_hnn_params(
         net._params, list(net.cell_types.keys()))
 

@@ -7,21 +7,17 @@ import os.path as op
 import numpy as np
 
 import hnn_core
-from hnn_core import Params, Network, read_params
+from hnn_core import Network, read_params
 from hnn_core.drives import (_drive_cell_event_times, _get_prng,
                              _create_extpois, _create_bursty_input)
-from hnn_core.params import _extract_drive_specs_from_hnn_params
 from hnn_core.network import pick_connection
 from hnn_core.network_models import jones_2009_model
 from hnn_core import simulate_dipole
+hnn_core_root = op.dirname(hnn_core.__file__)
 
 
 def test_external_drive_times():
     """Test the different external drives."""
-
-    params = Params()
-    cellname_list = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
-    drive_specs = _extract_drive_specs_from_hnn_params(params, cellname_list)
 
     drive_type = 'invalid_drive'
     dynamics = dict(mu=5, sigma=0.5, numspikes=1)
@@ -33,7 +29,9 @@ def test_external_drive_times():
 
     # validate poisson input time interval
     drive_type = 'poisson'
-    dynamics = drive_specs['extpois']['dynamics']
+    dynamics = {'tstart': 0, 'tstop': 250.0, 'rate_constant':
+                {'L2_basket': 1, 'L2_pyramidal': 140.0, 'L5_basket': 1,
+                 'L5_pyramidal': 40.0}}
     with pytest.raises(ValueError, match='The end time for Poisson input'):
         dynamics['tstop'] = -1
         event_times = _drive_cell_event_times(drive_type=drive_type,
