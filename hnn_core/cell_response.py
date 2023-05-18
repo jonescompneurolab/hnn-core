@@ -86,6 +86,8 @@ class CellResponse(object):
             spike_gids = list()
         if spike_types is None:
             spike_types = list()
+        if times is None:
+            times = list()
 
         if cell_type_names is None:
             cell_type_names = ['L2_basket', 'L2_pyramidal',
@@ -421,9 +423,6 @@ class CellResponse(object):
         data['vsec'] = self.vsec
         data['isec'] = self.isec
         data['times'] = self.times
-        # h5py cannot handle np.array(None)
-        if data['times'].shape == np.array(None).shape:
-            data['times'] = list()
         write_hdf5(fname, data, overwrite=True, use_json=True)
 
     def _write_txt(self, fname):
@@ -476,7 +475,7 @@ class CellResponse(object):
 
         Parameters
         ----------
-        fname : str/Path object
+        fname : str | Path object
             String format (e.g., 'spk_%d.txt' or 'spk_{0}.txt' or spk.hdf5)
             of the path to the output spike file(s).
 
@@ -519,7 +518,7 @@ def _read_spikes_txt(fname, gid_ranges=None):
         a 3rd column for spike type.
 
     Returns
-    ----------
+    -------
     cell_response : CellResponse
         An instance of the CellResponse object.
     """
@@ -567,7 +566,7 @@ def _read_spikes_hdf5(fname):
         Path to the hdf5 file (e.g., '<pathname>/spk.hdf5') to be read.
 
     Returns
-    ----------
+    -------
     cell_response : CellResponse
         An instance of the CellResponse object.
     """
@@ -577,9 +576,6 @@ def _read_spikes_hdf5(fname):
                                  spike_gids=data['spike_gids'],
                                  spike_types=data['spike_types'])
 
-    if data['times'] == list():
-        data['times'] = np.array(None)
-
     return cell_response
 
 
@@ -588,7 +584,7 @@ def read_spikes(fname, gid_ranges=None):
 
     Parameters
     ----------
-    fname : str/Path object
+    fname : str | Path object
         Path to the hdf5 or txt file (e.g., '<pathname>/spk.hdf5' or
         '<pathname>/spk_*.txt') to be read.
     gid_ranges : dict of lists or range objects | None
@@ -598,7 +594,7 @@ def read_spikes(fname, gid_ranges=None):
         spike type. (Not applicable for hdf5 files)
 
     Returns
-    ----------
+    -------
     cell_response : CellResponse
         An instance of the CellResponse object.
     """
