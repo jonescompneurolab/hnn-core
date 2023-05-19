@@ -22,7 +22,7 @@ API
 ~~~
 - :func:`~hnn_core.CellResponse.write` and :func:`~hnn_core.Cell_response.read_spikes`
   now support hdf5 format for read/write Cell response object, by
-  by `Rajat Partani`_ in :gh:`644`
+  `Rajat Partani`_ in :gh:`644`
 
 .. _0.3:
 
