@@ -853,7 +853,7 @@ def _linewidth_from_data_units(ax, linewidth):
     return linewidth * (length / value_range)
 
 
-def plot_cell_morphology(cell, ax, color=None, show=True):
+def plot_cell_morphology(cell, ax, color=None, pos=(0, 0, 0), show=True):
     """Plot the cell morphology.
 
     Parameters
@@ -871,6 +871,9 @@ def plot_cell_morphology(cell, ax, color=None, show=True):
         defined in the `Cell.sections` attribute.
 
         | Ex: ``{'apical_trunk': 'r', 'soma': 'b', ...}``
+    pos : tuple of int or float | None
+        Position of cell soma. Must be a tuple of 3 elements for the
+        (x, y, z) position of the soma in 3D space. Default: (0, 0, 0)
 
     Returns
     -------
@@ -893,18 +896,25 @@ def plot_cell_morphology(cell, ax, color=None, show=True):
     if isinstance(color, dict):
         section_colors = color
 
+    _validate_type(pos, tuple, 'pos')
+    if isinstance(pos, tuple):
+        if len(pos) != 3:
+            raise ValueError('pos must be a tuple of 3 elements')
+        for pos_idx in pos:
+            _validate_type(pos_idx, (float, int), 'pos[idx]')
+
     # Cell is in XZ plane
-    ax.set_xlim((cell.pos[1] - 250, cell.pos[1] + 150))
-    ax.set_zlim((cell.pos[2] - 100, cell.pos[2] + 1200))
+    # ax.set_xlim((pos[1] - 250, pos[1] + 150))
+    # ax.set_zlim((pos[2] - 100, pos[2] + 1200))
 
     for sec_name, section in cell.sections.items():
         linewidth = _linewidth_from_data_units(ax, section.diam)
         end_pts = section.end_pts
         xs, ys, zs = list(), list(), list()
         for pt in end_pts:
-            dx = cell.pos[0] - cell.sections['soma'].end_pts[0][0]
-            dy = cell.pos[1] - cell.sections['soma'].end_pts[0][1]
-            dz = cell.pos[2] - cell.sections['soma'].end_pts[0][2]
+            dx = pos[0] - cell.sections['soma'].end_pts[0][0]
+            dy = pos[1] - cell.sections['soma'].end_pts[0][1]
+            dz = pos[2] - cell.sections['soma'].end_pts[0][2]
             xs.append(pt[0] + dx)
             ys.append(pt[1] + dz)
             zs.append(pt[2] + dy)
