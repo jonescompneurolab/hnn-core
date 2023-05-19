@@ -84,6 +84,13 @@ def test_network_visualization():
     with pytest.raises(TypeError,
                        match="'ax' to be an instance of Axes3D, but got Axes"):
         plot_cells(net, ax=axes, show=False)
+    cell_type.plot_morphology(pos=(1.0, 2.0, 3.0))
+    with pytest.raises(TypeError, match='pos must be'):
+        cell_type.plot_morphology(pos=123)
+    with pytest.raises(ValueError, match='pos must be a tuple of 3 elements'):
+        cell_type.plot_morphology(pos=(1, 2, 3, 4))
+    with pytest.raises(TypeError, match='pos\\[idx\\] must be'):
+        cell_type.plot_morphology(pos=(1, '2', 3))
 
     plt.close('all')
 
