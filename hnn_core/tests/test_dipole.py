@@ -22,6 +22,7 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     dpl_out_fname = tmpdir.join('dpl1.txt')
+    dpl_out_hdf5_fname = tmpdir.join('dpl.hdf5')
     params = read_params(params_fname)
     times = np.arange(0, 6000 * params['dt'], params['dt'])
     data = np.random.random((6000, 3))
@@ -49,13 +50,39 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
                        " attribute 'append'"):
         plot_dipole(np.array([dipole, dipole]), average=True, show=False)
 
-    # Test IO
-    dipole.write(dpl_out_fname)
+    # Test IO for txt files
+    with pytest.warns(DeprecationWarning,
+                      match="Writing dipole to txt file is "
+                      "deprecated"):
+        dipole.write(dpl_out_fname)
     dipole_read = read_dipole(dpl_out_fname)
     assert_allclose(dipole_read.times, dipole.times, rtol=0, atol=0.00051)
     for dpl_key in dipole.data.keys():
         assert_allclose(dipole_read.data[dpl_key],
                         dipole.data[dpl_key], rtol=0, atol=0.000051)
+
+    # Test IO for hdf5 files
+    dipole.write(dpl_out_hdf5_fname)
+    dipole_read_hdf5 = read_dipole(dpl_out_hdf5_fname)
+    assert_allclose(dipole_read_hdf5.times, dipole.times, rtol=0, atol=0.00051)
+    for dpl_key in dipole.data.keys():
+        assert_allclose(dipole_read_hdf5.data[dpl_key],
+                        dipole.data[dpl_key], rtol=0, atol=0.000051)
+
+    # Testing when overwrite is False and same filename is used
+    with pytest.raises(FileExistsError,
+                       match="File already exists at path "):
+        dipole.write(dpl_out_hdf5_fname, overwrite=False)
+
+    # Testing for wrong extension provided
+    with pytest.raises(NameError,
+                       match="File extension should be either txt or hdf5"):
+        dipole.write(tmpdir.join('dpl.xls'))
+
+    # Testing File Not Found Error
+    with pytest.raises(FileNotFoundError,
+                       match="File not found at "):
+        read_dipole(tmpdir.join('dpl1.hdf5'))
 
     # dpls with different scale_applied should not be averaged.
     with pytest.raises(RuntimeError,

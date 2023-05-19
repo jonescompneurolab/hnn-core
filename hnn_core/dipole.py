@@ -3,9 +3,13 @@
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Sam Neymotin <samnemo@gmail.com>
 
+import os
 import warnings
+from io import StringIO
+
 import numpy as np
 from copy import deepcopy
+from h5io import write_hdf5, read_hdf5
 from .externals.mne import _check_option
 
 from .viz import plot_dipole, plot_psd, plot_tfr_morlet
@@ -102,8 +106,8 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
     return dpls
 
 
-def read_dipole(fname):
-    """Read dipole values from a file and create a Dipole instance.
+def _read_dipole_txt(fname):
+    """Read dipole values from a txt file and create a Dipole instance.
 
     Parameters
     ----------
@@ -122,6 +126,61 @@ def read_dipole(fname):
             f'Data are supposed to have 2 or 4 columns while we have {ncols}.')
     dpl = Dipole(dpl_data[:, 0], dpl_data[:, 1:])
     return dpl
+
+
+def _read_dipole_hdf5(fname):
+    """Read dipole values from a hdf5 file and create a Dipole instance.
+
+    Parameters
+    ----------
+    fname : str
+        Full path to the input file (.hdf5)
+
+    Returns
+    -------
+    dpl : Dipole
+        The instance of Dipole class
+    """
+
+    dpl_data = read_hdf5(fname)
+    dpl = Dipole(times=dpl_data['times'],
+                 data=dpl_data['data'],
+                 nave=dpl_data['nave'])
+    dpl.sfreq = dpl_data['sfreq']
+    dpl.scale_applied = dpl_data['scale_applied']
+    return dpl
+
+
+def read_dipole(fname):
+    """Read dipole values from a txt or hdf5 file and
+       create a Dipole instance.
+
+    Parameters
+    ----------
+    fname : str | Path object
+        Full path to the input file (.txt or .hdf5)
+
+    Returns
+    -------
+    dpl : Dipole
+        The instance of Dipole class
+    """
+
+    # For supporting tests in test_gui.py
+    if isinstance(fname, StringIO):
+        return _read_dipole_txt(fname)
+
+    fname = str(fname)
+    if not os.path.exists(fname):
+        raise FileNotFoundError('File not found at path %s.' % (fname,))
+    file_extension = os.path.splitext(fname)[-1]
+    if file_extension == '.txt':
+        return _read_dipole_txt(fname)
+    elif file_extension == '.hdf5':
+        return _read_dipole_hdf5(fname)
+    else:
+        raise NameError('File extension should be either txt or hdf5, but the '
+                        'given extension is %s' % (file_extension,))
 
 
 def average_dipoles(dpls):
@@ -274,13 +333,16 @@ class Dipole(object):
     def __init__(self, times, data, nave=1):  # noqa: D102
         self.times = np.array(times)
 
-        if data.ndim == 1:
-            data = data[:, None]
-
-        if data.shape[1] == 3:
-            self.data = {'agg': data[:, 0], 'L2': data[:, 1], 'L5': data[:, 2]}
-        elif data.shape[1] == 1:
-            self.data = {'agg': data[:, 0]}
+        if type(data) is dict:
+            self.data = data
+        else:
+            if data.ndim == 1:
+                data = data[:, None]
+            if data.shape[1] == 3:
+                self.data = {'agg': data[:, 0], 'L2': data[:, 1],
+                             'L5': data[:, 2]}
+            elif data.shape[1] == 1:
+                self.data = {'agg': data[:, 0]}
 
         self.nave = nave
         self.sfreq = 1000. / (times[1] - times[0])  # NB assumes len > 1
@@ -581,7 +643,7 @@ class Dipole(object):
         # normalized ones
         self.data['agg'] = self.data['L2'] + self.data['L5']
 
-    def write(self, fname):
+    def _write_txt(self, fname):
         """Write dipole values to a file.
 
         Parameters
@@ -599,6 +661,10 @@ class Dipole(object):
             4) L5 current dipole (scaled nAm)
         """
 
+        warnings.warn('Writing dipole to txt file is deprecated '
+                      'and will be removed in future versions. '
+                      'Please use hdf5', DeprecationWarning, stacklevel=2)
+
         if self.nave > 1:
             warnings.warn("Saving Dipole to file that is an average of %d"
                           " trials" % self.nave)
@@ -611,3 +677,59 @@ class Dipole(object):
         X = np.r_[X].T
 
         np.savetxt(fname, X, fmt=fmt, delimiter='\t')
+
+    def _write_hdf5(self, fname):
+        """Write dipole values to a hdf5 file.
+
+        Parameters
+        ----------
+        fname : str
+            Full path to the output file (.hdf5)
+        Outputs
+        -------
+        A hdf5 file containing the dipole object
+        """
+        print(f'Writing file {fname}')
+        dpl_data = dict()
+        dpl_data['times'] = self.times
+        dpl_data['sfreq'] = self.sfreq
+        dpl_data['nave'] = self.nave
+        dpl_data['data'] = self.data
+        dpl_data['scale_applied'] = self.scale_applied
+        write_hdf5(fname, dpl_data, overwrite=True)
+
+    def write(self, fname, overwrite=True):
+        """Write dipole values to a txt or hdf5 file.
+
+        Parameters
+        ----------
+        fname : str | Path object
+            Full path to the output file (.txt or .hdf5)
+
+        Outputs
+        -------
+        A tab separatd txt file where rows correspond
+            to samples and columns correspond to
+            1) time (s),
+            2) aggregate current dipole (scaled nAm),
+            3) L2/3 current dipole (scaled nAm), and
+            4) L5 current dipole (scaled nAm)
+        OR
+        A hdf5 file containing the dipole object
+        """
+        # For supporting tests in test_gui.py
+        if isinstance(fname, StringIO):
+            return self._write_txt(fname)
+
+        fname = str(fname)
+        if overwrite is False and os.path.exists(fname):
+            raise FileExistsError('File already exists at path %s. Rename '
+                                  'the file or set overwrite=True.' % (fname,))
+        file_extension = os.path.splitext(fname)[-1]
+        if file_extension == '.txt':
+            self._write_txt(fname)
+        elif file_extension == '.hdf5':
+            self._write_hdf5(fname)
+        else:
+            raise NameError('File extension should be either txt or hdf5, but '
+                            'the given extension is %s.' % (file_extension,))
