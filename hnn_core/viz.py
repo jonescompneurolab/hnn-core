@@ -853,7 +853,8 @@ def _linewidth_from_data_units(ax, linewidth):
     return linewidth * (length / value_range)
 
 
-def plot_cell_morphology(cell, ax, color=None, pos=(0, 0, 0), show=True):
+def plot_cell_morphology(cell, ax, color=None, pos=(0, 0, 0), xlim=(-250, 150),
+                         ylim=None, zlim=(-100, 1200), show=True):
     """Plot the cell morphology.
 
     Parameters
@@ -904,8 +905,9 @@ def plot_cell_morphology(cell, ax, color=None, pos=(0, 0, 0), show=True):
             _validate_type(pos_idx, (float, int), 'pos[idx]')
 
     # Cell is in XZ plane
-    # ax.set_xlim((pos[1] - 250, pos[1] + 150))
-    # ax.set_zlim((pos[2] - 100, pos[2] + 1200))
+    ax.set_xlim((pos[0] - xlim[0], pos[0] + xlim[1]))
+    ax.set_ylim((pos[1] - ylim[0], pos[1] + ylim[1]))
+    ax.set_zlim((pos[2] - zlim[0], pos[2] + zlim[1]))
 
     for sec_name, section in cell.sections.items():
         linewidth = _linewidth_from_data_units(ax, section.diam)
