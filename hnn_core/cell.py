@@ -863,7 +863,9 @@ class Cell:
 
         return nc
 
-    def plot_morphology(self, ax=None, color=None, pos=(0, 0, 0), show=True):
+    def plot_morphology(self, ax=None, color=None, pos=(0, 0, 0),
+                        xlim=(-250, 150), ylim=None, zlim=(-100, 1200),
+                        show=True):
         """Plot the cell morphology.
 
         Parameters
@@ -889,7 +891,7 @@ class Cell:
             The matplotlib 3D axis handle.
         """
         return plot_cell_morphology(self, ax=ax, color=color, pos=pos,
-                                    show=show)
+                                    xlim=xlim, ylim=ylim, zlim=zlim, show=show)
 
     def _update_section_end_pts_L(self, node, dpt):
         if self.cell_tree is None:
