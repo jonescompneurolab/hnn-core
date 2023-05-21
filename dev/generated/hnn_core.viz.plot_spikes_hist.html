@@ -152,7 +152,7 @@
 <h1>hnn_core.viz.plot_spikes_hist<a class="headerlink" href="#hnn-core-viz-plot-spikes-hist" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hnn_core.viz.plot_spikes_hist">
-<span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">plot_spikes_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trial_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#plot_spikes_hist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.plot_spikes_hist" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">plot_spikes_hist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trial_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#plot_spikes_hist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.plot_spikes_hist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the histogram of spiking activity across trials.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -182,6 +182,19 @@ Valid strings also include leading characters of spike types</p>
 <div class="line-block">
 <div class="line">Ex: <code class="docutils literal notranslate"><span class="pre">'ev'</span></code> is equivalent to <code class="docutils literal notranslate"><span class="pre">['evdist',</span> <span class="pre">'evprox']</span></code></div>
 </div>
+</dd>
+<dt><strong>color</strong><span class="classifier">str | list of str | dict | None</span></dt><dd><p>Input defining colors of plotted histograms. If str, all
+histograms plotted with same color. If list of str provided,
+histograms for each spike type will be plotted by cycling
+through colors in the list.</p>
+<p>If dict, colors must be specified for all spike_types as a key.
+If a group of spike types is defined by the <em class="xref py py-obj">spike_types</em>
+parameter (see dictionary example for <em class="xref py py-obj">spike_types</em>),
+the name of this group must be used to specify the colors.</p>
+<div class="line-block">
+<div class="line">Ex: <code class="docutils literal notranslate"><span class="pre">{'evdist':</span> <span class="pre">'g',</span> <span class="pre">'evprox':</span> <span class="pre">'r'}</span></code>, <code class="docutils literal notranslate"><span class="pre">{'Tonic':</span> <span class="pre">'b'}</span></code></div>
+</div>
+<p>If None, default color cycle used.</p>
 </dd>
 <dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure.</p>
 </dd>

@@ -483,7 +483,7 @@
             <span class="n">cell_response</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_idx</span><span class="o">=</span><span class="n">trial_idx</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CellResponse.plot_spikes_hist"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_hist">[docs]</a>    <span class="k">def</span> <span class="nf">plot_spikes_hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">spike_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                         <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                         <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the histogram of spiking activity across trials.</span>
 
 <span class="sd">        Parameters</span>
@@ -510,6 +510,20 @@
 <span class="sd">            Valid strings also include leading characters of spike types</span>
 
 <span class="sd">            | Ex: ``&#39;ev&#39;`` is equivalent to ``[&#39;evdist&#39;, &#39;evprox&#39;]``</span>
+<span class="sd">        color : str | list of str | dict | None</span>
+<span class="sd">            Input defining colors of plotted histograms. If str, all</span>
+<span class="sd">            histograms plotted with same color. If list of str provided,</span>
+<span class="sd">            histograms for each spike type will be plotted by cycling</span>
+<span class="sd">            through colors in the list.</span>
+
+<span class="sd">            If dict, colors must be specified for all spike_types as a key.</span>
+<span class="sd">            If a group of spike types is defined by the `spike_types`</span>
+<span class="sd">            parameter (see dictionary example for `spike_types`),</span>
+<span class="sd">            the name of this group must be used to specify the colors.</span>
+
+<span class="sd">            | Ex: ``{&#39;evdist&#39;: &#39;g&#39;, &#39;evprox&#39;: &#39;r&#39;}``, ``{&#39;Tonic&#39;: &#39;b&#39;}``</span>
+
+<span class="sd">            If None, default color cycle used.</span>
 <span class="sd">        show : bool</span>
 <span class="sd">            If True, show the figure.</span>
 
@@ -519,7 +533,8 @@
 <span class="sd">            The matplotlib figure handle.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">plot_spikes_hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_idx</span><span class="o">=</span><span class="n">trial_idx</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
-                                <span class="n">spike_types</span><span class="o">=</span><span class="n">spike_types</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
+                                <span class="n">spike_types</span><span class="o">=</span><span class="n">spike_types</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                                <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CellResponse.write"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Write spiking activity per trial to a collection of files.</span>
