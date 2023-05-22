@@ -1250,38 +1250,62 @@ class NetworkPlot:
     ----------
     net : Instance of Network object
         The Network object
-
-    colormap_name : str
-        Name of colormap used to visualize membrane potential
-
-    Attributes
-    ----------
-
+    ax : instance of matplotlib Axes3D | None
+        An axis object from matplotlib. If None,
+        a new figure is created.
+    vmin : int | float
+        Lower limit of colormap for plotting voltage
+        Default: -100 mV
+    vmax : int | float
+        Upper limit of colormap for plotting voltage
+        Default: 50 mV
+    bg_color : str
+        Background color of ax. Default: 'black'
+    voltage_colormap : str
+        Colormap used for plotting voltages
+        Default: 'viridis'
+    elev : int | float
+        Elevation 3D plot viewpoint, default: 10
+    azim : int | float
+        Azimuth of 3D plot view point, default: 20
+    xlim : tuple of int | tuple of float
+        x limits of plot window. Default (-200, 3100)
+    ylim : tuple of int | tuple of float
+        y limits of plot window. Default (-200, 3100)
+    zlim : tuple of int | tuple of float
+        z limits of plot window. Default (-300, 2200)
+    trial_idx : int
+        Index of simulation trial plotted. Default: 0
+    time_idx : int
+        Index of time point plotted. Default: 0
     """
-    def __init__(self, net, ax=None, vmin=-100, vmax=50, default_color='b',
+    def __init__(self, net, ax=None, vmin=-100, vmax=50, bg_color='black',
                  voltage_colormap='viridis', elev=10, azim=-500,
-                 xlim=(-200, 3100), ylim=(-200, 300), zlim=(-300, 2200),
-                 trial_idx=0):
+                 xlim=(-200, 3100), ylim=(-200, 3100), zlim=(-300, 2200),
+                 trial_idx=0, time_idx=0):
         import matplotlib.pyplot as plt
         from matplotlib import colormaps
-
         self.net = net
+        self.times = net.cell_response.times
 
-        self.vmin = vmin
-        self.vmax = vmax
+        self._vmin = vmin
+        self._vmax = vmax
 
-        self.default_color = default_color
-        self.voltage_colormap = voltage_colormap
+        self._bg_color = bg_color
+        self._voltage_colormap = voltage_colormap
+
+        self.colormaps = colormaps  # Saved for voltage_colormap update method
         self.colormap = colormaps[voltage_colormap]
 
         # Axes limits and view positions
-        self.xlim = xlim
-        self.ylim = ylim
-        self.zlim = zlim
-        self.elev = elev
-        self.azim = azim
+        self._xlim = xlim
+        self._ylim = ylim
+        self._zlim = zlim
+        self._elev = elev
+        self._azim = azim
 
-        self.trial_idx = trial_idx
+        self._trial_idx = trial_idx
+        self._time_idx = time_idx
 
         # Get voltage data and corresponding colors
         self.vsec_array = self.get_voltages()
@@ -1291,9 +1315,11 @@ class NetworkPlot:
         if ax is None:
             self.fig = plt.figure()
             self.ax = self.fig.add_subplot(projection='3d')
+            self.ax.set_facecolor(self._bg_color)
         else:
-            self.fig=None
+            self.fig = None
         self.init_network_plot()
+        self._update_axes()
 
     def get_voltages(self):
         vsec_list = list()
@@ -1304,19 +1330,19 @@ class NetworkPlot:
                 cell = self.net.cell_types[cell_type]
 
                 for sec_name in cell.sections.keys():
-                    vsec = np.array(self.net.cell_response.vsec[self.trial_idx][gid][sec_name])
+                    vsec = np.array(self.net.cell_response.vsec[
+                        self.trial_idx][gid][sec_name])
                     vsec_list.append(vsec)
-        
+
         vsec_array = np.vstack(vsec_list)
         vsec_array = (vsec_array - self.vmin) / (self.vmax - self.vmin)
         return np.vstack(vsec_list)
-    
-    def update_section_voltages(self, lines, color_list):
-        return
-    
-    def plot_voltage(self, t_idx):
-        return
-    
+
+    def update_section_voltages(self, t_idx):
+        color_list = self.color_array[:, t_idx]
+        for line, color in zip(self.ax.lines, color_list):
+            line.set_color(color)
+
     def init_network_plot(self):
         for cell_type in self.net.cell_types:
             gid_range = self.net.gid_ranges[cell_type]
@@ -1327,6 +1353,121 @@ class NetworkPlot:
                 pos = self.net.pos_dict[cell_type][gid_idx]
                 pos = (float(pos[0]), float(pos[2]), float(pos[1]))
 
-                cell.plot_morphology(ax=self.ax, show=False, color=self.default_color,
-                                     pos=pos, xlim=self.xlim, ylim=self.ylim, zlim=self.zlim)
+                cell.plot_morphology(ax=self.ax, show=False,
+                                     pos=pos, xlim=self.xlim,
+                                     ylim=self.ylim, zlim=self.zlim)
 
+    def _update_axes(self):
+        self.ax.set_xlim(self._xlim)
+        self.ax.set_ylim(self._ylim)
+        self.ax.set_zlim(self._zlim)
+
+        self.ax.view_init(self._elev, self._azim)
+
+    # Axis limits
+    @property
+    def xlim(self):
+        return self._xlim
+
+    @xlim.setter
+    def xlim(self, xlim):
+        self._xlim = xlim
+        self.ax.set_xlim(self._xlim)
+
+    @property
+    def ylim(self):
+        return self._ylim
+
+    @ylim.setter
+    def ylim(self, ylim):
+        self._ylim = ylim
+        self.ax.set_ylim(self._ylim)
+
+    @property
+    def zlim(self):
+        return self._zlim
+
+    @zlim.setter
+    def zlim(self, zlim):
+        self._zlim = zlim
+        self.ax.set_zlim(self._zlim)
+
+    # Eleevation and azimuth of 3D viewpoint
+    @property
+    def elev(self):
+        return self._elev
+
+    @elev.setter
+    def elev(self, elev):
+        self._elev = elev
+        self.ax.view_init(self._elev, self._azim)
+
+    @property
+    def azim(self):
+        return self._azim
+
+    @azim.setter
+    def azim(self, azim):
+        self._azim = azim
+        self.ax.view_init(self._elev, self._azim)
+
+    # Minimum and maximum voltages
+    @property
+    def vmin(self):
+        return self._vmin
+
+    @vmin.setter
+    def vmin(self, vmin):
+        self._vmin = vmin
+        self.vsec_array = self.get_voltages()
+        self.color_array = self.colormap(self.vsec_array)
+
+    @property
+    def vmax(self):
+        return self._vmax
+
+    @vmax.setter
+    def vmax(self, vmax):
+        self._vmax = vmax
+        self.vsec_array = self.get_voltages()
+        self.color_array = self.colormap(self.vsec_array)
+
+    # Time and trial indices
+    @property
+    def trial_idx(self):
+        return self._trial_idx
+
+    @trial_idx.setter
+    def trial_idx(self, trial_idx):
+        self._trial_idx = trial_idx
+        self.vsec_array = self.get_voltages()
+        self.color_array = self.colormap(self.vsec_array)
+
+    @property
+    def time_idx(self):
+        return self._time_idx
+
+    @time_idx.setter
+    def time_idx(self, time_idx):
+        self._time_idx = time_idx
+        self.update_section_voltages(self._time_idx)
+
+    # Background color and voltage colormaps
+    @property
+    def bg_color(self):
+        return self._bg_color
+
+    @bg_color.setter
+    def bg_color(self, bg_color):
+        self._bg_color = bg_color
+        self.ax.set_facecolor(self._bg_color)
+
+    @property
+    def voltage_colormap(self):
+        return self._voltage_colormap
+
+    @voltage_colormap.setter
+    def voltage_colormap(self, voltage_colormap):
+        self._voltage_colormap = voltage_colormap
+        self.colormap = self.colormaps[self._voltage_colormap]
+        self.color_array = self.colormap(self.vsec_array)
