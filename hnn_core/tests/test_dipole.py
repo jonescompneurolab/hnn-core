@@ -1,5 +1,6 @@
 import os.path as op
 from urllib.request import urlretrieve
+from pathlib import Path
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -64,10 +65,17 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
     # Test IO for hdf5 files
     dipole.write(dpl_out_hdf5_fname)
     dipole_read_hdf5 = read_dipole(dpl_out_hdf5_fname)
-    assert_allclose(dipole_read_hdf5.times, dipole.times, rtol=0, atol=0.00051)
+    assert_allclose(dipole_read_hdf5.times, dipole.times, rtol=0.00051, atol=0)
     for dpl_key in dipole.data.keys():
         assert_allclose(dipole_read_hdf5.data[dpl_key],
-                        dipole.data[dpl_key], rtol=0, atol=0.000051)
+                        dipole.data[dpl_key], rtol=0.000051, atol=0)
+
+    # Test read for hdf5 files using Path object
+    dipole_read_hdf5 = read_dipole(Path(dpl_out_hdf5_fname))
+    assert_allclose(dipole_read_hdf5.times, dipole.times, rtol=0.00051, atol=0)
+    for dpl_key in dipole.data.keys():
+        assert_allclose(dipole_read_hdf5.data[dpl_key],
+                        dipole.data[dpl_key], rtol=0.000051, atol=0)
 
     # Testing when overwrite is False and same filename is used
     with pytest.raises(FileExistsError,
