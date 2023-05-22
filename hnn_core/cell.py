@@ -864,7 +864,7 @@ class Cell:
         return nc
 
     def plot_morphology(self, ax=None, color=None, pos=(0, 0, 0),
-                        xlim=(-250, 150), ylim=None, zlim=(-100, 1200),
+                        xlim=(-250, 150), ylim=(-100, 100), zlim=(-100, 1200),
                         show=True):
         """Plot the cell morphology.
 
