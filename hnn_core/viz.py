@@ -1240,3 +1240,93 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
     plt_show(show)
 
     return ax.get_figure()
+
+
+class NetworkPlot:
+    """Helper class to visualize full
+       morphology of HNN model.
+
+    Parameters
+    ----------
+    net : Instance of Network object
+        The Network object
+
+    colormap_name : str
+        Name of colormap used to visualize membrane potential
+
+    Attributes
+    ----------
+
+    """
+    def __init__(self, net, ax=None, vmin=-100, vmax=50, default_color='b',
+                 voltage_colormap='viridis', elev=10, azim=-500,
+                 xlim=(-200, 3100), ylim=(-200, 300), zlim=(-300, 2200),
+                 trial_idx=0):
+        import matplotlib.pyplot as plt
+        from matplotlib import colormaps
+
+        self.net = net
+
+        self.vmin = vmin
+        self.vmax = vmax
+
+        self.default_color = default_color
+        self.voltage_colormap = voltage_colormap
+        self.colormap = colormaps[voltage_colormap]
+
+        # Axes limits and view positions
+        self.xlim = xlim
+        self.ylim = ylim
+        self.zlim = zlim
+        self.elev = elev
+        self.azim = azim
+
+        self.trial_idx = trial_idx
+
+        # Get voltage data and corresponding colors
+        self.vsec_array = self.get_voltages()
+        self.color_array = self.colormap(self.vsec_array)
+
+        # Create figure
+        if ax is None:
+            self.fig = plt.figure()
+            self.ax = self.fig.add_subplot(projection='3d')
+        else:
+            self.fig=None
+        self.init_network_plot()
+
+    def get_voltages(self):
+        vsec_list = list()
+        for cell_type in self.net.cell_types:
+            gid_range = self.net.gid_ranges[cell_type]
+            for gid in gid_range:
+
+                cell = self.net.cell_types[cell_type]
+
+                for sec_name in cell.sections.keys():
+                    vsec = np.array(self.net.cell_response.vsec[self.trial_idx][gid][sec_name])
+                    vsec_list.append(vsec)
+        
+        vsec_array = np.vstack(vsec_list)
+        vsec_array = (vsec_array - self.vmin) / (self.vmax - self.vmin)
+        return np.vstack(vsec_list)
+    
+    def update_section_voltages(self, lines, color_list):
+        return
+    
+    def plot_voltage(self, t_idx):
+        return
+    
+    def init_network_plot(self):
+        for cell_type in self.net.cell_types:
+            gid_range = self.net.gid_ranges[cell_type]
+            for gid_idx, gid in enumerate(gid_range):
+
+                cell = self.net.cell_types[cell_type]
+
+                pos = self.net.pos_dict[cell_type][gid_idx]
+                pos = (float(pos[0]), float(pos[2]), float(pos[1]))
+
+                cell.plot_morphology(ax=self.ax, show=False, color=self.default_color,
+                                     pos=pos, xlim=self.xlim, ylim=self.ylim, zlim=self.zlim)
+
