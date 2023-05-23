@@ -105,6 +105,12 @@ def test_dipole_visualization():
     params.update({'N_pyr_x': 3,
                    'N_pyr_y': 3})
     net = jones_2009_model(params)
+
+    # Test plotting of simulations with no spiking
+    dpls = simulate_dipole(net, tstop=100., n_trials=1)
+    net.cell_response.plot_spikes_raster()
+    net.cell_response.plot_spikes_hist()
+
     weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
     syn_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
 
