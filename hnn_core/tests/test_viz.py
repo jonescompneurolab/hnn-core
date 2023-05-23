@@ -124,6 +124,12 @@ def test_network_visualization(setup_net):
 def test_dipole_visualization(setup_net):
     """Test dipole visualisations."""
     net = setup_net
+
+    # Test plotting of simulations with no spiking
+    dpls = simulate_dipole(net, tstop=100., n_trials=1)
+    net.cell_response.plot_spikes_raster()
+    net.cell_response.plot_spikes_hist()
+
     weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
     syn_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
 

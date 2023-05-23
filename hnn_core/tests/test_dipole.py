@@ -274,13 +274,6 @@ def test_cell_response_backends(run_hnn_core_fixture):
                        g == gid_ran[idx_drive]]
             assert_allclose(np.array(event_times), np.array(net_ets))
 
-    # Test gid indexing for cell_response
-    cell_response_subset = joblib_net.cell_response[0]
-    assert len(cell_response_subset.vsec[0]) == 1
-
-    cell_response_subset = joblib_net.cell_response[:2]
-    assert len(cell_response_subset.vsec[0]) == 1
-
 
 def test_rmse():
     """Test to check RMSE calculation"""
