@@ -512,7 +512,10 @@ def _read_spikes_hdf5(fname):
     data = read_hdf5(fname)
     cell_response = CellResponse(spike_times=data['spike_times'],
                                  spike_gids=data['spike_gids'],
-                                 spike_types=data['spike_types'])
+                                 spike_types=data['spike_types'],
+                                 times=data['times'],
+                                 vsec=data['vsec'],
+                                 isec=data['isec'])
 
     return cell_response
 
