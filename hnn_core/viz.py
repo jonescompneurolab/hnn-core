@@ -1337,7 +1337,7 @@ class NetworkPlot:
 
         vsec_array = np.vstack(vsec_list)
         vsec_array = (vsec_array - self.vmin) / (self.vmax - self.vmin)
-        return np.vstack(vsec_list)
+        return vsec_array
 
     def update_section_voltages(self, t_idx):
         color_list = self.color_array[:, t_idx]
@@ -1364,6 +1364,15 @@ class NetworkPlot:
         self.ax.set_zlim(self._zlim)
 
         self.ax.view_init(self._elev, self._azim)
+
+    def export_movie(self, fname, dpi=300):
+        import matplotlib.animation as animation
+        ani = animation.FuncAnimation(
+            self.fig, self.set_time_idx, len(self.times) - 1, interval=30)
+
+        writer = animation.writers['ffmpeg'](fps=30)
+        ani.save(fname, writer=writer, dpi=dpi)
+        return ani
 
     # Axis limits
     @property
@@ -1452,6 +1461,10 @@ class NetworkPlot:
     def time_idx(self, time_idx):
         self._time_idx = time_idx
         self.update_section_voltages(self._time_idx)
+
+    # Necessary for making animations
+    def set_time_idx(self, time_idx):
+        self.time_idx = time_idx
 
     # Background color and voltage colormaps
     @property
