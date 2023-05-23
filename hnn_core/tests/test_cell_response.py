@@ -63,9 +63,6 @@ def test_cell_response(tmp_path):
 
     # Smoke test for visualization functions upon reading hdf5 file
     cell_response_hdf5 = read_spikes(tmpdir.join('spk.hdf5'))
-
-    # **Temporary solution for testing plotting until .times is saved with hdf5
-    cell_response_hdf5._times = sim_times
     cell_response_hdf5.plot_spikes_hist(show=False)
 
     # Testing File Not Found Error
