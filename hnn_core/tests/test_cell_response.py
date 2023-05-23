@@ -56,7 +56,7 @@ def test_cell_response(tmpdir):
 
     # **Temporary solution for testing plotting until .times is saved with hdf5
     cell_response_hdf5._times = sim_times
-    # cell_response_hdf5.plot_spikes_hist(show=False)
+    cell_response_hdf5.plot_spikes_hist(show=False)
 
     # Testing File Not Found Error
     with pytest.raises(FileNotFoundError,
