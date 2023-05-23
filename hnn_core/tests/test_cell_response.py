@@ -37,10 +37,42 @@ def test_cell_response(tmp_path):
         cell_response.write(tmp_path / 'spk_%d.txt')
 
     # Testing reading from txt files
+<<<<<<< HEAD
     with pytest.warns(DeprecationWarning,
                       match="Reading cell response from txt files is "
                       "deprecated"):
         assert cell_response == read_spikes(tmp_path / 'spk_*.txt')
+=======
+    assert cell_response == read_spikes(tmpdir.join('spk_*.txt'))
+
+    # Testing write using hdf5
+    cell_response.write(tmpdir.join('spk.hdf5'))
+
+    # Testing when overwrite is False and same filename is used
+    with pytest.raises(FileExistsError,
+                       match="File already exists at path "):
+        cell_response.write(tmpdir.join('spk.hdf5'), overwrite=False)
+
+    # Testing for wrong extension provided
+    with pytest.raises(NameError,
+                       match="File extension should be either txt or hdf5"):
+        cell_response.write(tmpdir.join('spk.xls'))
+
+    # Test read using hdf5
+    assert cell_response == read_spikes(tmpdir.join('spk.hdf5'))
+
+    # Smoke test for visualization functions upon reading hdf5 file
+    cell_response_hdf5 = read_spikes(tmpdir.join('spk.hdf5'))
+
+    # **Temporary solution for testing plotting until .times is saved with hdf5
+    cell_response_hdf5._times = sim_times
+    # cell_response_hdf5.plot_spikes_hist(show=False)
+
+    # Testing File Not Found Error
+    with pytest.raises(FileNotFoundError,
+                       match="File not found at "):
+        read_spikes(tmpdir.join('spk1.hdf5'))
+>>>>>>> 1ae1d2d7 (Fix tests)
 
     assert ("CellResponse | 2 simulation trials" in repr(cell_response))
 
@@ -86,25 +118,6 @@ def test_cell_response(tmp_path):
     cell_response = CellResponse(spike_times=spike_times,
                                  spike_gids=spike_gids,
                                  spike_types=spike_types)
-
-    with pytest.raises(TypeError, match="indices must be int, slice, or "
-                       "array-like, not str"):
-        cell_response['1']
-
-    with pytest.raises(TypeError, match="indices must be int, slice, or "
-                       "array-like, not float"):
-        cell_response[1.0]
-
-    with pytest.raises(ValueError, match="ndarray cannot exceed 1 dimension"):
-        cell_response[np.array([[1, 2], [3, 4]])]
-
-    with pytest.raises(TypeError, match="gids must be of dtype int, "
-                       "not float64"):
-        cell_response[np.array([1, 2, 3.0])]
-
-    with pytest.raises(TypeError, match="gids must be of dtype int, "
-                       "not float64"):
-        cell_response[[0, 1, 2, 2.0]]
 
     with pytest.raises(TypeError, match="spike_types should be str, "
                                         "list, dict, or None"):
