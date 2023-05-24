@@ -7,7 +7,7 @@ from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
-from hnn_core import read_params, CellResponse, Network
+from hnn_core import read_params, CellResponse, Network, read_network
 from hnn_core import jones_2009_model, law_2021_model, calcium_model
 from hnn_core.network_models import add_erp_drives_to_jones_model
 from hnn_core.network_builder import NetworkBuilder
@@ -15,6 +15,19 @@ from hnn_core.network import pick_connection
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
+
+
+def test_network_io(tmpdir):
+    net_jones = jones_2009_model()
+    # Writing network
+    net_jones.write(tmpdir.join('net_jones.hdf5'))
+    # Reading network
+    net_jones_read = read_network(tmpdir.join('net_jones.hdf5'))
+    # Check cell_types
+    # assert net_jones.cell_types == net_jones_read.cell_types
+    print(net_jones.cell_types)
+    print(net_jones_read.cell_types)
+    # assert 1 == 2 # To print
 
 
 def test_network_models():
