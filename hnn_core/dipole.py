@@ -655,7 +655,7 @@ class Dipole(object):
         -------
         A tab separatd txt file where rows correspond
             to samples and columns correspond to
-            1) time (s),
+            1) time (ms),
             2) aggregate current dipole (scaled nAm),
             3) L2/3 current dipole (scaled nAm), and
             4) L5 current dipole (scaled nAm)
@@ -710,7 +710,7 @@ class Dipole(object):
         -------
         A tab separatd txt file where rows correspond
             to samples and columns correspond to
-            1) time (s),
+            1) time (ms),
             2) aggregate current dipole (scaled nAm),
             3) L2/3 current dipole (scaled nAm), and
             4) L5 current dipole (scaled nAm)
