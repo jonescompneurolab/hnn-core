@@ -13,6 +13,7 @@ from collections import OrderedDict
 
 import numpy as np
 import warnings
+from h5io import write_hdf5, read_hdf5
 
 from .drives import _drive_cell_event_times
 from .drives import _get_target_properties, _add_drives_from_params
@@ -23,6 +24,7 @@ from .viz import plot_cells
 from .externals.mne import _validate_type, _check_option
 from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
+from .cell import Cell, Section
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
@@ -426,6 +428,11 @@ class Network(object):
               % (len(self.pos_dict['L2_basket']),
                  len(self.pos_dict['L5_basket'])))
         return '<%s | %s>' % (class_name, s)
+
+    def __eq__(self, other):
+        if not isinstance(other, Network):
+            return NotImplemented
+        # Check for all attributes (Discuss)
 
     def set_cell_positions(self, *, inplane_distance=None,
                            layer_separation=None):
@@ -1352,6 +1359,112 @@ class Network(object):
             The matplotlib figure handle.
         """
         return plot_cells(net=self, ax=ax, show=show)
+
+    def write(self, fname):
+        net_data = dict()
+        cell_types_data = dict()
+        # print(self.cell_types)
+        for key in self.cell_types:
+            # print(key)
+            cell_types_data[key] = _get_cell_as_dict(self.cell_types[key])
+            # print(cell_types_data[key])
+        net_data['cell_types'] = cell_types_data
+        # Write gid_ranges
+        # Write pos_dict
+        # Write cell_response
+        # Write External drives
+        # Write External biases
+        # Write connectivity
+        # Write rec arrays
+        # Write threshold
+        # Write delay
+
+        # Saving file
+        write_hdf5(fname, net_data, overwrite=True)
+
+
+def _get_section_as_dict(section):
+    section_data = dict()
+    section_data['L'] = section.L
+    section_data['diam'] = section.diam
+    section_data['cm'] = section.cm
+    section_data['Ra'] = section.Ra
+    section_data['end_pts'] = section.end_pts
+    # Need to solve the partial function problem
+    # in mechs
+    # section_data['mechs'] = section.mechs
+    # print(section.mechs)
+    section_data['syns'] = section.syns
+    return section_data
+
+
+def _get_cell_as_dict(cell):
+    cell_data = dict()
+    cell_data['name'] = cell.name
+    cell_data['pos'] = cell.pos
+    cell_data['sections'] = dict()
+    for key in cell.sections:
+        cell_data['sections'][key] = _get_section_as_dict(cell.sections[key])
+    cell_data['synapses'] = cell.synapses
+    cell_data['topology'] = cell.topology
+    cell_data['sect_loc'] = cell.sect_loc
+    cell_data['gid'] = cell.gid
+    cell_data['dipole_pp'] = cell.dipole_pp
+    cell_data['vsec'] = cell.vsec
+    cell_data['isec'] = cell.isec
+    cell_data['tonic_biases'] = cell.tonic_biases
+    return cell_data
+
+
+def read_cell_types(cell_types_data):
+    cell_types = dict()
+    # print(cell_types_data)
+    for cell_name in cell_types_data:
+        # print(cell_name)
+        cell_data = cell_types_data[cell_name]
+        sections = dict()
+        sections_data = cell_data['sections']
+        for section_name in sections_data:
+            section_data = sections_data[section_name]
+            # print(section_name)
+            # print(section_data)
+            sections[section_name] = Section(L=section_data['L'],
+                                             diam=section_data['diam'],
+                                             cm=section_data['cm'],
+                                             Ra=section_data['Ra'],
+                                             end_pts=section_data['end_pts'])
+            # Set section attributes
+            sections[section_name].syns = section_data['syns']
+            # Think how to set mechs
+            # sections[section_name].mechs = section_data['mechs']
+        cell_types[cell_name] = Cell(name=cell_data['name'],
+                                     pos=cell_data['pos'],
+                                     sections=sections,
+                                     synapses=cell_data['synapses'],
+                                     topology=cell_data['topology'],
+                                     sect_loc=cell_data['sect_loc'],
+                                     gid=cell_data['gid'])
+        # Setting cell attributes
+        cell_types[cell_name].dipole_pp = cell_data['dipole_pp']
+        cell_types[cell_name].vsec = cell_data['vsec']
+        cell_types[cell_name].isec = cell_data['isec']
+        cell_types[cell_name].tonic_biases = cell_data['tonic_biases']
+    # print(cell_types)
+    return cell_types
+
+
+def read_network(fname):
+    net_data = read_hdf5(fname)
+    # print(net_data)
+    params = dict()
+    params['N_pyr_x'] = 10
+    params['N_pyr_y'] = 10
+    params['threshold'] = 0.0
+    net = Network(params)
+    net.cell_types = read_cell_types(net_data['cell_types'])
+    # Setting attributes
+    # Set cell types
+    return net
 
 
 class _Connectivity(dict):
