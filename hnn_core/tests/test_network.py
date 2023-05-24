@@ -23,11 +23,11 @@ def test_network_io(tmpdir):
     net_jones.write(tmpdir.join('net_jones.hdf5'))
     # Reading network
     net_jones_read = read_network(tmpdir.join('net_jones.hdf5'))
-
     # Check cell_types
     # assert net_jones.cell_types == net_jones_read.cell_types
-
-    assert 1 == 2
+    print(net_jones.cell_types)
+    print(net_jones_read.cell_types)
+    # assert 1 == 2 # To print
 
 
 def test_network_models():
