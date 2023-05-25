@@ -16,6 +16,7 @@ import warnings
 from h5io import write_hdf5, read_hdf5
 
 from .cell import Cell, Section
+from .cell_response import CellResponse
 from .drives import _drive_cell_event_times
 from .drives import _get_target_properties, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
@@ -440,6 +441,9 @@ class Network(object):
         for key in self.pos_dict.keys():
             if not (self.pos_dict[key] == other.pos_dict[key]):
                 return False
+
+        # Check cell_response
+        self.cell_response == other.cell_response
 
         return True
 
@@ -1389,6 +1393,8 @@ class Network(object):
             pos_dict_data[key] = self.pos_dict[key]
         net_data['pos_dict'] = pos_dict_data
         # Write cell_response
+        net_data['cell_response'] = (_get_cell_response_as_dict
+                                     (self.cell_response))
         # Write External drives
         # Write External biases
         # Write connectivity
@@ -1433,6 +1439,19 @@ def _get_cell_as_dict(cell):
     return cell_data
 
 
+def _get_cell_response_as_dict(cell_response):
+    if not cell_response:
+        return None
+    cell_response_data = dict()
+    cell_response_data['spike_times'] = cell_response.spike_times
+    cell_response_data['spike_gids'] = cell_response.spike_gids
+    cell_response_data['spike_types'] = cell_response.spike_types
+    cell_response_data['vsec'] = cell_response.vsec
+    cell_response_data['isec'] = cell_response.isec
+    cell_response_data['times'] = cell_response.times
+    return cell_response_data
+
+
 def _read_cell_types(cell_types_data):
     cell_types = dict()
     # print(cell_types_data)
@@ -1470,6 +1489,16 @@ def _read_cell_types(cell_types_data):
     return cell_types
 
 
+def _read_cell_response(cell_response_data):
+    if not cell_response_data:
+        return None
+    cell_response = CellResponse(spike_times=cell_response_data['spike_times'],
+                                 spike_gids=cell_response_data['spike_gids'],
+                                 spike_types=cell_response_data['spike_types'])
+
+    return cell_response
+
+
 def read_network(fname):
     net_data = read_hdf5(fname)
     # print(net_data)
@@ -1490,6 +1519,8 @@ def read_network(fname):
     net.gid_ranges = gid_ranges_data
     # Set pos_dict
     net.pos_dict = net_data['pos_dict']
+    # Set cell_response
+    net.cell_response = _read_cell_response(net_data['cell_response'])
     return net
 
 
