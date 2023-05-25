@@ -15,6 +15,7 @@ import numpy as np
 import warnings
 from h5io import write_hdf5, read_hdf5
 
+from .cell import Cell, Section
 from .drives import _drive_cell_event_times
 from .drives import _get_target_properties, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
@@ -24,7 +25,6 @@ from .viz import plot_cells
 from .externals.mne import _validate_type, _check_option
 from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
-from .cell import Cell, Section
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
@@ -434,13 +434,19 @@ class Network(object):
             return NotImplemented
         # Check for all attributes (Discuss)
         # Check cell types
-
         if not (self.cell_types.keys() == other.cell_types.keys()):
             return False
-
         for key in self.cell_types.keys():
             if not (self.cell_types[key] == other.cell_types[key]):
                 return False
+
+        # Check gid_ranges
+        if not (self.gid_ranges.keys() == other.cell_types.keys()):
+            return False
+        for key in self.gid_ranges.keys():
+            if not (self.gid_ranges[key] == other.gid_ranges[key]):
+                return False
+
         return True
 
     def set_cell_positions(self, *, inplane_distance=None,
@@ -1374,11 +1380,15 @@ class Network(object):
         cell_types_data = dict()
         # print(self.cell_types)
         for key in self.cell_types:
-            # print(key)
             cell_types_data[key] = _get_cell_as_dict(self.cell_types[key])
-            # print(cell_types_data[key])
         net_data['cell_types'] = cell_types_data
         # Write gid_ranges
+        gid_ranges_data = dict()
+        for key in self.gid_ranges:
+            gid_ranges_data[key] = dict()
+            gid_ranges_data[key]['start'] = self.gid_ranges[key].start
+            gid_ranges_data[key]['stop'] = self.gid_ranges[key].stop
+        net_data['gid_ranges'] = gid_ranges_data
         # Write pos_dict
         # Write cell_response
         # Write External drives
@@ -1470,9 +1480,16 @@ def read_network(fname):
     params['N_pyr_y'] = 10
     params['threshold'] = 0.0
     net = Network(params)
-    net.cell_types = read_cell_types(net_data['cell_types'])
     # Setting attributes
     # Set cell types
+    net.cell_types = read_cell_types(net_data['cell_types'])
+    # Set gid ranges
+    gid_ranges_data = dict()
+    for key in net_data['gid_ranges']:
+        start = net_data['gid_ranges'][key]['start']
+        stop = net_data['gid_ranges'][key]['stop']
+        gid_ranges_data[key] = range(start, stop)
+    net.gid_ranges = gid_ranges_data
     return net
 
 
