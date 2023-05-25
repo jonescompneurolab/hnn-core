@@ -27,6 +27,10 @@ API
   now support hdf5 format for read/write Cell response object, by
   `Rajat Partani`_ in :gh:`644`
 
+- :func:`~hnn_core.Dipole.write` and :func:`~hnn_core.Dipole.read_dipoles`
+  now support hdf5 format for read/write Dipole object, by
+  `Rajat Partani`_ in :gh:`648`
+
 .. _0.3:
 
 0.3
