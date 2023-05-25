@@ -14,12 +14,18 @@ Changelog
 ~~~~~~~~~
 - Add ability to customize plot colors for each cell section in
   :func:`~hnn_core.Cell.plot_morphology`, by `Nick Tolley`_ in :gh:`646`
+  
+- Add ability to manually define colors in spike histogram plots,
+  by `Nick Tolley`_ in :gh:`640`
 
 Bug
 ~~~
 
 API
 ~~~
+- :func:`~hnn_core.CellResponse.write` and :func:`~hnn_core.Cell_response.read_spikes`
+  now support hdf5 format for read/write Cell response object, by
+  `Rajat Partani`_ in :gh:`644`
 
 .. _0.3:
 
@@ -408,10 +414,10 @@ People who contributed to this release (in alphabetical order):
 .. _Mostafa Khalil: https://github.com/mkhalil8
 .. _Nick Tolley: https://github.com/ntolley
 .. _Orsolya Beatrix Kolozsvari: http://github.com/orbekolo/
+.. _Rajat Partani: https://github.com/raj1701
 .. _Ryan Thorpe: https://github.com/rythorpe
 .. _Samika Kanekar: https://github.com/samikane
 .. _Sarah Pugliese: https://bcs.mit.edu/directory/sarah-pugliese
 .. _Stephanie R. Jones: https://github.com/stephanie-r-jones
 .. _Steven Brandt: https://github.com/spbrandt
 .. _Kaisu Lankinen: https://github.com/klankinen
-.. _Rajat Partani: https://github.com/raj1701

@@ -5,7 +5,11 @@
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
 from glob import glob
+import os
+from warnings import warn
+
 import numpy as np
+from h5io import write_hdf5, read_hdf5
 
 from .viz import plot_spikes_hist, plot_spikes_raster
 
@@ -82,6 +86,8 @@ class CellResponse(object):
             spike_gids = list()
         if spike_types is None:
             spike_types = list()
+        if times is None:
+            times = list()
 
         if cell_type_names is None:
             cell_type_names = ['L2_basket', 'L2_pyramidal',
@@ -343,7 +349,7 @@ class CellResponse(object):
             cell_response=self, trial_idx=trial_idx, ax=ax, show=show)
 
     def plot_spikes_hist(self, trial_idx=None, ax=None, spike_types=None,
-                         show=True):
+                         color=None, show=True):
         """Plot the histogram of spiking activity across trials.
 
         Parameters
@@ -370,6 +376,20 @@ class CellResponse(object):
             Valid strings also include leading characters of spike types
 
             | Ex: ``'ev'`` is equivalent to ``['evdist', 'evprox']``
+        color : str | list of str | dict | None
+            Input defining colors of plotted histograms. If str, all
+            histograms plotted with same color. If list of str provided,
+            histograms for each spike type will be plotted by cycling
+            through colors in the list.
+
+            If dict, colors must be specified for all spike_types as a key.
+            If a group of spike types is defined by the `spike_types`
+            parameter (see dictionary example for `spike_types`),
+            the name of this group must be used to specify the colors.
+
+            | Ex: ``{'evdist': 'g', 'evprox': 'r'}``, ``{'Tonic': 'b'}``
+
+            If None, default color cycle used.
         show : bool
             If True, show the figure.
 
@@ -379,9 +399,33 @@ class CellResponse(object):
             The matplotlib figure handle.
         """
         return plot_spikes_hist(self, trial_idx=trial_idx, ax=ax,
-                                spike_types=spike_types, show=show)
+                                spike_types=spike_types, color=color,
+                                show=show)
 
-    def write(self, fname):
+    def _write_hdf5(self, fname):
+        """Write spiking activity to a hdf5 file.
+
+        Parameters
+        ----------
+        fname : str
+            String format (e.g., 'spk.hdf5') of the
+            path to the output spike file.
+
+        Outputs
+        -------
+        A hdf5 file containing the cell response object
+        """
+        print(f'Writing file {fname}')
+        data = dict()
+        data['spike_times'] = self.spike_times
+        data['spike_gids'] = self.spike_gids
+        data['spike_types'] = self.spike_types
+        data['vsec'] = self.vsec
+        data['isec'] = self.isec
+        data['times'] = self.times
+        write_hdf5(fname, data, overwrite=True, use_json=True)
+
+    def _write_txt(self, fname):
         """Write spiking activity per trial to a collection of files.
 
         Parameters
@@ -396,10 +440,13 @@ class CellResponse(object):
         -------
         A tab separated txt file for each trial where rows
             correspond to spikes, and columns correspond to
-            1) spike time (s),
+            1) spike time (ms),
             2) spike gid, and
             3) gid type
         """
+        warn('Writing cell response to txt files is deprecated '
+             'and will be removed in future versions. Please use hdf5',
+             DeprecationWarning, stacklevel=2)
         fname = str(fname)
         old_style = True
         try:
@@ -423,8 +470,40 @@ class CellResponse(object):
                         int(self._spike_gids[trial_idx][spike_idx]),
                         self._spike_types[trial_idx][spike_idx]))
 
+    def write(self, fname, overwrite=True):
+        """Write spiking activity to txt or hdf5 files based on extension.
 
-def read_spikes(fname, gid_ranges=None):
+        Parameters
+        ----------
+        fname : str | Path object
+            String format (e.g., 'spk_%d.txt' or 'spk_{0}.txt' or spk.hdf5)
+            of the path to the output spike file(s).
+
+        Outputs
+        -------
+        A tab separated txt file for each trial where rows
+            correspond to spikes, and columns correspond to
+            1) spike time (ms),
+            2) spike gid, and
+            3) gid type
+        OR
+        A hdf5 file containing the cell response object
+        """
+        fname = str(fname)
+        if overwrite is False and os.path.exists(fname):
+            raise FileExistsError('File already exists at path %s. Rename '
+                                  'the file or set overwrite=True.' % (fname,))
+        file_extension = os.path.splitext(fname)[-1]
+        if file_extension == '.txt':
+            self._write_txt(fname)
+        elif file_extension == '.hdf5':
+            self._write_hdf5(fname)
+        else:
+            raise NameError('File extension should be either txt or hdf5, but '
+                            'the given extension is %s.' % (file_extension,))
+
+
+def _read_spikes_txt(fname, gid_ranges=None):
     """Read spiking activity from a collection of spike trial files.
 
     Parameters
@@ -439,7 +518,7 @@ def read_spikes(fname, gid_ranges=None):
         a 3rd column for spike type.
 
     Returns
-    ----------
+    -------
     cell_response : CellResponse
         An instance of the CellResponse object.
     """
@@ -476,3 +555,59 @@ def read_spikes(fname, gid_ranges=None):
         cell_response.update_types(gid_ranges)
 
     return cell_response
+
+
+def _read_spikes_hdf5(fname):
+    """Read spiking activity from a hdf5 file.
+
+    Parameters
+    ----------
+    fname : str
+        Path to the hdf5 file (e.g., '<pathname>/spk.hdf5') to be read.
+
+    Returns
+    -------
+    cell_response : CellResponse
+        An instance of the CellResponse object.
+    """
+
+    data = read_hdf5(fname)
+    cell_response = CellResponse(spike_times=data['spike_times'],
+                                 spike_gids=data['spike_gids'],
+                                 spike_types=data['spike_types'])
+
+    return cell_response
+
+
+def read_spikes(fname, gid_ranges=None):
+    """Read spiking activity from a hdf5 or txt file.
+
+    Parameters
+    ----------
+    fname : str | Path object
+        Path to the hdf5 or txt file (e.g., '<pathname>/spk.hdf5' or
+        '<pathname>/spk_*.txt') to be read.
+    gid_ranges : dict of lists or range objects | None
+        Dictionary with keys 'evprox1', 'evdist1' etc.
+        containing the range of Cell or input IDs of different
+        cell or input types. If None, data object should contain
+        spike type. (Not applicable for hdf5 files)
+
+    Returns
+    -------
+    cell_response : CellResponse
+        An instance of the CellResponse object.
+    """
+
+    fname = str(fname)
+    file_extension = os.path.splitext(fname)[-1]
+    if file_extension == '.txt':
+        return _read_spikes_txt(fname, gid_ranges=gid_ranges)
+    elif file_extension == '.hdf5':
+        # Only for hdf5 files as txt files can be multiple.
+        if not os.path.exists(fname):
+            raise FileNotFoundError('File not found at path %s.' % (fname,))
+        return _read_spikes_hdf5(fname)
+    else:
+        raise NameError('File extension should be either txt or hdf5, but the '
+                        'given extension is %s' % (file_extension,))

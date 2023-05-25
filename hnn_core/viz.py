@@ -323,7 +323,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 
 
 def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
-                     show=True):
+                     color=None, show=True):
     """Plot the histogram of spiking activity across trials.
 
     Parameters
@@ -353,6 +353,20 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         Valid strings also include leading characters of spike types
 
         | Ex: ``'ev'`` is equivalent to ``['evdist', 'evprox']``
+    color : str | list of str | dict | None
+        Input defining colors of plotted histograms. If str, all
+        histograms plotted with same color. If list of str provided,
+        histograms for each spike type will be plotted by cycling
+        through colors in the list.
+
+        If dict, colors must be specified for all spike_types as a key.
+        If a group of spike types is defined by the `spike_types`
+        parameter (see dictionary example for `spike_types`),
+        the name of this group must be used to specify the colors.
+
+        | Ex: ``{'evdist': 'g', 'evprox': 'r'}``, ``{'Tonic': 'b'}``
+
+        If None, default color cycle used.
     show : bool
         If True, show the figure.
 
@@ -425,19 +439,42 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
-    color_cycle = cycle(['r', 'g', 'b', 'y', 'm', 'c'])
+    _validate_type(color, (str, list, dict, None),
+                   'color', 'str, list of str, or dict')
+
+    if color is None:
+        color_cycle = cycle(['r', 'g', 'b', 'y', 'm', 'c'])
+    elif isinstance(color, str):
+        color_cycle = cycle([color])
+    elif isinstance(color, list):
+        color_cycle = cycle(color)
 
     bins = np.linspace(0, spike_times[-1], 50)
-    spike_color = dict()
-    for spike_type, spike_label in spike_labels.items():
-        label = "_nolegend_"
-        if spike_label not in spike_color:
-            spike_color[spike_label] = next(color_cycle)
-            label = spike_label
 
-        color = spike_color[spike_label]
-        ax.hist(spike_times[spike_types_mask[spike_type]], bins,
-                label=label, color=color)
+    # Create dictionary to aggregate spike times that have the same spike_label
+    spike_type_times = {spike_label: list() for
+                        spike_label in np.unique(list(spike_labels.values()))}
+    spike_color = dict()  # Store colors specified for each spike_label
+    for spike_type, spike_label in spike_labels.items():
+        if spike_label not in spike_color:
+            if isinstance(color, dict):
+                if spike_label not in color:
+                    raise ValueError(
+                        f"'{spike_label}' must be defined in color dictionary")
+                _validate_type(color[spike_label], str,
+                               'Dictionary values of color', 'str')
+                spike_color[spike_label] = color[spike_label]
+            else:
+                spike_color[spike_label] = next(color_cycle)
+        spike_type_times[spike_label].extend(
+            spike_times[spike_types_mask[spike_type]])
+
+    # Plot aggregated spike_times
+    for spike_label, plot_data in spike_type_times.items():
+        hist_color = spike_color[spike_label]
+        ax.hist(plot_data, bins,
+                label=spike_label, color=hist_color)
+
     ax.set_ylabel("Counts")
     ax.legend()
 
