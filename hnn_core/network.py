@@ -433,6 +433,15 @@ class Network(object):
         if not isinstance(other, Network):
             return NotImplemented
         # Check for all attributes (Discuss)
+        # Check cell types
+
+        if not (self.cell_types.keys() == other.cell_types.keys()):
+            return False
+
+        for key in self.cell_types.keys():
+            if not (self.cell_types[key] == other.cell_types[key]):
+                return False
+        return True
 
     def set_cell_positions(self, *, inplane_distance=None,
                            layer_separation=None):

@@ -220,6 +220,17 @@ class Section:
     def __repr__(self):
         return f'L={self.L}, diam={self.diam}, cm={self.cm}, Ra={self.Ra}'
 
+    def __eq__(self, other):
+        if not isinstance(other, Section):
+            return NotImplemented
+        # Add for mechs also
+        return (self.L == other.L and
+                self.diam == other.diam and
+                self.Ra == other.Ra and
+                self.cm == other.cm and
+                self.end_pts == other.end_pts and
+                self.syns == other.syns)
+
     @property
     def L(self):
         return self._L
@@ -354,6 +365,29 @@ class Cell:
     def __repr__(self):
         class_name = self.__class__.__name__
         return f'<{class_name} | gid={self._gid}>'
+
+    def __eq__(self, other):
+        if not isinstance(other, Cell):
+            return NotImplemented
+        if not (self.name == other.name and
+                self.pos == other.pos and
+                self.synapses == other.synapses and
+                self.topology == other.topology and
+                self.sect_loc == other.sect_loc and
+                self.dipole_pp == other.dipole_pp and
+                self.vsec == other.vsec and
+                self.isec == other.isec and
+                self.tonic_biases == other.tonic_biases):
+            return False
+
+        if not (self.sections.keys() == other.sections.keys()):
+            return False
+
+        for key in self.sections.keys():
+            if not (self.sections[key] == other.sections[key]):
+                return False
+
+        return True
 
     @property
     def gid(self):
