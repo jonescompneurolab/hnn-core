@@ -434,6 +434,13 @@ class Network(object):
             if not (self.gid_ranges[key] == other.gid_ranges[key]):
                 return False
 
+        # Check pos_dict
+        if not (self.pos_dict.keys() == other.pos_dict.keys()):
+            return False
+        for key in self.pos_dict.keys():
+            if not (self.pos_dict[key] == other.pos_dict[key]):
+                return False
+
         return True
 
     def set_cell_positions(self, *, inplane_distance=None,
@@ -1377,6 +1384,10 @@ class Network(object):
             gid_ranges_data[key]['stop'] = self.gid_ranges[key].stop
         net_data['gid_ranges'] = gid_ranges_data
         # Write pos_dict
+        pos_dict_data = dict()
+        for key in self.pos_dict:
+            pos_dict_data[key] = self.pos_dict[key]
+        net_data['pos_dict'] = pos_dict_data
         # Write cell_response
         # Write External drives
         # Write External biases
@@ -1422,7 +1433,7 @@ def _get_cell_as_dict(cell):
     return cell_data
 
 
-def read_cell_types(cell_types_data):
+def _read_cell_types(cell_types_data):
     cell_types = dict()
     # print(cell_types_data)
     for cell_name in cell_types_data:
@@ -1469,7 +1480,7 @@ def read_network(fname):
     net = Network(params)
     # Setting attributes
     # Set cell types
-    net.cell_types = read_cell_types(net_data['cell_types'])
+    net.cell_types = _read_cell_types(net_data['cell_types'])
     # Set gid ranges
     gid_ranges_data = dict()
     for key in net_data['gid_ranges']:
@@ -1477,6 +1488,8 @@ def read_network(fname):
         stop = net_data['gid_ranges'][key]['stop']
         gid_ranges_data[key] = range(start, stop)
     net.gid_ranges = gid_ranges_data
+    # Set pos_dict
+    net.pos_dict = net_data['pos_dict']
     return net
 
 
