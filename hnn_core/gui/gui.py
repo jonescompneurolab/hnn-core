@@ -13,6 +13,7 @@ import urllib.request
 from collections import defaultdict
 from pathlib import Path
 from IPython.display import IFrame, display
+import ipywidgets
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload, VBox,
                         HBox, IntText, Layout, Output, RadioButtons, Tab, Text)
@@ -961,7 +962,7 @@ def _get_tonic_widget(name, layout, style, data=None):
     kwargs = dict(layout=layout, style=style)
 
     amplitudes, start_times, stop_times = dict(), dict(), dict()
-    for cell_type in cell_types:
+    for ct_idx, cell_type in enumerate(cell_types):
         if cell_type in data:
             default_data.update(data[cell_type])
         amplitudes[cell_type] = BoundedFloatText(
@@ -973,6 +974,13 @@ def _get_tonic_widget(name, layout, style, data=None):
         stop_times[cell_type] = BoundedFloatText(
             value=copy.deepcopy(default_data['tstop']), description=cell_type,
             min=-1, max=1e6, step=0.01, **kwargs)
+
+        # link all t0 and tstop
+        if ct_idx > 0:
+            ipywidgets.link((start_times[cell_type], 'value'),
+                            (start_times[cell_types[ct_idx - 1]], 'value'))
+            ipywidgets.link((stop_times[cell_type], 'value'),
+                            (stop_times[cell_types[ct_idx - 1]], 'value'))
 
     widgets_dict = {
         'amplitude': amplitudes,
