@@ -19,6 +19,7 @@ params_fname = op.join(hnn_core_root, 'param', 'default.json')
 
 def test_network_io(tmpdir):
     net_jones = jones_2009_model()
+    add_erp_drives_to_jones_model(net_jones)
     # Writing network
     net_jones.write(tmpdir.join('net_jones.hdf5'))
     # Reading network
