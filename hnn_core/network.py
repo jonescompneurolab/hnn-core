@@ -442,7 +442,7 @@ class Network(object):
                 return False
 
         # Check gid_ranges
-        if not (self.gid_ranges.keys() == other.cell_types.keys()):
+        if not (self.gid_ranges.keys() == other.gid_ranges.keys()):
             return False
         for key in self.gid_ranges.keys():
             if not (self.gid_ranges[key] == other.gid_ranges[key]):
@@ -457,6 +457,13 @@ class Network(object):
 
         # Check cell_response
         self.cell_response == other.cell_response
+
+        # Check external drives
+        if not (self.external_drives.keys() == other.external_drives.keys()):
+            return False
+        for key in self.external_drives.keys():
+            if not (self.external_drives[key] == other.external_drives[key]):
+                return False
 
         return True
 
@@ -625,6 +632,11 @@ class Network(object):
         drive['conn_seed'] = conn_seed
         drive['dynamics'] = dict(mu=mu, sigma=sigma, numspikes=numspikes)
         drive['events'] = list()
+        # Need to save this information
+        drive['weights_ampa'] = weights_ampa
+        drive['weights_nmda'] = weights_nmda
+        drive['synaptic_delays'] = synaptic_delays
+        drive['probability'] = probability
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
@@ -734,6 +746,11 @@ class Network(object):
         drive['dynamics'] = dict(tstart=tstart, tstop=tstop,
                                  rate_constant=rate_constant)
         drive['events'] = list()
+        # Need to save this information
+        drive['weights_ampa'] = weights_ampa
+        drive['weights_nmda'] = weights_nmda
+        drive['synaptic_delays'] = synaptic_delays
+        drive['probability'] = probability
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
@@ -840,6 +857,11 @@ class Network(object):
                                  burst_rate=burst_rate, burst_std=burst_std,
                                  numspikes=numspikes, spike_isi=spike_isi)
         drive['events'] = list()
+        # Need to save this information
+        drive['weights_ampa'] = weights_ampa
+        drive['weights_nmda'] = weights_nmda
+        drive['synaptic_delays'] = synaptic_delays
+        drive['probability'] = probability
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
@@ -1389,7 +1411,6 @@ class Network(object):
     def write(self, fname):
         net_data = dict()
         cell_types_data = dict()
-        # print(self.cell_types)
         for key in self.cell_types:
             cell_types_data[key] = _get_cell_as_dict(self.cell_types[key])
         net_data['cell_types'] = cell_types_data
@@ -1409,6 +1430,11 @@ class Network(object):
         net_data['cell_response'] = (_get_cell_response_as_dict
                                      (self.cell_response))
         # Write External drives
+        external_drives_data = dict()
+        for key in self.external_drives.keys():
+            external_drives_data[key] = (_get_external_drive_as_dict
+                                         (self.external_drives[key]))
+        net_data['external_drives'] = external_drives_data
         # Write External biases
         # Write connectivity
         # Write rec arrays
@@ -1465,18 +1491,25 @@ def _get_cell_response_as_dict(cell_response):
     return cell_response_data
 
 
+def _get_external_drive_as_dict(drive):
+    drive_data = dict()
+    for key in drive.keys():
+        # Cannot store sets with hdf5
+        if isinstance(drive[key], set):
+            drive_data[key] = list(drive[key])
+        else:
+            drive_data[key] = drive[key]
+    return drive_data
+
+
 def _read_cell_types(cell_types_data):
     cell_types = dict()
-    # print(cell_types_data)
     for cell_name in cell_types_data:
-        # print(cell_name)
         cell_data = cell_types_data[cell_name]
         sections = dict()
         sections_data = cell_data['sections']
         for section_name in sections_data:
             section_data = sections_data[section_name]
-            # print(section_name)
-            # print(section_data)
             sections[section_name] = Section(L=section_data['L'],
                                              diam=section_data['diam'],
                                              cm=section_data['cm'],
@@ -1498,7 +1531,7 @@ def _read_cell_types(cell_types_data):
         cell_types[cell_name].vsec = cell_data['vsec']
         cell_types[cell_name].isec = cell_data['isec']
         cell_types[cell_name].tonic_biases = cell_data['tonic_biases']
-    # print(cell_types)
+
     return cell_types
 
 
@@ -1512,9 +1545,57 @@ def _read_cell_response(cell_response_data):
     return cell_response
 
 
+def _read_external_drive(net, drive_data):
+    if drive_data['type'] == 'evoked':
+        # Skipped n_drive_cells here
+        net.add_evoked_drive(name=drive_data['name'],
+                             mu=drive_data['dynamics']['mu'],
+                             sigma=drive_data['dynamics']['sigma'],
+                             numspikes=drive_data['dynamics']['numspikes'],
+                             location=drive_data['location'],
+                             cell_specific=drive_data['cell_specific'],
+                             weights_ampa=drive_data['weights_ampa'],
+                             weights_nmda=drive_data['weights_nmda'],
+                             synaptic_delays=drive_data['synaptic_delays'],
+                             event_seed=drive_data['event_seed'],
+                             conn_seed=drive_data['conn_seed'])
+    elif drive_data['type'] == 'poisson':
+        net.add_poisson_drive(name=drive_data['name'],
+                              tstart=drive_data['dynamics']['tstart'],
+                              tstop=drive_data['dynamics']['tstop'],
+                              rate_constant=(drive_data['dynamics']
+                                                       ['rate_constant']),
+                              location=drive_data['location'],
+                              n_drive_cells=drive_data['n_drive_cells'],
+                              cell_specific=drive_data['cell_specific'],
+                              weights_ampa=drive_data['weights_ampa'],
+                              weights_nmda=drive_data['weights_nmda'],
+                              synaptic_delays=drive_data['synaptic_delays'],
+                              event_seed=drive_data['event_seed'],
+                              conn_seed=drive_data['conn_seed'])
+    elif drive_data['type'] == 'bursty':
+        net.add_bursty_drive(name=drive_data['name'],
+                             tstart=drive_data['dynamics']['tstart'],
+                             tstart_std=drive_data['dynamics']['tstart_std'],
+                             tstop=drive_data['dynamics']['tstop'],
+                             burst_rate=drive_data['dynamics']['burst_rate'],
+                             burst_std=drive_data['dynamics']['burst_std'],
+                             num_spikes=drive_data['dynamics']['num_spikes'],
+                             spike_isi=drive_data['dynamics']['spike_isi'],
+                             location=drive_data['location'],
+                             n_drive_cells=drive_data['n_drive_cells'],
+                             cell_specific=drive_data['cell_specific'],
+                             weights_ampa=drive_data['weights_ampa'],
+                             weights_nmda=drive_data['weights_nmda'],
+                             synaptic_delays=drive_data['synaptic_delays'],
+                             event_seed=drive_data['event_seed'],
+                             conn_seed=drive_data['conn_seed'])
+
+    net.external_drives[drive_data['name']]['events'] = drive_data['events']
+
+
 def read_network(fname):
     net_data = read_hdf5(fname)
-    # print(net_data)
     params = dict()
     params['N_pyr_x'] = 10
     params['N_pyr_y'] = 10
@@ -1534,6 +1615,9 @@ def read_network(fname):
     net.pos_dict = net_data['pos_dict']
     # Set cell_response
     net.cell_response = _read_cell_response(net_data['cell_response'])
+    # Set external drives
+    for key in net_data['external_drives'].keys():
+        _read_external_drive(net, net_data['external_drives'][key])
     return net
 
 
