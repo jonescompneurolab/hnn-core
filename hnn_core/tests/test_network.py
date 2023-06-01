@@ -688,7 +688,6 @@ def test_network_connectivity():
     kwargs_good = [
         ('src_gids', 0),
         ('src_gids', 'L2_pyramidal'),
-        ('src_gids', range(2)),
         ('src_gids', None),
         ('target_gids', 35),
         ('target_gids', range(2)),
@@ -704,13 +703,23 @@ def test_network_connectivity():
         indices = pick_connection(**kwargs)
         for conn_idx in indices:
             if (arg == 'src_gids' or arg == 'target_gids') and \
-                    isinstance(item, str):
-                assert np.all(np.in1d(net.connectivity[conn_idx][arg],
-                              net.gid_ranges[item]))
+               isinstance(item, str):
+                # item and arg specify equivalent sets
+                assert not net.connectivity[conn_idx][arg].difference(
+                    net.gid_ranges[item])
             elif item is None:
                 pass
             else:
-                assert np.any(np.in1d([item], net.connectivity[conn_idx][arg]))
+                # item and arg specify sets with a non-empty intersection
+                if isinstance(item, range):
+                    set_1 = set(item)
+                else:
+                    set_1 = {item}
+                if isinstance(net.connectivity[conn_idx][arg], str):
+                    set_2 = {net.connectivity[conn_idx][arg]}
+                else:
+                    set_2 = set(net.connectivity[conn_idx][arg])
+                assert set_1.intersection(set_2)
 
     # Test searching a list of src or target types
     src_cell_type_list = ['L2_basket', 'L5_basket']

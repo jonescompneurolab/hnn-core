@@ -873,6 +873,10 @@ class Network(object):
         if not target_populations.issubset(set(self.cell_types.keys())):
             raise ValueError('Allowed drive target cell types are: ',
                              f'{self.cell_types.keys()}')
+        
+        # enforce the same order as in self.cell_types
+        target_populations = [cell_type for cell_type in self.cell_types.keys()
+                              if cell_type in target_populations]
 
         # Ensure location exists for all target cells
         cell_sections = [set(self.cell_types[cell_type].sections.keys()) for
@@ -938,8 +942,7 @@ class Network(object):
         # seed_increment increased by 1 for each target cell type,
         # added to conn_seed to ensure statistical independence of random
         # connections when probability < 1.0
-        for seed_increment, target_cell_type in enumerate(
-                sorted(target_populations)):
+        for seed_increment, target_cell_type in enumerate(target_populations):
             target_gids = list(self.gid_ranges[target_cell_type])
             delays = delays_by_type[target_cell_type]
             probability = probability_by_type[target_cell_type]
@@ -978,8 +981,6 @@ class Network(object):
                     if receptor_idx > 0:
                         self.connectivity[-1]['src_gids'] = \
                             self.connectivity[-2]['src_gids']
-
-            seed_increment += 1
 
     def _reset_drives(self):
         # reset every time called again, e.g., from dipole.py or in self.copy()
@@ -1194,7 +1195,7 @@ class Network(object):
                 raise AssertionError(
                     'All target_gids must be of the same type')
         conn['target_type'] = target_type
-        conn['target_gids'] = sorted(target_set)
+        conn['target_gids'] = target_set
         conn['num_targets'] = len(target_set)
 
         if len(target_gids) != len(src_gids):
@@ -1209,7 +1210,7 @@ class Network(object):
             gid_pairs[src_gid] = target_src_pair
 
         conn['src_type'] = self.gid_to_type(src_gids[0])
-        conn['src_gids'] = sorted(set(src_gids))
+        conn['src_gids'] = set(src_gids)
         conn['num_srcs'] = len(src_gids)
 
         conn['gid_pairs'] = gid_pairs
