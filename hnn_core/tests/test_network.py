@@ -20,11 +20,25 @@ params_fname = op.join(hnn_core_root, 'param', 'default.json')
 def test_network_io(tmpdir):
     net_jones = jones_2009_model()
     add_erp_drives_to_jones_model(net_jones)
+    net_jones.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
     # Writing network
     net_jones.write(tmpdir.join('net_jones.hdf5'))
     # Reading network
     net_jones_read = read_network(tmpdir.join('net_jones.hdf5'))
     assert net_jones == net_jones_read
+
+    # Add test to check weights are equal in connections and drives
+    # Run simulation and simulation output should be same (dipole)
+
+    # Simulating network
+    simulate_dipole(net_jones, tstop=5)
+    # Writing network
+    net_jones.write(tmpdir.join('net_jones_sim.hdf5'))
+    # Reading network
+    net_jones_sim = read_network(tmpdir.join('net_jones_sim.hdf5'))
+    assert net_jones == net_jones_sim
+    # For cell response vsec isec bug
+    assert net_jones.cell_response.vsec == net_jones_sim.cell_response.vsec
 
 
 def test_network_models():
