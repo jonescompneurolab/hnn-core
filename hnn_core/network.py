@@ -1472,8 +1472,16 @@ def _get_cell_response_as_dict(cell_response):
     cell_response_data['spike_times'] = cell_response.spike_times
     cell_response_data['spike_gids'] = cell_response.spike_gids
     cell_response_data['spike_types'] = cell_response.spike_types
-    cell_response_data['vsec'] = cell_response.vsec
-    cell_response_data['isec'] = cell_response.isec
+    vsec_data = cell_response.vsec
+    cell_response_data['vsec'] = list()
+    for trial in vsec_data:
+        trial = dict((str(key), val) for key, val in trial.items())
+        cell_response_data['vsec'].append(trial)
+    isec_data = cell_response.isec
+    cell_response_data['isec'] = list()
+    for trial in isec_data:
+        trial = dict((str(key), val) for key, val in trial.items())
+        cell_response_data['isec'].append(trial)
     cell_response_data['times'] = cell_response.times
     return cell_response_data
 
@@ -1529,6 +1537,15 @@ def _read_cell_response(cell_response_data):
                                  spike_gids=cell_response_data['spike_gids'],
                                  spike_types=cell_response_data['spike_types'])
 
+    cell_response._times = cell_response_data['times']
+    cell_response._vsec = list()
+    for trial in cell_response_data['vsec']:
+        trial = dict((int(key), val) for key, val in trial.items())
+        cell_response._vsec.append(trial)
+    cell_response._isec = list()
+    for trial in cell_response_data['isec']:
+        trial = dict((int(key), val) for key, val in trial.items())
+        cell_response._isec.append(trial)
     return cell_response
 
 
