@@ -1412,7 +1412,7 @@ class Network(object):
         net_data = dict()
         cell_types_data = dict()
         for key in self.cell_types:
-            cell_types_data[key] = _get_cell_as_dict(self.cell_types[key])
+            cell_types_data[key] = self.cell_types[key].to_dict()
         net_data['cell_types'] = cell_types_data
         # Write gid_ranges
         gid_ranges_data = dict()
@@ -1427,12 +1427,12 @@ class Network(object):
             pos_dict_data[key] = self.pos_dict[key]
         net_data['pos_dict'] = pos_dict_data
         # Write cell_response
-        net_data['cell_response'] = (_get_cell_response_as_dict
+        net_data['cell_response'] = (_cell_response_to_dict
                                      (self.cell_response))
         # Write External drives
         external_drives_data = dict()
         for key in self.external_drives.keys():
-            external_drives_data[key] = (_get_external_drive_as_dict
+            external_drives_data[key] = (_external_drive_to_dict
                                          (self.external_drives[key]))
         net_data['external_drives'] = external_drives_data
         # Write External biases
@@ -1445,40 +1445,9 @@ class Network(object):
         write_hdf5(fname, net_data, overwrite=True)
 
 
-def _get_section_as_dict(section):
-    section_data = dict()
-    section_data['L'] = section.L
-    section_data['diam'] = section.diam
-    section_data['cm'] = section.cm
-    section_data['Ra'] = section.Ra
-    section_data['end_pts'] = section.end_pts
-    # Need to solve the partial function problem
-    # in mechs
-    # section_data['mechs'] = section.mechs
-    # print(section.mechs)
-    section_data['syns'] = section.syns
-    return section_data
-
-
-def _get_cell_as_dict(cell):
-    cell_data = dict()
-    cell_data['name'] = cell.name
-    cell_data['pos'] = cell.pos
-    cell_data['sections'] = dict()
-    for key in cell.sections:
-        cell_data['sections'][key] = _get_section_as_dict(cell.sections[key])
-    cell_data['synapses'] = cell.synapses
-    cell_data['topology'] = cell.topology
-    cell_data['sect_loc'] = cell.sect_loc
-    cell_data['gid'] = cell.gid
-    cell_data['dipole_pp'] = cell.dipole_pp
-    cell_data['vsec'] = cell.vsec
-    cell_data['isec'] = cell.isec
-    cell_data['tonic_biases'] = cell.tonic_biases
-    return cell_data
-
-
-def _get_cell_response_as_dict(cell_response):
+def _cell_response_to_dict(cell_response):
+    # Will be deleted when to_dict method will be merged
+    # in a diiferent PR
     if not cell_response:
         return None
     cell_response_data = dict()
@@ -1499,7 +1468,7 @@ def _get_cell_response_as_dict(cell_response):
     return cell_response_data
 
 
-def _get_external_drive_as_dict(drive):
+def _external_drive_to_dict(drive):
     drive_data = dict()
     for key in drive.keys():
         # Cannot store sets with hdf5
