@@ -231,6 +231,20 @@ class Section:
                 self.end_pts == other.end_pts and
                 self.syns == other.syns)
 
+    def to_dict(self):
+        section_data = dict()
+        section_data['L'] = self.L
+        section_data['diam'] = self.diam
+        section_data['cm'] = self.cm
+        section_data['Ra'] = self.Ra
+        section_data['end_pts'] = self.end_pts
+        # Need to solve the partial function problem
+        # in mechs
+        # section_data['mechs'] = self.mechs
+        # print(self.mechs)
+        section_data['syns'] = self.syns
+        return section_data
+
     @property
     def L(self):
         return self._L
@@ -388,6 +402,23 @@ class Cell:
                 return False
 
         return True
+
+    def to_dict(self):
+        cell_data = dict()
+        cell_data['name'] = self.name
+        cell_data['pos'] = self.pos
+        cell_data['sections'] = dict()
+        for key in self.sections:
+            cell_data['sections'][key] = self.sections[key].to_dict()
+        cell_data['synapses'] = self.synapses
+        cell_data['topology'] = self.topology
+        cell_data['sect_loc'] = self.sect_loc
+        cell_data['gid'] = self.gid
+        cell_data['dipole_pp'] = self.dipole_pp
+        cell_data['vsec'] = self.vsec
+        cell_data['isec'] = self.isec
+        cell_data['tonic_biases'] = self.tonic_biases
+        return cell_data
 
     @property
     def gid(self):
