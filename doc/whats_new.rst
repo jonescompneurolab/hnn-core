@@ -20,8 +20,7 @@ Changelog
 
 Bug
 ~~~
-- Fix random inconsistency in network spiking when seed is set by sorting target
-  and source gids in :meth:`~hnn_core.Network.add_connection`, by 
+- Fix inconsistent connection mapping from drive gids to cell gids, by
   `Ryan Thorpe`_ in :gh:`642`.
 
 API
