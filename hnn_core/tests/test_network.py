@@ -262,6 +262,19 @@ def test_network_drives():
         n_drive_cells = net.external_drives[dn]['n_drive_cells']
         assert len(net.gid_ranges[dn]) == n_drive_cells
 
+    # Source gids should be assigned in order according to net.cell_types
+    # For a cell-specific drive, connections are made between disjoint sets of
+    # source gids by target type
+    drive_src_list = list()
+    for target_type in net.cell_types:
+        conn_idxs = pick_connection(net, src_gids='evprox1',
+                                    target_gids=target_type)
+        src_set = set()
+        for conn_idx in conn_idxs:
+            src_set.update(net.connectivity[conn_idx]['src_gids'])
+        drive_src_list.extend(sorted(list(src_set)))
+    assert np.array_equal(drive_src_list, sorted(drive_src_list))
+
     # Check drive dict structure for each external drive
     for drive_idx, drive in enumerate(net.external_drives.values()):
         # Check that connectivity sources correspond to gid_ranges
@@ -701,25 +714,24 @@ def test_network_connectivity():
         kwargs = kwargs_default.copy()
         kwargs[arg] = item
         indices = pick_connection(**kwargs)
+        if item is None:
+            assert len(indices) == 0
         for conn_idx in indices:
-            if (arg == 'src_gids' or arg == 'target_gids') and \
-               isinstance(item, str):
-                # item and arg specify equivalent sets
-                assert not net.connectivity[conn_idx][arg].difference(
-                    net.gid_ranges[item])
-            elif item is None:
-                pass
+            if isinstance(item, range):
+                # arg specifies a subset of item gids (within range)
+                net.connectivity[conn_idx][arg] <= set(item)
+            elif isinstance(item, str):
+                if arg in {'src_gids', 'target_gids'}:
+                    # arg specifies a subset of item gids (within gid_ranges)
+                    assert (net.connectivity[conn_idx][arg] <=
+                            set(net.gid_ranges[item]))
+                else:
+                    # arg and item specify equivalent string descriptors for
+                    # this connection type
+                    assert net.connectivity[conn_idx][arg] == item
             else:
-                # item and arg specify sets with a non-empty intersection
-                if isinstance(item, range):
-                    set_1 = set(item)
-                else:
-                    set_1 = {item}
-                if isinstance(net.connectivity[conn_idx][arg], str):
-                    set_2 = {net.connectivity[conn_idx][arg]}
-                else:
-                    set_2 = set(net.connectivity[conn_idx][arg])
-                assert set_1.intersection(set_2)
+                # arg specifies a superset of item gids
+                assert set(net.connectivity[conn_idx][arg]) >= {item}
 
     # Test searching a list of src or target types
     src_cell_type_list = ['L2_basket', 'L5_basket']

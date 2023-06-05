@@ -873,8 +873,9 @@ class Network(object):
         if not target_populations.issubset(set(self.cell_types.keys())):
             raise ValueError('Allowed drive target cell types are: ',
                              f'{self.cell_types.keys()}')
-        
-        # enforce the same order as in self.cell_types
+
+        # enforce the same order as in self.cell_types - necessary for
+        # consistent source gid assignment
         target_populations = [cell_type for cell_type in self.cell_types.keys()
                               if cell_type in target_populations]
 
