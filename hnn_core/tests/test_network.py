@@ -701,6 +701,7 @@ def test_network_connectivity():
     kwargs_good = [
         ('src_gids', 0),
         ('src_gids', 'L2_pyramidal'),
+        ('src_gids', range(2)),
         ('src_gids', None),
         ('target_gids', 35),
         ('target_gids', range(2)),
