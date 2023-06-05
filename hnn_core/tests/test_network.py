@@ -21,6 +21,9 @@ def test_network_io(tmpdir):
     net_jones = jones_2009_model()
     add_erp_drives_to_jones_model(net_jones)
     net_jones.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
+    # Test __eq__ method
+    net_copy = net_jones.copy()
+    assert net_copy == net_jones
     # Writing network
     net_jones.write(tmpdir.join('net_jones.hdf5'))
     # Reading network

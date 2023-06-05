@@ -435,34 +435,38 @@ class Network(object):
             return NotImplemented
         # Check for all attributes (Discuss)
         # Check cell types
-        if not (self.cell_types.keys() == other.cell_types.keys()):
+        if not (self.cell_types == other.cell_types):
             return False
-        for key in self.cell_types.keys():
-            if not (self.cell_types[key] == other.cell_types[key]):
-                return False
 
         # Check gid_ranges
-        if not (self.gid_ranges.keys() == other.gid_ranges.keys()):
+        if not (self.gid_ranges == other.gid_ranges):
             return False
-        for key in self.gid_ranges.keys():
-            if not (self.gid_ranges[key] == other.gid_ranges[key]):
-                return False
 
         # Check pos_dict
-        if not (self.pos_dict.keys() == other.pos_dict.keys()):
+        if not (self.pos_dict == other.pos_dict):
             return False
-        for key in self.pos_dict.keys():
-            if not (self.pos_dict[key] == other.pos_dict[key]):
-                return False
 
         # Check cell_response
         self.cell_response == other.cell_response
 
         # Check external drives
-        if not (self.external_drives.keys() == other.external_drives.keys()):
+        if not (self.external_drives == other.external_drives):
             return False
-        for key in self.external_drives.keys():
-            if not (self.external_drives[key] == other.external_drives[key]):
+
+        # Check external biases
+        if not (self.external_biases == other.external_biases):
+            return False
+
+        # Check connectivity
+        if not (len(self.connectivity) == len(other.connectivity)):
+            return False
+        for conn in self.connectivity:
+            match_conns = pick_connection(other,
+                                          src_gids=conn['src_gids'],
+                                          target_gids=conn['target_gids'],
+                                          loc=conn['loc'],
+                                          receptor=conn['receptor'])
+            if len(match_conns) == 0:
                 return False
 
         return True
@@ -1331,6 +1335,7 @@ class Network(object):
             _connection_probability(conn, probability, conn_seed)
 
         conn['probability'] = probability
+        conn['allow_autapses'] = allow_autapses
 
         self.connectivity.append(deepcopy(conn))
 
@@ -1410,6 +1415,12 @@ class Network(object):
 
     def write(self, fname):
         net_data = dict()
+        # Write the required params
+        params = dict()
+        params['N_pyr_x'] = self._N_pyr_x
+        params['N_pyr_y'] = self._N_pyr_y
+        params['threshold'] = self.threshold
+        net_data['params'] = params
         cell_types_data = dict()
         for key in self.cell_types:
             cell_types_data[key] = self.cell_types[key].to_dict()
@@ -1436,13 +1447,37 @@ class Network(object):
                                          (self.external_drives[key]))
         net_data['external_drives'] = external_drives_data
         # Write External biases
+        net_data['external_biases'] = self.external_biases
         # Write connectivity
+        net_data['connectivity'] = _write_connectivity(self.connectivity)
         # Write rec arrays
         # Write threshold
         # Write delay
 
         # Saving file
         write_hdf5(fname, net_data, overwrite=True)
+
+
+def _write_connectivity(connectivity):
+    conns_data = list()
+    for conn in connectivity:
+        conn_data = dict()
+        conn_data['target_type'] = conn['target_type']
+        conn_data['target_gids'] = conn['target_gids']
+        conn_data['num_targets'] = conn['num_targets']
+        conn_data['src_type'] = conn['src_type']
+        conn_data['src_gids'] = conn['src_gids']
+        conn_data['num_srcs'] = conn['num_srcs']
+        gid_pairs = (dict((str(key), val)
+                     for key, val in conn['gid_pairs'].items()))
+        conn_data['gid_pairs'] = gid_pairs
+        conn_data['loc'] = conn['loc']
+        conn_data['receptor'] = conn['receptor']
+        conn_data['nc_dict'] = conn['nc_dict']
+        conn_data['allow_autapses'] = int(conn['allow_autapses'])
+        conn_data['probability'] = conn['probability']
+        conns_data.append(conn_data)
+    return conns_data
 
 
 def _cell_response_to_dict(cell_response):
@@ -1580,12 +1615,26 @@ def _read_external_drive(net, drive_data):
     net.external_drives[drive_data['name']]['events'] = drive_data['events']
 
 
+def _read_connectivity(net, conns_data):
+    # Overwrite drive connections
+    net.connectivity = list()
+    for conn_data in conns_data:
+        conn_data['allow_autapses'] = bool(conn_data['allow_autapses'])
+        # conn_data['allow_autapses'] = bool(conn_data['allow_autapses'])
+        net.add_connection(src_gids=conn_data['src_type'],
+                           target_gids=conn_data['target_type'],
+                           loc=conn_data['loc'],
+                           receptor=conn_data['receptor'],
+                           weight=conn_data['nc_dict']['A_weight'],
+                           delay=conn_data['nc_dict']['A_delay'],
+                           lamtha=conn_data['nc_dict']['lamtha'],
+                           allow_autapses=conn_data['allow_autapses'],
+                           probability=conn_data['probability'])
+
+
 def read_network(fname):
     net_data = read_hdf5(fname)
-    params = dict()
-    params['N_pyr_x'] = 10
-    params['N_pyr_y'] = 10
-    params['threshold'] = 0.0
+    params = net_data['params']
     net = Network(params)
     # Setting attributes
     # Set cell types
@@ -1604,6 +1653,11 @@ def read_network(fname):
     # Set external drives
     for key in net_data['external_drives'].keys():
         _read_external_drive(net, net_data['external_drives'][key])
+    # Set external biases
+    net.external_biases = net_data['external_biases']
+    # Set connectivity
+    _read_connectivity(net, net_data['connectivity'])
+
     return net
 
 
