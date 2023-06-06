@@ -21,15 +21,15 @@ authors:
     equal-contrib: true
     affiliation: "2, 3"
   - name: Christopher Bailey
-    affiliation:
+    affiliation: 4
   - name: Steven Brandt
     affiliation: "2, 3"
   - name: Blake Caldwell
-    affiliation: 
+    affiliation: 3
   - name: Huzi Cheng
     affiliation: 
   - name: Dylan Daniels
-    affiliation: 
+    affiliation: 3
   - name: Carolina Fernandez
     affiliation: 
   - name: Mostafa Khalil
@@ -69,12 +69,12 @@ authors:
 affiliations:
   - name: Athinoula A. Martinos Center for Biomedical Imaging, Massachusetts General Hospital, Boston, MA, USA
     index: 1
-  - name: Brown University, Department of Neuroscience, Providence, RI, USA
+  - name: Department of Neuroscience, Brown University, Providence, RI, USA
     index: 2
-  - name: Brown University, Robert J. and Nancy D. Carney Institute for Brain Science, Providence, RI, USA
+  - name: Robert J. and Nancy D. Carney Institute for Brain Science, Brown University, Providence, RI, USA
     index: 3
-  - name:
-    index: 
+  - name: Department of Clinical Medicine, Aarhus University, Aarhus, Denmark
+    index: 4
   - name:
     index: 
   - name: Department of Radiology, Harvard Medical School, Boston, MA, USA # Kaisu Lankinen
@@ -126,18 +126,16 @@ HNN-core has minimal dependencies which allows for effortless installation using
 
 ```python
 from hnn_core import jones_2009_model, simulate_dipole
-
-net = jones_2009_model()
-
-weights_ampa = {'L2_basket': 0.09, 'L2_pyramidal': 0.02,
+net = jones_2009_model() # Create network model
+weights_ampa = {'L2_basket': 0.09, 'L2_pyramidal': 0.02, 
                 'L5_basket': 0.2, 'L5_pyramidal': 8e-3}
 synaptic_delays = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                    'L5_basket': 1.0, 'L5_pyramidal': 1.0}
-
+# Add inputs to drive activiy in the network
 net.add_evoked_drive(name='evprox1', mu=26.61, sigma=2.47, numspikes=1,
                      weights_ampa=weights_ampa, location='proximal',
                      synaptic_delays=synaptic_delays)
-
+# Simulate and plot electrical current dipole
 dpl = simulate_dipole(net, tstop=170.0, dt=0.025)
 dpl[0].plot()
 ```
