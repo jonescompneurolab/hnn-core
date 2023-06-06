@@ -1361,10 +1361,10 @@ class _Connectivity(dict):
         Number of unique source gids.
     num_targets : int
         Number of unique target gids.
-    src_gids : list of int
-        List of unique source gids in connection.
-    target_gids : list of int
-        List of unique target gids in connection.
+    src_gids : set of int
+        Set of unique source gids in connection.
+    target_gids : set of int
+        Set of unique target gids in connection.
     loc : str
         Location of synapse on target cell. Must be
         'proximal', 'distal', or 'soma'. Note that inhibitory synapses

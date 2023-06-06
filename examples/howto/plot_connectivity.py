@@ -48,8 +48,7 @@ conn_idx = conn_indices[0]
 print(net_erp.connectivity[conn_idx])
 plot_connectivity_matrix(net_erp, conn_idx)
 
-gid_idx = 11
-src_gid = net_erp.connectivity[conn_idx]['src_gids'][gid_idx]
+src_gid = net_erp.connectivity[conn_idx]['src_gids'].copy().pop()
 fig = plot_cell_connectivity(net_erp, conn_idx, src_gid)
 
 ###############################################################################
@@ -81,7 +80,7 @@ def get_network(probability=1.0):
     for target in ['L5_pyramidal', 'L2_basket']:
         net.add_connection(src, target, location, receptor,
                            delay, weight, lamtha, probability=probability,
-			   conn_seed=conn_seed)
+                           conn_seed=conn_seed)
 
     # Basket cell connections
     location, receptor = 'soma', 'gabaa'
@@ -90,7 +89,7 @@ def get_network(probability=1.0):
     for target in ['L5_pyramidal', 'L2_basket']:
         net.add_connection(src, target, location, receptor,
                            delay, weight, lamtha, probability=probability,
-			   conn_seed=conn_seed)
+                           conn_seed=conn_seed)
     return net
 
 
@@ -125,7 +124,7 @@ plot_connectivity_matrix(net_sparse, conn_idx)
 ###############################################################################
 # Note that the sparsity is in addition to the weight decay with distance
 # from the source cell.
-src_gid = net_sparse.connectivity[conn_idx]['src_gids'][5]
+src_gid = net_sparse.connectivity[conn_idx]['src_gids'].copy().pop()
 plot_cell_connectivity(net_sparse, conn_idx, src_gid=src_gid)
 
 ###############################################################################
