@@ -272,7 +272,7 @@ def test_network_drives():
         src_set = set()
         for conn_idx in conn_idxs:
             src_set.update(net.connectivity[conn_idx]['src_gids'])
-        drive_src_list.extend(sorted(list(src_set)))
+        drive_src_list.extend(sorted(src_set))
     assert np.array_equal(drive_src_list, sorted(drive_src_list))
 
     # Check drive dict structure for each external drive
