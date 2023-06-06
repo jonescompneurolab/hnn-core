@@ -469,6 +469,18 @@ class Network(object):
             if len(match_conns) == 0:
                 return False
 
+        # Check extracellular arrays
+        if not (self.rec_arrays == other.rec_arrays):
+            return False
+
+        # Check threshold
+        if not (self.threshold == other.threshold):
+            return False
+
+        # Check delay
+        if not (self.delay == other.delay):
+            return False
+
         return True
 
     def set_cell_positions(self, *, inplane_distance=None,
@@ -1451,8 +1463,13 @@ class Network(object):
         # Write connectivity
         net_data['connectivity'] = _write_connectivity(self.connectivity)
         # Write rec arrays
+        net_data['rec_arrays'] = dict()
+        for key in self.rec_arrays.keys():
+            net_data['rec_arrays'][key] = self.rec_arrays[key].to_dict()
         # Write threshold
+        net_data['threshold'] = self.threshold
         # Write delay
+        net_data['delay'] = self.delay
 
         # Saving file
         write_hdf5(fname, net_data, overwrite=True)
@@ -1632,6 +1649,18 @@ def _read_connectivity(net, conns_data):
                            probability=conn_data['probability'])
 
 
+def _read_rec_arrays(net, rec_arrays_data):
+    for key in rec_arrays_data:
+        rec_array = rec_arrays_data[key]
+        net.add_electrode_array(name=key,
+                                electrode_pos=rec_array['positions'],
+                                conductivity=rec_array['conductivity'],
+                                method=rec_array['method'],
+                                min_distance=rec_array['min_distance'])
+        net.rec_arrays[key]._times = rec_array['times']
+        net.rec_arrays[key]._data = rec_array['voltages']
+
+
 def read_network(fname):
     net_data = read_hdf5(fname)
     params = net_data['params']
@@ -1657,6 +1686,12 @@ def read_network(fname):
     net.external_biases = net_data['external_biases']
     # Set connectivity
     _read_connectivity(net, net_data['connectivity'])
+    # Set rec_arrays
+    _read_rec_arrays(net, net_data['rec_arrays'])
+    # Set threshold
+    net.threshold = net_data['threshold']
+    # Set delay
+    net.delay = net_data['delay']
 
     return net
 
