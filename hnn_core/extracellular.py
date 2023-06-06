@@ -354,6 +354,19 @@ class ExtracellularArray:
     def __len__(self):
         return len(self._data)  # length == number of trials
 
+    def __eq__(self, other):
+        if not isinstance(other, ExtracellularArray):
+            return NotImplemented
+        if not (self.positions == other.positions and
+                self.conductivity == other.conductivity and
+                self.method == other.method and
+                self.min_distance == other.min_distance and
+                (self.times == other.times).all() and
+                (self.voltages == other.voltages).all()):
+            return False
+
+        return True
+
     def copy(self):
         """Return a copy of the ExtracellularArray instance
 
@@ -523,6 +536,17 @@ class ExtracellularArray:
                                colorbar=colorbar, show=show)
 
         return fig
+
+    def to_dict(self):
+        rec_array_data = dict()
+        rec_array_data['positions'] = self.positions
+        rec_array_data['conductivity'] = self.conductivity
+        rec_array_data['method'] = self.method
+        rec_array_data['min_distance'] = self.min_distance
+        rec_array_data['times'] = self.times
+        rec_array_data['voltages'] = self.voltages
+
+        return rec_array_data
 
 
 class _ExtracellularArrayBuilder(object):
