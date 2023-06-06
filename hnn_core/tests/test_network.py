@@ -24,6 +24,10 @@ def test_network_io(tmpdir):
     # Test __eq__ method
     net_copy = net_jones.copy()
     assert net_copy == net_jones
+    electrode_pos = (1, 2, 3)
+    net_jones.add_electrode_array('el1', electrode_pos)
+    electrode_pos = [(1, 2, 3), (-1, -2, -3)]
+    net_jones.add_electrode_array('arr1', electrode_pos)
     # Writing network
     net_jones.write(tmpdir.join('net_jones.hdf5'))
     # Reading network
