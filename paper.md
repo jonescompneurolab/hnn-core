@@ -114,7 +114,7 @@ HNN-core code enables the creation of a new and improved web-based GUI based on 
 - The ability to modify all features of the morphology and biophysical properties of any cell in the network
 - An API that enables complete control of cell-cell and drive-cell connectivity in the network
 - An API that allows for flexibility in defining the exogenous layer specific drive to the neocortical network
-- The ability to choose from multiple template models based on previous publications (jones_2009_model() [@jones2009quantitative], law_2021_model() [@law2022thalamocortical], calcium_model() [@kohl2022neural])
+- The ability to choose from multiple template models based on previous publications (`jones_2009_model()`{.python} [@jones2009quantitative], `law_2021_model()`{.python} [@law2022thalamocortical], `calcium_model()`{.python} [@kohl2022neural])
 - Built-in ERP optimization functionality designed for faster convergence 
 - The choice of two parallel backends for either parallelizing across cells to speed up individual simulations (MPI), or across trials to speed up batches of simulations (joblib)
 
@@ -124,6 +124,23 @@ All of the code associated with HNN-core has been extensively documented at mult
 
 HNN-core has minimal dependencies which allows for effortless installation using the pip Python installer. In addition to numpy, scipy and matplotlib common in most libraries in the scientific Python stack, HNN-core uses Neuron for the cell and circuit modeling. Here, we demonstrate how the HNN-core interface can be used to quickly simulate and plot the net cortical dipole response to a brief exogenously evoked drive representing “feedforward” thalamocortical input. This input  (referred to as ‘evprox1’) effectively targets the proximal dendrites of the pyramidal neurons in L2/3 and L5, using the template neocortical model as in @jones2009quantitative.
 
+```python
+from hnn_core import jones_2009_model, simulate_dipole
+
+net = jones_2009_model()
+
+weights_ampa = {'L2_basket': 0.09, 'L2_pyramidal': 0.02,
+                'L5_basket': 0.2, 'L5_pyramidal': 8e-3}
+synaptic_delays = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                   'L5_basket': 1.0, 'L5_pyramidal': 1.0}
+
+net.add_evoked_drive(name='evprox1', mu=26.61, sigma=2.47, numspikes=1,
+                     weights_ampa=weights_ampa, location='proximal',
+                     synaptic_delays=synaptic_delays)
+
+dpl = simulate_dipole(net, tstop=170.0, dt=0.025)
+dpl[0].plot()
+```
 ** ADD CODE AND PLOTS HERE **
 
 # Ongoing research using HNN-core
@@ -134,6 +151,6 @@ Overall, HNN-core provides an expandable and sustainable Python-based software p
 
 # Acknowledgements
 
-HNN-core was supported by NIH grants R01EB022889,  2R01NS104585-05, R01MH130415, R01AG076227,  and Google Summer of Code.
+HNN-core was supported by NIH grants R01EB022889, 2R01NS104585-05, R01MH130415, R01AG076227, and Google Summer of Code.
 
 # References
