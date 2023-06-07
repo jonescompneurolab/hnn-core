@@ -224,6 +224,19 @@ class Section:
         if not isinstance(other, Section):
             return NotImplemented
         # Add for mechs also
+        # Check equality for mechs
+        for mech_name in self.mechs.keys():
+            self_mech = self.mechs[mech_name]
+            other_mech = other.mechs[mech_name]
+            for attr in self_mech.keys():
+                self_val = self_mech[attr]
+                other_val = other_mech[attr]
+                if (hasattr(self_val, '__call__') or
+                   hasattr(other_val, '__call__')):
+                    continue
+                elif self_val != other_val:
+                    return False
+
         return (self.L == other.L and
                 self.diam == other.diam and
                 self.Ra == other.Ra and
@@ -240,8 +253,7 @@ class Section:
         section_data['end_pts'] = self.end_pts
         # Need to solve the partial function problem
         # in mechs
-        # section_data['mechs'] = self.mechs
-        # print(self.mechs)
+        section_data['mechs'] = self.mechs
         section_data['syns'] = self.syns
         return section_data
 
