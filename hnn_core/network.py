@@ -1419,10 +1419,14 @@ class Network(object):
         params['N_pyr_x'] = self._N_pyr_x
         params['N_pyr_y'] = self._N_pyr_y
         params['threshold'] = self.threshold
+        # Remove on discussion
+        params = self._params
         net_data['params'] = params
         cell_types_data = dict()
         for key in self.cell_types:
-            cell_types_data[key] = self.cell_types[key].to_dict()
+            cell_copy = self.cell_types[key].copy()
+            cell_copy.build()
+            cell_types_data[key] = cell_copy.to_dict()
         net_data['cell_types'] = cell_types_data
         # Write gid_ranges
         gid_ranges_data = dict()
@@ -1534,7 +1538,7 @@ def _read_cell_types(cell_types_data):
             # Set section attributes
             sections[section_name].syns = section_data['syns']
             # Think how to set mechs
-            # sections[section_name].mechs = section_data['mechs']
+            sections[section_name].mechs = section_data['mechs']
         cell_types[cell_name] = Cell(name=cell_data['name'],
                                      pos=cell_data['pos'],
                                      sections=sections,

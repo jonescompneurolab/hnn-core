@@ -34,11 +34,17 @@ def test_network_io(tmpdir):
     net_jones_read = read_network(tmpdir.join('net_jones.hdf5'))
     assert net_jones == net_jones_read
 
-    # Add test to check weights are equal in connections and drives
-    # Run simulation and simulation output should be same (dipole)
+    # Add test to check weights are equal in connections and drives (todo)
+    # Run simulation and simulation output should be same (dipole) (Done)
 
     # Simulating network
-    simulate_dipole(net_jones, tstop=5)
+    dpls1 = simulate_dipole(net_jones, tstop=2, n_trials=1)
+    dpls2 = simulate_dipole(net_jones_read, tstop=2, n_trials=1)
+    for dpl1, dpl2 in zip(dpls1, dpls2):
+        assert_allclose(dpl1.times, dpl2.times, rtol=0.00051, atol=0)
+        for dpl_key in dpl1.data.keys():
+            assert_allclose(dpl1.data[dpl_key],
+                            dpl2.data[dpl_key], rtol=0.000051, atol=0)
     # Writing network
     net_jones.write(tmpdir.join('net_jones_sim.hdf5'))
     # Reading network
