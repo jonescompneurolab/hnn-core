@@ -26,22 +26,24 @@ authors:
   - name: Steven Brandt
     affiliation: "2, 3"
   - name: Blake Caldwell
-    affiliation: 3
-  - name: Huzi Cheng
+    orcid: 0000-0002-6882-6998
     affiliation: 5
+  - name: Huzi Cheng
+    affiliation: 6
   - name: Dylan Daniels
     orcid: 0009-0008-1958-353X
     affiliation: 3
   - name: Carolina Fernandez
     orcid: 0009-0003-0611-1270
-    affiliation: 6
-  - name: Mostafa Khalil
     affiliation: 7
+  - name: Mostafa Khalil
+    affiliation: 8
   - name: Samika Kanekar
     affiliation: 3
   - name: Carmen Kohl
-    affiliation: 3
-  - name: Orsolya Kolozsvari
+    affiliation: 
+  - name: Orsolya Kolozsvári
+    orcid: 0000-0002-1619-6314
     affiliation: 
   - name: Kaisu Lankinen
     orcid: 0000-0003-2210-2385
@@ -80,12 +82,18 @@ affiliations:
     index: 3
   - name: Department of Clinical Medicine, Aarhus University, Aarhus, Denmark # Chris Bailey
     index: 4
-  - name: Department of Psychological and Brain Sciences, Indiana University Bloomington, Bloomington, IN, USA # Huzi Cheng
+  - name: Bassett Medical Center, Cooperstown, NY, USA # Blake Caldwell
     index: 5
-  - name: Department of Biomedical Engineering, University of Miami, Coral Gables, FL, USA # Carolina Fernandez
+  - name: Department of Psychological and Brain Sciences, Indiana University Bloomington, Bloomington, IN, USA # Huzi Cheng
     index: 6
-  - name: Department of Psychiatry and Behavioral Health, Penn State Milton S. Hershey Medical Center, Penn State College of Medicine, Hershey, PA, USA # Mostafa Khalil
+  - name: Department of Biomedical Engineering, University of Miami, Coral Gables, FL, USA # Carolina Fernandez
     index: 7
+  - name: Department of Psychiatry and Behavioral Health, Penn State Milton S. Hershey Medical Center, Penn State College of Medicine, Hershey, PA, USA # Mostafa Khalil
+    index: 8
+  - name: Department of Psychology, University of Jyväskylä, Jyväskylä, Finland # Orsolya Kolozsvári
+    index:
+  - name: Jyväskylä Centre for Interdisciplinary Brain Research, University of Jyväskylä, Jyväskylä, Finland # Orsolya Kolozsvári
+    index: 
   - name: Department of Radiology, Harvard Medical School, Boston, MA, USA # Kaisu Lankinen
     index: 
   - name: University of California, Berkeley, Department of Molecular and Cell Biology, Innovative Genomics Institute, Berkeley, CA, USA # Keneth Loi
@@ -98,7 +106,7 @@ affiliations:
     index: 
   - name: Department of Human Physiology, University of Oregon, Eugene, OR, USA # Alex Rockhill
     index: 
-date: 5 June 2023
+date: 7 June 2023
 bibliography: paper.bib
 
 ---
