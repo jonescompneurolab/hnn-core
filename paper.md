@@ -21,23 +21,26 @@ authors:
     equal-contrib: true
     affiliation: "2, 3"
   - name: Christopher Bailey
+    orcid: 0000-0003-3318-3344
     affiliation: 4
   - name: Steven Brandt
     affiliation: "2, 3"
   - name: Blake Caldwell
     affiliation: 3
   - name: Huzi Cheng
-    affiliation: 
+    affiliation: 5
   - name: Dylan Daniels
+    orcid: 0009-0008-1958-353X
     affiliation: 3
   - name: Carolina Fernandez
-    affiliation: 
+    orcid: 0009-0003-0611-1270
+    affiliation: 6
   - name: Mostafa Khalil
-    affiliation: 
+    affiliation: 7
   - name: Samika Kanekar
-    affiliation: 
+    affiliation: 3
   - name: Carmen Kohl
-    affiliation: 
+    affiliation: 3
   - name: Orsolya Kolozsvari
     affiliation: 
   - name: Kaisu Lankinen
@@ -49,6 +52,7 @@ authors:
     orcid: 0000-0003-3646-5195
     affiliation: "XX, XX"
   - name: Rajat Partani
+    orcid: 0000-0002-6863-7046
     affiliation: 
   - name: Mattan Pelah
     affiliation: 
@@ -59,9 +63,10 @@ authors:
     affiliation: 
 
   - name: Matti Hamalainen
+    orcid: 0000-0001-6841-112X
     affiliation: 
   - name: Stephanie Jones
-    orcid: 
+    orcid: 0000-0001-6760-5301
     corresponding: true # (This is how to denote the corresponding author)
     affiliation: "2, 3"
 
@@ -73,10 +78,14 @@ affiliations:
     index: 2
   - name: Robert J. and Nancy D. Carney Institute for Brain Science, Brown University, Providence, RI, USA
     index: 3
-  - name: Department of Clinical Medicine, Aarhus University, Aarhus, Denmark
+  - name: Department of Clinical Medicine, Aarhus University, Aarhus, Denmark # Chris Bailey
     index: 4
-  - name:
-    index: 
+  - name: Department of Psychological and Brain Sciences, Indiana University Bloomington, Bloomington, IN, USA # Huzi Cheng
+    index: 5
+  - name: Department of Biomedical Engineering, University of Miami, Coral Gables, FL, USA # Carolina Fernandez
+    index: 6
+  - name: Department of Psychiatry and Behavioral Health, Penn State Milton S. Hershey Medical Center, Penn State College of Medicine, Hershey, PA, USA # Mostafa Khalil
+    index: 7
   - name: Department of Radiology, Harvard Medical School, Boston, MA, USA # Kaisu Lankinen
     index: 
   - name: University of California, Berkeley, Department of Molecular and Cell Biology, Innovative Genomics Institute, Berkeley, CA, USA # Keneth Loi
@@ -84,6 +93,8 @@ affiliations:
   - name: Center for Biomedical Imaging and Neuromodulation, Nathan S. Kline Institute for Psychiatric Research, Orangeburg, NY, USA # Sam Neymotin
     index: 
   - name: Department of Psychiatry, New York University Grossman School of Medicine, New York, NY, USA # Sam Ney Motin
+    index:
+  - name: Department of Computer Science and Engineering, National Institute of Technology Karnataka, Karnataka, India # Rajat Partani
     index: 
   - name: Department of Human Physiology, University of Oregon, Eugene, OR, USA # Alex Rockhill
     index: 
@@ -131,7 +142,7 @@ weights_ampa = {'L2_basket': 0.09, 'L2_pyramidal': 0.02,
                 'L5_basket': 0.2, 'L5_pyramidal': 8e-3}
 synaptic_delays = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                    'L5_basket': 1.0, 'L5_pyramidal': 1.0}
-# Add inputs to drive activiy in the network
+# Add inputs to drive activity in the network
 net.add_evoked_drive(name='evprox1', mu=26.61, sigma=2.47, numspikes=1,
                      weights_ampa=weights_ampa, location='proximal',
                      synaptic_delays=synaptic_delays)
