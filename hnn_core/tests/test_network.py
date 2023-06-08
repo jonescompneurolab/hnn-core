@@ -720,19 +720,19 @@ def test_network_connectivity():
         for conn_idx in indices:
             if isinstance(item, range):
                 # arg specifies a subset of item gids (within range)
-                net.connectivity[conn_idx][arg] <= set(item)
+                net.connectivity[conn_idx][arg].issubset(item)
             elif isinstance(item, str):
                 if arg in {'src_gids', 'target_gids'}:
                     # arg specifies a subset of item gids (within gid_ranges)
-                    assert (net.connectivity[conn_idx][arg] <=
-                            set(net.gid_ranges[item]))
+                    assert net.connectivity[conn_idx][arg].issubset(
+                        net.gid_ranges[item])
                 else:
                     # arg and item specify equivalent string descriptors for
                     # this connection type
                     assert net.connectivity[conn_idx][arg] == item
             else:
                 # arg specifies a superset of item gids
-                assert set(net.connectivity[conn_idx][arg]) >= {item}
+                assert set(net.connectivity[conn_idx][arg]).issuperset({item})
 
     # Test searching a list of src or target types
     src_cell_type_list = ['L2_basket', 'L5_basket']
