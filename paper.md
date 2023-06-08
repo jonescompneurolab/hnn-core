@@ -143,22 +143,27 @@ All of the code associated with HNN-core has been extensively documented at mult
 
 HNN-core has minimal dependencies which allows for effortless installation using the pip Python installer. In addition to numpy, scipy and matplotlib common in most libraries in the scientific Python stack, HNN-core uses Neuron for the cell and circuit modeling. Here, we demonstrate how the HNN-core interface can be used to quickly simulate and plot the net cortical dipole response to a brief exogenously evoked drive representing “feedforward” thalamocortical input. This input  (referred to as ‘evprox1’) effectively targets the proximal dendrites of the pyramidal neurons in L2/3 and L5, using the template neocortical model as in @jones2009quantitative.
 
+\newpage
+
 ```python
 from hnn_core import jones_2009_model, simulate_dipole
-net = jones_2009_model() # Create network model
-weights_ampa = {'L2_basket': 0.09, 'L2_pyramidal': 0.02, 
+# 1) Create the network model
+net = jones_2009_model()
+# 2) Define weights and delay times of inputs to network
+weights_ampa = {'L2_basket': 0.09, 'L2_pyramidal': 0.02,
                 'L5_basket': 0.2, 'L5_pyramidal': 8e-3}
 synaptic_delays = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                    'L5_basket': 1.0, 'L5_pyramidal': 1.0}
-# Add inputs to drive activity in the network
-net.add_evoked_drive(name='evprox1', mu=26.61, sigma=2.47, numspikes=1,
+# 3) Attach inputs to to network
+net.add_evoked_drive(name='evprox1', mu=20.0, sigma=2.0, numspikes=1,
                      weights_ampa=weights_ampa, location='proximal',
                      synaptic_delays=synaptic_delays)
-# Simulate and plot electrical current dipole
-dpl = simulate_dipole(net, tstop=170.0, dt=0.025)
-dpl[0].plot()
+# 4) Run simulation and plot results
+dpl = simulate_dipole(net, tstop=100.0)
+
+
 ```
-** ADD CODE AND PLOTS HERE **
+![Plots of the network and simulated results can be generated using HNN-core visualization API. The position of neuron somas can be plotted with `net.plot_cells()`, the drive input histogram with `net.cell_response.plot_spikes_hist()`, the electrical current dipole with `plot_dipole(dpl)`, and the spike raster with `net.cell_response.plot_spikes_raster().\label{fig:fig1}](joss_figure.png)
 
 # Ongoing research using HNN-core
 
