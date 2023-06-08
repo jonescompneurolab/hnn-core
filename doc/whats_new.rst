@@ -29,6 +29,9 @@ API
   now support hdf5 format for read/write Cell response object, by
   `Rajat Partani`_ in :gh:`644`
 
+- Connection `'src_gids'` and `'target_gids'` are now stored as set objects
+  instead of lists, by `Ryan Thorpe`_ in :gh:`642`.
+
 .. _0.3:
 
 0.3
