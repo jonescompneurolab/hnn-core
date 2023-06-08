@@ -48,6 +48,8 @@ conn_idx = conn_indices[0]
 print(net_erp.connectivity[conn_idx])
 plot_connectivity_matrix(net_erp, conn_idx)
 
+# Note here that `'src_gids'` is a `set` object
+# The `.pop()` method can be used to remove a random element
 src_gid = net_erp.connectivity[conn_idx]['src_gids'].copy().pop()
 fig = plot_cell_connectivity(net_erp, conn_idx, src_gid)
 
