@@ -41,32 +41,32 @@ authors:
   - name: Samika Kanekar
     affiliation: 3
   - name: Carmen Kohl
-    affiliation: 
+    orcid: 0000-0001-7585-595X
+    affiliation: 3
   - name: Orsolya Kolozsvári
     orcid: 0000-0002-1619-6314
-    affiliation: 
+    affiliation: "9, 10"
   - name: Kaisu Lankinen
     orcid: 0000-0003-2210-2385
-    affiliation: "1, XX"
+    affiliation: "1, 11"
   - name: Kenneth Loi
-    affiliation: 
+    affiliation: 12
   - name: Sam Neymotin
     orcid: 0000-0003-3646-5195
-    affiliation: "XX, XX"
+    affiliation: "13, 14"
   - name: Rajat Partani
     orcid: 0000-0002-6863-7046
-    affiliation: 
+    affiliation: 15
   - name: Mattan Pelah
-    affiliation: 
+    affiliation: "XX"
   - name: Alex Rockhill
     orcid: 0000-0003-3868-7453
-    affiliation: 
+    affiliation: 16
   - name: Mohamed Sherif
-    affiliation: 
-
+    affiliation: "XX"
   - name: Matti Hamalainen
     orcid: 0000-0001-6841-112X
-    affiliation: 
+    affiliation: "XX"
   - name: Stephanie Jones
     orcid: 0000-0001-6760-5301
     corresponding: true # (This is how to denote the corresponding author)
@@ -91,21 +91,21 @@ affiliations:
   - name: Department of Psychiatry and Behavioral Health, Penn State Milton S. Hershey Medical Center, Penn State College of Medicine, Hershey, PA, USA # Mostafa Khalil
     index: 8
   - name: Department of Psychology, University of Jyväskylä, Jyväskylä, Finland # Orsolya Kolozsvári
-    index:
+    index: 9
   - name: Jyväskylä Centre for Interdisciplinary Brain Research, University of Jyväskylä, Jyväskylä, Finland # Orsolya Kolozsvári
-    index: 
+    index: 10
   - name: Department of Radiology, Harvard Medical School, Boston, MA, USA # Kaisu Lankinen
-    index: 
+    index: 11
   - name: University of California, Berkeley, Department of Molecular and Cell Biology, Innovative Genomics Institute, Berkeley, CA, USA # Keneth Loi
-    index:
+    index: 12
   - name: Center for Biomedical Imaging and Neuromodulation, Nathan S. Kline Institute for Psychiatric Research, Orangeburg, NY, USA # Sam Neymotin
-    index: 
+    index: 13
   - name: Department of Psychiatry, New York University Grossman School of Medicine, New York, NY, USA # Sam Ney Motin
-    index:
+    index: 14
   - name: Department of Computer Science and Engineering, National Institute of Technology Karnataka, Karnataka, India # Rajat Partani
-    index: 
+    index: 15
   - name: Department of Human Physiology, University of Oregon, Eugene, OR, USA # Alex Rockhill
-    index: 
+    index: 16
 date: 7 June 2023
 bibliography: paper.bib
 
