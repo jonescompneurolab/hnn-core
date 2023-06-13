@@ -58,12 +58,13 @@ authors:
     orcid: 0000-0002-6863-7046
     affiliation: 15
   - name: Mattan Pelah
-    affiliation: "XX"
+    affiliation: 3
   - name: Alex Rockhill
     orcid: 0000-0003-3868-7453
     affiliation: 16
   - name: Mohamed Sherif
-    affiliation: "XX"
+    orcid: 0000-0002-8951-1645
+    affiliation: 17
   - name: Matti Hamalainen
     orcid: 0000-0001-6841-112X
     affiliation: "XX"
@@ -106,6 +107,8 @@ affiliations:
     index: 15
   - name: Department of Human Physiology, University of Oregon, Eugene, OR, USA # Alex Rockhill
     index: 16
+  - name: Rhode Island Hospital, Brown University, Providence, RI, USA
+    index: 17
 date: 7 June 2023
 bibliography: paper.bib
 
@@ -163,7 +166,7 @@ dpl = simulate_dipole(net, tstop=100.0)
 
 
 ```
-![Plots of the network and simulated results can be generated using the HNN-core visualization API. The position of neuron somas can be plotted with `net.plot_cells()`, the drive input histogram with `net.cell_response.plot_spikes_hist()`, the electrical current dipole with `plot_dipole(dpl)`, and the spike raster with `net.cell_response.plot_spikes_raster()`.\label{fig:fig1}](joss_figure.png)
+![**Left**: 3D rendering of neurons composing the network model. Figure adapted from [@neymotin2020human]. **Right**: Plots of the network and simulated results can be generated using the HNN-core visualization API. The drive input histogram with `net.cell_response.plot_spikes_hist()`, the electrical current dipole with `plot_dipole(dpl)`, and the spike raster with `net.cell_response.plot_spikes_raster()`.\label{fig:fig1}](joss_figure.pdf)
 
 # Ongoing research using HNN-core
 
