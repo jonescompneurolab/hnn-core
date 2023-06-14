@@ -30,6 +30,10 @@ def test_network_io(tmpdir):
     net_jones.add_electrode_array('arr1', electrode_pos)
     # Writing network
     net_jones.write(tmpdir.join('net_jones.hdf5'))
+    # Testing when overwrite is False and same filename is used
+    with pytest.raises(FileExistsError,
+                       match="File already exists at path "):
+        net_jones.write(tmpdir.join('net_jones.hdf5'), overwrite=False)
     # Reading network
     net_jones_read = read_network(tmpdir.join('net_jones.hdf5'))
     assert net_jones == net_jones_read
