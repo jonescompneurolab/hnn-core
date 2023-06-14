@@ -33,32 +33,10 @@ def test_cell_response(tmpdir):
         cell_response.write(tmpdir.join('spk_%d.txt'))
 
     # Testing reading from txt files
-    assert cell_response == read_spikes(tmpdir.join('spk_*.txt'))
-
-    # Testing write using hdf5
-    cell_response.write(tmpdir.join('spk.hdf5'))
-
-    # Testing when overwrite is False and same filename is used
-    with pytest.raises(FileExistsError,
-                       match="File already exists at path "):
-        cell_response.write(tmpdir.join('spk.hdf5'), overwrite=False)
-
-    # Testing for wrong extension provided
-    with pytest.raises(NameError,
-                       match="File extension should be either txt or hdf5"):
-        cell_response.write(tmpdir.join('spk.xls'))
-
-    # Test read using hdf5
-    assert cell_response == read_spikes(tmpdir.join('spk.hdf5'))
-
-    # Smoke test for visualization functions upon reading hdf5 file
-    cell_response_hdf5 = read_spikes(tmpdir.join('spk.hdf5'))
-    cell_response_hdf5.plot_spikes_hist(show=False)
-
-    # Testing File Not Found Error
-    with pytest.raises(FileNotFoundError,
-                       match="File not found at "):
-        read_spikes(tmpdir.join('spk1.hdf5'))
+    with pytest.warns(DeprecationWarning,
+                      match="Reading cell response from txt files is "
+                      "deprecated"):
+        assert cell_response == read_spikes(tmpdir.join('spk_*.txt'))
 
     assert ("CellResponse | 2 simulation trials" in repr(cell_response))
 
@@ -80,10 +58,6 @@ def test_cell_response(tmpdir):
     empty_spike.write(tmpdir.join('empty_spk.txt'))
     empty_spike.write(tmpdir.join('empty_spk_{0}.txt'))
     assert empty_spike == read_spikes(tmpdir.join('empty_spk_*.txt'))
-
-    # Test recovery of empty spike file using hdf5
-    empty_spike.write(tmpdir.join('empty_spk.hdf5'))
-    assert empty_spike == read_spikes(tmpdir.join('empty_spk.hdf5'))
 
     assert ("CellResponse | 2 simulation trials" in repr(empty_spike))
 
