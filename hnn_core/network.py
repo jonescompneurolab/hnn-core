@@ -10,6 +10,7 @@
 import itertools as it
 from copy import deepcopy
 from collections import OrderedDict
+import os
 
 import numpy as np
 import warnings
@@ -1412,15 +1413,25 @@ class Network(object):
         """
         return plot_cells(net=self, ax=ax, show=show)
 
-    def write(self, fname):
+    def write(self, fname, overwrite=True):
+        # Tasks
+        # 1) Remove params dict (Partial done)
+        # 2) Add overwrite warnings (Done)
+        # 3) Add boolean to read/write un-simulated network
+        # 4) Add boolean to read/write simulated network
+        # 5) Think about documentation
+        # 6) Add tests
+        # 7) Store the type of object saved and issue warning
+        if overwrite is False and os.path.exists(fname):
+            raise FileExistsError('File already exists at path %s. Rename '
+                                  'the file or set overwrite=True.' % (fname,))
         net_data = dict()
         # Write the required params
         params = dict()
         params['N_pyr_x'] = self._N_pyr_x
         params['N_pyr_y'] = self._N_pyr_y
         params['threshold'] = self.threshold
-        # Remove on discussion
-        params = self._params
+        params['celsius'] = self._params['celsius']
         net_data['params'] = params
         cell_types_data = dict()
         for key in self.cell_types:
@@ -1463,7 +1474,7 @@ class Network(object):
         net_data['delay'] = self.delay
 
         # Saving file
-        write_hdf5(fname, net_data, overwrite=True)
+        write_hdf5(fname, net_data, overwrite=overwrite)
 
 
 def _write_connectivity(connectivity):
