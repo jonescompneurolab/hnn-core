@@ -1426,7 +1426,7 @@ class Network(object):
         """
         return plot_cells(net=self, ax=ax, show=show)
 
-    def write(self, fname, overwrite=True):
+    def write(self, fname, overwrite=True, save_unsimulated=False):
         # Tasks
         # 1) Remove params dict (Partial done)
         # 2) Add overwrite warnings (Done)
@@ -1466,12 +1466,13 @@ class Network(object):
         net_data['pos_dict'] = pos_dict_data
         # Write cell_response
         net_data['cell_response'] = (_cell_response_to_dict
-                                     (self.cell_response))
+                                     (self.cell_response, save_unsimulated))
         # Write External drives
         external_drives_data = dict()
         for key in self.external_drives.keys():
             external_drives_data[key] = (_external_drive_to_dict
-                                         (self.external_drives[key]))
+                                         (self.external_drives[key],
+                                          save_unsimulated))
         net_data['external_drives'] = external_drives_data
         # Write External biases
         net_data['external_biases'] = self.external_biases
@@ -1480,7 +1481,10 @@ class Network(object):
         # Write rec arrays
         net_data['rec_arrays'] = dict()
         for key in self.rec_arrays.keys():
-            net_data['rec_arrays'][key] = self.rec_arrays[key].to_dict()
+            rec_array_copy = self.rec_arrays[key].copy()
+            if save_unsimulated:
+                rec_array_copy._reset()
+            net_data['rec_arrays'][key] = rec_array_copy.to_dict()
         # Write threshold
         net_data['threshold'] = self.threshold
         # Write delay
@@ -1512,10 +1516,10 @@ def _write_connectivity(connectivity):
     return conns_data
 
 
-def _cell_response_to_dict(cell_response):
+def _cell_response_to_dict(cell_response, save_unsimulated):
     # Will be deleted when to_dict method will be merged
     # in a diiferent PR
-    if not cell_response:
+    if (not cell_response) or save_unsimulated:
         return None
     cell_response_data = dict()
     cell_response_data['spike_times'] = cell_response.spike_times
@@ -1535,7 +1539,7 @@ def _cell_response_to_dict(cell_response):
     return cell_response_data
 
 
-def _external_drive_to_dict(drive):
+def _external_drive_to_dict(drive, save_unsimulated):
     drive_data = dict()
     for key in drive.keys():
         # Cannot store sets with hdf5
@@ -1543,6 +1547,8 @@ def _external_drive_to_dict(drive):
             drive_data[key] = list(drive[key])
         else:
             drive_data[key] = drive[key]
+    if save_unsimulated:
+        drive_data['events'] = list()
     return drive_data
 
 
@@ -1579,8 +1585,8 @@ def _read_cell_types(cell_types_data):
     return cell_types
 
 
-def _read_cell_response(cell_response_data):
-    if not cell_response_data:
+def _read_cell_response(cell_response_data, read_raw):
+    if (not cell_response_data) or read_raw:
         return None
     cell_response = CellResponse(spike_times=cell_response_data['spike_times'],
                                  spike_gids=cell_response_data['spike_gids'],
@@ -1598,7 +1604,7 @@ def _read_cell_response(cell_response_data):
     return cell_response
 
 
-def _read_external_drive(net, drive_data):
+def _read_external_drive(net, drive_data, read_raw):
     if drive_data['type'] == 'evoked':
         # Skipped n_drive_cells here
         net.add_evoked_drive(name=drive_data['name'],
@@ -1645,6 +1651,8 @@ def _read_external_drive(net, drive_data):
                              conn_seed=drive_data['conn_seed'])
 
     net.external_drives[drive_data['name']]['events'] = drive_data['events']
+    if read_raw:
+        net.external_drives[drive_data['name']]['events'] = list()
 
 
 def _read_connectivity(net, conns_data):
@@ -1664,7 +1672,7 @@ def _read_connectivity(net, conns_data):
                            probability=conn_data['probability'])
 
 
-def _read_rec_arrays(net, rec_arrays_data):
+def _read_rec_arrays(net, rec_arrays_data, read_raw):
     for key in rec_arrays_data:
         rec_array = rec_arrays_data[key]
         net.add_electrode_array(name=key,
@@ -1674,9 +1682,11 @@ def _read_rec_arrays(net, rec_arrays_data):
                                 min_distance=rec_array['min_distance'])
         net.rec_arrays[key]._times = rec_array['times']
         net.rec_arrays[key]._data = rec_array['voltages']
+        if read_raw:
+            net.rec_arrays[key]._reset()
 
 
-def read_network(fname):
+def read_network(fname, read_raw=False):
     net_data = read_hdf5(fname)
     params = net_data['params']
     net = Network(params)
@@ -1693,16 +1703,17 @@ def read_network(fname):
     # Set pos_dict
     net.pos_dict = net_data['pos_dict']
     # Set cell_response
-    net.cell_response = _read_cell_response(net_data['cell_response'])
+    net.cell_response = _read_cell_response(net_data['cell_response'],
+                                            read_raw)
     # Set external drives
     for key in net_data['external_drives'].keys():
-        _read_external_drive(net, net_data['external_drives'][key])
+        _read_external_drive(net, net_data['external_drives'][key], read_raw)
     # Set external biases
     net.external_biases = net_data['external_biases']
     # Set connectivity
     _read_connectivity(net, net_data['connectivity'])
     # Set rec_arrays
-    _read_rec_arrays(net, net_data['rec_arrays'])
+    _read_rec_arrays(net, net_data['rec_arrays'], read_raw)
     # Set threshold
     net.threshold = net_data['threshold']
     # Set delay
