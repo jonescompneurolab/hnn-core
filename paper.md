@@ -39,35 +39,36 @@ authors:
   - name: Mostafa Khalil
     affiliation: 8
   - name: Samika Kanekar
-    affiliation: 3
+    orcid: 0000-0002-6111-4461
+    affiliation: 9
   - name: Carmen Kohl
     orcid: 0000-0001-7585-595X
     affiliation: 3
   - name: Orsolya Kolozsvári
     orcid: 0000-0002-1619-6314
-    affiliation: "9, 10"
+    affiliation: "10, 11"
   - name: Kaisu Lankinen
     orcid: 0000-0003-2210-2385
-    affiliation: "1, 11"
+    affiliation: "1, 12"
   - name: Kenneth Loi
-    affiliation: 12
+    affiliation: "3, 13"
   - name: Sam Neymotin
     orcid: 0000-0003-3646-5195
-    affiliation: "13, 14"
+    affiliation: "14, 15"
   - name: Rajat Partani
     orcid: 0000-0002-6863-7046
-    affiliation: 15
+    affiliation: 16
   - name: Mattan Pelah
     affiliation: 3
   - name: Alex Rockhill
     orcid: 0000-0003-3868-7453
-    affiliation: 16
+    affiliation: 17
   - name: Mohamed Sherif
     orcid: 0000-0002-8951-1645
-    affiliation: 17
+    affiliation: "18, 19"
   - name: Matti Hamalainen
     orcid: 0000-0001-6841-112X
-    affiliation: "XX"
+    affiliation: 20
   - name: Stephanie Jones
     orcid: 0000-0001-6760-5301
     corresponding: true # (This is how to denote the corresponding author)
@@ -91,24 +92,30 @@ affiliations:
     index: 7
   - name: Department of Psychiatry and Behavioral Health, Penn State Milton S. Hershey Medical Center, Penn State College of Medicine, Hershey, PA, USA # Mostafa Khalil
     index: 8
-  - name: Department of Psychology, University of Jyväskylä, Jyväskylä, Finland # Orsolya Kolozsvári
+  - name: Warren Alpert Medical, Brown University, Providence, RI # Samika Kanekar
     index: 9
-  - name: Jyväskylä Centre for Interdisciplinary Brain Research, University of Jyväskylä, Jyväskylä, Finland # Orsolya Kolozsvári
+  - name: Department of Psychology, University of Jyväskylä, Jyväskylä, Finland # Orsolya Kolozsvári
     index: 10
-  - name: Department of Radiology, Harvard Medical School, Boston, MA, USA # Kaisu Lankinen
+  - name: Jyväskylä Centre for Interdisciplinary Brain Research, University of Jyväskylä, Jyväskylä, Finland # Orsolya Kolozsvári
     index: 11
-  - name: University of California, Berkeley, Department of Molecular and Cell Biology, Innovative Genomics Institute, Berkeley, CA, USA # Keneth Loi
+  - name: Department of Radiology, Harvard Medical School, Boston, MA, USA # Kaisu Lankinen
     index: 12
-  - name: Center for Biomedical Imaging and Neuromodulation, Nathan S. Kline Institute for Psychiatric Research, Orangeburg, NY, USA # Sam Neymotin
+  - name: Department of Molecular and Cell Biology; Innovative Genomics Institute, University of California, Berkeley, Berkeley, CA, USA # Keneth Loi
     index: 13
-  - name: Department of Psychiatry, New York University Grossman School of Medicine, New York, NY, USA # Sam Ney Motin
+  - name: Center for Biomedical Imaging and Neuromodulation, Nathan S. Kline Institute for Psychiatric Research, Orangeburg, NY, USA # Sam Neymotin
     index: 14
-  - name: Department of Computer Science and Engineering, National Institute of Technology Karnataka, Karnataka, India # Rajat Partani
+  - name: Department of Psychiatry, New York University Grossman School of Medicine, New York, NY, USA # Sam Ney Motin
     index: 15
-  - name: Department of Human Physiology, University of Oregon, Eugene, OR, USA # Alex Rockhill
+  - name: Department of Computer Science and Engineering, National Institute of Technology Karnataka, Karnataka, India # Rajat Partani
     index: 16
-  - name: Rhode Island Hospital, Brown University, Providence, RI, USA
+  - name: Department of Human Physiology, University of Oregon, Eugene, OR, USA # Alex Rockhill
     index: 17
+  - name: Department of Psychiatry and Human Behavior, Brown University, Providence, RI, USA
+    index: 18
+  - name: Rhode Island Hospital, Providence, RI, USA
+    index: 19
+  - name: Aalto University, Espoo, Finland
+    index: 20
 date: 7 June 2023
 bibliography: paper.bib
 
@@ -144,7 +151,7 @@ All of the code associated with HNN-core has been extensively documented at mult
 
 # Quick example code of running a simulation
 
-HNN-core has minimal dependencies which allows for effortless installation using the pip Python installer. In addition to numpy, scipy and matplotlib common in most libraries in the scientific Python stack, HNN-core uses Neuron for the cell and circuit modeling. Here, we demonstrate how the HNN-core interface can be used to quickly simulate and plot the net cortical dipole response to a brief exogenously evoked drive representing “feedforward” thalamocortical input. This input  (referred to as ‘evprox1’) effectively targets the proximal dendrites of the pyramidal neurons in L2/3 and L5, using the template neocortical model as in @jones2009quantitative.
+HNN-core has minimal dependencies which allows for effortless installation using the pip Python installer. In addition to numpy, scipy and matplotlib common in most libraries in the scientific Python stack, HNN-core uses Neuron for the cell and circuit modeling. Here, we demonstrate how the HNN-core interface can be used to quickly simulate and plot the net cortical dipole response to a brief exogenously evoked drive representing “feedforward” thalamocortical input. This input  (referred to as ‘evprox1’) effectively targets the proximal dendrites of the pyramidal neurons in L2/3 and L5, using the template neocortical model as in @jones2009quantitative. Note that this simulation is not addressing a specific scientific question, and is simply an educational example.
 
 \newpage
 
