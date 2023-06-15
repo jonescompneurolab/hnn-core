@@ -57,6 +57,18 @@ def test_network_io(tmpdir):
     # For cell response vsec isec bug
     assert net_jones.cell_response.vsec == net_jones_sim.cell_response.vsec
 
+    # Checking Saving unsimulated network
+    net_jones.write(tmpdir.join('net_jones_unsim.hdf5'), save_unsimulated=True)
+    net_jones_unsim = read_network(tmpdir.join('net_jones_unsim.hdf5'))
+    net_unsim = net_jones.copy()
+    net_unsim.cell_response = None
+    assert net_jones_unsim == net_unsim
+
+    # Checking reading of raw network
+    net_jones_raw = read_network(tmpdir.join('net_jones_sim.hdf5'),
+                                 read_raw=True)
+    assert net_jones_raw == net_unsim
+
 
 def test_network_models():
     """"Test instantiations of the network object"""
