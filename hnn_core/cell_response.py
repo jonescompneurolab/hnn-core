@@ -420,6 +420,7 @@ class CellResponse(object):
         isec_data = self.isec
         cell_response_data['isec'] = list()
         for trial in isec_data:
+            # Turn `int` gid keys into string values for hdf5 format
             trial = dict((str(key), val) for key, val in trial.items())
             cell_response_data['isec'].append(trial)
         cell_response_data['times'] = self.times
