@@ -264,7 +264,7 @@ def _drive_cell_event_times(drive_type, dynamics, tstop, target_type='any',
     elif len(matches) > 1:
         raise ValueError('Ambiguous external drive: %s' % drive_type)
 
-    event_times = list()
+    event_times = np.array([])
     if drive_type == 'poisson':
         if target_type == 'any':
             rate_constant = dynamics['rate_constant']
@@ -299,11 +299,10 @@ def _drive_cell_event_times(drive_type, dynamics, tstop, target_type='any',
     # brute force remove non-zero times. Might result in fewer vals
     # than desired
     # values MUST be sorted for VecStim()!
-    if len(event_times) > 0:
-        event_times = event_times[np.logical_and(event_times > 0,
-                                                 event_times <= tstop)]
-        event_times.sort()
-        event_times = event_times.tolist()
+    event_times = event_times[np.logical_and(event_times > 0,
+                                             event_times <= tstop)]
+    event_times.sort()
+    event_times = event_times.tolist()
 
     return event_times
 

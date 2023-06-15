@@ -9,6 +9,7 @@
 
 import itertools as it
 from copy import deepcopy
+from collections import OrderedDict
 
 import numpy as np
 import warnings
@@ -270,9 +271,7 @@ def pick_connection(net, src_gids=None, target_gids=None,
         else:
             conn_set = conn_set.union(inner_set)
 
-    conn_set = list(conn_set)
-    conn_set.sort()
-    return conn_set
+    return sorted(conn_set)
 
 
 class Network(object):
@@ -348,8 +347,9 @@ class Network(object):
         # We want it to remain in each Network object, so that the user can
         # interrogate a built and simulated net. In addition, CellResponse is
         # attached to a Network during simulation---Network is the natural
-        # place to keep this information
-        self.gid_ranges = dict()
+        # place to keep this information. Order matters: cell gids first, then
+        # artifical drive cells
+        self.gid_ranges = OrderedDict()
         self._n_gids = 0  # utility: keep track of last GID
 
         # XXX this can be removed once tests are made independent of HNN GUI
@@ -396,6 +396,8 @@ class Network(object):
         self.set_cell_positions(inplane_distance=self._inplane_distance,
                                 layer_separation=self._layer_separation)
 
+        # populates self.gid_ranges for the 1st time: order matters for
+        # NetworkBuilder!
         for cell_name in cell_types:
             self._add_cell_type(cell_name, self.pos_dict[cell_name],
                                 cell_template=cell_types[cell_name])
@@ -872,6 +874,11 @@ class Network(object):
             raise ValueError('Allowed drive target cell types are: ',
                              f'{self.cell_types.keys()}')
 
+        # enforce the same order as in self.cell_types - necessary for
+        # consistent source gid assignment
+        target_populations = [cell_type for cell_type in self.cell_types.keys()
+                              if cell_type in target_populations]
+
         # Ensure location exists for all target cells
         cell_sections = [set(self.cell_types[cell_type].sections.keys()) for
                          cell_type in target_populations]
@@ -975,8 +982,6 @@ class Network(object):
                     if receptor_idx > 0:
                         self.connectivity[-1]['src_gids'] = \
                             self.connectivity[-2]['src_gids']
-
-            seed_increment += 1
 
     def _reset_drives(self):
         # reset every time called again, e.g., from dipole.py or in self.copy()
@@ -1191,7 +1196,7 @@ class Network(object):
                 raise AssertionError(
                     'All target_gids must be of the same type')
         conn['target_type'] = target_type
-        conn['target_gids'] = list(target_set)
+        conn['target_gids'] = target_set
         conn['num_targets'] = len(target_set)
 
         if len(target_gids) != len(src_gids):
@@ -1206,7 +1211,7 @@ class Network(object):
             gid_pairs[src_gid] = target_src_pair
 
         conn['src_type'] = self.gid_to_type(src_gids[0])
-        conn['src_gids'] = list(set(src_gids))
+        conn['src_gids'] = set(src_gids)
         conn['num_srcs'] = len(src_gids)
 
         conn['gid_pairs'] = gid_pairs
@@ -1356,10 +1361,10 @@ class _Connectivity(dict):
         Number of unique source gids.
     num_targets : int
         Number of unique target gids.
-    src_gids : list of int
-        List of unique source gids in connection.
-    target_gids : list of int
-        List of unique target gids in connection.
+    src_gids : set of int
+        Set of unique source gids in connection.
+    target_gids : set of int
+        Set of unique target gids in connection.
     loc : str
         Location of synapse on target cell. Must be
         'proximal', 'distal', or 'soma'. Note that inhibitory synapses
