@@ -414,6 +414,7 @@ class CellResponse(object):
         vsec_data = self.vsec
         cell_response_data['vsec'] = list()
         for trial in vsec_data:
+            # Turn `int` gid keys into string values for hdf5 format
             trial = dict((str(key), val) for key, val in trial.items())
             cell_response_data['vsec'].append(trial)
         isec_data = self.isec
