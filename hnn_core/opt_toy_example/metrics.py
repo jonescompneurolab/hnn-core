@@ -1,10 +1,9 @@
 from hnn_core import simulate_dipole
 import numpy as np
-from mne.time_frequency import psd_array_multitaper
 
 
-def _rmse_evoked(net, param_names, target_statistic, predicted_params,
-                 f_bands, weights, _set_params):
+def _rmse_evoked(net, param_names, set_params, predicted_params, scaling,
+                 target_statistic, f_bands, weights):
     """The objective function for evoked responses.
 
        Parameters
@@ -23,23 +22,21 @@ def _rmse_evoked(net, param_names, target_statistic, predicted_params,
     """
 
     # get network with predicted params
-    new_net = _set_params(net, param_names, predicted_params)
+    new_net = set_params(net, param_names, predicted_params) # ???
     # simulate dipole
     dpl = simulate_dipole(new_net, tstop=500, n_trials=1)[0]
 
-    # smooth & scale (scale must be passed in by user)
-    dpl.scale(1000)
+    # smooth & scale
+    dpl.scale(scaling)
     dpl.smooth(20)
 
     # calculate rmse
-    obj = np.sqrt(((dpl.data['agg'] - target_statistic)**2).sum()
-                   / len(dpl.times)) / (max(target_statistic)
-                                        - min(target_statistic))
+    obj = np.sqrt(((dpl.data['agg'] - target_statistic)**2).sum() / len(dpl.times)) / (max(target_statistic) - min(target_statistic))
     return obj
 
 
-def _rmse_rhythmic(net, param_names, target_statistic, predicted_params,
-                   f_bands, weights, _set_params):
+def _rmse_rhythmic(net, param_names, set_params, predicted_params, scaling,
+                   target_statistic, f_bands, weights):
     """The objective function for evoked responses.
 
        Parameters
@@ -62,11 +59,11 @@ def _rmse_rhythmic(net, param_names, target_statistic, predicted_params,
     from scipy.signal import periodogram
 
     # simulate dpl with predicted params
-    new_net = _set_params(net, param_names, predicted_params)
+    new_net = set_params(net, param_names, predicted_params) # ???
     dpl = simulate_dipole(new_net, tstop=300, n_trials=1)[0]
 
-    # scale (scale must be passed in by user)
-    dpl.scale(1000)
+    # scale
+    dpl.scale(scaling)
 
     # get psd of simulated dpl
     freqs_simulated, psd_simulated = periodogram(dpl.data['agg'], dpl.sfreq,

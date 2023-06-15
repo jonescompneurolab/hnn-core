@@ -33,16 +33,17 @@ from scipy.optimize import fmin_cobyla
 
 
 class Optimizer:
-    def __init__(self, net, constraints, solver, obj_fun, f_bands=None,
-                 weights=None):
+    def __init__(self, net, constraints, set_params, solver, obj_fun, scaling,
+                 f_bands=None, weights=None):
         self.net = net
         self.constraints = constraints
+        self._set_params = set_params
         # Optimizer method
         if solver == 'bayesian':
-            self._get_params = _get_params_bayesian
+            self._assemble_constraints = _assemble_constraints_bayesian
             self._run_opt = _run_opt_bayesian
         elif solver == 'cobyla':
-            self._get_params = _get_params_cobyla
+            self.__assemble_constraints = _assemble_constraints_cobyla
             self._run_opt = _run_opt_cobyla
         # Response to be optimized
         if obj_fun == 'evoked':
@@ -53,6 +54,7 @@ class Optimizer:
             self.weights = weights
         elif obj_fun == 'poisson':
             self.obj_fun = _rmse_poisson
+        self.scaling = scaling
         self.net_ = None
         self.obj = list()
         self.opt_params = None
@@ -82,6 +84,7 @@ class Optimizer:
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     def fit(self, target_statistic):
 >>>>>>> 672ce00 (Address comments for more generalized routine)
 =======
@@ -90,6 +93,9 @@ class Optimizer:
 =======
     def fit(self, target_statistic):
 >>>>>>> a4f67f6 (add optimize rhythmic function)
+=======
+    def fit(self, target_statistic=None):
+>>>>>>> e101c24 (Draft opt class and functions based on comments)
         """ ...
 
             Parameters
@@ -130,6 +136,7 @@ class Optimizer:
 def _get_params_bayesian(net, constraints):
     """Assembles constraints & initial parameters as required by gp_minimize.
 
+<<<<<<< HEAD
 =======
             
         init_params, cons = self._get_params(self.net, self.constraints)  
@@ -139,9 +146,16 @@ def _get_params_bayesian(net, constraints):
 >>>>>>> 2f308f8 (added pep8 formatting)
 =======
         params = self._get_params(self.net, self.constraints)
+=======
+        params = self.__assemble_constraints(self._set_params,
+                                             self.constraints)
+
+>>>>>>> e101c24 (Draft opt class and functions based on comments)
         opt_params, obj, net_ = self._run_opt(self.net,
                                               params,
+                                              self._set_params,
                                               self.obj_fun,
+<<<<<<< HEAD
                                               target_statistic,
 <<<<<<< HEAD
                                               self.max_iter)
@@ -158,6 +172,14 @@ def _get_params_bayesian(net, constraints):
                                               self.f_bands,
                                               self.weights)
 >>>>>>> a4f67f6 (add optimize rhythmic function)
+=======
+                                              self.scaling,
+                                              self.max_iter,
+                                              target_statistic,
+                                              self.f_bands,
+                                              self.weights)
+
+>>>>>>> e101c24 (Draft opt class and functions based on comments)
         self.opt_params = opt_params
         self.obj = obj
         self.net_ = net_
@@ -205,7 +227,7 @@ def _get_params_bayesian(net, constraints):
         return
 
 
-def _get_params(net, constraints):
+def _get_initial_params(net, constraints):
     """Gets parameters.
 
     Parameters
@@ -228,49 +250,71 @@ def _get_params(net, constraints):
         (might have to go back to weights_ampa instead of ampa)
     """
 
+    # get params to optimize
+    # param_names = dict()
+    # for drive_name in constraints:
+    #     temp = list()
+    #     for param_name in constraints[drive_name]:
+    #         temp.append(param_name)
+    #     param_names.update({drive_name: temp})
+    # params.update({'names': param_names})
+
     params = dict()
-
-    # Get params to optimize
     param_names = dict()
-    for drive_name in constraints:
-        temp = list()
-        for param_name in constraints[drive_name]:
-            temp.append(param_name)
-        param_names.update({drive_name: temp})
-    params.update({'names': param_names})
-
-    # Get initial params (bayesian & cobyla can use the same format)
     initial_params = list()
     cons = list()
 
     # get net drive names
     drive_names = [key for key in net.external_drives.keys()]
 
-    for drive_name in param_names:
+    for drive_name in constraints:
         # get relevant params
         if drive_name in drive_names:
-            for param_name in param_names[drive_name]:
+
+            drive_param_names = list()  # keys *****************
+
+            for param_name in constraints[drive_name]:
                 if param_name in ('mu', 'sigma', 'tstart', 'burst_rate',
                                   'burst_std'):
+
+                    drive_param_names.append(param_name)  # *****************
+
                     initial_params.append(net.external_drives[drive_name]
                                           ['dynamics'][param_name])
                     cons.append(constraints[drive_name][param_name])
                 elif param_name in ('ampa', 'nmda'):
+
+                    drive_param_names.append(param_name)  # *****************
+                    weight_target_names = list()  # values for ampa/nmda keys *****************
+
                     conn_idxs = pick_connection(net, src_gids=drive_name)
                     for conn_idx in conn_idxs:
+
+                        target_type = net.connectivity[conn_idx]['target']  # *****************
+
                         # L5_pyramidal, L2_basket, L5_basket, L2_pyramidal
                         target_receptor = net.connectivity[conn_idx]\
                             ['receptor']
                         if target_receptor == param_name:
+     
+                            weight_target_names.append(target_type)  # *****************
+
                             initial_params.append(net.connectivity[conn_idx]
                                                   ['nc_dict']['A_weight'])
                             cons.append(constraints[drive_name][param_name])
+            
+            param_names.update({drive_name: dict.fromkeys(drive_param_names)})
+            param_names[drive_name]['ampa'] = dict.fromkeys(weight_target_names)
+                    
+                
 
+    # params.update({'names': param_names})
     params.update({'initial': initial_params})
     params.update({'constraints': cons})
     return params
 
 
+<<<<<<< HEAD
 def _get_params_bayesian(net, constraints):
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -280,6 +324,9 @@ def _get_params_bayesian(net, constraints):
 =======
     """Assembles constraints & initial parameters as required by gp_minimize.
 =======
+=======
+def _assemble_constraints_bayesian(set_params, constraints):
+>>>>>>> e101c24 (Draft opt class and functions based on comments)
     """Assembles constraints in format required by gp_minimize.
 >>>>>>> 672ce00 (Address comments for more generalized routine)
 
@@ -495,8 +542,10 @@ def _run_opt_cobyla(net, init_params, cons, metric, target_statistic,
 
     """
 
+    net = set_params
+
     # get initial params
-    params = _get_params(net, constraints)
+    params = _get_initial_params(net, constraints)
 
     # assemble constraints in solver-specific format
     cons_bayesian = list()
@@ -506,7 +555,7 @@ def _run_opt_cobyla(net, init_params, cons, metric, target_statistic,
     return params
 
 
-def _get_params_cobyla(net, constraints):
+def _assemble_constraints_cobyla(set_params, constraints):
     """Assembles constraints in format required by fmin_cobyla.
 
     Parameters
@@ -523,8 +572,10 @@ def _get_params_cobyla(net, constraints):
 
     """
 
+    net = set_params
+
     # get initial params
-    params = _get_params(net, constraints)
+    params = _get_initial_params(net, constraints)
 
     # assemble constraints in solver-specific format
     cons_cobyla = list()
@@ -537,8 +588,8 @@ def _get_params_cobyla(net, constraints):
     return params
 
 
-def _run_opt_bayesian(net, params, obj_fun, target_statistic, max_iter,
-                      f_bands, weights):
+def _run_opt_bayesian(net, params, set_params, obj_fun, scaling, max_iter,
+                      target_statistic, f_bands, weights):
     """Uses gp_minimize optimizer.
 
        Parameters
@@ -566,6 +617,7 @@ def _run_opt_bayesian(net, params, obj_fun, target_statistic, max_iter,
     def _obj_func(predicted_params):
         return obj_fun(net,
                        params['names'],
+<<<<<<< HEAD
                        target_statistic,
 <<<<<<< HEAD
                        predicted_params)
@@ -580,6 +632,14 @@ def _run_opt_bayesian(net, params, obj_fun, target_statistic, max_iter,
                        weights,
                        _set_params)
 >>>>>>> a4f67f6 (add optimize rhythmic function)
+=======
+                       set_params,
+                       predicted_params,
+                       scaling,
+                       target_statistic,
+                       f_bands,
+                       weights)
+>>>>>>> e101c24 (Draft opt class and functions based on comments)
 
     opt_results = gp_minimize(func=_obj_func,
                               dimensions=params['constraints'],
@@ -590,12 +650,12 @@ def _run_opt_bayesian(net, params, obj_fun, target_statistic, max_iter,
     opt_params = opt_results.x
     obj = [np.min(opt_results.func_vals[:i]) for i in range(1, max_iter + 1)]
     # get optimized net
-    net_ = _set_params(net, params['names'], opt_params)
+    net_ = set_params(net, params['names'], opt_params)
     return opt_params, obj, net_
 
 
-def _run_opt_cobyla(net, params, obj_fun, target_statistic, max_iter, f_bands,
-                    weights):
+def _run_opt_cobyla(net, params, set_params, obj_fun, scaling, max_iter,
+                    target_statistic, f_bands, weights):
     """Uses fmin_cobyla optimizer.
 
        Parameters
@@ -623,11 +683,12 @@ def _run_opt_cobyla(net, params, obj_fun, target_statistic, max_iter, f_bands,
     def _obj_func(predicted_params):
         return obj_fun(net,
                        params['names'],
-                       target_statistic,
+                       set_params,
                        predicted_params,
+                       scaling,
+                       target_statistic,
                        f_bands,
-                       weights,
-                       _set_params)
+                       weights)
 
     opt_results = fmin_cobyla(_obj_func,
 <<<<<<< HEAD
@@ -662,10 +723,11 @@ def _run_opt_cobyla(net, params, obj_fun, target_statistic, max_iter, f_bands,
 =======
     obj = list()
     # get optimized net
-    net_ = _set_params(net, params['names'], opt_params)
+    net_ = set_params(net, params['names'], opt_params)
     return opt_params, obj, net_
 >>>>>>> 672ce00 (Address comments for more generalized routine)
 
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 =======
@@ -1108,3 +1170,5 @@ def _rmse_poisson():
 >>>>>>> 2f308f8 (added pep8 formatting)
 =======
 >>>>>>> 18ac228 (added methods to remove 1/f and compute psd)
+=======
+>>>>>>> e101c24 (Draft opt class and functions based on comments)
