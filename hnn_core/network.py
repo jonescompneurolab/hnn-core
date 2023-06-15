@@ -462,9 +462,11 @@ class Network(object):
         if not (len(self.connectivity) == len(other.connectivity)):
             return False
         for conn in self.connectivity:
+            src_gids = list(conn['src_gids'])
+            target_gids = list(conn['target_gids'])
             match_conns = pick_connection(other,
-                                          src_gids=conn['src_gids'],
-                                          target_gids=conn['target_gids'],
+                                          src_gids=src_gids,
+                                          target_gids=target_gids,
                                           loc=conn['loc'],
                                           receptor=conn['receptor'])
             if len(match_conns) == 0:
@@ -1499,10 +1501,10 @@ def _write_connectivity(connectivity):
     for conn in connectivity:
         conn_data = dict()
         conn_data['target_type'] = conn['target_type']
-        conn_data['target_gids'] = conn['target_gids']
+        conn_data['target_gids'] = list(conn['target_gids'])
         conn_data['num_targets'] = conn['num_targets']
         conn_data['src_type'] = conn['src_type']
-        conn_data['src_gids'] = conn['src_gids']
+        conn_data['src_gids'] = list(conn['src_gids'])
         conn_data['num_srcs'] = conn['num_srcs']
         gid_pairs = (dict((str(key), val)
                      for key, val in conn['gid_pairs'].items()))
