@@ -62,6 +62,7 @@ class Optimizer:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     def fit(self, target_statistic, window_len=None):
 =======
@@ -77,6 +78,9 @@ class Optimizer:
 =======
         self.max_iter = 150
 >>>>>>> a4f67f6 (add optimize rhythmic function)
+=======
+        self.max_iter = 200
+>>>>>>> f3490e1 (added pep8 formatting)
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -100,11 +104,8 @@ class Optimizer:
 
             Parameters
             ----------
-            target_statistic : ndarray
-                Recorded dipole (must have the same amount of data points as
-                                 the initial, simulated dipole).
-            scaling_factor : float
-                ...
+            target_statistic : ndarray | None
+                Recorded dipole.
             """
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -223,6 +224,7 @@ def _get_params_bayesian(net, constraints):
         fig.show(show)
         return axis.get_figure()
 
+
     def plot_param_search():
         return
 
@@ -242,22 +244,8 @@ def _get_initial_params(net, constraints):
     -------
     params : dictionary
         params['initial'] : list
-        params['constraints'] : list of tuples (min, max)
+        params['constraints'] : list of tuples (min, max)"""
 
-    params_to_optim : dictionary
-        {drive_name: ['param_name', 'param_name', 'param_name']}
-        might use this later to override net params in _set_params
-        (might have to go back to weights_ampa instead of ampa)
-    """
-
-    # get params to optimize
-    # param_names = dict()
-    # for drive_name in constraints:
-    #     temp = list()
-    #     for param_name in constraints[drive_name]:
-    #         temp.append(param_name)
-    #     param_names.update({drive_name: temp})
-    # params.update({'names': param_names})
 
     params = dict()
     param_names = dict()
@@ -539,7 +527,6 @@ def _run_opt_cobyla(net, init_params, cons, metric, target_statistic,
     -------
     params : dictionary
         Contains parameter names, initial parameters, and constraints.
-
     """
 
     net = set_params
@@ -548,7 +535,7 @@ def _run_opt_cobyla(net, init_params, cons, metric, target_statistic,
     params = _get_initial_params(net, constraints)
 
     # assemble constraints in solver-specific format
-    cons_bayesian = list()
+    cons_bayesian = list() 
     for cons in params['constraints']:
         cons_bayesian.append((cons[0], cons[1]))
     params.update({'constraints': cons_bayesian})
@@ -569,7 +556,6 @@ def _assemble_constraints_cobyla(set_params, constraints):
     -------
     params : dictionary
         Contains parameter names, initial parameters, and constraints.
-
     """
 
     net = set_params
