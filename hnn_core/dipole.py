@@ -143,6 +143,14 @@ def _read_dipole_hdf5(fname):
     """
 
     dpl_data = read_hdf5(fname)
+    if 'object_type' not in dpl_data:
+        raise NameError('The given file is not compatible. '
+                        'The file should contain information'
+                        ' about object type to be read.')
+    if dpl_data['object_type'] != 'Dipole':
+        raise ValueError('The object should be of type Dipole. '
+                         'The file contains object of '
+                         'type %s' % (dpl_data['object_type'],))
     dpl = Dipole(times=dpl_data['times'],
                  data=dpl_data['data'],
                  nave=dpl_data['nave'])
@@ -691,6 +699,7 @@ class Dipole(object):
         """
         print(f'Writing file {fname}')
         dpl_data = dict()
+        dpl_data['object_type'] = "Dipole"
         dpl_data['times'] = self.times
         dpl_data['sfreq'] = self.sfreq
         dpl_data['nave'] = self.nave

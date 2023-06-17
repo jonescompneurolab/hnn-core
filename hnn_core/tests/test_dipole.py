@@ -6,6 +6,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_allclose
+from h5io import write_hdf5
 import pytest
 
 import hnn_core
@@ -96,6 +97,19 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
     with pytest.raises(RuntimeError,
                        match="All dipoles must be scaled equally"):
         dipole_avg = average_dipoles([dipole, dipole_read])
+    # Checking object type field not exists error
+    dummy_data = dict()
+    dummy_data['objective'] = "Check Object type errors"
+    write_hdf5(tmpdir.join('not_dpl.hdf5'), dummy_data)
+    with pytest.raises(NameError,
+                       match="The given file is not compatible."):
+        read_dipole(tmpdir.join('not_dpl.hdf5'))
+    # Checking wrong object type error
+    dummy_data['object_type'] = "dpl"
+    write_hdf5(tmpdir.join('not_dpl.hdf5'), dummy_data, overwrite=True)
+    with pytest.raises(ValueError,
+                       match="The object should be of type Dipole."):
+        read_dipole(tmpdir.join('not_dpl.hdf5'))
     # force the scale_applied to be identical across dpls to allow averaging.
     dipole.scale_applied = dipole_read.scale_applied
     # average two identical dipole objects
