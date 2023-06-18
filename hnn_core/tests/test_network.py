@@ -18,66 +18,73 @@ hnn_core_root = op.dirname(hnn_core.__file__)
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
 
 
-def test_network_io(tmpdir):
-    net_jones = jones_2009_model()
-    add_erp_drives_to_jones_model(net_jones)
-    net_jones.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
+@pytest.mark.parametrize("network_model",
+                         ["law_2021", "calcium", "jones_2009"])
+def test_network_io(tmpdir, network_model):
+    if network_model == "jones_2009":
+        net = jones_2009_model(add_drives_from_params=True)
+    elif network_model == "law_2021":
+        net = law_2021_model(add_drives_from_params=True)
+    elif network_model == "calcium":
+        net = calcium_model(add_drives_from_params=True)
+    # add_erp_drives_to_model(net)
+    net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
     # Test __eq__ method
-    net_copy = net_jones.copy()
-    assert net_copy == net_jones
+    net_copy = net.copy()
+    assert net_copy == net
     electrode_pos = (1, 2, 3)
-    net_jones.add_electrode_array('el1', electrode_pos)
+    net.add_electrode_array('el1', electrode_pos)
     electrode_pos = [(1, 2, 3), (-1, -2, -3)]
-    net_jones.add_electrode_array('arr1', electrode_pos)
+    net.add_electrode_array('arr1', electrode_pos)
     # Writing network
-    net_jones.write(tmpdir.join('net_jones.hdf5'))
+    net.write(tmpdir.join('net.hdf5'))
     # Testing when overwrite is False and same filename is used
     with pytest.raises(FileExistsError,
                        match="File already exists at path "):
-        net_jones.write(tmpdir.join('net_jones.hdf5'), overwrite=False)
+        net.write(tmpdir.join('net.hdf5'), overwrite=False)
     # Reading network
-    net_jones_read = read_network(tmpdir.join('net_jones.hdf5'))
-    assert net_jones == net_jones_read
+    net_read = read_network(tmpdir.join('net.hdf5'))
+    assert net == net_read
 
     # Add test to check weights are equal in connections and drives (todo)
     # Run simulation and simulation output should be same (dipole) (Done)
 
     # Simulating network
-    dpls1 = simulate_dipole(net_jones, tstop=2, n_trials=1)
-    dpls2 = simulate_dipole(net_jones_read, tstop=2, n_trials=1)
+    dpls1 = simulate_dipole(net, tstop=2, n_trials=1)
+    dpls2 = simulate_dipole(net_read, tstop=2, n_trials=1)
     for dpl1, dpl2 in zip(dpls1, dpls2):
         assert_allclose(dpl1.times, dpl2.times, rtol=0.00051, atol=0)
         for dpl_key in dpl1.data.keys():
             assert_allclose(dpl1.data[dpl_key],
                             dpl2.data[dpl_key], rtol=0.000051, atol=0)
     # Writing network
-    net_jones.write(tmpdir.join('net_jones_sim.hdf5'))
+    net.write(tmpdir.join('net_sim.hdf5'))
     # Reading network
-    net_jones_sim = read_network(tmpdir.join('net_jones_sim.hdf5'))
-    assert net_jones == net_jones_sim
+    net_sim = read_network(tmpdir.join('net_sim.hdf5'))
+    assert net == net_sim
     # For cell response vsec isec bug
-    assert net_jones.cell_response.vsec == net_jones_sim.cell_response.vsec
+    assert net.cell_response.vsec == net_sim.cell_response.vsec
 
     # Checking Saving unsimulated network
-    net_jones.write(tmpdir.join('net_jones_unsim.hdf5'), save_unsimulated=True)
-    net_jones_unsim = read_network(tmpdir.join('net_jones_unsim.hdf5'))
-    net_unsim = net_jones.copy()
+    net.write(tmpdir.join('net_unsim.hdf5'), save_unsimulated=True)
+    net_unsim = read_network(tmpdir.join('net_unsim.hdf5'))
+    net_unsim = net.copy()
     net_unsim.cell_response = None
-    assert net_jones_unsim == net_unsim
+    assert net_unsim == net_unsim
     # Run simulation on the read unsimulated network and check it against the
     # previous simulation
 
     # Checking reading of raw network
-    net_jones_raw = read_network(tmpdir.join('net_jones_sim.hdf5'),
-                                 read_raw=True)
-    assert net_jones_raw == net_unsim
+    net_raw = read_network(tmpdir.join('net_sim.hdf5'),
+                           read_raw=True)
+    assert net_raw == net_unsim
     # Add smoke tests for plotting
     # Use pytest.parametrize to run through different networks
 
     # Checking object type field not exists error
     dummy_data = dict()
     dummy_data['objective'] = "Check Object type errors"
-    write_hdf5(tmpdir.join('not_net.hdf5'), dummy_data)
+    write_hdf5(tmpdir.join('not_net.hdf5'), dummy_data, overwrite=True)
     with pytest.raises(NameError,
                        match="The given file is not compatible."):
         read_network(tmpdir.join('not_net.hdf5'))
