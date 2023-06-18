@@ -1419,11 +1419,11 @@ class Network(object):
         # Tasks
         # 1) Remove params dict (Partial done)
         # 2) Add overwrite warnings (Done)
-        # 3) Add boolean to read/write un-simulated network
-        # 4) Add boolean to read/write simulated network
+        # 3) Add boolean to read/write un-simulated network (Done)
+        # 4) Add boolean to read/write simulated network (Done)
         # 5) Think about documentation
         # 6) Add tests
-        # 7) Store the type of object saved and issue warning
+        # 7) Store the type of object saved and issue warning (Done)
         if overwrite is False and os.path.exists(fname):
             raise FileExistsError('File already exists at path %s. Rename '
                                   'the file or set overwrite=True.' % (fname,))
