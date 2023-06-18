@@ -4,6 +4,7 @@ from hnn_core.dipole import simulate_dipole
 import os.path as op
 import numpy as np
 from numpy.testing import assert_allclose
+from h5io import write_hdf5
 import pytest
 
 import hnn_core
@@ -63,11 +64,29 @@ def test_network_io(tmpdir):
     net_unsim = net_jones.copy()
     net_unsim.cell_response = None
     assert net_jones_unsim == net_unsim
+    # Run simulation on the read unsimulated network and check it against the
+    # previous simulation
 
     # Checking reading of raw network
     net_jones_raw = read_network(tmpdir.join('net_jones_sim.hdf5'),
                                  read_raw=True)
     assert net_jones_raw == net_unsim
+    # Add smoke tests for plotting
+    # Use pytest.parametrize to run through different networks
+
+    # Checking object type field not exists error
+    dummy_data = dict()
+    dummy_data['objective'] = "Check Object type errors"
+    write_hdf5(tmpdir.join('not_net.hdf5'), dummy_data)
+    with pytest.raises(NameError,
+                       match="The given file is not compatible."):
+        read_network(tmpdir.join('not_net.hdf5'))
+    # Checking wrong object type error
+    dummy_data['object_type'] = "net"
+    write_hdf5(tmpdir.join('not_net.hdf5'), dummy_data, overwrite=True)
+    with pytest.raises(ValueError,
+                       match="The object should be of type Network."):
+        read_network(tmpdir.join('not_net.hdf5'))
 
 
 def test_network_models():
