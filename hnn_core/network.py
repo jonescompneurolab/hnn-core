@@ -1428,6 +1428,7 @@ class Network(object):
             raise FileExistsError('File already exists at path %s. Rename '
                                   'the file or set overwrite=True.' % (fname,))
         net_data = dict()
+        net_data['object_type'] = "Network"
         # Write the required params
         params = dict()
         params['N_pyr_x'] = self._N_pyr_x
@@ -1677,6 +1678,14 @@ def _read_rec_arrays(net, rec_arrays_data, read_raw):
 
 def read_network(fname, read_raw=False):
     net_data = read_hdf5(fname)
+    if 'object_type' not in net_data:
+        raise NameError('The given file is not compatible. '
+                        'The file should contain information'
+                        ' about object type to be read.')
+    if net_data['object_type'] != 'Network':
+        raise ValueError('The object should be of type Network. '
+                         'The file contains object of '
+                         'type %s' % (net_data['object_type'],))
     params = net_data['params']
     net = Network(params)
     # Setting attributes
