@@ -100,6 +100,7 @@
 <li><a class="reference internal" href="#hnn_core.CellResponse.mean_rates"><code class="docutils literal notranslate"><span class="pre">CellResponse.mean_rates()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.CellResponse.plot_spikes_hist"><code class="docutils literal notranslate"><span class="pre">CellResponse.plot_spikes_hist()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.CellResponse.plot_spikes_raster"><code class="docutils literal notranslate"><span class="pre">CellResponse.plot_spikes_raster()</span></code></a></li>
+<li><a class="reference internal" href="#hnn_core.CellResponse.to_dict"><code class="docutils literal notranslate"><span class="pre">CellResponse.to_dict()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.CellResponse.update_types"><code class="docutils literal notranslate"><span class="pre">CellResponse.update_types()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.CellResponse.write"><code class="docutils literal notranslate"><span class="pre">CellResponse.write()</span></code></a></li>
 </ul>
@@ -374,6 +375,19 @@ the name of this group must be used to specify the colors.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.CellResponse.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return cell response as a dict object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>dict object containing the cell response</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.CellResponse.update_types">
 <span class="sig-name descname"><span class="pre">update_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gid_ranges</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse.update_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse.update_types" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update spike types in the current instance of CellResponse.</p>
@@ -391,13 +405,15 @@ cell or input types.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.CellResponse.write">
-<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse.write" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write spiking activity to txt or hdf5 files based on extension.</p>
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write spiking activity per trial to a collection of files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>fname</strong><span class="classifier">str | Path object</span></dt><dd><p>String format (e.g., ‘spk_%d.txt’ or ‘spk_{0}.txt’ or spk.hdf5)
-of the path to the output spike file(s).</p>
+<dt><strong>fname</strong><span class="classifier">str</span></dt><dd><p>String format (e.g., ‘spk_%d.txt’ or ‘spk_{0}.txt’) of the
+path to the output spike file(s). If no string format
+is provided, the trial index will be automatically
+appended to the file name.</p>
 </dd>
 </dl>
 </dd>
