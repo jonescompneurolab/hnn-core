@@ -32,6 +32,10 @@ API
 - Connection `'src_gids'` and `'target_gids'` are now stored as set objects
   instead of lists, by `Ryan Thorpe`_ in :gh:`642`.
 
+- :func:`~hnn_core.Dipole.write` and :func:`~hnn_core.Dipole.read_dipoles`
+  now support hdf5 format for read/write Dipole object, by
+  `Rajat Partani`_ in :gh:`648`
+
 .. _0.3:
 
 0.3

@@ -222,8 +222,8 @@ to 1</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.dipole.Dipole.smooth" title="hnn_core.dipole.Dipole.smooth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">smooth</span></code></a>(window_len)</p></td>
 <td><p>Smooth the dipole waveform using Hamming-windowed convolution</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.dipole.Dipole.write" title="hnn_core.dipole.Dipole.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code></a>(fname)</p></td>
-<td><p>Write dipole values to a file.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.dipole.Dipole.write" title="hnn_core.dipole.Dipole.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code></a>(fname[, overwrite])</p></td>
+<td><p>Write dipole values to a txt or hdf5 file.</p></td>
 </tr>
 </tbody>
 </table>
@@ -446,12 +446,12 @@ data with.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.dipole.Dipole.write">
-<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/dipole.html#Dipole.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.dipole.Dipole.write" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write dipole values to a file.</p>
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/dipole.html#Dipole.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.dipole.Dipole.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write dipole values to a txt or hdf5 file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>fname</strong><span class="classifier">str</span></dt><dd><p>Full path to the output file (.txt)</p>
+<dt><strong>fname</strong><span class="classifier">str | Path object</span></dt><dd><p>Full path to the output file (.txt or .hdf5)</p>
 </dd>
 </dl>
 </dd>

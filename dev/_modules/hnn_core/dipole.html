@@ -143,9 +143,13 @@
 <span class="c1"># Authors: Mainak Jas &lt;mjas@mgh.harvard.edu&gt;</span>
 <span class="c1">#          Sam Neymotin &lt;samnemo@gmail.com&gt;</span>
 
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">h5io</span> <span class="kn">import</span> <span class="n">write_hdf5</span><span class="p">,</span> <span class="n">read_hdf5</span>
 <span class="kn">from</span> <span class="nn">.externals.mne</span> <span class="kn">import</span> <span class="n">_check_option</span>
 
 <span class="kn">from</span> <span class="nn">.viz</span> <span class="kn">import</span> <span class="n">plot_dipole</span><span class="p">,</span> <span class="n">plot_psd</span><span class="p">,</span> <span class="n">plot_tfr_morlet</span>
@@ -242,8 +246,8 @@
     <span class="k">return</span> <span class="n">dpls</span></div>
 
 
-<div class="viewcode-block" id="read_dipole"><a class="viewcode-back" href="../../generated/hnn_core.read_dipole.html#hnn_core.dipole.read_dipole">[docs]</a><span class="k">def</span> <span class="nf">read_dipole</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read dipole values from a file and create a Dipole instance.</span>
+<span class="k">def</span> <span class="nf">_read_dipole_txt</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read dipole values from a txt file and create a Dipole instance.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -261,7 +265,70 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s1">&#39;Data are supposed to have 2 or 4 columns while we have </span><span class="si">{</span><span class="n">ncols</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
     <span class="n">dpl</span> <span class="o">=</span> <span class="n">Dipole</span><span class="p">(</span><span class="n">dpl_data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dpl_data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:])</span>
-    <span class="k">return</span> <span class="n">dpl</span></div>
+    <span class="k">return</span> <span class="n">dpl</span>
+
+
+<span class="k">def</span> <span class="nf">_read_dipole_hdf5</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read dipole values from a hdf5 file and create a Dipole instance.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fname : str</span>
+<span class="sd">        Full path to the input file (.hdf5)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dpl : Dipole</span>
+<span class="sd">        The instance of Dipole class</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dpl_data</span> <span class="o">=</span> <span class="n">read_hdf5</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;object_type&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dpl_data</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s1">&#39;The given file is not compatible. &#39;</span>
+                        <span class="s1">&#39;The file should contain information&#39;</span>
+                        <span class="s1">&#39; about object type to be read.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dpl_data</span><span class="p">[</span><span class="s1">&#39;object_type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;Dipole&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The object should be of type Dipole. &#39;</span>
+                         <span class="s1">&#39;The file contains object of &#39;</span>
+                         <span class="s1">&#39;type </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">dpl_data</span><span class="p">[</span><span class="s1">&#39;object_type&#39;</span><span class="p">],))</span>
+    <span class="n">dpl</span> <span class="o">=</span> <span class="n">Dipole</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="n">dpl_data</span><span class="p">[</span><span class="s1">&#39;times&#39;</span><span class="p">],</span>
+                 <span class="n">data</span><span class="o">=</span><span class="n">dpl_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">],</span>
+                 <span class="n">nave</span><span class="o">=</span><span class="n">dpl_data</span><span class="p">[</span><span class="s1">&#39;nave&#39;</span><span class="p">])</span>
+    <span class="n">dpl</span><span class="o">.</span><span class="n">sfreq</span> <span class="o">=</span> <span class="n">dpl_data</span><span class="p">[</span><span class="s1">&#39;sfreq&#39;</span><span class="p">]</span>
+    <span class="n">dpl</span><span class="o">.</span><span class="n">scale_applied</span> <span class="o">=</span> <span class="n">dpl_data</span><span class="p">[</span><span class="s1">&#39;scale_applied&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">dpl</span>
+
+
+<div class="viewcode-block" id="read_dipole"><a class="viewcode-back" href="../../generated/hnn_core.read_dipole.html#hnn_core.dipole.read_dipole">[docs]</a><span class="k">def</span> <span class="nf">read_dipole</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read dipole values from a txt or hdf5 file and</span>
+<span class="sd">       create a Dipole instance.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fname : str | Path object</span>
+<span class="sd">        Full path to the input file (.txt or .hdf5)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dpl : Dipole</span>
+<span class="sd">        The instance of Dipole class</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># For supporting tests in test_gui.py</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">StringIO</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_read_dipole_txt</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+
+    <span class="n">fname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;File not found at path </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fname</span><span class="p">,))</span>
+    <span class="n">file_extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s1">&#39;.txt&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_read_dipole_txt</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s1">&#39;.hdf5&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_read_dipole_hdf5</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s1">&#39;File extension should be either txt or hdf5, but the &#39;</span>
+                        <span class="s1">&#39;given extension is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_extension</span><span class="p">,))</span></div>
 
 
 <div class="viewcode-block" id="average_dipoles"><a class="viewcode-back" href="../../generated/hnn_core.dipole.average_dipoles.html#hnn_core.dipole.average_dipoles">[docs]</a><span class="k">def</span> <span class="nf">average_dipoles</span><span class="p">(</span><span class="n">dpls</span><span class="p">):</span>
@@ -414,13 +481,16 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">nave</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>  <span class="c1"># noqa: D102</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
-
-        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;agg&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;L2&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;L5&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]}</span>
-        <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;agg&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]}</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;agg&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;L2&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+                             <span class="s1">&#39;L5&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]}</span>
+            <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;agg&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">nave</span> <span class="o">=</span> <span class="n">nave</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sfreq</span> <span class="o">=</span> <span class="mf">1000.</span> <span class="o">/</span> <span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">times</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># NB assumes len &gt; 1</span>
@@ -721,7 +791,7 @@
         <span class="c1"># normalized ones</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;L2&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;L5&#39;</span><span class="p">]</span>
 
-<div class="viewcode-block" id="Dipole.write"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_write_txt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Write dipole values to a file.</span>
 
 <span class="sd">        Parameters</span>
@@ -733,11 +803,15 @@
 <span class="sd">        -------</span>
 <span class="sd">        A tab separatd txt file where rows correspond</span>
 <span class="sd">            to samples and columns correspond to</span>
-<span class="sd">            1) time (s),</span>
+<span class="sd">            1) time (ms),</span>
 <span class="sd">            2) aggregate current dipole (scaled nAm),</span>
 <span class="sd">            3) L2/3 current dipole (scaled nAm), and</span>
 <span class="sd">            4) L5 current dipole (scaled nAm)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Writing dipole to txt file is deprecated &#39;</span>
+                      <span class="s1">&#39;and will be removed in future versions. &#39;</span>
+                      <span class="s1">&#39;Please use hdf5&#39;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nave</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Saving Dipole to file that is an average of </span><span class="si">%d</span><span class="s2">&quot;</span>
@@ -750,7 +824,64 @@
             <span class="n">fmt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%5.4f</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span><span class="n">X</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
 
-        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span></div></div>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_hdf5</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write dipole values to a hdf5 file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fname : str</span>
+<span class="sd">            Full path to the output file (.hdf5)</span>
+<span class="sd">        Outputs</span>
+<span class="sd">        -------</span>
+<span class="sd">        A hdf5 file containing the dipole object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Writing file </span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">dpl_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">dpl_data</span><span class="p">[</span><span class="s1">&#39;object_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Dipole&quot;</span>
+        <span class="n">dpl_data</span><span class="p">[</span><span class="s1">&#39;times&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">times</span>
+        <span class="n">dpl_data</span><span class="p">[</span><span class="s1">&#39;sfreq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfreq</span>
+        <span class="n">dpl_data</span><span class="p">[</span><span class="s1">&#39;nave&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nave</span>
+        <span class="n">dpl_data</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">dpl_data</span><span class="p">[</span><span class="s1">&#39;scale_applied&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_applied</span>
+        <span class="n">write_hdf5</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">dpl_data</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Dipole.write"><a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write dipole values to a txt or hdf5 file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fname : str | Path object</span>
+<span class="sd">            Full path to the output file (.txt or .hdf5)</span>
+
+<span class="sd">        Outputs</span>
+<span class="sd">        -------</span>
+<span class="sd">        A tab separatd txt file where rows correspond</span>
+<span class="sd">            to samples and columns correspond to</span>
+<span class="sd">            1) time (ms),</span>
+<span class="sd">            2) aggregate current dipole (scaled nAm),</span>
+<span class="sd">            3) L2/3 current dipole (scaled nAm), and</span>
+<span class="sd">            4) L5 current dipole (scaled nAm)</span>
+<span class="sd">        OR</span>
+<span class="sd">        A hdf5 file containing the dipole object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># For supporting tests in test_gui.py</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">StringIO</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_txt</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+
+        <span class="n">fname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">overwrite</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileExistsError</span><span class="p">(</span><span class="s1">&#39;File already exists at path </span><span class="si">%s</span><span class="s1">. Rename &#39;</span>
+                                  <span class="s1">&#39;the file or set overwrite=True.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fname</span><span class="p">,))</span>
+        <span class="n">file_extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s1">&#39;.txt&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_txt</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s1">&#39;.hdf5&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_hdf5</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s1">&#39;File extension should be either txt or hdf5, but &#39;</span>
+                            <span class="s1">&#39;the given extension is </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">file_extension</span><span class="p">,))</span></div></div>
 </pre></div>
 
     </div>
