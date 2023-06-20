@@ -59,16 +59,16 @@ authors:
     orcid: 0000-0002-6863-7046
     affiliation: 16
   - name: Mattan Pelah
-    affiliation: 3
+    affiliation: "3, 17"
   - name: Alex Rockhill
     orcid: 0000-0003-3868-7453
-    affiliation: 17
+    affiliation: 18
   - name: Mohamed Sherif
     orcid: 0000-0002-8951-1645
-    affiliation: "18, 19"
+    affiliation: "19, 20"
   - name: Matti Hamalainen
     orcid: 0000-0001-6841-112X
-    affiliation: 20
+    affiliation: 21
   - name: Stephanie Jones
     orcid: 0000-0001-6760-5301
     corresponding: true # (This is how to denote the corresponding author)
@@ -108,14 +108,16 @@ affiliations:
     index: 15
   - name: Department of Computer Science and Engineering, National Institute of Technology Karnataka, Karnataka, India # Rajat Partani
     index: 16
-  - name: Department of Human Physiology, University of Oregon, Eugene, OR, USA # Alex Rockhill
+  - name: Florida State University, Tallahassee, FL, USA # Mattan Pelah
     index: 17
-  - name: Department of Psychiatry and Human Behavior, Brown University, Providence, RI, USA
+  - name: Department of Human Physiology, University of Oregon, Eugene, OR, USA # Alex Rockhill
     index: 18
-  - name: Rhode Island Hospital, Providence, RI, USA
+  - name: Department of Psychiatry and Human Behavior, Brown University, Providence, RI, USA
     index: 19
-  - name: Aalto University, Espoo, Finland
+  - name: Rhode Island Hospital, Providence, RI, USA
     index: 20
+  - name: Aalto University, Espoo, Finland
+    index: 21
 date: 20 June 2023
 bibliography: paper.bib
 
