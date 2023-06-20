@@ -33,7 +33,7 @@ authors:
   - name: Dylan Daniels
     orcid: 0009-0008-1958-353X
     affiliation: 3
-  - name: Carolina Fernandez
+  - name: Carolina Fernandez Pujol
     orcid: 0009-0003-0611-1270
     affiliation: 7
   - name: Mostafa Khalil
@@ -116,7 +116,7 @@ affiliations:
     index: 19
   - name: Aalto University, Espoo, Finland
     index: 20
-date: 7 June 2023
+date: 20 June 2023
 bibliography: paper.bib
 
 ---
@@ -153,8 +153,6 @@ All of the code associated with HNN-core has been extensively documented at mult
 
 HNN-core has minimal dependencies which allows for effortless installation using the pip Python installer. In addition to numpy, scipy and matplotlib common in most libraries in the scientific Python stack, HNN-core uses Neuron for the cell and circuit modeling. Here, we demonstrate how the HNN-core interface can be used to quickly simulate and plot the net cortical dipole response to a brief exogenously evoked drive representing “feedforward” thalamocortical input. This input  (referred to as ‘evprox1’) effectively targets the proximal dendrites of the pyramidal neurons in L2/3 and L5, using the template neocortical model as in @jones2009quantitative. Note that this simulation is not addressing a specific scientific question, and is simply an educational example.
 
-\newpage
-
 ```python
 from hnn_core import jones_2009_model, simulate_dipole
 # 1) Create the network model
@@ -177,7 +175,7 @@ dpl = simulate_dipole(net, tstop=100.0)
 
 # Ongoing research using HNN-core
 
-The scripted interface of HNN-core has enabled the development of advanced parameter inference techniques [@tolley2023methods] using Simulation Based Inference [@tejero-cantero2020sbi]. It has been used in @thorpe2021distinct to propose new mechanisms of innocuous versus noxious sensory processing in the primary somatosensory neocortex. Lankinen et al. (2023)[**NEED TO GET REFERENCE] have used HNN-core to study crossmodal interactions between auditory and visual cortices. They performed group analysis on multiple subjects along with optimization and nonparametric statistical testing. Additionally, @szul2022diverse used it for understanding features of beta bursts in motor cortex and @fernandez2023laminar to study auditory perception.
+The scripted interface of HNN-core has enabled the development of advanced parameter inference techniques [@tolley2023methods] using Simulation Based Inference [@tejero-cantero2020sbi]. It has been used in @thorpe2021distinct to propose new mechanisms of innocuous versus noxious sensory processing in the primary somatosensory neocortex. @Lankinen2023.06.16.545371 have used HNN-core to study crossmodal interactions between auditory and visual cortices. They performed group analysis on multiple subjects along with optimization and nonparametric statistical testing. Additionally, @szul2022diverse used it for understanding features of beta bursts in motor cortex and @fernandez2023laminar to study auditory perception.
 
 Overall, HNN-core provides an expandable and sustainable Python-based software package that can help advance understanding of the cellular and circuit mechanisms of MEG/EEG signal generation and ultimately lead to new neuroscience discoveries.
 
