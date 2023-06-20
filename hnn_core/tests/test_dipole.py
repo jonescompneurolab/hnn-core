@@ -1,10 +1,12 @@
 import os.path as op
 from urllib.request import urlretrieve
+from pathlib import Path
 
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_allclose
+from h5io import write_hdf5
 import pytest
 
 import hnn_core
@@ -22,6 +24,7 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     dpl_out_fname = tmpdir.join('dpl1.txt')
+    dpl_out_hdf5_fname = tmpdir.join('dpl.hdf5')
     params = read_params(params_fname)
     times = np.arange(0, 6000 * params['dt'], params['dt'])
     data = np.random.random((6000, 3))
@@ -49,18 +52,64 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
                        " attribute 'append'"):
         plot_dipole(np.array([dipole, dipole]), average=True, show=False)
 
-    # Test IO
-    dipole.write(dpl_out_fname)
+    # Test IO for txt files
+    with pytest.warns(DeprecationWarning,
+                      match="Writing dipole to txt file is "
+                      "deprecated"):
+        dipole.write(dpl_out_fname)
     dipole_read = read_dipole(dpl_out_fname)
     assert_allclose(dipole_read.times, dipole.times, rtol=0, atol=0.00051)
     for dpl_key in dipole.data.keys():
         assert_allclose(dipole_read.data[dpl_key],
                         dipole.data[dpl_key], rtol=0, atol=0.000051)
 
+    # Test IO for hdf5 files
+    dipole.write(dpl_out_hdf5_fname)
+    dipole_read_hdf5 = read_dipole(dpl_out_hdf5_fname)
+    assert_allclose(dipole_read_hdf5.times, dipole.times, rtol=0.00051, atol=0)
+    for dpl_key in dipole.data.keys():
+        assert_allclose(dipole_read_hdf5.data[dpl_key],
+                        dipole.data[dpl_key], rtol=0.000051, atol=0)
+
+    # Test read for hdf5 files using Path object
+    dipole_read_hdf5 = read_dipole(Path(dpl_out_hdf5_fname))
+    assert_allclose(dipole_read_hdf5.times, dipole.times, rtol=0.00051, atol=0)
+    for dpl_key in dipole.data.keys():
+        assert_allclose(dipole_read_hdf5.data[dpl_key],
+                        dipole.data[dpl_key], rtol=0.000051, atol=0)
+
+    # Testing when overwrite is False and same filename is used
+    with pytest.raises(FileExistsError,
+                       match="File already exists at path "):
+        dipole.write(dpl_out_hdf5_fname, overwrite=False)
+
+    # Testing for wrong extension provided
+    with pytest.raises(NameError,
+                       match="File extension should be either txt or hdf5"):
+        dipole.write(tmpdir.join('dpl.xls'))
+
+    # Testing File Not Found Error
+    with pytest.raises(FileNotFoundError,
+                       match="File not found at "):
+        read_dipole(tmpdir.join('dpl1.hdf5'))
+
     # dpls with different scale_applied should not be averaged.
     with pytest.raises(RuntimeError,
                        match="All dipoles must be scaled equally"):
         dipole_avg = average_dipoles([dipole, dipole_read])
+    # Checking object type field not exists error
+    dummy_data = dict()
+    dummy_data['objective'] = "Check Object type errors"
+    write_hdf5(tmpdir.join('not_dpl.hdf5'), dummy_data)
+    with pytest.raises(NameError,
+                       match="The given file is not compatible."):
+        read_dipole(tmpdir.join('not_dpl.hdf5'))
+    # Checking wrong object type error
+    dummy_data['object_type'] = "dpl"
+    write_hdf5(tmpdir.join('not_dpl.hdf5'), dummy_data, overwrite=True)
+    with pytest.raises(ValueError,
+                       match="The object should be of type Dipole."):
+        read_dipole(tmpdir.join('not_dpl.hdf5'))
     # force the scale_applied to be identical across dpls to allow averaging.
     dipole.scale_applied = dipole_read.scale_applied
     # average two identical dipole objects
