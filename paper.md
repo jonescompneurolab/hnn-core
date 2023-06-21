@@ -147,13 +147,13 @@ HNN-core code enables the creation of a new and improved web-based GUI based on 
 - An API that allows for flexibility in defining the exogenous layer specific drive to the neocortical network
 - The ability to choose from multiple template models based on previous publications (e.g., `jones_2009_model()`{.python} [@jones2009quantitative], `law_2021_model()`{.python} [@law2022thalamocortical], and `calcium_model()`{.python} [@kohl2022neural])
 - Built-in ERP optimization functionality designed for faster convergence 
-- The choice of two parallel backends for either parallelizing across cells to speed up individual simulations (MPI), or across trials to speed up batches of simulations (joblib)
+- The choice of two parallel backends for either parallelizing across cells to speed up individual simulations (MPI), or across trials to speed up batches of simulations (Joblib)
 
 All of the code associated with HNN-core has been extensively documented at multiple levels,  including an API describing basic functions/parameters and examples of  use for hypothesis generation and/or testing. Specifically, we distribute tutorials that mimic the original GUI tutorial workflows for simulating ERPs and low frequency rhythms using HNN-core functions, with commentary on the known biophysical mechanisms of these signals. We also provide short and targeted “How to” examples that describe how to use specific functionality, such as plotting firing rates, or recording extracellular LFPs. 
 
 # Quick example code of running a simulation
 
-HNN-core has minimal dependencies which allows for effortless installation using the pip Python installer. In addition to numpy, scipy and matplotlib common in most libraries in the scientific Python stack, HNN-core uses Neuron for the cell and circuit modeling. Here, we demonstrate how the HNN-core interface can be used to quickly simulate and plot the net cortical dipole response to a brief exogenously evoked drive representing “feedforward” thalamocortical input. This input  (referred to as ‘evprox1’) effectively targets the proximal dendrites of the pyramidal neurons in L2/3 and L5, using the template neocortical model as in @jones2009quantitative. Note that this simulation is not addressing a specific scientific question, and is simply an educational example.
+HNN-core has minimal dependencies which allows for effortless installation using the pip Python installer. In addition to NumPy [@harris2020array], SciPy [@virtanen2020scipy], and Matplotlib [@hunter2007matplotlib] common in most libraries in the scientific Python stack, HNN-core uses NEURON [@hines1997neuron] for the cell and circuit modeling. Here, we demonstrate how the HNN-core interface can be used to quickly simulate and plot the net cortical dipole response to a brief exogenously evoked drive representing “feedforward” thalamocortical input. This input  (referred to as ‘evprox1’) effectively targets the proximal dendrites of the pyramidal neurons in L2/3 and L5, using the template neocortical model as in @jones2009quantitative. Note that this simulation is not addressing a specific scientific question, and is simply an educational example.
 
 ```python
 from hnn_core import jones_2009_model, simulate_dipole
@@ -173,7 +173,7 @@ dpl = simulate_dipole(net, tstop=100.0)
 
 
 ```
-![**Left**: 3D rendering of neurons composing the network model. Figure adapted from [@neymotin2020human]. **Right**: Plots of the network and simulated results can be generated using the HNN-core visualization API. The drive input histogram with `net.cell_response.plot_spikes_hist()`, the electrical current dipole with `plot_dipole(dpl)`, and the spike raster with `net.cell_response.plot_spikes_raster()`.\label{fig:fig1}](joss_figure.pdf)
+![**Left**: Schematic of HNN model detailing the cell types and layer specific synaptic connectivity structure. **Right**: Plots of the network and simulated results can be generated using the HNN-core visualization API. The drive input histogram with `net.cell_response.plot_spikes_hist()`, the net current dipole with `plot_dipole(dpl)`, and the spike raster with `net.cell_response.plot_spikes_raster()`.\label{fig:fig1}](joss_figure.pdf)
 
 # Ongoing research using HNN-core
 
