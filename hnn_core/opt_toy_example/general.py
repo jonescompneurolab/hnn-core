@@ -192,7 +192,7 @@ class Optimizer:
             If True, show the figure
 
         Returns
-       -------
+        -------
        fig : instance of plt.fig
            The matplotlib figure handle.
         """
