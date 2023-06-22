@@ -583,10 +583,24 @@ def plot_cells(net, ax=None, show=True):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
 
-    colors = {'L5_pyramidal': 'b', 'L2_pyramidal': 'c',
-              'L5_basket': 'r', 'L2_basket': 'm'}
-    markers = {'L5_pyramidal': '^', 'L2_pyramidal': '^',
-               'L5_basket': 'x', 'L2_basket': 'x'}
+    #colors = {'L5_pyramidal': 'b', 'L2_pyramidal': 'c',
+              #'L5_basket': 'r', 'L2_basket': 'm'}
+
+   #markers = {'L5_pyramidal': '^', 'L2_pyramidal': '^',
+            #   'L5_basket': 'x', 'L2_basket': 'x'}
+            
+    all_colors = ['b', 'c', 'r', 'm', 'tab:orange', 'g', 'y', 'k', 'w', 'tab:brown']
+    all_markers= ['^', '^', 'x', 'x', 'o', 'v', 's', 'p', 'h', '<']
+    cell_names = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket', 'L2_basket']
+    for cell_name in net.cell_types:
+        if cell_name not in cell_names:
+            cell_names.append(cell_name)
+    
+    colors= dict()
+    markers= dict()
+    for idx, cell_name in enumerate(cell_names):
+        colors[cell_name] = all_colors[idx]
+        markers[cell_name] = all_markers[idx]
 
     for cell_type in net.cell_types:
         x = [pos[0] for pos in net.pos_dict[cell_type]]
