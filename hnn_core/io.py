@@ -1,5 +1,9 @@
 """Network io"""
 
+# Authors: Rajat Partani <rajatpartani@gmail.com>
+#          Mainak Jas <mjas@mgh.harvard.edu>
+#          Nick Tolley <nicholas_tolley@brown.edu>
+
 import os
 from h5io import write_hdf5, read_hdf5
 
@@ -66,13 +70,9 @@ def write_network(net, fname, overwrite=True, save_unsimulated=False):
                               'the file or set overwrite=True.' % (fname,))
     net_data = dict()
     net_data['object_type'] = "Network"
-    # Write the required params
-    params = dict()
-    params['N_pyr_x'] = net._N_pyr_x
-    params['N_pyr_y'] = net._N_pyr_y
-    params['threshold'] = net.threshold
-    params['celsius'] = net._params['celsius']
-    net_data['params'] = params
+    net_data['N_pyr_x'] = net._N_pyr_x
+    net_data['N_pyr_y'] = net._N_pyr_y
+    net_data['celsius'] = net._params['celsius']
     cell_types_data = dict()
     for key in net.cell_types:
         cell_copy = net.cell_types[key].copy()
@@ -133,7 +133,11 @@ def read_network(fname, read_raw=False):
         raise ValueError('The object should be of type Network. '
                          'The file contains object of '
                          'type %s' % (net_data['object_type'],))
-    params = net_data['params']
+    params = dict()
+    params['N_pyr_x'] = net_data['N_pyr_x']
+    params['N_pyr_y'] = net_data['N_pyr_y']
+    params['celsius'] = net_data['celsius']
+    params['threshold'] = net_data['threshold']
 
     # Instantiating network
     # Cannot do this globally due to circular import
