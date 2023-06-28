@@ -173,7 +173,7 @@ dpl = simulate_dipole(net, tstop=100.0)
 
 
 ```
-![**Left**: Schematic of HNN model detailing the cell types and layer specific synaptic connectivity structure. **Right**: Plots of the network and simulated results can be generated using the HNN-core visualization API. The drive input histogram with `net.cell_response.plot_spikes_hist()`, the net current dipole with `plot_dipole(dpl)`, and the spike raster with `net.cell_response.plot_spikes_raster()`.\label{fig:fig1}](joss_figure.pdf)
+![**Left**: Reduced schematic of HNN model detailing the cell types, layer specific synaptic connectivity structure, and locations of proximal drive synapses. The default size of the full network is a grid of 100 pyramidal neurons, and 35 inhibitory neurons, synaptically connected in each layer. **Right**: Plots of the network and simulated results can be generated using the HNN-core visualization API. The drive input histogram with `net.cell_response.plot_spikes_hist()`, the net current dipole with `plot_dipole(dpl)`, and the spike raster with `net.cell_response.plot_spikes_raster()`.\label{fig:fig1}](joss_figure.pdf)
 
 # Ongoing research using HNN-core
 
