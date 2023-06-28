@@ -1,4 +1,3 @@
-from hnn_core.dipole import simulate_dipole
 import os.path as op
 from numpy.testing import assert_allclose
 from h5io import write_hdf5
@@ -6,6 +5,8 @@ import pytest
 
 import hnn_core
 from hnn_core import read_network
+from hnn_core import simulate_dipole
+from hnn_core import read_params
 from hnn_core import jones_2009_model, law_2021_model, calcium_model
 
 hnn_core_root = op.dirname(hnn_core.__file__)
@@ -13,15 +14,20 @@ params_fname = op.join(hnn_core_root, 'param', 'default.json')
 
 
 @pytest.mark.parametrize("network_model",
-                         ["law_2021", "calcium", "jones_2009"])
+                         [law_2021_model, calcium_model,
+                          jones_2009_model])
 def test_network_io(tmpdir, network_model):
+    # For simulation to be shorter(Discuss)
+    params = op.join(hnn_core_root, 'param', 'default.json')
+    if isinstance(params, str):
+        params = read_params(params)
+    params['N_pyr_x'] = 3
+    params['N_pyr_y'] = 3
+    params['celsius'] = 37.0
+    params['threshold'] = 0.0
+
     # Instantiating network along with drives
-    if network_model == "jones_2009":
-        net = jones_2009_model(add_drives_from_params=True)
-    elif network_model == "law_2021":
-        net = law_2021_model(add_drives_from_params=True)
-    elif network_model == "calcium":
-        net = calcium_model(add_drives_from_params=True)
+    net = network_model(params=params, add_drives_from_params=True)
 
     # Adding bias
     net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
@@ -49,8 +55,8 @@ def test_network_io(tmpdir, network_model):
     assert net == net_read
 
     # Simulating network
-    dpls1 = simulate_dipole(net, tstop=2, n_trials=1)
-    dpls2 = simulate_dipole(net_read, tstop=2, n_trials=1)
+    dpls1 = simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
+    dpls2 = simulate_dipole(net_read, tstop=2, n_trials=1, dt=0.5)
     for dpl1, dpl2 in zip(dpls1, dpls2):
         assert_allclose(dpl1.times, dpl2.times, rtol=0.00051, atol=0)
         for dpl_key in dpl1.data.keys():
@@ -76,7 +82,7 @@ def test_network_io(tmpdir, network_model):
 
     # Running simulation on the read unsimulated network and check it against
     # previous simulation
-    dpls3 = simulate_dipole(net_unsim_read, tstop=2, n_trials=1)
+    dpls3 = simulate_dipole(net_unsim_read, tstop=2, n_trials=1, dt=0.5)
     for dpl1, dpl3 in zip(dpls1, dpls3):
         assert_allclose(dpl1.times, dpl3.times, rtol=0.00051, atol=0)
         for dpl_key in dpl1.data.keys():
@@ -91,7 +97,7 @@ def test_network_io(tmpdir, network_model):
                            read_raw=True)
     assert net_raw == net_unsim
     # Checking simulation correctness of read raw network
-    dpls4 = simulate_dipole(net_raw, tstop=2, n_trials=1)
+    dpls4 = simulate_dipole(net_raw, tstop=2, n_trials=1, dt=0.5)
     for dpl1, dpl4 in zip(dpls1, dpls4):
         assert_allclose(dpl1.times, dpl4.times, rtol=0.00051, atol=0)
         for dpl_key in dpl1.data.keys():

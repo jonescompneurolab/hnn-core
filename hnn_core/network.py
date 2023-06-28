@@ -431,33 +431,11 @@ class Network(object):
     def __eq__(self, other):
         if not isinstance(other, Network):
             return NotImplemented
-        # Check for all attributes (Discuss)
-        # Check cell types
-        if not (self.cell_types == other.cell_types):
-            return False
-
-        # Check gid_ranges
-        if not (self.gid_ranges == other.gid_ranges):
-            return False
-
-        # Check pos_dict
-        if not (self.pos_dict == other.pos_dict):
-            return False
-
-        # Check cell_response
-        self.cell_response == other.cell_response
-
-        # Check external drives
-        if not (self.external_drives == other.external_drives):
-            return False
-
-        # Check external biases
-        if not (self.external_biases == other.external_biases):
-            return False
 
         # Check connectivity
         if not (len(self.connectivity) == len(other.connectivity)):
             return False
+        # order of connections doesn't matter
         for conn in self.connectivity:
             src_gids = list(conn['src_gids'])
             target_gids = list(conn['target_gids'])
@@ -469,17 +447,12 @@ class Network(object):
             if len(match_conns) == 0:
                 return False
 
-        # Check extracellular arrays
-        if not (self.rec_arrays == other.rec_arrays):
-            return False
-
-        # Check threshold
-        if not (self.threshold == other.threshold):
-            return False
-
-        # Check delay
-        if not (self.delay == other.delay):
-            return False
+        # Check all other attributes
+        for attr in ['cell_types', 'gid_ranges', 'pos_dict', 'cell_response',
+                     'external_drives', 'external_biases', 'rec_arrays',
+                     'threshold', 'delay']:
+            if getattr(self, attr) != getattr(other, attr):
+                return False
 
         return True
 
