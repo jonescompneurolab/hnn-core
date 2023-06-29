@@ -24,6 +24,7 @@ from .externals.mne import _validate_type, _check_option
 from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
 from .io import write_network
+from .docs import copy_doc
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
@@ -1398,6 +1399,7 @@ class Network(object):
         """
         return plot_cells(net=self, ax=ax, show=show)
 
+    @copy_doc(write_network)
     def write(self, fname, overwrite=True, save_unsimulated=False):
         write_network(self, fname, overwrite, save_unsimulated)
 
