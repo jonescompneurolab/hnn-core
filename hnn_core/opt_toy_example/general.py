@@ -4,9 +4,14 @@ import numpy as np
 <<<<<<< HEAD
 =======
 
+<<<<<<< HEAD
 >>>>>>> 672ce00 (Address comments for more generalized routine)
 from hnn_core import simulate_dipole
+=======
+>>>>>>> 18ac228 (added methods to remove 1/f and compute psd)
 from hnn_core.network import pick_connection
+
+from metrics import _rmse_evoked, _rmse_rhythmic, _rmse_poisson, _compute_welch_psd, _compute_multitaper_psd, _remove_aperiodic_foof, _remove_aperiodic_irasa
 
 from skopt import gp_minimize
 from scipy.optimize import fmin_cobyla
@@ -28,21 +33,38 @@ from scipy.optimize import fmin_cobyla
 
 
 class Optimizer:
-    def __init__(self, net, constraints, solver, obj_fun):
+    def __init__(self, net, constraints, solver, obj_fun, psd_method=None,
+                 aperiodic_method=None):
         self.net = net
         self.constraints = constraints
+        # Optimizer method
         if solver == 'bayesian':
             self._get_params = _get_params_bayesian
             self._run_opt = _run_opt_bayesian
         elif solver == 'cobyla':
             self._get_params = _get_params_cobyla
             self._run_opt = _run_opt_cobyla
+        # Response to be optimized
         if obj_fun == 'evoked':
             self.obj_fun = _rmse_evoked
+            self.obj_fun_type = 'evoked'
         elif obj_fun == 'rhythmic':
             self.obj_fun = _rmse_rhythmic
+            self.obj_fun_type = 'rhythmic'
         elif obj_fun == 'poisson':
             self.obj_fun = _rmse_poisson
+        # Methods to compute PSD (for rhythmic responses only)
+        self._compute_psd = None  
+        if psd_method == 'welch':
+            self._compute_psd = _compute_welch_psd
+        elif psd_method == 'multitaper':
+            self._compute_psd = _compute_multitaper_psd
+        # Methods to remove aperiodic component (for rhythmic responses only)
+        self._remove_aperiodic = None  
+        if aperiodic_method == 'fooof':
+            self._remove_aperiodic = _remove_aperiodic_foof
+        elif aperiodic_method == 'irasa':
+            self._remove_aperiodic = _remove_aperiodic_irasa
         self.net_ = None
         self.obj = list()
         self.opt_params = None
@@ -66,16 +88,25 @@ class Optimizer:
         class_name = self.__class__.__name__
         return '<%s | %s>' % (class_name)
 
+<<<<<<< HEAD
     def fit(self, target_statistic):
 >>>>>>> 672ce00 (Address comments for more generalized routine)
+=======
+    def fit(self, target_statistic, sfreq):
+>>>>>>> 18ac228 (added methods to remove 1/f and compute psd)
         """ ...
 
             Parameters
             ----------
-            target_statistic :
-                dpl
+            target_statistic : ndarray
+                Recorded dipole (must have the same amount of data points as
+                                 the initial, simulated dipole).
             window_len : float
-                for smoothing dpl
+                ...
+            sfreq : float
+                Sampling frequency of recorded dipole (must be the same as the
+                                 sampling frequency of the initial, simulated
+                                 dipole).
             """
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -120,8 +151,16 @@ def _get_params_bayesian(net, constraints):
                                               params,
                                               self.obj_fun,
                                               target_statistic,
+<<<<<<< HEAD
                                               self.max_iter)
 >>>>>>> 672ce00 (Address comments for more generalized routine)
+=======
+                                              self.max_iter,
+                                              self.obj_fun_type,
+                                              self._remove_aperiodic,
+                                              self._compute_psd,
+                                              sfreq)
+>>>>>>> 18ac228 (added methods to remove 1/f and compute psd)
         self.opt_params = opt_params
         self.obj = obj
         self.net_ = net_
@@ -133,15 +172,16 @@ def _get_params_bayesian(net, constraints):
         Parameters
         ----------
         ax : instance of matplotlib figure | None
-            The matplotlib axis
+            The matplotlib axis.
         show : bool
-            If True, show the figure
+            If True, show the figure.
 
         Returns
-       -------
-       fig : instance of plt.fig
-           The matplotlib figure handle.
+        -------
+        fig : instance of plt.fig
+            The matplotlib figure handle.
         """
+
         import matplotlib as mpl
         import matplotlib.pyplot as plt
 
@@ -173,7 +213,7 @@ def _get_params(net, constraints):
     Parameters
     ----------
     net : Network
-    constraints :
+    constraints : dictionary
         {'drive_name': {'param_name': [min, max],
                       'param_name': [min, max],
                       'param_name': [min, max]}}
@@ -189,6 +229,7 @@ def _get_params(net, constraints):
         might use this later to override net params in _set_params
         (might have to go back to weights_ampa instead of ampa)
     """
+
     params = dict()
 
     # Get params to optimize
@@ -456,6 +497,7 @@ def _run_opt_cobyla(net, init_params, cons, metric, target_statistic,
         Contains parameter names, initial parameters, and constraints.
 
     """
+
     # get initial params
     params = _get_params(net, constraints)
 
@@ -483,6 +525,7 @@ def _get_params_cobyla(net, constraints):
         Contains parameter names, initial parameters, and constraints.
 
     """
+
     # get initial params
     params = _get_params(net, constraints)
 
@@ -497,7 +540,8 @@ def _get_params_cobyla(net, constraints):
     return params
 
 
-def _run_opt_bayesian(net, params, obj_fun, target_statistic, max_iter):
+def _run_opt_bayesian(net, params, obj_fun, target_statistic, max_iter,
+                      obj_fun_type, remove_aperiodic, compute_psd, sfreq):
     """Uses gp_minimize optimizer.
 
        Parameters
@@ -507,10 +551,18 @@ def _run_opt_bayesian(net, params, obj_fun, target_statistic, max_iter):
            Contains parameter names, initial parameters, and constraints.
        obj_fun : func
            The objective function.
-        target_statistic : Dipole
-            The target statistic.
+        target_statistic : ndarray
+            The recorded dipole.
         max_iter : int
             Max number of calls.
+        obj_fun_type : string
+            Evoked or rhythmic.
+        remove_aperiodic :
+            ...
+        compute_psd :
+            ...
+        sfreq :
+            ...
 
        Returns
        -------
@@ -521,12 +573,23 @@ def _run_opt_bayesian(net, params, obj_fun, target_statistic, max_iter):
        net_ : Network
            Optimized network object.
     """
+
+    # if response type is rhythmic, first remove 1/f
+    if obj_fun_type == 'rhythmic':
+        target_statistic = remove_aperiodic(target_statistic, compute_psd,
+                                            sfreq)  # psd
+
     def _obj_func(predicted_params):
         return obj_fun(net,
                        params['names'],
                        target_statistic,
+<<<<<<< HEAD
                        predicted_params)
 >>>>>>> 672ce00 (Address comments for more generalized routine)
+=======
+                       predicted_params,
+                       compute_psd)
+>>>>>>> 18ac228 (added methods to remove 1/f and compute psd)
 
     opt_results = gp_minimize(func=_obj_func,
                               dimensions=params['constraints'],
@@ -541,7 +604,8 @@ def _run_opt_bayesian(net, params, obj_fun, target_statistic, max_iter):
     return opt_params, obj, net_
 
 
-def _run_opt_cobyla(net, params, obj_fun, target_statistic, max_iter):
+def _run_opt_cobyla(net, params, obj_fun, target_statistic, max_iter,
+                    obj_fun_type, remove_aperiodic, compute_psd, sfreq):
     """Uses fmin_cobyla optimizer.
 
        Parameters
@@ -551,10 +615,18 @@ def _run_opt_cobyla(net, params, obj_fun, target_statistic, max_iter):
            Contains parameter names, initial parameters, and constraints.
        obj_fun : func
            The objective function.
-        target_statistic : Dipole
-            The target statistic.
+        target_statistic : ndarray
+            The recorded dipole.
         max_iter : int
             Max number of calls.
+        obj_fun_type : string
+            Evoked or rhythmic.
+        remove_aperiodic :
+            ...
+        compute_psd :
+            ...
+        sfreq :
+            ...
 
        Returns
        -------
@@ -565,11 +637,18 @@ def _run_opt_cobyla(net, params, obj_fun, target_statistic, max_iter):
        net_ : Network
            Optimized network object.
     """
+
+    # if response type is rhythmic, first remove 1/f
+    if obj_fun_type == 'rhythmic':
+        target_statistic = remove_aperiodic(target_statistic, compute_psd,
+                                            sfreq)
+
     def _obj_func(predicted_params):
         return obj_fun(net,
                        params['names'],
                        target_statistic,
-                       predicted_params)
+                       predicted_params,
+                       compute_psd)
 
     opt_results = fmin_cobyla(_obj_func,
 <<<<<<< HEAD
@@ -895,7 +974,6 @@ def _rmse_evoked(net, target_statistic, window_len, **params):
                     net_new.external_drives[drive_name]['dynamics']\
                         [param_name] = predicted_params[count]
                     count += 1
-
                 elif param_name in ('ampa', 'nmda'):
                     conn_idxs = pick_connection(net_new, src_gids=drive_name)
                     for conn_idx in conn_idxs:
@@ -906,6 +984,7 @@ def _rmse_evoked(net, target_statistic, window_len, **params):
                                 ['A_weight'] = predicted_params[count]
                             count += 1
     return net_new
+<<<<<<< HEAD
 
 
 # These 2 functions will go in a file called metrics.py
@@ -1047,3 +1126,5 @@ def _rmse_poisson():
 >>>>>>> 672ce00 (Address comments for more generalized routine)
     return
 >>>>>>> 2f308f8 (added pep8 formatting)
+=======
+>>>>>>> 18ac228 (added methods to remove 1/f and compute psd)
