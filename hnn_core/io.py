@@ -9,23 +9,19 @@ from h5io import write_hdf5, read_hdf5
 
 from .cell import Cell, Section
 from .cell_response import CellResponse
+from .docs import fill_doc
 
 
+@fill_doc
 def write_network(net, fname, overwrite=True, save_unsimulated=False):
     """Write network to a file.
 
     Parameters
     ----------
-    net : Instance of Network object
-        The Network object
-    fname : str | Path object
-        Full path to the output file (.hdf5)
-    overwrite : Boolean
-        True : Overwrite existing file
-        False : Throw error if file already exists
-    save_unsimulated : Boolean
-        True : Do not save the Network simulation output
-        False : Save complete Network as provided in input
+    %(net)s
+    %(fname)s
+    %(overwrite)s
+    %(save_unsimulated)s
 
     Outputs
     -------
@@ -33,37 +29,32 @@ def write_network(net, fname, overwrite=True, save_unsimulated=False):
 
     File Content Description
     ------------------------
-    object_type : str
-        Type of object (Network) saved
-    params : dict
-        Parameters required to initialize a Network object
-    cell_types : dict of dict
-        Key : name of cell type
-        Value : dict version of Cell object
-    gid_ranges : dict of dict
-        key : cell name or drive name
-        Value : dict
-    pos_dict : dict
-        key : cell type name
-        value : All co-ordintes of the cell types
+    %(network_file_content_description)s
 
-    params description
-    ------------------
-    N_pyr_x : int
-    N_pyr_y : int
-    threshold : float
-        Firing threshold of all cells.
-    celsius : float
-
-    cell type description (Can be done in to_dict of Cell)
+    cell type description
     ---------------------
+    %(cell_description)s
 
     gid range description
     ---------------------
-    start : int
-        Start of the gid_range
-    stop : int
-        End of the gid_range
+    %(gid_range_description)s
+
+    external drive description
+    --------------------------
+    %(external_drive_description)s
+
+    external bias description
+    -------------------------
+    %(external_bias_description)s
+
+    connection description
+    ----------------------
+    %(connection_description)s
+
+    extracellular array description
+    -------------------------------
+    %(extracellular_array_description)s
+
     """
     if overwrite is False and os.path.exists(fname):
         raise FileExistsError('File already exists at path %s. Rename '
@@ -123,7 +114,47 @@ def write_network(net, fname, overwrite=True, save_unsimulated=False):
     write_hdf5(fname, net_data, overwrite=overwrite)
 
 
+@fill_doc
 def read_network(fname, read_raw=False):
+    """Read network from a file.
+
+    Parameters
+    ----------
+    %(fname)s
+    %(read_raw)s
+
+    Outputs
+    -------
+    %(net)s
+
+    File Content Description
+    ------------------------
+    %(network_file_content_description)s
+
+    cell type description
+    ---------------------
+    %(cell_description)s
+
+    gid range description
+    ---------------------
+    %(gid_range_description)s
+
+    external drive description
+    --------------------------
+    %(external_drive_description)s
+
+    external bias description
+    -------------------------
+    %(external_bias_description)s
+
+    connection description
+    ----------------------
+    %(connection_description)s
+
+    extracellular array description
+    -------------------------------
+    %(extracellular_array_description)s
+    """
     net_data = read_hdf5(fname)
     if 'object_type' not in net_data:
         raise NameError('The given file is not compatible. '

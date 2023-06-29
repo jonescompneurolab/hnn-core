@@ -123,3 +123,12 @@ def test_network_io(tmpdir, network_model):
         read_network(tmpdir.join('not_net.hdf5'))
 
     # Add test to check weights are equal in connections and drives (todo)
+
+    # Tests for checking docstrings
+    # check attribute in docstring for write
+    docstring_write = net.write.__doc__
+    docstring_read = read_network.__doc__
+    for attr in net.__dict__.keys():
+        if not attr.startswith('_'):
+            assert docstring_write.find(attr) != -1
+            assert docstring_read.find(attr) != -1
