@@ -443,6 +443,8 @@ class Cell:
             with this section. The section should belong to the apical dendrite
             of a pyramidal neuron.
         """
+        from .network_builder import load_custom_mechanisms
+        load_custom_mechanisms()
         self._create_sections(self.sections, self.topology)
         self._create_synapses(self.sections, self.synapses)
         self._set_biophysics(self.sections)
