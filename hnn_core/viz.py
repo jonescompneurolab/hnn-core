@@ -1365,12 +1365,18 @@ class NetworkPlot:
 
         self.ax.view_init(self._elev, self._azim)
 
-    def export_movie(self, fname, dpi=300):
+    def export_movie(self, fname, fps=30, dpi=300, decim=10,
+                     interval=30, frame_start=0, frame_stop=None,
+                     writer='ffmpeg'):
         import matplotlib.animation as animation
-        ani = animation.FuncAnimation(
-            self.fig, self.set_time_idx, len(self.times) - 1, interval=30)
+        if frame_stop is None:
+            frame_stop = len(self.times) - 1
 
-        writer = animation.writers['ffmpeg'](fps=30)
+        frames = np.arange(frame_start, frame_stop, decim)
+        ani = animation.FuncAnimation(
+            self.fig, self.set_time_idx, frames, interval=interval)
+
+        writer = animation.writers[writer](fps=fps)
         ani.save(fname, writer=writer, dpi=dpi)
         return ani
 
