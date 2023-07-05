@@ -1237,7 +1237,7 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
     return ax.get_figure()
 
 
-class NetworkPlot:
+class NetworkPlotter:
     """Helper class to visualize full
        morphology of HNN model.
 
@@ -1283,6 +1283,8 @@ class NetworkPlot:
         self.net = net
         self.times = net.cell_response.times
 
+        _validate_type(vmin, (int, float), 'vmin')
+        _validate_type(vmax, (int, float), 'vmax')
         self._vmin = vmin
         self._vmax = vmax
 
@@ -1293,11 +1295,21 @@ class NetworkPlot:
         self.colormap = colormaps[voltage_colormap]
 
         # Axes limits and view positions
+        _validate_type(xlim, tuple, 'xlim')
+        _validate_type(ylim, tuple, 'ylim')
+        _validate_type(zlim, tuple, 'zlim')
+        _validate_type(elev, (int, float), 'elev')
+        _validate_type(azim, (int, float), 'azim')
+
         self._xlim = xlim
         self._ylim = ylim
         self._zlim = zlim
         self._elev = elev
         self._azim = azim
+
+        # Trial and time indices
+        _validate_type(trial_idx, int, 'trial_idx')
+        _validate_type(time_idx, int, 'time_idx')
 
         self._trial_idx = trial_idx
         self._time_idx = time_idx
@@ -1381,6 +1393,7 @@ class NetworkPlot:
 
     @xlim.setter
     def xlim(self, xlim):
+        _validate_type(xlim, tuple, 'xlim')
         self._xlim = xlim
         self.ax.set_xlim(self._xlim)
 
@@ -1390,6 +1403,7 @@ class NetworkPlot:
 
     @ylim.setter
     def ylim(self, ylim):
+        _validate_type(ylim, tuple, 'ylim')
         self._ylim = ylim
         self.ax.set_ylim(self._ylim)
 
@@ -1399,6 +1413,7 @@ class NetworkPlot:
 
     @zlim.setter
     def zlim(self, zlim):
+        _validate_type(zlim, tuple, 'zlim')
         self._zlim = zlim
         self.ax.set_zlim(self._zlim)
 
@@ -1409,6 +1424,7 @@ class NetworkPlot:
 
     @elev.setter
     def elev(self, elev):
+        _validate_type(elev, (int, float), 'elev')
         self._elev = elev
         self.ax.view_init(self._elev, self._azim)
 
@@ -1418,6 +1434,7 @@ class NetworkPlot:
 
     @azim.setter
     def azim(self, azim):
+        _validate_type(azim, (int, float), 'azim')
         self._azim = azim
         self.ax.view_init(self._elev, self._azim)
 
@@ -1428,6 +1445,7 @@ class NetworkPlot:
 
     @vmin.setter
     def vmin(self, vmin):
+        _validate_type(vmin, (int, float), 'vmin')
         self._vmin = vmin
         self.vsec_array = self.get_voltages()
         self.color_array = self.colormap(self.vsec_array)
@@ -1438,6 +1456,7 @@ class NetworkPlot:
 
     @vmax.setter
     def vmax(self, vmax):
+        _validate_type(vmax, (int, float), 'vmax')
         self._vmax = vmax
         self.vsec_array = self.get_voltages()
         self.color_array = self.colormap(self.vsec_array)
@@ -1449,6 +1468,7 @@ class NetworkPlot:
 
     @trial_idx.setter
     def trial_idx(self, trial_idx):
+        _validate_type(trial_idx, int, 'trial_idx')
         self._trial_idx = trial_idx
         self.vsec_array = self.get_voltages()
         self.color_array = self.colormap(self.vsec_array)
@@ -1459,6 +1479,7 @@ class NetworkPlot:
 
     @time_idx.setter
     def time_idx(self, time_idx):
+        _validate_type(time_idx, int, 'time_idx')
         self._time_idx = time_idx
         self.update_section_voltages(self._time_idx)
 
