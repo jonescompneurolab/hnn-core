@@ -1321,7 +1321,7 @@ class NetworkPlotter:
         self._time_idx = time_idx
 
         # Get voltage data and corresponding colors
-        self.vsec_array = self.get_voltages()
+        self.vsec_array = self._get_voltages()
         self.color_array = self.colormap(self.vsec_array)
 
         # Create figure
@@ -1331,10 +1331,10 @@ class NetworkPlotter:
             self.ax.set_facecolor(self._bg_color)
         else:
             self.fig = None
-        self.init_network_plot()
+        self._init_network_plot()
         self._update_axes()
 
-    def get_voltages(self):
+    def _get_voltages(self):
         vsec_list = list()
         for cell_type in self.net.cell_types:
             gid_range = self.net.gid_ranges[cell_type]
@@ -1356,7 +1356,7 @@ class NetworkPlotter:
         for line, color in zip(self.ax.lines, color_list):
             line.set_color(color)
 
-    def init_network_plot(self):
+    def _init_network_plot(self):
         for cell_type in self.net.cell_types:
             gid_range = self.net.gid_ranges[cell_type]
             for gid_idx, gid in enumerate(gid_range):
@@ -1380,13 +1380,32 @@ class NetworkPlotter:
     def export_movie(self, fname, fps=30, dpi=300, decim=10,
                      interval=30, frame_start=0, frame_stop=None,
                      writer='ffmpeg'):
+        """Export movie of network activity
+        fname : str
+            Filename of exported movie
+        fps : int
+            Frames per second, default: 30
+        dpi : int
+            Dots per inch, default: 300
+        decim : int
+            Decimation factor for frames, default: 10
+        interval : int
+            Delay between frames, default: 30
+        frame_start : int
+            Index of first frame, default: 0
+        frame_stop : int | None
+            Index of last frame, default: None
+            If None, entire simulation is animated
+        writer : str
+            Movie writer, default: 'ffmpeg'
+        """
         import matplotlib.animation as animation
         if frame_stop is None:
             frame_stop = len(self.times) - 1
 
         frames = np.arange(frame_start, frame_stop, decim)
         ani = animation.FuncAnimation(
-            self.fig, self.set_time_idx, frames, interval=interval)
+            self.fig, self._set_time_idx, frames, interval=interval)
 
         writer = animation.writers[writer](fps=fps)
         ani.save(fname, writer=writer, dpi=dpi)
@@ -1453,7 +1472,7 @@ class NetworkPlotter:
     def vmin(self, vmin):
         _validate_type(vmin, (int, float), 'vmin')
         self._vmin = vmin
-        self.vsec_array = self.get_voltages()
+        self.vsec_array = self._get_voltages()
         self.color_array = self.colormap(self.vsec_array)
 
     @property
@@ -1464,7 +1483,7 @@ class NetworkPlotter:
     def vmax(self, vmax):
         _validate_type(vmax, (int, float), 'vmax')
         self._vmax = vmax
-        self.vsec_array = self.get_voltages()
+        self.vsec_array = self._get_voltages()
         self.color_array = self.colormap(self.vsec_array)
 
     # Time and trial indices
@@ -1476,7 +1495,7 @@ class NetworkPlotter:
     def trial_idx(self, trial_idx):
         _validate_type(trial_idx, int, 'trial_idx')
         self._trial_idx = trial_idx
-        self.vsec_array = self.get_voltages()
+        self.vsec_array = self._get_voltages()
         self.color_array = self.colormap(self.vsec_array)
 
     @property
@@ -1489,8 +1508,8 @@ class NetworkPlotter:
         self._time_idx = time_idx
         self.update_section_voltages(self._time_idx)
 
-    # Necessary for making animations
-    def set_time_idx(self, time_idx):
+    # Callable update function for making animations
+    def _set_time_idx(self, time_idx):
         self.time_idx = time_idx
 
     # Background color and voltage colormaps
