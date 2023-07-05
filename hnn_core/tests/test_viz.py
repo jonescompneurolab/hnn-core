@@ -9,8 +9,9 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, jones_2009_model
-from hnn_core.viz import plot_cells, plot_dipole, plot_psd, plot_tfr_morlet
-from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
+from hnn_core.viz import (plot_cells, plot_dipole, plot_psd, plot_tfr_morlet,
+                          plot_connectivity_matrix, plot_cell_connectivity,
+                          NetworkPlotter)
 from hnn_core.dipole import simulate_dipole
 
 matplotlib.use('agg')
@@ -132,7 +133,7 @@ def test_dipole_visualization():
         weights_ampa=weights_ampa, synaptic_delays=syn_delays,
         event_seed=14)
 
-    dpls = simulate_dipole(net, tstop=100., n_trials=2)
+    dpls = simulate_dipole(net, tstop=100., n_trials=2, record_vsec='all')
     fig = dpls[0].plot()  # plot the first dipole alone
     axes = fig.get_axes()[0]
     dpls[0].copy().smooth(window_len=10).plot(ax=axes)  # add smoothed versions
@@ -219,5 +220,45 @@ def test_dipole_visualization():
                                                   'beta_dist': 'g'})
     with pytest.raises(ValueError, match="'beta_dist' must be"):
         net.cell_response.plot_spikes_hist(color={'beta_prox': 'r'})
+
+    # test NetworkPlotter class
+    with pytest.raises(TypeError, match='xlim must be'):
+        _ = NetworkPlotter(net, xlim='blah')
+    with pytest.raises(TypeError, match='ylim must be'):
+        _ = NetworkPlotter(net, ylim='blah')
+    with pytest.raises(TypeError, match='zlim must be'):
+        _ = NetworkPlotter(net, zlim='blah')
+    with pytest.raises(TypeError, match='elev must be'):
+        _ = NetworkPlotter(net, elev='blah')
+    with pytest.raises(TypeError, match='azim must be'):
+        _ = NetworkPlotter(net, azim='blah')
+    with pytest.raises(TypeError, match='vmin must be'):
+        _ = NetworkPlotter(net, vmin='blah')
+    with pytest.raises(TypeError, match='vmax must be'):
+        _ = NetworkPlotter(net, vmax='blah')
+    with pytest.raises(TypeError, match='trial_idx must be'):
+        _ = NetworkPlotter(net, trial_idx=1.0)
+    with pytest.raises(TypeError, match='time_idx must be'):
+        _ = NetworkPlotter(net, time_idx=1.0)
+
+    net_plot = NetworkPlotter(net)
+    with pytest.raises(TypeError, match='xlim must be'):
+        net_plot.xlim = 'blah'
+    with pytest.raises(TypeError, match='ylim must be'):
+        net_plot.ylim = 'blah'
+    with pytest.raises(TypeError, match='zlim must be'):
+        net_plot.zlim = 'blah'
+    with pytest.raises(TypeError, match='elev must be'):
+        net_plot.elev = 'blah'
+    with pytest.raises(TypeError, match='azim must be'):
+        net_plot.azim = 'blah'
+    with pytest.raises(TypeError, match='vmin must be'):
+        net_plot.vmin = 'blah'
+    with pytest.raises(TypeError, match='vmax must be'):
+        net_plot.vmax = 'blah'
+    with pytest.raises(TypeError, match='trial_idx must be'):
+        net_plot.trial_idx = 1.0
+    with pytest.raises(TypeError, match='time_idx must be'):
+        net_plot.time_idx = 1.0
 
     plt.close('all')
