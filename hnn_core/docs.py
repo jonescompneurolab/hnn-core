@@ -1,7 +1,5 @@
 """The documentation functions."""
 
-import sys
-
 docdict = dict()
 # Define docdicts
 
@@ -44,10 +42,69 @@ read_raw : Boolean
 """
 
 docdict[
-    "cell_description"
+    "section_description"
 ] = """
-net : Instance of Network object
-    The Network object
+section description
+-------------------
+L : float
+    length of a section in microns.
+diam : float
+    diameter of a section in microns.
+cm : float
+    membrane capacitance in micro-Farads.
+Ra : float
+    axial resistivity in ohm-cm.
+end_pts : list of [x, y, z]
+    The start and stop points of the section.
+mechs : dict
+    Mechanisms to insert in this section. The keys
+    are the names of the mechanisms and values
+    are the properties.
+syns : list of str
+    The synaptic mechanisms to add in this section.
+"""
+
+docdict[
+    "cell_description"
+] = f"""
+cell_name : str
+    Name of the cell
+pos : tuple
+    The (x, y, z) coordinates.
+sections : dict of Section
+    Dictionary with keys as section name.
+synapses : dict of dict
+    Keys are name of synaptic mechanism. Each synaptic mechanism
+    has keys for parameters of the mechanism, e.g., 'e', 'tau1',
+    'tau2'.
+topology : list of list
+    The topology of cell sections. Each element is a list of
+    4 items in the format
+    [parent_sec, parent_loc, child_sec, child_loc] where
+    parent_sec and parent_loc are float between 0 and 1
+    specifying the location in the section to connect and
+    parent_sec and child_sec are names of the connecting
+    sections.
+sect_loc : dict of list
+    Can have keys 'proximal' or 'distal' each containing
+gid : int
+    GID of the cell in a network (or None if not yet assigned)
+dipole_pp : list of h.Dipole()
+    The Dipole objects (see dipole.mod).
+vsec : dict
+    Recording of section specific voltage. Must be enabled
+    by running simulate_dipole(net, record_vsec=True) or
+    simulate_dipole(net, record_vsoma=True)
+isec : dict
+    Contains recording of section specific currents indexed
+    by synapse type (keys can be soma_gabaa, soma_gabab etc.).
+    Must be enabled by running simulate_dipole(net, record_isec=True)
+    or simulate_dipole(net, record_isoma=True)
+tonic_biases : list of h.IClamp
+    The current clamps inserted at each section of the cell
+    for tonic biasing inputs.
+
+{docdict['section_description']}
 """
 
 docdict[
@@ -62,29 +119,104 @@ stop : int
 docdict[
     "external_drive_description"
 ] = """
-net : Instance of Network object
-    The Network object
+name : str
+    Unique name for the drive
+dynamics : dict
+    Parameters describing how the temporal dynamics of spike trains in the
+    drive. The keys are specific to the type of drive ('evoked', 'bursty',
+    etc.).
+location : str
+    Target location of synapses.
+cell_specific : bool
+    Whether each artifical drive cell has 1-to-1 (True, default) or
+    all-to-all (False) connection parameters.
+weights_ampa : dict or None
+    Synaptic weights (in uS) of AMPA receptors on each targeted cell
+    type (dict keys).
+weights_nmda : dict or None
+    Synaptic weights (in uS) of NMDA receptors on each targeted cell
+    type (dict keys).
+probability : dict or float
+    Probability of connection between any src-target pair.
+    Use dict to create probability->cell mapping. If float, applies to
+    all target cell types
+synaptic_delays : dict or float
+    Synaptic delay (in ms) at the column origin, dispersed laterally as
+    a function of the space_constant. If float, applies to all target
+    cell types.
+event_seed : int
+    Optional initial seed for random number generator.
+conn_seed : int
+    Optional initial seed for random number generator
+n_drive_cells : int | 'n_cells'
+    The number of drive cells that each contribute an independently
+    sampled synaptic spike to the network according to the Gaussian
+    time distribution (mu, sigma).
+events : list
+    Contains the spike times of exogeneous inputs.
 """
 
 docdict[
     "external_bias_description"
 ] = """
-net : Instance of Network object
-    The Network object
+cell_type : str
+    The cell type whose cells will get the tonic input.
+amplitude : float
+    The amplitude of the input.
+t0 : float
+    The start time of tonic input (in ms).
+tstop : float
+    The end time of tonic input (in ms).
 """
 
 docdict[
     "connection_description"
 ] = """
-net : Instance of Network object
-    The Network object
+target_type : str
+    Cell type of target gids.
+target_gids : list of int
+    Identifer for targets of source cells
+num_targets : int
+    Number of unique target gids.
+src_type : str
+    Cell type of source gids.
+src_gids : list of int
+    Identifier for source cells.
+num_srcs : int
+    Number of unique source gids.
+gid_pairs : dict
+    dict indexed by src gids
+loc : str
+    Target location of synapses.
+receptor : str
+    Synaptic receptor of connection.
+nc_dict : dict
+    Contains information about delay, weight, lamtha etc.
+allow_autapses : bool
+    If True, allow connecting neuron to itself.
+probability : float
+    Probability of connection between any src-target pair.
 """
 
 docdict[
     "extracellular_array_description"
 ] = """
-net : Instance of Network object
-    The Network object
+positions : tuple | list of tuple
+    The (x, y, z) coordinates (in um) of the extracellular electrodes.
+conductivity : float
+    Extracellular conductivity, in S/m
+method : str
+    Approximation to use.
+min_distance : float
+    To avoid numerical errors in calculating potentials, apply a minimum
+    distance limit between the electrode contacts and the active neuronal
+    membrane elements that act as sources of current.
+times : array-like, shape (n_times,) | None
+    Optionally, provide precomputed voltage sampling times for electrodes
+    at `positions`.
+voltages : array-like, shape (n_trials, n_electrodes, n_times) | None
+    Optionally, provide precomputed voltages for electrodes at
+    ``positions``.
 """
 
 docdict[
@@ -121,255 +253,3 @@ rec_arrays : dict of Extracellular Arrays
 delay : float
     Synaptic delay in ms.
 """
-
-docdict_indented = {}
-
-
-def fill_doc(f):
-    """Fill a docstring with docdict entries.
-
-    Parameters
-    ----------
-    f : callable
-        The function to fill the docstring of. Will be modified in place.
-
-    Returns
-    -------
-    f : callable
-        The function, potentially with an updated ``__doc__``.
-    """
-    docstring = f.__doc__
-    if not docstring:
-        return f
-    lines = docstring.splitlines()
-    # Find the minimum indent of the main docstring, after first line
-    if len(lines) < 2:
-        icount = 0
-    else:
-        icount = _indentcount_lines(lines[1:])
-    # Insert this indent to dictionary docstrings
-    try:
-        indented = docdict_indented[icount]
-    except KeyError:
-        indent = " " * icount
-        docdict_indented[icount] = indented = {}
-        for name, dstr in docdict.items():
-            lines = dstr.splitlines()
-            try:
-                newlines = [lines[0]]
-                for line in lines[1:]:
-                    newlines.append(indent + line)
-                indented[name] = "\n".join(newlines)
-            except IndexError:
-                indented[name] = dstr
-    try:
-        f.__doc__ = docstring % indented
-    except (TypeError, ValueError, KeyError) as exp:
-        funcname = f.__name__
-        funcname = docstring.split("\n")[0] if funcname is None else funcname
-        raise RuntimeError("Error documenting %s:\n%s" % (funcname, str(exp)))
-    return f
-
-
-##############################################################################
-# Utilities for docstring manipulation.
-
-
-def copy_doc(source):
-    """Copy the docstring from another function (decorator).
-
-    The docstring of the source function is prepepended to the docstring of the
-    function wrapped by this decorator.
-
-    This is useful when inheriting from a class and overloading a method. This
-    decorator can be used to copy the docstring of the original method.
-
-    Parameters
-    ----------
-    source : function
-        Function to copy the docstring from
-
-    Returns
-    -------
-    wrapper : function
-        The decorated function
-
-    Examples
-    --------
-    >>> class A:
-    ...     def m1():
-    ...         '''Docstring for m1'''
-    ...         pass
-    >>> class B (A):
-    ...     @copy_doc(A.m1)
-    ...     def m1():
-    ...         ''' this gets appended'''
-    ...         pass
-    >>> print(B.m1.__doc__)
-    Docstring for m1 this gets appended
-    """
-
-    def wrapper(func):
-        if source.__doc__ is None or len(source.__doc__) == 0:
-            raise ValueError("Cannot copy docstring: docstring was empty.")
-        doc = source.__doc__
-        if func.__doc__ is not None:
-            doc += func.__doc__
-        func.__doc__ = doc
-        return func
-
-    return wrapper
-
-
-def copy_function_doc_to_method_doc(source):
-    """Use the docstring from a function as docstring for a method.
-
-    The docstring of the source function is prepepended to the docstring of the
-    function wrapped by this decorator. Additionally, the first parameter
-    specified in the docstring of the source function is removed in the new
-    docstring.
-
-    This decorator is useful when implementing a method that just calls a
-    function.  This pattern is prevalent in for example the plotting functions
-    of MNE.
-
-    Parameters
-    ----------
-    source : function
-        Function to copy the docstring from.
-
-    Returns
-    -------
-    wrapper : function
-        The decorated method.
-
-    Notes
-    -----
-    The parsing performed is very basic and will break easily on docstrings
-    that are not formatted exactly according to the ``numpydoc`` standard.
-    Always inspect the resulting docstring when using this decorator.
-
-    Examples
-    --------
-    >>> def plot_function(object, a, b):
-    ...     '''Docstring for plotting function.
-    ...
-    ...     Parameters
-    ...     ----------
-    ...     object : instance of object
-    ...         The object to plot
-    ...     a : int
-    ...         Some parameter
-    ...     b : int
-    ...         Some parameter
-    ...     '''
-    ...     pass
-    ...
-    >>> class A:
-    ...     @copy_function_doc_to_method_doc(plot_function)
-    ...     def plot(self, a, b):
-    ...         '''
-    ...         Notes
-    ...         -----
-    ...         .. versionadded:: 0.13.0
-    ...         '''
-    ...         plot_function(self, a, b)
-    >>> print(A.plot.__doc__)
-    Docstring for plotting function.
-    <BLANKLINE>
-        Parameters
-        ----------
-        a : int
-            Some parameter
-        b : int
-            Some parameter
-    <BLANKLINE>
-            Notes
-            -----
-            .. versionadded:: 0.13.0
-    <BLANKLINE>
-    """
-
-    def wrapper(func):
-        doc = source.__doc__.split("\n")
-        if len(doc) == 1:
-            doc = doc[0]
-            if func.__doc__ is not None:
-                doc += func.__doc__
-            func.__doc__ = doc
-            return func
-
-        # Find parameter block
-        for line, text in enumerate(doc[:-2]):
-            if (text.strip() == "Parameters" and
-               doc[line + 1].strip() == "----------"):
-                parameter_block = line
-                break
-        else:
-            # No parameter block found
-            raise ValueError(
-                "Cannot copy function docstring: no parameter "
-                "block found. To simply copy the docstring, use "
-                "the @copy_doc decorator instead."
-            )
-
-        # Find first parameter
-        for line, text in enumerate(doc[parameter_block:], parameter_block):
-            if ":" in text:
-                first_parameter = line
-                parameter_indentation = len(text) - len(text.lstrip(" "))
-                break
-        else:
-            raise ValueError(
-                "Cannot copy function docstring: no parameters "
-                "found. To simply copy the docstring, use the "
-                "@copy_doc decorator instead."
-            )
-
-        # Find end of first parameter
-        for line, text in enumerate(doc[first_parameter + 1:],
-                                    first_parameter + 1):
-            # Ignore empty lines
-            if len(text.strip()) == 0:
-                continue
-
-            line_indentation = len(text) - len(text.lstrip(" "))
-            if line_indentation <= parameter_indentation:
-                # Reach end of first parameter
-                first_parameter_end = line
-
-                # Of only one parameter is defined, remove the Parameters
-                # heading as well
-                if ":" not in text:
-                    first_parameter = parameter_block
-
-                break
-        else:
-            # End of docstring reached
-            first_parameter_end = line
-            first_parameter = parameter_block
-
-        # Copy the docstring, but remove the first parameter
-        doc = (
-            "\n".join(doc[:first_parameter]) +
-            "\n" +
-            "\n".join(doc[first_parameter_end:])
-        )
-        if func.__doc__ is not None:
-            doc += func.__doc__
-        func.__doc__ = doc
-        return func
-
-    return wrapper
-
-
-def _indentcount_lines(lines):
-    """Compute minimum indent for all lines in line list."""
-    indentno = sys.maxsize
-    for line in lines:
-        stripped = line.lstrip()
-        if stripped:
-            indentno = min(indentno, len(line) - len(stripped))
-    if indentno == sys.maxsize:
-        return 0
-    return indentno

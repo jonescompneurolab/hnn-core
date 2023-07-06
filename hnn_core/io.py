@@ -9,7 +9,7 @@ from h5io import write_hdf5, read_hdf5
 
 from .cell import Cell, Section
 from .cell_response import CellResponse
-from .docs import fill_doc
+from .externals.mne import fill_doc
 
 
 @fill_doc
@@ -305,6 +305,7 @@ def _read_external_drive(net, drive_data, read_raw):
                              weights_ampa=drive_data['weights_ampa'],
                              weights_nmda=drive_data['weights_nmda'],
                              synaptic_delays=drive_data['synaptic_delays'],
+                             probability=drive_data["probability"],
                              event_seed=drive_data['event_seed'],
                              conn_seed=drive_data['conn_seed'])
     elif drive_data['type'] == 'poisson':
@@ -319,6 +320,7 @@ def _read_external_drive(net, drive_data, read_raw):
                               weights_ampa=drive_data['weights_ampa'],
                               weights_nmda=drive_data['weights_nmda'],
                               synaptic_delays=drive_data['synaptic_delays'],
+                              probability=drive_data["probability"],
                               event_seed=drive_data['event_seed'],
                               conn_seed=drive_data['conn_seed'])
     elif drive_data['type'] == 'bursty':
@@ -336,6 +338,7 @@ def _read_external_drive(net, drive_data, read_raw):
                              weights_ampa=drive_data['weights_ampa'],
                              weights_nmda=drive_data['weights_nmda'],
                              synaptic_delays=drive_data['synaptic_delays'],
+                             probability=drive_data["probability"],
                              event_seed=drive_data['event_seed'],
                              conn_seed=drive_data['conn_seed'])
 
