@@ -11,7 +11,7 @@ from hnn_core import simulate_dipole
 >>>>>>> 18ac228 (added methods to remove 1/f and compute psd)
 from hnn_core.network import pick_connection
 
-from metrics import _rmse_evoked, _rmse_rhythmic, _rmse_poisson, _compute_welch_psd, _compute_multitaper_psd, _remove_aperiodic_foof, _remove_aperiodic_irasa
+from metrics import _rmse_evoked, _rmse_rhythmic, _rmse_poisson
 
 from skopt import gp_minimize
 from scipy.optimize import fmin_cobyla
@@ -33,8 +33,8 @@ from scipy.optimize import fmin_cobyla
 
 
 class Optimizer:
-    def __init__(self, net, constraints, solver, obj_fun, psd_method=None,
-                 aperiodic_method=None):
+    def __init__(self, net, constraints, solver, obj_fun, f_bands=None,
+                 weights=None):
         self.net = net
         self.constraints = constraints
         # Optimizer method
@@ -47,27 +47,16 @@ class Optimizer:
         # Response to be optimized
         if obj_fun == 'evoked':
             self.obj_fun = _rmse_evoked
-            self.obj_fun_type = 'evoked'
         elif obj_fun == 'rhythmic':
             self.obj_fun = _rmse_rhythmic
-            self.obj_fun_type = 'rhythmic'
+            self.f_bands = f_bands
+            self.weights = weights
         elif obj_fun == 'poisson':
             self.obj_fun = _rmse_poisson
-        # Methods to compute PSD (for rhythmic responses only)
-        self._compute_psd = None  
-        if psd_method == 'welch':
-            self._compute_psd = _compute_welch_psd
-        elif psd_method == 'multitaper':
-            self._compute_psd = _compute_multitaper_psd
-        # Methods to remove aperiodic component (for rhythmic responses only)
-        self._remove_aperiodic = None  
-        if aperiodic_method == 'fooof':
-            self._remove_aperiodic = _remove_aperiodic_foof
-        elif aperiodic_method == 'irasa':
-            self._remove_aperiodic = _remove_aperiodic_irasa
         self.net_ = None
         self.obj = list()
         self.opt_params = None
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -83,17 +72,24 @@ class Optimizer:
 >>>>>>> 2f308f8 (added pep8 formatting)
 =======
         self.max_iter = 200
+=======
+        self.max_iter = 150
+>>>>>>> a4f67f6 (add optimize rhythmic function)
 
     def __repr__(self):
         class_name = self.__class__.__name__
         return '<%s | %s>' % (class_name)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     def fit(self, target_statistic):
 >>>>>>> 672ce00 (Address comments for more generalized routine)
 =======
     def fit(self, target_statistic, sfreq):
 >>>>>>> 18ac228 (added methods to remove 1/f and compute psd)
+=======
+    def fit(self, target_statistic):
+>>>>>>> a4f67f6 (add optimize rhythmic function)
         """ ...
 
             Parameters
@@ -101,12 +97,8 @@ class Optimizer:
             target_statistic : ndarray
                 Recorded dipole (must have the same amount of data points as
                                  the initial, simulated dipole).
-            window_len : float
+            scaling_factor : float
                 ...
-            sfreq : float
-                Sampling frequency of recorded dipole (must be the same as the
-                                 sampling frequency of the initial, simulated
-                                 dipole).
             """
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -156,11 +148,16 @@ def _get_params_bayesian(net, constraints):
 >>>>>>> 672ce00 (Address comments for more generalized routine)
 =======
                                               self.max_iter,
+<<<<<<< HEAD
                                               self.obj_fun_type,
                                               self._remove_aperiodic,
                                               self._compute_psd,
                                               sfreq)
 >>>>>>> 18ac228 (added methods to remove 1/f and compute psd)
+=======
+                                              self.f_bands,
+                                              self.weights)
+>>>>>>> a4f67f6 (add optimize rhythmic function)
         self.opt_params = opt_params
         self.obj = obj
         self.net_ = net_
@@ -191,10 +188,11 @@ def _get_params_bayesian(net, constraints):
         axis = ax if isinstance(ax, mpl.axes._axes.Axes) else ax
 
         x = list(range(1, self.max_iter + 1))
+        y_min = min(self.obj) - 0.01
         y_max = max(self.obj) + 0.01
 
         axis.plot(x, self.obj, color='black')
-        axis.set_ylim([-.01, y_max])
+        axis.set_ylim([y_min, y_max])
         axis.set_title('Convergence')
         axis.set_xlabel('Number of calls')
         axis.set_ylabel('Objective value')
@@ -252,7 +250,6 @@ def _get_params(net, constraints):
         # get relevant params
         if drive_name in drive_names:
             for param_name in param_names[drive_name]:
-                # instead check obj_fun
                 if param_name in ('mu', 'sigma', 'tstart', 'burst_rate',
                                   'burst_std'):
                     initial_params.append(net.external_drives[drive_name]
@@ -541,7 +538,7 @@ def _get_params_cobyla(net, constraints):
 
 
 def _run_opt_bayesian(net, params, obj_fun, target_statistic, max_iter,
-                      obj_fun_type, remove_aperiodic, compute_psd, sfreq):
+                      f_bands, weights):
     """Uses gp_minimize optimizer.
 
        Parameters
@@ -555,14 +552,6 @@ def _run_opt_bayesian(net, params, obj_fun, target_statistic, max_iter,
             The recorded dipole.
         max_iter : int
             Max number of calls.
-        obj_fun_type : string
-            Evoked or rhythmic.
-        remove_aperiodic :
-            ...
-        compute_psd :
-            ...
-        sfreq :
-            ...
 
        Returns
        -------
@@ -574,11 +563,6 @@ def _run_opt_bayesian(net, params, obj_fun, target_statistic, max_iter,
            Optimized network object.
     """
 
-    # if response type is rhythmic, first remove 1/f
-    if obj_fun_type == 'rhythmic':
-        target_statistic = remove_aperiodic(target_statistic, compute_psd,
-                                            sfreq)  # psd
-
     def _obj_func(predicted_params):
         return obj_fun(net,
                        params['names'],
@@ -588,8 +572,14 @@ def _run_opt_bayesian(net, params, obj_fun, target_statistic, max_iter,
 >>>>>>> 672ce00 (Address comments for more generalized routine)
 =======
                        predicted_params,
+<<<<<<< HEAD
                        compute_psd)
 >>>>>>> 18ac228 (added methods to remove 1/f and compute psd)
+=======
+                       f_bands,
+                       weights,
+                       _set_params)
+>>>>>>> a4f67f6 (add optimize rhythmic function)
 
     opt_results = gp_minimize(func=_obj_func,
                               dimensions=params['constraints'],
@@ -604,8 +594,8 @@ def _run_opt_bayesian(net, params, obj_fun, target_statistic, max_iter,
     return opt_params, obj, net_
 
 
-def _run_opt_cobyla(net, params, obj_fun, target_statistic, max_iter,
-                    obj_fun_type, remove_aperiodic, compute_psd, sfreq):
+def _run_opt_cobyla(net, params, obj_fun, target_statistic, max_iter, f_bands,
+                    weights):
     """Uses fmin_cobyla optimizer.
 
        Parameters
@@ -619,14 +609,6 @@ def _run_opt_cobyla(net, params, obj_fun, target_statistic, max_iter,
             The recorded dipole.
         max_iter : int
             Max number of calls.
-        obj_fun_type : string
-            Evoked or rhythmic.
-        remove_aperiodic :
-            ...
-        compute_psd :
-            ...
-        sfreq :
-            ...
 
        Returns
        -------
@@ -638,17 +620,14 @@ def _run_opt_cobyla(net, params, obj_fun, target_statistic, max_iter,
            Optimized network object.
     """
 
-    # if response type is rhythmic, first remove 1/f
-    if obj_fun_type == 'rhythmic':
-        target_statistic = remove_aperiodic(target_statistic, compute_psd,
-                                            sfreq)
-
     def _obj_func(predicted_params):
         return obj_fun(net,
                        params['names'],
                        target_statistic,
                        predicted_params,
-                       compute_psd)
+                       f_bands,
+                       weights,
+                       _set_params)
 
     opt_results = fmin_cobyla(_obj_func,
 <<<<<<< HEAD
@@ -970,7 +949,8 @@ def _rmse_evoked(net, target_statistic, window_len, **params):
         # set relevant params
         if drive_name in drive_names:
             for param_name in param_names[drive_name]:
-                if param_name in ('mu', 'sigma'):
+                if param_name in ('mu', 'sigma', 'tstart', 'burst_rate',
+                                  'burst_std'):
                     net_new.external_drives[drive_name]['dynamics']\
                         [param_name] = predicted_params[count]
                     count += 1
