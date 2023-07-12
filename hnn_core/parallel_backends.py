@@ -4,6 +4,9 @@
 #          Mainak Jas <mainakjas@gmail.com>
 
 import os
+import platform
+import os.path as op
+
 import sys
 import re
 import multiprocessing
@@ -110,6 +113,8 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     child_data : object
         The data returned by the child process.
     """
+    for cm in command:
+        print(cm)
     proc_data_bytes = b''
     # each loop while waiting will involve two Queue.get() timeouts, each
     # 0.01s. This caclulation will error on the side of a longer timeout
@@ -631,27 +636,23 @@ class MPIBackend(object):
             warn(f'{packages} not installed. Will run on single processor')
             self.n_procs = 1
 
-        self.mpi_cmd = mpi_cmd
-
-        if hyperthreading:
-            self.mpi_cmd += ' --use-hwthread-cpus'
-
-        if oversubscribe:
-            self.mpi_cmd += ' --oversubscribe'
-
-        self.mpi_cmd += ' -np ' + str(self.n_procs)
-
-        self.mpi_cmd += ' nrniv -python -mpi -nobanner ' + \
-            sys.executable + ' ' + \
-            os.path.join(os.path.dirname(sys.modules[__name__].__file__),
-                         'mpi_child.py')
-
         # Split the command into shell arguments for passing to Popen
-        if 'win' in sys.platform:
-            use_posix = True
+        use_posix = True if platform.system() == 'Windows' else False
+        self.mpi_cmd = shlex.split(mpi_cmd, posix=use_posix)
+
+        if platform.system() == 'Windows':
+            self.mpi_cmd.extend([r'/np', f'{self.n_procs}'])
         else:
-            use_posix = False
-        self.mpi_cmd = shlex.split(self.mpi_cmd, posix=use_posix)
+            if hyperthreading:
+                self.mpi_cmd.append('--use-hwthread-cpus')
+            if oversubscribe:
+                self.mpi_cmd.append('--oversubscribe')
+
+            self.mpi_cmd.extend(['-np', f'{self.n_procs}'])
+
+        mpi_child_fname = op.join(op.dirname(__file__), 'mpi_child.py')
+        self.mpi_cmd.extend(['nrniv', '-python', '-mpi', '-nobanner',
+                             sys.executable, rf'{mpi_child_fname}'])
 
     def __enter__(self):
         global _BACKEND
