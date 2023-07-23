@@ -3,6 +3,7 @@
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Sam Neymotin <samnemo@gmail.com>
 
+import math
 from copy import deepcopy
 
 import numpy as np
@@ -321,6 +322,16 @@ class Cell:
         self.tonic_biases = list()
         if gid is not None:
             self.gid = gid  # use setter method to check input argument gid
+
+        # This will store the tree representation of the cell
+        # Will be constructed from topology.
+        # The keys will be the parents - {parent_name, end pt used}
+        # Values will be arrays containing children
+        # A child can be either {child_name, end pt used}
+        # Think which representation will be better as length information is
+        # also available
+        self.cell_tree = dict()
+        self.create_cell_tree()
 
         self._update_end_pts()
 
@@ -697,6 +708,136 @@ class Cell:
             self.sections[name]._end_pts = [[x0, y0, z0], [x1, y1, z1]]
 
         self._nrn_sections = dict()
+
+    def create_cell_tree(self):
+        end_pts_used = set()
+        # Make the soma entry.
+        # Note the 0 end of the soma will be the root
+        cell_tree = dict()
+        soma_0_end = ('soma', 0)
+        soma_1_end = ('soma', 1)
+        cell_tree[soma_0_end] = list()
+        cell_tree[soma_0_end].append(soma_1_end)
+        end_pts_used.add(soma_0_end)
+        end_pts_used.add(soma_1_end)
+        # If topology is none then a huge problem
+        # Is this case possible outside tests
+        if self.topology is None:
+            return
+        for connection in self.topology:
+            parent_name = connection[0]
+            parent_loc = connection[1]
+            child_name = connection[2]
+            child_loc = connection[3]
+            parent = (parent_name, parent_loc)
+            child = (child_name, child_loc)
+            child_other_end = (child_name, int(not child_loc))
+            # Add the tree entries
+            if parent not in cell_tree.keys():
+                cell_tree[parent] = list()
+            cell_tree[parent].append(child)
+            end_pts_used.add(parent)
+            end_pts_used.add(child_loc)
+            if child_other_end not in end_pts_used:
+                cell_tree[child] = list()
+                cell_tree[child].append(child_other_end)
+                end_pts_used.add(child_other_end)
+
+        self.cell_tree = cell_tree
+
+    def update_section_end_pts_L(self, sec_name, end_num, dpt):
+        x = self.sections[sec_name].end_pts[end_num][0]
+        y = self.sections[sec_name].end_pts[end_num][1]
+        z = self.sections[sec_name].end_pts[end_num][2]
+        self.sections[sec_name].end_pts[end_num][0] = x + dpt[0]
+        self.sections[sec_name].end_pts[end_num][1] = y + dpt[1]
+        self.sections[sec_name].end_pts[end_num][2] = z + dpt[2]
+        if (sec_name, end_num) in self.cell_tree.keys():
+            for (child_name, conn) in self.cell_tree[(sec_name, end_num)]:
+                self.update_section_end_pts_L(child_name, conn, dpt)
+
+    def update_end_pts(self):
+        if 'soma' not in self.sections:
+            raise KeyError('soma must be defined for cell')
+        # shift cell to self.pos and reorient apical dendrite
+        # along z direction of self.pos
+        dx = self.pos[0] - self.sections['soma'].end_pts[0][0]
+        dy = self.pos[1] - self.sections['soma'].end_pts[0][1]
+        dz = self.pos[2] - self.sections['soma'].end_pts[0][2]
+
+        for sec_name in self.sections:
+            end_pts = self.sections[sec_name].end_pts
+            updated_end_pts = list()
+            for pt in end_pts:
+                updated_end_pts.append(
+                    [
+                        pt[0] + dx,
+                        pt[1] + dy,
+                        pt[2] + dz
+                    ]
+                )
+            self.sections[sec_name]._end_pts = updated_end_pts
+        # Step 1-
+        # Get same coordinates after commenting out h.define_shape()
+        # Ongoing
+        # Step 2-
+        # Mimic the functionality of h.define_shape()
+        # h.define_shape() basically scales end pts to match the length.
+        # if I am able to form a tree like representation of the cell,
+        # I can get a simpler version of h.define_shape().
+        # Update end pts of each section according to its length
+        # for sec_name in self.sections.keys():
+            # First find the new coordinates of the end pt
+            # Using the new end pt we can get dx, dy, dz
+            # dpt = [dx, dy, dz]
+            # Find which end to use first
+            # Use start_pt, end_pt
+
+            # flag_start = 0
+            # if (sec_name, 1) in self.cell_tree.keys():
+            #     if (sec_name, 0) in self.cell_tree[(sec_name, 1)]:
+            #         print("Im here")
+            #         flag_start = 1
+            # pts = self.sections[sec_name].end_pts
+            # x0, y0, z0 = (pts[flag_start][0], pts[flag_start][1],
+            #               pts[flag_start][2])
+            # flag_end = int(not flag_start)
+            # x1, y1, z1 = pts[flag_end][0], pts[flag_end][1], pts[flag_end][2]
+            # old_len = math.sqrt((x1-x0)**2+(y1-y0)**2+(z1-z0)**2)
+            # new_len = self.sections[sec_name].L
+            # fac = new_len/old_len
+            # x_new = (x1-x0)*fac
+            # y_new = (y1-y0)*fac
+            # z_new = (z1-z0)*fac
+            # dx = x_new - x1
+            # dy = y_new - y1
+            # dz = z_new - z1
+            # dpt = [dx, dy, dz]
+
+            # self.update_section_end_pts_L(sec_name, flag_end, dpt)
+
+        # Need to start from the root I think
+        self.tree_traversal('soma', 0)
+
+    def tree_traversal(self, sec_name, flag_start):
+        flag_end = int(not flag_start)
+        pts = self.sections[sec_name].end_pts
+        x0, y0, z0 = pts[flag_start][0], pts[flag_start][1], pts[flag_start][2]
+        x1, y1, z1 = pts[flag_end][0], pts[flag_end][1], pts[flag_end][2]
+        old_len = math.sqrt((x1 - x0) ** 2 + (y1 - y0) ** 2 + (z1 - z0) ** 2)
+        new_len = self.sections[sec_name].L
+        fac = new_len / old_len
+        x_new = x0 + (x1 - x0) * fac
+        y_new = y0 + (y1 - y0) * fac
+        z_new = z0 + (z1 - z0) * fac
+        dx = x_new - x1
+        dy = y_new - y1
+        dz = z_new - z1
+        dpt = [dx, dy, dz]
+        self.update_section_end_pts_L(sec_name, flag_end, dpt)
+        if (sec_name, flag_start) in self.cell_tree.keys():
+            for (child_name, coord) in self.cell_tree[(sec_name, flag_start)]:
+                self.tree_traversal(child_name, coord)
 
     def modify_section(self, sec_name, L=None, diam=None, cm=None, Ra=None):
         """Change attributes of section specified by `sec_name`
