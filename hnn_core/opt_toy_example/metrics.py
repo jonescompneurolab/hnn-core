@@ -1,86 +1,65 @@
-from hnn_core import simulate_dipole
 import numpy as np
 
+from hnn_core import simulate_dipole, MPIBackend
 
-def _rmse_evoked(net, param_names, set_params, predicted_params, scaling,
-                 target_statistic, f_bands, weights):
-    """The objective function for evoked responses.
+from scipy.signal import resample
 
-       Parameters
-       -----------
-       net : Network
-       param_names : dictionary
-           Parameters to change.
-       target_statistic : ndarray
-           The recorded dipole.
-       predicted_params : list
-           Parameters selected by the optimizer.
 
-       Returns
-       -------
-       rmse : normalized RMSE between recorded and simulated dipole
+def _rmse_evoked(net, initial_params, set_params, predicted_params,
+                 update_params, obj_values, scale_factor, smooth_window_len,
+                 tstop, target_statistic):
+    """
+    The objective function for evoked responses.
+
+    Parameters
+    ----------
+    net : Network
+        The network object.
+    initial_params : dict
+        Keys are parameter names, values are initial parameters.
+    set_params : func
+        User-defined function that sets network drives and parameters.
+    predicted_params : list
+        Parameters selected by the optimizer.
+    update_params : func
+        Function to update param_dict.
+    scale_factor : float
+        The dipole scale factor.
+    smooth_window_len : float
+        The smooth window length.
+    tstop : float
+        The simulated dipole's duration.
+    target_statistic : ndarray
+        The recorded dipole.
+
+    Returns
+    -------
+    obj : float
+        Normalized RMSE between recorded and simulated dipole.
     """
 
-    # get network with predicted params
-    new_net = set_params(net, param_names, predicted_params) # ???
-    # simulate dipole
-    dpl = simulate_dipole(new_net, tstop=500, n_trials=1)[0]
-
-    # smooth & scale
-    dpl.scale(scaling)
-    dpl.smooth(20)
-
-    # calculate rmse
-    obj = np.sqrt(((dpl.data['agg'] - target_statistic)**2).sum() / len(dpl.times)) / (max(target_statistic) - min(target_statistic))
-    return obj
-
-
-def _rmse_rhythmic(net, param_names, set_params, predicted_params, scaling,
-                   target_statistic, f_bands, weights):
-    """The objective function for evoked responses.
-
-       Parameters
-       -----------
-       net : Network
-       param_names : dictionary
-           Parameters to change.
-       target_statistic : ndarray
-           Recorded dipole.
-       predicted_params : list
-           Parameters selected by the optimizer.
-       compute_psd :
-           ...
-
-       Returns
-       -------
-       rmse : normalized RMSE between recorded and simulated dipole
-    """
-
-    from scipy.signal import periodogram
+    param_dict = update_params(initial_params, predicted_params)
 
     # simulate dpl with predicted params
-    new_net = set_params(net, param_names, predicted_params) # ???
-    dpl = simulate_dipole(new_net, tstop=300, n_trials=1)[0]
+    new_net = set_params(net.copy(), param_dict)
+    with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
+        dpl = simulate_dipole(new_net, tstop=tstop, n_trials=1)[0]
 
-    # scale
-    dpl.scale(scaling)
+    # downsample if necessary
+    if (len(dpl.data['agg']) < len(target_statistic)):
+        target_statistic = resample(target_statistic, len(dpl.data['agg']))
+    elif (len(dpl.data['agg']) > len(target_statistic)):
+        dpl.data['agg'] = resample(dpl.data['agg'], len(target_statistic))
 
-    # get psd of simulated dpl
-    freqs_simulated, psd_simulated = periodogram(dpl.data['agg'], dpl.sfreq,
-                                                 window='hamming')
+    # smooth & scale
+    dpl.scale(scale_factor)
+    dpl.smooth(smooth_window_len)
 
-    # for each f band
-    f_bands_psds = list()
-    for f_band_idx, f_band_val in enumerate(f_bands):
-        f_band_psd_idx = np.where(np.logical_and(freqs_simulated >= f_band_val[0],
-                                                 freqs_simulated <= f_band_val[1]))[0]
-        f_bands_psds.append((-weights[f_band_idx] * sum(psd_simulated[f_band_psd_idx])) / sum(psd_simulated))
+    # calculate rmse
+    obj = np.sqrt(((dpl.data['agg'] - target_statistic)**2).sum() /
+                  len(dpl.times)) / (max(target_statistic) -
+                                     min(target_statistic))
 
-    # grand sum
-    obj = sum(f_bands_psds)
+    obj_values.append(obj)
 
     return obj
-
-
-def _rmse_poisson():
-    return
