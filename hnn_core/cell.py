@@ -203,6 +203,14 @@ class Section:
         self.mechs = dict()
         self.syns = list()
 
+        # For distance functionality
+        self.nseg = 1
+        if self.L > 100.:  # 100 um
+            self.nseg = int(self.L / 50.)
+            # make dend.nseg odd for all sections
+            if not self.nseg % 2:
+                self.nseg += 1
+
     def __repr__(self):
         return f'L={self.L}, diam={self.diam}, cm={self.cm}, Ra={self.Ra}'
 
@@ -287,6 +295,11 @@ class Cell:
     sect_loc : dict of list
         Can have keys 'proximal' or 'distal' each containing
         names of section locations that are proximal or distal.
+    cell_tree : dict of list
+        Stores the tree representation of a cell. Built from topology.
+        Root is the 0 end of 'soma'. Nodes are a tuple (sec_name, sec_end_pt)
+        where sec_name is the name of the section and sec_end_pt is the o end
+        or 1 end.
 
     Examples
     --------
@@ -323,14 +336,9 @@ class Cell:
         if gid is not None:
             self.gid = gid  # use setter method to check input argument gid
 
-        # This will store the tree representation of the cell
-        # Will be constructed from topology.
-        # The keys will be the parents - {parent_name, end pt used}
-        # Values will be arrays containing children
-        # A child can be either {child_name, end pt used}
-        # Think which representation will be better as length information is
-        # also available
+        # This will store the tree representation of the cell4
         self.cell_tree = dict()
+        # Create the tree
         self.create_cell_tree()
 
         self._update_end_pts()
@@ -351,6 +359,30 @@ class Cell:
             self._gid = gid
         else:
             raise RuntimeError('Global ID for this cell already assigned!')
+
+    def distance_section(self, target_sec_name, base_sec_name, base_sec_end):
+        if (base_sec_name, base_sec_end) not in self.cell_tree.keys():
+            return 100000  # Ask about this
+        if (((target_sec_name, 0) in (
+            self.cell_tree[(base_sec_name, base_sec_end)])) or (
+                ((target_sec_name, 1) in (
+                    self.cell_tree[(base_sec_name, base_sec_end)])))):
+            return 0
+
+        dist = 1000000
+
+        for sec_name, sec_end_pt in self.cell_tree[(base_sec_name,
+                                                    base_sec_end)]:
+            if (sec_name == base_sec_name):
+                dist_1 = (self.distance_section(target_sec_name, sec_name,
+                          sec_end_pt) + self.sections[sec_name].L)
+            else:
+                dist_1 = self.distance_section(target_sec_name,
+                                               sec_name, sec_end_pt)
+            if dist_1 < dist:
+                dist = dist_1
+
+        return dist
 
     def _set_biophysics(self, sections):
         "Set the biophysics for the cell."
@@ -374,11 +406,45 @@ class Cell:
                 for attr, val in p_mech.items():
                     if hasattr(val, '__call__'):
                         sec.push()
+                        seg_dists = list()
                         for seg in sec:
+                            seg_dists.append(h.distance(seg.x))
                             setattr(seg, attr, val(h.distance(seg.x)))
                         h.pop_section()
+                        print(sec_name)
+                        print(seg_dists)
                     else:
                         setattr(sec, attr, val)
+
+    def _set_biophysics_new(self, sections):
+        for sec_name, section in sections.items():
+            for mech_name, p_mech in section.mechs.items():
+                for attr, val in p_mech.items():
+                    if hasattr(val, '__call__'):
+                        seg_xs, seg_vals = list(), list()
+                        section_distance = self.distance_section(sec_name,
+                                                                 'soma', 0)
+                        print(sec_name)
+                        print(section_distance)
+                        adjacent_seg_dist = 1 / section.nseg
+                        first_seg_centre = (0.5 - (((section.nseg - 1) / 2) *
+                                            adjacent_seg_dist))
+                        seg_centres = list()
+                        seg_dists = list()
+                        for i in range(0, section.nseg):
+                            seg_centres.append(first_seg_centre +
+                                               (i * adjacent_seg_dist))
+                        for seg_x in seg_centres:
+                            seg_xs.append(seg_x)
+                            seg_vals.append(val(section_distance +
+                                            (seg_x * section.L)))
+                            seg_dists.append(section_distance +
+                                             (seg_x * section.L))
+                        p_mech[attr] = [seg_xs, seg_vals]
+                        print(seg_dists)
+                    else:
+                        p_mech[attr] = val
+        return self.sections
 
     def _create_synapses(self, sections, synapses):
         """Create synapses."""
@@ -710,21 +776,32 @@ class Cell:
         self._nrn_sections = dict()
 
     def create_cell_tree(self):
-        end_pts_used = set()
-        # Make the soma entry.
-        # Note the 0 end of the soma will be the root
-        cell_tree = dict()
-        soma_0_end = ('soma', 0)
-        soma_1_end = ('soma', 1)
-        cell_tree[soma_0_end] = list()
-        cell_tree[soma_0_end].append(soma_1_end)
-        end_pts_used.add(soma_0_end)
-        end_pts_used.add(soma_1_end)
-        # If topology is none then a huge problem
-        # Is this case possible outside tests
+        """Create cell tree from topology
+
+        Returns
+        -------
+        Tree representation of the cell.
+        """
         if self.topology is None:
             return
+
+        end_pts_used = set()
+        # Make the soma entries
+        cell_tree = dict()
+
+        soma_0_end = ('soma', 0)  # end 0
+        soma_1_end = ('soma', 1)  # end 1
+
+        cell_tree[soma_0_end] = list()
+        # Connect end 1 to end 0
+        cell_tree[soma_0_end].append(soma_1_end)
+
+        end_pts_used.add(soma_0_end)
+        end_pts_used.add(soma_1_end)
+
+        # Add all connections
         for connection in self.topology:
+            # Creating the nodes
             parent_name = connection[0]
             parent_loc = connection[1]
             child_name = connection[2]
@@ -732,12 +809,18 @@ class Cell:
             parent = (parent_name, parent_loc)
             child = (child_name, child_loc)
             child_other_end = (child_name, int(not child_loc))
+
             # Add the tree entries
+            # If the parent has no child yet
             if parent not in cell_tree.keys():
                 cell_tree[parent] = list()
+
+            # Connecting child to parent
             cell_tree[parent].append(child)
             end_pts_used.add(parent)
             end_pts_used.add(child_loc)
+
+            # Defining the edge (section)
             if child_other_end not in end_pts_used:
                 cell_tree[child] = list()
                 cell_tree[child].append(child_other_end)
@@ -745,7 +828,7 @@ class Cell:
 
         self.cell_tree = cell_tree
 
-    def update_section_end_pts_L(self, sec_name, end_num, dpt):
+    def _update_section_end_pts_L(self, sec_name, end_num, dpt):
         x = self.sections[sec_name].end_pts[end_num][0]
         y = self.sections[sec_name].end_pts[end_num][1]
         z = self.sections[sec_name].end_pts[end_num][2]
@@ -754,17 +837,53 @@ class Cell:
         self.sections[sec_name].end_pts[end_num][2] = z + dpt[2]
         if (sec_name, end_num) in self.cell_tree.keys():
             for (child_name, conn) in self.cell_tree[(sec_name, end_num)]:
-                self.update_section_end_pts_L(child_name, conn, dpt)
+                self._update_section_end_pts_L(child_name, conn, dpt)
+
+    def _tree_traversal(self, sec_name, flag_start):
+        # Find the end pts of the section
+        flag_end = int(not flag_start)
+        pts = self.sections[sec_name].end_pts
+        x0, y0, z0 = pts[flag_start][0], pts[flag_start][1], pts[flag_start][2]
+        x1, y1, z1 = pts[flag_end][0], pts[flag_end][1], pts[flag_end][2]
+
+        # Find the factor by which length is changed
+        old_len = math.sqrt((x1 - x0) ** 2 + (y1 - y0) ** 2 + (z1 - z0) ** 2)
+        new_len = self.sections[sec_name].L
+        fac = new_len / old_len
+        x_new = x0 + (x1 - x0) * fac
+        y_new = y0 + (y1 - y0) * fac
+        z_new = z0 + (z1 - z0) * fac
+
+        # Find the change in coordinates
+        dx = x_new - x1
+        dy = y_new - y1
+        dz = z_new - z1
+        dpt = [dx, dy, dz]
+
+        # Update all coordinates in the subtree
+        self._update_section_end_pts_L(sec_name, flag_end, dpt)
+
+        # Check for change in section lengths in the subtree
+        if (sec_name, flag_start) in self.cell_tree.keys():
+            for (child_name, coord) in self.cell_tree[(sec_name, flag_start)]:
+                self._tree_traversal(child_name, coord)
 
     def update_end_pts(self):
+        """Udpate all end pts according to the length of the sections.
+        Can be used whenever length of any section is updated
+
+        Returns
+        -------
+        Updated end pts for the cell
+        """
         if 'soma' not in self.sections:
             raise KeyError('soma must be defined for cell')
+
         # shift cell to self.pos and reorient apical dendrite
         # along z direction of self.pos
         dx = self.pos[0] - self.sections['soma'].end_pts[0][0]
         dy = self.pos[1] - self.sections['soma'].end_pts[0][1]
         dz = self.pos[2] - self.sections['soma'].end_pts[0][2]
-
         for sec_name in self.sections:
             end_pts = self.sections[sec_name].end_pts
             updated_end_pts = list()
@@ -777,67 +896,10 @@ class Cell:
                     ]
                 )
             self.sections[sec_name]._end_pts = updated_end_pts
-        # Step 1-
-        # Get same coordinates after commenting out h.define_shape()
-        # Ongoing
-        # Step 2-
-        # Mimic the functionality of h.define_shape()
-        # h.define_shape() basically scales end pts to match the length.
-        # if I am able to form a tree like representation of the cell,
-        # I can get a simpler version of h.define_shape().
-        # Update end pts of each section according to its length
-        # for sec_name in self.sections.keys():
-            # First find the new coordinates of the end pt
-            # Using the new end pt we can get dx, dy, dz
-            # dpt = [dx, dy, dz]
-            # Find which end to use first
-            # Use start_pt, end_pt
 
-            # flag_start = 0
-            # if (sec_name, 1) in self.cell_tree.keys():
-            #     if (sec_name, 0) in self.cell_tree[(sec_name, 1)]:
-            #         print("Im here")
-            #         flag_start = 1
-            # pts = self.sections[sec_name].end_pts
-            # x0, y0, z0 = (pts[flag_start][0], pts[flag_start][1],
-            #               pts[flag_start][2])
-            # flag_end = int(not flag_start)
-            # x1, y1, z1 = pts[flag_end][0], pts[flag_end][1], pts[flag_end][2]
-            # old_len = math.sqrt((x1-x0)**2+(y1-y0)**2+(z1-z0)**2)
-            # new_len = self.sections[sec_name].L
-            # fac = new_len/old_len
-            # x_new = (x1-x0)*fac
-            # y_new = (y1-y0)*fac
-            # z_new = (z1-z0)*fac
-            # dx = x_new - x1
-            # dy = y_new - y1
-            # dz = z_new - z1
-            # dpt = [dx, dy, dz]
-
-            # self.update_section_end_pts_L(sec_name, flag_end, dpt)
-
-        # Need to start from the root I think
-        self.tree_traversal('soma', 0)
-
-    def tree_traversal(self, sec_name, flag_start):
-        flag_end = int(not flag_start)
-        pts = self.sections[sec_name].end_pts
-        x0, y0, z0 = pts[flag_start][0], pts[flag_start][1], pts[flag_start][2]
-        x1, y1, z1 = pts[flag_end][0], pts[flag_end][1], pts[flag_end][2]
-        old_len = math.sqrt((x1 - x0) ** 2 + (y1 - y0) ** 2 + (z1 - z0) ** 2)
-        new_len = self.sections[sec_name].L
-        fac = new_len / old_len
-        x_new = x0 + (x1 - x0) * fac
-        y_new = y0 + (y1 - y0) * fac
-        z_new = z0 + (z1 - z0) * fac
-        dx = x_new - x1
-        dy = y_new - y1
-        dz = z_new - z1
-        dpt = [dx, dy, dz]
-        self.update_section_end_pts_L(sec_name, flag_end, dpt)
-        if (sec_name, flag_start) in self.cell_tree.keys():
-            for (child_name, coord) in self.cell_tree[(sec_name, flag_start)]:
-                self.tree_traversal(child_name, coord)
+        # Check and update all end pts starting from root according to length
+        # of sections.
+        self._tree_traversal('soma', 0)
 
     def modify_section(self, sec_name, L=None, diam=None, cm=None, Ra=None):
         """Change attributes of section specified by `sec_name`
