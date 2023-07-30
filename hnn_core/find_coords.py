@@ -79,11 +79,11 @@ def test_distance(func_name, cell_name):
 def find_coords(func_name, cell_name):
     cell = func_name(cell_name=cell_name)
     # print(cell.sections['soma'].end_pts)
-    for section_name, section in cell.sections.items():
-        print(section_name)
-        print(section.end_pts)
+    # for section_name, section in cell.sections.items():
+    #     print(section_name)
+    #     print(section.end_pts)
     cell.build()
-    print(cell._nrn_sections)
+    # print(cell._nrn_sections)
 
 
 def test_cell_tree(func_name, cell_name):
@@ -108,6 +108,31 @@ def test_cell_tree(func_name, cell_name):
         print("\n")
 
 
-# find_coords(pyramidal, cell_name='L2Pyr')
+def test_distance_(func_name, cell_name):
+    cell = func_name(cell_name=cell_name)
+    cell_new = func_name(cell_name=cell_name)
+
+    print(cell_new.sections['soma'].L)
+
+    cell._update_end_pts()
+    cell.build()
+
+    cell_new.update_end_pts()
+    cell_new.sections = cell_new._set_biophysics_new(cell_new.sections)
+
+    for sec_name in cell.sections.keys():
+        print(sec_name)
+        for mech_name in cell.sections[sec_name].mechs.keys():
+            print(mech_name)
+            for attr, val in cell.sections[sec_name].mechs[mech_name].items():
+                print(attr)
+                print(val)
+            for attr, val in cell_new.sections[sec_name].mechs[mech_name].items():  # noqa
+                print(attr)
+                print(val)
+
+
+# find_coords(pyramidal, cell_name='L5Pyr')
 # test_distance(pyramidal, cell_name='L2Pyr')
-test_cell_tree(pyramidal, cell_name='L2Pyr')
+# test_cell_tree(pyramidal, cell_name='L2Pyr')
+test_distance_(pyramidal, cell_name='L5Pyr')
