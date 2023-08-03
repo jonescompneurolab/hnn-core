@@ -1,3 +1,10 @@
+"""Parameter optimization."""
+
+# Authors: Carolina Fernandez <cxf418@miami.edu>
+#          Nick Tolley <nicholas_tolley@brown.edu>
+#          Ryan Thorpe <ryan_thorpe@brown.edu>
+#          Mainak Jas <mjas@mgh.harvard.edu>
+
 import numpy as np
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -16,8 +23,12 @@ from hnn_core.network import pick_connection
 from metrics import _rmse_evoked, _rmse_rhythmic, _rmse_poisson
 =======
 
+<<<<<<< HEAD
 from metrics import _rmse_evoked
 >>>>>>> 50186cb (Clean up optimize evoked and example)
+=======
+from metrics import _rmse_evoked  # change path***
+>>>>>>> 46f1268 (Add tests and address comments)
 
 from skopt import gp_minimize
 from scipy.optimize import fmin_cobyla
@@ -43,10 +54,14 @@ from scipy.optimize import fmin_cobyla
 class Optimizer:
 <<<<<<< HEAD
     def __init__(self, net, constraints, set_params, solver, obj_fun,
+<<<<<<< HEAD
                  scale_factor, smooth_window_len, tstop):
 =======
     def __init__(self, net, constraints, solver, obj_fun):
 >>>>>>> 1a7e98b (Address comments for more generalized routine)
+=======
+                 tstop, scale_factor=1., smooth_window_len=None):
+>>>>>>> 46f1268 (Add tests and address comments)
         self.net = net
         self.constraints = constraints
         self._set_params = set_params
@@ -103,6 +118,7 @@ class Optimizer:
         class_name = self.__class__.__name__
         return class_name
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -305,12 +321,15 @@ def _get_params_bayesian(net, constraints):
                                              self.constraints)
 =======
     def fit(self, target_statistic):
+=======
+    def fit(self, target):
+>>>>>>> 46f1268 (Add tests and address comments)
         """
         Runs optimization routine.
 
         Parameters
         ----------
-        target_statistic : ndarray
+        target : ndarray
             The recorded dipole.
 
         Returns
@@ -355,7 +374,7 @@ def _get_params_bayesian(net, constraints):
                                               self.tstop,
 >>>>>>> 50186cb (Clean up optimize evoked and example)
                                               self.max_iter,
-                                              target_statistic)
+                                              target)
 
 >>>>>>> e101c24 (Draft opt class and functions based on comments)
         self.opt_params = opt_params
@@ -376,7 +395,7 @@ def _get_params_bayesian(net, constraints):
 
         Returns
         -------
-        instance of plt.fig
+        fig : instance of plt.fig
             The matplotlib figure handle.
         """
 
@@ -421,9 +440,8 @@ def _get_initial_params(constraints):
 
     initial_params = dict()
     for cons_key in constraints:
-        initial_params.update({cons_key:
-                               (constraints[cons_key][0] +
-                                constraints[cons_key][1])/2})
+        initial_params.update({cons_key: (constraints[cons_key][0] +
+                                          constraints[cons_key][1])/2})
 
     return initial_params
 
@@ -461,14 +479,16 @@ def _assemble_constraints_cobyla(constraints):
     Returns
     -------
     cons_bayesian : dict
-        ...
+        Set of functions.
     """
 
     # assemble constraints in solver-specific format
     cons_cobyla = list()
     for idx, cons_key in enumerate(constraints):
-        cons_cobyla.append(lambda x: float(constraints[cons_key][1]) - x[idx])
-        cons_cobyla.append(lambda x: x[idx] - float(constraints[cons_key][0]))
+        cons_cobyla.append(lambda x, idx=idx:
+                           float(constraints[cons_key][1]) - x[idx])
+        cons_cobyla.append(lambda x, idx=idx:
+                           x[idx] - float(constraints[cons_key][0]))
 
     return cons_cobyla
 
@@ -794,7 +814,7 @@ def _run_opt_cobyla(net, params, obj_fun, target_statistic, max_iter):
 
 def _run_opt_bayesian(net, constraints, initial_params, set_params, obj_fun,
                       scale_factor, smooth_window_len, tstop, max_iter,
-                      target_statistic):
+                      target):
     """
     Runs optimization routine with gp_minimize optimizer.
 
@@ -818,7 +838,7 @@ def _run_opt_bayesian(net, constraints, initial_params, set_params, obj_fun,
         The simulated dipole's duration.
     max_iter : int
         Number of calls the optimizer makes.
-    target_statistic : ndarray
+    target : ndarray
         The recorded dipole.
 
     Returns
@@ -869,8 +889,12 @@ def _run_opt_bayesian(net, constraints, initial_params, set_params, obj_fun,
                        scale_factor,
                        smooth_window_len,
                        tstop,
+<<<<<<< HEAD
                        target_statistic)
 >>>>>>> 50186cb (Clean up optimize evoked and example)
+=======
+                       target)
+>>>>>>> 46f1268 (Add tests and address comments)
 
     opt_results = gp_minimize(func=_obj_func,
                               dimensions=constraints,
@@ -886,14 +910,15 @@ def _run_opt_bayesian(net, constraints, initial_params, set_params, obj_fun,
 
     # get optimized net
     param_dict = _update_params(initial_params, opt_params)
-    net_ = set_params(net.copy(), param_dict)
+    net_ = net.copy()
+    set_params(net_, param_dict)
 
     return opt_params, obj, net_
 
 
 def _run_opt_cobyla(net, constraints, initial_params, set_params, obj_fun,
                     scale_factor, smooth_window_len, tstop, max_iter,
-                    target_statistic):
+                    target):
     """
     Runs optimization routine with fmin_cobyla optimizer.
 
@@ -917,7 +942,7 @@ def _run_opt_cobyla(net, constraints, initial_params, set_params, obj_fun,
         The simulated dipole's duration.
     max_iter : int
         Number of calls the optimizer makes.
-    target_statistic : ndarray, None
+    target : ndarray, None
         The recorded dipole. The default is None.
 
     Returns
@@ -942,7 +967,7 @@ def _run_opt_cobyla(net, constraints, initial_params, set_params, obj_fun,
                        scale_factor,
                        smooth_window_len,
                        tstop,
-                       target_statistic)
+                       target)
 
     opt_results = fmin_cobyla(_obj_func,
 <<<<<<< HEAD
@@ -993,7 +1018,8 @@ def _run_opt_cobyla(net, constraints, initial_params, set_params, obj_fun,
 >>>>>>> 50186cb (Clean up optimize evoked and example)
     # get optimized net
     param_dict = _update_params(initial_params, opt_params)
-    net_ = set_params(net.copy(), param_dict)
+    net_ = net.copy()
+    set_params(net_, param_dict)
 
     return opt_params, obj, net_
 <<<<<<< HEAD
