@@ -7,7 +7,9 @@ This example demonstrates how to optimize the parameters
 of the model simulation to match an experimental dipole waveform.
 """
 
-# Authors:
+# Authors: Blake Caldwell <blake_caldwell@brown.edu>
+#          Mainak Jas <mjas@mgh.harvard.edu>
+#          Carolina Fernandez <cxf418@miami.edu>
 
 import os.path as op
 
@@ -98,8 +100,6 @@ def set_params(net, params_dict):
                          weights_ampa=weights_ampa_p2,
                          synaptic_delays=synaptic_delays_p)
 
-    return net
-
 ###############################################################################
 # Then, we define the constrainst.
 #
@@ -131,16 +131,17 @@ constraints.update({'evprox1_ampa_L2_basket': (0.01, 1.),
 ###############################################################################
 # Now we define and fit the optimizer.
 
-from general import Optimizer
+from general import Optimizer  # change path***
 
 tstop = exp_dpl.times[-1]
 scale_factor = 3000
-smooth_window_len = 2
+smooth_window_len = 30
 
 net = jones_2009_model()
-optim = Optimizer(net, constraints, set_params, solver='cobyla',
-                  obj_fun='evoked', scale_factor=scale_factor,
-                  smooth_window_len=smooth_window_len, tstop=tstop)
+optim = Optimizer(net, constraints=constraints, set_params=set_params,
+                  solver='bayesian', obj_fun='evoked', tstop=tstop,
+                  scale_factor=scale_factor,
+                  smooth_window_len=smooth_window_len)
 optim.fit(exp_dpl.data['agg'])
 
 ###############################################################################
