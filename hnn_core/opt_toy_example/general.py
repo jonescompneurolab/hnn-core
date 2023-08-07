@@ -61,7 +61,14 @@ class Optimizer:
 >>>>>>> 1a7e98b (Address comments for more generalized routine)
 =======
                  tstop, scale_factor=1., smooth_window_len=None):
+<<<<<<< HEAD
 >>>>>>> 46f1268 (Add tests and address comments)
+=======
+        if net.external_drives:
+            raise ValueError("The current Network instance has external " +
+                             "drives, provide a Network object with no " +
+                             "drives.")
+>>>>>>> 51112fc (Address comments and fix test script)
         self.net = net
         self.constraints = constraints
         self._set_params = set_params
@@ -73,9 +80,16 @@ class Optimizer:
             self._assemble_constraints = _assemble_constraints_cobyla
             self._run_opt = _run_opt_cobyla
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        else:
+            raise ValueError("solver must be 'bayesian' or 'cobyla'")
+>>>>>>> 51112fc (Address comments and fix test script)
         # Response to be optimized
         if obj_fun == 'evoked':
             self.obj_fun = _rmse_evoked
+        else:
+            raise ValueError("obj_fun must be 'evoked'")
         self.scale_factor = scale_factor
         self.smooth_window_len = smooth_window_len
         self.tstop = tstop
@@ -440,8 +454,8 @@ def _get_initial_params(constraints):
 
     initial_params = dict()
     for cons_key in constraints:
-        initial_params.update({cons_key: (constraints[cons_key][0] +
-                                          constraints[cons_key][1])/2})
+        initial_params.update({cons_key: ((constraints[cons_key][0] +
+                                          constraints[cons_key][1]))/2})
 
     return initial_params
 

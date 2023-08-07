@@ -1,5 +1,4 @@
-# Authors: Mainak Jas <mainakjas@gmail.com>
-#          Carolina Fernandez <cxf418@miami.edu>
+# Authors: Carolina Fernandez <cxf418@miami.edu>
 
 from hnn_core import jones_2009_model, simulate_dipole
 from general import Optimizer  # change path***
@@ -8,12 +7,14 @@ from general import Optimizer  # change path***
 def _optimize_evoked(solver):
     """Test running the full routine in a reduced network."""
 
-    tstop = 5.
+    tstop = 10.
     n_trials = 1
 
     # simulate a dipole to establish ground-truth drive parameters
     net_orig = jones_2009_model()
-    mu_orig = 6.
+    net_orig._N_pyr_x = 3
+    net_orig._N_pyr_y = 3
+    mu_orig = 2.
     weights_ampa = {'L2_basket': 0.5,
                     'L2_pyramidal': 0.5,
                     'L5_basket': 0.5,
@@ -31,6 +32,8 @@ def _optimize_evoked(solver):
 
     # define set_params function and constraints
     net_offset = jones_2009_model()
+    net_offset._N_pyr_x = 3
+    net_offset._N_pyr_y = 3
 
     def set_params(net_offset, param_dict):
         weights_ampa = {'L2_basket': 0.5,
@@ -48,8 +51,7 @@ def _optimize_evoked(solver):
                                     synaptic_delays=synaptic_delays)
 
     # define constraints
-    mu_offset = 4.  # initial time-shifted drive
-    mu_range = (2, 8)
+    mu_range = (1, 6)
     constraints = dict()
     constraints.update({'mu_offset': mu_range})
 
@@ -58,9 +60,9 @@ def _optimize_evoked(solver):
                       obj_fun='evoked', tstop=tstop)
     optim.fit(dpl_orig.data['agg'])
 
-    opt_param = optim.opt_params
+    opt_param = optim.opt_params[0]
     # the optimized parameter is in the range
-    assert opt_param[0] in range(mu_range[0], mu_range[1]), "Optimized parameter is not in user-defined range"
+    assert mu_range[0] <= opt_param <= mu_range[1], "Optimized parameter is not in user-defined range"
 
     obj = optim.obj
     # the number of returned rmse values should be the same as max_iter

@@ -7,9 +7,10 @@ This example demonstrates how to optimize the parameters
 of the model simulation to match an experimental dipole waveform.
 """
 
-# Authors: Blake Caldwell <blake_caldwell@brown.edu>
+# Authors: Carolina Fernandez <cxf418@miami.edu>
+#          Nick Tolley <nicholas_tolley@brown.edu>
+#          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
-#          Carolina Fernandez <cxf418@miami.edu>
 
 import os.path as op
 
