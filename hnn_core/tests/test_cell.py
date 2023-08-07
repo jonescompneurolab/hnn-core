@@ -6,6 +6,7 @@ import matplotlib
 
 from hnn_core.network_builder import load_custom_mechanisms
 from hnn_core.cell import _ArtificialCell, Cell, Section
+from hnn_core import pyramidal
 
 matplotlib.use('agg')
 
@@ -102,6 +103,54 @@ def test_cell():
     assert cell.sections[sec_name].diam == new_diam
     assert cell.sections[sec_name].cm == new_cm
     assert cell.sections[sec_name].Ra == new_Ra
+
+    # Testing update end pts using template cell
+    cell1 = pyramidal(cell_name='L5Pyr')
+    cell1.update_end_pts()
+    end_pts_original = list()
+    end_pts_new = list()
+    for sec_name in cell1.sections.keys():
+        section = cell1.sections[sec_name]
+        end_pts_original.append(section.end_pts)
+        section._L = section._L * 2
+        cell1.sections[sec_name] = section
+    cell1.update_end_pts()
+    for sec_name in cell1.sections.keys():
+        section = cell1.sections[sec_name]
+        section._L = section._L / 2
+        cell1.sections[sec_name] = section
+        end_pts_new.append(section.end_pts)
+
+    # All coordinates are multiplied by 2 since all section
+    # lengths are doubled
+    for end_pt_original, end_pt_new in zip(end_pts_original, end_pts_new):
+        for pt_original, pt_new in zip(end_pt_original, end_pt_new):
+            assert list(np.array(pt_original) * 2) == pt_new
+
+    end_pts_new = list()
+    cell1.update_end_pts()
+    for sec_name in cell1.sections.keys():
+        section = cell1.sections[sec_name]
+        cell1.sections[sec_name] = section
+        end_pts_new.append(section.end_pts)
+    # print(end_pts_original)
+    # print(end_pts_new)
+    assert end_pts_original == end_pts_new
+
+    # Testing distance function using template cell (L5pyr)
+    sec_dist = dict()
+    sec_dist['soma'] = 19.5
+    sec_dist['apical_trunk'] = 90
+    sec_dist['apical_oblique'] = 268.5
+    sec_dist['apical_1'] = 481
+    sec_dist['apical_2'] = 1161
+    sec_dist['apical_tuft'] = 1713.5
+    sec_dist['basal_1'] = 42.5
+    sec_dist['basal_2'] = 212.5
+    sec_dist['basal_3'] = 212.5
+    for sec_name in cell1.sections.keys():
+        sec_dist_test = cell1.distance_section(sec_name, 'soma', 0)
+        assert sec_dist_test == sec_dist[sec_name]
 
 
 def test_artificial_cell():

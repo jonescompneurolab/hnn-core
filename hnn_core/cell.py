@@ -341,7 +341,8 @@ class Cell:
         # Create the tree
         self.create_cell_tree()
 
-        self._update_end_pts()
+        # self._update_end_pts()  # Old implementation
+        self.update_end_pts()  # New implementation
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -362,15 +363,24 @@ class Cell:
 
     def distance_section(self, target_sec_name, base_sec_name, base_sec_end):
         if (base_sec_name, base_sec_end) not in self.cell_tree.keys():
-            return 100000  # Ask about this
-        if (((target_sec_name, 0) in (
-            self.cell_tree[(base_sec_name, base_sec_end)])) or (
-                ((target_sec_name, 1) in (
-                    self.cell_tree[(base_sec_name, base_sec_end)])))):
-            return 0
+            return 1000000  # Ask about this
 
-        dist = 1000000
+        # Children of the current section
+        curr_sec_children = self.cell_tree[(base_sec_name, base_sec_end)]
+        # All sections have 0 and 1 ends
+        end_pts = (0, 1)
 
+        # Base condition
+        # If target section is connected to current section
+        # Return (target section length / 2)
+        # As distances are measured till the centre of the target section
+        for end_pt in end_pts:
+            if (target_sec_name, end_pt) in curr_sec_children:
+                return self.sections[target_sec_name].L / 2
+
+        dist = 1000000  # Return large value
+
+        # Recursion to find distance
         for sec_name, sec_end_pt in self.cell_tree[(base_sec_name,
                                                     base_sec_end)]:
             if (sec_name == base_sec_name):
@@ -435,10 +445,11 @@ class Cell:
                             seg_centres.append(first_seg_centre +
                                                (i * adjacent_seg_dist))
                         for seg_x in seg_centres:
+                            sec_end_dist = section_distance - (section.L / 2)
                             seg_xs.append(seg_x)
-                            seg_vals.append(val(section_distance +
-                                            (seg_x * section.L)))
-                            seg_dists.append(section_distance +
+                            seg_vals.append(val(sec_end_dist +
+                                                (seg_x * section.L)))
+                            seg_dists.append(sec_end_dist +
                                              (seg_x * section.L))
                         p_mech[attr] = [seg_xs, seg_vals]
                         print(seg_dists)
@@ -839,7 +850,7 @@ class Cell:
             for (child_name, conn) in self.cell_tree[(sec_name, end_num)]:
                 self._update_section_end_pts_L(child_name, conn, dpt)
 
-    def _tree_traversal(self, sec_name, flag_start):
+    def define_shape(self, sec_name, flag_start):
         # Find the end pts of the section
         flag_end = int(not flag_start)
         pts = self.sections[sec_name].end_pts
@@ -866,7 +877,7 @@ class Cell:
         # Check for change in section lengths in the subtree
         if (sec_name, flag_start) in self.cell_tree.keys():
             for (child_name, coord) in self.cell_tree[(sec_name, flag_start)]:
-                self._tree_traversal(child_name, coord)
+                self.define_shape(child_name, coord)
 
     def update_end_pts(self):
         """Udpate all end pts according to the length of the sections.
@@ -899,7 +910,7 @@ class Cell:
 
         # Check and update all end pts starting from root according to length
         # of sections.
-        self._tree_traversal('soma', 0)
+        self.define_shape('soma', 0)
 
     def modify_section(self, sec_name, L=None, diam=None, cm=None, Ra=None):
         """Change attributes of section specified by `sec_name`
