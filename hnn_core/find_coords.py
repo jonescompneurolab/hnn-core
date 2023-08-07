@@ -120,16 +120,16 @@ def test_distance_(func_name, cell_name):
     cell_new.update_end_pts()
     cell_new.sections = cell_new._set_biophysics_new(cell_new.sections)
 
-    for sec_name in cell.sections.keys():
-        print(sec_name)
-        for mech_name in cell.sections[sec_name].mechs.keys():
-            print(mech_name)
-            for attr, val in cell.sections[sec_name].mechs[mech_name].items():
-                print(attr)
-                print(val)
-            for attr, val in cell_new.sections[sec_name].mechs[mech_name].items():  # noqa
-                print(attr)
-                print(val)
+    # for sec_name in cell.sections.keys():
+    #     print(sec_name)
+    #     for mech_name in cell.sections[sec_name].mechs.keys():
+    #         print(mech_name)
+    #         for attr, val in cell.sections[sec_name].mechs[mech_name].items():  # noqa
+    #             print(attr)
+    #             print(val)
+    #         for attr, val in cell_new.sections[sec_name].mechs[mech_name].items():  # noqa
+    #             print(attr)
+    #             print(val)
 
 
 # find_coords(pyramidal, cell_name='L5Pyr')
