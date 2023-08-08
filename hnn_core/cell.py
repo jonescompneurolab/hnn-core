@@ -828,11 +828,19 @@ class Cell:
                 cell_tree[parent] = list()
 
             # Connecting child to parent
+            # Note - The coordinates of parent and child node will
+            # be same. Example -
+            # Suppose 0 end of section x is connected to 1 end of soma
+            # then the coordinates of 0 end of section will be same as
+            # coordinates of 1 end of soma.
             cell_tree[parent].append(child)
             end_pts_used.add(parent)
             end_pts_used.add(child_loc)
 
-            # Defining the edge (section)
+            # Defining the edge (connect the ends of a section)
+            # Example(Cont.) - The 1 end of section x will be connected
+            # to 0 end of section x. The distance between the two ends
+            # is the length of the section.
             if child_other_end not in end_pts_used:
                 cell_tree[child] = list()
                 cell_tree[child].append(child_other_end)
@@ -847,11 +855,34 @@ class Cell:
         self.sections[sec_name].end_pts[end_num][0] = x + dpt[0]
         self.sections[sec_name].end_pts[end_num][1] = y + dpt[1]
         self.sections[sec_name].end_pts[end_num][2] = z + dpt[2]
-        if (sec_name, end_num) in self.cell_tree.keys():
-            for (child_name, conn) in self.cell_tree[(sec_name, end_num)]:
-                self._update_section_end_pts_L(child_name, conn, dpt)
+
+        # If current node is a leaf node
+        if (sec_name, end_num) not in self.cell_tree.keys():
+            return
+
+        # If current node is an internal node
+        for (child_name, conn) in self.cell_tree[(sec_name, end_num)]:
+            self._update_section_end_pts_L(child_name, conn, dpt)
 
     def define_shape(self, sec_name, flag_start):
+        """Redefines end_pts according to section lengths.
+        Detects change in section lengths of the sections in the
+        subtree of the input section.
+
+        Parameters
+        ----------
+        sec_name : Section name
+            end_pts will be modified to adjust changes in length
+            of any section in the subtree of sec_name
+        flag_start : 0 | 1
+            End pt of the section closer to the soma
+
+        Note
+        ----
+        Using sec_name as 'soma' and flag_start as 0 checks for changes
+        in any section length of the cell as (soma, 0) is the root node
+        of the cell.
+        """
         # Find the end pts of the section
         flag_end = int(not flag_start)
         pts = self.sections[sec_name].end_pts
