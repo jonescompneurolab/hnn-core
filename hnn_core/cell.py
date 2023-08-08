@@ -344,6 +344,8 @@ class Cell:
         # self._update_end_pts()  # Old implementation
         self.update_end_pts()  # New implementation
 
+        self._set_section_mechs()  # Set mech values of all sections
+
     def __repr__(self):
         class_name = self.__class__.__name__
         return f'<{class_name} | gid={self._gid}>'
@@ -414,19 +416,17 @@ class Cell:
             for mech_name, p_mech in section.mechs.items():
                 sec.insert(mech_name)
                 for attr, val in p_mech.items():
-                    if hasattr(val, '__call__'):
-                        sec.push()
-                        seg_dists = list()
-                        for seg in sec:
-                            seg_dists.append(h.distance(seg.x))
-                            setattr(seg, attr, val(h.distance(seg.x)))
-                        h.pop_section()
-                        print(sec_name)
-                        print(seg_dists)
+                    if isinstance(val, list):
+                        seg_xs, seg_vals = val[0], val[1]
+                        for seg, seg_x, seg_val in zip(sec, seg_xs, seg_vals):
+                            # Checking equaliy till 4 decimal places
+                            np.testing.assert_almost_equal(seg.x, seg_x, 4)
+                            setattr(seg, attr, seg_val)
                     else:
                         setattr(sec, attr, val)
 
-    def _set_biophysics_new(self, sections):
+    def _set_section_mechs(self):
+        sections = self.sections
         for sec_name, section in sections.items():
             for mech_name, p_mech in section.mechs.items():
                 for attr, val in p_mech.items():
@@ -434,25 +434,26 @@ class Cell:
                         seg_xs, seg_vals = list(), list()
                         section_distance = self.distance_section(sec_name,
                                                                  'soma', 0)
-                        print(sec_name)
-                        print(section_distance)
                         adjacent_seg_dist = 1 / section.nseg
                         first_seg_centre = (0.5 - (((section.nseg - 1) / 2) *
                                             adjacent_seg_dist))
                         seg_centres = list()
-                        seg_dists = list()
+
+                        # Finding centres of all segments in the section
+                        # If number of segments is 5 then seg_centres will
+                        # be 0.1, 0.3, 0.5, 0.7 and 0.9.
                         for i in range(0, section.nseg):
                             seg_centres.append(first_seg_centre +
                                                (i * adjacent_seg_dist))
+
                         for seg_x in seg_centres:
+                            # sec_end_dist is distance between 0 end of soma to
+                            # the 0 or 1 end of section (whichever is closer)
                             sec_end_dist = section_distance - (section.L / 2)
                             seg_xs.append(seg_x)
                             seg_vals.append(val(sec_end_dist +
                                                 (seg_x * section.L)))
-                            seg_dists.append(sec_end_dist +
-                                             (seg_x * section.L))
                         p_mech[attr] = [seg_xs, seg_vals]
-                        print(seg_dists)
                     else:
                         p_mech[attr] = val
         return self.sections
