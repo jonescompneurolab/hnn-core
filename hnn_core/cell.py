@@ -3,7 +3,6 @@
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Sam Neymotin <samnemo@gmail.com>
 
-import math
 from copy import deepcopy
 
 import numpy as np
@@ -189,6 +188,8 @@ class Section:
         membrane capacitance in micro-Farads.
     Ra : float
         axial resistivity in ohm-cm.
+    nseg : int
+        Number of segments in the section
     """
     def __init__(self, L, diam, Ra, cm, end_pts=None):
 
@@ -297,9 +298,11 @@ class Cell:
         names of section locations that are proximal or distal.
     cell_tree : dict of list
         Stores the tree representation of a cell. Built from topology.
-        Root is the 0 end of 'soma'. Nodes are a tuple (sec_name, sec_end_pt)
-        where sec_name is the name of the section and sec_end_pt is the o end
-        or 1 end.
+        Root is the 0 end of 'soma'. Nodes are a tuple (sec_name, node_pos)
+        where sec_name is the name of the section and node_pos is the 0 end
+        or 1 end. The data structure is the adjacency list represetation of a
+        tree. The keys of the dict are the parent nodes. The value is the
+        list of nodes (chldren nodes) connected to the parent node.
 
     Examples
     --------
@@ -336,9 +339,8 @@ class Cell:
         if gid is not None:
             self.gid = gid  # use setter method to check input argument gid
 
-        # This will store the tree representation of the cell4
+        # Store the tree representation of the cell4
         self.cell_tree = dict()
-        # Create the tree
         self.create_cell_tree()
 
         # self._update_end_pts()  # Old implementation
@@ -363,12 +365,14 @@ class Cell:
         else:
             raise RuntimeError('Global ID for this cell already assigned!')
 
-    def distance_section(self, target_sec_name, base_sec_name, base_sec_end):
-        if (base_sec_name, base_sec_end) not in self.cell_tree.keys():
-            return 1000000  # Ask about this
+    def distance_section(self, target_sec_name, curr_node):
+        # Python version of the Neuron distance function
+        # https://nrn.readthedocs.io/en/latest/python/modelspec/programmatic/topology/geometry.html#distance  # noqa
+        if curr_node not in self.cell_tree:
+            return 1000000
 
         # Children of the current section
-        curr_sec_children = self.cell_tree[(base_sec_name, base_sec_end)]
+        curr_sec_children = self.cell_tree[curr_node]
         # All sections have 0 and 1 ends
         end_pts = (0, 1)
 
@@ -383,16 +387,13 @@ class Cell:
         dist = 1000000  # Return large value
 
         # Recursion to find distance
-        for sec_name, sec_end_pt in self.cell_tree[(base_sec_name,
-                                                    base_sec_end)]:
-            if (sec_name == base_sec_name):
-                dist_1 = (self.distance_section(target_sec_name, sec_name,
-                          sec_end_pt) + self.sections[sec_name].L)
+        for node in self.cell_tree[curr_node]:
+            if (node[0] == curr_node[0]):
+                dist_temp = (self.distance_section(target_sec_name, node) +
+                             self.sections[node[0]].L)
             else:
-                dist_1 = self.distance_section(target_sec_name,
-                                               sec_name, sec_end_pt)
-            if dist_1 < dist:
-                dist = dist_1
+                dist_temp = self.distance_section(target_sec_name, node)
+            dist = min(dist, dist_temp)
 
         return dist
 
@@ -433,7 +434,7 @@ class Cell:
                     if hasattr(val, '__call__'):
                         seg_xs, seg_vals = list(), list()
                         section_distance = self.distance_section(sec_name,
-                                                                 'soma', 0)
+                                                                 ('soma', 0))
                         adjacent_seg_dist = 1 / section.nseg
                         first_seg_centre = (0.5 - (((section.nseg - 1) / 2) *
                                             adjacent_seg_dist))
@@ -848,50 +849,55 @@ class Cell:
 
         self.cell_tree = cell_tree
 
-    def _update_section_end_pts_L(self, sec_name, end_num, dpt):
-        x = self.sections[sec_name].end_pts[end_num][0]
-        y = self.sections[sec_name].end_pts[end_num][1]
-        z = self.sections[sec_name].end_pts[end_num][2]
-        self.sections[sec_name].end_pts[end_num][0] = x + dpt[0]
-        self.sections[sec_name].end_pts[end_num][1] = y + dpt[1]
-        self.sections[sec_name].end_pts[end_num][2] = z + dpt[2]
+    def _update_section_end_pts_L(self, node, dpt):
+        x = self.sections[node[0]].end_pts[node[1]][0]
+        y = self.sections[node[0]].end_pts[node[1]][1]
+        z = self.sections[node[0]].end_pts[node[1]][2]
+        self.sections[node[0]].end_pts[node[1]][0] = x + dpt[0]
+        self.sections[node[0]].end_pts[node[1]][1] = y + dpt[1]
+        self.sections[node[0]].end_pts[node[1]][2] = z + dpt[2]
 
         # If current node is a leaf node
-        if (sec_name, end_num) not in self.cell_tree.keys():
+        if node not in self.cell_tree:
             return
 
         # If current node is an internal node
-        for (child_name, conn) in self.cell_tree[(sec_name, end_num)]:
-            self._update_section_end_pts_L(child_name, conn, dpt)
+        for child_node in self.cell_tree[node]:
+            self._update_section_end_pts_L(child_node, dpt)
 
-    def define_shape(self, sec_name, flag_start):
+    def define_shape(self, node):
         """Redefines end_pts according to section lengths.
         Detects change in section lengths of the sections in the
-        subtree of the input section.
+        subtree of the input node.
 
         Parameters
         ----------
-        sec_name : Section name
-            end_pts will be modified to adjust changes in length
-            of any section in the subtree of sec_name
-        flag_start : 0 | 1
-            End pt of the section closer to the soma
+        node : tuple of size 2
+        The first element is the section name
+        The second element is the node end used (0 or 1)
 
         Note
         ----
-        Using sec_name as 'soma' and flag_start as 0 checks for changes
+        Using sec_name as 'soma' and node end as 0 checks for changes
         in any section length of the cell as (soma, 0) is the root node
         of the cell.
         """
+        # Python version of Neuron define_shape function
+        # https://nrn.readthedocs.io/en/latest/python/modelspec/programmatic/topology/geometry.html?highlight=pt3dadd#pt3dadd  # noqa
         # Find the end pts of the section
-        flag_end = int(not flag_start)
-        pts = self.sections[sec_name].end_pts
-        x0, y0, z0 = pts[flag_start][0], pts[flag_start][1], pts[flag_start][2]
-        x1, y1, z1 = pts[flag_end][0], pts[flag_end][1], pts[flag_end][2]
+        node_opp_end = 1
+        if node[1] == 1:
+            node_opp_end = 0
+        pts = self.sections[node[0]].end_pts
+        x0, y0, z0 = pts[node[1]][0], pts[node[1]][1], pts[node[1]][2]
+        x1, y1, z1 = (pts[node_opp_end][0], pts[node_opp_end][1],
+                      pts[node_opp_end][2])
 
         # Find the factor by which length is changed
-        old_len = math.sqrt((x1 - x0) ** 2 + (y1 - y0) ** 2 + (z1 - z0) ** 2)
-        new_len = self.sections[sec_name].L
+        end_1 = np.array((x0, y0, z0))
+        end_2 = np.array((x1, y1, z1))
+        old_len = np.linalg.norm(end_1 - end_2)
+        new_len = self.sections[node[0]].L
         fac = new_len / old_len
         x_new = x0 + (x1 - x0) * fac
         y_new = y0 + (y1 - y0) * fac
@@ -904,12 +910,12 @@ class Cell:
         dpt = [dx, dy, dz]
 
         # Update all coordinates in the subtree
-        self._update_section_end_pts_L(sec_name, flag_end, dpt)
+        self._update_section_end_pts_L((node[0], node_opp_end), dpt)
 
         # Check for change in section lengths in the subtree
-        if (sec_name, flag_start) in self.cell_tree.keys():
-            for (child_name, coord) in self.cell_tree[(sec_name, flag_start)]:
-                self.define_shape(child_name, coord)
+        if node in self.cell_tree:
+            for child_node in self.cell_tree[node]:
+                self.define_shape(child_node)
 
     def update_end_pts(self):
         """Udpate all end pts according to the length of the sections.
@@ -942,7 +948,7 @@ class Cell:
 
         # Check and update all end pts starting from root according to length
         # of sections.
-        self.define_shape('soma', 0)
+        self.define_shape(('soma', 0))
 
     def modify_section(self, sec_name, L=None, diam=None, cm=None, Ra=None):
         """Change attributes of section specified by `sec_name`

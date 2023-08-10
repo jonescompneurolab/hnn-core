@@ -106,7 +106,6 @@ def test_cell():
 
     # Testing update end pts using template cell
     cell1 = pyramidal(cell_name='L5Pyr')
-    cell1.update_end_pts()
     end_pts_original = list()
     end_pts_new = list()
     for sec_name in cell1.sections.keys():
@@ -116,16 +115,19 @@ def test_cell():
         cell1.sections[sec_name] = section
     cell1.update_end_pts()
     for sec_name in cell1.sections.keys():
-        section = cell1.sections[sec_name]
-        section._L = section._L / 2
-        cell1.sections[sec_name] = section
-        end_pts_new.append(section.end_pts)
+        end_pts_new.append(cell1.sections[sec_name].end_pts)
 
     # All coordinates are multiplied by 2 since all section
     # lengths are doubled
+    cell1.plot_morphology(show=True)
     for end_pt_original, end_pt_new in zip(end_pts_original, end_pts_new):
         for pt_original, pt_new in zip(end_pt_original, end_pt_new):
             assert list(np.array(pt_original) * 2) == pt_new
+
+    for sec_name in cell1.sections.keys():
+        section = cell1.sections[sec_name]
+        section._L = section._L / 2
+        cell1.sections[sec_name] = section
 
     end_pts_new = list()
     cell1.update_end_pts()
@@ -135,6 +137,7 @@ def test_cell():
         end_pts_new.append(section.end_pts)
     # print(end_pts_original)
     # print(end_pts_new)
+    cell1.plot_morphology(show=True)
     assert end_pts_original == end_pts_new
 
     # Testing distance function using template cell (L5pyr)
@@ -149,7 +152,7 @@ def test_cell():
     sec_dist['basal_2'] = 212.5
     sec_dist['basal_3'] = 212.5
     for sec_name in cell1.sections.keys():
-        sec_dist_test = cell1.distance_section(sec_name, 'soma', 0)
+        sec_dist_test = cell1.distance_section(sec_name, ('soma', 0))
         assert sec_dist_test == sec_dist[sec_name]
 
 
