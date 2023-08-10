@@ -7,7 +7,7 @@
 
 import numpy as np
 
-from metrics import _rmse_evoked  # change path***
+from optimization import _rmse_evoked
 
 from skopt import gp_minimize
 from scipy.optimize import fmin_cobyla
@@ -16,6 +16,29 @@ from scipy.optimize import fmin_cobyla
 class Optimizer:
     def __init__(self, net, constraints, set_params, solver, obj_fun,
                  tstop, scale_factor=1., smooth_window_len=None):
+        """Parameter optimization.
+
+        Parameters
+        ----------
+        net : Network
+            The network object.
+        constraints : dict
+            The user-defined constraints.
+        set_params : func
+            User-defined function that sets parameters in network drives.
+        solver : string
+            The optimizer, 'bayesian' or 'cobyla'.
+        obj_fun : string
+            The type of drive to be optimized, 'evoked'.
+        tstop : float
+            The simulated dipole's duration.
+        scale_factor : float, optional
+            The dipole scale factor. The default is 1.
+        smooth_window_len : float, optional
+            The smooth window length. The default is None.
+
+        """
+
         if net.external_drives:
             raise ValueError("The current Network instance has external " +
                              "drives, provide a Network object with no " +
@@ -23,6 +46,7 @@ class Optimizer:
         self.net = net
         self.constraints = constraints
         self._set_params = set_params
+        self.max_iter = 200
         # Optimizer method
         if solver == 'bayesian':
             self._assemble_constraints = _assemble_constraints_bayesian
@@ -41,26 +65,30 @@ class Optimizer:
         self.smooth_window_len = smooth_window_len
         self.tstop = tstop
         self.net_ = None
-        self.obj = list()
-        self.opt_params = None
-        self.max_iter = 200
+        self.obj_ = list()
+        self.opt_params_ = None
 
     def __repr__(self):
         class_name = self.__class__.__name__
-        return class_name
+        is_fit = False
+        if self.net_ is not None:
+            is_fit = True
+        s = (
+            f'{class_name}: '
+            f'solver={self.solver}, '
+            f'response type={self.obj_fun}, '
+            f'has been fit={is_fit}'
+        )
+
+        return s
 
     def fit(self, target):
-        """
-        Runs optimization routine.
+        """Runs optimization routine.
 
         Parameters
         ----------
         target : ndarray
             The recorded dipole.
-
-        Returns
-        -------
-        None.
 
         """
 
@@ -78,18 +106,16 @@ class Optimizer:
                                               self.max_iter,
                                               target)
 
-        self.opt_params = opt_params
-        self.obj = obj
         self.net_ = net_
-        return
+        self.obj_ = obj
+        self.opt_params_ = opt_params
 
     def plot_convergence(self, ax=None, show=True):
-        """
-        Convergence plot.
+        """Convergence plot.
 
         Parameters
         ----------
-        ax : instance of matplotlib figure, None
+        ax : instance of matplotlib figure, optional
             The matplotlib axis. The default is None.
         show : bool
             If True, show the figure. The default is True.
@@ -109,10 +135,10 @@ class Optimizer:
         axis = ax if isinstance(ax, mpl.axes._axes.Axes) else ax
 
         x = list(range(1, self.max_iter + 1))
-        y_min = min(self.obj) - 0.01
-        y_max = max(self.obj) + 0.01
+        y_min = min(self.obj_) - 0.01
+        y_max = max(self.obj_) + 0.01
 
-        axis.plot(x, self.obj, color='black')
+        axis.plot(x, self.obj_, color='black')
         axis.set_ylim([y_min, y_max])
         axis.set_title('Convergence')
         axis.set_xlabel('Number of calls')
@@ -124,8 +150,7 @@ class Optimizer:
 
 
 def _get_initial_params(constraints):
-    """
-    Gets initial parameters as midpoints of parameter ranges.
+    """Gets initial parameters as midpoints of parameter ranges.
 
     Parameters
     ----------
@@ -148,8 +173,7 @@ def _get_initial_params(constraints):
 
 
 def _assemble_constraints_bayesian(constraints):
-    """
-    Assembles constraints in format required by gp_minimize.
+    """Assembles constraints in format required by gp_minimize.
 
     Parameters
     ----------
@@ -168,8 +192,7 @@ def _assemble_constraints_bayesian(constraints):
 
 
 def _assemble_constraints_cobyla(constraints):
-    """
-    Assembles constraints in format required by fmin_cobyla.
+    """Assembles constraints in format required by fmin_cobyla.
 
     Parameters
     ----------
@@ -194,8 +217,7 @@ def _assemble_constraints_cobyla(constraints):
 
 
 def _update_params(initial_params, predicted_params):
-    """
-    Update param_dict with predicted parameters.
+    """Update params with predicted parameters.
 
     Parameters
     ----------
@@ -206,22 +228,21 @@ def _update_params(initial_params, predicted_params):
 
     Returns
     -------
-    params_dict : dict
+    params : dict
         Keys are parameter names, values are parameters.
     """
 
-    param_dict = dict()
+    params = dict()
     for param_key, param_name in enumerate(initial_params):
-        param_dict.update({param_name: predicted_params[param_key]})
+        params.update({param_name: predicted_params[param_key]})
 
-    return param_dict
+    return params
 
 
 def _run_opt_bayesian(net, constraints, initial_params, set_params, obj_fun,
                       scale_factor, smooth_window_len, tstop, max_iter,
                       target):
-    """
-    Runs optimization routine with gp_minimize optimizer.
+    """Runs optimization routine with gp_minimize optimizer.
 
     Parameters
     ----------
@@ -267,8 +288,8 @@ def _run_opt_bayesian(net, constraints, initial_params, set_params, obj_fun,
                        obj_values,
                        scale_factor,
                        smooth_window_len,
-                       tstop,
-                       target)
+                       target,
+                       tstop)
 
     opt_results = gp_minimize(func=_obj_func,
                               dimensions=constraints,
@@ -280,12 +301,12 @@ def _run_opt_bayesian(net, constraints, initial_params, set_params, obj_fun,
     opt_params = opt_results.x
 
     # get objective values
-    obj = [np.min(obj_values[:i]) for i in range(1, max_iter + 1)]
+    obj = [np.min(obj_values[:idx]) for idx in range(1, max_iter + 1)]
 
     # get optimized net
-    param_dict = _update_params(initial_params, opt_params)
+    params = _update_params(initial_params, opt_params)
     net_ = net.copy()
-    set_params(net_, param_dict)
+    set_params(net_, params)
 
     return opt_params, obj, net_
 
@@ -293,8 +314,7 @@ def _run_opt_bayesian(net, constraints, initial_params, set_params, obj_fun,
 def _run_opt_cobyla(net, constraints, initial_params, set_params, obj_fun,
                     scale_factor, smooth_window_len, tstop, max_iter,
                     target):
-    """
-    Runs optimization routine with fmin_cobyla optimizer.
+    """Runs optimization routine with fmin_cobyla optimizer.
 
     Parameters
     ----------
@@ -316,7 +336,7 @@ def _run_opt_cobyla(net, constraints, initial_params, set_params, obj_fun,
         The simulated dipole's duration.
     max_iter : int
         Number of calls the optimizer makes.
-    target : ndarray, None
+    target : ndarray, optional
         The recorded dipole. The default is None.
 
     Returns
@@ -340,8 +360,8 @@ def _run_opt_cobyla(net, constraints, initial_params, set_params, obj_fun,
                        obj_values,
                        scale_factor,
                        smooth_window_len,
-                       tstop,
-                       target)
+                       target,
+                       tstop)
 
     opt_results = fmin_cobyla(_obj_func,
                               cons=constraints,
@@ -355,11 +375,11 @@ def _run_opt_cobyla(net, constraints, initial_params, set_params, obj_fun,
     opt_params = opt_results
 
     # get objective values
-    obj = [np.min(obj_values[:i]) for i in range(1, max_iter + 1)]
+    obj = [np.min(obj_values[:idx]) for idx in range(1, max_iter + 1)]
 
     # get optimized net
-    param_dict = _update_params(initial_params, opt_params)
+    params = _update_params(initial_params, opt_params)
     net_ = net.copy()
-    set_params(net_, param_dict)
+    set_params(net_, params)
 
     return opt_params, obj, net_
