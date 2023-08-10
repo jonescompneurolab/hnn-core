@@ -7,16 +7,15 @@
 
 import numpy as np
 
-from hnn_core import simulate_dipole, MPIBackend
+from hnn_core import simulate_dipole
 
 from scipy.signal import resample
 
 
 def _rmse_evoked(net, initial_params, set_params, predicted_params,
                  update_params, obj_values, scale_factor, smooth_window_len,
-                 tstop, target):
-    """
-    The objective function for evoked responses.
+                 target, tstop):
+    """The objective function for evoked responses.
 
     Parameters
     ----------
@@ -29,7 +28,7 @@ def _rmse_evoked(net, initial_params, set_params, predicted_params,
     predicted_params : list
         Parameters selected by the optimizer.
     update_params : func
-        Function to update param_dict.
+        Function to update params.
     scale_factor : float
         The dipole scale factor.
     smooth_window_len : float
@@ -45,13 +44,12 @@ def _rmse_evoked(net, initial_params, set_params, predicted_params,
         Normalized RMSE between recorded and simulated dipole.
     """
 
-    param_dict = update_params(initial_params, predicted_params)
+    params = update_params(initial_params, predicted_params)
 
     # simulate dpl with predicted params
     new_net = net.copy()
-    set_params(new_net, param_dict)
-    with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
-        dpl = simulate_dipole(new_net, tstop=tstop, n_trials=1)[0]
+    set_params(new_net, params)
+    dpl = simulate_dipole(new_net, tstop=tstop, n_trials=1)[0]
 
     # smooth & scale
     dpl.scale(scale_factor)
