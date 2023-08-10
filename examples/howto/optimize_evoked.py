@@ -26,7 +26,7 @@ from hnn_core import (MPIBackend, jones_2009_model, simulate_dipole,
 hnn_core_root = op.join(op.dirname(hnn_core.__file__))
 
 # The number of cores may need modifying depending on your current machine.
-n_procs = 2
+n_procs = 10
 
 ###############################################################################
 # First, we will load experimental data into Dipole object.
