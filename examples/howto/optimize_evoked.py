@@ -154,7 +154,8 @@ optim = Optimizer(net, constraints=constraints, set_params=set_params,
                   solver='bayesian', obj_fun='evoked', tstop=tstop,
                   scale_factor=scale_factor,
                   smooth_window_len=smooth_window_len)
-optim.fit(exp_dpl.data['agg'])
+with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
+    optim.fit(exp_dpl.data['agg'])
 
 ###############################################################################
 # Finally, we can plot the experimental data alongside the post-optimization

@@ -7,7 +7,7 @@
 
 import numpy as np
 
-from optimization import _rmse_evoked
+from .metrics import _rmse_evoked
 
 from skopt import gp_minimize
 from scipy.optimize import fmin_cobyla
