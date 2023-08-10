@@ -5,6 +5,8 @@
 
 from hnn_core import jones_2009_model, simulate_dipole, Optimizer
 
+import pytest
+
 
 def _optimize_evoked(solver):
     """Test running the full routine in a reduced network."""
@@ -45,7 +47,7 @@ def _optimize_evoked(solver):
         synaptic_delays = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                            'L5_basket': 1., 'L5_pyramidal': 1.}
         net_offset.add_evoked_drive('evprox',
-                                    mu=params['mu_offset'],
+                                    mu=params['mu'],
                                     sigma=1,
                                     numspikes=1,
                                     location='proximal',
@@ -55,7 +57,7 @@ def _optimize_evoked(solver):
     # define constraints
     mu_range = (1, 6)
     constraints = dict()
-    constraints.update({'mu_offset': mu_range})
+    constraints.update({'mu': mu_range})
 
     optim = Optimizer(net_offset, constraints=constraints,
                       set_params=set_params, solver=solver,
@@ -75,9 +77,8 @@ def _optimize_evoked(solver):
     assert all(vals > 0 for vals in obj), "rmse values should be positive"
 
 
-def test_bayesian_evoked():
-    _optimize_evoked('bayesian')
+@pytest.mark.parametrize("solver", ['bayesian', 'cobyla'])
+def test_optimize_evoked(solver):
+    """Test optimization routines for evoked drives."""
 
-
-def test_cobyla_evoked():
-    _optimize_evoked('cobyla')
+    _optimize_evoked(solver)

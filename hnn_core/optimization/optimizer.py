@@ -29,7 +29,7 @@ class Optimizer:
         solver : string
             The optimizer, 'bayesian' or 'cobyla'.
         obj_fun : string
-            The type of drive to be optimized, 'evoked'.
+            The objective function to be minimized.
         tstop : float
             The simulated dipole's duration.
         scale_factor : float, optional
