@@ -36,7 +36,6 @@ class Optimizer:
             The dipole scale factor. The default is 1.
         smooth_window_len : float, optional
             The smooth window length. The default is None.
-
         """
 
         if net.external_drives:
@@ -89,7 +88,6 @@ class Optimizer:
         ----------
         target : ndarray
             The recorded dipole.
-
         """
 
         constraints = self._assemble_constraints(self.constraints)
@@ -161,7 +159,6 @@ def _get_initial_params(constraints):
     -------
     initial_params : dict
         Keys are parameter names, values are initial parameters.
-
     """
 
     initial_params = dict()
