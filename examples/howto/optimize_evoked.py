@@ -74,20 +74,16 @@ def set_params(net, params):
                          synaptic_delays=synaptic_delays_p)
 
     # Distal
-    weights_ampa_d1 = {'L2_basket':
-                       params['evdist1_ampa_L2_basket'],
-                       'L2_pyramidal':
-                       params['evdist1_ampa_L2_pyramidal'],
-                       'L5_pyramidal':
-                       params['evdist1_ampa_L5_pyramidal']}
+    weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': 7e-06,
+                       'L5_pyramidal': 0.1423}
     weights_nmda_d1 = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
                        'L5_pyramidal': 0.080074}
     synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                           'L5_pyramidal': 0.1}
 
     net.add_evoked_drive('evdist1',
-                         mu=params['evdist1_mu'],
-                         sigma=params['evdist1_sigma'],
+                         mu=63.53,
+                         sigma=3.85,
                          numspikes=1,
                          location='distal',
                          weights_ampa=weights_ampa_d1,
@@ -95,18 +91,12 @@ def set_params(net, params):
                          synaptic_delays=synaptic_delays_d1)
 
     # Proximal 2
-    weights_ampa_p2 = {'L2_basket':
-                       params['evprox2_ampa_L2_basket'],
-                       'L2_pyramidal':
-                       params['evprox2_ampa_L2_pyramidal'],
-                       'L5_basket':
-                       params['evprox2_ampa_L5_basket'],
-                       'L5_pyramidal':
-                       params['evprox2_ampa_L5_pyramidal']}
+    weights_ampa_p2 = {'L2_basket': 3e-06, 'L2_pyramidal': 1.43884,
+                       'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
 
     net.add_evoked_drive('evprox2',
-                         mu=params['evprox2_mu'],
-                         sigma=params['evprox2_sigma'],
+                         mu=137.12,
+                         sigma=8.33,
                          numspikes=1,
                          location='proximal',
                          weights_ampa=weights_ampa_p2,
@@ -118,6 +108,9 @@ def set_params(net, params):
 # The constraints must be a dictionary of tuples where the first value in each
 # tuple is the lower bound and the second value is the upper bound for the
 # corresponding parameter.
+#
+# The following synaptic weight parameter ranges (units of micro-siemens)
+# were chosen given that they are physiologically realistic.
 
 
 constraints = dict()
@@ -126,18 +119,7 @@ constraints.update({'evprox1_ampa_L2_basket': (0.01, 1.),
                     'evprox1_ampa_L5_basket': (0.01, 1.),
                     'evprox1_ampa_L5_pyramidal': (0.01, 1.),
                     'evprox1_mu': (5., 50.),
-                    'evprox1_sigma': (2., 25.),
-                    'evdist1_ampa_L2_basket': (0.01, 1.),
-                    'evdist1_ampa_L2_pyramidal': (0.01, 1.),
-                    'evdist1_ampa_L5_pyramidal': (0.01, 1.),
-                    'evdist1_mu': (50., 80.),
-                    'evdist1_sigma': (2., 25.),
-                    'evprox2_ampa_L2_basket': (0.01, 1.),
-                    'evprox2_ampa_L2_pyramidal': (0.01, 1.),
-                    'evprox2_ampa_L5_basket': (0.01, 1.),
-                    'evprox2_ampa_L5_pyramidal': (0.01, 1.),
-                    'evprox2_mu': (125., 150.),
-                    'evprox2_sigma': (10., 60.)})
+                    'evprox1_sigma': (2., 25.)})
 
 
 ###############################################################################
