@@ -3,13 +3,16 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
-from hnn_core import jones_2009_model, simulate_dipole, Optimizer
+from hnn_core import jones_2009_model, simulate_dipole
+
+from hnn_core.optimization import Optimizer
 
 import pytest
 
 
-def _optimize_evoked(solver):
-    """Test running the full routine in a reduced network."""
+@pytest.mark.parametrize("solver", ['bayesian', 'cobyla'])
+def test_optimize_evoked(solver):
+    """Test optimization routines for evoked drives in a reduced network."""
 
     tstop = 10.
     n_trials = 1
@@ -59,10 +62,17 @@ def _optimize_evoked(solver):
     constraints = dict()
     constraints.update({'mu': mu_range})
 
-    optim = Optimizer(net_offset, constraints=constraints,
+    optim = Optimizer(net_offset, tstop=tstop, constraints=constraints,
                       set_params=set_params, solver=solver,
-                      obj_fun='evoked', tstop=tstop)
+                      obj_fun='dipole_rmse')
+
+    # test repr before fitting
+    assert 'fit=False' in repr(optim), "optimizer is already fit"
+
     optim.fit(dpl_orig.data['agg'])
+
+    # test repr after fitting
+    assert 'fit=True' in repr(optim), "optimizer was not fit"
 
     opt_param = optim.opt_params_[0]
     # the optimized parameter is in the range
@@ -74,11 +84,4 @@ def _optimize_evoked(solver):
     assert len(obj) <= 200, \
         "Number of rmse values should be the same as max_iter"
     # the returned rmse values should be positive
-    assert all(vals > 0 for vals in obj), "rmse values should be positive"
-
-
-@pytest.mark.parametrize("solver", ['bayesian', 'cobyla'])
-def test_optimize_evoked(solver):
-    """Test optimization routines for evoked drives."""
-
-    _optimize_evoked(solver)
+    assert all(vals >= 0 for vals in obj), "rmse values should be positive"
