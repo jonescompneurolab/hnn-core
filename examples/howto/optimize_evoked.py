@@ -113,28 +113,25 @@ def set_params(net, params):
 # were chosen given that they are physiologically realistic.
 
 
-constraints = dict()
-constraints.update({'evprox1_ampa_L2_basket': (0.01, 1.),
+constraints = dict({'evprox1_ampa_L2_basket': (0.01, 1.),
                     'evprox1_ampa_L2_pyramidal': (0.01, 1.),
                     'evprox1_ampa_L5_basket': (0.01, 1.),
                     'evprox1_ampa_L5_pyramidal': (0.01, 1.),
                     'evprox1_mu': (5., 50.),
                     'evprox1_sigma': (2., 25.)})
 
-
 ###############################################################################
 # Now we define and fit the optimizer.
 
-from hnn_core import Optimizer
+from hnn_core.optimization import Optimizer
 
 tstop = exp_dpl.times[-1]
 scale_factor = 3000
 smooth_window_len = 30
 
 net = jones_2009_model()
-optim = Optimizer(net, constraints=constraints, set_params=set_params,
-                  solver='bayesian', obj_fun='evoked', tstop=tstop,
-                  scale_factor=scale_factor,
+optim = Optimizer(net, tstop=tstop, constraints=constraints,
+                  set_params=set_params, scale_factor=scale_factor,
                   smooth_window_len=smooth_window_len)
 with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
     optim.fit(exp_dpl.data['agg'])

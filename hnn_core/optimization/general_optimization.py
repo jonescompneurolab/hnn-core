@@ -14,14 +14,17 @@ from scipy.optimize import fmin_cobyla
 
 
 class Optimizer:
-    def __init__(self, net, constraints, set_params, solver, obj_fun,
-                 tstop, scale_factor=1., smooth_window_len=None):
+    def __init__(self, net, tstop, constraints, set_params, solver='bayesian',
+                 obj_fun='dipole_rmse', scale_factor=1.,
+                 smooth_window_len=None):
         """Parameter optimization.
 
         Parameters
         ----------
         net : Network
             The network object.
+        tstop : float
+            The simulated dipole's duration.
         constraints : dict
             The user-defined constraints.
         set_params : func
@@ -30,8 +33,6 @@ class Optimizer:
             The optimizer, 'bayesian' or 'cobyla'.
         obj_fun : string
             The objective function to be minimized.
-        tstop : float
-            The simulated dipole's duration.
         scale_factor : float, optional
             The dipole scale factor. The default is 1.
         smooth_window_len : float, optional
@@ -48,18 +49,20 @@ class Optimizer:
         self.max_iter = 200
         # Optimizer method
         if solver == 'bayesian':
+            self.solver = 'bayesian'
             self._assemble_constraints = _assemble_constraints_bayesian
             self._run_opt = _run_opt_bayesian
         elif solver == 'cobyla':
+            self.solver = 'cobyla'
             self._assemble_constraints = _assemble_constraints_cobyla
             self._run_opt = _run_opt_cobyla
         else:
             raise ValueError("solver must be 'bayesian' or 'cobyla'")
         # Response to be optimized
-        if obj_fun == 'evoked':
+        if obj_fun == 'dipole_rmse':
             self.obj_fun = _rmse_evoked
         else:
-            raise ValueError("obj_fun must be 'evoked'")
+            raise ValueError("obj_fun must be 'dipole_rmse'")
         self.scale_factor = scale_factor
         self.smooth_window_len = smooth_window_len
         self.tstop = tstop
@@ -68,18 +71,14 @@ class Optimizer:
         self.opt_params_ = None
 
     def __repr__(self):
-        class_name = self.__class__.__name__
         is_fit = False
         if self.net_ is not None:
             is_fit = True
-        s = (
-            f'{class_name}: '
-            f'solver={self.solver}, '
-            f'response type={self.obj_fun}, '
-            f'has been fit={is_fit}'
-        )
 
-        return s
+        return "<Instance of {} class, solver={}, fit={}>".format(
+            self.__class__.__name__,
+            self.solver,
+            is_fit)
 
     def fit(self, target):
         """Runs optimization routine.
@@ -94,15 +93,15 @@ class Optimizer:
         initial_params = _get_initial_params(self.constraints)
 
         opt_params, obj, net_ = self._run_opt(self.net,
+                                              self.tstop,
                                               constraints,
-                                              initial_params,
                                               self._set_params,
                                               self.obj_fun,
-                                              self.scale_factor,
-                                              self.smooth_window_len,
-                                              self.tstop,
+                                              initial_params,
                                               self.max_iter,
-                                              target)
+                                              target,
+                                              self.scale_factor,
+                                              self.smooth_window_len)
 
         self.net_ = net_
         self.obj_ = obj
@@ -236,33 +235,33 @@ def _update_params(initial_params, predicted_params):
     return params
 
 
-def _run_opt_bayesian(net, constraints, initial_params, set_params, obj_fun,
-                      scale_factor, smooth_window_len, tstop, max_iter,
-                      target):
+def _run_opt_bayesian(net, tstop, constraints, set_params, obj_fun,
+                      initial_params, max_iter, target, scale_factor=1.,
+                      smooth_window_len=None):
     """Runs optimization routine with gp_minimize optimizer.
 
     Parameters
     ----------
     net : Network
         The network object.
+    tstop : float
+        The simulated dipole's duration.
     constraints : list of tuples
         Parameter constraints in solver-specific format.
-    initial_params : dict
-        Keys are parameter names, values are initial parameters..
     set_params : func
         User-defined function that sets parameters in network drives.
     obj_fun : func
         The objective function.
-    scale_factor : float
-        The dipole scale factor.
-    smooth_window_len : float
-        The smooth window length.
-    tstop : float
-        The simulated dipole's duration.
+    initial_params : dict
+        Keys are parameter names, values are initial parameters.
     max_iter : int
         Number of calls the optimizer makes.
     target : ndarray
         The recorded dipole.
+    scale_factor : float
+        The dipole scale factor.
+    smooth_window_len : float
+        The smooth window length.
 
     Returns
     -------
@@ -308,33 +307,33 @@ def _run_opt_bayesian(net, constraints, initial_params, set_params, obj_fun,
     return opt_params, obj, net_
 
 
-def _run_opt_cobyla(net, constraints, initial_params, set_params, obj_fun,
-                    scale_factor, smooth_window_len, tstop, max_iter,
-                    target):
+def _run_opt_cobyla(net, tstop, constraints, set_params, obj_fun,
+                    initial_params, max_iter, target, scale_factor=1.,
+                    smooth_window_len=None):
     """Runs optimization routine with fmin_cobyla optimizer.
 
     Parameters
     ----------
     net : Network
         The network object.
-    constraints : dict
+    tstop : float
+        The simulated dipole's duration.
+    constraints : list of tuples
         Parameter constraints in solver-specific format.
-    initial_params : dict
-        Keys are parameter names, values are initial parameters..
     set_params : func
         User-defined function that sets parameters in network drives.
     obj_fun : func
         The objective function.
+    initial_params : dict
+        Keys are parameter names, values are initial parameters.
+    max_iter : int
+        Number of calls the optimizer makes.
+    target : ndarray
+        The recorded dipole.
     scale_factor : float
         The dipole scale factor.
     smooth_window_len : float
         The smooth window length.
-    tstop : float
-        The simulated dipole's duration.
-    max_iter : int
-        Number of calls the optimizer makes.
-    target : ndarray, optional
-        The recorded dipole. The default is None.
 
     Returns
     -------
