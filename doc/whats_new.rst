@@ -38,6 +38,11 @@ API
 - :func:`~hnn_core.Dipole.write` and :func:`~hnn_core.Dipole.read_dipoles`
   now support hdf5 format for read/write Dipole object, by
   `Rajat Partani`_ in :gh:`648`
+  
+- Add ability to optimize parameters associated with evoked drives and plot 
+  convergence. User can constrain parameter ranges and specify solver. 
+  Document with an example and develop tests, by `Carolina Fernandez Pujol`_ 
+  in :gh:`652`
 
 .. _0.3:
 
