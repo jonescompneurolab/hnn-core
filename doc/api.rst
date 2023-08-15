@@ -41,6 +41,7 @@ Optimization (:py:mod:`hnn_core.optimization`):
    :toctree: generated/
 
    optimize_evoked
+   Optimizer
 
 Dipole (:py:mod:`hnn_core.dipole`):
 -----------------------------------
