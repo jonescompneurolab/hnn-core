@@ -163,7 +163,7 @@ def _get_initial_params(constraints):
     initial_params = dict()
     for cons_key in constraints:
         initial_params.update({cons_key: ((constraints[cons_key][0] +
-                                          constraints[cons_key][1]))/2})
+                                          constraints[cons_key][1])) / 2})
 
     return initial_params
 

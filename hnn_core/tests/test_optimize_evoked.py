@@ -6,9 +6,11 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, jones_2009_model, simulate_dipole
-from hnn_core.optimization import (_consolidate_chunks, _split_by_evinput,
-                                   _generate_weights, _get_drive_params,
-                                   optimize_evoked)
+from hnn_core.optimization.optimize_evoked import (_consolidate_chunks,
+                                                   _split_by_evinput,
+                                                   _generate_weights,
+                                                   _get_drive_params,
+                                                   optimize_evoked)
 
 
 def test_consolidate_chunks():
