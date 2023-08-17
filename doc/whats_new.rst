@@ -41,8 +41,7 @@ API
   
 - Add ability to optimize parameters associated with evoked drives and plot 
   convergence. User can constrain parameter ranges and specify solver,
-  by `Carolina Fernandez Pujol`_ 
-  in :gh:`652`
+  by `Carolina Fernandez Pujol`_ in :gh:`652`
 
 .. _0.3:
 
