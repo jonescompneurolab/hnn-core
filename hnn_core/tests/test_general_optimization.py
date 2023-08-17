@@ -64,7 +64,7 @@ def test_optimize_evoked(solver):
 
     optim = Optimizer(net_offset, tstop=tstop, constraints=constraints,
                       set_params=set_params, solver=solver,
-                      obj_fun='dipole_rmse')
+                      obj_fun='dipole_rmse', max_iter=11)
 
     # test repr before fitting
     assert 'fit=False' in repr(optim), "optimizer is already fit"

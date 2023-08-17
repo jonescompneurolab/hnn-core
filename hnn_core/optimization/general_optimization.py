@@ -16,7 +16,7 @@ from scipy.optimize import fmin_cobyla
 class Optimizer:
     def __init__(self, net, tstop, constraints, set_params, solver='bayesian',
                  obj_fun='dipole_rmse', scale_factor=1.,
-                 smooth_window_len=None):
+                 smooth_window_len=None, max_iter=200):
         """Parameter optimization.
 
         Parameters
@@ -37,6 +37,34 @@ class Optimizer:
             The dipole scale factor. The default is 1.
         smooth_window_len : float, optional
             The smooth window length. The default is None.
+        max_iter : int, optional
+            The max number of calls to the objective function. The default is
+            200.
+
+        Attributes
+        ----------
+        net : Network
+            The network object.
+        constraints : dict
+            The user-defined constraints.
+        max_iter : int
+            The max number of calls to the objective function.
+        solver : string
+            The optimizer, 'bayesian' or 'cobyla'.
+        obj_fun : func
+            The objective function to be minimized.
+        scale_factor : float
+            The dipole scale factor.
+        smooth_window_len : float
+            The smooth window length.
+        tstop : float
+            The simulated dipole's duration.
+        net_ : Network
+            The network object with optimized drives.
+        obj_ : list
+            The objective function values.
+        opt_params_ : list
+            The list of optimized parameter values.
         """
 
         if net.external_drives:
