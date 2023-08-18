@@ -20,17 +20,19 @@ def test_cell():
     sections = {'soma': Section(L=1, diam=5, Ra=3, cm=100,
                                 end_pts=[[0, 0, 0], [0, 39., 0]])}
     synapses = {'ampa': dict(e=0, tau1=0.5, tau2=5.)}
-    topology = None
+    cell_tree = {
+        ('soma', 0): [('soma', 1)]
+    }
     sect_loc = {'proximal': 'soma'}
     # GID is assigned exactly once for each cell, either at initialisation...
-    cell = Cell(name, pos, sections, synapses, topology, sect_loc, gid=42)
+    cell = Cell(name, pos, sections, synapses, sect_loc, cell_tree, gid=42)
     assert cell.gid == 42
     with pytest.raises(RuntimeError,
                        match='Global ID for this cell already assigned!'):
         cell.gid += 1
     # ... or later
     # cells can exist fine without gid
-    cell = Cell(name, pos, sections, synapses, topology, sect_loc)
+    cell = Cell(name, pos, sections, synapses, sect_loc, cell_tree)
     assert cell.gid is None  # check that it's initialised to None
     with pytest.raises(ValueError,
                        match='gid must be an integer'):
@@ -40,7 +42,7 @@ def test_cell():
     with pytest.raises(ValueError,
                        match='gid must be an integer'):
         # test init checks gid
-        cell = Cell(name, pos, sections, synapses, topology, sect_loc,
+        cell = Cell(name, pos, sections, synapses, sect_loc, cell_tree,
                     gid='one')
 
     # test that ExpSyn always takes nrn.Segment, not float
@@ -53,7 +55,7 @@ def test_cell():
                     end_pts=[[0, 0, 0], [0, 39., 0]])}
     # Check soma must be included in sections
     with pytest.raises(KeyError, match='soma must be defined'):
-        cell = Cell(name, pos, bad_sections, synapses, topology, sect_loc)
+        cell = Cell(name, pos, bad_sections, synapses, sect_loc, cell_tree)
 
     sections = {
         'soma': Section(
@@ -74,7 +76,7 @@ def test_cell():
         }
     }
 
-    cell = Cell(name, pos, sections, synapses, topology, sect_loc)
+    cell = Cell(name, pos, sections, synapses, sect_loc, cell_tree)
 
     # test successful build
     cell.build()
@@ -139,6 +141,8 @@ def test_cell():
     # print(end_pts_new)
     cell1.plot_morphology(show=True)
     assert end_pts_original == end_pts_new
+    # Checking equaliy till 5 decimal places
+    np.testing.assert_almost_equal(end_pts_original, end_pts_new, 5)
 
     # Testing distance function using template cell (L5pyr)
     sec_dist = dict()
