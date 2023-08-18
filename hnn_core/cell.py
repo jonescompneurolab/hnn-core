@@ -251,13 +251,6 @@ class Cell:
         Keys are name of synaptic mechanism. Each synaptic mechanism
         has keys for parameters of the mechanism, e.g., 'e', 'tau1',
         'tau2'.
-    topology : list of list
-        The topology of cell sections. Each element is a list of
-        4 items in the format
-        [parent_sec, parent_loc, child_sec, child_loc] where
-        parent_sec and parent_loc are float between 0 and 1
-        specifying the location in the section to connect and
-        parent_sec and child_sec are names of the connecting
         sections.
     sect_loc : dict of list
         Can have keys 'proximal' or 'distal' each containing
@@ -266,6 +259,14 @@ class Cell:
         Each cell in a network is uniquely identified by it's "global ID": GID.
         The GID is an integer from 0 to n_cells, or None if the cell is not
         yet attached to a network. Once the GID is set, it cannot be changed.
+    cell_tree : dict of list
+        Stores the tree representation of a cell.
+        Root is the 0 end of 'soma'. Nodes are a tuple (sec_name, node_pos)
+        where sec_name is the name of the section and node_pos is the 0 end
+        or 1 end. The data structure is the adjacency list represetation of a
+        tree. The keys of the dict are the parent nodes. The value is the
+        list of nodes (chldren nodes) connected to the parent node.
+
 
     Attributes
     ----------
@@ -297,7 +298,7 @@ class Cell:
         Can have keys 'proximal' or 'distal' each containing
         names of section locations that are proximal or distal.
     cell_tree : dict of list
-        Stores the tree representation of a cell. Built from topology.
+        Stores the tree representation of a cell.
         Root is the 0 end of 'soma'. Nodes are a tuple (sec_name, node_pos)
         where sec_name is the name of the section and node_pos is the 0 end
         or 1 end. The data structure is the adjacency list represetation of a
@@ -315,7 +316,7 @@ class Cell:
         )
     """
 
-    def __init__(self, name, pos, sections, synapses, topology, sect_loc,
+    def __init__(self, name, pos, sections, synapses, sect_loc, cell_tree,
                  gid=None):
         self.name = name
         self.pos = pos
@@ -325,7 +326,6 @@ class Cell:
                                  f' of Section. Got {type(section)}')
         self.sections = sections
         self.synapses = synapses
-        self.topology = topology
         self.sect_loc = sect_loc
         self._nrn_sections = dict()
         self._nrn_synapses = dict()
@@ -339,9 +339,8 @@ class Cell:
         if gid is not None:
             self.gid = gid  # use setter method to check input argument gid
 
-        # Store the tree representation of the cell4
-        self.cell_tree = dict()
-        self.create_cell_tree()
+        # Store the tree representation of the cell
+        self.cell_tree = cell_tree
 
         # self._update_end_pts()  # Old implementation
         self.update_end_pts()  # New implementation
@@ -368,6 +367,9 @@ class Cell:
     def distance_section(self, target_sec_name, curr_node):
         # Python version of the Neuron distance function
         # https://nrn.readthedocs.io/en/latest/python/modelspec/programmatic/topology/geometry.html#distance  # noqa
+        if self.cell_tree is None:
+            raise TypeError("distance_section() "
+                            "cannot work with cell_tree as None.")
         if curr_node not in self.cell_tree:
             return 1000000
 
@@ -420,8 +422,8 @@ class Cell:
                     if isinstance(val, list):
                         seg_xs, seg_vals = val[0], val[1]
                         for seg, seg_x, seg_val in zip(sec, seg_xs, seg_vals):
-                            # Checking equaliy till 4 decimal places
-                            np.testing.assert_almost_equal(seg.x, seg_x, 4)
+                            # Checking equaliy till 5 decimal places
+                            np.testing.assert_almost_equal(seg.x, seg_x, 5)
                             setattr(seg, attr, seg_val)
                     else:
                         setattr(sec, attr, val)
@@ -468,7 +470,7 @@ class Cell:
                 self._nrn_synapses[syn_key] = self.syn_create(
                     seg, **synapses[receptor])
 
-    def _create_sections(self, sections, topology):
+    def _create_sections(self, sections, cell_tree):
         """Create soma and set geometry.
 
         Notes
@@ -507,16 +509,19 @@ class Cell:
                 if not sec.nseg % 2:
                     sec.nseg += 1
 
-        if topology is None:
-            topology = list()
+        if cell_tree is None:
+            cell_tree = dict()
 
         # Connects sections of THIS cell together.
-        for connection in topology:
-            parent_sec = self._nrn_sections[connection[0]]
-            child_sec = self._nrn_sections[connection[2]]
-            parent_loc = connection[1]
-            child_loc = connection[3]
-            child_sec.connect(parent_sec, parent_loc, child_loc)
+        for parent_node in cell_tree:
+            for child_node in cell_tree[parent_node]:
+                parent_sec = self._nrn_sections[parent_node[0]]
+                child_sec = self._nrn_sections[child_node[0]]
+                if parent_sec == child_sec:
+                    continue
+                parent_loc = parent_node[1]
+                child_loc = child_node[1]
+                child_sec.connect(parent_sec, parent_loc, child_loc)
 
         # be explicit about letting sec.L dominate over the 3d points used by
         # h.pt3dadd(); see
@@ -535,7 +540,7 @@ class Cell:
         """
         from .network_builder import load_custom_mechanisms
         load_custom_mechanisms()
-        self._create_sections(self.sections, self.topology)
+        self._create_sections(self.sections, self.cell_tree)
         self._create_synapses(self.sections, self.synapses)
         self._set_biophysics(self.sections)
         if sec_name_apical in self._nrn_sections:
@@ -773,7 +778,7 @@ class Cell:
 
     def _update_end_pts(self):
         """"Create cell and copy coordinates to Section.end_pts"""
-        self._create_sections(self.sections, self.topology)
+        self._create_sections(self.sections, self.cell_tree)
         section_names = list(self.sections.keys())
 
         for name in section_names:
@@ -788,68 +793,9 @@ class Cell:
 
         self._nrn_sections = dict()
 
-    def create_cell_tree(self):
-        """Create cell tree from topology
-
-        Returns
-        -------
-        Tree representation of the cell.
-        """
-        if self.topology is None:
-            return
-
-        end_pts_used = set()
-        # Make the soma entries
-        cell_tree = dict()
-
-        soma_0_end = ('soma', 0)  # end 0
-        soma_1_end = ('soma', 1)  # end 1
-
-        cell_tree[soma_0_end] = list()
-        # Connect end 1 to end 0
-        cell_tree[soma_0_end].append(soma_1_end)
-
-        end_pts_used.add(soma_0_end)
-        end_pts_used.add(soma_1_end)
-
-        # Add all connections
-        for connection in self.topology:
-            # Creating the nodes
-            parent_name = connection[0]
-            parent_loc = connection[1]
-            child_name = connection[2]
-            child_loc = connection[3]
-            parent = (parent_name, parent_loc)
-            child = (child_name, child_loc)
-            child_other_end = (child_name, int(not child_loc))
-
-            # Add the tree entries
-            # If the parent has no child yet
-            if parent not in cell_tree.keys():
-                cell_tree[parent] = list()
-
-            # Connecting child to parent
-            # Note - The coordinates of parent and child node will
-            # be same. Example -
-            # Suppose 0 end of section x is connected to 1 end of soma
-            # then the coordinates of 0 end of section will be same as
-            # coordinates of 1 end of soma.
-            cell_tree[parent].append(child)
-            end_pts_used.add(parent)
-            end_pts_used.add(child_loc)
-
-            # Defining the edge (connect the ends of a section)
-            # Example(Cont.) - The 1 end of section x will be connected
-            # to 0 end of section x. The distance between the two ends
-            # is the length of the section.
-            if child_other_end not in end_pts_used:
-                cell_tree[child] = list()
-                cell_tree[child].append(child_other_end)
-                end_pts_used.add(child_other_end)
-
-        self.cell_tree = cell_tree
-
     def _update_section_end_pts_L(self, node, dpt):
+        if self.cell_tree is None:
+            return
         x = self.sections[node[0]].end_pts[node[1]][0]
         y = self.sections[node[0]].end_pts[node[1]][1]
         z = self.sections[node[0]].end_pts[node[1]][2]
@@ -884,6 +830,9 @@ class Cell:
         """
         # Python version of Neuron define_shape function
         # https://nrn.readthedocs.io/en/latest/python/modelspec/programmatic/topology/geometry.html?highlight=pt3dadd#pt3dadd  # noqa
+        # cell tree is None therefore cannot define shape
+        if self.cell_tree is None:
+            return
         # Find the end pts of the section
         node_opp_end = 1
         if node[1] == 1:
@@ -927,6 +876,9 @@ class Cell:
         """
         if 'soma' not in self.sections:
             raise KeyError('soma must be defined for cell')
+        # cell tree is None therefore no end_pts to update
+        if self.cell_tree is None:
+            return
 
         # shift cell to self.pos and reorient apical dendrite
         # along z direction of self.pos
