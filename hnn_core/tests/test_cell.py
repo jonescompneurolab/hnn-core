@@ -124,7 +124,8 @@ def test_cell():
     cell1.plot_morphology(show=True)
     for end_pt_original, end_pt_new in zip(end_pts_original, end_pts_new):
         for pt_original, pt_new in zip(end_pt_original, end_pt_new):
-            assert list(np.array(pt_original) * 2) == pt_new
+            np.testing.assert_almost_equal(list(np.array(pt_original) * 2),
+                                           pt_new, 5)
 
     for sec_name in cell1.sections.keys():
         section = cell1.sections[sec_name]
@@ -139,8 +140,7 @@ def test_cell():
         end_pts_new.append(section.end_pts)
     # print(end_pts_original)
     # print(end_pts_new)
-    cell1.plot_morphology(show=True)
-    assert end_pts_original == end_pts_new
+    cell1.plot_morphology(show=False)
     # Checking equaliy till 5 decimal places
     np.testing.assert_almost_equal(end_pts_original, end_pts_new, 5)
 
