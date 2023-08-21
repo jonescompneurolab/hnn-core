@@ -103,7 +103,7 @@ def set_params(net, params):
                          synaptic_delays=synaptic_delays_p)
 
 ###############################################################################
-# Then, we define the constrainst.
+# Then, we define the constraints.
 #
 # The constraints must be a dictionary of tuples where the first value in each
 # tuple is the lower bound and the second value is the upper bound for the
