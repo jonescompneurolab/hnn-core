@@ -49,8 +49,8 @@ class Optimizer:
             The user-defined constraints.
         max_iter : int
             The max number of calls to the objective function.
-        solver : string
-            The optimizer, 'bayesian' or 'cobyla'.
+        solver : func
+            The optimization function.
         obj_fun : func
             The objective function to be minimized.
         scale_factor : float
@@ -103,10 +103,8 @@ class Optimizer:
         if self.net_ is not None:
             is_fit = True
 
-        return "<Instance of {} class, solver={}, fit={}>".format(
-            self.__class__.__name__,
-            self.solver,
-            is_fit)
+        name = self.__class__.__name__
+        return f"<{name}\nsolver={self.solver}\nfit={is_fit}>"
 
     def fit(self, target):
         """Runs optimization routine.
