@@ -110,7 +110,7 @@ def set_params(net, params):
 # corresponding parameter.
 #
 # The following synaptic weight parameter ranges (units of micro-siemens)
-# were chosen given that they are physiologically realistic.
+# were chosen so as to keep the model in physiologically realistic regimes.
 
 
 constraints = dict({'evprox1_ampa_L2_basket': (0.01, 1.),
