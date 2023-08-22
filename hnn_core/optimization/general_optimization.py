@@ -9,12 +9,9 @@ import numpy as np
 
 from .metrics import _rmse_evoked
 
-from skopt import gp_minimize
-from scipy.optimize import fmin_cobyla
-
 
 class Optimizer:
-    def __init__(self, net, tstop, constraints, set_params, solver='bayesian',
+    def __init__(self, net, tstop, constraints, set_params, solver='cobyla',
                  obj_fun='dipole_rmse', scale_factor=1.,
                  smooth_window_len=None, max_iter=200):
         """Parameter optimization.
@@ -299,6 +296,8 @@ def _run_opt_bayesian(net, tstop, constraints, set_params, obj_fun,
         Optimized network object.
     """
 
+    from skopt import gp_minimize
+
     obj_values = list()
 
     def _obj_func(predicted_params):
@@ -370,6 +369,8 @@ def _run_opt_cobyla(net, tstop, constraints, set_params, obj_fun,
     net_ : Network
         Optimized network object.
     """
+
+    from scipy.optimize import fmin_cobyla
 
     obj_values = list()
 
