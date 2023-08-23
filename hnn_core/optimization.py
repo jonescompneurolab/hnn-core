@@ -358,7 +358,7 @@ def _optrun(drive_params_updated, drive_params_static, net, tstop, dt,
 
     opt_params['optiter'] += 1
 
-    return avg_rmse, avg_rmse_unweighted  # nlopt expects error
+    return avg_rmse
 
 
 def _run_optimization(maxiter, param_ranges, optrun):
