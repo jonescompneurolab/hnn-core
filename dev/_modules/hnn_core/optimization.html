@@ -419,8 +419,6 @@
 <span class="sd">    -------</span>
 <span class="sd">    avg_rmse: float</span>
 <span class="sd">        Weighted RMSE between data in dpl and exp_dpl</span>
-<span class="sd">    avg_rmse_unweighted : float</span>
-<span class="sd">        Unweighted RMSE between data in dpl and exp_dpl</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Optimization step </span><span class="si">%d</span><span class="s2">, iteration </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;cur_step&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
                                                   <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;optiter&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
@@ -498,7 +496,7 @@
 
     <span class="n">opt_params</span><span class="p">[</span><span class="s1">&#39;optiter&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="k">return</span> <span class="n">avg_rmse</span><span class="p">,</span> <span class="n">avg_rmse_unweighted</span>  <span class="c1"># nlopt expects error</span>
+    <span class="k">return</span> <span class="n">avg_rmse</span>
 
 
 <span class="k">def</span> <span class="nf">_run_optimization</span><span class="p">(</span><span class="n">maxiter</span><span class="p">,</span> <span class="n">param_ranges</span><span class="p">,</span> <span class="n">optrun</span><span class="p">):</span>
