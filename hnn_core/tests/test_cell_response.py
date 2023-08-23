@@ -9,7 +9,7 @@ import numpy as np
 from hnn_core import CellResponse, read_spikes
 
 
-def test_cell_response(tmpdir):
+def test_cell_response(tmp_path):
     """Test CellResponse object."""
     # Round-trip test
     spike_times = [[2.3456, 7.89], [4.2812, 93.2]]
@@ -30,13 +30,13 @@ def test_cell_response(tmpdir):
     with pytest.warns(DeprecationWarning,
                       match="Writing cell response to txt files is "
                       "deprecated"):
-        cell_response.write(tmpdir.join('spk_%d.txt'))
+        cell_response.write(tmp_path.join('spk_%d.txt'))
 
     # Testing reading from txt files
     with pytest.warns(DeprecationWarning,
                       match="Reading cell response from txt files is "
                       "deprecated"):
-        assert cell_response == read_spikes(tmpdir.join('spk_*.txt'))
+        assert cell_response == read_spikes(tmp_path.join('spk_*.txt'))
 
     assert ("CellResponse | 2 simulation trials" in repr(cell_response))
 
@@ -54,10 +54,10 @@ def test_cell_response(tmpdir):
     # Test recovery of empty spike files
     empty_spike = CellResponse(spike_times=[[], []], spike_gids=[[], []],
                                spike_types=[[], []])
-    empty_spike.write(tmpdir.join('empty_spk_%d.txt'))
-    empty_spike.write(tmpdir.join('empty_spk.txt'))
-    empty_spike.write(tmpdir.join('empty_spk_{0}.txt'))
-    assert empty_spike == read_spikes(tmpdir.join('empty_spk_*.txt'))
+    empty_spike.write(tmp_path.join('empty_spk_%d.txt'))
+    empty_spike.write(tmp_path.join('empty_spk.txt'))
+    empty_spike.write(tmp_path.join('empty_spk_{0}.txt'))
+    assert empty_spike == read_spikes(tmp_path.join('empty_spk_*.txt'))
 
     assert ("CellResponse | 2 simulation trials" in repr(empty_spike))
 
@@ -154,23 +154,23 @@ def test_cell_response(tmpdir):
         'L2_basket': [[test_rate], [0.0]]}
 
     # Write spike file with no 'types' column
-    for fname in sorted(glob(str(tmpdir.join('spk_*.txt')))):
+    for fname in sorted(glob(str(tmp_path.join('spk_*.txt')))):
         times_gids_only = np.loadtxt(fname, dtype=str)[:, (0, 1)]
         np.savetxt(fname, times_gids_only, delimiter='\t', fmt='%s')
 
     # Check that spike_types are updated according to gid_ranges
-    cell_response = read_spikes(tmpdir.join('spk_*.txt'),
+    cell_response = read_spikes(tmp_path.join('spk_*.txt'),
                                 gid_ranges=gid_ranges)
     assert cell_response.spike_types == spike_types
 
     # Check for gid_ranges errors
     with pytest.raises(ValueError, match="gid_ranges must be provided if "
                        "spike types are unspecified in the file "):
-        cell_response = read_spikes(tmpdir.join('spk_*.txt'))
+        cell_response = read_spikes(tmp_path.join('spk_*.txt'))
     with pytest.raises(ValueError, match="gid_ranges should contain only "
                        "disjoint sets of gid values"):
         gid_ranges = {'L2_pyramidal': range(3), 'L2_basket': range(2, 4),
                       'L5_pyramidal': range(4, 6), 'L5_basket': range(6, 8)}
-        cell_response = read_spikes(tmpdir.join('spk_*.txt'),
+        cell_response = read_spikes(tmp_path.join('spk_*.txt'),
                                     gid_ranges=gid_ranges)
     plt.close('all')
