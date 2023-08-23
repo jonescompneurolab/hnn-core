@@ -23,8 +23,8 @@ def test_dipole(tmp_path, run_hnn_core_fixture):
     """Test dipole object."""
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    dpl_out_fname = tmp_path.join('dpl1.txt')
-    dpl_out_hdf5_fname = tmp_path.join('dpl.hdf5')
+    dpl_out_fname = tmp_path / 'dpl1.txt'
+    dpl_out_hdf5_fname = tmp_path / 'dpl.hdf5'
     params = read_params(params_fname)
     times = np.arange(0, 6000 * params['dt'], params['dt'])
     data = np.random.random((6000, 3))
@@ -86,12 +86,12 @@ def test_dipole(tmp_path, run_hnn_core_fixture):
     # Testing for wrong extension provided
     with pytest.raises(NameError,
                        match="File extension should be either txt or hdf5"):
-        dipole.write(tmp_path.join('dpl.xls'))
+        dipole.write(tmp_path / 'dpl.xls')
 
     # Testing File Not Found Error
     with pytest.raises(FileNotFoundError,
                        match="File not found at "):
-        read_dipole(tmp_path.join('dpl1.hdf5'))
+        read_dipole(tmp_path / 'dpl1.hdf5')
 
     # dpls with different scale_applied should not be averaged.
     with pytest.raises(RuntimeError,
@@ -100,16 +100,16 @@ def test_dipole(tmp_path, run_hnn_core_fixture):
     # Checking object type field not exists error
     dummy_data = dict()
     dummy_data['objective'] = "Check Object type errors"
-    write_hdf5(tmp_path.join('not_dpl.hdf5'), dummy_data)
+    write_hdf5(tmp_path / 'not_dpl.hdf5', dummy_data)
     with pytest.raises(NameError,
                        match="The given file is not compatible."):
-        read_dipole(tmp_path.join('not_dpl.hdf5'))
+        read_dipole(tmp_path / 'not_dpl.hdf5')
     # Checking wrong object type error
     dummy_data['object_type'] = "dpl"
-    write_hdf5(tmp_path.join('not_dpl.hdf5'), dummy_data, overwrite=True)
+    write_hdf5(tmp_path / 'not_dpl.hdf5', dummy_data, overwrite=True)
     with pytest.raises(ValueError,
                        match="The object should be of type Dipole."):
-        read_dipole(tmp_path.join('not_dpl.hdf5'))
+        read_dipole(tmp_path / 'not_dpl.hdf5')
     # force the scale_applied to be identical across dpls to allow averaging.
     dipole.scale_applied = dipole_read.scale_applied
     # average two identical dipole objects
