@@ -100,13 +100,13 @@ def test_dipole(tmpdir, run_hnn_core_fixture):
     # Checking object type field not exists error
     dummy_data = dict()
     dummy_data['objective'] = "Check Object type errors"
-    write_hdf5(tmpdir.join('not_dpl.hdf5'), dummy_data)
+    write_hdf5(Path(tmpdir.join('not_dpl.hdf5'), dummy_data))
     with pytest.raises(NameError,
                        match="The given file is not compatible."):
         read_dipole(tmpdir.join('not_dpl.hdf5'))
     # Checking wrong object type error
     dummy_data['object_type'] = "dpl"
-    write_hdf5(tmpdir.join('not_dpl.hdf5'), dummy_data, overwrite=True)
+    write_hdf5(Path(tmpdir.join('not_dpl.hdf5'), dummy_data, overwrite=True))
     with pytest.raises(ValueError,
                        match="The object should be of type Dipole."):
         read_dipole(tmpdir.join('not_dpl.hdf5'))
