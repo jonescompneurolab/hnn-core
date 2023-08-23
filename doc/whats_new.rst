@@ -23,6 +23,9 @@ Bug
 - Fix inconsistent connection mapping from drive gids to cell gids, by
   `Ryan Thorpe`_ in :gh:`642`.
 
+- Objective function called by :func:`~hnn_core/optimization/optimize_evoked`
+  now returns a scalar instead of tuple, by `Ryan Thorpe`_ in :gh:`670`.
+
 API
 ~~~
 - :func:`~hnn_core.CellResponse.write` and :func:`~hnn_core.Cell_response.read_spikes`
