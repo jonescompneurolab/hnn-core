@@ -345,7 +345,7 @@ class Cell:
         # self._update_end_pts()  # Old implementation
         self.update_end_pts()  # New implementation
 
-        self._set_section_mechs()  # Set mech values of all sections
+        self._compute_section_mechs()  # Set mech values of all sections
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -422,13 +422,13 @@ class Cell:
                     if isinstance(val, list):
                         seg_xs, seg_vals = val[0], val[1]
                         for seg, seg_x, seg_val in zip(sec, seg_xs, seg_vals):
-                            # Checking equaliy till 5 decimal places
+                            # Checking equality till 5 decimal places
                             np.testing.assert_almost_equal(seg.x, seg_x, 5)
                             setattr(seg, attr, seg_val)
                     else:
                         setattr(sec, attr, val)
 
-    def _set_section_mechs(self):
+    def _compute_section_mechs(self):
         sections = self.sections
         for sec_name, section in sections.items():
             for mech_name, p_mech in section.mechs.items():
@@ -437,17 +437,17 @@ class Cell:
                         seg_xs, seg_vals = list(), list()
                         section_distance = self.distance_section(sec_name,
                                                                  ('soma', 0))
-                        adjacent_seg_dist = 1 / section.nseg
-                        first_seg_centre = (0.5 - (((section.nseg - 1) / 2) *
-                                            adjacent_seg_dist))
-                        seg_centres = list()
-
                         # Finding centres of all segments in the section
                         # If number of segments is 5 then seg_centres will
                         # be 0.1, 0.3, 0.5, 0.7 and 0.9.
-                        for i in range(0, section.nseg):
-                            seg_centres.append(first_seg_centre +
-                                               (i * adjacent_seg_dist))
+                        adjacent_seg_dist = 1 / section.nseg
+                        first_seg_centre = (0.5 - (((section.nseg - 1) / 2) *
+                                            adjacent_seg_dist))
+                        last_seg_centre = (0.5 + (((section.nseg - 1) / 2) *
+                                           adjacent_seg_dist))
+                        seg_centres = list(np.linspace(first_seg_centre,
+                                                       last_seg_centre,
+                                                       num=section.nseg))
 
                         for seg_x in seg_centres:
                             # sec_end_dist is distance between 0 end of soma to
@@ -457,8 +457,6 @@ class Cell:
                             seg_vals.append(val(sec_end_dist +
                                                 (seg_x * section.L)))
                         p_mech[attr] = [seg_xs, seg_vals]
-                    else:
-                        p_mech[attr] = val
         return self.sections
 
     def _create_synapses(self, sections, synapses):
@@ -819,8 +817,8 @@ class Cell:
         Parameters
         ----------
         node : tuple of size 2
-        The first element is the section name
-        The second element is the node end used (0 or 1)
+            The first element is the section name
+            The second element is the node end used (0 or 1)
 
         Note
         ----
@@ -867,7 +865,7 @@ class Cell:
                 self.define_shape(child_node)
 
     def update_end_pts(self):
-        """Udpate all end pts according to the length of the sections.
+        """Update all end pts according to the length of the sections.
         Can be used whenever length of any section is updated
 
         Returns

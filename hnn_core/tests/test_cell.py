@@ -138,10 +138,8 @@ def test_cell():
         section = cell1.sections[sec_name]
         cell1.sections[sec_name] = section
         end_pts_new.append(section.end_pts)
-    # print(end_pts_original)
-    # print(end_pts_new)
     cell1.plot_morphology(show=False)
-    # Checking equaliy till 5 decimal places
+    # Checking equality till 5 decimal places
     np.testing.assert_almost_equal(end_pts_original, end_pts_new, 5)
 
     # Testing distance function using template cell (L5pyr)

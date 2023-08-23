@@ -97,18 +97,19 @@ def _cell_L2Pyr(override_params, pos=(0., 0., 0), gid=0.):
 
     # Node description - (section_name, end_point)
     cell_tree = {
-        ('soma', 0): [('soma', 1), ('basal_1', 0)],
-        ('soma', 1): [('apical_trunk', 0)],
         ('apical_trunk', 0): [('apical_trunk', 1)],
-        ('apical_trunk', 1): [('apical_1', 0), ('apical_oblique', 0)],
         ('apical_1', 0): [('apical_1', 1)],
-        ('apical_1', 1): [('apical_tuft', 0)],
         ('apical_tuft', 0): [('apical_tuft', 1)],
         ('apical_oblique', 0): [('apical_oblique', 1)],
         ('basal_1', 0): [('basal_1', 1)],
-        ('basal_1', 1): [('basal_2', 0), ('basal_3', 0)],
         ('basal_2', 0): [('basal_2', 1)],
-        ('basal_3', 0): [('basal_3', 1)]
+        ('basal_3', 0): [('basal_3', 1)],
+        # Different sections connected
+        ('soma', 0): [('soma', 1), ('basal_1', 0)],
+        ('soma', 1): [('apical_trunk', 0)],
+        ('apical_trunk', 1): [('apical_1', 0), ('apical_oblique', 0)],
+        ('apical_1', 1): [('apical_tuft', 0)],
+        ('basal_1', 1): [('basal_2', 0), ('basal_3', 0)]
     }
 
     sect_loc = {'proximal': ['apical_oblique', 'basal_2', 'basal_3'],
@@ -181,20 +182,21 @@ def _cell_L5Pyr(override_params, pos=(0., 0., 0), gid=0.):
                         exp_term=3e-3, offset=0.0)
 
     cell_tree = {
-        ('soma', 0): [('soma', 1), ('basal_1', 0)],
-        ('soma', 1): [('apical_trunk', 0)],
         ('apical_trunk', 0): [('apical_trunk', 1)],
-        ('apical_trunk', 1): [('apical_1', 0), ('apical_oblique', 0)],
         ('apical_1', 0): [('apical_1', 1)],
-        ('apical_1', 1): [('apical_2', 0)],
         ('apical_2', 0): [('apical_2', 1)],
-        ('apical_2', 1): [('apical_tuft', 0)],
         ('apical_tuft', 0): [('apical_tuft', 1)],
         ('apical_oblique', 0): [('apical_oblique', 1)],
         ('basal_1', 0): [('basal_1', 1)],
-        ('basal_1', 1): [('basal_2', 0), ('basal_3', 0)],
         ('basal_2', 0): [('basal_2', 1)],
-        ('basal_3', 0): [('basal_3', 1)]
+        ('basal_3', 0): [('basal_3', 1)],
+        # Different sections connected
+        ('soma', 0): [('soma', 1), ('basal_1', 0)],
+        ('soma', 1): [('apical_trunk', 0)],
+        ('apical_trunk', 1): [('apical_1', 0), ('apical_oblique', 0)],
+        ('apical_1', 1): [('apical_2', 0)],
+        ('apical_2', 1): [('apical_tuft', 0)],
+        ('basal_1', 1): [('basal_2', 0), ('basal_3', 0)]
     }
 
     sect_loc = {'proximal': ['apical_oblique', 'basal_2', 'basal_3'],
