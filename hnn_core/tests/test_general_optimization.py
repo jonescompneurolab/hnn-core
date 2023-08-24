@@ -66,6 +66,15 @@ def test_optimize_evoked(solver):
                       set_params=set_params, solver=solver,
                       obj_fun='dipole_rmse', max_iter=11)
 
+    # test exception raised
+    with pytest.raises(ValueError, match='The current Network instance has '
+                       'external drives, provide a Network object with no '
+                       'external drives.'):
+        net_with_drives = net_orig.copy()
+        optim = Optimizer(net_with_drives, tstop=tstop,
+                          constraints=constraints, set_params=set_params,
+                          solver=solver, obj_fun='dipole_rmse', max_iter=11)
+
     # test repr before fitting
     assert 'fit=False' in repr(optim), "optimizer is already fit"
 

@@ -70,7 +70,7 @@ class Optimizer:
         if initial_net.external_drives:
             raise ValueError("The current Network instance has external " +
                              "drives, provide a Network object with no " +
-                             "drives.")
+                             "external drives.")
         self._initial_net = initial_net
         self.constraints = constraints
         self._set_params = set_params
