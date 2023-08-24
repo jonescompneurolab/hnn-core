@@ -115,7 +115,7 @@ def test_cell():
         end_pts_original.append(section.end_pts)
         section._L = section._L * 2
         cell1.sections[sec_name] = section
-    cell1.update_end_pts()
+    cell1._update_end_pts()
     for sec_name in cell1.sections.keys():
         end_pts_new.append(cell1.sections[sec_name].end_pts)
 
@@ -133,7 +133,7 @@ def test_cell():
         cell1.sections[sec_name] = section
 
     end_pts_new = list()
-    cell1.update_end_pts()
+    cell1._update_end_pts()
     for sec_name in cell1.sections.keys():
         section = cell1.sections[sec_name]
         cell1.sections[sec_name] = section
