@@ -35,7 +35,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8 pytest pytest-cov
           pip install psutil joblib
-          pip install scikit-optimize
+          pip install scikit-learn
           if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
             pip install mpi4py
           else
