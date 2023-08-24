@@ -41,7 +41,7 @@ jobs:
           pip install flake8 pytest pytest-cov
           pip install psutil joblib
           pip install --verbose .[gui]
-          pip install scikit-optimize
+          pip install scikit-learn
       - name: Test with pytest
         shell: cmd
         run: |
