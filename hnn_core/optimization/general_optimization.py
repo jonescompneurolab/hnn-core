@@ -7,18 +7,18 @@
 
 import numpy as np
 
-from .metrics import _rmse_evoked
+from .objective_functions import _rmse_evoked
 
 
 class Optimizer:
-    def __init__(self, net, tstop, constraints, set_params, solver='cobyla',
-                 obj_fun='dipole_rmse', scale_factor=1.,
+    def __init__(self, initial_net, tstop, constraints, set_params,
+                 solver='cobyla', obj_fun='dipole_rmse', scale_factor=1.,
                  smooth_window_len=None, max_iter=200):
         """Parameter optimization.
 
         Parameters
         ----------
-        net : Network
+        initial_net : instance of Network
             The network object.
         tstop : float
             The simulated dipole's duration.
@@ -26,9 +26,14 @@ class Optimizer:
             The user-defined constraints.
         set_params : func
             User-defined function that sets parameters in network drives.
-        solver : string
+
+                ``set_params(net, params) -> None``
+
+            where ``net`` is a Network object and ``params`` is a dictionary
+            of the parameters that will be set inside the function.
+        solver : str
             The optimizer, 'bayesian' or 'cobyla'.
-        obj_fun : string
+        obj_fun : str
             The objective function to be minimized.
         scale_factor : float, optional
             The dipole scale factor. The default is 1.
@@ -40,8 +45,6 @@ class Optimizer:
 
         Attributes
         ----------
-        net : Network
-            The network object.
         constraints : dict
             The user-defined constraints.
         max_iter : int
@@ -56,7 +59,7 @@ class Optimizer:
             The smooth window length.
         tstop : float
             The simulated dipole's duration.
-        net_ : Network
+        net_ : instance of Network
             The network object with optimized drives.
         obj_ : list
             The objective function values.
@@ -64,11 +67,11 @@ class Optimizer:
             The list of optimized parameter values.
         """
 
-        if net.external_drives:
+        if initial_net.external_drives:
             raise ValueError("The current Network instance has external " +
                              "drives, provide a Network object with no " +
                              "drives.")
-        self.net = net
+        self._initial_net = initial_net
         self.constraints = constraints
         self._set_params = set_params
         self.max_iter = 200
@@ -115,7 +118,7 @@ class Optimizer:
         constraints = self._assemble_constraints(self.constraints)
         initial_params = _get_initial_params(self.constraints)
 
-        opt_params, obj, net_ = self._run_opt(self.net,
+        opt_params, obj, net_ = self._run_opt(self._initial_net,
                                               self.tstop,
                                               constraints,
                                               self._set_params,
@@ -258,14 +261,14 @@ def _update_params(initial_params, predicted_params):
     return params
 
 
-def _run_opt_bayesian(net, tstop, constraints, set_params, obj_fun,
+def _run_opt_bayesian(initial_net, tstop, constraints, set_params, obj_fun,
                       initial_params, max_iter, target, scale_factor=1.,
                       smooth_window_len=None):
     """Runs optimization routine with gp_minimize optimizer.
 
     Parameters
     ----------
-    net : Network
+    initial_net : instance of Network
         The network object.
     tstop : float
         The simulated dipole's duration.
@@ -292,7 +295,7 @@ def _run_opt_bayesian(net, tstop, constraints, set_params, obj_fun,
         Optimized parameters.
     obj : list
         Objective values.
-    net_ : Network
+    net_ : instance of Network
         Optimized network object.
     """
 
@@ -301,7 +304,7 @@ def _run_opt_bayesian(net, tstop, constraints, set_params, obj_fun,
     obj_values = list()
 
     def _obj_func(predicted_params):
-        return obj_fun(net,
+        return obj_fun(initial_net,
                        initial_params,
                        set_params,
                        predicted_params,
@@ -326,20 +329,20 @@ def _run_opt_bayesian(net, tstop, constraints, set_params, obj_fun,
 
     # get optimized net
     params = _update_params(initial_params, opt_params)
-    net_ = net.copy()
+    net_ = initial_net.copy()
     set_params(net_, params)
 
     return opt_params, obj, net_
 
 
-def _run_opt_cobyla(net, tstop, constraints, set_params, obj_fun,
+def _run_opt_cobyla(initial_net, tstop, constraints, set_params, obj_fun,
                     initial_params, max_iter, target, scale_factor=1.,
                     smooth_window_len=None):
     """Runs optimization routine with fmin_cobyla optimizer.
 
     Parameters
     ----------
-    net : Network
+    initial_net : instance of Network
         The network object.
     tstop : float
         The simulated dipole's duration.
@@ -366,7 +369,7 @@ def _run_opt_cobyla(net, tstop, constraints, set_params, obj_fun,
         Optimized parameters.
     obj : list
         Objective values.
-    net_ : Network
+    net_ : instance of Network
         Optimized network object.
     """
 
@@ -375,7 +378,7 @@ def _run_opt_cobyla(net, tstop, constraints, set_params, obj_fun,
     obj_values = list()
 
     def _obj_func(predicted_params):
-        return obj_fun(net,
+        return obj_fun(initial_net,
                        initial_params,
                        set_params,
                        predicted_params,
@@ -402,7 +405,7 @@ def _run_opt_cobyla(net, tstop, constraints, set_params, obj_fun,
 
     # get optimized net
     params = _update_params(initial_params, opt_params)
-    net_ = net.copy()
+    net_ = initial_net.copy()
     set_params(net_, params)
 
     return opt_params, obj, net_

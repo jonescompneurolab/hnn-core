@@ -1,4 +1,4 @@
-"""Metrics for parameter optimization."""
+"""Objective functions for parameter optimization."""
 
 # Authors: Carolina Fernandez <cxf418@miami.edu>
 #          Nick Tolley <nicholas_tolley@brown.edu>
@@ -12,14 +12,14 @@ from hnn_core import simulate_dipole
 from scipy.signal import resample
 
 
-def _rmse_evoked(net, initial_params, set_params, predicted_params,
+def _rmse_evoked(initial_net, initial_params, set_params, predicted_params,
                  update_params, obj_values, scale_factor, smooth_window_len,
                  target, tstop):
     """The objective function for evoked responses.
 
     Parameters
     ----------
-    net : Network
+    initial_net : instance of Network
         The network object.
     initial_params : dict
         Keys are parameter names, values are initial parameters.
@@ -47,7 +47,7 @@ def _rmse_evoked(net, initial_params, set_params, predicted_params,
     params = update_params(initial_params, predicted_params)
 
     # simulate dpl with predicted params
-    new_net = net.copy()
+    new_net = initial_net.copy()
     set_params(new_net, params)
     dpl = simulate_dipole(new_net, tstop=tstop, n_trials=1)[0]
 
