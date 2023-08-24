@@ -12,8 +12,8 @@ import numpy as np
 import scipy.stats as stats
 from scipy.optimize import fmin_cobyla
 
-from .dipole import simulate_dipole, _rmse, average_dipoles
-from .network import pick_connection
+from ..dipole import simulate_dipole, _rmse, average_dipoles
+from ..network import pick_connection
 
 
 def _get_range(val, multiplier):
