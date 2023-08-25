@@ -74,7 +74,7 @@ class Optimizer:
         self._initial_net = initial_net
         self.constraints = constraints
         self._set_params = set_params
-        self.max_iter = 200
+        self.max_iter = max_iter
         # Optimizer method
         if solver == 'bayesian':
             self.solver = 'bayesian'
@@ -299,7 +299,8 @@ def _run_opt_bayesian(initial_net, tstop, constraints, set_params, obj_fun,
         Optimized network object.
     """
 
-    from skopt import gp_minimize
+    # from skopt import gp_minimize
+    from ..externals.bayesopt import bayes_opt, expected_improvement
 
     obj_values = list()
 
@@ -315,14 +316,14 @@ def _run_opt_bayesian(initial_net, tstop, constraints, set_params, obj_fun,
                        target,
                        tstop)
 
-    opt_results = gp_minimize(func=_obj_func,
-                              dimensions=constraints,
-                              acq_func='EI',
-                              n_calls=max_iter,
-                              x0=list(initial_params.values()))
+    opt_results, _ = bayes_opt(f=_obj_func,
+                               initial_x=list(initial_params.values()),
+                               all_x=constraints,
+                               acquisition=expected_improvement,
+                               max_iter=max_iter)
 
     # get optimized params
-    opt_params = opt_results.x
+    opt_params = opt_results
 
     # get objective values
     obj = [np.min(obj_values[:idx]) for idx in range(1, max_iter + 1)]

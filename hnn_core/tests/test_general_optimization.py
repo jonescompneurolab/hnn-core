@@ -14,6 +14,7 @@ import pytest
 def test_optimize_evoked(solver):
     """Test optimization routines for evoked drives in a reduced network."""
 
+    max_iter = 11
     tstop = 10.
     n_trials = 1
 
@@ -51,29 +52,33 @@ def test_optimize_evoked(solver):
                            'L5_basket': 1., 'L5_pyramidal': 1.}
         net_offset.add_evoked_drive('evprox',
                                     mu=params['mu'],
-                                    sigma=1,
+                                    sigma=params['sigma'],
                                     numspikes=1,
                                     location='proximal',
                                     weights_ampa=weights_ampa,
                                     synaptic_delays=synaptic_delays)
 
     # define constraints
-    mu_range = (1, 6)
     constraints = dict()
-    constraints.update({'mu': mu_range})
+    constraints.update({'mu': (1, 6),
+                        'sigma': (1, 3)})
 
     optim = Optimizer(net_offset, tstop=tstop, constraints=constraints,
                       set_params=set_params, solver=solver,
-                      obj_fun='dipole_rmse', max_iter=11)
+                      obj_fun='dipole_rmse', max_iter=max_iter)
 
     # test exception raised
     with pytest.raises(ValueError, match='The current Network instance has '
                        'external drives, provide a Network object with no '
                        'external drives.'):
         net_with_drives = net_orig.copy()
-        optim = Optimizer(net_with_drives, tstop=tstop,
-                          constraints=constraints, set_params=set_params,
-                          solver=solver, obj_fun='dipole_rmse', max_iter=11)
+        optim = Optimizer(net_with_drives,
+                          tstop=tstop,
+                          constraints=constraints,
+                          set_params=set_params,
+                          solver=solver,
+                          obj_fun='dipole_rmse',
+                          max_iter=max_iter)
 
     # test repr before fitting
     assert 'fit=False' in repr(optim), "optimizer is already fit"
@@ -83,14 +88,16 @@ def test_optimize_evoked(solver):
     # test repr after fitting
     assert 'fit=True' in repr(optim), "optimizer was not fit"
 
-    opt_param = optim.opt_params_[0]
     # the optimized parameter is in the range
-    assert mu_range[0] <= opt_param <= mu_range[1], \
-        "Optimized parameter is not in user-defined range"
+    for param_idx, param in enumerate(optim.opt_params_):
+        assert (list(constraints.values())[param_idx][0]
+                <= param
+                <= list(constraints.values())[param_idx][1],
+               "Optimized parameter is not in user-defined range")
 
     obj = optim.obj_
     # the number of returned rmse values should be the same as max_iter
-    assert len(obj) <= 200, \
-        "Number of rmse values should be the same as max_iter"
+    assert (len(obj) <= max_iter,
+           "Number of rmse values should be the same as max_iter")
     # the returned rmse values should be positive
     assert all(vals >= 0 for vals in obj), "rmse values should be positive"
