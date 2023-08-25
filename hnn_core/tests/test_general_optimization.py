@@ -3,11 +3,13 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
-from hnn_core import jones_2009_model, simulate_dipole
-
-from hnn_core.optimization import Optimizer
+import os.path as op
 
 import pytest
+
+import hnn_core
+from hnn_core import jones_2009_model, simulate_dipole, read_params
+from hnn_core.optimization import Optimizer
 
 
 @pytest.mark.parametrize("solver", ['bayesian', 'cobyla'])
@@ -19,9 +21,14 @@ def test_optimize_evoked(solver):
     n_trials = 1
 
     # simulate a dipole to establish ground-truth drive parameters
-    net_orig = jones_2009_model()
-    net_orig._N_pyr_x = 3
-    net_orig._N_pyr_y = 3
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+
+    params.update({'N_pyr_x': 3,
+                   'N_pyr_y': 3})
+    net_orig = jones_2009_model(params)
+
     mu_orig = 2.
     weights_ampa = {'L2_basket': 0.5,
                     'L2_pyramidal': 0.5,
@@ -39,9 +46,7 @@ def test_optimize_evoked(solver):
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
     # define set_params function and constraints
-    net_offset = jones_2009_model()
-    net_offset._N_pyr_x = 3
-    net_offset._N_pyr_y = 3
+    net_offset = jones_2009_model(params)
 
     def set_params(net_offset, params):
         weights_ampa = {'L2_basket': 0.5,

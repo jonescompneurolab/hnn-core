@@ -316,11 +316,11 @@ def _run_opt_bayesian(initial_net, tstop, constraints, set_params, obj_fun,
                        target,
                        tstop)
 
-    opt_results, _ = bayes_opt(f=_obj_func,
-                               initial_x=list(initial_params.values()),
-                               all_x=constraints,
+    opt_results, _ = bayes_opt(func=_obj_func,
+                               x0=list(initial_params.values()),
+                               cons=constraints,
                                acquisition=expected_improvement,
-                               max_iter=max_iter)
+                               maxfun=max_iter)
 
     # get optimized params
     opt_params = opt_results
