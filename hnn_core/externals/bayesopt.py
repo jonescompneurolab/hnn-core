@@ -18,7 +18,7 @@ import numpy as np
 import scipy.stats as st
 
 
-def expected_improvement(gp, best_y, x):
+def expected_improvement(gp, best_f, all_x):
     """The expected improvement acquisition function. The equation is
     explained in Eq (3) of the tutorial.
 
@@ -26,75 +26,85 @@ def expected_improvement(gp, best_y, x):
     ----------
     gp : instance of GaussianProcessRegressor
         The GaussianProcessRegressor object.
-    best_y : float
+    best_f : float
         Best objective value.
-    x : ndarray
+    all_x : ndarray
         Randomly distributed samples.
 
     Returns
     -------
     ndarray
-        Object values corresponding to x.
+        Object values corresponding to all_x.
     """
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        y, y_std = gp.predict(x, return_std=True)  # (n_samples, n_features)
-    Z = (y - best_y) / (y_std + 1e-12)
-    return (y - best_y) * st.norm.cdf(Z) + y_std * st.norm.pdf(Z)
+        # (n_samples, n_features)
+        y, y_std = gp.predict(all_x, return_std=True)
+    Z = (y - best_f) / (y_std + 1e-12)
+    return (y - best_f) * st.norm.cdf(Z) + y_std * st.norm.pdf(Z)
 
 
-def bayes_opt(f, initial_x, all_x, acquisition, max_iter=200,
-              random_state=None):
+def bayes_opt(func, x0, cons, acquisition, maxfun=200,
+              debug=False, random_state=None):
     """The actual bayesian optimization function.
 
     Parameters
     ----------
-    f : func
-        The objective functions.
-    initial_x : list
+    func : func
+        The objective function.
+    x0 : list
        Initial parameters.
-    all_x : list of tuples
+    cons : list of tuples
         Parameter constraints in solver-specific format.
     acquisition : func
         Acquisiton function we want to use to find query points.
-    max_iter : int, optional
-        Number of calls the optimizer makes. The default is 200.
+    maxfun : int, optional
+        Maximum number of function evaluations. The default is 200.
+    debug : bool, optional
+        The default is False.
     random_state : int, optional
-        Random state of the gaussian process. The default is None.
+        Random state of the GaussianProcessRegressor. The default is None.
 
     Returns
     -------
     best_x : list
-        Optimized parameters.
+        The argument that minimizes f.
     best_f : float
-        Best objective value.
-
+        The final objective value.
     """
 
     X, y = list(), list()
 
     # evaluate
-    y.append(f(initial_x))
-    X.append(initial_x)
+    initial_f = func(x0)
+    if not np.isinf(initial_f):
+        X.append(x0)
+        y.append(initial_f)
 
     best_x = X[np.argmin(y)]
     best_f = y[np.argmin(y)]
     gp = gaussian_process.GaussianProcessRegressor(random_state=random_state)
 
-    # draw samples from distribution
-    all_x = np.random.uniform(low=[idx[0] for idx in all_x],
-                              high=[idx[1] for idx in all_x],
-                              size=(10000, len(all_x)))
+    if debug:
+        print("iter", -1, "best_x", best_x, best_f)
 
-    for i in range(max_iter):
-        gp.fit(np.array(X), np.array(y))  # (n_samples, n_features)
+    for i in range(maxfun):
 
+        # draw samples from distribution
+        all_x = np.random.uniform(low=[idx[0] for idx in cons],
+                                  high=[idx[1] for idx in cons],
+                                  size=(10000, len(cons)))
+
+        # (n_samples, n_features)
+        gp.fit(np.array(X), np.array(y))
+
+        # get new set of params
         new_x = all_x[acquisition(gp, best_f, all_x).argmin()]  # lowest obj
         new_x = new_x.tolist()
 
         # evaluate
-        new_f = f(new_x)
+        new_f = func(new_x)
 
         if not np.isinf(new_f):
             X.append(new_x)
@@ -103,4 +113,33 @@ def bayes_opt(f, initial_x, all_x, acquisition, max_iter=200,
                 best_f = new_f
                 best_x = new_x
 
+        if debug:
+            print("iter", i, "best_x", best_x, best_f)
+
+    if debug:
+        import matplotlib.pyplot as plt
+        scale = 1e6
+        sort_idx = np.argsort(X)
+        plt.plot(np.array(X)[sort_idx] * scale,
+                 np.array(y)[sort_idx] * scale, 'bo-')
+        plt.axvline(best_x * scale, linestyle='--')
+        plt.show()
+
     return best_x, best_f
+
+
+if __name__ == '__main__':
+    import numpy as np
+    from scipy.optimize import rosen
+
+    opt_params, obj_vals = bayes_opt(rosen,
+                                     [0.5, 0.6], [(-1, 1), (-1, 1)],
+                                     expected_improvement,
+                                     maxfun=200,
+                                     random_state=1)
+
+    x = np.linspace(-1, 1, 50)
+    y = np.linspace(-1, 1, 50)
+    X, Y = np.meshgrid(x, y)
+
+    objs = rosen(np.vstack((X.ravel(), Y.ravel())))

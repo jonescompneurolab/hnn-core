@@ -7,9 +7,9 @@
 
 import numpy as np
 
-from hnn_core import simulate_dipole
-
 from scipy.signal import resample
+
+from hnn_core import simulate_dipole
 
 
 def _rmse_evoked(initial_net, initial_params, set_params, predicted_params,
