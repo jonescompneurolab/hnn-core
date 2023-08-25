@@ -99,6 +99,8 @@
 <li><a class="reference internal" href="#hnn_core.Cell.build"><code class="docutils literal notranslate"><span class="pre">Cell.build()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.Cell.copy"><code class="docutils literal notranslate"><span class="pre">Cell.copy()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.Cell.create_tonic_bias"><code class="docutils literal notranslate"><span class="pre">Cell.create_tonic_bias()</span></code></a></li>
+<li><a class="reference internal" href="#hnn_core.Cell.define_shape"><code class="docutils literal notranslate"><span class="pre">Cell.define_shape()</span></code></a></li>
+<li><a class="reference internal" href="#hnn_core.Cell.distance_section"><code class="docutils literal notranslate"><span class="pre">Cell.distance_section()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.Cell.modify_section"><code class="docutils literal notranslate"><span class="pre">Cell.modify_section()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.Cell.parconnect_from_src"><code class="docutils literal notranslate"><span class="pre">Cell.parconnect_from_src()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.Cell.plot_morphology"><code class="docutils literal notranslate"><span class="pre">Cell.plot_morphology()</span></code></a></li>
@@ -164,7 +166,7 @@
 <h1>hnn_core.Cell<a class="headerlink" href="#hnn-core-cell" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="hnn_core.Cell">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">Cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sect_loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">Cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synapses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sect_loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_tree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a cell object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -177,14 +179,7 @@
 </dd>
 <dt><strong>synapses</strong><span class="classifier">dict of dict</span></dt><dd><p>Keys are name of synaptic mechanism. Each synaptic mechanism
 has keys for parameters of the mechanism, e.g., ‘e’, ‘tau1’,
-‘tau2’.</p>
-</dd>
-<dt><strong>topology</strong><span class="classifier">list of list</span></dt><dd><p>The topology of cell sections. Each element is a list of
-4 items in the format
-[parent_sec, parent_loc, child_sec, child_loc] where
-parent_sec and parent_loc are float between 0 and 1
-specifying the location in the section to connect and
-parent_sec and child_sec are names of the connecting
+‘tau2’.
 sections.</p>
 </dd>
 <dt><strong>sect_loc</strong><span class="classifier">dict of list</span></dt><dd><p>Can have keys ‘proximal’ or ‘distal’ each containing
@@ -193,6 +188,13 @@ names of section locations that are proximal or distal.</p>
 <dt><strong>gid</strong><span class="classifier">int or None (optional)</span></dt><dd><p>Each cell in a network is uniquely identified by it’s “global ID”: GID.
 The GID is an integer from 0 to n_cells, or None if the cell is not
 yet attached to a network. Once the GID is set, it cannot be changed.</p>
+</dd>
+<dt><strong>cell_tree</strong><span class="classifier">dict of list</span></dt><dd><p>Stores the tree representation of a cell.
+Root is the 0 end of ‘soma’. Nodes are a tuple (sec_name, node_pos)
+where sec_name is the name of the section and node_pos is the 0 end
+or 1 end. The data structure is the adjacency list represetation of a
+tree. The keys of the dict are the parent nodes. The value is the
+list of nodes (children nodes) connected to the parent node.</p>
 </dd>
 </dl>
 </dd>
@@ -237,6 +239,13 @@ for tonic biasing inputs.</p>
 <dt><strong>sect_loc</strong><span class="classifier">dict of list</span></dt><dd><p>Can have keys ‘proximal’ or ‘distal’ each containing
 names of section locations that are proximal or distal.</p>
 </dd>
+<dt><strong>cell_tree</strong><span class="classifier">dict of list</span></dt><dd><p>Stores the tree representation of a cell.
+Root is the 0 end of ‘soma’. Nodes are a tuple (sec_name, node_pos)
+where sec_name is the name of the section and node_pos is the 0 end
+or 1 end. The data structure is the adjacency list represetation of a
+tree. The keys of the dict are the parent nodes. The value is the
+list of nodes (children nodes) connected to the parent node.</p>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -251,6 +260,12 @@ names of section locations that are proximal or distal.</p>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.create_tonic_bias" title="hnn_core.Cell.create_tonic_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_tonic_bias</span></code></a>(amplitude, t0, tstop[, loc])</p></td>
 <td><p>Create tonic bias at the soma.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.define_shape" title="hnn_core.Cell.define_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">define_shape</span></code></a>(node)</p></td>
+<td><p>Redefines end_pts according to section lengths.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.distance_section" title="hnn_core.Cell.distance_section"><code class="xref py py-obj docutils literal notranslate"><span class="pre">distance_section</span></code></a>(target_sec_name, curr_node)</p></td>
+<td><p>Find distance between the current node and the target section.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.modify_section" title="hnn_core.Cell.modify_section"><code class="xref py py-obj docutils literal notranslate"><span class="pre">modify_section</span></code></a>(sec_name[, L, diam, cm, Ra])</p></td>
 <td><p>Change attributes of section specified by <em class="xref py py-obj">sec_name</em></p></td>
@@ -314,6 +329,46 @@ of a pyramidal neuron.</p>
 <dt><strong>tstop</strong><span class="classifier">float</span></dt><dd><p>The end time of tonic input (in ms).</p>
 </dd>
 <dt><strong>loc</strong><span class="classifier">float (0 to 1)</span></dt><dd><p>The location of the input in the soma section.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Cell.define_shape">
+<span class="sig-name descname"><span class="pre">define_shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.define_shape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.define_shape" title="Permalink to this definition">¶</a></dt>
+<dd><p>Redefines end_pts according to section lengths.</p>
+<p>Detects change in section lengths of the sections in the
+subtree of the input node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>node</strong><span class="classifier">tuple of size 2</span></dt><dd><p>The first element is the section name
+The second element is the node end used (0 or 1)</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Cell.distance_section">
+<span class="sig-name descname"><span class="pre">distance_section</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_sec_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">curr_node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.distance_section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.distance_section" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find distance between the current node and the target section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>target_sec_name</strong><span class="classifier">string</span></dt><dd><p>Name of the target section</p>
+</dd>
+<dt><strong>curr_node</strong><span class="classifier">tuple</span></dt><dd><p>Source node from where search begins.
+It is of the the form (sec_name, end_pt).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>distance</strong><span class="classifier">float</span></dt><dd><p>Path distance between source node and mid of the target section.</p>
 </dd>
 </dl>
 </dd>
