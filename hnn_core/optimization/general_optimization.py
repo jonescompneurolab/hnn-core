@@ -299,7 +299,6 @@ def _run_opt_bayesian(initial_net, tstop, constraints, set_params, obj_fun,
         Optimized network object.
     """
 
-    # from skopt import gp_minimize
     from ..externals.bayesopt import bayes_opt, expected_improvement
 
     obj_values = list()
