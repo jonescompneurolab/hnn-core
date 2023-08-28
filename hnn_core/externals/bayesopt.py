@@ -8,7 +8,7 @@ Adopted from http://atpassos.me/post/44900091837/bayesian-optimization
 
 # Authors: Alexandre Gramfort <alexandre.gramfort@telecom-paristech.fr>
 #          Alexandre Passos <alexandre.tp@gmail.com>
-#          Mainak Jas <mainak.jas@telecom-paristech.fr>
+#          Mainak Jas <mjas@mgh.harvard.edu>
 #          Carolina Fernandez <cxf418@miami.edu>
 
 import warnings
@@ -78,9 +78,8 @@ def bayes_opt(func, x0, cons, acquisition, maxfun=200,
 
     # evaluate
     initial_f = func(x0)
-    if not np.isinf(initial_f):
-        X.append(x0)
-        y.append(initial_f)
+    X.append(x0)
+    y.append(initial_f)
 
     best_x = X[np.argmin(y)]
     best_f = y[np.argmin(y)]
@@ -106,12 +105,11 @@ def bayes_opt(func, x0, cons, acquisition, maxfun=200,
         # evaluate
         new_f = func(new_x)
 
-        if not np.isinf(new_f):
-            X.append(new_x)
-            y.append(new_f)
-            if new_f < best_f:
-                best_f = new_f
-                best_x = new_x
+        X.append(new_x)
+        y.append(new_f)
+        if new_f < best_f:
+            best_f = new_f
+            best_x = new_x
 
         if debug:
             print("iter", i, "best_x", best_x, best_f)
