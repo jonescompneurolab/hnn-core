@@ -16,7 +16,7 @@ params_fname = op.join(hnn_core_root, 'param', 'default.json')
 @pytest.mark.parametrize("network_model",
                          [law_2021_model, calcium_model,
                           jones_2009_model])
-def test_network_io(tmpdir, network_model):
+def test_network_io(tmp_path, network_model):
     # For simulation to be shorter(Discuss)
     params = op.join(hnn_core_root, 'param', 'default.json')
     if isinstance(params, str):
@@ -43,15 +43,15 @@ def test_network_io(tmpdir, network_model):
     net.add_electrode_array('arr1', electrode_pos)
 
     # Writing network
-    net.write(tmpdir.join('net.hdf5'))
+    net.write(tmp_path / 'net.hdf5')
 
     # Testing when overwrite is False and same filename is used
     with pytest.raises(FileExistsError,
                        match="File already exists at path "):
-        net.write(tmpdir.join('net.hdf5'), overwrite=False)
+        net.write(tmp_path / 'net.hdf5', overwrite=False)
 
     # Reading network
-    net_read = read_network(tmpdir.join('net.hdf5'))
+    net_read = read_network(tmp_path / 'net.hdf5')
     assert net == net_read
 
     # Simulating network
@@ -63,8 +63,8 @@ def test_network_io(tmpdir, network_model):
             assert_allclose(dpl1.data[dpl_key],
                             dpl2.data[dpl_key], rtol=0.000051, atol=0)
     # Writing simulated network and reading it
-    net.write(tmpdir.join('net_sim.hdf5'))
-    net_sim = read_network(tmpdir.join('net_sim.hdf5'))
+    net.write(tmp_path / 'net_sim.hdf5')
+    net_sim = read_network(tmp_path / 'net_sim.hdf5')
     assert net == net_sim
 
     # For cell response vsec isec bug (Not checked by __eq__)
@@ -74,8 +74,8 @@ def test_network_io(tmpdir, network_model):
     net_sim.plot_cells(show=False)
 
     # Checking Saving unsimulated network
-    net.write(tmpdir.join('net_unsim.hdf5'), save_unsimulated=True)
-    net_unsim_read = read_network(tmpdir.join('net_unsim.hdf5'))
+    net.write(tmp_path / 'net_unsim.hdf5', save_unsimulated=True)
+    net_unsim_read = read_network(tmp_path / 'net_unsim.hdf5')
     net_unsim = net.copy()
     net_unsim.cell_response = None
     assert net_unsim_read == net_unsim
@@ -93,7 +93,7 @@ def test_network_io(tmpdir, network_model):
     net_unsim_read.plot_cells(show=False)
 
     # Checking reading of raw network
-    net_raw = read_network(tmpdir.join('net_sim.hdf5'),
+    net_raw = read_network(tmp_path / 'net_sim.hdf5',
                            read_raw=True)
     assert net_raw == net_unsim
     # Checking simulation correctness of read raw network
@@ -110,17 +110,17 @@ def test_network_io(tmpdir, network_model):
     # Checking object type field not exists error
     dummy_data = dict()
     dummy_data['objective'] = "Check Object type errors"
-    write_hdf5(tmpdir.join('not_net.hdf5'), dummy_data, overwrite=True)
+    write_hdf5(tmp_path / 'not_net.hdf5', dummy_data, overwrite=True)
     with pytest.raises(NameError,
                        match="The given file is not compatible."):
-        read_network(tmpdir.join('not_net.hdf5'))
+        read_network(tmp_path / 'not_net.hdf5')
 
     # Checking wrong object type error
     dummy_data['object_type'] = "net"
-    write_hdf5(tmpdir.join('not_net.hdf5'), dummy_data, overwrite=True)
+    write_hdf5(tmp_path / 'not_net.hdf5', dummy_data, overwrite=True)
     with pytest.raises(ValueError,
                        match="The object should be of type Network."):
-        read_network(tmpdir.join('not_net.hdf5'))
+        read_network(tmp_path / 'not_net.hdf5')
 
     # Add test to check weights are equal in connections and drives (todo)
 
