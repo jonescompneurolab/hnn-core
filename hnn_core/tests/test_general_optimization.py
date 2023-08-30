@@ -88,7 +88,7 @@ def test_optimize_evoked(solver):
     # test repr before fitting
     assert 'fit=False' in repr(optim), "optimizer is already fit"
 
-    optim.fit(dpl_orig.data['agg'])
+    optim.fit(dpl_orig)
 
     # test repr after fitting
     assert 'fit=True' in repr(optim), "optimizer was not fit"

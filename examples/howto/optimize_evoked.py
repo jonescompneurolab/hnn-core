@@ -114,12 +114,6 @@ init_dpl.smooth(smooth_window_len)
 def set_params(net, params):
 
     # Proximal 1
-    weights_ampa_p1 = {'L2_basket': 0.2913, 'L2_pyramidal': 0.9337,
-                       'L5_basket': 0.1951, 'L5_pyramidal': 0.3602}
-    weights_nmda_p1 = {'L2_basket': 0.9240, 'L2_pyramidal': 0.0845,
-                       'L5_basket': 0.5849, 'L5_pyramidal': 0.65105}
-    synaptic_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                         'L5_basket': 1., 'L5_pyramidal': 1.}
     net.add_evoked_drive('evprox1',
                          mu=5.6813,
                          sigma=20.3969,
@@ -130,12 +124,6 @@ def set_params(net, params):
                          synaptic_delays=synaptic_delays_p)
 
     # Distal
-    weights_ampa_d1 = {'L2_basket': 0.8037, 'L2_pyramidal': 0.5738,
-                       'L5_pyramidal': 0.3626}
-    weights_nmda_d1 = {'L2_basket': 0.2492, 'L2_pyramidal': 0.6183,
-                       'L5_pyramidal': 0.1121}
-    synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                          'L5_pyramidal': 0.1}
     net.add_evoked_drive('evdist1',
                          mu=58.6539,
                          sigma=5.5810,
@@ -181,6 +169,7 @@ def set_params(net, params):
 # The following synaptic weight parameter ranges (units of micro-siemens)
 # were chosen so as to keep the model in physiologically realistic regimes.
 
+
 constraints = dict({'evprox2_ampa_L2_basket': (0.01, 1.),
                     'evprox2_ampa_L2_pyramidal': (0.01, 1.),
                     'evprox2_ampa_L5_basket': (0.01, 1.),
@@ -200,9 +189,9 @@ from hnn_core.optimization import Optimizer
 net = jones_2009_model()
 optim = Optimizer(net, tstop=tstop, constraints=constraints,
                   set_params=set_params, scale_factor=scale_factor,
-                  smooth_window_len=smooth_window_len, solver='bayesian')
+                  smooth_window_len=smooth_window_len, max_iter=40)
 with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
-    optim.fit(exp_dpl.data['agg'])
+    optim.fit(exp_dpl)
 
 ###############################################################################
 # Finally, we can plot the experimental data alongside the post-optimization

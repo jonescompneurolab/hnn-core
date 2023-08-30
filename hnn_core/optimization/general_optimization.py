@@ -111,8 +111,8 @@ class Optimizer:
 
         Parameters
         ----------
-        target : ndarray
-            The recorded dipole.
+        target : instance of Dipole
+            A dipole object with experimental data.
         """
 
         constraints = self._assemble_constraints(self.constraints)
@@ -282,8 +282,8 @@ def _run_opt_bayesian(initial_net, tstop, constraints, set_params, obj_fun,
         Keys are parameter names, values are initial parameters.
     max_iter : int
         Number of calls the optimizer makes.
-    target : ndarray
-        The recorded dipole.
+    target : instance of Dipole
+        A dipole object with experimental data.
     scale_factor : float
         The dipole scale factor.
     smooth_window_len : float
@@ -356,8 +356,8 @@ def _run_opt_cobyla(initial_net, tstop, constraints, set_params, obj_fun,
         Keys are parameter names, values are initial parameters.
     max_iter : int
         Number of calls the optimizer makes.
-    target : ndarray
-        The recorded dipole.
+    target : instance of Dipole
+        A dipole object with experimental data.
     scale_factor : float
         The dipole scale factor.
     smooth_window_len : float
