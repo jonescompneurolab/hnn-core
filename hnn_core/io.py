@@ -12,6 +12,13 @@ from .cell_response import CellResponse
 from .externals.mne import fill_doc
 
 
+def str_to_node(node_string):
+    node_tuple = node_string.split(',')
+    node_tuple[1] = int(node_tuple[1])
+    node = (node_tuple[0], node_tuple[1])
+    return node
+
+
 @fill_doc
 def write_network(net, fname, overwrite=True, save_unsimulated=False):
     """Write network to a file.
@@ -66,9 +73,7 @@ def write_network(net, fname, overwrite=True, save_unsimulated=False):
     net_data['celsius'] = net._params['celsius']
     cell_types_data = dict()
     for key in net.cell_types:
-        cell_copy = net.cell_types[key].copy()
-        cell_copy.build()
-        cell_types_data[key] = cell_copy.to_dict()
+        cell_types_data[key] = net.cell_types[key].to_dict()
     net_data['cell_types'] = cell_types_data
     # Write gid_ranges
     gid_ranges_data = dict()
@@ -258,11 +263,22 @@ def _read_cell_types(cell_types_data):
             # Set section attributes
             sections[section_name].syns = section_data['syns']
             sections[section_name].mechs = section_data['mechs']
+        # cell_tree
+        cell_tree = None
+        if cell_data['cell_tree'] is not None:
+            cell_tree = dict()
+            for parent, children in cell_data['cell_tree'].items():
+                key = str_to_node(parent)
+                value = list()
+                for child in children:
+                    value.append(str_to_node(child))
+                cell_tree[key] = value
+
         cell_types[cell_name] = Cell(name=cell_data['name'],
                                      pos=cell_data['pos'],
                                      sections=sections,
                                      synapses=cell_data['synapses'],
-                                     topology=cell_data['topology'],
+                                     cell_tree=cell_tree,
                                      sect_loc=cell_data['sect_loc'],
                                      gid=cell_data['gid'])
         # Setting cell attributes

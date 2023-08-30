@@ -313,8 +313,7 @@ class NetworkBuilder(object):
         self._rank = _get_rank()
 
         # load mechanisms needs ParallelContext for get_rank
-        # Not required here as already loaded in building cells
-        # load_custom_mechanisms()
+        load_custom_mechanisms()
 
         if self._rank == 0:
             print('Building the NEURON model')
