@@ -95,6 +95,10 @@ def _get_gaussian_connection(src_pos, target_pos, nc_dict,
     return weight, delay
 
 
+def node_to_str(node):
+    return node[0] + "," + str(node[1])
+
+
 class _ArtificialCell:
     """The ArtificialCell class for initializing a NEURON feed source.
 
@@ -223,26 +227,34 @@ class Section:
     def __eq__(self, other):
         if not isinstance(other, Section):
             return NotImplemented
-        # Add for mechs also
+
         # Check equality for mechs
         for mech_name in self.mechs.keys():
             self_mech = self.mechs[mech_name]
             other_mech = other.mechs[mech_name]
             for attr in self_mech.keys():
-                self_val = self_mech[attr]
-                other_val = other_mech[attr]
-                if (hasattr(self_val, '__call__') or
-                   hasattr(other_val, '__call__')):
-                    continue
-                elif self_val != other_val:
+                if self_mech[attr] != other_mech[attr]:
                     return False
 
-        return (self.L == other.L and
-                self.diam == other.diam and
-                self.Ra == other.Ra and
-                self.cm == other.cm and
-                self.end_pts == other.end_pts and
-                self.syns == other.syns)
+        # Check end_pts
+        for self_end_pt, other_end_pt in zip(self.end_pts, other.end_pts):
+            if self_end_pt != other_end_pt:
+                if np.testing.assert_almost_equal(self_end_pt,
+                                                  other_end_pt, 5):
+                    print(self_end_pt)
+                    print(other_end_pt)
+                    return False
+
+        # Check all other attributes
+        if (self.L != other.L or
+           self.diam != other.diam or
+           self.Ra != other.Ra or
+           self.cm != other.cm or
+           self.nseg != other.nseg or
+           self.syns != other.syns):
+            return False
+
+        return True
 
     def to_dict(self):
         section_data = dict()
@@ -251,6 +263,7 @@ class Section:
         section_data['cm'] = self.cm
         section_data['Ra'] = self.Ra
         section_data['end_pts'] = self.end_pts
+        section_data['nseg'] = self.nseg
         # Need to solve the partial function problem
         # in mechs
         section_data['mechs'] = self.mechs
@@ -398,7 +411,7 @@ class Cell:
         if not (self.name == other.name and
                 self.pos == other.pos and
                 self.synapses == other.synapses and
-                self.topology == other.topology and
+                self.cell_tree == other.cell_tree and
                 self.sect_loc == other.sect_loc and
                 self.dipole_pp == other.dipole_pp and
                 self.vsec == other.vsec and
@@ -410,7 +423,7 @@ class Cell:
             return False
 
         for key in self.sections.keys():
-            if not (self.sections[key] == other.sections[key]):
+            if self.sections[key] != other.sections[key]:
                 return False
 
         return True
@@ -423,7 +436,18 @@ class Cell:
         for key in self.sections:
             cell_data['sections'][key] = self.sections[key].to_dict()
         cell_data['synapses'] = self.synapses
-        cell_data['topology'] = self.topology
+        # cell_data['cell_tree'] = self.cell_tree
+        if self.cell_tree is None:
+            cell_data['cell_tree'] = None
+        else:
+            cell_tree_dict = dict()
+            for parent, children in self.cell_tree.items():
+                key = node_to_str(parent)
+                value = list()
+                for child in children:
+                    value.append(node_to_str(child))
+                cell_tree_dict[key] = value
+            cell_data['cell_tree'] = cell_tree_dict
         cell_data['sect_loc'] = self.sect_loc
         cell_data['gid'] = self.gid
         cell_data['dipole_pp'] = self.dipole_pp
@@ -521,8 +545,6 @@ class Cell:
                     if isinstance(val, list):
                         seg_xs, seg_vals = val[0], val[1]
                         for seg, seg_x, seg_val in zip(sec, seg_xs, seg_vals):
-                            # Checking equality till 5 decimal places
-                            np.testing.assert_almost_equal(seg.x, seg_x, 5)
                             setattr(seg, attr, seg_val)
                     else:
                         setattr(sec, attr, val)
