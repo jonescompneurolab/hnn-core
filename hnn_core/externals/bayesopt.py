@@ -16,6 +16,7 @@ from sklearn import gaussian_process
 import numpy as np
 
 import scipy.stats as st
+from scipy.optimize import basinhopping
 
 
 def expected_improvement(gp, best_f, all_x):
@@ -95,8 +96,7 @@ def bayes_opt(func, x0, cons, acquisition, maxfun=200,
                                   high=[idx[1] for idx in cons],
                                   size=(10000, len(cons)))
 
-        # (n_samples, n_features)
-        gp.fit(np.array(X), np.array(y))
+        gp.fit(np.array(X), np.array(y))  # (n_samples, n_features)
 
         # get new set of params
         new_x = all_x[acquisition(gp, best_f, all_x).argmin()]  # lowest obj
