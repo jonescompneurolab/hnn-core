@@ -10,6 +10,7 @@ import numpy as np
 from scipy.signal import resample
 
 from hnn_core import simulate_dipole
+from ..dipole import _rmse
 
 
 def _rmse_evoked(initial_net, initial_params, set_params, predicted_params,
@@ -35,8 +36,8 @@ def _rmse_evoked(initial_net, initial_params, set_params, predicted_params,
         The smooth window length.
     tstop : float
         The simulated dipole's duration.
-    target : ndarray
-        The recorded dipole.
+    target : instance of Dipole
+        A dipole object with experimental data.
 
     Returns
     -------
@@ -56,16 +57,7 @@ def _rmse_evoked(initial_net, initial_params, set_params, predicted_params,
     if smooth_window_len is not None:
         dpl.smooth(smooth_window_len)
 
-    # downsample if necessary
-    if (len(dpl.data['agg']) < len(target)):
-        target = resample(target, len(dpl.data['agg']))
-    elif (len(dpl.data['agg']) > len(target)):
-        dpl.data['agg'] = resample(dpl.data['agg'], len(target))
-
-    # calculate rmse
-    obj = np.sqrt(((dpl.data['agg'] - target)**2).sum() /
-                  len(dpl.times)) / (max(target) -
-                                     min(target))
+    obj = _rmse(dpl, target, tstop=tstop)
 
     obj_values.append(obj)
 
