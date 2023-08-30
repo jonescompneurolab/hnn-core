@@ -114,15 +114,6 @@ def bayes_opt(func, x0, cons, acquisition, maxfun=200,
         if debug:
             print("iter", i, "best_x", best_x, best_f)
 
-    if debug:
-        import matplotlib.pyplot as plt
-        scale = 1e6
-        sort_idx = np.argsort(X)
-        plt.plot(np.array(X)[sort_idx] * scale,
-                 np.array(y)[sort_idx] * scale, 'bo-')
-        plt.axvline(best_x * scale, linestyle='--')
-        plt.show()
-
     return best_x, best_f
 
 
