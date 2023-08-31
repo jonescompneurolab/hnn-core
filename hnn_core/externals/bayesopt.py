@@ -16,7 +16,6 @@ from sklearn import gaussian_process
 import numpy as np
 
 import scipy.stats as st
-from scipy.optimize import basinhopping
 
 
 def expected_improvement(gp, best_f, all_x):
