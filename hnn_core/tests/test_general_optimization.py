@@ -95,14 +95,13 @@ def test_optimize_evoked(solver):
 
     # the optimized parameter is in the range
     for param_idx, param in enumerate(optim.opt_params_):
-        assert list(constraints.values())[param_idx][0] \
-            <= param \
-            <= list(constraints.values())[param_idx][1], \
-            "Optimized parameter is not in user-defined range"
+        assert (list(constraints.values())[param_idx][0] <= param <=
+                list(constraints.values())[param_idx][1]), (
+                    "Optimized parameter is not in user-defined range")
 
     obj = optim.obj_
     # the number of returned rmse values should be the same as max_iter
-    assert len(obj) <= max_iter, \
-           "Number of rmse values should be the same as max_iter"
+    assert (len(obj) <= max_iter), (
+           "Number of rmse values should be the same as max_iter")
     # the returned rmse values should be positive
     assert all(vals >= 0 for vals in obj), "rmse values should be positive"
