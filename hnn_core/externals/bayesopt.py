@@ -117,7 +117,6 @@ def bayes_opt(func, x0, cons, acquisition, maxfun=200,
 
 
 if __name__ == '__main__':
-    import numpy as np
     from scipy.optimize import rosen
 
     opt_params, obj_vals = bayes_opt(rosen,

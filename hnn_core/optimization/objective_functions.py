@@ -5,10 +5,6 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
-import numpy as np
-
-from scipy.signal import resample
-
 from hnn_core import simulate_dipole
 from ..dipole import _rmse
 
