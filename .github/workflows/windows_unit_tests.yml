@@ -40,7 +40,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8 pytest pytest-cov
           pip install psutil joblib
-          pip install --verbose .[gui]
+          pip install --verbose .[gui,opt]
       - name: Test with pytest
         shell: cmd
         run: |
