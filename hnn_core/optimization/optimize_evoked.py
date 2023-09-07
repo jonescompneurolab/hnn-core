@@ -279,8 +279,6 @@ def _optrun(drive_params_updated, drive_params_static, net, tstop, dt,
     -------
     avg_rmse: float
         Weighted RMSE between data in dpl and exp_dpl
-    avg_rmse_unweighted : float
-        Unweighted RMSE between data in dpl and exp_dpl
     """
     print("Optimization step %d, iteration %d" % (opt_params['cur_step'] + 1,
                                                   opt_params['optiter'] + 1))
@@ -358,7 +356,7 @@ def _optrun(drive_params_updated, drive_params_static, net, tstop, dt,
 
     opt_params['optiter'] += 1
 
-    return avg_rmse, avg_rmse_unweighted  # nlopt expects error
+    return avg_rmse
 
 
 def _run_optimization(maxiter, param_ranges, optrun):
