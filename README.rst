@@ -66,6 +66,13 @@ To check if everything worked fine, you can do::
 
 and it should not give any error messages.
 
+**Installing optimization dependencies**
+
+If you are using bayesian optimization, then scikit-learn is required. Install 
+hnn-core with scikit-learn using the following command::
+
+    $ pip install hnn_core[opt]
+
 **GUI installation**
 
 To install the GUI dependencies along with ``hnn-core``, a simple tweak to the above command is needed::
