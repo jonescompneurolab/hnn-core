@@ -371,7 +371,7 @@ def _run_optimization(maxiter, param_ranges, optrun):
             lambda x, idx=idx: param_ranges[param_name]['maxval'] - x[idx])
         cons.append(
             lambda x, idx=idx: x[idx] - param_ranges[param_name]['minval'])
-    result = fmin_cobyla(optrun, cons=cons, rhobeg=0.1, rhoend=1e-4,
+    result = fmin_cobyla(func=optrun, cons=cons, rhobeg=0.1, rhoend=1e-4,
                          x0=x0, maxfun=maxiter, catol=0.0)
     return result
 
