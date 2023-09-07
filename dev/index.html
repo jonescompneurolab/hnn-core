@@ -97,6 +97,7 @@
 <li><a class="reference internal" href="#dependencies">Dependencies</a></li>
 <li><a class="reference internal" href="#optional-dependencies">Optional dependencies</a><ul>
 <li><a class="reference internal" href="#gui">GUI</a></li>
+<li><a class="reference internal" href="#optimization">Optimization</a></li>
 <li><a class="reference internal" href="#parallel-processing">Parallel processing</a></li>
 </ul>
 </li>
@@ -184,6 +185,12 @@
 <li><p>voila (&lt;=0.3.6)</p></li>
 </ul>
 </section>
+<section id="optimization">
+<h3>Optimization<a class="headerlink" href="#optimization" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>scikit-learn</p></li>
+</ul>
+</section>
 <section id="parallel-processing">
 <h3>Parallel processing<a class="headerlink" href="#parallel-processing" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
@@ -218,6 +225,12 @@ because the pip installer works better with virtual environments such as the one
 </pre></div>
 </div>
 <p>and it should not give any error messages.</p>
+<p><strong>Installing optimization dependencies</strong></p>
+<p>If you are using bayesian optimization, then scikit-learn is required. Install
+hnn-core with scikit-learn using the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install hnn_core[opt]
+</pre></div>
+</div>
 <p><strong>GUI installation</strong></p>
 <p>To install the GUI dependencies along with <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>, a simple tweak to the above command is needed:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install hnn_core[gui]

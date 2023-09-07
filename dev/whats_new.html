@@ -208,6 +208,9 @@ instead of lists, by <a class="reference external" href="https://github.com/ryth
 <li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">write()</span></code> and <code class="xref py py-func docutils literal notranslate"><span class="pre">read_dipoles()</span></code>
 now support hdf5 format for read/write Dipole object, by
 <a class="reference external" href="https://github.com/raj1701">Rajat Partani</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/648">#648</a></p></li>
+<li><p>Add ability to optimize parameters associated with evoked drives and plot
+convergence. User can constrain parameter ranges and specify solver,
+by <a href="#id54"><span class="problematic" id="id55">`Carolina Fernandez Pujol`_</span></a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/652">#652</a></p></li>
 </ul>
 </section>
 </section>
@@ -217,7 +220,7 @@ now support hdf5 format for read/write Dipole object, by
 <h3>Changelog<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Add option to select drives using argument ‘which_drives’ in
-<a class="reference internal" href="generated/hnn_core.optimization.optimize_evoked.html#hnn_core.optimization.optimize_evoked" title="hnn_core.optimization.optimize_evoked"><code class="xref py py-func docutils literal notranslate"><span class="pre">optimize_evoked()</span></code></a>, by <a class="reference external" href="https://github.com/mohdsherif/">Mohamed A. Sherif</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/478">#478</a>.</p></li>
+<code class="xref py py-func docutils literal notranslate"><span class="pre">optimize_evoked()</span></code>, by <a class="reference external" href="https://github.com/mohdsherif/">Mohamed A. Sherif</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/478">#478</a>.</p></li>
 <li><p>Changed <code class="docutils literal notranslate"><span class="pre">conn_seed</span></code> default to <code class="docutils literal notranslate"><span class="pre">None</span></code> (from <code class="docutils literal notranslate"><span class="pre">3</span></code>) in <code class="xref py py-func docutils literal notranslate"><span class="pre">add_connection()</span></code>,
 by <a class="reference external" href="https://github.com/mjpelah">Mattan Pelah</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/492">#492</a>.</p></li>
 <li><p>Add interface to modify attributes of sections in
@@ -229,7 +232,7 @@ checkpoint belongs too, by <a class="reference external" href="https://github.co
 <li><p>Add warning if network drives are not loaded, by <a class="reference external" href="http://github.com/orbekolo/">Orsolya Beatrix Kolozsvari</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/516">#516</a></p></li>
 <li><p>Add ability to record voltages and synaptic currents from all sections in <a class="reference internal" href="generated/hnn_core.CellResponse.html#hnn_core.CellResponse" title="hnn_core.CellResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">CellResponse</span></code></a>,
 by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/502">#502</a>.</p></li>
-<li><p>Add ability to return unweighted RMSE for each optimization iteration in <a class="reference internal" href="generated/hnn_core.optimization.optimize_evoked.html#hnn_core.optimization.optimize_evoked" title="hnn_core.optimization.optimize_evoked"><code class="xref py py-func docutils literal notranslate"><span class="pre">optimize_evoked()</span></code></a>, by <a class="reference external" href="https://github.com/klankinen">Kaisu Lankinen</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/610">#610</a>.</p></li>
+<li><p>Add ability to return unweighted RMSE for each optimization iteration in <code class="xref py py-func docutils literal notranslate"><span class="pre">optimize_evoked()</span></code>, by <a class="reference external" href="https://github.com/klankinen">Kaisu Lankinen</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/610">#610</a>.</p></li>
 </ul>
 </section>
 <section id="id4">
@@ -273,7 +276,7 @@ type of Dipole, by <a class="reference external" href="https://github.com/raj170
 <ul class="simple">
 <li><p>Optimization of the evoked drives can be conducted on any <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a>
 template model by passing a <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> instance directly into
-<a class="reference internal" href="generated/hnn_core.optimization.optimize_evoked.html#hnn_core.optimization.optimize_evoked" title="hnn_core.optimization.optimize_evoked"><code class="xref py py-func docutils literal notranslate"><span class="pre">optimize_evoked()</span></code></a>. Simulations run during
+<code class="xref py py-func docutils literal notranslate"><span class="pre">optimize_evoked()</span></code>. Simulations run during
 optimization can now consist of multiple trials over which the simulated
 dipole is averaged, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/446">#446</a>.</p></li>
 <li><p><a class="reference internal" href="generated/hnn_core.viz.plot_dipole.html#hnn_core.viz.plot_dipole" title="hnn_core.viz.plot_dipole"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_dipole</span></code></a> now supports separate visualizations of different
@@ -363,7 +366,7 @@ drive cell, the number of which users can set when adding drives with <code clas
 <li><p>Drives in <code class="xref py py-attr docutils literal notranslate"><span class="pre">external_drives</span></code> no longer contain a <em class="xref py py-obj">‘conn’</em> key and the
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">connectivity</span></code> list contains more items when adding drives from a param
 file or when in legacy mode, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a>, <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a>, and <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/369">#369</a></p></li>
-<li><p>Add <a class="reference internal" href="generated/hnn_core.optimization.optimize_evoked.html#hnn_core.optimization.optimize_evoked" title="hnn_core.optimization.optimize_evoked"><code class="xref py py-func docutils literal notranslate"><span class="pre">optimize_evoked()</span></code></a> to optimize the timing and weights of driving
+<li><p>Add <code class="xref py py-func docutils literal notranslate"><span class="pre">optimize_evoked()</span></code> to optimize the timing and weights of driving
 inputs for simulating evoked responses, by <a class="reference external" href="https://github.com/blakecaldwell">Blake Caldwell</a> and <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/77">#77</a></p></li>
 <li><p>Add method for setting in-plane cell distances and layer separation in the network <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network.set_cell_positions" title="hnn_core.Network.set_cell_positions"><code class="xref py py-func docutils literal notranslate"><span class="pre">set_cell_positions()</span></code></a>, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/pull/370">#370</a></p></li>
 <li><p>External drives API now accepts probability argument for targetting subsets of cells,
