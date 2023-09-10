@@ -30,38 +30,98 @@ def write_network(net, fname, overwrite=True, save_unsimulated=False):
     %(overwrite)s
     %(save_unsimulated)s
 
-    Outputs
-    -------
-    A hdf5 file containing the Network object
+    Yields
+    ------
+    A hdf5 file containing the Network object.
 
     File Content Description
-    ------------------------
-    %(network_file_content_description)s
+    ~~~~~~~~~~~~~~~~~~~~~~~~
+    %(object_type)s
+    %(N_pyr_x)s
+    %(N_pyr_y)s
+    %(threshold)s
+    %(celsius)s
+    %(cell_types)s
+    %(gid_ranges)s
+    %(pos_dict)s
+    %(cell_response)s
+    %(external_drives)s
+    %(external_biases)s
+    %(connectivity)s
+    %(rec_arrays)s
+    %(delay)s
 
     cell type description
-    ---------------------
-    %(cell_description)s
+    ~~~~~~~~~~~~~~~~~~~~~
+    %(cell_name)s
+    %(pos)s
+    %(sections)s
+    %(synapses)s
+    %(cell_tree)s
+    %(sect_loc)s
+    %(gid)s
+    %(dipole_pp)s
+    %(vsec)s
+    %(isec)s
+    %(tonic_biases)s
+
+    section description
+    ~~~~~~~~~~~~~~~~~~~
+    %(L)s
+    %(diam)s
+    %(cm)s
+    %(Ra)s
+    %(end_pts)s
+    %(syns)s
+    %(mechs)s
 
     gid range description
-    ---------------------
-    %(gid_range_description)s
+    ~~~~~~~~~~~~~~~~~~~~~
+    %(start)s
+    %(stop)s
 
     external drive description
-    --------------------------
-    %(external_drive_description)s
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    %(drive_name)s
+    %(dynamics)s
+    %(location)s
+    %(cell_specific)s
+    %(weights_ampa)s
+    %(weights_nmda)s
+    %(probability)s
+    %(synaptic_delays)s
+    %(event_seed)s
+    %(conn_seed)s
+    %(n_drive_cells)s
+    %(events)s
 
     external bias description
-    -------------------------
-    %(external_bias_description)s
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
+    %(cell_type)s
+    %(amplitude)s
+    %(t0)s
+    %(tstop)s
 
     connection description
-    ----------------------
-    %(connection_description)s
+    ~~~~~~~~~~~~~~~~~~~~~~
+    %(target_types)s
+    %(target_gids)s
+    %(num_targets)s
+    %(src_type)s
+    %(src_gids)s
+    %(num_srcs)s
+    %(gid_pairs)s
+    %(loc)s
+    %(receptor)s
+    %(nc_dict)s
+    %(allow_autapses)s
+    %(connection_probability)s
 
     extracellular array description
-    -------------------------------
-    %(extracellular_array_description)s
-
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    %(positions)s
+    %(conductivity)s
+    %(method)s
     """
     if overwrite is False and os.path.exists(fname):
         raise FileExistsError('File already exists at path %s. Rename '
@@ -128,37 +188,98 @@ def read_network(fname, read_raw=False):
     %(fname)s
     %(read_raw)s
 
-    Outputs
-    -------
+    Yields
+    ------
     %(net)s
 
     File Content Description
-    ------------------------
-    %(network_file_content_description)s
+    ~~~~~~~~~~~~~~~~~~~~~~~~
+    %(object_type)s
+    %(N_pyr_x)s
+    %(N_pyr_y)s
+    %(threshold)s
+    %(celsius)s
+    %(cell_types)s
+    %(gid_ranges)s
+    %(pos_dict)s
+    %(cell_response)s
+    %(external_drives)s
+    %(external_biases)s
+    %(connectivity)s
+    %(rec_arrays)s
+    %(delay)s
 
     cell type description
-    ---------------------
-    %(cell_description)s
+    ~~~~~~~~~~~~~~~~~~~~~
+    %(cell_name)s
+    %(pos)s
+    %(sections)s
+    %(synapses)s
+    %(cell_tree)s
+    %(sect_loc)s
+    %(gid)s
+    %(dipole_pp)s
+    %(vsec)s
+    %(isec)s
+    %(tonic_biases)s
+
+    section description
+    ~~~~~~~~~~~~~~~~~~~
+    %(L)s
+    %(diam)s
+    %(cm)s
+    %(Ra)s
+    %(end_pts)s
+    %(syns)s
+    %(mechs)s
 
     gid range description
-    ---------------------
-    %(gid_range_description)s
+    ~~~~~~~~~~~~~~~~~~~~~
+    %(start)s
+    %(stop)s
 
     external drive description
-    --------------------------
-    %(external_drive_description)s
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    %(drive_name)s
+    %(dynamics)s
+    %(location)s
+    %(cell_specific)s
+    %(weights_ampa)s
+    %(weights_nmda)s
+    %(probability)s
+    %(synaptic_delays)s
+    %(event_seed)s
+    %(conn_seed)s
+    %(n_drive_cells)s
+    %(events)s
 
     external bias description
-    -------------------------
-    %(external_bias_description)s
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
+    %(cell_type)s
+    %(amplitude)s
+    %(t0)s
+    %(tstop)s
 
     connection description
-    ----------------------
-    %(connection_description)s
+    ~~~~~~~~~~~~~~~~~~~~~~
+    %(target_types)s
+    %(target_gids)s
+    %(num_targets)s
+    %(src_type)s
+    %(src_gids)s
+    %(num_srcs)s
+    %(gid_pairs)s
+    %(loc)s
+    %(receptor)s
+    %(nc_dict)s
+    %(allow_autapses)s
+    %(connection_probability)s
 
     extracellular array description
-    -------------------------------
-    %(extracellular_array_description)s
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    %(positions)s
+    %(conductivity)s
+    %(method)s
     """
     net_data = read_hdf5(fname)
     if 'object_type' not in net_data:
