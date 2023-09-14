@@ -7,7 +7,7 @@
 
 import numpy as np
 
-from .objective_functions import _rmse_evoked
+from .objective_functions import _rmse_evoked, _maximize_psd
 
 
 class Optimizer:
@@ -89,8 +89,10 @@ class Optimizer:
         # Response to be optimized
         if obj_fun == 'dipole_rmse':
             self.obj_fun = _rmse_evoked
+        elif obj_fun == 'maximize_psd':
+            self.obj_fun = _maximize_psd
         else:
-            raise ValueError("obj_fun must be 'dipole_rmse'")
+            raise ValueError("obj_fun must be 'dipole_rmse' or 'maximize_psd'")
         self.scale_factor = scale_factor
         self.smooth_window_len = smooth_window_len
         self.tstop = tstop
@@ -106,13 +108,18 @@ class Optimizer:
         name = self.__class__.__name__
         return f"<{name}\nsolver={self.solver}\nfit={is_fit}>"
 
-    def fit(self, target):
+    def fit(self, target=None, f_bands=None, weights=None):
         """Runs optimization routine.
 
         Parameters
         ----------
-        target : instance of Dipole
-            A dipole object with experimental data.
+        target : instance of Dipole, optional
+            A dipole object with experimental data. The default is None.
+        f_bands : list of tuples, optional
+            Lower and higher limit for each frequency band. The default is
+            None.
+        weights : tuple, optional
+            Weight for each frequency band. The default is None.
         """
 
         constraints = self._assemble_constraints(self.constraints)
@@ -125,9 +132,11 @@ class Optimizer:
                                               self.obj_fun,
                                               initial_params,
                                               self.max_iter,
-                                              target,
                                               self.scale_factor,
-                                              self.smooth_window_len)
+                                              self.smooth_window_len,
+                                              target,
+                                              f_bands,
+                                              weights)
 
         self.net_ = net_
         self.obj_ = obj
@@ -262,8 +271,9 @@ def _update_params(initial_params, predicted_params):
 
 
 def _run_opt_bayesian(initial_net, tstop, constraints, set_params, obj_fun,
-                      initial_params, max_iter, target, scale_factor=1.,
-                      smooth_window_len=None):
+                      initial_params, max_iter, scale_factor=1.,
+                      smooth_window_len=None, target=None, f_bands=None,
+                      weights=None):
     """Runs optimization routine with gp_minimize optimizer.
 
     Parameters
@@ -282,12 +292,16 @@ def _run_opt_bayesian(initial_net, tstop, constraints, set_params, obj_fun,
         Keys are parameter names, values are initial parameters.
     max_iter : int
         Number of calls the optimizer makes.
-    target : instance of Dipole
-        A dipole object with experimental data.
     scale_factor : float
         The dipole scale factor.
     smooth_window_len : float
         The smooth window length.
+    target : instance of Dipole, optional
+        A dipole object with experimental data. The default is None.
+    f_bands : list of tuples, optional
+        Lower and higher limit for each frequency band. The default is None.
+    weights : tuple, optional
+        Weight for each frequency band. The default is None.
 
     Returns
     -------
@@ -304,16 +318,18 @@ def _run_opt_bayesian(initial_net, tstop, constraints, set_params, obj_fun,
     obj_values = list()
 
     def _obj_func(predicted_params):
-        return obj_fun(initial_net,
-                       initial_params,
-                       set_params,
-                       predicted_params,
-                       _update_params,
-                       obj_values,
-                       scale_factor,
-                       smooth_window_len,
-                       target,
-                       tstop)
+        return obj_fun(initial_net=initial_net,
+                       initial_params=initial_params,
+                       set_params=set_params,
+                       predicted_params=predicted_params,
+                       update_params=_update_params,
+                       obj_values=obj_values,
+                       scale_factor=scale_factor,
+                       smooth_window_len=smooth_window_len,
+                       tstop=tstop,
+                       target=target,
+                       f_bands=f_bands,
+                       weights=weights)
 
     opt_results, _ = bayes_opt(func=_obj_func,
                                x0=list(initial_params.values()),
@@ -336,8 +352,9 @@ def _run_opt_bayesian(initial_net, tstop, constraints, set_params, obj_fun,
 
 
 def _run_opt_cobyla(initial_net, tstop, constraints, set_params, obj_fun,
-                    initial_params, max_iter, target, scale_factor=1.,
-                    smooth_window_len=None):
+                    initial_params, max_iter, scale_factor=1.,
+                    smooth_window_len=None, target=None, f_bands=None,
+                    weights=None):
     """Runs optimization routine with fmin_cobyla optimizer.
 
     Parameters
@@ -356,12 +373,16 @@ def _run_opt_cobyla(initial_net, tstop, constraints, set_params, obj_fun,
         Keys are parameter names, values are initial parameters.
     max_iter : int
         Number of calls the optimizer makes.
-    target : instance of Dipole
-        A dipole object with experimental data.
     scale_factor : float
         The dipole scale factor.
     smooth_window_len : float
         The smooth window length.
+    target : instance of Dipole, optional
+        A dipole object with experimental data. The default is None.
+    f_bands : list of tuples, optional
+        Lower and higher limit for each frequency band. The default is None.
+    weights : tuple, optional
+        Weight for each frequency band. The default is None.
 
     Returns
     -------
@@ -378,16 +399,18 @@ def _run_opt_cobyla(initial_net, tstop, constraints, set_params, obj_fun,
     obj_values = list()
 
     def _obj_func(predicted_params):
-        return obj_fun(initial_net,
-                       initial_params,
-                       set_params,
-                       predicted_params,
-                       _update_params,
-                       obj_values,
-                       scale_factor,
-                       smooth_window_len,
-                       target,
-                       tstop)
+        return obj_fun(initial_net=initial_net,
+                       initial_params=initial_params,
+                       set_params=set_params,
+                       predicted_params=predicted_params,
+                       update_params=_update_params,
+                       obj_values=obj_values,
+                       scale_factor=scale_factor,
+                       smooth_window_len=smooth_window_len,
+                       tstop=tstop,
+                       target=target,
+                       f_bands=f_bands,
+                       weights=weights)
 
     opt_results = fmin_cobyla(_obj_func,
                               cons=constraints,
