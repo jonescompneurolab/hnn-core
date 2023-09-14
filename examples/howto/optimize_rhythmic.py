@@ -4,8 +4,12 @@
 =========================================
 
 This example demonstrates how to optimize the power spectral density (PSD)
+<<<<<<< HEAD
 of a current dipole signal with significant alpha and beta spectral
 components.
+=======
+of a sensory evoked response in the alpha and beta frequency bands.
+>>>>>>> 72423f24 (add obj func for rhythmic drives, tests, and example)
 """
 
 # Authors: Carolina Fernandez <cxf418@miami.edu>
