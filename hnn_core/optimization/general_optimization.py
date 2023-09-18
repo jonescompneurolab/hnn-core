@@ -108,11 +108,7 @@ class Optimizer:
         name = self.__class__.__name__
         return f"<{name}\nsolver={self.solver}\nfit={is_fit}>"
 
-<<<<<<< HEAD
     def fit(self, target=None, f_bands=None, relative_bandpower=None):
-=======
-    def fit(self, target=None, f_bands=None, weights=None):
->>>>>>> 72423f24 (add obj func for rhythmic drives, tests, and example)
         """Runs optimization routine.
 
         Parameters
@@ -122,11 +118,7 @@ class Optimizer:
         f_bands : list of tuples, optional
             Lower and higher limit for each frequency band. The default is
             None.
-<<<<<<< HEAD
         relative_bandpower : tuple, optional
-=======
-        weights : tuple, optional
->>>>>>> 72423f24 (add obj func for rhythmic drives, tests, and example)
             Weight for each frequency band. The default is None.
         """
 
@@ -144,11 +136,7 @@ class Optimizer:
                                               self.smooth_window_len,
                                               target,
                                               f_bands,
-<<<<<<< HEAD
                                               relative_bandpower)
-=======
-                                              weights)
->>>>>>> 72423f24 (add obj func for rhythmic drives, tests, and example)
 
         self.net_ = net_
         self.obj_ = obj
@@ -285,11 +273,7 @@ def _update_params(initial_params, predicted_params):
 def _run_opt_bayesian(initial_net, tstop, constraints, set_params, obj_fun,
                       initial_params, max_iter, scale_factor=1.,
                       smooth_window_len=None, target=None, f_bands=None,
-<<<<<<< HEAD
                       relative_bandpower=None):
-=======
-                      weights=None):
->>>>>>> 72423f24 (add obj func for rhythmic drives, tests, and example)
     """Runs optimization routine with gp_minimize optimizer.
 
     Parameters
@@ -317,10 +301,14 @@ def _run_opt_bayesian(initial_net, tstop, constraints, set_params, obj_fun,
     f_bands : list of tuples, optional
         Lower and higher limit for each frequency band. The default is None.
 <<<<<<< HEAD
+<<<<<<< HEAD
     relative_bandpower : tuple, optional
 =======
     weights : tuple, optional
 >>>>>>> 72423f24 (add obj func for rhythmic drives, tests, and example)
+=======
+    relative_bandpower : tuple, optional
+>>>>>>> 35dd061b (rename variables, update example description)
         Weight for each frequency band. The default is None.
 
     Returns
@@ -349,11 +337,7 @@ def _run_opt_bayesian(initial_net, tstop, constraints, set_params, obj_fun,
                        tstop=tstop,
                        target=target,
                        f_bands=f_bands,
-<<<<<<< HEAD
                        relative_bandpower=relative_bandpower)
-=======
-                       weights=weights)
->>>>>>> 72423f24 (add obj func for rhythmic drives, tests, and example)
 
     opt_results, _ = bayes_opt(func=_obj_func,
                                x0=list(initial_params.values()),
@@ -378,11 +362,7 @@ def _run_opt_bayesian(initial_net, tstop, constraints, set_params, obj_fun,
 def _run_opt_cobyla(initial_net, tstop, constraints, set_params, obj_fun,
                     initial_params, max_iter, scale_factor=1.,
                     smooth_window_len=None, target=None, f_bands=None,
-<<<<<<< HEAD
                     relative_bandpower=None):
-=======
-                    weights=None):
->>>>>>> 72423f24 (add obj func for rhythmic drives, tests, and example)
     """Runs optimization routine with fmin_cobyla optimizer.
 
     Parameters
@@ -409,11 +389,7 @@ def _run_opt_cobyla(initial_net, tstop, constraints, set_params, obj_fun,
         A dipole object with experimental data. The default is None.
     f_bands : list of tuples, optional
         Lower and higher limit for each frequency band. The default is None.
-<<<<<<< HEAD
     relative_bandpower : tuple, optional
-=======
-    weights : tuple, optional
->>>>>>> 72423f24 (add obj func for rhythmic drives, tests, and example)
         Weight for each frequency band. The default is None.
 
     Returns
@@ -442,11 +418,7 @@ def _run_opt_cobyla(initial_net, tstop, constraints, set_params, obj_fun,
                        tstop=tstop,
                        target=target,
                        f_bands=f_bands,
-<<<<<<< HEAD
                        relative_bandpower=relative_bandpower)
-=======
-                       weights=weights)
->>>>>>> 72423f24 (add obj func for rhythmic drives, tests, and example)
 
     opt_results = fmin_cobyla(_obj_func,
                               cons=constraints,
