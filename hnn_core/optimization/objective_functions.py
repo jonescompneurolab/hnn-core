@@ -85,7 +85,7 @@ def _maximize_psd(initial_net, initial_params, set_params, predicted_params,
         The simulated dipole's duration.
     f_bands : list of tuples
         Lower and higher limit for each frequency band.
-    weights : tuple
+    relative_bandpower : tuple
         Weight for each frequency band.
 
     Returns
@@ -121,7 +121,7 @@ def _maximize_psd(initial_net, initial_params, set_params, predicted_params,
     for idx, f_band in enumerate(kwargs['f_bands']):
         f_band_idx = np.where(np.logical_and(freqs_simulated >= f_band[0],
                                              freqs_simulated <= f_band[1]))[0]
-        f_bands_psds.append((-kwargs['weights'][idx] * sum(
+        f_bands_psds.append((-kwargs['relative_bandpower'][idx] * sum(
             psd_simulated[f_band_idx])) / sum(psd_simulated))
 
     # grand sum
