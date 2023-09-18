@@ -188,7 +188,7 @@ def test_rhythmic(solver):
     # test repr before fitting
     assert 'fit=False' in repr(optim), "optimizer is already fit"
 
-    optim.fit(f_bands=[(8, 12), (18, 22)], weights=(1, 2))
+    optim.fit(f_bands=[(8, 12), (18, 22)], relative_bandpower=(1, 2))
 
     # test repr after fitting
     assert 'fit=True' in repr(optim), "optimizer was not fit"
