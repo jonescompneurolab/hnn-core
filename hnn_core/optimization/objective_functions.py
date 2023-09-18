@@ -86,6 +86,7 @@ def _maximize_psd(initial_net, initial_params, set_params, predicted_params,
     f_bands : list of tuples
         Lower and higher limit for each frequency band.
     relative_bandpower : tuple
+        Weight for each frequency band.
 
     Returns
     -------
