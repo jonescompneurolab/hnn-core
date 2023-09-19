@@ -281,6 +281,9 @@ def read_network(fname, read_raw=False):
     %(conductivity)s
     %(method)s
     """
+    # Importing Network.
+    # Cannot do this globally due to circular import.
+    from .network import Network
     net_data = read_hdf5(fname)
     if 'object_type' not in net_data:
         raise NameError('The given file is not compatible. '
@@ -297,8 +300,6 @@ def read_network(fname, read_raw=False):
     params['threshold'] = net_data['threshold']
 
     # Instantiating network
-    # Cannot do this globally due to circular import
-    from .network import Network
     net = Network(params)
 
     # Setting attributes
