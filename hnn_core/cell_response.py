@@ -136,7 +136,9 @@ class CellResponse(object):
                        for trial in other._spike_times]
         return (times_self == times_other and
                 self._spike_gids == other._spike_gids and
-                self._spike_types == other._spike_types)
+                self._spike_types == other._spike_types and
+                self.vsec == other.vsec and
+                self.isec == other.isec)
 
     def __getitem__(self, gid_item):
         """Returns a CellResponse object with a copied subset filtered by gid.
