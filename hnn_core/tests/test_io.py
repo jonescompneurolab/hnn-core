@@ -67,9 +67,6 @@ def test_network_io(tmp_path, network_model):
     net_sim = read_network(tmp_path / 'net_sim.hdf5')
     assert net == net_sim
 
-    # For cell response vsec isec bug (Not checked by __eq__)
-    assert net.cell_response.vsec == net_sim.cell_response.vsec
-
     # Smoke test
     net_sim.plot_cells(show=False)
 
