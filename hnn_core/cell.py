@@ -239,7 +239,7 @@ class Section:
         # Check end_pts
         for self_end_pt, other_end_pt in zip(self.end_pts, other.end_pts):
             if np.testing.assert_almost_equal(self_end_pt,
-                                              other_end_pt, 5) != None:
+                                              other_end_pt, 5) is not None:
                 return False
 
         # Check all other attributes
