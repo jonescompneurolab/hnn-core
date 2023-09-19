@@ -171,16 +171,6 @@ isec : dict
 """
 
 docdict[
-    "isec"
-] = """
-isec : dict
-    Contains recording of section specific currents indexed
-    by synapse type (keys can be soma_gabaa, soma_gabab etc.).
-    Must be enabled by running simulate_dipole(net, record_isec=True)
-    or simulate_dipole(net, record_isoma=True).
-"""
-
-docdict[
     "tonic_biases"
 ] = """
 tonic_biases : list of h.IClamp
