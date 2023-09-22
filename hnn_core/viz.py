@@ -1498,7 +1498,7 @@ class NetworkPlotter:
 
     @time_idx.setter
     def time_idx(self, time_idx):
-        _validate_type(time_idx, int, 'time_idx')
+        _validate_type(time_idx, (int, np.integer), 'time_idx')
         self._time_idx = time_idx
         self.update_section_voltages(self._time_idx)
 
