@@ -1330,6 +1330,7 @@ class NetworkPlotter:
             self.ax = self.fig.add_subplot(projection='3d')
             self.ax.set_facecolor(self._bg_color)
         else:
+            self.ax = ax
             self.fig = None
         self._init_network_plot()
         self._update_axes()
