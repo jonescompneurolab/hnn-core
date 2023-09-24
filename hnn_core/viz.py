@@ -1287,7 +1287,20 @@ class NetworkPlotter:
         import matplotlib.pyplot as plt
         from matplotlib import colormaps
         self.net = net
-        self.times = net.cell_response.times
+
+        # Check if network simulated
+        if net.cell_response is not None:
+            self.times = net.cell_response.times
+
+            # Check if voltage recorded
+            if net._params['record_vsec'] == 'all':
+                self._vsec_recorded = True
+            else:
+                self._vsec_recorded = False
+        else:
+            self._is_simulated = False
+            self._vsec_recorded = False
+            self.times = None
 
         _validate_type(vmin, (int, float), 'vmin')
         _validate_type(vmax, (int, float), 'vmax')
@@ -1340,19 +1353,24 @@ class NetworkPlotter:
         for cell_type in self.net.cell_types:
             gid_range = self.net.gid_ranges[cell_type]
             for gid in gid_range:
-
                 cell = self.net.cell_types[cell_type]
-
                 for sec_name in cell.sections.keys():
-                    vsec = np.array(self.net.cell_response.vsec[
-                        self.trial_idx][gid][sec_name])
-                    vsec_list.append(vsec)
+                    if self._vsec_recorded is True:
+                        vsec = np.array(self.net.cell_response.vsec[
+                            self.trial_idx][gid][sec_name])
+                        vsec_list.append(vsec)
+                    else:  # Populate with zeros if no voltage recording
+                        vsec_list.append([0.0])
 
         vsec_array = np.vstack(vsec_list)
         vsec_array = (vsec_array - self.vmin) / (self.vmax - self.vmin)
         return vsec_array
 
     def update_section_voltages(self, t_idx):
+        if not self._vsec_recorded:
+            raise RuntimeError("Network must be simulated with"
+                               "`simulate_dipole(record_vsec='all')` before"
+                               "plotting voltages.")
         color_list = self.color_array[:, t_idx]
         for line, color in zip(self.ax.lines, color_list):
             line.set_color(color)
@@ -1401,6 +1419,10 @@ class NetworkPlotter:
             Movie writer, default: 'ffmpeg'
         """
         import matplotlib.animation as animation
+
+        if not self._vsec_recorded:
+            raise RuntimeError('Network must be simulated before'
+                               'plotting voltages.')
         if frame_stop is None:
             frame_stop = len(self.times) - 1
 
