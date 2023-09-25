@@ -265,7 +265,8 @@ def test_dipole_visualization():
 
     # Simulate with record_vsec='all' to test voltage plotting
     net = jones_2009_model(params)
-    _ = simulate_dipole(net, dt=0.5, tstop=10, record_vsec='all')
+    _ = simulate_dipole(net, dt=0.5, tstop=10, n_trials=2,
+                        record_vsec='all')
     net_plot = NetworkPlotter(net)
 
     assert net_plot.vsec_array.shape == (159, 21)
@@ -300,7 +301,7 @@ def test_dipole_visualization():
     net_plot.azim = 10
     net_plot.vmin = 0
     net_plot.vmax = 100
-    net_plot.trial_idx = 0
+    net_plot.trial_idx = 1
     net_plot.time_idx = 5
     net_plot.bgcolor = 'white'
     net_plot.voltage_colormap = 'jet'
@@ -313,7 +314,7 @@ def test_dipole_visualization():
     assert net_plot.azim == 10
     assert net_plot.vmin == 0
     assert net_plot.vmax == 100
-    assert net_plot.trial_idx == 0
+    assert net_plot.trial_idx == 1
     assert net_plot.time_idx == 5
 
     assert net_plot.bgcolor == 'white'
