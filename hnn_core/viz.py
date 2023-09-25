@@ -1298,7 +1298,6 @@ class NetworkPlotter:
             else:
                 self._vsec_recorded = False
         else:
-            self._is_simulated = False
             self._vsec_recorded = False
             self.times = None
 
