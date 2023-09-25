@@ -1366,7 +1366,7 @@ class NetworkPlotter:
         vsec_array = (vsec_array - self.vmin) / (self.vmax - self.vmin)
         return vsec_array
 
-    def update_section_voltages(self, t_idx):
+    def _update_section_voltages(self, t_idx):
         if not self._vsec_recorded:
             raise RuntimeError("Network must be simulated with"
                                "`simulate_dipole(record_vsec='all')` before"
@@ -1398,7 +1398,7 @@ class NetworkPlotter:
 
     def export_movie(self, fname, fps=30, dpi=300, decim=10,
                      interval=30, frame_start=0, frame_stop=None,
-                     writer='ffmpeg'):
+                     writer='pillow'):
         """Export movie of network activity
         fname : str
             Filename of exported movie
@@ -1416,13 +1416,16 @@ class NetworkPlotter:
             Index of last frame, default: None
             If None, entire simulation is animated
         writer : str
-            Movie writer, default: 'ffmpeg'
+            Movie writer, default: 'pillow'.
+            Alternative movie writers can be found at
+            https://matplotlib.org/stable/api/animation_api.html
         """
         import matplotlib.animation as animation
 
         if not self._vsec_recorded:
-            raise RuntimeError('Network must be simulated before'
-                               'plotting voltages.')
+            raise RuntimeError("Network must be simulated with"
+                               "`simulate_dipole(record_vsec='all')` before"
+                               "plotting voltages.")
         if frame_stop is None:
             frame_stop = len(self.times) - 1
 
@@ -1529,7 +1532,7 @@ class NetworkPlotter:
     def time_idx(self, time_idx):
         _validate_type(time_idx, (int, np.integer), 'time_idx')
         self._time_idx = time_idx
-        self.update_section_voltages(self._time_idx)
+        self._update_section_voltages(self._time_idx)
 
     # Callable update function for making animations
     def _set_time_idx(self, time_idx):
