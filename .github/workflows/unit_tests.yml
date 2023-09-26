@@ -27,7 +27,6 @@ jobs:
           if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
             sudo add-apt-repository ppa:ubuntu-toolchain-r/test
             sudo apt-get update
-            sudo apt-get install libopenmpi-dev openmpi-bin
           fi;
       - name: Install dependencies
         shell: bash -el {0}
