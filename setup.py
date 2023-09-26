@@ -109,7 +109,7 @@ if __name__ == "__main__":
               'gui': ['ipywidgets <=7.7.1', 'ipympl<0.9', 'voila<=0.3.6'],
               'opt': ['scikit-learn']
           },
-          python_requires='>=3.7',
+          python_requires='>=3.8',
           packages=find_packages(),
           package_data={'hnn_core': [
               'param/*.json',
