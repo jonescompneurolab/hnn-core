@@ -1400,8 +1400,8 @@ class Network(object):
         return plot_cells(net=self, ax=ax, show=show)
 
     @copy_doc(write_network)
-    def write(self, fname, overwrite=True, save_unsimulated=False):
-        write_network(self, fname, overwrite, save_unsimulated)
+    def write(self, fname, overwrite=True, write_output=True):
+        write_network(self, fname, overwrite, write_output)
 
 
 class _Connectivity(dict):
