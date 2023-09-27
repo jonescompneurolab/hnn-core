@@ -117,7 +117,6 @@ html_theme_options = {
         ("Examples", "auto_examples/index"),
         ("GUI", "gui/index"),
         ("API", "api"),
-        ("Network File", "network_file_desc"),
         ("Glossary", "glossary"),
         ("What's new", "whats_new"),
         ("GitHub", "https://github.com/jonescompneurolab/hnn-core", True)
