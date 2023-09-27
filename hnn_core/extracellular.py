@@ -538,6 +538,13 @@ class ExtracellularArray:
         return fig
 
     def to_dict(self):
+        """Converts an object of ExtracellularArray class to a
+        dictionary.
+
+        Returns
+        -------
+        dictionary form of an object of ExtracellularArray class.
+        """
         rec_array_data = dict()
         rec_array_data['positions'] = self.positions
         rec_array_data['conductivity'] = self.conductivity

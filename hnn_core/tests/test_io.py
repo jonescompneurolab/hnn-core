@@ -36,6 +36,9 @@ def test_network_io(tmp_path, network_model):
     net_copy = net.copy()
     assert net_copy == net
 
+    # Test other not NotImplemented for Network Class
+    assert (net == "net") is False
+
     # Adding electrode arrays
     electrode_pos = (1, 2, 3)
     net.add_electrode_array('el1', electrode_pos)
@@ -70,8 +73,8 @@ def test_network_io(tmp_path, network_model):
     # Smoke test
     net_sim.plot_cells(show=False)
 
-    # Checking Saving unsimulated network
-    net.write(tmp_path / 'net_unsim.hdf5', save_unsimulated=True)
+    # Checking Saving network without simulation results.
+    net.write(tmp_path / 'net_unsim.hdf5', write_output=False)
     net_unsim_read = read_network(tmp_path / 'net_unsim.hdf5')
     net_unsim = net.copy()
     net_unsim.cell_response = None
@@ -91,7 +94,7 @@ def test_network_io(tmp_path, network_model):
 
     # Checking reading of raw network
     net_raw = read_network(tmp_path / 'net_sim.hdf5',
-                           read_raw=True)
+                           read_output=False)
     assert net_raw == net_unsim
     # Checking simulation correctness of read raw network
     dpls4 = simulate_dipole(net_raw, tstop=2, n_trials=1, dt=0.5)
@@ -118,5 +121,10 @@ def test_network_io(tmp_path, network_model):
     with pytest.raises(ValueError,
                        match="The object should be of type Network."):
         read_network(tmp_path / 'not_net.hdf5')
+
+    # Checking read_drives=False
+    net_no_drives = read_network(tmp_path / 'net.hdf5', read_output=False,
+                                 read_drives=False)
+    assert len(net_no_drives.external_drives) == 0
 
     # Add test to check weights are equal in connections and drives (todo)

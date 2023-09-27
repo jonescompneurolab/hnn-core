@@ -108,6 +108,13 @@ def test_cell():
 
     # Testing update end pts using template cell
     cell1 = pyramidal(cell_name='L5Pyr')
+
+    # Test other not NotImplemented for Cell Class
+    assert (cell1 == "cell") is False
+
+    # Test other not NotImplemented for Section Class
+    assert (cell1.sections['soma'] == "section") is False
+
     end_pts_original = list()
     end_pts_new = list()
     for sec_name in cell1.sections.keys():

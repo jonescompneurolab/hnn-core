@@ -33,6 +33,9 @@ def test_extracellular_api():
     assert len(net.rec_arrays) == 2
     assert len(net.rec_arrays['arr1'].positions) == 2
 
+    # Test other not NotImplemented for ExtracellularArray Class
+    assert (net.rec_arrays['arr1'] == "extArr") is False
+
     # ensure unique names
     pytest.raises(ValueError, net.add_electrode_array, 'arr1', [(6, 6, 800)])
     # all remaining input arguments checked by ExtracellularArray

@@ -254,6 +254,12 @@ class Section:
         return True
 
     def to_dict(self):
+        """Converts an object of Section class to a dictionary.
+
+        Returns
+        -------
+        dictionary form of an object of Section class.
+        """
         section_data = dict()
         section_data['L'] = self.L
         section_data['diam'] = self.diam
@@ -426,6 +432,12 @@ class Cell:
         return True
 
     def to_dict(self):
+        """Converts an object of Cell class to a dictionary.
+
+        Returns
+        -------
+        dictionary form of an object of Cell class.
+        """
         cell_data = dict()
         cell_data['name'] = self.name
         cell_data['pos'] = self.pos
