@@ -357,11 +357,20 @@ class ExtracellularArray:
     def __eq__(self, other):
         if not isinstance(other, ExtracellularArray):
             return NotImplemented
-        if not (self.positions == other.positions and
-                self.conductivity == other.conductivity and
-                self.method == other.method and
-                self.min_distance == other.min_distance and
-                (self.times == other.times).all() and
+        
+        all_attrs = dir(self)
+        attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
+        attrs_to_ignore.extend(['conductivity', 'copy', 'n_contacts',
+                                'plot_csd', 'plot_lfp', 'sfreq', 'smooth',
+                                'voltages', 'to_dict', 'times', 'voltages'])
+        attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
+
+        # Check all other attributes
+        for attr in attrs_to_check:
+            if getattr(self, attr) != getattr(other, attr):
+                return False
+
+        if not ((self.times == other.times).all() and
                 (self.voltages == other.voltages).all()):
             return False
 

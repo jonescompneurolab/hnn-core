@@ -241,15 +241,16 @@ class Section:
             if np.testing.assert_almost_equal(self_end_pt,
                                               other_end_pt, 5) is not None:
                 return False
+        
+        all_attrs = dir(self)
+        attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
+        attrs_to_ignore.extend(['end_pts', 'mechs', 'to_dict'])
+        attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
 
         # Check all other attributes
-        if (self.L != other.L or
-           self.diam != other.diam or
-           self.Ra != other.Ra or
-           self.cm != other.cm or
-           self.nseg != other.nseg or
-           self.syns != other.syns):
-            return False
+        for attr in attrs_to_check:
+            if getattr(self, attr) != getattr(other, attr):
+                return False
 
         return True
 
@@ -411,16 +412,21 @@ class Cell:
     def __eq__(self, other):
         if not isinstance(other, Cell):
             return NotImplemented
-        if not (self.name == other.name and
-                self.pos == other.pos and
-                self.synapses == other.synapses and
-                self.cell_tree == other.cell_tree and
-                self.sect_loc == other.sect_loc and
-                self.dipole_pp == other.dipole_pp and
-                self.vsec == other.vsec and
-                self.isec == other.isec and
-                self.tonic_biases == other.tonic_biases):
-            return False
+        
+        all_attrs = dir(self)
+        attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
+        attrs_to_ignore.extend(['build', 'copy', 'create_tonic_bias',
+                                'define_shape', 'distance_section', 'gid',
+                                'list_IClamp', 'modify_section',
+                                'parconnect_from_src', 'plot_morphology',
+                                'record', 'sections', 'setup_source_netcon',
+                                'syn_create', 'to_dict'])
+        attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
+
+        # Check all other attributes
+        for attr in attrs_to_check:
+            if getattr(self, attr) != getattr(other, attr):
+                return False
 
         if not (self.sections.keys() == other.sections.keys()):
             return False
