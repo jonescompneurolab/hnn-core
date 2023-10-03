@@ -1,7 +1,7 @@
-from functools import partial
 import os.path as op
 
 import matplotlib
+from matplotlib import backend_bases
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_allclose
@@ -19,8 +19,11 @@ matplotlib.use('agg')
 def _fake_click(fig, ax, point, button=1):
     """Fake a click at a point within axes."""
     x, y = ax.transData.transform_point(point)
-    func = partial(fig.canvas.button_press_event, x=x, y=y, button=button)
-    func(guiEvent=None)
+    button_press_event = backend_bases.MouseEvent(
+        name='button_press_event', canvas=fig.canvas,
+        x=x, y=y, button=button
+    )
+    fig.canvas.callbacks.process('button_press_event', button_press_event)
 
 
 def test_network_visualization():
