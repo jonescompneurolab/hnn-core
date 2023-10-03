@@ -18,6 +18,9 @@ Changelog
 - Add ability to manually define colors in spike histogram plots,
   by `Nick Tolley`_ in :gh:`640`
 
+- Update minimum supported version of Python to 3.8, by `Ryan Thorpe`_ in
+  :gh:`678`.
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
