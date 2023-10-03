@@ -22,8 +22,9 @@ studies [1]_, [2]_.
 
 ###############################################################################
 # First, we will import the packages needed for computing the inverse solution
-# from the MNE somatosensory dataset. `MNE`_ can be installed with
-# ``pip install mne``, and the somatosensory dataset can be downloaded by
+# from the MNE somatosensory dataset. `MNE`_ (and its dependency `NiBabel`_)
+# can be installed with ``pip install mne nibabel``
+# The somatosensory dataset can be downloaded by
 # importing ``somato`` from ``mne.datasets``.
 import os.path as op
 import matplotlib.pyplot as plt
@@ -271,6 +272,7 @@ net.cell_response.plot_spikes_raster(ax=axes[2])
 # .. LINKS
 #
 # .. _MNE: https://mne.tools/
+# .. _NiBabel: https://nipy.org/nibabel/
 # .. _HNN ERP tutorial: https://jonescompneurolab.github.io/hnn-tutorials/erp/erp
 # .. _this MNE-python example: https://mne.tools/stable/auto_examples/inverse/plot_label_source_activations.html
 # .. |mne_label_fig| image:: https://user-images.githubusercontent.com/20212206/106524603-cfe75c80-64b0-11eb-9607-3415195c3e7a.png
