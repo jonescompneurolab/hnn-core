@@ -3,24 +3,21 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>05. Optimize simulated evoked response parameters &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/sphinx_highlight.js"></script>
-    <script src="../../_static/clipboard.min.js"></script>
-    <script src="../../_static/copybutton.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=9afac83c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=fd10adb8"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -154,7 +151,7 @@ to download the full example code or to run this example in your browser via Bin
 <span id="sphx-glr-auto-examples-howto-optimize-evoked-py"></span><h1>05. Optimize simulated evoked response parameters<a class="headerlink" href="#optimize-simulated-evoked-response-parameters" title="Permalink to this heading">¶</a></h1>
 <p>This example demonstrates how to optimize the parameters
 of the model simulation to match an experimental dipole waveform.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Authors: Carolina Fernandez &lt;cxf418@miami.edu&gt;</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Authors: Carolina Fernandez &lt;cxf418@miami.edu&gt;</span>
 <span class="c1">#          Nick Tolley &lt;nicholas_tolley@brown.edu&gt;</span>
 <span class="c1">#          Ryan Thorpe &lt;ryan_thorpe@brown.edu&gt;</span>
 <span class="c1">#          Mainak Jas &lt;mjas@mgh.harvard.edu&gt;</span>
@@ -165,7 +162,7 @@ of the model simulation to match an experimental dipole waveform.</p>
 </pre></div>
 </div>
 <p>Let us import hnn_core</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hnn_core</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hnn_core</span>
 <span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <span class="p">(</span><span class="n">MPIBackend</span><span class="p">,</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">,</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">,</span>
                       <a href="../../generated/hnn_core.read_dipole.html#hnn_core.read_dipole" title="hnn_core.read_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">read_dipole</span></a><span class="p">)</span>
 
@@ -179,7 +176,7 @@ of the model simulation to match an experimental dipole waveform.</p>
 <p>This is a different experiment than the one to which the base parameters were
 tuned. So, the initial RMSE will be large, giving the optimization procedure
 a lot to work with.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <a href="https://docs.python.org/3/library/urllib.request.html#urllib.request.urlretrieve" title="urllib.request.urlretrieve" class="sphx-glr-backref-module-urllib-request sphx-glr-backref-type-py-function"><span class="n">urlretrieve</span></a>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <a href="https://docs.python.org/3/library/urllib.request.html#urllib.request.urlretrieve" title="urllib.request.urlretrieve" class="sphx-glr-backref-module-urllib-request sphx-glr-backref-type-py-function"><span class="n">urlretrieve</span></a>
 
 <span class="n">data_url</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/jonescompneurolab/hnn/master/&#39;</span>
             <span class="s1">&#39;data/MEG_detection_data/S1_SupraT.txt&#39;</span><span class="p">)</span>
@@ -188,7 +185,7 @@ a lot to work with.</p>
 </pre></div>
 </div>
 <p>Let’s then simulate the dipole with some initial parameters.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tstop</span> <span class="o">=</span> <span class="n">exp_dpl</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">tstop</span> <span class="o">=</span> <span class="n">exp_dpl</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 <span class="n">scale_factor</span> <span class="o">=</span> <span class="mi">3000</span>
 <span class="n">smooth_window_len</span> <span class="o">=</span> <span class="mi">30</span>
 
@@ -251,7 +248,7 @@ a lot to work with.</p>
 modify the network drive parameters. The function will take in the Network
 object with no attached drives, and a dictionary of the paramters we wish to
 optimize.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
 
     <span class="c1"># Proximal 1</span>
     <span class="n">net</span><span class="o">.</span><span class="n">add_evoked_drive</span><span class="p">(</span><span class="s1">&#39;evprox1&#39;</span><span class="p">,</span>
@@ -306,7 +303,7 @@ tuple is the lower bound and the second value is the upper bound for the
 corresponding parameter.</p>
 <p>The following synaptic weight parameter ranges (units of micro-siemens)
 were chosen so as to keep the model in physiologically realistic regimes.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">constraints</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">({</span><span class="s1">&#39;evprox2_ampa_L2_basket&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">1.</span><span class="p">),</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">constraints</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">({</span><span class="s1">&#39;evprox2_ampa_L2_basket&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">1.</span><span class="p">),</span>
                     <span class="s1">&#39;evprox2_ampa_L2_pyramidal&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">1.</span><span class="p">),</span>
                     <span class="s1">&#39;evprox2_ampa_L5_basket&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">1.</span><span class="p">),</span>
                     <span class="s1">&#39;evprox2_ampa_L5_pyramidal&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">1.</span><span class="p">),</span>
@@ -319,10 +316,10 @@ were chosen so as to keep the model in physiologically realistic regimes.</p>
 </pre></div>
 </div>
 <p>Now we define and fit the optimizer.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hnn_core.optimization</span> <span class="kn">import</span> <span class="n">Optimizer</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hnn_core.optimization</span> <span class="kn">import</span> <a href="../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer" title="hnn_core.optimization.Optimizer" class="sphx-glr-backref-module-hnn_core-optimization sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Optimizer</span></a>
 
 <span class="n">net</span> <span class="o">=</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">()</span>
-<span class="n">optim</span> <span class="o">=</span> <span class="n">Optimizer</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>
+<span class="n">optim</span> <span class="o">=</span> <a href="../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer" title="hnn_core.optimization.Optimizer" class="sphx-glr-backref-module-hnn_core-optimization sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Optimizer</span></a><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>
                   <span class="n">set_params</span><span class="o">=</span><span class="n">set_params</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">,</span>
                   <span class="n">smooth_window_len</span><span class="o">=</span><span class="n">smooth_window_len</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
 <span class="k">with</span> <span class="n">MPIBackend</span><span class="p">(</span><span class="n">n_procs</span><span class="o">=</span><span class="n">n_procs</span><span class="p">,</span> <span class="n">mpi_cmd</span><span class="o">=</span><span class="s1">&#39;mpiexec&#39;</span><span class="p">):</span>
@@ -331,7 +328,7 @@ were chosen so as to keep the model in physiologically realistic regimes.</p>
 </div>
 <p>Finally, we can plot the experimental data alongside the post-optimization
 simulation dipole as well as the convergence plot.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">MPIBackend</span><span class="p">(</span><span class="n">n_procs</span><span class="o">=</span><span class="n">n_procs</span><span class="p">,</span> <span class="n">mpi_cmd</span><span class="o">=</span><span class="s1">&#39;mpiexec&#39;</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">MPIBackend</span><span class="p">(</span><span class="n">n_procs</span><span class="o">=</span><span class="n">n_procs</span><span class="p">,</span> <span class="n">mpi_cmd</span><span class="o">=</span><span class="s1">&#39;mpiexec&#39;</span><span class="p">):</span>
     <span class="n">opt_dpl</span> <span class="o">=</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">(</span><span class="n">optim</span><span class="o">.</span><span class="n">net_</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">opt_dpl</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">scale_factor</span><span class="p">)</span>
 <span class="n">opt_dpl</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">smooth_window_len</span><span class="p">)</span>
@@ -348,16 +345,15 @@ simulation dipole as well as the convergence plot.</p>
 <span class="n">fig1</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">plot_convergence</span><span class="p">()</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.000 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-optimize-evoked-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/optimize_evoked.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" width="150px" /></a>
 </div>
-<div class="sphx-glr-download sphx-glr-download-python docutils container">
-<p><a class="reference download internal" download="" href="../../_downloads/22d5db970aab05efd15642829d022260/optimize_evoked.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">optimize_evoked.py</span></code></a></p>
-</div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/4fb7f4980e22706b9bee1e0b5ead0f51/optimize_evoked.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">optimize_evoked.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/22d5db970aab05efd15642829d022260/optimize_evoked.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">optimize_evoked.py</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
@@ -376,7 +372,7 @@ simulation dipole as well as the convergence plot.</p>
     </p>
     <p>
         &copy; Copyright 2023, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
     </p>
   </div>
 </footer>

@@ -26,7 +26,7 @@ This example demonstrates how to modify the network connectivity.
 
 .. GENERATED FROM PYTHON SOURCE LINES 8-15
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # Author: Nick Tolley <nicholas_tolley@brown.edu>
@@ -48,7 +48,7 @@ Let us import ``hnn_core``.
 
 .. GENERATED FROM PYTHON SOURCE LINES 17-21
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import hnn_core
@@ -72,7 +72,7 @@ predefined drives without the drives API shown previously).
 
 .. GENERATED FROM PYTHON SOURCE LINES 28-30
 
-.. code-block:: default
+.. code-block:: Python
 
     net_erp = jones_2009_model(add_drives_from_params=True)
 
@@ -96,7 +96,7 @@ of ``net.connectivity`` that match the provided parameters.
 
 .. GENERATED FROM PYTHON SOURCE LINES 39-56
 
-.. code-block:: default
+.. code-block:: Python
 
     from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
     from hnn_core.network import pick_connection
@@ -159,7 +159,7 @@ a simulation is using :meth:`~hnn_core.Cell_Response.plot_spikes_raster`
 
 .. GENERATED FROM PYTHON SOURCE LINES 60-63
 
-.. code-block:: default
+.. code-block:: Python
 
     dpl_erp = simulate_dipole(net_erp, tstop=170., n_trials=1)
     net_erp.cell_response.plot_spikes_raster()
@@ -216,7 +216,7 @@ directly.
 
 .. GENERATED FROM PYTHON SOURCE LINES 73-101
 
-.. code-block:: default
+.. code-block:: Python
 
     def get_network(probability=1.0):
         net = jones_2009_model(add_drives_from_params=True)
@@ -286,7 +286,7 @@ network with a 10% chance of cells connecting to each other.
 
 .. GENERATED FROM PYTHON SOURCE LINES 105-108
 
-.. code-block:: default
+.. code-block:: Python
 
     net_sparse = get_network(probability=0.1)
     dpl_sparse = simulate_dipole(net_sparse, tstop=170., n_trials=1)
@@ -333,7 +333,7 @@ the L5 pyramidal cells.
 
 .. GENERATED FROM PYTHON SOURCE LINES 114-117
 
-.. code-block:: default
+.. code-block:: Python
 
     net_all.cell_response.plot_spikes_raster()
     net_sparse.cell_response.plot_spikes_raster()
@@ -374,7 +374,7 @@ We can plot the sparse connectivity pattern between cell populations.
 
 .. GENERATED FROM PYTHON SOURCE LINES 119-126
 
-.. code-block:: default
+.. code-block:: Python
 
     conn_indices = pick_connection(
         net=net_sparse, src_gids='L2_basket', target_gids='L2_basket',
@@ -408,7 +408,7 @@ from the source cell.
 
 .. GENERATED FROM PYTHON SOURCE LINES 129-132
 
-.. code-block:: default
+.. code-block:: Python
 
     src_gid = net_sparse.connectivity[conn_idx]['src_gids'].copy().pop()
     plot_cell_connectivity(net_sparse, conn_idx, src_gid=src_gid)
@@ -440,7 +440,7 @@ the aggregate current dipole.
 
 .. GENERATED FROM PYTHON SOURCE LINES 137-152
 
-.. code-block:: default
+.. code-block:: Python
 
     import matplotlib.pyplot as plt
     from hnn_core.viz import plot_dipole
@@ -478,7 +478,7 @@ the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 43.636 seconds)
+   **Total running time of the script:** (1 minutes 24.723 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_connectivity.py:
@@ -487,7 +487,6 @@ the aggregate current dipole.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
-
     .. container:: binder-badge
 
       .. image:: images/binder_badge_logo.svg
@@ -495,15 +494,13 @@ the aggregate current dipole.
         :alt: Launch binder
         :width: 150 px
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
+      :download:`Download Jupyter notebook: plot_connectivity.ipynb <plot_connectivity.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_connectivity.py <plot_connectivity.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_connectivity.ipynb <plot_connectivity.ipynb>`
 
 
 .. only:: html

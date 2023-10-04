@@ -35,7 +35,7 @@ in the GUI tutorial.
 
 .. GENERATED FROM PYTHON SOURCE LINES 17-26
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # Authors: Mainak Jas <mjas@mgh.harvard.edu>
@@ -59,7 +59,7 @@ Let us import hnn_core
 
 .. GENERATED FROM PYTHON SOURCE LINES 28-34
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import hnn_core
@@ -82,7 +82,7 @@ in, e.g., :ref:`sphx_glr_auto_examples_workflows_plot_simulate_alpha.py`.
 
 .. GENERATED FROM PYTHON SOURCE LINES 38-42
 
-.. code-block:: default
+.. code-block:: Python
 
     params_fname = op.join(hnn_core_root, 'param', 'gamma_L5weak_L2weak.json')
     params = read_params(params_fname)
@@ -125,7 +125,7 @@ simulate the dipole moment in a single trial (the default value used by
 
 .. GENERATED FROM PYTHON SOURCE LINES 46-57
 
-.. code-block:: default
+.. code-block:: Python
 
 
     net = jones_2009_model(params)
@@ -147,7 +147,7 @@ simulate the dipole moment in a single trial (the default value used by
 
 .. GENERATED FROM PYTHON SOURCE LINES 58-62
 
-.. code-block:: default
+.. code-block:: Python
 
     dpls = simulate_dipole(net, tstop=250.)
     scaling_factor = 30000
@@ -202,7 +202,7 @@ varied pattern, in which only a fraction of cells reach firing threshold.
 
 .. GENERATED FROM PYTHON SOURCE LINES 67-69
 
-.. code-block:: default
+.. code-block:: Python
 
     net.cell_response.plot_spikes_raster()
 
@@ -233,7 +233,7 @@ time to reach steady state. Hence, we omit the first 50 ms in our analysis.
 
 .. GENERATED FROM PYTHON SOURCE LINES 74-91
 
-.. code-block:: default
+.. code-block:: Python
 
 
     tmin = 50
@@ -280,7 +280,7 @@ is applied to the entire duration of the simulation.
 
 .. GENERATED FROM PYTHON SOURCE LINES 97-103
 
-.. code-block:: default
+.. code-block:: Python
 
     net.add_tonic_bias(cell_type='L5_pyramidal', amplitude=6.)
     dpls = simulate_dipole(net, tstop=250., n_trials=1)
@@ -346,7 +346,7 @@ referred to as “strong” PING.
 
 .. GENERATED FROM PYTHON SOURCE LINES 111-113
 
-.. code-block:: default
+.. code-block:: Python
 
     net.cell_response.plot_spikes_raster()
 
@@ -375,7 +375,7 @@ frequency is lower compared with the "weak" PING simulation above.
 
 .. GENERATED FROM PYTHON SOURCE LINES 116-119
 
-.. code-block:: default
+.. code-block:: Python
 
     from hnn_core.viz import plot_psd
     plot_psd(dpls[trial_idx], fmin=20., fmax=100., tmin=tmin)
@@ -408,7 +408,7 @@ frequency from ~50 to ~65 Hz.
 
 .. GENERATED FROM PYTHON SOURCE LINES 125-135
 
-.. code-block:: default
+.. code-block:: Python
 
     net.cell_types['L5_pyramidal'].synapses['gabaa']['tau2'] = 2
     dpls = simulate_dipole(net, tstop=250., n_trials=1)
@@ -478,7 +478,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (2 minutes 25.434 seconds)
+   **Total running time of the script:** (2 minutes 5.647 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_gamma.py:
@@ -487,7 +487,6 @@ References
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
-
     .. container:: binder-badge
 
       .. image:: images/binder_badge_logo.svg
@@ -495,15 +494,13 @@ References
         :alt: Launch binder
         :width: 150 px
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
+      :download:`Download Jupyter notebook: plot_simulate_gamma.ipynb <plot_simulate_gamma.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_simulate_gamma.py <plot_simulate_gamma.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_simulate_gamma.ipynb <plot_simulate_gamma.ipynb>`
 
 
 .. only:: html

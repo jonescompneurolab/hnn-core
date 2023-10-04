@@ -33,7 +33,7 @@ placed in and around the HNN network model.
 
 .. GENERATED FROM PYTHON SOURCE LINES 15-27
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # Authors: Christopher Bailey <cjb@cfin.au.dk>
@@ -66,7 +66,7 @@ drives; see the event-related potential (ERP) example for details.
 
 .. GENERATED FROM PYTHON SOURCE LINES 35-41
 
-.. code-block:: default
+.. code-block:: Python
 
 
     net = jones_2009_model()
@@ -89,7 +89,7 @@ each electrode.
 
 .. GENERATED FROM PYTHON SOURCE LINES 45-47
 
-.. code-block:: default
+.. code-block:: Python
 
     net.plot_cells()
 
@@ -127,7 +127,7 @@ recording array in the center of the network. By default, a value of
 
 .. GENERATED FROM PYTHON SOURCE LINES 59-64
 
-.. code-block:: default
+.. code-block:: Python
 
 
     depths = list(range(-325, 2150, 100))
@@ -153,7 +153,7 @@ speed up computation considerably.
 
 .. GENERATED FROM PYTHON SOURCE LINES 72-77
 
-.. code-block:: default
+.. code-block:: Python
 
     print(net.rec_arrays)
     net.plot_cells()
@@ -207,7 +207,7 @@ steps). Decimation speeds up plotting significantly.
 
 .. GENERATED FROM PYTHON SOURCE LINES 82-107
 
-.. code-block:: default
+.. code-block:: Python
 
     trial_idx = 0
     window_len = 10  # ms
@@ -243,6 +243,13 @@ steps). Decimation speeds up plotting significantly.
    :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    /home/circleci/project/examples/howto/plot_record_extracellular_potentials.py:104: UserWarning: The figure layout has changed to tight
+      plt.tight_layout()
+
 
 
 
@@ -259,7 +266,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 42.823 seconds)
+   **Total running time of the script:** (0 minutes 34.366 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_record_extracellular_potentials.py:
@@ -268,7 +275,6 @@ References
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
-
     .. container:: binder-badge
 
       .. image:: images/binder_badge_logo.svg
@@ -276,15 +282,13 @@ References
         :alt: Launch binder
         :width: 150 px
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
+      :download:`Download Jupyter notebook: plot_record_extracellular_potentials.ipynb <plot_record_extracellular_potentials.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_record_extracellular_potentials.py <plot_record_extracellular_potentials.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_record_extracellular_potentials.ipynb <plot_record_extracellular_potentials.ipynb>`
 
 
 .. only:: html

@@ -35,7 +35,7 @@ studies [1]_, [2]_.
 
 .. GENERATED FROM PYTHON SOURCE LINES 17-23
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # Authors: Mainak Jas <mainakjas@gmail.com>
@@ -50,16 +50,17 @@ studies [1]_, [2]_.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-28
+.. GENERATED FROM PYTHON SOURCE LINES 24-29
 
 First, we will import the packages needed for computing the inverse solution
-from the MNE somatosensory dataset. `MNE`_ can be installed with
-``pip install mne``, and the somatosensory dataset can be downloaded by
+from the MNE somatosensory dataset. `MNE`_ (and its dependency `NiBabel`_)
+can be installed with ``pip install mne nibabel``
+The somatosensory dataset can be downloaded by
 importing ``somato`` from ``mne.datasets``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 28-35
+.. GENERATED FROM PYTHON SOURCE LINES 29-36
 
-.. code-block:: default
+.. code-block:: Python
 
     import os.path as op
     import matplotlib.pyplot as plt
@@ -75,13 +76,13 @@ importing ``somato`` from ``mne.datasets``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-37
+.. GENERATED FROM PYTHON SOURCE LINES 37-38
 
 Now we set the the path of the ``somato`` dataset for subject ``'01'``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 37-46
+.. GENERATED FROM PYTHON SOURCE LINES 38-47
 
-.. code-block:: default
+.. code-block:: Python
 
     data_path = somato.data_path()
     subject = '01'
@@ -103,21 +104,22 @@ Now we set the the path of the ``somato`` dataset for subject ``'01'``.
     Using default location ~/mne_data for somato...
     Creating ~/mne_data
     Downloading file 'MNE-somato-data.tar.gz' from 'https://osf.io/tp4sg/download?version=7' to '/home/circleci/mne_data'.
-      0%|                                               | 0.00/611M [00:00<?, ?B/s]      1%|▏                                     | 3.63M/611M [00:00<00:16, 36.3MB/s]      2%|▌                                     | 9.97M/611M [00:00<00:11, 52.3MB/s]      3%|█                                     | 17.1M/611M [00:00<00:09, 60.8MB/s]      4%|█▌                                    | 24.3M/611M [00:00<00:08, 65.2MB/s]      5%|█▉                                    | 31.5M/611M [00:00<00:08, 67.8MB/s]      6%|██▍                                   | 38.8M/611M [00:00<00:08, 69.4MB/s]      8%|██▊                                   | 46.0M/611M [00:00<00:08, 70.4MB/s]      9%|███▎                                  | 53.2M/611M [00:00<00:07, 70.8MB/s]     10%|███▊                                  | 60.3M/611M [00:00<00:07, 70.9MB/s]     11%|████▏                                 | 67.5M/611M [00:01<00:07, 71.4MB/s]     12%|████▋                                 | 74.7M/611M [00:01<00:07, 71.5MB/s]     13%|█████                                 | 81.9M/611M [00:01<00:07, 71.4MB/s]     15%|█████▌                                | 89.2M/611M [00:01<00:07, 71.9MB/s]     16%|██████                                | 96.5M/611M [00:01<00:07, 72.3MB/s]     17%|██████▋                                | 104M/611M [00:01<00:06, 73.0MB/s]     18%|███████                                | 111M/611M [00:01<00:06, 73.6MB/s]     19%|███████▌                               | 119M/611M [00:01<00:06, 73.9MB/s]     21%|████████                               | 126M/611M [00:01<00:06, 74.2MB/s]     22%|████████▌                              | 134M/611M [00:01<00:06, 74.4MB/s]     23%|█████████                              | 141M/611M [00:02<00:06, 74.4MB/s]     24%|█████████▌                             | 149M/611M [00:02<00:06, 74.4MB/s]     26%|█████████▉                             | 156M/611M [00:02<00:06, 74.3MB/s]     27%|██████████▍                            | 164M/611M [00:02<00:06, 74.0MB/s]     28%|██████████▉                            | 171M/611M [00:02<00:05, 74.2MB/s]     29%|███████████▍                           | 179M/611M [00:02<00:05, 74.3MB/s]     30%|███████████▉                           | 186M/611M [00:02<00:05, 74.5MB/s]     32%|████████████▎                          | 194M/611M [00:02<00:05, 74.6MB/s]     33%|████████████▊                          | 201M/611M [00:02<00:05, 74.7MB/s]     34%|█████████████▎                         | 209M/611M [00:02<00:05, 74.7MB/s]     35%|█████████████▊                         | 216M/611M [00:03<00:05, 74.6MB/s]     37%|██████████████▎                        | 223M/611M [00:03<00:05, 74.6MB/s]     38%|██████████████▊                        | 231M/611M [00:03<00:05, 74.7MB/s]     39%|███████████████▏                       | 238M/611M [00:03<00:04, 74.7MB/s]     40%|███████████████▋                       | 246M/611M [00:03<00:04, 74.8MB/s]     42%|████████████████▏                      | 253M/611M [00:03<00:04, 74.8MB/s]     43%|████████████████▋                      | 261M/611M [00:03<00:04, 74.8MB/s]     44%|█████████████████▏                     | 268M/611M [00:03<00:04, 74.8MB/s]     45%|█████████████████▌                     | 276M/611M [00:03<00:04, 74.8MB/s]     46%|██████████████████                     | 283M/611M [00:03<00:04, 74.8MB/s]     48%|██████████████████▌                    | 291M/611M [00:04<00:04, 74.7MB/s]     49%|███████████████████                    | 298M/611M [00:04<00:04, 74.7MB/s]     50%|███████████████████▌                   | 306M/611M [00:04<00:04, 74.9MB/s]     51%|████████████████████                   | 313M/611M [00:04<00:03, 74.8MB/s]     53%|████████████████████▍                  | 321M/611M [00:04<00:03, 74.8MB/s]     54%|████████████████████▉                  | 328M/611M [00:04<00:03, 74.9MB/s]     55%|█████████████████████▍                 | 336M/611M [00:04<00:03, 74.8MB/s]     56%|█████████████████████▉                 | 343M/611M [00:04<00:03, 75.0MB/s]     57%|██████████████████████▍                | 351M/611M [00:04<00:03, 75.1MB/s]     59%|██████████████████████▉                | 358M/611M [00:04<00:03, 75.3MB/s]     60%|███████████████████████▍               | 366M/611M [00:05<00:03, 75.4MB/s]     61%|███████████████████████▊               | 374M/611M [00:05<00:03, 75.5MB/s]     62%|████████████████████████▎              | 381M/611M [00:05<00:03, 75.4MB/s]     64%|████████████████████████▊              | 389M/611M [00:05<00:02, 75.1MB/s]     65%|█████████████████████████▎             | 396M/611M [00:05<00:02, 74.9MB/s]     66%|█████████████████████████▊             | 404M/611M [00:05<00:02, 74.8MB/s]     67%|██████████████████████████▎            | 411M/611M [00:05<00:02, 74.8MB/s]     69%|██████████████████████████▋            | 419M/611M [00:05<00:02, 74.6MB/s]     70%|███████████████████████████▏           | 426M/611M [00:05<00:02, 74.5MB/s]     71%|███████████████████████████▋           | 434M/611M [00:05<00:02, 74.6MB/s]     72%|████████████████████████████▏          | 441M/611M [00:06<00:02, 74.5MB/s]     73%|████████████████████████████▋          | 448M/611M [00:06<00:02, 74.3MB/s]     75%|█████████████████████████████          | 456M/611M [00:06<00:02, 74.4MB/s]     76%|█████████████████████████████▌         | 463M/611M [00:06<00:01, 74.5MB/s]     77%|██████████████████████████████         | 471M/611M [00:06<00:01, 74.4MB/s]     78%|██████████████████████████████▌        | 478M/611M [00:06<00:01, 74.3MB/s]     80%|███████████████████████████████        | 486M/611M [00:06<00:01, 72.2MB/s]     81%|███████████████████████████████▍       | 493M/611M [00:06<00:01, 66.3MB/s]     82%|███████████████████████████████▉       | 500M/611M [00:06<00:01, 67.8MB/s]     83%|████████████████████████████████▍      | 508M/611M [00:06<00:01, 69.7MB/s]     84%|████████████████████████████████▉      | 515M/611M [00:07<00:01, 71.0MB/s]     86%|█████████████████████████████████▍     | 522M/611M [00:07<00:01, 72.1MB/s]     87%|█████████████████████████████████▊     | 530M/611M [00:07<00:01, 72.7MB/s]     88%|██████████████████████████████████▎    | 537M/611M [00:07<00:00, 73.3MB/s]     89%|██████████████████████████████████▊    | 545M/611M [00:07<00:00, 73.7MB/s]     90%|███████████████████████████████████▎   | 552M/611M [00:07<00:00, 73.8MB/s]     92%|███████████████████████████████████▊   | 560M/611M [00:07<00:00, 74.1MB/s]     93%|████████████████████████████████████▏  | 567M/611M [00:07<00:00, 74.4MB/s]     94%|████████████████████████████████████▋  | 575M/611M [00:07<00:00, 74.4MB/s]     95%|█████████████████████████████████████▏ | 582M/611M [00:07<00:00, 74.3MB/s]     97%|█████████████████████████████████████▋ | 590M/611M [00:08<00:00, 74.2MB/s]     98%|██████████████████████████████████████▏| 597M/611M [00:08<00:00, 74.3MB/s]     99%|██████████████████████████████████████▌| 604M/611M [00:08<00:00, 73.4MB/s]      0%|                                               | 0.00/611M [00:00<?, ?B/s]    100%|███████████████████████████████████████| 611M/611M [00:00<00:00, 1.56TB/s]
+      0%|                                               | 0.00/611M [00:00<?, ?B/s]      1%|▍                                     | 6.79M/611M [00:00<00:08, 67.8MB/s]      3%|█                                     | 16.1M/611M [00:00<00:07, 82.6MB/s]      4%|█▋                                    | 26.5M/611M [00:00<00:06, 92.3MB/s]      6%|██▎                                   | 36.9M/611M [00:00<00:05, 97.2MB/s]      8%|███                                    | 47.8M/611M [00:00<00:05, 101MB/s]      9%|███▋                                   | 57.9M/611M [00:00<00:05, 101MB/s]     11%|████▍                                  | 68.9M/611M [00:00<00:05, 104MB/s]     13%|█████                                  | 79.7M/611M [00:00<00:05, 105MB/s]     15%|█████▌                                | 90.2M/611M [00:00<00:05, 94.2MB/s]     16%|██████▏                               | 99.9M/611M [00:01<00:05, 86.5MB/s]     18%|██████▉                                | 109M/611M [00:01<00:06, 78.0MB/s]     19%|███████▍                               | 117M/611M [00:01<00:06, 73.7MB/s]     20%|███████▉                               | 124M/611M [00:01<00:06, 72.1MB/s]     22%|████████▍                              | 132M/611M [00:01<00:06, 72.7MB/s]     23%|████████▉                              | 140M/611M [00:01<00:06, 74.2MB/s]     24%|█████████▌                             | 149M/611M [00:01<00:05, 79.3MB/s]     26%|██████████                             | 157M/611M [00:01<00:05, 80.9MB/s]     27%|██████████▌                            | 166M/611M [00:01<00:05, 82.2MB/s]     29%|███████████▏                           | 174M/611M [00:02<00:05, 75.1MB/s]     30%|███████████▌                           | 182M/611M [00:02<00:06, 70.4MB/s]     31%|████████████                           | 189M/611M [00:02<00:06, 67.7MB/s]     32%|████████████▌                          | 196M/611M [00:02<00:06, 67.5MB/s]     34%|█████████████                          | 205M/611M [00:02<00:05, 75.0MB/s]     35%|█████████████▋                         | 215M/611M [00:02<00:04, 81.2MB/s]     37%|██████████████▎                        | 223M/611M [00:02<00:04, 80.5MB/s]     38%|██████████████▉                        | 233M/611M [00:02<00:04, 85.2MB/s]     40%|███████████████▌                       | 243M/611M [00:02<00:04, 88.8MB/s]     41%|████████████████                       | 252M/611M [00:03<00:03, 91.1MB/s]     43%|████████████████▋                      | 262M/611M [00:03<00:04, 86.3MB/s]     44%|█████████████████▎                     | 270M/611M [00:03<00:04, 82.0MB/s]     46%|█████████████████▊                     | 279M/611M [00:03<00:03, 83.8MB/s]     47%|██████████████████▍                    | 288M/611M [00:03<00:03, 85.4MB/s]     49%|██████████████████▉                    | 297M/611M [00:03<00:03, 87.7MB/s]     50%|███████████████████▌                   | 306M/611M [00:03<00:03, 87.6MB/s]     52%|████████████████████▏                  | 316M/611M [00:03<00:03, 90.1MB/s]     53%|████████████████████▊                  | 325M/611M [00:04<00:04, 63.4MB/s]     55%|█████████████████████▍                 | 335M/611M [00:04<00:03, 71.9MB/s]     56%|█████████████████████▉                 | 343M/611M [00:04<00:03, 70.5MB/s]     58%|██████████████████████▌                | 352M/611M [00:04<00:03, 75.6MB/s]     59%|███████████████████████                | 361M/611M [00:04<00:03, 75.7MB/s]     61%|███████████████████████▋               | 370M/611M [00:04<00:02, 81.2MB/s]     62%|████████████████████████▏              | 379M/611M [00:04<00:02, 79.3MB/s]     63%|████████████████████████▋              | 387M/611M [00:04<00:03, 71.5MB/s]     65%|█████████████████████████▎             | 396M/611M [00:04<00:02, 76.8MB/s]     66%|█████████████████████████▉             | 405M/611M [00:05<00:02, 81.0MB/s]     68%|██████████████████████████▍            | 414M/611M [00:05<00:03, 63.6MB/s]     69%|██████████████████████████▉            | 421M/611M [00:05<00:02, 65.9MB/s]     70%|███████████████████████████▍           | 430M/611M [00:05<00:02, 71.4MB/s]     72%|████████████████████████████           | 439M/611M [00:05<00:02, 77.7MB/s]     73%|████████████████████████████▋          | 448M/611M [00:05<00:02, 81.0MB/s]     75%|█████████████████████████████▏         | 458M/611M [00:05<00:01, 84.9MB/s]     77%|█████████████████████████████▉         | 468M/611M [00:05<00:01, 90.2MB/s]     78%|██████████████████████████████▌        | 478M/611M [00:05<00:01, 94.2MB/s]     80%|███████████████████████████████▏       | 488M/611M [00:06<00:01, 86.3MB/s]     81%|███████████████████████████████▋       | 497M/611M [00:06<00:01, 80.9MB/s]     83%|████████████████████████████████▎      | 505M/611M [00:06<00:01, 80.6MB/s]     84%|████████████████████████████████▊      | 513M/611M [00:06<00:01, 79.5MB/s]     86%|█████████████████████████████████▍     | 524M/611M [00:06<00:01, 86.4MB/s]     87%|██████████████████████████████████     | 534M/611M [00:06<00:00, 89.8MB/s]     89%|██████████████████████████████████▋    | 543M/611M [00:06<00:00, 91.1MB/s]     91%|███████████████████████████████████▎   | 553M/611M [00:06<00:00, 92.4MB/s]     92%|███████████████████████████████████▉   | 562M/611M [00:06<00:00, 93.5MB/s]     94%|████████████████████████████████████▌  | 572M/611M [00:06<00:00, 88.2MB/s]     95%|█████████████████████████████████████  | 580M/611M [00:07<00:00, 78.6MB/s]     96%|█████████████████████████████████████▌ | 589M/611M [00:07<00:00, 70.9MB/s]     98%|██████████████████████████████████████ | 596M/611M [00:07<00:00, 61.3MB/s]     99%|██████████████████████████████████████▍| 602M/611M [00:07<00:00, 51.2MB/s]    100%|██████████████████████████████████████▉| 610M/611M [00:07<00:00, 56.2MB/s]      0%|                                               | 0.00/611M [00:00<?, ?B/s]    100%|███████████████████████████████████████| 611M/611M [00:00<00:00, 1.81TB/s]
     Untarring contents of '/home/circleci/mne_data/MNE-somato-data.tar.gz' to '/home/circleci/mne_data'
     Attempting to create new mne-python configuration file:
     /home/circleci/.mne/mne-python.json
+    Download complete in 15s (582.2 MB)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-48
+.. GENERATED FROM PYTHON SOURCE LINES 48-49
 
 Then, we load the raw data and estimate the inverse operator.
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-68
+.. GENERATED FROM PYTHON SOURCE LINES 49-69
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # Read and band-pass filter the raw data
@@ -163,12 +165,12 @@ Then, we load the raw data and estimate the inverse operator.
     - Lower transition bandwidth: 1.00 Hz (-6 dB cutoff frequency: 0.50 Hz)
     - Upper passband edge: 40.00 Hz
     - Upper transition bandwidth: 10.00 Hz (-6 dB cutoff frequency: 45.00 Hz)
-    - Filter length: 993 samples (3.307 sec)
+    - Filter length: 993 samples (3.307 s)
 
     [Parallel(n_jobs=1)]: Done  17 tasks      | elapsed:    0.1s
-    [Parallel(n_jobs=1)]: Done  71 tasks      | elapsed:    0.4s
+    [Parallel(n_jobs=1)]: Done  71 tasks      | elapsed:    0.5s
     [Parallel(n_jobs=1)]: Done 161 tasks      | elapsed:    1.0s
-    [Parallel(n_jobs=1)]: Done 287 tasks      | elapsed:    1.8s
+    [Parallel(n_jobs=1)]: Done 287 tasks      | elapsed:    1.9s
     111 events found
     Event IDs: [1]
     Not setting metadata
@@ -190,7 +192,7 @@ Then, we load the raw data and estimate the inverse operator.
         Using tolerance 1.5e-08 (2.2e-16 eps * 306 dim * 2.2e+05  max singular value)
         Estimated rank (mag + grad): 306
         MEG: rank 306 computed from 306 data channels with 0 projectors
-    /home/circleci/project/examples/workflows/plot_simulate_somato.py:65: RuntimeWarning: Something went wrong in the data-driven estimation of the data rank as it exceeds the theoretical rank from the info (306 > 64). Consider setting rank to "auto" or setting it explicitly as an integer.
+    /home/circleci/project/examples/workflows/plot_simulate_somato.py:66: RuntimeWarning: Something went wrong in the data-driven estimation of the data rank as it exceeds the theoretical rank from the info (306 > 64). Consider setting rank to "auto" or setting it explicitly as an integer.
       cov = mne.compute_covariance(epochs)
     Reducing data rank from 306 -> 306
     Estimating covariance using EMPIRICAL
@@ -224,7 +226,7 @@ Then, we load the raw data and estimate the inverse operator.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-77
+.. GENERATED FROM PYTHON SOURCE LINES 70-78
 
 There are several methods to do source reconstruction. Some of the methods
 such as MNE are distributed source methods whereas dipole fitting will
@@ -235,9 +237,9 @@ to note that the dipole currents simulated with HNN are assumed to be normal
 to the cortical surface. Hence, using the option ``pick_ori='normal'`` is
 appropriate.
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-84
+.. GENERATED FROM PYTHON SOURCE LINES 78-85
 
-.. code-block:: default
+.. code-block:: Python
 
     snr = 3.
     lambda2 = 1. / snr ** 2
@@ -254,6 +256,7 @@ appropriate.
 
  .. code-block:: none
 
+    NOTE: pick_channels() is a legacy function. New code should use inst.pick(...).
     Preparing the inverse operator for use...
         Scaled noise and source covariance from nave = 1 to nave = 111
         Created the regularized inverter
@@ -270,14 +273,14 @@ appropriate.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-87
+.. GENERATED FROM PYTHON SOURCE LINES 86-88
 
 To extract the primary response in primary somatosensory cortex (S1), we
 create a label for the postcentral gyrus (S1) in source-space
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-93
+.. GENERATED FROM PYTHON SOURCE LINES 88-94
 
-.. code-block:: default
+.. code-block:: Python
 
     hemi = 'rh'
     label_tag = 'G_postcentral'
@@ -299,7 +302,7 @@ create a label for the postcentral gyrus (S1) in source-space
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-105
+.. GENERATED FROM PYTHON SOURCE LINES 95-106
 
 Visualizing the distributed S1 activation in reference to the geometric
 structure of the cortex (i.e., plotted on a structural MRI) can help us
@@ -313,9 +316,9 @@ post-central gyrus label from which the dipole time course was extracted and
 the second showing MNE activation at 0.040 sec that resemble the following
 images.
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-115
+.. GENERATED FROM PYTHON SOURCE LINES 106-116
 
-.. code-block:: default
+.. code-block:: Python
 
     '''
     Brain = mne.viz.get_brain_class()
@@ -340,13 +343,13 @@ images.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-119
+.. GENERATED FROM PYTHON SOURCE LINES 117-120
 
 |mne_label_fig|
 
 |mne_activity_fig|
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-129
+.. GENERATED FROM PYTHON SOURCE LINES 122-130
 
 Now we extract the representative time course of dipole activation in our
 labeled brain region using ``mode='pca_flip'`` (see `this MNE-python
@@ -357,9 +360,9 @@ extracted waveform so that the deflection at ~0.040 sec is pointed downwards.
 Thus, the ~0.040 sec deflection corresponds to current flow traveling from
 superficial to deep layers of cortex.
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-141
+.. GENERATED FROM PYTHON SOURCE LINES 130-142
 
-.. code-block:: default
+.. code-block:: Python
 
     flip_data = stc.extract_label_time_course(label_s1, inv['src'],
                                               mode='pca_flip')
@@ -391,14 +394,14 @@ superficial to deep layers of cortex.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-144
+.. GENERATED FROM PYTHON SOURCE LINES 143-145
 
 Now, let us try to simulate the same with ``hnn-core``. We read in the
 network parameters from ``N20.json`` and instantiate the network.
 
-.. GENERATED FROM PYTHON SOURCE LINES 144-153
+.. GENERATED FROM PYTHON SOURCE LINES 145-154
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import hnn_core
@@ -416,7 +419,7 @@ network parameters from ``N20.json`` and instantiate the network.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 154-162
+.. GENERATED FROM PYTHON SOURCE LINES 155-163
 
 To simulate the source of the median nerve evoked response, we add a
 sequence of synchronous evoked drives: 1 proximal, 2 distal, and 1 final
@@ -427,9 +430,9 @@ a sequence of exogenous drive for simulating evoked responses, see the
 ``cell_specific=False`` creates a drive with synchronous input across cells
 in the network.
 
-.. GENERATED FROM PYTHON SOURCE LINES 162-219
+.. GENERATED FROM PYTHON SOURCE LINES 163-220
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # Early proximal drive
@@ -495,15 +498,15 @@ in the network.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 220-223
+.. GENERATED FROM PYTHON SOURCE LINES 221-224
 
 Now we run the simulation over 2 trials so that we can plot the average
 aggregate dipole. For a better match to the empirical waveform, set
 ``n_trials`` to be >=25.
 
-.. GENERATED FROM PYTHON SOURCE LINES 223-228
+.. GENERATED FROM PYTHON SOURCE LINES 224-229
 
-.. code-block:: default
+.. code-block:: Python
 
     n_trials = 2
     # n_trials = 25
@@ -523,7 +526,7 @@ aggregate dipole. For a better match to the empirical waveform, set
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 229-236
+.. GENERATED FROM PYTHON SOURCE LINES 230-237
 
 Since the model is a reduced representation of the larger network
 contributing to the response, the model response is noisier than it would be
@@ -533,9 +536,9 @@ post-processing steps of smoothing and scaling the simulated dipole response
 allow us to more accurately approximate the true signal responsible for the
 recorded macroscopic evoked response [1]_, [2]_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 236-242
+.. GENERATED FROM PYTHON SOURCE LINES 237-243
 
-.. code-block:: default
+.. code-block:: Python
 
     dpl_smooth_win = 20
     dpl_scalefctr = 12
@@ -550,14 +553,14 @@ recorded macroscopic evoked response [1]_, [2]_.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 243-245
+.. GENERATED FROM PYTHON SOURCE LINES 244-246
 
 Finally, we plot the driving spike histogram, empirical and simulated median
 nerve evoked response waveforms, and output spike histogram.
 
-.. GENERATED FROM PYTHON SOURCE LINES 245-257
+.. GENERATED FROM PYTHON SOURCE LINES 246-258
 
-.. code-block:: default
+.. code-block:: Python
 
     fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 6),
                              constrained_layout=True)
@@ -589,7 +592,7 @@ nerve evoked response waveforms, and output spike histogram.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 258-269
+.. GENERATED FROM PYTHON SOURCE LINES 259-270
 
 References
 ----------
@@ -603,11 +606,12 @@ References
    network origin of human MEG/EEG data. eLife 9, e51214 (2020).
    https://doi.org/10.7554/eLife.51214
 
-.. GENERATED FROM PYTHON SOURCE LINES 271-280
+.. GENERATED FROM PYTHON SOURCE LINES 272-282
 
 .. LINKS
 
 .. _MNE: https://mne.tools/
+.. _NiBabel: https://nipy.org/nibabel/
 .. _HNN ERP tutorial: https://jonescompneurolab.github.io/hnn-tutorials/erp/erp
 .. _this MNE-python example: https://mne.tools/stable/auto_examples/inverse/plot_label_source_activations.html
 .. |mne_label_fig| image:: https://user-images.githubusercontent.com/20212206/106524603-cfe75c80-64b0-11eb-9607-3415195c3e7a.png
@@ -618,7 +622,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 56.584 seconds)
+   **Total running time of the script:** (0 minutes 48.915 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_somato.py:
@@ -627,7 +631,6 @@ References
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
-
     .. container:: binder-badge
 
       .. image:: images/binder_badge_logo.svg
@@ -635,15 +638,13 @@ References
         :alt: Launch binder
         :width: 150 px
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
+      :download:`Download Jupyter notebook: plot_simulate_somato.ipynb <plot_simulate_somato.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_simulate_somato.py <plot_simulate_somato.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_simulate_somato.ipynb <plot_simulate_somato.ipynb>`
 
 
 .. only:: html

@@ -35,7 +35,7 @@ visualization of the corresponding time-frequency spectrograms [1]_.
 
 .. GENERATED FROM PYTHON SOURCE LINES 17-25
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # Authors: Mainak Jas <mjas@mgh.harvard.edu>
@@ -58,7 +58,7 @@ Let us import hnn_core
 
 .. GENERATED FROM PYTHON SOURCE LINES 27-31
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import hnn_core
@@ -83,7 +83,7 @@ time with unique randomization. The drive is only connected to the
 
 .. GENERATED FROM PYTHON SOURCE LINES 39-58
 
-.. code-block:: default
+.. code-block:: Python
 
     net = jones_2009_model()
 
@@ -147,7 +147,7 @@ time with unique randomization. The drive is only connected to the
     Trial 1: 290.0 ms...
     Trial 1: 300.0 ms...
 
-    <hnn_core.dipole.Dipole object at 0x7f2eb5a30310>
+    <hnn_core.dipole.Dipole object at 0x7fe71ffbb3a0>
 
 
 
@@ -162,7 +162,7 @@ indeed 10 Hz activity by plotting the power spectral density (PSD).
 
 .. GENERATED FROM PYTHON SOURCE LINES 65-84
 
-.. code-block:: default
+.. code-block:: Python
 
     import matplotlib.pyplot as plt
     from hnn_core.viz import plot_dipole, plot_psd
@@ -196,7 +196,7 @@ indeed 10 Hz activity by plotting the power spectral density (PSD).
 
  .. code-block:: none
 
-    /home/circleci/project/examples/workflows/plot_simulate_alpha.py:83: UserWarning: This figure was using constrained_layout, but that is incompatible with subplots_adjust and/or tight_layout; disabling constrained_layout.
+    /home/circleci/project/examples/workflows/plot_simulate_alpha.py:83: UserWarning: The figure layout has changed to tight
       plt.tight_layout()
 
 
@@ -212,7 +212,7 @@ as beta frequency events.
 
 .. GENERATED FROM PYTHON SOURCE LINES 90-100
 
-.. code-block:: default
+.. code-block:: Python
 
     location = 'distal'
     burst_std = 15
@@ -280,7 +280,7 @@ smaller absolute values in the plots.
 
 .. GENERATED FROM PYTHON SOURCE LINES 106-120
 
-.. code-block:: default
+.. code-block:: Python
 
     fig, axes = plt.subplots(3, 1, constrained_layout=True)
 
@@ -309,7 +309,7 @@ smaller absolute values in the plots.
 
  .. code-block:: none
 
-    /home/circleci/project/examples/workflows/plot_simulate_alpha.py:118: UserWarning: This figure was using constrained_layout, but that is incompatible with subplots_adjust and/or tight_layout; disabling constrained_layout.
+    /home/circleci/project/examples/workflows/plot_simulate_alpha.py:118: UserWarning: The figure layout has changed to tight
       plt.tight_layout()
 
 
@@ -326,7 +326,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 53.493 seconds)
+   **Total running time of the script:** (1 minutes 38.427 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_alpha.py:
@@ -335,7 +335,6 @@ References
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
-
     .. container:: binder-badge
 
       .. image:: images/binder_badge_logo.svg
@@ -343,15 +342,13 @@ References
         :alt: Launch binder
         :width: 150 px
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
+      :download:`Download Jupyter notebook: plot_simulate_alpha.ipynb <plot_simulate_alpha.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_simulate_alpha.py <plot_simulate_alpha.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_simulate_alpha.ipynb <plot_simulate_alpha.ipynb>`
 
 
 .. only:: html

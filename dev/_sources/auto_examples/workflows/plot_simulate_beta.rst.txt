@@ -32,7 +32,7 @@ of the beta event, and the incoming sensory information.
 
 .. GENERATED FROM PYTHON SOURCE LINES 14-20
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # Authors: Nick Tolley <nicholas_tolley@brown.edu>
@@ -53,7 +53,7 @@ We begin by instantiating the network model from Law et al. 2021 [1]_.
 
 .. GENERATED FROM PYTHON SOURCE LINES 22-24
 
-.. code-block:: default
+.. code-block:: Python
 
     net = law_2021_model()
 
@@ -77,7 +77,7 @@ contains information on the biophysics and geometry of each cell.
 
 .. GENERATED FROM PYTHON SOURCE LINES 33-48
 
-.. code-block:: default
+.. code-block:: Python
 
     net_jones = jones_2009_model()
 
@@ -123,7 +123,7 @@ the distal dendrites of L5 pyramidal cells.
 
 .. GENERATED FROM PYTHON SOURCE LINES 53-56
 
-.. code-block:: default
+.. code-block:: Python
 
     print('Recurrent Tuft Connection')
     print(net.connectivity[16])
@@ -154,7 +154,7 @@ L2_basket -> L5_pyramidal GABAa connection, and replacing it with GABAb.
 
 .. GENERATED FROM PYTHON SOURCE LINES 59-66
 
-.. code-block:: default
+.. code-block:: Python
 
     print('New GABAb connection')
     print(net.connectivity[15])
@@ -208,7 +208,7 @@ above.
 
 .. GENERATED FROM PYTHON SOURCE LINES 80-117
 
-.. code-block:: default
+.. code-block:: Python
 
     def add_erp_drives(net, stimulus_start):
         # Distal evoked drive
@@ -263,7 +263,7 @@ of the network, and ultimately suppressed sensory detection.
 
 .. GENERATED FROM PYTHON SOURCE LINES 122-148
 
-.. code-block:: default
+.. code-block:: Python
 
     def add_beta_drives(net, beta_start):
         # Distal Drive
@@ -305,7 +305,7 @@ We can now use our functions to create three distinct simulations:
 
 .. GENERATED FROM PYTHON SOURCE LINES 151-161
 
-.. code-block:: default
+.. code-block:: Python
 
     beta_start, stimulus_start = 50.0, 125.0
     net_beta = net.copy()
@@ -332,7 +332,7 @@ can influence sensory input to the cortical column.
 
 .. GENERATED FROM PYTHON SOURCE LINES 165-169
 
-.. code-block:: default
+.. code-block:: Python
 
     dpls_beta = simulate_dipole(net_beta, tstop=400)
     dpls_erp = simulate_dipole(net_erp, tstop=400)
@@ -489,7 +489,7 @@ is an assymetric beta event with a long positive tail.
 
 .. GENERATED FROM PYTHON SOURCE LINES 175-189
 
-.. code-block:: default
+.. code-block:: Python
 
     import matplotlib.pyplot as plt
     import numpy as np
@@ -532,7 +532,7 @@ input to the cortical column occurs ~100 ms after the beta event.
 
 .. GENERATED FROM PYTHON SOURCE LINES 194-205
 
-.. code-block:: default
+.. code-block:: Python
 
     dpls_beta_erp[0].smooth(45)
     fig, axes = plt.subplots(3, 1, sharex=True, figsize=(7, 7),
@@ -573,7 +573,7 @@ the sensory response which is associated with a reduced ERP amplitude
 
 .. GENERATED FROM PYTHON SOURCE LINES 211-225
 
-.. code-block:: default
+.. code-block:: Python
 
     dpls_erp[0].smooth(45)
     fig, axes = plt.subplots(3, 1, sharex=True, figsize=(7, 7),
@@ -623,7 +623,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (3 minutes 40.764 seconds)
+   **Total running time of the script:** (2 minutes 57.027 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_beta.py:
@@ -632,7 +632,6 @@ References
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
-
     .. container:: binder-badge
 
       .. image:: images/binder_badge_logo.svg
@@ -640,15 +639,13 @@ References
         :alt: Launch binder
         :width: 150 px
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
+      :download:`Download Jupyter notebook: plot_simulate_beta.ipynb <plot_simulate_beta.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_simulate_beta.py <plot_simulate_beta.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_simulate_beta.ipynb <plot_simulate_beta.ipynb>`
 
 
 .. only:: html

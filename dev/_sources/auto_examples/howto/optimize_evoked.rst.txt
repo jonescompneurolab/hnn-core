@@ -27,7 +27,7 @@ of the model simulation to match an experimental dipole waveform.
 
 .. GENERATED FROM PYTHON SOURCE LINES 9-19
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # Authors: Carolina Fernandez <cxf418@miami.edu>
@@ -46,7 +46,7 @@ Let us import hnn_core
 
 .. GENERATED FROM PYTHON SOURCE LINES 21-31
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import hnn_core
@@ -69,7 +69,7 @@ a lot to work with.
 
 .. GENERATED FROM PYTHON SOURCE LINES 37-45
 
-.. code-block:: default
+.. code-block:: Python
 
 
     from urllib.request import urlretrieve
@@ -86,7 +86,7 @@ Let’s then simulate the dipole with some initial parameters.
 
 .. GENERATED FROM PYTHON SOURCE LINES 47-105
 
-.. code-block:: default
+.. code-block:: Python
 
 
     tstop = exp_dpl.times[-1]
@@ -158,7 +158,7 @@ optimize.
 
 .. GENERATED FROM PYTHON SOURCE LINES 112-162
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -224,7 +224,7 @@ were chosen so as to keep the model in physiologically realistic regimes.
 
 .. GENERATED FROM PYTHON SOURCE LINES 171-184
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -246,7 +246,7 @@ Now we define and fit the optimizer.
 
 .. GENERATED FROM PYTHON SOURCE LINES 186-196
 
-.. code-block:: default
+.. code-block:: Python
 
 
     from hnn_core.optimization import Optimizer
@@ -266,7 +266,7 @@ simulation dipole as well as the convergence plot.
 
 .. GENERATED FROM PYTHON SOURCE LINES 199-215
 
-.. code-block:: default
+.. code-block:: Python
 
 
     with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
@@ -286,17 +286,11 @@ simulation dipole as well as the convergence plot.
     fig1 = optim.plot_convergence()
 
 
-.. rst-class:: sphx-glr-timing
-
-   **Total running time of the script:** (0 minutes 0.000 seconds)
-
-
 .. _sphx_glr_download_auto_examples_howto_optimize_evoked.py:
 
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
-
 
     .. container:: binder-badge
 
@@ -305,15 +299,13 @@ simulation dipole as well as the convergence plot.
         :alt: Launch binder
         :width: 150 px
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
+      :download:`Download Jupyter notebook: optimize_evoked.ipynb <optimize_evoked.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: optimize_evoked.py <optimize_evoked.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: optimize_evoked.ipynb <optimize_evoked.ipynb>`
 
 
 .. only:: html

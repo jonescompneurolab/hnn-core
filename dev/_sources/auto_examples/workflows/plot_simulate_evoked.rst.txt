@@ -34,7 +34,7 @@ to the recorded data.
 
 .. GENERATED FROM PYTHON SOURCE LINES 16-29
 
-.. code-block:: default
+.. code-block:: Python
 
 
     # Authors: Mainak Jas <mmjas@mgh.harvard.edu>
@@ -62,7 +62,7 @@ Let us import hnn_core
 
 .. GENERATED FROM PYTHON SOURCE LINES 31-36
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import hnn_core
@@ -83,7 +83,7 @@ inside it.
 
 .. GENERATED FROM PYTHON SOURCE LINES 39-43
 
-.. code-block:: default
+.. code-block:: Python
 
     net = jones_2009_model()
     net.plot_cells()
@@ -115,7 +115,7 @@ inside it.
  .. code-block:: none
 
 
-    <Axes3DSubplot:>
+    <Axes3D: >
 
 
 
@@ -136,7 +136,7 @@ First, we add a distal evoked drive
 
 .. GENERATED FROM PYTHON SOURCE LINES 55-66
 
-.. code-block:: default
+.. code-block:: Python
 
     weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': .000007,
                        'L5_pyramidal': 0.142300}
@@ -162,7 +162,7 @@ Then, we add two proximal drives
 
 .. GENERATED FROM PYTHON SOURCE LINES 68-87
 
-.. code-block:: default
+.. code-block:: Python
 
     weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
                        'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
@@ -200,7 +200,7 @@ across trials.
 
 .. GENERATED FROM PYTHON SOURCE LINES 93-98
 
-.. code-block:: default
+.. code-block:: Python
 
     from hnn_core import JoblibBackend
 
@@ -229,7 +229,7 @@ operate in-place, i.e., the objects are modified.
 
 .. GENERATED FROM PYTHON SOURCE LINES 103-107
 
-.. code-block:: default
+.. code-block:: Python
 
     window_len, scaling_factor = 30, 3000
     for dpl in dpls:
@@ -248,7 +248,7 @@ Plot the amplitudes of the simulated aggregate dipole moments over time
 
 .. GENERATED FROM PYTHON SOURCE LINES 109-116
 
-.. code-block:: default
+.. code-block:: Python
 
     import matplotlib.pyplot as plt
     fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6),
@@ -284,7 +284,7 @@ a list of axes to ``ax`` to visualize the dipole moments separately.
 
 .. GENERATED FROM PYTHON SOURCE LINES 121-124
 
-.. code-block:: default
+.. code-block:: Python
 
     plot_dipole(dpls, average=False, layer=['L2', 'L5', 'agg'], show=False)
 
@@ -315,7 +315,7 @@ synchronous and see what happens. This is achieved by setting
 
 .. GENERATED FROM PYTHON SOURCE LINES 128-149
 
-.. code-block:: default
+.. code-block:: Python
 
 
     net_sync = jones_2009_model()
@@ -351,7 +351,7 @@ You may interrogate current values defining the spike event time dynamics by
 
 .. GENERATED FROM PYTHON SOURCE LINES 151-153
 
-.. code-block:: default
+.. code-block:: Python
 
     print(net_sync.external_drives['evdist1']['dynamics'])
 
@@ -375,7 +375,7 @@ object, this time we make a copy of it before smoothing and scaling.
 
 .. GENERATED FROM PYTHON SOURCE LINES 156-162
 
-.. code-block:: default
+.. code-block:: Python
 
     dpls_sync = simulate_dipole(net_sync, tstop=170., n_trials=1)
 
@@ -409,7 +409,7 @@ object, this time we make a copy of it before smoothing and scaling.
  .. code-block:: none
 
     Joblib will run 1 trial(s) in parallel by distributing trials over 1 jobs.
-    Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.7/site-packages/hnn_core/mod/x86_64/libnrnmech.so
+    Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.8/site-packages/hnn_core/mod/x86_64/libnrnmech.so
     Building the NEURON model
     [Done]
     Trial 1: 0.03 ms...
@@ -453,7 +453,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 18.464 seconds)
+   **Total running time of the script:** (1 minutes 1.029 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_evoked.py:
@@ -462,7 +462,6 @@ References
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
-
     .. container:: binder-badge
 
       .. image:: images/binder_badge_logo.svg
@@ -470,15 +469,13 @@ References
         :alt: Launch binder
         :width: 150 px
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
+      :download:`Download Jupyter notebook: plot_simulate_evoked.ipynb <plot_simulate_evoked.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_simulate_evoked.py <plot_simulate_evoked.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_simulate_evoked.ipynb <plot_simulate_evoked.ipynb>`
 
 
 .. only:: html
