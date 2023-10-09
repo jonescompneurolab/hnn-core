@@ -40,7 +40,7 @@ def _get_target_properties(weights_ampa, weights_nmda, synaptic_delays,
     if location == 'distal' and 'L5_basket' in target_populations:
         raise ValueError('When adding a distal drive, synaptic weight cannot '
                          'be defined for the L5_basket cell type as this '
-                         'connection does not exist. Please remove the L5_basket part from the code.')
+                         'connection does not exist. Please delete the L5_basket part from the code.')
 
     if isinstance(synaptic_delays, float):
         delays_by_type = {cell_type: synaptic_delays for cell_type in
