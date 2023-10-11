@@ -38,9 +38,13 @@ def _get_target_properties(weights_ampa, weights_nmda, synaptic_delays,
     # Distal drives should not target L5 basket cells according to the
     # canonical Jones model
     if location == 'distal' and 'L5_basket' in target_populations:
-        raise ValueError('When adding a distal drive, synaptic weight cannot '
-                         'be defined for the L5_basket cell type as this '
-                         'connection does not exist. Please delete the L5_basket part from the code.')
+        raise ValueError('Due to physiological/anatomical constraints, '
+                         'a distal drive cannot target L5_basket cell types. '
+                         'L5_basket cell types must remain undefined by '
+                         'the user in all synaptic weights dictionaries '
+                         'for this drive. '
+                         'Therefore, please remove the L5_basket entries '
+                         'from the corresponding dictionaries.')
 
     if isinstance(synaptic_delays, float):
         delays_by_type = {cell_type: synaptic_delays for cell_type in
