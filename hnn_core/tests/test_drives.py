@@ -254,8 +254,8 @@ def test_add_drives():
         net.add_evoked_drive('evdist1', mu=10, sigma=1, numspikes=1,
                              location='distal')
     with pytest.raises(ValueError,
-                       match='When adding a distal drive, synaptic weight '
-                       'cannot be defined for the L5_basket cell type'):
+                       match='Due to physiological/anatomical constraints, '
+                       'a distal drive cannot target L5_basket cell types. '):
         net.add_evoked_drive('evdist1', mu=10, sigma=1, numspikes=1,
                              location='distal', weights_ampa={'L5_basket': 1.},
                              synaptic_delays={'L5_basket': .1})
