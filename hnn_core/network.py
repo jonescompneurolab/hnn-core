@@ -459,7 +459,30 @@ class Network(object):
 
         self._inplane_distance = inplane_distance
         self._layer_separation = layer_separation
-
+    def celltype_rename(self, oldcell_type, newcell_type):
+        """ Renames cell_types and assigns them gid ranges
+        Paramters
+        ---------
+        oldcell_type: str
+            This is the cell type to be replaced;
+            takes 4 types: 'L2_basket', 'L2_pyramidal',
+            'L5_basket', 'L5_pyramidal'
+        newcell_type: str
+            This is new cell type name replacing
+            the old cell type 
+            e.g. 'L2_basket' to 'L2_basket_column1' 
+            for multiple cortical column models
+            """
+        if oldcell_type in self.cell_types:
+            self.cell_types[newcell_type] = self.cell_types.pop(oldcell_type)
+            self.gid_ranges[newcell_type] = self.gid_ranges.pop(oldcell_type)
+            self.pos_dict[newcell_type] = self.pos_dict.pop(oldcell_type)
+            for cell_dict in self.connectivity:
+                for key, value in cell_dict.items():
+                    if value == oldcell_type:
+                        cell_dict[key] = newcell_type              
+        else:
+            print(f"'{oldcell_type}' not found in cell_types!")
     def copy(self):
         """Return a copy of the Network instance
 

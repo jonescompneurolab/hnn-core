@@ -397,7 +397,8 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     unique_types = np.unique(spike_types_data)
     spike_types_mask = {s_type: np.in1d(spike_types_data, s_type)
                         for s_type in unique_types}
-    cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
+  #  cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
+    cell_types= cell_response._cell_type_names
     input_types = np.setdiff1d(unique_types, cell_types)
 
     if isinstance(spike_types, str):
@@ -482,7 +483,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     return ax.get_figure()
 
 
-def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
+def plot_spikes_raster(cell_response, trial_idx=None, cell_type_colors= {'L5_pyramidal': 'r', 'L5_basket': 'b', 'L2_pyramidal': 'g', 'L2_basket': 'w'},ax=None, show=True):
     """Plot the aggregate spiking activity according to cell type.
 
     Parameters
@@ -524,9 +525,8 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
         spike_types = np.array([])
         spike_gids = np.array([])
 
-    cell_types = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
-    cell_type_colors = {'L5_pyramidal': 'r', 'L5_basket': 'b',
-                        'L2_pyramidal': 'g', 'L2_basket': 'w'}
+#    cell_types = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
+    cell_types= cell_response._cell_type_names
 
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
