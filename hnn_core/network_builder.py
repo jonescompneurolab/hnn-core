@@ -99,7 +99,7 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
         for sec_name, isec in isec_dict.items():
             isec_py[gid][sec_name] = {
                 key: isec.to_python() for key, isec in isec.items()}
-            
+
     dcell_py = dict()
     for gid, dcell in neuron_net._dcell.items():
         dcell_py[gid] = dcell.to_python()

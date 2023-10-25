@@ -229,7 +229,7 @@ class CellResponse(object):
     @property
     def isec(self):
         return self._isec
-    
+
     @property
     def dcell(self):
         return self._dcell
