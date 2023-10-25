@@ -281,7 +281,7 @@ def test_cell_response_backends(run_hnn_core_fixture):
 
     dipole_data = np.stack([agg_dipole_sum, L2_dipole_sum, L5_dipole_sum], axis=1)
 
-    test_dpl = Dipole(dpl[0].times, dipole_data)
+    test_dpl = Dipole(joblib_dpl[0].times, dipole_data)
     N_pyr_x = joblib_net._params['N_pyr_x']
     N_pyr_y = joblib_net._params['N_pyr_y']
     test_dpl._baseline_renormalize(N_pyr_x, N_pyr_y)
