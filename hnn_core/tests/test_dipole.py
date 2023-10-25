@@ -232,7 +232,7 @@ def test_cell_response_backends(run_hnn_core_fixture):
         trial_idx][gid]['apical_1']) == n_times
     assert len(joblib_net.cell_response.isec[
                trial_idx][gid]['soma']['soma_gabaa']) == n_times
-    assert len(joblib_net.cell_response.isec[trial_idx][gid]) == n_times
+    assert len(joblib_net.cell_response.dcell[trial_idx][gid]) == n_times
 
     assert len(mpi_net.cell_response.vsec) == n_trials
     assert len(mpi_net.cell_response.isec) == n_trials
@@ -243,7 +243,7 @@ def test_cell_response_backends(run_hnn_core_fixture):
         trial_idx][gid]['apical_1']) == n_times
     assert len(mpi_net.cell_response.isec[
                trial_idx][gid]['soma']['soma_gabaa']) == n_times
-    assert len(mpi_net.cell_response.isec[trial_idx][gid]) == n_times
+    assert len(mpi_net.cell_response.dcell[trial_idx][gid]) == n_times
     assert mpi_net.cell_response.vsec == joblib_net.cell_response.vsec
     assert mpi_net.cell_response.isec == joblib_net.cell_response.isec
     assert mpi_net.cell_response.dcell == joblib_net.cell_response.dcell
