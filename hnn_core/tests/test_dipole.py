@@ -215,12 +215,12 @@ def test_cell_response_backends(run_hnn_core_fixture):
 
     # reduced simulation has n_trials=2
     trial_idx, n_trials, gid = 0, 2, 7
-    joblib_dpl, joblib_net = run_hnn_core_fixture(backend='joblib', n_jobs=1,
-                                         reduced=True, record_vsec='all',
-                                         record_isec='soma', record_dcell=True)
-    mpi_dpl, mpi_net = run_hnn_core_fixture(backend='mpi', n_procs=2, reduced=True,
-                                      record_vsec='all', record_isec='soma',
-                                      record_dcell=True)
+    joblib_dpl, joblib_net = run_hnn_core_fixture(
+        backend='joblib', n_jobs=1, reduced=True, record_vsec='all',
+        record_isec='soma', record_dcell=True)
+    mpi_dpl, mpi_net = run_hnn_core_fixture(
+        backend='mpi', n_procs=2, reduced=True, record_vsec='all',
+        record_isec='soma', record_dcell=True)
     n_times = len(joblib_net.cell_response.times)
 
     assert len(joblib_net.cell_response.vsec) == n_trials
@@ -233,7 +233,6 @@ def test_cell_response_backends(run_hnn_core_fixture):
     assert len(joblib_net.cell_response.isec[
                trial_idx][gid]['soma']['soma_gabaa']) == n_times
     assert len(joblib_net.cell_response.isec[trial_idx][gid]) == n_times
-    
 
     assert len(mpi_net.cell_response.vsec) == n_trials
     assert len(mpi_net.cell_response.isec) == n_trials
@@ -279,7 +278,8 @@ def test_cell_response_backends(run_hnn_core_fixture):
     L2_dipole_sum = np.sum(L2_dipole, axis=0)
     agg_dipole_sum = np.sum(agg_dipole, axis=0)
 
-    dipole_data = np.stack([agg_dipole_sum, L2_dipole_sum, L5_dipole_sum], axis=1)
+    dipole_data = np.stack(
+        [agg_dipole_sum, L2_dipole_sum, L5_dipole_sum], axis=1)
 
     test_dpl = Dipole(joblib_dpl[0].times, dipole_data)
     N_pyr_x = joblib_net._params['N_pyr_x']
