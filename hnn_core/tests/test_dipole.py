@@ -270,8 +270,8 @@ def test_cell_response_backends(run_hnn_core_fixture):
     # test that individual cell dipoles match aggregate dipole
     L5_dipole = np.array([joblib_net.cell_response.dcell[0][gid] for
                           gid in list(joblib_net.gid_ranges['L5_pyramidal'])])
-    L2_dipole = np.array([joblib_net.cell_response.dcell[0][gid]
-                          for gid in list(joblib_net.gid_ranges['L2_pyramidal'])])
+    L2_dipole = np.array([joblib_net.cell_response.dcell[0][gid] for
+                          gid in list(joblib_net.gid_ranges['L2_pyramidal'])])
     agg_dipole = np.concatenate([L2_dipole, L5_dipole], axis=0)
 
     L5_dipole_sum = np.sum(L5_dipole, axis=0)
