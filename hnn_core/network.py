@@ -1266,23 +1266,70 @@ class Network(object):
 
         self.connectivity.append(deepcopy(conn))
 
-    def clear_connectivity(self):
-        """Remove all connections defined in Network.connectivity
-        """
-        connectivity = list()
-        for conn in self.connectivity:
-            if conn['src_type'] in self.external_drives.keys():
-                connectivity.append(conn)
-        self.connectivity = connectivity
+    def _clear_connectivity(self, src_types):
+        """Remove connections with src_type in Network.connectivity.
 
-    def clear_drives(self):
-        """Remove all drives defined in Network.connectivity"""
-        connectivity = list()
-        for conn in self.connectivity:
-            if conn['src_type'] not in self.external_drives.keys():
-                connectivity.append(conn)
-        self.external_drives = dict()
-        self.connectivity = connectivity
+        Parameters
+        ----------
+        src_types : list
+            Source types of connections to be cleared
+
+        """
+        _validate_type(src_types, list, 'src_types', 'list, drives, local')
+        # Finding connection indices to be deleted
+        conn_idxs = list()
+        for src_type in src_types:
+            conn_idxs.extend(pick_connection(self, src_gids=src_type))
+
+        # Deleting the indices
+        for conn_idx in sorted(conn_idxs, reverse=True):
+            del self.connectivity[conn_idx]
+
+    def clear_connectivity(self, src_types='all'):
+        """Clear connections between cells of the local network
+
+        Parameters
+        ----------
+        src_types : list | 'all'
+            Source types of connections to be cleared
+            'all' - Clear all connections between cells of the local network
+
+        """
+        if src_types == "all":
+            src_types = list((src_type for src_type in self.gid_ranges.keys()
+                             if src_type not in self.drive_names))
+        _validate_type(src_types, list, 'src_types', 'list')
+        drive_names = self.drive_names
+        for src_type in src_types:
+            if src_type in drive_names:
+                raise ValueError('src_types contains %s which is an external '
+                                 'drive.' % (src_type,))
+        self._clear_connectivity(src_types)
+
+    def clear_drives(self, drive_names='all'):
+        """Remove drives defined in Network.connectivity.
+
+        Parameters
+        ----------
+        drive_names : list | 'all'
+            The drive_names to remove
+        """
+        if drive_names == 'all':
+            drive_names = self.drive_names
+        _validate_type(drive_names, list, 'drive_names', 'list')
+        all_drive_names = self.drive_names
+        for drive_name in drive_names:
+            if drive_name not in all_drive_names:
+                raise ValueError('drive_names contains %s which is not an '
+                                 'external drive.' % (drive_name,))
+        for drive_name in drive_names:
+            del self.external_drives[drive_name]
+        self.clear_connectivity(src_types=drive_names)
+
+    @property
+    def drive_names(self):
+        """Returns a list containing names of all external drives."""
+        return list(self.external_drives.keys())
 
     def add_electrode_array(self, name, electrode_pos, *, conductivity=0.3,
                             method='psa', min_distance=0.5):

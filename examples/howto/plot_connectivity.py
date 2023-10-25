@@ -73,6 +73,7 @@ net_erp.cell_response.plot_spikes_raster()
 def get_network(probability=1.0):
     net = jones_2009_model(add_drives_from_params=True)
     net.clear_connectivity()
+    net.clear_drives()
 
     # Pyramidal cell connections
     location, receptor = 'distal', 'ampa'
