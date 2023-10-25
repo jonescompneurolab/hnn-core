@@ -421,9 +421,9 @@ class ExtracellularArray:
 
         return self
 
-    def plot_lfp(self, *, trial_no=None, contact_no=None, tmin=None, tmax=None,
-                 ax=None, decim=None, color='cividis', voltage_offset=50,
-                 voltage_scalebar=200, show=True):
+    def plot_lfp(self, *, trial_no=None, contact_no=None, ax=None, decim=None,
+                 color='cividis', voltage_offset=50, voltage_scalebar=200,
+                 show=True):
         """Plot laminar local field potential time series.
 
         One plot is created for each trial. Multiple trials can be overlaid
@@ -435,11 +435,6 @@ class ExtracellularArray:
             Trial number(s) to plot
         contact_no : int | list of int | slice
             Electrode contact number(s) to plot
-        tmin : float | None
-            Start time of plot in milliseconds. If None, plot entire
-            simulation.
-        tmax : float | None
-            End time of plot in milliseconds. If None, plot entire simulation.
         ax : instance of matplotlib figure | None
             The matplotlib axis
         decim : int | list of int | None (default)
@@ -486,7 +481,7 @@ class ExtracellularArray:
 
         for trial_data in plot_data:
             fig = plot_laminar_lfp(
-                self.times, trial_data, tmin=tmin, tmax=tmax, ax=ax,
+                self.times, trial_data, ax=ax,
                 decim=decim, color=color,
                 voltage_offset=voltage_offset,
                 voltage_scalebar=voltage_scalebar,
@@ -534,6 +529,7 @@ class _ExtracellularArrayBuilder(object):
         The instance of :class:`hnn_core.extracellular.ExtracellularArray` to
         build in NEURON-Python
     """
+
     def __init__(self, array):
         self.array = array
         self.n_contacts = array.n_contacts
