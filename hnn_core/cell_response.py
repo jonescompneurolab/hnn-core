@@ -56,6 +56,9 @@ class CellResponse(object):
     isec : list (n_trials,) of dict, shape
         Each element of the outer list is a trial.
         Dictionary indexed by gids containing currents for cell sections.
+    dcell : list (n_trials,) of dict, shape
+        Each element of the outer list is a trial.
+        Dictionary indexed by gids containing dipoles for individual cells.
     times : array-like, shape (n_times,)
         Array of time points for samples in continuous data.
         This includes vsoma and isoma.
@@ -115,6 +118,7 @@ class CellResponse(object):
         self._spike_types = spike_types
         self._vsec = list()
         self._isec = list()
+        self._dcell = list()
         if times is not None:
             if not isinstance(times, (list, np.ndarray)):
                 raise TypeError("'times' is an np.ndarray of simulation times")
@@ -225,6 +229,10 @@ class CellResponse(object):
     @property
     def isec(self):
         return self._isec
+    
+    @property
+    def dcell(self):
+        return self._dcell
 
     @property
     def times(self):
@@ -423,6 +431,10 @@ class CellResponse(object):
             # Turn `int` gid keys into string values for hdf5 format
             trial = dict((str(key), val) for key, val in trial.items())
             cell_response_data['isec'].append(trial)
+        for trial in self.dcell:
+            # Turn `int` gid keys into string values for hdf5 format
+            trial = dict((str(key), val) for key, val in trial.items())
+            cell_response_data['dcell'].append(trial)
         cell_response_data['times'] = self.times
         return cell_response_data
 
