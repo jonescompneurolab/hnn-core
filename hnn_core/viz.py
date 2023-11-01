@@ -476,7 +476,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     return ax.get_figure()
 
 
-def plot_spikes_raster(cell_response, trial_idx=None, tmin=None, tmax=None,
+def plot_spikes_raster(cell_response, trial_idx=None,
                        ax=None, show=True):
     """Plot the aggregate spiking activity according to cell type.
 
@@ -486,10 +486,6 @@ def plot_spikes_raster(cell_response, trial_idx=None, tmin=None, tmax=None,
         The CellResponse object from net.cell_response
     trial_idx : int | list of int | None
         Index of trials to be plotted. If None, all trials plotted
-    tmin : float or None
-        Start time of plot in milliseconds. If None, plot entire simulation.
-    tmax : float or None
-        End time of plot in milliseconds. If None, plot entire simulation.
     ax : instance of matplotlib axis | None
         An axis object from matplotlib. If None, a new figure is created.
     show : bool
@@ -537,7 +533,9 @@ def plot_spikes_raster(cell_response, trial_idx=None, tmin=None, tmax=None,
         cell_type_times, cell_type_ypos = [], []
         for gid in cell_type_gids:
             gid_time = spike_times[spike_gids == gid]
-            _, gid_time = _get_plot_data_trange(gid_time, gid_time, tmin, tmax)
+            _, gid_time = _get_plot_data_trange(
+                gid_time, gid_time, cell_response.times[0],
+                cell_response.times[-1])
             cell_type_times.append(gid_time)
             cell_type_ypos.append(ypos)
             ypos = ypos - 1
@@ -1179,7 +1177,7 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
     return ax.get_figure()
 
 
-def plot_laminar_csd(times, data, contact_labels, tmin=None, tmax=None,
+def plot_laminar_csd(times, data, contact_labels,
                      ax=None, colorbar=True, show=True):
     """Plot laminar current source density (CSD) estimation from LFP array.
 
@@ -1189,9 +1187,6 @@ def plot_laminar_csd(times, data, contact_labels, tmin=None, tmax=None,
         Sampling times (in ms).
     data : array-like, shape (n_channels, n_times)
         CSD data, channels x time.
-    tmin : float | None
-        Start time of plot in milliseconds. If None, plot entire simulation.
-    tmax : float | None
     ax : instance of matplotlib figure | None
         The matplotlib axis.
     colorbar : bool
@@ -1210,9 +1205,9 @@ def plot_laminar_csd(times, data, contact_labels, tmin=None, tmax=None,
     import matplotlib.pyplot as plt
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
-    times, data = _get_plot_data_trange(times, data, tmin, tmax)
+    times, data = _get_plot_data_trange(times, data, times[0], times[-1])
     _, contact_labels = _get_plot_data_trange(
-        times, contact_labels, tmin, tmax)
+        times, contact_labels, times[0], times[-1])
     im = ax.pcolormesh(times, contact_labels, np.array(data),
                        cmap="jet_r", shading='auto')
     ax.set_title("CSD")
