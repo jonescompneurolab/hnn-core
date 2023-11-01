@@ -178,7 +178,7 @@ def plot_laminar_lfp(times, data, contact_labels, ax=None, decim=None,
             col = color
         ax.plot(plot_times, plot_data + trace_offsets[contact_no],
                 label=f'C{contact_no}', color=col)
-        ax.set_xlim(right=plot_times[-1])
+        ax.set_xlim(right=times[-1])
 
     if voltage_offset is not None:
         ax.set_ylim(-voltage_offset, n_offsets * voltage_offset)
