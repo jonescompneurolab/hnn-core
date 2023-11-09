@@ -322,6 +322,8 @@ class HNNGUI:
             text-align:center;color:white;'>
             HUMAN NEOCORTICAL NEUROSOLVER</div>""")
 
+        self._conn_drive_s = {}
+
     @property
     def analysis_config(self):
         """Provides everything viz window needs except for the data."""
@@ -357,11 +359,16 @@ class HNNGUI:
                                          self.widget_n_jobs)
 
         def _add_drive_button_clicked(b):
-            return add_drive_widget(self.widget_drive_type_selection.value,
-                                    self.drive_boxes, self.drive_widgets,
-                                    self._drives_out, self.widget_tstop,
-                                    self.widget_location_selection.value,
-                                    layout=self.layout['drive_textbox'])
+            add_drive_widget(self.widget_drive_type_selection.value,
+                             self.drive_boxes, self.drive_widgets,
+                             self.widget_tstop,
+                             self.widget_location_selection.value,
+                             layout=self.layout['drive_textbox'])
+            self._conn_drive_s['drive'] = add_drive_accordian(
+                self._drives_out,
+                self.drive_boxes,
+                self.drive_widgets,
+                expand_last_drive=False)
 
         def _delete_drives_clicked(b):
             self._drives_out.clear_output()
@@ -375,7 +382,7 @@ class HNNGUI:
             return on_upload_params_change(
                 change, self.params, self.widget_tstop, self.widget_dt,
                 self._log_out, self.drive_boxes, self.drive_widgets,
-                self._drives_out, self._connectivity_out,
+                self._drives_out, self._connectivity_out, self._conn_drive_s,
                 self.connectivity_widgets, self.layout['drive_textbox'],
                 "connectivity")
 
@@ -383,9 +390,9 @@ class HNNGUI:
             return on_upload_params_change(
                 change, self.params, self.widget_tstop, self.widget_dt,
                 self._log_out, self.drive_boxes, self.drive_widgets,
-                self._drives_out, self._connectivity_out,
+                self._drives_out, self._connectivity_out, self._conn_drive_s,
                 self.connectivity_widgets, self.layout['drive_textbox'],
-                "drives")
+                "drive")
 
         def _on_upload_data(change):
             return on_upload_data_change(change, self.data, self.viz_manager,
@@ -495,6 +502,7 @@ class HNNGUI:
         load_drive_and_connectivity(self.params, self._log_out,
                                     self._drives_out, self.drive_widgets,
                                     self.drive_boxes, self._connectivity_out,
+                                    self._conn_drive_s,
                                     self.connectivity_widgets,
                                     self.widget_tstop, self.layout)
 
@@ -751,9 +759,9 @@ def _get_cell_specific_widgets(layout, style, location, data=None):
         'weights_nmda': weights_nmda,
         'delays': delays
     }
-    widgets_list = ([HTML(value="<b>AMPA weights</b>")] +
+    widgets_list = ([HTML(value="<b>AMPA weights (µS)</b>")] +
                     list(weights_ampa.values()) +
-                    [HTML(value="<b>NMDA weights</b>")] +
+                    [HTML(value="<b>NMDA weights (µS)</b>")] +
                     list(weights_nmda.values()) +
                     [HTML(value="<b>Synaptic delays</b>")] +
                     list(delays.values()))
@@ -877,7 +885,7 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
         },
     )
     widgets_dict.update({'rate_constant': rate_constant})
-    widgets_list.extend([HTML(value="<b>Rate constants</b>")] +
+    widgets_list.extend([HTML(value="<b>Rate constants (Hz)</b>")] +
                         list(widgets_dict['rate_constant'].values()))
 
     drive_box = VBox([tstart, tstop, seedcore] + widgets_list)
@@ -943,81 +951,65 @@ def _get_evoked_widget(name, layout, style, location, data=None,
     return drive, drive_box
 
 
-def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
-                     tstop_widget, location, layout,
-                     prespecified_drive_name=None,
+def add_drive_widget(drive_type, drive_boxes, drive_widgets, tstop_widget,
+                     location, layout, prespecified_drive_name=None,
                      prespecified_drive_data=None,
                      prespecified_weights_ampa=None,
                      prespecified_weights_nmda=None,
-                     prespecified_delays=None, render=True,
-                     expand_last_drive=True, event_seed=14):
+                     prespecified_delays=None, event_seed=14):
     """Add a widget for a new drive."""
-
     style = {'description_width': '150px'}
-    drives_out.clear_output()
+
     if not prespecified_drive_data:
         prespecified_drive_data = {}
     prespecified_drive_data.update({"seedcore": max(event_seed, 2)})
 
-    with drives_out:
-        if not prespecified_drive_name:
-            name = drive_type + str(len(drive_boxes))
-        else:
-            name = prespecified_drive_name
-        if drive_type in ('Rhythmic', 'Bursty'):
-            drive, drive_box = _get_rhythmic_widget(
-                name,
-                tstop_widget,
-                layout,
-                style,
-                location,
-                data=prespecified_drive_data,
-                default_weights_ampa=prespecified_weights_ampa,
-                default_weights_nmda=prespecified_weights_nmda,
-                default_delays=prespecified_delays,
-            )
-        elif drive_type == 'Poisson':
-            drive, drive_box = _get_poisson_widget(
-                name,
-                tstop_widget,
-                layout,
-                style,
-                location,
-                data=prespecified_drive_data,
-                default_weights_ampa=prespecified_weights_ampa,
-                default_weights_nmda=prespecified_weights_nmda,
-                default_delays=prespecified_delays,
-            )
-        elif drive_type in ('Evoked', 'Gaussian'):
-            drive, drive_box = _get_evoked_widget(
-                name,
-                layout,
-                style,
-                location,
-                data=prespecified_drive_data,
-                default_weights_ampa=prespecified_weights_ampa,
-                default_weights_nmda=prespecified_weights_nmda,
-                default_delays=prespecified_delays,
-            )
+    if not prespecified_drive_name:
+        name = drive_type + str(len(drive_boxes))
+    else:
+        name = prespecified_drive_name
+    assert drive_type in [
+        'Evoked', 'Poisson', 'Rhythmic', 'Bursty', 'Gaussian'
+    ], "Unsupported drive type in GUI"
 
-        if drive_type in [
-                'Evoked', 'Poisson', 'Rhythmic', 'Bursty', 'Gaussian'
-        ]:
-            drive_boxes.append(drive_box)
-            drive_widgets.append(drive)
+    if drive_type in ('Rhythmic', 'Bursty'):
+        drive, drive_box = _get_rhythmic_widget(
+            name,
+            tstop_widget,
+            layout,
+            style,
+            location,
+            data=prespecified_drive_data,
+            default_weights_ampa=prespecified_weights_ampa,
+            default_weights_nmda=prespecified_weights_nmda,
+            default_delays=prespecified_delays,
+        )
+    elif drive_type == 'Poisson':
+        drive, drive_box = _get_poisson_widget(
+            name,
+            tstop_widget,
+            layout,
+            style,
+            location,
+            data=prespecified_drive_data,
+            default_weights_ampa=prespecified_weights_ampa,
+            default_weights_nmda=prespecified_weights_nmda,
+            default_delays=prespecified_delays,
+        )
+    elif drive_type in ('Evoked', 'Gaussian'):
+        drive, drive_box = _get_evoked_widget(
+            name,
+            layout,
+            style,
+            location,
+            data=prespecified_drive_data,
+            default_weights_ampa=prespecified_weights_ampa,
+            default_weights_nmda=prespecified_weights_nmda,
+            default_delays=prespecified_delays,
+        )
 
-        if render:
-            accordion = Accordion(
-                children=drive_boxes,
-                selected_index=len(drive_boxes) -
-                1 if expand_last_drive else None,
-            )
-
-            for idx, drive in enumerate(drive_widgets):
-                accordion.set_title(idx,
-                                    f"{drive['name']} ({drive['location']})")
-
-            display(accordion)
+    drive_boxes.append(drive_box)
+    drive_widgets.append(drive)
 
 
 def add_connectivity_tab(params, connectivity_out,
@@ -1076,7 +1068,26 @@ def add_connectivity_tab(params, connectivity_out,
     with connectivity_out:
         display(cell_connectivity)
 
-    return net
+    return net, cell_connectivity
+
+
+def add_drive_accordian(drives_out, drive_boxes, drive_widgets,
+                        expand_last_drive=False):
+    drives_out.clear_output()
+    with drives_out:
+        logger.info("create drive Accordion")
+        accordion = Accordion(
+            children=drive_boxes,
+            selected_index=len(drive_boxes) -
+            1 if expand_last_drive else None,
+        )
+
+        for idx, drive in enumerate(drive_widgets):
+            accordion.set_title(idx,
+                                f"{drive['name']} ({drive['location']})")
+
+        display(accordion)
+    return accordion
 
 
 def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
@@ -1094,13 +1105,10 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
     drive_names = sorted(drive_specs.keys())
     for idx, drive_name in enumerate(drive_names):  # order matters
         specs = drive_specs[drive_name]
-        should_render = idx == (len(drive_names) - 1)
-
         add_drive_widget(
             specs['type'].capitalize(),
             drive_boxes,
             drive_widgets,
-            drives_out,
             tstop,
             specs['location'],
             layout=layout,
@@ -1109,23 +1117,30 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
             prespecified_weights_ampa=specs['weights_ampa'],
             prespecified_weights_nmda=specs['weights_nmda'],
             prespecified_delays=specs['synaptic_delays'],
-            render=should_render,
-            expand_last_drive=False,
             event_seed=specs['event_seed'],
         )
+
+    accordian = add_drive_accordian(drives_out, drive_boxes, drive_widgets,
+                                    expand_last_drive=False)
+    return net, accordian
 
 
 def load_drive_and_connectivity(params, log_out, drives_out,
                                 drive_widgets, drive_boxes, connectivity_out,
-                                connectivity_textfields, tstop, layout):
+                                conn_drive_s, connectivity_textfields, tstop,
+                                layout):
     """Add drive and connectivity ipywidgets from params."""
     log_out.clear_output()
     with log_out:
         # Add connectivity
-        add_connectivity_tab(params, connectivity_out, connectivity_textfields)
+        _, _conns = add_connectivity_tab(
+            params, connectivity_out, connectivity_textfields)
         # Add drives
-        add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
-                      layout)
+        _, _drives = add_drive_tab(params, drives_out, drive_widgets,
+                                   drive_boxes, tstop, layout)
+
+        conn_drive_s['connectivity'] = _conns
+        conn_drive_s['drive'] = _drives
 
 
 def on_upload_data_change(change, data, viz_manager, log_out):
@@ -1158,7 +1173,8 @@ def on_upload_data_change(change, data, viz_manager, log_out):
 
 def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
                             drive_widgets, drives_out, connectivity_out,
-                            connectivity_textfields, layout, load_type):
+                            conn_drive_s, connectivity_textfields, layout,
+                            load_type):
     if len(change['owner'].value) == 0:
         logger.info("Empty change")
         return
@@ -1185,12 +1201,14 @@ def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
         params.update(params_network)
     # init network, add drives & connectivity
     if load_type == 'connectivity':
-        add_connectivity_tab(params, connectivity_out, connectivity_textfields)
-    elif load_type == 'drives':
-        add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
-                      layout)
+        _, _res = add_connectivity_tab(params, connectivity_out,
+                                       connectivity_textfields)
+    elif load_type == 'drive':
+        _, _res = add_drive_tab(params, drives_out, drive_widgets, drive_boxes,
+                                tstop, layout)
     else:
         raise ValueError
+    conn_drive_s[load_type] = _res
 
     change['owner'].set_trait('_counter', 0)
     change['owner'].set_trait('value', {})
@@ -1239,11 +1257,17 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
         }
         synaptic_delays = {k: v.value for k, v in drive['delays'].items()}
         print(
-            f"drive type is {drive['type']}, location={drive['location']}")
+            f"drive type is {drive['type']}, location={drive['location']} "
+            f"synaptic_delays={synaptic_delays}")
         if drive['type'] == 'Poisson':
             rate_constant = {
                 k: v.value
                 for k, v in drive['rate_constant'].items() if v.value > 0
+            }
+            # filter to match the key
+            synaptic_delays = {
+                k: synaptic_delays[k]
+                for k in rate_constant.keys()
             }
             weights_ampa = {
                 k: v
