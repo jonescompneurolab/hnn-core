@@ -1,9 +1,9 @@
-# import itertools as it
-# from copy import deepcopy
-# from collections import OrderedDict
+import itertools as it
+from copy import deepcopy
+from collections import OrderedDict
 
-# import numpy as np
-# import warnings
+import numpy as np
+import warnings
 
 # from .drives import _drive_cell_event_times
 # from .drives import _get_target_properties, _add_drives_from_params
@@ -17,6 +17,9 @@
 
 
 from netpyne import specs, sim
+from neuron import h
+
+from netpyne.cell.inputs import createEvokedPattern
 
 
 class NetPyne_Model(object):
@@ -113,12 +116,19 @@ class NetPyne_Model(object):
             'synMech': 'exc'}               # synaptic mechanism
 
 
-    def add_evoked_drive(self):
+
+    # def add_evoked_drive(self):
+
+    def add_evoked_drive(self, mu, sigma, numspikes, location,
+                         n_drive_cells, synaptic_delays=0.1,
+                         probability=1.0, event_seed=2):
+
     # def add_evoked_drive(self, name, *, mu, sigma, numspikes, location,
     #                      n_drive_cells='n_cells', cell_specific=True,
     #                      weights_ampa=None, weights_nmda=None,
     #                      space_constant=3., synaptic_delays=0.1,
     #                      probability=1.0, event_seed=2, conn_seed=3):
+
         """Add an 'evoked' external drive to the network
 
         # create drive cells and connect them to the real cells defined in the init function
@@ -201,16 +211,36 @@ class NetPyne_Model(object):
             probability < 1.0, the random subset of gids targeted is the same.
         """
 
+        
         # Stimulation parameters
         self.netParams.stimSourceParams['bkg'] = {'type': 'NetStim', 'rate': 10, 'noise': 0.5}
-        self.netParams.stimTargetParams['bkg->PYR'] = {'source': 'bkg', 'conds': {'cellType': 'PYR'}, 'weight': 0.01, 'delay': 1, 'synMech': 'exc'}
+        self.netParams.stimTargetParams['bkg->PYR'] = {'source': 'bkg', 'loc':location, 'conds': {'cellType': 'PYR'}, 'weight': 0.01, 'delay': synaptic_delays, 'synMech': 'exc'}
 
+
+        params = {'start':mu, 'startStd':sigma, 'numspikes':numspikes}
+        spkTimes = createEvokedPattern(params, rand=h.Random())
+
+        ## Population parameters
+        self.netParams.popParams['artif1'] = {'cellModel': 'NetStim', 'cellType': 'bkg', 'numCells': n_drive_cells, 'start':spkTimes[0], 'number':numspikes, 'seed':event_seed, 'spkTimes': spkTimes} 
+        self.netParams.popParams['artif2'] = {'cellModel': 'NetStim', 'cellType': 'bkg', 'numCells': n_drive_cells, 'start':spkTimes[0], 'number':numspikes, 'seed':event_seed, 'spkTimes': spkTimes}  # ??? VecStim with spike times
+
+
+        ## Cell connectivity rules
+        self.netParams.connParams['artif1->artif2'] = {    #  artif1 -> artif2 label
+            'preConds': {'pop': 'artif1'},       # conditions of presyn cells
+            'postConds': {'pop': 'artif2'},      # conditions of postsyn cells
+            'probability': probability,
+            'weight': 0.01,                 # synaptic weight
+            'delay': synaptic_delays, 
+            'loc': location, 
+            'synMech': 'exc'}               # synaptic mechanism
         
         
 
 def netpyne_model(params):
 	net = NetPyne_Model(params)
 	return net
+
 
 def simulate_dipole_netpyne(net,  dt=0.025, tstop=170):
 	# code to simulate netpyne model
