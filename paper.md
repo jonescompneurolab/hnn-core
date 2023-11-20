@@ -143,9 +143,7 @@ Scripting in HNN-core greatly expands the software utility particularly for larg
 
 # Notable features of HNN-core 
 
-HNN-core code enables the creation of a new and improved web-based GUI based on ipywidgets [@ipywidgets2015] and voila [@voila2019] that can be run remotely with port forwarding.
-
-HNN-core functionality also supports advanced simulations through scripting that are not currently possible in the GUI including:
+HNN-core functionality supports advanced simulations through scripting that are not currently possible in the GUI including:
 
 - The ability to record extracellular local field potentials from user defined positions, as well as voltages and synaptic currents from any compartment in the model
 - The ability to modify all features of the morphology and biophysical properties of any cell in the network
@@ -154,6 +152,8 @@ HNN-core functionality also supports advanced simulations through scripting that
 - The ability to choose from multiple template models based on previous publications (e.g., `jones_2009_model()`{.python} [@jones2009quantitative], `law_2021_model()`{.python} [@law2022thalamocortical], and `calcium_model()`{.python} [@kohl2022neural])
 - Built-in ERP optimization functionality designed for faster convergence 
 - The choice of two parallel backends for either parallelizing across cells to speed up individual simulations (MPI), or across trials to speed up batches of simulations (Joblib)
+
+HNN-core code has also enabled the creation of a new and improved web-based GUI based on ipywidgets [@ipywidgets2015] and voila [@voila2019] that can be run remotely with port forwarding.
 
 All of the code associated with HNN-core has been extensively documented at multiple levels,  including an API describing basic functions/parameters and examples of  use for hypothesis generation and/or testing. Specifically, we distribute tutorials that mimic the original GUI tutorial workflows for simulating ERPs and low frequency rhythms using HNN-core functions, with commentary on the known biophysical mechanisms of these signals. We also provide short and targeted “How to” examples that describe how to use specific functionality, such as plotting firing rates, or recording extracellular LFPs. 
 
@@ -183,7 +183,7 @@ dpl = simulate_dipole(net, tstop=100.0)
 
 Given a well-structured hypothesis, HNN-core can be used to make inferences on a variety of neocortical circuit mechanisms by observing a mechanism’s effect (through simulation) on resting state and evoked response current dipoles, LFPs, and spiking activity. Such mechanisms include, but are not limited to, the timing, location, and synaptic strength of external inputs, as well as biophysical and morphological properties of key neuron types and their connectivity within a neocortical column network.
 
-The HNN-core tutorials include examples of directly comparing simulations to real data such as human SI MEG [tactile](https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/workflows/plot_simulate_evoked.html#sphx-glr-auto-examples-workflows-plot-simulate-evoked-py) and [median nerve](https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/workflows/plot_simulate_somato.html#sphx-glr-auto-examples-workflows-plot-simulate-somato-py) evoked responses. The tutorials also include examples of recreating [alpha/beta](https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/workflows/plot_simulate_alpha.html#sphx-glr-auto-examples-workflows-plot-simulate-alpha-py) , and [gamma](https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/workflows/plot_simulate_gamma.html#sphx-glr-auto-examples-workflows-plot-simulate-gamma-py) brain rhythms.
+The HNN-core tutorials include examples of directly comparing simulations to real data such as human SI MEG [tactile](https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/workflows/plot_simulate_evoked.html#sphx-glr-auto-examples-workflows-plot-simulate-evoked-py) and [median nerve](https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/workflows/plot_simulate_somato.html#sphx-glr-auto-examples-workflows-plot-simulate-somato-py) evoked responses. The tutorials also include examples of recreating [alpha/beta](https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/workflows/plot_simulate_alpha.html#sphx-glr-auto-examples-workflows-plot-simulate-alpha-py) and [gamma](https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/workflows/plot_simulate_gamma.html#sphx-glr-auto-examples-workflows-plot-simulate-gamma-py) brain rhythms.
 
 # Ongoing research using HNN-core
 
