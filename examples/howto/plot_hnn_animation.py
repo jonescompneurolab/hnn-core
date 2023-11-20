@@ -13,6 +13,7 @@ This example demonstrates how to animate HNN simulations
 # First, we'll import the necessary modules for instantiating a network and
 # running a simulation that we would like to animate.
 import os.path as op
+
 import hnn_core
 from hnn_core import jones_2009_model, simulate_dipole, read_params
 from hnn_core.network_models import add_erp_drives_to_jones_model
