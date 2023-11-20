@@ -1211,7 +1211,7 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
     ax : instance of matplotlib figure | None
         The matplotlib axis.
     colorbar : bool
-        If the colorbar is presented.
+        If True (default), adjust figure to include colorbar.
     contact_labels : list
         Labels associated with the contacts to plot. Passed as-is to
         :func:`~matplotlib.axes.Axes.set_yticklabels`.
@@ -1244,8 +1244,7 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
 
 
 class NetworkPlotter:
-    """Helper class to visualize full
-       morphology of HNN model.
+    """Helper class to visualize full morphology of HNN model.
 
     Parameters
     ----------
@@ -1262,6 +1261,8 @@ class NetworkPlotter:
         Default: 50 mV
     bg_color : str
         Background color of ax. Default: 'black'
+    colorbar : bool
+        If True (default), adjust figure to include colorbar.
     voltage_colormap : str
         Colormap used for plotting voltages
         Default: 'viridis'
@@ -1281,7 +1282,7 @@ class NetworkPlotter:
         Index of time point plotted. Default: 0
     """
     def __init__(self, net, ax=None, vmin=-100, vmax=50, bg_color='black',
-                 voltage_colormap='viridis', elev=10, azim=-500,
+                 colorbar=True, voltage_colormap='viridis', elev=10, azim=-500,
                  xlim=(-200, 3100), ylim=(-200, 3100), zlim=(-300, 2200),
                  trial_idx=0, time_idx=0):
         import matplotlib.pyplot as plt
@@ -1309,8 +1310,8 @@ class NetworkPlotter:
         self._bg_color = bg_color
         self._voltage_colormap = voltage_colormap
 
-        self.colormaps = colormaps  # Saved for voltage_colormap update method
-        self.colormap = colormaps[voltage_colormap]
+        self._colormaps = colormaps  # Saved for voltage_colormap update method
+        self._colormap = colormaps[voltage_colormap]
 
         # Axes limits and view positions
         _validate_type(xlim, tuple, 'xlim')
@@ -1334,7 +1335,7 @@ class NetworkPlotter:
 
         # Get voltage data and corresponding colors
         self.vsec_array = self._get_voltages()
-        self.color_array = self.colormap(self.vsec_array)
+        self.color_array = self._colormap(self.vsec_array)
 
         # Create figure
         if ax is None:
@@ -1346,6 +1347,13 @@ class NetworkPlotter:
             self.fig = None
         self._init_network_plot()
         self._update_axes()
+
+        _validate_type(colorbar, bool, 'colorbar')
+        self._colorbar = colorbar
+        if self._colorbar:
+            self._update_colorbar()
+        else:
+            self._cbar = None
 
     def _get_voltages(self):
         vsec_list = list()
@@ -1395,10 +1403,23 @@ class NetworkPlotter:
 
         self.ax.view_init(self._elev, self._azim)
 
+    def _update_colorbar(self):
+        import matplotlib.pyplot as plt
+        import matplotlib.colors as mc
+
+        fig = self.ax.get_figure()
+        sm = plt.cm.ScalarMappable(
+            cmap=self.voltage_colormap,
+            norm=mc.Normalize(vmin=self.vmin, vmax=self.vmax))
+        self._cbar = fig.colorbar(sm, ax=self.ax)
+
     def export_movie(self, fname, fps=30, dpi=300, decim=10,
                      interval=30, frame_start=0, frame_stop=None,
                      writer='pillow'):
         """Export movie of network activity
+
+        Parameters
+        ----------
         fname : str
             Filename of exported movie
         fps : int
@@ -1498,7 +1519,10 @@ class NetworkPlotter:
         _validate_type(vmin, (int, float), 'vmin')
         self._vmin = vmin
         self.vsec_array = self._get_voltages()
-        self.color_array = self.colormap(self.vsec_array)
+        self.color_array = self._colormap(self.vsec_array)
+        if self._colorbar:
+            self._cbar.remove()
+            self._update_colorbar()
 
     @property
     def vmax(self):
@@ -1509,7 +1533,10 @@ class NetworkPlotter:
         _validate_type(vmax, (int, float), 'vmax')
         self._vmax = vmax
         self.vsec_array = self._get_voltages()
-        self.color_array = self.colormap(self.vsec_array)
+        self.color_array = self._colormap(self.vsec_array)
+        if self._colorbar:
+            self._cbar.remove()
+            self._update_colorbar()
 
     # Time and trial indices
     @property
@@ -1521,7 +1548,7 @@ class NetworkPlotter:
         _validate_type(trial_idx, int, 'trial_idx')
         self._trial_idx = trial_idx
         self.vsec_array = self._get_voltages()
-        self.color_array = self.colormap(self.vsec_array)
+        self.color_array = self._colormap(self.vsec_array)
 
     @property
     def time_idx(self):
@@ -1554,5 +1581,25 @@ class NetworkPlotter:
     @voltage_colormap.setter
     def voltage_colormap(self, voltage_colormap):
         self._voltage_colormap = voltage_colormap
-        self.colormap = self.colormaps[self._voltage_colormap]
-        self.color_array = self.colormap(self.vsec_array)
+        self._colormap = self._colormaps[self._voltage_colormap]
+        self.color_array = self._colormap(self.vsec_array)
+        if self._colorbar:
+            self._cbar.remove()
+            self._update_colorbar()
+
+    @property
+    def colorbar(self):
+        return self._colorbar
+
+    @colorbar.setter
+    def colorbar(self, colorbar):
+        _validate_type(colorbar, bool, 'colorbar')
+        self._colorbar = colorbar
+        if self._colorbar:
+            # Remove old colorbar if already exists
+            if self._cbar is not None:
+                self._cbar.remove()
+            self._update_colorbar()
+        else:
+            self._cbar.remove()
+            self._cbar = None

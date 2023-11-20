@@ -3,6 +3,8 @@ import os.path as op
 import matplotlib
 from matplotlib import backend_bases
 import matplotlib.pyplot as plt
+from matplotlib.colorbar import Colorbar
+
 import numpy as np
 from numpy.testing import assert_allclose
 import pytest
@@ -240,6 +242,8 @@ def test_dipole_visualization():
         _ = NetworkPlotter(net, trial_idx=1.0)
     with pytest.raises(TypeError, match='time_idx must be'):
         _ = NetworkPlotter(net, time_idx=1.0)
+    with pytest.raises(TypeError, match='colorbar must be'):
+        _ = NetworkPlotter(net, colorbar='blah')
 
     net = jones_2009_model(params)
     net_plot = NetworkPlotter(net)
@@ -272,6 +276,7 @@ def test_dipole_visualization():
     assert net_plot.vsec_array.shape == (159, 21)
     assert net_plot.color_array.shape == (159, 21, 4)
     assert net_plot._vsec_recorded is True
+    assert isinstance(net_plot._cbar, Colorbar)
 
     # Type check errors
     with pytest.raises(TypeError, match='xlim must be'):
@@ -292,6 +297,8 @@ def test_dipole_visualization():
         net_plot.trial_idx = 1.0
     with pytest.raises(TypeError, match='time_idx must be'):
         net_plot.time_idx = 1.0
+    with pytest.raises(TypeError, match='colorbar must be'):
+        net_plot.colorbar = 'blah'
 
     # Check that the setters work
     net_plot.xlim = (-100, 100)
@@ -305,6 +312,10 @@ def test_dipole_visualization():
     net_plot.time_idx = 5
     net_plot.bgcolor = 'white'
     net_plot.voltage_colormap = 'jet'
+
+    net_plot.colorbar = False
+    # check later that net._cbar is None
+    assert net_plot._cbar is None
 
     # Check that the getters work
     assert net_plot.xlim == (-100, 100)
