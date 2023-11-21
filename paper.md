@@ -149,7 +149,7 @@ HNN-core functionality supports advanced simulations through scripting that are 
 - The ability to modify all features of the morphology and biophysical properties of any cell in the network
 - An API that enables complete control of cell-cell and drive-cell connectivity in the network
 - An API that allows for flexibility in defining the exogenous layer-specific drive to the neocortical network
-- The ability to choose from multiple template models based on previous publications (e.g., `jones_2009_model()`{.python} [@jones2009quantitative], `law_2021_model()`{.python} [@law2022thalamocortical], and `calcium_model()`{.python} [@kohl2022neural])
+- The ability to choose from multiple template models based on previous publications (e.g., `jones_2009_model()`{.python} [@jones2009quantitative], `law_2021_model()`{.python} [@law2022thalamocortical], and `calcium_model()`{.python} adapted from [@kohl2022neural])
 - Built-in ERP optimization functionality designed for faster convergence 
 - The choice of two parallel backends for either parallelizing across cells to speed up individual simulations (MPI), or across trials to speed up batches of simulations (Joblib)
 
