@@ -28,7 +28,7 @@ def pytest_runtest_makereport(item, call):
         # are skipped because mpi4py is not installed, still continue with
         # all other tests that do not require mpi4py
         if call.excinfo is not None and not call.excinfo.typename == "Skipped":
-            # the test has failed, but was not skiped
+            # the test has failed, but was not skipped
 
             # retrieve the class name of the test
             cls_name = str(item.cls)
