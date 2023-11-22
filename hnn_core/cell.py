@@ -268,7 +268,7 @@ class Cell:
         Stores the tree representation of a cell.
         Root is the 0 end of 'soma'. Nodes are a tuple (sec_name, node_pos)
         where sec_name is the name of the section and node_pos is the 0 end
-        or 1 end. The data structure is the adjacency list represetation of a
+        or 1 end. The data structure is the adjacency list representation of a
         tree. The keys of the dict are the parent nodes. The value is the
         list of nodes (children nodes) connected to the parent node.
 
@@ -306,7 +306,7 @@ class Cell:
         Stores the tree representation of a cell.
         Root is the 0 end of 'soma'. Nodes are a tuple (sec_name, node_pos)
         where sec_name is the name of the section and node_pos is the 0 end
-        or 1 end. The data structure is the adjacency list represetation of a
+        or 1 end. The data structure is the adjacency list representation of a
         tree. The keys of the dict are the parent nodes. The value is the
         list of nodes (children nodes) connected to the parent node.
 

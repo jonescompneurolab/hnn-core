@@ -20,7 +20,7 @@ def test_cells_default():
     assert 'apical_2' in l5p.sections
 
     # check that after building, the vertical sections have the length
-    # specified in get_L5Pyr_params_default (or overriden in a params file).
+    # specified in get_L5Pyr_params_default (or overridden in a params file).
     # Note that the lengths implied by _secs_L5Pyr are completely ignored:
     # NEURON extends the sections as needed to match the sec.L 's
     vertical_secs = ['basal_1', 'soma', 'apical_trunk', 'apical_1', 'apical_2',

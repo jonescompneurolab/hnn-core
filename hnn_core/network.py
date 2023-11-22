@@ -114,7 +114,7 @@ def _connection_probability(conn, probability, conn_seed=None):
         Defaults to 1.0 producing an all-to-all pattern.
     conn_seed : int
         Optional initial seed for random number generator (default: None).
-        Used to randomly remove connections when probablity < 1.0.
+        Used to randomly remove connections when probability < 1.0.
 
     Notes
     -----
@@ -171,12 +171,12 @@ def pick_connection(net, src_gids=None, target_gids=None,
     src_gids : str | int | range | list of int | None
         Identifier for source cells. Passing str arguments
         ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
-        equivalent to passing a list of gids for the relvant cell type.
+        equivalent to passing a list of gids for the relevant cell type.
         source - target connections are made in an all-to-all pattern.
     target_gids : str | int | range | list of int | None
-        Identifer for targets of source cells. Passing str arguments
+        Identifier for targets of source cells. Passing str arguments
         ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
-        equivalent to passing a list of gids for the relvant cell type.
+        equivalent to passing a list of gids for the relevant cell type.
         source - target connections are made in an all-to-all pattern.
     loc : str | list of str | None
         Location of synapse on target cell. Must be
@@ -253,7 +253,7 @@ def pick_connection(net, src_gids=None, target_gids=None,
         else:
             receptor_dict[conn['receptor']] = [conn_idx]
 
-    # Look up conn indeces that match search terms and add to set.
+    # Look up conn indices that match search terms and add to set.
     conn_set = set()
     search_pairs = [(src_gids, src_dict), (target_gids, target_dict),
                     (loc, loc_dict), (receptor, receptor_dict)]
@@ -331,7 +331,7 @@ class Network(object):
 
     Notes
     -----
-    ``net = jones_2009_model(params)`` is the reccomended path for creating a
+    ``net = jones_2009_model(params)`` is the recommended path for creating a
     network. Instantiating the network as ``net = Network(params)`` will
     produce a network with no cell-to-cell connections. As such,
     connectivity information contained in ``params`` will be ignored.
@@ -348,7 +348,7 @@ class Network(object):
         # interrogate a built and simulated net. In addition, CellResponse is
         # attached to a Network during simulation---Network is the natural
         # place to keep this information. Order matters: cell gids first, then
-        # artifical drive cells
+        # artificial drive cells
         self.gid_ranges = OrderedDict()
         self._n_gids = 0  # utility: keep track of last GID
 
@@ -517,7 +517,7 @@ class Network(object):
             this evoked drive across the network in a given trial with one
             spike, set n_drive_cells=1 and cell_specific=False.
         cell_specific : bool
-            Whether each artifical drive cell has 1-to-1 (True, default) or
+            Whether each artificial drive cell has 1-to-1 (True, default) or
             all-to-all (False) connection parameters. Note that 1-to-1
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
             denotes the number of all available cells that this drive can
@@ -551,7 +551,7 @@ class Network(object):
             Not fixed across trials (see Notes)
         conn_seed : int
             Optional initial seed for random number generator (default: 3).
-            Used to randomly remove connections when probablity < 1.0.
+            Used to randomly remove connections when probability < 1.0.
             Fixed across trials (see Notes)
 
         Notes
@@ -624,7 +624,7 @@ class Network(object):
             to synchronize the timing of Poisson drive across the network in a
             given trial, set n_drive_cells=1 and cell_specific=False.
         cell_specific : bool
-            Whether each artifical drive cell has 1-to-1 (True, default) or
+            Whether each artificial drive cell has 1-to-1 (True, default) or
             all-to-all (False) connection parameters. Note that 1-to-1
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
             denotes the number of all available cells that this drive can
@@ -657,7 +657,7 @@ class Network(object):
             Used to generate event times for drive cells.
         conn_seed : int
             Optional initial seed for random number generator (default: 3).
-            Used to randomly remove connections when probablity < 1.0.
+            Used to randomly remove connections when probability < 1.0.
         """
 
         _check_drive_parameter_values('Poisson', tstart=tstart,
@@ -740,7 +740,7 @@ class Network(object):
             all-to-all connectivity and provide synchronous input to cells in
             the network.
         cell_specific : bool
-            Whether each artifical drive cell has 1-to-1 (True) or all-to-all
+            Whether each artificial drive cell has 1-to-1 (True) or all-to-all
             (False, default) connection parameters. Note that 1-to-1
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
             denotes the number of all available cells that this drive can
@@ -773,7 +773,7 @@ class Network(object):
             Used to generate event times for drive cells.
         conn_seed : int
             Optional initial seed for random number generator (default: 3).
-            Used to randomly remove connections when probablity < 1.0.
+            Used to randomly remove connections when probability < 1.0.
         """
         if not self._legacy_mode:
             _check_drive_parameter_values('bursty', tstart=tstart, tstop=tstop,
@@ -845,7 +845,7 @@ class Network(object):
             drive across the network in a given trial with one spike, set
             n_drive_cells=1 and cell_specific=False.
         cell_specific : bool
-            Whether each artifical drive cell has 1-to-1 (True) or all-to-all
+            Whether each artificial drive cell has 1-to-1 (True) or all-to-all
             (False) connection parameters. Note that 1-to-1
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
             denotes the number of all available cells that this drive can
@@ -1005,7 +1005,7 @@ class Network(object):
 
         NB this must be a separate method because dipole.py:simulate_dipole
         accepts an n_trials-argument, which overrides the N_trials-parameter
-        used at intialisation time. The good news is that only the event_times
+        used at initialisation time. The good news is that only the event_times
         need to be recalculated, all the GIDs etc remain the same.
         """
         self._reset_drives()
@@ -1114,7 +1114,7 @@ class Network(object):
             equivalent to passing a list of gids for the relevant cell type.
             source - target connections are made in an all-to-all pattern.
         target_gids : str | int | range | list of int
-            Identifer for targets of source cells. Passing str arguments
+            Identifier for targets of source cells. Passing str arguments
             ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
             equivalent to passing a list of gids for the relevant cell type.
             source - target connections are made in an all-to-all pattern.
@@ -1141,7 +1141,7 @@ class Network(object):
             Defaults to 1.0 producing an all-to-all pattern.
         conn_seed : int
             Optional initial seed for random number generator (default: None).
-            Used to randomly remove connections when probablity < 1.0.
+            Used to randomly remove connections when probability < 1.0.
 
         Notes
         -----
@@ -1434,7 +1434,7 @@ class _NetworkDrive(dict):
         Each artificial drive cell has seed = event_seed + gid
     conn_seed : int
         Optional initial seed for random number generator.
-        Used to randomly remove connections when probablity < 1.0.
+        Used to randomly remove connections when probability < 1.0.
     target_types : set or list of str
         Names of cell types targeted by this drive (must be subset of
         net.cell_types.keys()).

@@ -91,7 +91,7 @@ def test_extracellular_api():
     with pytest.raises(ValueError, match='Electrode array positions must '
                        'contain more than 1 contact'):
         _, _ = _get_laminar_z_coords([(1, 2, 3)])
-    with pytest.raises(ValueError, match='Make sure the electrode postions '
+    with pytest.raises(ValueError, match='Make sure the electrode positions '
                        'are equispaced, colinear'):
         _, _ = _get_laminar_z_coords([(1, 1, 3), (1, 1, 4), (1, 1, 3.5)])
 

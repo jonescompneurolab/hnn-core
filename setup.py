@@ -37,7 +37,7 @@ if version is None:
 #
 # to make sure there are no residual mod files
 #
-# also see following link to understand why build_py must be overriden:
+# also see following link to understand why build_py must be overridden:
 # https://stackoverflow.com/questions/51243633/python-setuptools-setup-py-install-does-not-automatically-call-build
 class BuildMod(Command):
     user_options = []

@@ -110,7 +110,7 @@ def _split_by_evinput(drive_names, drive_dynamics, drive_syn_weights, tstop,
 
 
 def _generate_weights(evinput_params, tstop, dt, decay_multiplier):
-    """Calculation of weight function for wRMSE calcuation
+    """Calculation of weight function for wRMSE calculation
 
     Returns
     -------
@@ -392,7 +392,7 @@ def _get_drive_params(net, drive_names):
             target_receptor = net.connectivity[conn_idx]['receptor']
             weight = net.connectivity[conn_idx]['nc_dict']['A_weight']
             # note that for each drive, the weights dict should be unnested
-            # accross target cell types and receptors for ease-of-use when
+            # across target cell types and receptors for ease-of-use when
             # these values get restructured into a list downstream
 
             # legacy_mode hack: don't include invalid connections that have
@@ -475,7 +475,7 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
     dt : float
         The integration time step (ms) of h.CVode during simulation.
     which_drives: 'all' or list
-        Evoked drives to optimize. If 'all', will opimize all evoked drives.
+        Evoked drives to optimize. If 'all', will optimize all evoked drives.
         If a subset list of evoked drives, will optimize only the evoked drives in the list.
     return_rmse : bool
         Returns list of unweighted RMSEs between the simulated and experimental dipole 
@@ -595,7 +595,7 @@ def optimize_evoked(net, tstop, n_trials, target_dpl, initial_dpl, maxiter=50,
                                             weights=opt_params['weights'])
 
         net_opt = net.copy()
-        # drive_params_updated must be a list for compatability with the args
+        # drive_params_updated must be a list for compatibility with the args
         # in the optimization engine, scipy.optimize.fmin_cobyla
         _myoptrun = partial(_optrun,
                             drive_params_static=drive_static_params,

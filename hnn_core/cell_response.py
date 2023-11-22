@@ -27,7 +27,7 @@ class CellResponse(object):
     spike_types : list (n_trials,) of list (n_spikes,) of float, shape | None
         Each element of the outer list is a trial.
         The inner list contains the type of spike (e.g., evprox1
-        or L2_pyramidal) that occured at the corresonding time stamp.
+        or L2_pyramidal) that occurred at the corresponding time stamp.
         Each gid corresponds to a type via Network().gid_ranges.
     times : numpy array | None
         Array of time points for samples in continuous data.
@@ -48,7 +48,7 @@ class CellResponse(object):
     spike_types : list (n_trials,) of list (n_spikes,) of float, shape
         Each element of the outer list is a trial.
         The inner list contains the type of spike (e.g., evprox1
-        or L2_pyramidal) that occured at the corresonding time stamp.
+        or L2_pyramidal) that occurred at the corresponding time stamp.
         Each gid corresponds to a type via Network::gid_ranges.
     vsec : list (n_trials,) of dict, shape
         Each element of the outer list is a trial.
