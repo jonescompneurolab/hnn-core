@@ -810,7 +810,7 @@ def test_network_connectivity():
             pick_connection(**kwargs)
 
     # Test removing connections from net.connectivity
-    # Needs to be updated if number of drives change in preceeding tests
+    # Needs to be updated if number of drives change in preceding tests
     net.clear_connectivity()
     assert len(net.connectivity) == 4  # 2 drives x 2 target cell types
     net.clear_drives()
