@@ -78,7 +78,7 @@ def read_params(params_fname):
     Returns
     -------
     params : an instance of Params
-        Params containing paramter values from file
+        Params containing parameter values from file
     """
 
     split_fname = op.splitext(params_fname)

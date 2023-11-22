@@ -90,7 +90,7 @@ def _get_laminar_z_coords(electrode_positions):
         raise ValueError(
             'Electrode contacts are incompatible with laminar profiling '
             'in a neocortical column. Make sure the '
-            'electrode postions are equispaced, colinear, and projecting '
+            'electrode positions are equispaced, colinear, and projecting '
             'along the z-axis.')
     else:
         return np.array(electrode_positions)[:, 2], z_delta

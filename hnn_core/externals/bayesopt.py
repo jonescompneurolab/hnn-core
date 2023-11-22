@@ -58,7 +58,7 @@ def bayes_opt(func, x0, cons, acquisition, maxfun=200,
     cons : list of tuples
         Parameter constraints in solver-specific format.
     acquisition : func
-        Acquisiton function we want to use to find query points.
+        Acquisition function we want to use to find query points.
     maxfun : int, optional
         Maximum number of function evaluations. The default is 200.
     debug : bool, optional

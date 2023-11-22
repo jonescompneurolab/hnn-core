@@ -240,7 +240,7 @@ Changelog
 
 - Add method for setting in-plane cell distances and layer separation in the network :func:`~hnn_core.Network.set_cell_positions`, by `Christopher Bailey`_ in `#370 <https://github.com/jonescompneurolab/hnn-core/pull/370>`_
 
-- External drives API now accepts probability argument for targetting subsets of cells,
+- External drives API now accepts probability argument for targeting subsets of cells,
   by `Nick Tolley`_ in :gh:`416`
 
 Bug
@@ -275,7 +275,7 @@ API
   :func:`~hnn_core.Network.add_connection`, by `Nick Tolley`_ in :gh:`276`
 
 - Remove :class:`~hnn_core.L2Pyr`, :class:`~hnn_core.L5Pyr`, :class:`~hnn_core.L2Basket`,
-  and :class:`~hnn_core.L5Basket` classes in favor of instantation through functions and
+  and :class:`~hnn_core.L5Basket` classes in favor of instantiation through functions and
   a more consistent :class:`~hnn_core.Cell` class by `Mainak Jas`_ in  :gh:`322`
 
 - Remove parameter ``distribution`` in :func:`~hnn_core.Network.add_bursty_drive`.

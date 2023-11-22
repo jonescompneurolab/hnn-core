@@ -746,7 +746,7 @@ class _VizManager:
             fig_name : str
                 The figure name shown in the GUI, e.g., 'Figure 1'.
             ax_name : str
-                Axis name shwon in the left side of GUI, like, 'ax0'.
+                Axis name shown in the left side of GUI, like, 'ax0'.
             simulation_name : str
                 The name of simulation you want to visualize
             plot_type : str

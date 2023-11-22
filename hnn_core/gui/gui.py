@@ -431,7 +431,7 @@ class HNNGUI:
             self._connectivity_out,
         ])
 
-        # accordians to group local-connectivity by cell type
+        # accordions to group local-connectivity by cell type
         connectivity_boxes = [
             VBox(slider) for slider in self.connectivity_widgets]
         connectivity_names = (

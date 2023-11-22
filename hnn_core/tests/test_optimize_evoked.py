@@ -171,7 +171,7 @@ def test_optimize_evoked():
     # static drive params should remain constant
     assert drive_static_params_opt == drive_static_params_orig
 
-    # ensure that only the drive that we wanted to optimzie over changed
+    # ensure that only the drive that we wanted to optimize over changed
     drive_evdist1_dynamics_offset, drive_evdist1_syn_weights_offset, \
         drive_static_params_offset = _get_drive_params(net_offset, ['evdist1'])
     drive_evdist1_dynamics_opt, drive_evdist1_syn_weights_opt, \

@@ -96,7 +96,7 @@ def test_cell():
     new_Ra = 4.0
     cell.modify_section(sec_name, L=new_L, diam=new_diam, cm=new_cm, Ra=new_Ra)
 
-    # Make sure distance betweeen `Section.end_pts` matches `Section.L`
+    # Make sure distance between `Section.end_pts` matches `Section.L`
     new_pts = np.array(cell.sections[sec_name].end_pts)
     new_dist = np.linalg.norm(new_pts[0, :] - new_pts[1, :])
     np.isclose(new_L, new_dist)

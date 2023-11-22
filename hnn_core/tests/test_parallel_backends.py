@@ -246,7 +246,7 @@ class TestParallelBackends():
 @requires_psutil
 def test_mpi_failure(run_hnn_core_fixture):
     """Test that an MPI failure is handled and messages are printed"""
-    # this MPI paramter will cause a MPI job to fail
+    # this MPI parameter will cause a MPI job to fail
     environ["OMPI_MCA_btl"] = "self"
 
     with pytest.warns(UserWarning) as record:

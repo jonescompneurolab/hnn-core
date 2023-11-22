@@ -364,7 +364,7 @@ def test_network_drives():
     assert network_builder._drive_cells[n_bursty_sources].gid ==\
         net._n_cells + n_bursty_sources
 
-    # check that Network drive connectivity tranfers to NetworkBuilder
+    # check that Network drive connectivity transfers to NetworkBuilder
     n_pyr = len(net.gid_ranges['L2_pyramidal'])
     n_basket = len(net.gid_ranges['L2_basket'])
 
@@ -572,7 +572,7 @@ def test_network_connectivity():
                             n_trials=1)
     network_builder = NetworkBuilder(net)
 
-    # start by checking that Network connectivity tranfers to NetworkBuilder
+    # start by checking that Network connectivity transfers to NetworkBuilder
     n_pyr = len(net.gid_ranges['L2_pyramidal'])
     n_basket = len(net.gid_ranges['L2_basket'])
 
@@ -763,7 +763,7 @@ def test_network_connectivity():
             assert 0 not in net.connectivity[conn_idx]['src_gids']
 
     # Check that pick_connection returns empty lists when searching for
-    # a drive targetting the wrong location
+    # a drive targeting the wrong location
     conn_idxs = pick_connection(net, src_gids='evdist1', loc='proximal')
     assert len(conn_idxs) == 0
     assert not pick_connection(net, src_gids='evprox1', loc='distal')

@@ -268,7 +268,7 @@ def calcium_model(params=None, add_drives_from_params=False,
     Returns
     -------
     net : Instance of Network object
-        Network object used to store the Jones 2009 model with an impoved
+        Network object used to store the Jones 2009 model with an improved
         calcium channel distribution.
 
     See Also

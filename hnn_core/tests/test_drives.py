@@ -148,7 +148,7 @@ def test_add_drives():
         assert drive_conn['nc_dict']['A_weight'] == weights_ampa[target_type]
         assert drive_conn['nc_dict']['A_delay'] == syn_delays[target_type]
 
-    # Test drive targetting specific section
+    # Test drive targeting specific section
     # Section present on all cells indicated
     location = 'apical_tuft'
     weights_ampa_tuft = {'L2_pyramidal': 1.0, 'L5_pyramidal': 2.0}
@@ -170,7 +170,7 @@ def test_add_drives():
             weights_ampa=weights_ampa_no_tuft,
             synaptic_delays=syn_delays_no_tuft, n_drive_cells=n_drive_cells)
 
-    # Test probabalistic drive connections.
+    # Test probabilistic drive connections.
     # drive with cell_specific=False
     n_drive_cells = 10
     probability = 0.5  # test that only half of possible connections are made
