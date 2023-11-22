@@ -1,3 +1,8 @@
 [build-system]
 requires = ["setuptools>=40.8.0", "NEURON >=7.7; platform_system != 'Windows'"]
 build-backend = "setuptools.build_meta:__legacy__"
+[tool.codespell]
+skip = '.git,*.pdf,*.svg'
+check-hidden = true
+ignore-regex = '^\s*"image/\S+": ".*'
+# ignore-words-list = ''
