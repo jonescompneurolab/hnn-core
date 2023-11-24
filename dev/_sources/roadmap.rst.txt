@@ -37,7 +37,7 @@ Timeline Overview
 This roadmap timeline outlines the major short-term and longer-term 
 goals for HNNs. The short term goals will entail a substantial reorganization of the
 HNN code and creation of an API to facilitate HNN expansions, community contribution,
-and integration with other relevant open-source platforms (e.g. MNE-Python, NetPyNE). To this end, in March 2021, we released the first version of the HNN-core repository. HNN-core contains improved versions of HNN’s non-GUI components following best practices in open-source software design, with unit testing and continuous integration, along with initial API and documentation for command-line coding. We will adopt similar best practices to develop a new HNN-GUI and several new HNN features, including the ability to simulate and visualize LFP/CSD and to use improved parameter estimation procedures. Our process will be to develop all new features in HNN-core, with  API and examples of use followed, when applicable, by integration into the HNN-GUI with correspoding GUI-based tutorials on our website. Longer-term goals include integration with the related modeling software MNE-Python and NetPyNe, the development of a web-based interface with ability for simultaneous GUI and Command Line Interface (CLI), and extension to multi-area simulations. 
+and integration with other relevant open-source platforms (e.g. MNE-Python, NetPyNE). To this end, in March 2021, we released the first version of the HNN-core repository. HNN-core contains improved versions of HNN’s non-GUI components following best practices in open-source software design, with unit testing and continuous integration, along with initial API and documentation for command-line coding. We will adopt similar best practices to develop a new HNN-GUI and several new HNN features, including the ability to simulate and visualize LFP/CSD and to use improved parameter estimation procedures. Our process will be to develop all new features in HNN-core, with  API and examples of use followed, when applicable, by integration into the HNN-GUI with corresponding GUI-based tutorials on our website. Longer-term goals include integration with the related modeling software MNE-Python and NetPyNe, the development of a web-based interface with ability for simultaneous GUI and Command Line Interface (CLI), and extension to multi-area simulations. 
 
 Short-Term Goals
 --------------------------
@@ -54,7 +54,7 @@ This reorganization will entail continued improvements within the HNN-core repos
 
 -   Following best practices in open-source software design, including continuous integration testing, 
     to develop HNN-core. HNN-core will contain clean and reorganized code, and separate all components that 
-    interact directly with the NEURON simulator (e.g. cell and network intantiation, external drives, etc..), 
+    interact directly with the NEURON simulator (e.g. cell and network instantiation, external drives, etc..), 
     from those that pertain to post-processing data analysis and plotting functions (e.g. spectra lanalysis). 
     **COMPLETED FEB 2021** 
 -   Convert installation procedures to PIP. **COMPLETED FEB 2021** 
@@ -98,7 +98,7 @@ domain over which the predictions will be tested is local field potential (LFP) 
 across the cortical layers and the associated current source density (CSD) profiles.  
 We will develop a method to simulate and visualize LFP/CSD across the cortical layers 
 and to statistically compare model simulations to recorded data. These components will 
-be developed in HNN-core, with correponding API and examples of use, followed by integration 
+be developed in HNN-core, with corresponding API and examples of use, followed by integration 
 into the HNN-GUI, with corresponding GUI based tutorials on the HNN website, in the following steps:
 
 - Develop code in HNN-core to simulate and visualize LFP/CSD from cellular 
@@ -150,7 +150,7 @@ API and Tutorial development
 The ability to interpret the neural origin of macroscale MEG/EEG signals in a 
 complex high-dimensional non-linear computational neural model is challenging. 
 A primary goal of HNN is to facilitate this interpretation with a clear API and examples 
-of use in HNN-core, and interative GUI-based tutorals for all HNN-GUI functionality on our HNN website.  
+of use in HNN-core, and interactive GUI-based tutorals for all HNN-GUI functionality on our HNN website.  
 Following the process for creating new featuers in HNN, the process for documenting 
 new features will be to first develop them with API and examples of use in HNN-core, followed
 by integration into the HNN-GUI, with corresponding GUI-based tutorials on the HNN-website. 

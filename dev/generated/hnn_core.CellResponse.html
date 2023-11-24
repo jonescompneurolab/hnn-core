@@ -66,7 +66,7 @@
                 <li><a href="../gui/index.html">GUI</a></li>
                 <li><a href="../api.html">API</a></li>
                 <li><a href="../glossary.html">Glossary</a></li>
-                <li><a href="../whats_new.html">Whats new</a></li>
+                <li><a href="../whats_new.html">What's new</a></li>
                 <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
             
             
@@ -102,6 +102,7 @@
 <li><a class="reference internal" href="#hnn_core.CellResponse.write"><code class="docutils literal notranslate"><span class="pre">CellResponse.write()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#examples-using-hnn-core-cellresponse">Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.CellResponse</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -173,7 +174,7 @@ spiked.</p>
 </dd>
 <dt><strong>spike_types</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape | None</span></dt><dd><p>Each element of the outer list is a trial.
 The inner list contains the type of spike (e.g., evprox1
-or L2_pyramidal) that occured at the corresonding time stamp.
+or L2_pyramidal) that occurred at the corresponding time stamp.
 Each gid corresponds to a type via Network().gid_ranges.</p>
 </dd>
 <dt><strong>times</strong><span class="classifier">numpy array | None</span></dt><dd><p>Array of time points for samples in continuous data.
@@ -195,7 +196,7 @@ spiked.</p>
 </dd>
 <dt><strong>spike_types</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape</span></dt><dd><p>Each element of the outer list is a trial.
 The inner list contains the type of spike (e.g., evprox1
-or L2_pyramidal) that occured at the corresonding time stamp.
+or L2_pyramidal) that occurred at the corresponding time stamp.
 Each gid corresponds to a type via Network::gid_ranges.</p>
 </dd>
 <dt><strong>vsec</strong><span class="classifier">list (n_trials,) of dict, shape</span></dt><dd><p>Each element of the outer list is a trial.
@@ -419,7 +420,13 @@ appended to the file name.</p>
 
 </dd></dl>
 
-<span class="target" id="sphx-glr-backreferences-hnn-core-cellresponse"></span></section>
+<section id="examples-using-hnn-core-cellresponse">
+<span id="sphx-glr-backreferences-hnn-core-cellresponse"></span><h2>Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.CellResponse</span></code><a class="headerlink" href="#examples-using-hnn-core-cellresponse" title="Permalink to this heading">¶</a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to inspect the firing pattern of cells in the HNN model."><img alt="" src="../_images/sphx_glr_plot_firing_pattern_thumb.png" />
+<p><a class="reference internal" href="../auto_examples/howto/plot_firing_pattern.html#sphx-glr-auto-examples-howto-plot-firing-pattern-py"><span class="std std-ref">01. Plot firing pattern</span></a></p>
+  <div class="sphx-glr-thumbnail-title">01. Plot firing pattern</div>
+</div></div></section>
+</section>
 
 
     </div>

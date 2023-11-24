@@ -65,7 +65,7 @@
                 <li><a href="../../gui/index.html">GUI</a></li>
                 <li><a href="../../api.html">API</a></li>
                 <li><a href="../../glossary.html">Glossary</a></li>
-                <li><a href="../../whats_new.html">Whats new</a></li>
+                <li><a href="../../whats_new.html">What's new</a></li>
                 <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
             
             
@@ -249,7 +249,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">proc_data_bytes</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
     <span class="c1"># each loop while waiting will involve two Queue.get() timeouts, each</span>
-    <span class="c1"># 0.01s. This caclulation will error on the side of a longer timeout</span>
+    <span class="c1"># 0.01s. This calculation will error on the side of a longer timeout</span>
     <span class="c1"># than is specified because more is done each loop that just Queue.get()</span>
     <span class="n">timeout_cycles</span> <span class="o">=</span> <span class="n">timeout</span> <span class="o">/</span> <span class="mf">0.02</span>
 
@@ -832,7 +832,7 @@
 
         <span class="c1"># just use the joblib backend for a single core</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MPIBackend is set to use 1 core: tranferring the &quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MPIBackend is set to use 1 core: transferring the &quot;</span>
                   <span class="s2">&quot;simulation to JoblibBackend....&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
                                                     <span class="n">dt</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>

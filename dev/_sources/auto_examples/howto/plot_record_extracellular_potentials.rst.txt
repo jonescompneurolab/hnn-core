@@ -83,7 +83,7 @@ drives; see the event-related potential (ERP) example for details.
 
 .. GENERATED FROM PYTHON SOURCE LINES 42-45
 
-Extracellular recordings require specifying the electrode postions. It can be
+Extracellular recordings require specifying the electrode positions. It can be
 useful to visualize the cells of the network to decide on the placement of
 each electrode.
 
@@ -266,7 +266,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 34.366 seconds)
+   **Total running time of the script:** (0 minutes 55.460 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_record_extracellular_potentials.py:

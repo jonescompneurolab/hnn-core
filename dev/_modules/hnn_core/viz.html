@@ -65,7 +65,7 @@
                 <li><a href="../../gui/index.html">GUI</a></li>
                 <li><a href="../../api.html">API</a></li>
                 <li><a href="../../glossary.html">Glossary</a></li>
-                <li><a href="../../whats_new.html">Whats new</a></li>
+                <li><a href="../../whats_new.html">What's new</a></li>
                 <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
             
             
@@ -1150,7 +1150,7 @@
                         <span class="n">inplane_distance</span><span class="p">):</span>
     <span class="kn">from</span> <span class="nn">.cell</span> <span class="kn">import</span> <span class="n">_get_gaussian_connection</span>
 
-    <span class="c1"># Extract indeces to get position in network</span>
+    <span class="c1"># Extract indices to get position in network</span>
     <span class="c1"># Index in gid range aligns with net.pos_dict</span>
     <span class="n">target_src_pair</span> <span class="o">=</span> <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;gid_pairs&#39;</span><span class="p">][</span><span class="n">src_gid</span><span class="p">]</span>
     <span class="n">target_indeces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">in1d</span><span class="p">(</span><span class="n">target_range</span><span class="p">,</span> <span class="n">target_src_pair</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>

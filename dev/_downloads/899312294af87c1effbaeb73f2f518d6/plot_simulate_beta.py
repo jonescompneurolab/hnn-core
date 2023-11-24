@@ -6,7 +6,7 @@
 This example demonstrates how event related potentials (ERP) are modulated
 by prestimulus beta events. Specifically, this example reproduces Figure 5
 from Law et al. 2021 [1]_. To be consistent with the publication, the default
-network connectivity is altered. These modfications demonstrate a potential
+network connectivity is altered. These modifications demonstrate a potential
 mechanism by which transient beta activity in the neocortex can suppress
 the perceptibility of sensory input. This suppression depends on the timing
 of the beta event, and the incoming sensory information.
@@ -171,7 +171,7 @@ dpls_beta_erp = simulate_dipole(net_beta_erp, tstop=400)
 # occurs exclusively at 50 ms, the peak of the gaussian distributed proximal
 # and distal inputs. This spiking activity leads to sustained GABAb mediated
 # inhibition of the L2 and L5 pyrmaidal cells. One effect of this inhibition
-# is an assymetric beta event with a long positive tail.
+# is an asymmetric beta event with a long positive tail.
 import matplotlib.pyplot as plt
 import numpy as np
 fig, axes = plt.subplots(4, 1, sharex=True, figsize=(7, 7),
