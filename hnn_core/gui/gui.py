@@ -438,8 +438,7 @@ class HNNGUI:
             'Layer 2/3 Pyramidal', 'Layer 5 Pyramidal', 'Layer 2 Basket',
             'Layer 5 Basket')
         cell_connectivity = Accordion(children=connectivity_boxes)
-        for idx, connectivity_name in enumerate(connectivity_names):
-            cell_connectivity.set_title(idx, connectivity_name)
+        cell_connectivity.titles = [s for s in connectivity_names]
 
         drive_selections = VBox([
             self.add_drive_button, self.widget_drive_type_selection,
