@@ -4,7 +4,7 @@
 
 import copy
 import io
-from functools import partial
+from functools import partial, wraps
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -97,6 +97,35 @@ def plot_type_coupled_change(new_plot_type, target_data_selection):
         target_data_selection.disabled = True
     else:
         target_data_selection.disabled = False
+
+
+def unlink_relink(attribute: str):
+    """
+    Wrapper function to unlink widgets to perform edits and re-link them on completion.
+    Used as a decorator on class methods. The class must have an attribute containing an
+    ipywidgets/traitlets link object.
+
+    Parameters
+    ----------
+    attribute: The class attribute containing link object of ipywidgets widgets
+
+    """
+    def _unlink_relink(f):
+        @wraps(f)
+        def wrapper(self, *args, **kwargs):
+            # Unlink the widgets using the provided link object
+            link_attribute: link = getattr(self, attribute)
+            link_attribute.unlink()
+
+            # Call the original function
+            result = f(self, *args, **kwargs)
+
+            # Re-link the widgets using link.link()
+            link_attribute.link()
+
+            return result
+        return wrapper
+    return _unlink_relink
 
 
 def _idx2figname(idx):
@@ -626,10 +655,10 @@ class _VizManager:
         self.figs_tabs = Tab()
         self.axes_config_tabs.selected_index = None
         self.figs_tabs.selected_index = None
-        link(
+        self.figs_config_tab_link = link(
             (self.axes_config_tabs, 'selected_index'),
             (self.figs_tabs, 'selected_index'),
-        )
+                                         )
 
         template_names = list(fig_templates.keys())
         self.templates_dropdown = Dropdown(
@@ -710,6 +739,7 @@ class _VizManager:
         ])
         return config_panel, fig_output_container
 
+    @unlink_relink(attribute='figs_config_tab_link')
     def add_figure(self, b=None):
         """Add a figure and corresponding config tabs to the dashboard.
         """
