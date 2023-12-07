@@ -150,7 +150,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
 
     elif plot_type == 'PSD':
         if len(dpls_copied) > 0:
-            color = next(ax._get_lines.prop_cycler)['color']
+            color = ax._get_lines.get_next_color()
             dpls_copied[0].plot_psd(fmin=0, fmax=50, ax=ax, color=color,
                                     label=sim_name, show=False)
 
@@ -175,7 +175,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
             else:
                 label = sim_name
 
-            color = next(ax._get_lines.prop_cycler)['color']
+            color = ax._get_lines.get_next_color()
             if plot_type == 'current dipole':
                 plot_dipole(dpls_copied,
                             ax=ax,
