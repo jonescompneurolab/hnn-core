@@ -125,7 +125,7 @@ bibliography: paper.bib
 
 # Summary
 
-HNN-core is a library for circuit and cellular level interpretation of non-invasive human magneto-/electro-encephalography (MEG/EEG) data. It is based on the Human Neocortical Neurosolver (HNN) software [@neymotin2020human], a modeling tool designed to simulate multiscale neural mechanisms generating current dipoles in a localized patch of neocortex. HNN’s foundation is a biophysically detailed neural network representing a canonical neocortical column containing populations of pyramidal and inhibitory neurons together with layer-specific exogenous synaptic drive. In addition to simulating network-level interactions, HNN produces the intracellular currents in the long apical dendrites of pyramidal cells across the cortical layers known to be responsible for macroscopic current dipole generation.
+HNN-core is a library for circuit and cellular level interpretation of non-invasive human magneto-/electro-encephalography (MEG/EEG) data. It is based on the Human Neocortical Neurosolver (HNN) software [@neymotin2020human], a modeling tool designed to simulate multiscale neural mechanisms generating current dipoles in a localized patch of neocortex. HNN’s foundation is a biophysically detailed neural network representing a canonical neocortical column containing populations of pyramidal and inhibitory neurons together with layer-specific exogenous synaptic drive (\autoref{fig:fig1} left). In addition to simulating network-level interactions, HNN produces the intracellular currents in the long apical dendrites of pyramidal cells across the cortical layers known to be responsible for macroscopic current dipole generation.
 
 HNN-core reproduces the workflows and tutorials provided in the original HNN software to generate commonly observed MEG/EEG signals including evoked response potentials (ERPs) and alpha (8-10 Hz), beta (15-30 Hz), and gamma (30-80 Hz) rhythms. HNN-core enables simultaneous calculation and visualization of macro- to micro-scale dynamics including MEG/EEG current dipoles, local field potential, laminar current-source density, and cell spiking and intrinsic dynamics. Importantly, HNN-core adopts modern open source development standards including a simplified installation procedure, unit tests, automatic documentation builds, code coverage, continuous integration, and contributing guidelines, supporting community development and long-term sustainability.
 
@@ -145,13 +145,13 @@ Scripting in HNN-core greatly expands the software utility particularly for larg
 
 HNN-core functionality supports advanced simulations through scripting that are not currently possible in the GUI including:
 
-- The ability to record extracellular local field potentials from user defined positions, as well as voltages and synaptic currents from any compartment in the model
-- The ability to modify all features of the morphology and biophysical properties of any cell in the network
-- An API that enables complete control of cell-cell and drive-cell connectivity in the network
-- An API that allows for flexibility in defining the exogenous layer-specific drive to the neocortical network
-- The ability to choose from multiple template models based on previous publications (e.g., `jones_2009_model()`{.python} [@jones2009quantitative], `law_2021_model()`{.python} [@law2022thalamocortical], and `calcium_model()`{.python} adapted from [@kohl2022neural])
-- Built-in ERP optimization functionality designed for faster convergence 
-- The choice of two parallel backends for either parallelizing across cells to speed up individual simulations (MPI), or across trials to speed up batches of simulations (Joblib)
+- the ability to record extracellular local field potentials from user defined positions, as well as voltages and synaptic currents from any compartment in the model;
+- the ability to modify all features of the morphology and biophysical properties of any cell in the network;
+- an API that enables complete control of cell-cell and drive-cell connectivity in the network;
+- an API that allows for flexibility in defining the exogenous layer-specific drive to the neocortical network;
+- the ability to choose from multiple template models based on previous publications (e.g., `jones_2009_model()`{.python} [@jones2009quantitative], `law_2021_model()`{.python} [@law2022thalamocortical], and `calcium_model()`{.python} adapted from [@kohl2022neural]);
+- built-in ERP optimization functionality designed for faster convergence;
+- the choice of two parallel backends for either parallelizing across cells to speed up individual simulations (MPI), or across trials to speed up batches of simulations (Joblib).
 
 HNN-core code has also enabled the creation of a new and improved web-based GUI based on ipywidgets [@ipywidgets2015] and voila [@voila2019] that can be run remotely with port forwarding.
 
@@ -163,7 +163,7 @@ As summarized above, HNN-core reproduces the workflows and tutorials provided in
 
 In practice, users learn how to study the multi-scale origin of ERPs and low frequency oscillations by first following the tutorials in the [HNN-GUI](https://hnn.brown.edu/tutorials/), and then recapitulating these tutorials in [HNN-core](https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/index.html). The tutorials provide an interactive investigation that gives intuition on how exogenous drives and other parameters in the model impact the outputs of the simulations. From there, users can test hypotheses about what parameters or sets of parameters need to be adjusted to account for their recorded data by directly comparing simulation output to data. Automated parameter inference can be performed to optimize parameters to produce a close fit (i.e., small root mean squared error) to current source ERPs, and more advanced parameter inference methods are in development.
 
-HNN-core has minimal dependencies which allows for effortless installation using the pip Python installer. In addition to NumPy [@harris2020array], SciPy [@virtanen2020scipy], and Matplotlib [@hunter2007matplotlib] common in most libraries in the scientific Python stack, HNN-core uses NEURON [@hines1997neuron] for the cell and circuit modeling. Here, we demonstrate how the HNN-core interface can be used to quickly simulate and plot the net cortical dipole response to a brief exogenously evoked drive representing “feedforward” thalamocortical input. This input  (referred to as ‘evprox1’) effectively targets the proximal dendrites of the pyramidal neurons in L2/3 and L5, using the template neocortical model as in @jones2009quantitative. Note that this simulation is not addressing a specific scientific question, and is simply an educational example.
+HNN-core has minimal dependencies which allows for effortless installation using the pip Python installer. In addition to NumPy [@harris2020array], SciPy [@virtanen2020scipy], and Matplotlib [@hunter2007matplotlib] common in most libraries in the scientific Python stack, HNN-core uses NEURON [@hines1997neuron] for the cell and circuit modeling. Here, we demonstrate how the HNN-core interface can be used to quickly simulate and plot the net cortical dipole response to a brief exogenously evoked drive representing “feedforward” thalamocortical input (\autoref{fig:fig1} right). This input  (referred to as ‘evprox1’) effectively targets the proximal dendrites of the pyramidal neurons in L2/3 and L5, using the template neocortical model as in @jones2009quantitative (\autoref{fig:fig1} left). Note that this simulation is not addressing a specific scientific question, and is simply an educational example.
 
 ```python
 from hnn_core import jones_2009_model, simulate_dipole
