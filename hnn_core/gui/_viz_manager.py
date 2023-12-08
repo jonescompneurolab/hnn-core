@@ -658,7 +658,7 @@ class _VizManager:
         self.figs_config_tab_link = link(
             (self.axes_config_tabs, 'selected_index'),
             (self.figs_tabs, 'selected_index'),
-                                         )
+        )
 
         template_names = list(fig_templates.keys())
         self.templates_dropdown = Dropdown(
