@@ -299,8 +299,11 @@ def test_gui_add_figure():
     gui.run_button.click()
     assert len(fig_tabs.children) == 1
     assert len(axes_config_tabs.children) == 1
-
     assert gui.viz_manager.fig_idx['idx'] == 2
+
+    # Check default figs have data on their axis
+    assert gui.viz_manager.figs[1].axes[0].has_data()
+    assert gui.viz_manager.figs[1].axes[1].has_data()
 
     for idx in range(3):
         n_fig = idx + 2
