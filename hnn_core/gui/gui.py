@@ -615,15 +615,14 @@ class HNNGUI:
         self.load_drives_button.set_trait('value', uploaded_value)
 
     def _simulate_left_tab_click(self, tab_title):
-        tab_index = None
+        # Get left tab group object
         left_tab = self.app_layout.left_sidebar.children[0].children[0]
-        for idx in left_tab._titles.keys():
-            if tab_title == left_tab._titles[idx]:
-                tab_index = int(idx)
-                break
-        if tab_index is None:
-            raise ValueError("Incorrect tab title")
-        left_tab.selected_index = tab_index
+        # Check that the title is in the tab group
+        if tab_title in left_tab.titles:
+            # Simulate the user clicking on the tab
+            left_tab.selected_index = left_tab.titles.index(tab_title)
+        else:
+            raise ValueError("Tab title does not exist.")
 
     def _simulate_make_figure(self,):
         self._simulate_left_tab_click("Visualization")
