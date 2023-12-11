@@ -528,18 +528,25 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
 def _close_figure(b, widgets, data, fig_idx):
     fig_related_widgets = [widgets['figs_tabs'], widgets['axes_config_tabs']]
     for w_idx, tab in enumerate(fig_related_widgets):
+        # Get tab object's list of children and their titles
         tab_children = list(tab.children)
-        titles = tab.titles
+        titles = list(tab.titles)
+        # Get the index based on the title
         tab_idx = titles.index(_idx2figname(fig_idx))
+        # Remove the child and title specified
         print(f"Del fig_idx={fig_idx}, fig_idx={fig_idx}")
-        del tab_children[tab_idx], titles[tab_idx]
+        tab_children.pop(tab_idx)
+        titles.pop(tab_idx)
+        # Reset children and titles of the tab object
+        tab.children = tab_children
+        tab.titles = titles
 
-        tab.children = tuple(tab_children)
-        [tab.set_title(idx, title) for idx, title in enumerate(titles)]
-
+        # If the figure tab group...
         if w_idx == 0:
+            # Close figure and delete the data
             plt.close(data['figs'][fig_idx])
-            del data['figs'][fig_idx]
+            data['figs'].pop(fig_idx)
+            # Redisplay the remaining children
             n_tabs = len(tab.children)
             for idx in range(n_tabs):
                 _fig_idx = _figname2idx(tab.get_title(idx))
@@ -549,10 +556,11 @@ def _close_figure(b, widgets, data, fig_idx):
                 with tab.children[idx]:
                     display(data['figs'][_fig_idx].canvas)
 
-        if n_tabs == 0:
-            widgets['figs_output'].clear_output()
-            with widgets['figs_output']:
-                display(Label(_fig_placeholder))
+            # If all children have been deleted display the placeholder
+            if n_tabs == 0:
+                widgets['figs_output'].clear_output()
+                with widgets['figs_output']:
+                    display(Label(_fig_placeholder))
 
 
 def _add_axes_controls(widgets, data, fig, axd):
