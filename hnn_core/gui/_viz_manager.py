@@ -255,9 +255,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
 def _static_rerender(widgets, fig, fig_idx):
     logger.debug('_static_re_render is called')
     figs_tabs = widgets['figs_tabs']
-    titles = [
-        figs_tabs.get_title(idx) for idx in range(len(figs_tabs.children))
-    ]
+    titles = figs_tabs.titles
     fig_tab_idx = titles.index(_idx2figname(fig_idx))
     fig_output = widgets['figs_tabs'].children[fig_tab_idx]
     fig_output.clear_output()
@@ -531,7 +529,7 @@ def _close_figure(b, widgets, data, fig_idx):
     fig_related_widgets = [widgets['figs_tabs'], widgets['axes_config_tabs']]
     for w_idx, tab in enumerate(fig_related_widgets):
         tab_children = list(tab.children)
-        titles = [tab.get_title(idx) for idx in range(len(tab.children))]
+        titles = tab.titles
         tab_idx = titles.index(_idx2figname(fig_idx))
         print(f"Del fig_idx={fig_idx}, fig_idx={fig_idx}")
         del tab_children[tab_idx], titles[tab_idx]
@@ -758,7 +756,7 @@ class _VizManager:
 
     def _simulate_delete_figure(self, fig_name):
         tab = self.axes_config_tabs
-        titles = [tab.get_title(idx) for idx in range(len(tab.children))]
+        titles = tab.titles
         assert fig_name in titles
         tab_idx = titles.index(fig_name)
 
@@ -793,16 +791,13 @@ class _VizManager:
         assert operation in ("plot", "clear")
 
         tab = self.axes_config_tabs
-        titles = [tab.get_title(idx) for idx in range(len(tab.children))]
+        titles = tab.titles
         assert fig_name in titles, "No such figure"
         tab_idx = titles.index(fig_name)
         self.axes_config_tabs.selected_index = tab_idx
 
         ax_control_tabs = self.axes_config_tabs.children[tab_idx].children[1]
-        ax_titles = [
-            ax_control_tabs.get_title(idx)
-            for idx in range(len(ax_control_tabs.children))
-        ]
+        ax_titles = ax_control_tabs.titles
         assert ax_name in ax_titles, "No such axis"
         ax_idx = ax_titles.index(ax_name)
         ax_control_tabs.selected_index = ax_idx
