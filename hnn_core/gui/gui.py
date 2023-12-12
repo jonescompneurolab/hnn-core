@@ -11,6 +11,7 @@ import urllib.parse
 import urllib.request
 from collections import defaultdict
 from pathlib import Path
+from datetime import datetime
 from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload, VBox,
@@ -653,16 +654,13 @@ def _prepare_upload_file_from_url(file_url):
     for line in data:
         content += line
 
-    return {
-        params_name: {
-            'metadata': {
-                'name': params_name,
-                'type': 'application/json',
-                'size': len(content),
-            },
-            'content': content
-        }
-    }
+    return [{
+        'name': params_name,
+        'type': 'application/json',
+        'size': len(content),
+        'content': content,
+        'last_modified': datetime.now()
+    }]
 
 
 def create_expanded_button(description, button_style, layout, disabled=False,
@@ -1131,14 +1129,14 @@ def on_upload_data_change(change, data, viz_manager, log_out):
         logger.info("Empty change")
         return
 
-    key = list(change['new'].keys())[0]
+    data_dict = change['new'][0]
 
-    data_fname = change['new'][key]['metadata']['name'].rstrip('.txt')
+    data_fname = data_dict['name'].rstrip('.txt')
     if data_fname in data['simulation_data'].keys():
         logger.error(f"Found existing data: {data_fname}.")
         return
 
-    ext_content = change['new'][key]['content']
+    ext_content = data_dict['content']
     ext_content = codecs.decode(ext_content, encoding="utf-8")
     with log_out:
         data['simulation_data'][data_fname] = {'net': None, 'dpls': [
@@ -1161,10 +1159,9 @@ def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
         logger.info("Empty change")
         return
     logger.info("Loading connectivity...")
-    key = list(change['new'].keys())[0]
-
-    params_fname = change['new'][key]['metadata']['name']
-    param_data = change['new'][key]['content']
+    param_dict = change['new'][0]
+    params_fname = param_dict['name']
+    param_data = param_dict['content']
 
     param_data = codecs.decode(param_data, encoding="utf-8")
 
