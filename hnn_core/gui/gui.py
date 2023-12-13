@@ -1186,9 +1186,8 @@ def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
                       layout)
     else:
         raise ValueError
-
-    change['owner'].set_trait('_counter', 0)
-    change['owner'].set_trait('value', {})
+    # Resets file counter to 0
+    change['owner'].set_trait('value', ([]))
 
 
 def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
