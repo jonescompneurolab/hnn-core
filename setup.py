@@ -106,7 +106,7 @@ if __name__ == "__main__":
               'h5io'
           ],
           extras_require={
-              'gui': ['ipywidgets>=8.0.0'],
+              'gui': ['ipywidgets>=8.0.0', 'ipykernel'],
               'opt': ['scikit-learn']
           },
           python_requires='>=3.8',
