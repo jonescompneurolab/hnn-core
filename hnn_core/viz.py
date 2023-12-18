@@ -7,9 +7,7 @@
 import numpy as np
 from itertools import cycle
 import colorsys
-
 from .externals.mne import _validate_type
-
 
 def _lighten_color(color, amount=0.5):
     import matplotlib.colors as mc
@@ -483,7 +481,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     return ax.get_figure()
 
 
-def plot_spikes_raster(cell_response, trial_idx=None, cell_type_colors= {'L5_pyramidal': 'r', 'L5_basket': 'b', 'L2_pyramidal': 'g', 'L2_basket': 'w'},ax=None, show=True):
+def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True, cell_type_colors=None):
     """Plot the aggregate spiking activity according to cell type.
 
     Parameters
@@ -496,7 +494,10 @@ def plot_spikes_raster(cell_response, trial_idx=None, cell_type_colors= {'L5_pyr
         An axis object from matplotlib. If None, a new figure is created.
     show : bool
         If True, show the figure.
-
+    cell_type_colors: dic
+        A dictionary of cell names (keys) and their color (values)
+        If not edited, the standard is:
+        cell_type_colors= {'L5_pyramidal': 'r', 'L5_basket': 'b', 'L2_pyramidal': 'g', 'L2_basket': 'w'}
     Returns
     -------
     fig : instance of matplotlib Figure
@@ -524,7 +525,10 @@ def plot_spikes_raster(cell_response, trial_idx=None, cell_type_colors= {'L5_pyr
         spike_times = np.array([])
         spike_types = np.array([])
         spike_gids = np.array([])
-
+    if cell_type_colors == None:
+        cell_type_colors= {'L5_pyramidal': 'r', 'L5_basket': 'b', 'L2_pyramidal': 'g', 'L2_basket': 'w'} #default HNN colors
+   # cell_type_colors.update(cell_type_colors)
+    
 #    cell_types = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
     cell_types= cell_response._cell_type_names
 
@@ -536,6 +540,9 @@ def plot_spikes_raster(cell_response, trial_idx=None, cell_type_colors= {'L5_pyr
     for cell_type in cell_types:
         cell_type_gids = np.unique(spike_gids[spike_types == cell_type])
         cell_type_times, cell_type_ypos = [], []
+         # if cell_types == 'L2_basket_column1':
+         #pdb.pdbsetrace
+        
         for gid in cell_type_gids:
             gid_time = spike_times[spike_gids == gid]
             cell_type_times.append(gid_time)
