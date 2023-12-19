@@ -1,0 +1,148 @@
+cff-version: "1.2.0"
+authors:
+- family-names: Jas
+  given-names: Mainak
+  orcid: "https://orcid.org/0000-0002-3199-9027"
+- family-names: Thorpe
+  given-names: Ryan
+  orcid: "https://orcid.org/0000-0003-2491-8599"
+- family-names: Tolley
+  given-names: Nicholas
+  orcid: "https://orcid.org/0000-0003-0358-0074"
+- family-names: Bailey
+  given-names: Christopher
+  orcid: "https://orcid.org/0000-0003-3318-3344"
+- family-names: Brandt
+  given-names: Steven
+- family-names: Caldwell
+  given-names: Blake
+  orcid: "https://orcid.org/0000-0002-6882-6998"
+- family-names: Cheng
+  given-names: Huzi
+- family-names: Daniels
+  given-names: Dylan
+  orcid: "https://orcid.org/0009-0008-1958-353X"
+- family-names: Pujol
+  given-names: Carolina Fernandez
+  orcid: "https://orcid.org/0009-0003-0611-1270"
+- family-names: Khalil
+  given-names: Mostafa
+- family-names: Kanekar
+  given-names: Samika
+  orcid: "https://orcid.org/0000-0002-6111-4461"
+- family-names: Kohl
+  given-names: Carmen
+  orcid: "https://orcid.org/0000-0001-7585-595X"
+- family-names: Kolozsvári
+  given-names: Orsolya
+  orcid: "https://orcid.org/0000-0002-1619-6314"
+- family-names: Lankinen
+  given-names: Kaisu
+  orcid: "https://orcid.org/0000-0003-2210-2385"
+- family-names: Loi
+  given-names: Kenneth
+- family-names: Neymotin
+  given-names: Sam
+  orcid: "https://orcid.org/0000-0003-3646-5195"
+- family-names: Partani
+  given-names: Rajat
+  orcid: "https://orcid.org/0000-0002-6863-7046"
+- family-names: Pelah
+  given-names: Mattan
+- family-names: Rockhill
+  given-names: Alex
+  orcid: "https://orcid.org/0000-0003-3868-7453"
+- family-names: Sherif
+  given-names: Mohamed
+  orcid: "https://orcid.org/0000-0002-8951-1645"
+- family-names: Hamalainen
+  given-names: Matti
+  orcid: "https://orcid.org/0000-0001-6841-112X"
+- family-names: Jones
+  given-names: Stephanie
+  orcid: "https://orcid.org/0000-0001-6760-5301"
+contact:
+- family-names: Jones
+  given-names: Stephanie
+  orcid: "https://orcid.org/0000-0001-6760-5301"
+doi: 10.5281/zenodo.10289164
+message: If you use this software, please cite our article in the
+  Journal of Open Source Software.
+preferred-citation:
+  authors:
+  - family-names: Jas
+    given-names: Mainak
+    orcid: "https://orcid.org/0000-0002-3199-9027"
+  - family-names: Thorpe
+    given-names: Ryan
+    orcid: "https://orcid.org/0000-0003-2491-8599"
+  - family-names: Tolley
+    given-names: Nicholas
+    orcid: "https://orcid.org/0000-0003-0358-0074"
+  - family-names: Bailey
+    given-names: Christopher
+    orcid: "https://orcid.org/0000-0003-3318-3344"
+  - family-names: Brandt
+    given-names: Steven
+  - family-names: Caldwell
+    given-names: Blake
+    orcid: "https://orcid.org/0000-0002-6882-6998"
+  - family-names: Cheng
+    given-names: Huzi
+  - family-names: Daniels
+    given-names: Dylan
+    orcid: "https://orcid.org/0009-0008-1958-353X"
+  - family-names: Pujol
+    given-names: Carolina Fernandez
+    orcid: "https://orcid.org/0009-0003-0611-1270"
+  - family-names: Khalil
+    given-names: Mostafa
+  - family-names: Kanekar
+    given-names: Samika
+    orcid: "https://orcid.org/0000-0002-6111-4461"
+  - family-names: Kohl
+    given-names: Carmen
+    orcid: "https://orcid.org/0000-0001-7585-595X"
+  - family-names: Kolozsvári
+    given-names: Orsolya
+    orcid: "https://orcid.org/0000-0002-1619-6314"
+  - family-names: Lankinen
+    given-names: Kaisu
+    orcid: "https://orcid.org/0000-0003-2210-2385"
+  - family-names: Loi
+    given-names: Kenneth
+  - family-names: Neymotin
+    given-names: Sam
+    orcid: "https://orcid.org/0000-0003-3646-5195"
+  - family-names: Partani
+    given-names: Rajat
+    orcid: "https://orcid.org/0000-0002-6863-7046"
+  - family-names: Pelah
+    given-names: Mattan
+  - family-names: Rockhill
+    given-names: Alex
+    orcid: "https://orcid.org/0000-0003-3868-7453"
+  - family-names: Sherif
+    given-names: Mohamed
+    orcid: "https://orcid.org/0000-0002-8951-1645"
+  - family-names: Hamalainen
+    given-names: Matti
+    orcid: "https://orcid.org/0000-0001-6841-112X"
+  - family-names: Jones
+    given-names: Stephanie
+    orcid: "https://orcid.org/0000-0001-6760-5301"
+  date-published: 2023-12-15
+  doi: 10.21105/joss.05848
+  issn: 2475-9066
+  issue: 92
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 5848
+  title: "HNN-core: A Python software for cellular and circuit-level
+    interpretation of human MEG/EEG"
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.05848"
+  volume: 8
+title: "HNN-core: A Python software for cellular and circuit-level
+  interpretation of human MEG/EEG"
