@@ -62,6 +62,7 @@ jobs:
               command: |
                   source ~/miniconda/bin/activate testenv
                   cd doc/ && make html
+              no_output_timeout: 20m
 
           - persist_to_workspace:
               root: doc/_build
