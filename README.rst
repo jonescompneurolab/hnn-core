@@ -1,7 +1,7 @@
 hnn-core
 ========
 
-|tests| |CircleCI| |Codecov| |PyPI| |Gitter|
+|tests| |CircleCI| |Codecov| |PyPI| |Gitter| |JOSS|
 
 |HNN-GUI|
 
@@ -195,3 +195,6 @@ Read our `roadmap`_.
 
 .. |Gitter| image:: https://badges.gitter.im/jonescompneurolab/hnn_core.svg
    :target: https://gitter.im/jonescompneurolab/hnn-core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+
+.. |JOSS| image:: https://joss.theoj.org/papers/10.21105/joss.05848/status.svg
+   :target: https://doi.org/10.21105/joss.05848
