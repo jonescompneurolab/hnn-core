@@ -178,7 +178,7 @@ Citing
 ======
 
 If you use HNN-core in your work, please cite our
-`publication in JOSS <https://doi.org/10.21105/joss.05848>`_::
+`publication in JOSS <https://doi.org/10.21105/joss.05848>`_:
 
    Jas et al., (2023). HNN-core: A Python software for cellular and
    circuit-level interpretation of human MEG/EEG. *Journal of Open Source
