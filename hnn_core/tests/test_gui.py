@@ -3,14 +3,18 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
+import traitlets
+
 from hnn_core import Dipole, Network, Params
 from hnn_core.gui import HNNGUI
-from hnn_core.gui._viz_manager import _idx2figname, _no_overlay_plot_types
+from hnn_core.gui._viz_manager import _idx2figname, _no_overlay_plot_types, \
+    unlink_relink
 from hnn_core.gui.gui import _init_network_from_widgets
 from hnn_core.network import pick_connection
 from hnn_core.network_models import jones_2009_model
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 from IPython.display import IFrame
+from ipywidgets import Tab, Text, link
 
 matplotlib.use('agg')
 
@@ -416,3 +420,57 @@ def test_gui_adaptive_spectrogram():
                 for attr in dir(gui.viz_manager.figs[figid])]) is False
     assert len(gui.viz_manager.figs[1].axes) == 2
     plt.close('all')
+
+
+def test_unlink_relink_widget():
+    """Tests the unlinking and relinking of widgets decorator."""
+
+    # Create a basic version of the VizManager class
+    class MiniViz:
+        def __init__(self):
+            self.tab_group_1 = Tab()
+            self.tab_group_2 = Tab()
+            self.tab_link = link(
+                (self.tab_group_1, 'selected_index'),
+                (self.tab_group_2, 'selected_index'),
+            )
+
+        def add_child(self, to_add=1):
+            n_tabs = len(self.tab_group_2.children) + to_add
+            # Add figure tab and select latest tab
+            self.tab_group_1.children = \
+                [Text(f'Test{s}') for s in np.arange(n_tabs)]
+            self.tab_group_1.selected_index = n_tabs - 1
+
+            self.tab_group_2.children = \
+                [Text(f'Test{s}') for s in np.arange(n_tabs)]
+            self.tab_group_2.selected_index = n_tabs - 1
+
+        @unlink_relink(attribute='tab_link')
+        def add_child_decorated(self, to_add):
+            self.add_child(to_add)
+
+    # Check that widgets are linked.
+    gui = MiniViz()
+    error = False
+    try:
+        gui.add_child(2)
+    except traitlets.TraitError:
+        error = True
+    # Error from tab groups momentarily having a different number of children
+    assert error
+
+    # Check decorator unlinks and is able to make a change
+    gui = MiniViz()
+    error1 = False
+    try:
+        gui.add_child_decorated(2)
+    except traitlets.TraitError:
+        error1 = True
+    assert not error1
+    assert gui.tab_group_1.selected_index == 1
+    assert gui.tab_group_2.selected_index == 1
+
+    # Check if the widgets are relinked, the selected index should be synced
+    gui.tab_group_1.selected_index = 0
+    assert gui.tab_group_2.selected_index == 0
