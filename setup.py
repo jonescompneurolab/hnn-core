@@ -76,6 +76,18 @@ class build_py_mod(build_py):
 
 
 if __name__ == "__main__":
+    extras = {
+              'gui': ['ipywidgets>=8.0.0', 'ipykernel', 'voila', 'ipympl',
+                      ],
+              'opt': ['scikit-learn'],
+              'test': ['flake8', 'pytest', 'pytest-cov'],
+              'docs': ['psutil', 'mne', 'sphinx', 'nbsphinx', 'sphinx-gallery',
+                       'sphinx_bootstrap_theme', 'sphinx-copybutton', 'pillow',
+                       'numpydoc', 'joblib'
+                       ]
+          }
+    extras['dev'] = extras['test'] + extras['docs'] + extras['gui']
+
     setup(name=DISTNAME,
           maintainer=MAINTAINER,
           maintainer_email=MAINTAINER_EMAIL,
@@ -105,10 +117,7 @@ if __name__ == "__main__":
               'scipy',
               'h5io'
           ],
-          extras_require={
-              'gui': ['ipywidgets>=8.0.0', 'ipykernel'],
-              'opt': ['scikit-learn']
-          },
+          extras_require=extras,
           python_requires='>=3.8',
           packages=find_packages(),
           package_data={'hnn_core': [
