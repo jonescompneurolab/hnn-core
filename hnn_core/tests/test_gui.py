@@ -448,24 +448,17 @@ def test_unlink_relink_widget():
             self.add_child(to_add)
 
     # Check that widgets are linked.
-    gui = MiniViz()
-    error = False
-    try:
-        gui.add_child(2)
-    except traitlets.TraitError:
-        error = True
     # Error from tab groups momentarily having a different number of children
-    assert error
+    gui = MiniViz()
+    with pytest.raises(traitlets.TraitError, match='.*index out of bounds.*'):
+        gui.add_child(2)
 
     # Check decorator unlinks and is able to make a change
     gui = MiniViz()
-    error1 = False
-    try:
-        gui.add_child_decorated(2)
-    except traitlets.TraitError:
-        error1 = True
-    assert not error1
+    gui.add_child_decorated(2)
+    assert len(gui.tab_group_1.children) == 2
     assert gui.tab_group_1.selected_index == 1
+    assert len(gui.tab_group_2.children) == 2
     assert gui.tab_group_2.selected_index == 1
 
     # Check if the widgets are relinked, the selected index should be synced
