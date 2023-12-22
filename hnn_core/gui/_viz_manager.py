@@ -604,7 +604,7 @@ def _add_figure(b, widgets, data, scale=0.95, dpi=96):
             display(widgets['figs_tabs'])
 
     widgets['figs_tabs'].children = (
-            [s for s in widgets['figs_tabs'].children] + [fig_outputs]
+        [s for s in widgets['figs_tabs'].children] + [fig_outputs]
     )
     widgets['figs_tabs'].set_title(n_tabs, _idx2figname(fig_idx))
 
