@@ -101,7 +101,7 @@ def plot_type_coupled_change(new_plot_type, target_data_selection):
 
 def unlink_relink(attribute):
     """
-    Wrapper function to unlink widgets and re-link widgets.
+    Decorator function to unlink widgets and re-link widgets.
 
     Unlinks linked widgets, runs the wrapped function, and relinks the widgets
     upon completion. To be used as a decorator on class methods. The class must
