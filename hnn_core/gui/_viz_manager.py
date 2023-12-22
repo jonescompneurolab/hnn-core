@@ -99,15 +99,18 @@ def plot_type_coupled_change(new_plot_type, target_data_selection):
         target_data_selection.disabled = False
 
 
-def unlink_relink(attribute: str):
+def unlink_relink(attribute):
     """
-    Wrapper function to unlink widgets to perform edits and re-link them on
-    completion. Used as a decorator on class methods. The class must have an
-    attribute containing an ipywidgets/traitlets link object.
+    Wrapper function to unlink widgets and re-link widgets.
+
+    Unlinks linked widgets, runs the wrapped function, and relinks the widgets
+    upon completion. To be used as a decorator on class methods. The class must
+    have an attribute containing an ipywidgets/traitlets link object.
 
     Parameters
     ----------
-    attribute: The class attribute containing link object of ipywidgets widgets
+    attribute: (str) The class attribute containing link object of ipywidgets
+               widgets
 
     """
     def _unlink_relink(f):
@@ -120,7 +123,7 @@ def unlink_relink(attribute: str):
             # Call the original function
             result = f(self, *args, **kwargs)
 
-            # Re-link the widgets using link.link()
+            # Re-link the widgets
             link_attribute.link()
 
             return result
@@ -600,8 +603,9 @@ def _add_figure(b, widgets, data, scale=0.95, dpi=96):
         with widgets['figs_output']:
             display(widgets['figs_tabs'])
 
-    widgets['figs_tabs'].children = \
-        [s for s in widgets['figs_tabs'].children] + [fig_outputs]
+    widgets['figs_tabs'].children = (
+            [s for s in widgets['figs_tabs'].children] + [fig_outputs]
+    )
     widgets['figs_tabs'].set_title(n_tabs, _idx2figname(fig_idx))
 
     with fig_outputs:
