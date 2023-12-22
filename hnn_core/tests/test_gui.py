@@ -7,8 +7,8 @@ import traitlets
 
 from hnn_core import Dipole, Network, Params
 from hnn_core.gui import HNNGUI
-from hnn_core.gui._viz_manager import _idx2figname, _no_overlay_plot_types, \
-    unlink_relink
+from hnn_core.gui._viz_manager import (_idx2figname, _no_overlay_plot_types,
+                                       unlink_relink)
 from hnn_core.gui.gui import _init_network_from_widgets
 from hnn_core.network import pick_connection
 from hnn_core.network_models import jones_2009_model
@@ -437,7 +437,7 @@ def test_unlink_relink_widget():
 
         def add_child(self, to_add=1):
             n_tabs = len(self.tab_group_2.children) + to_add
-            # Add figure tab and select latest tab
+            # Add tab and select latest tab
             self.tab_group_1.children = \
                 [Text(f'Test{s}') for s in np.arange(n_tabs)]
             self.tab_group_1.selected_index = n_tabs - 1
