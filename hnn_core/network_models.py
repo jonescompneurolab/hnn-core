@@ -81,6 +81,11 @@ def jones_2009_model(params=None, add_drives_from_params=False,
                 delay, lamtha, allow_autapses=False)
 
     # layer2 Basket -> layer2 Pyr
+    # WAGDY: could try to create a dictionary
+    # of src_cell and target_cell and then a
+    # function that takes default cell names
+    # from this dictionary and overrides it
+    # with user cell names
     src_cell = 'L2_basket'
     target_cell = 'L2_pyramidal'
     lamtha = 50.
