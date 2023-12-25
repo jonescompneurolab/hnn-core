@@ -28,7 +28,7 @@ from .externals.mne import copy_doc
 from typing import Union
 
 
-def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
+def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance, cell_types):
     """Creates coordinate grid and place cells in it.
 
     Parameters
@@ -47,7 +47,7 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
         The grid spacing of pyramidal cells (in um). Note that basket cells are
         placed in an uneven formation. Each one of them lies on a grid point
         together with a pyramidal cell, though (overlapping).
-
+    cell_names: a dictionary of cells {'L2_pyramidal': 'L2_pyramidal'}
     Returns
     -------
     pos_dict : dict of list of tuple (x, y, z)
@@ -94,17 +94,24 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
     xxrange = np.arange(n_pyr_x) * inplane_distance
     yyrange = np.arange(n_pyr_y) * inplane_distance
 
-    pos_dict = {
-        'L5_pyramidal': _calc_pyramidal_coord(xxrange, yyrange, zdiff=0),
-        'L2_pyramidal': _calc_pyramidal_coord(xxrange, yyrange, zdiff=zdiff),
-        'L5_basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
-                                        inplane_distance, weight=0.2
-                                        ),
-        'L2_basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
-                                        inplane_distance, weight=0.8
-                                        ),
-        'origin': _calc_origin(xxrange, yyrange, zdiff),
+
+    cell_name_pos_mapping = {
+        'L5Pyr': _calc_pyramidal_coord(xxrange, yyrange, zdiff=0),
+        'L2Pyr': _calc_pyramidal_coord(xxrange, yyrange, zdiff=zdiff),
+        'L5Basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
+                                       inplane_distance, weight=0.2
+                                       ),
+        'L2Basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
+                                       inplane_distance, weight=0.8
+                                       )
     }
+
+    pos_dict = dict()
+    for cell_net_name, cell_value in cell_types.items():
+        cell_name = cell_value.name
+        pos_dict[cell_net_name] = cell_name_pos_mapping[cell_name]
+
+    pos_dict['origin'] = _calc_origin(xxrange, yyrange, zdiff),
 
     return pos_dict
 
@@ -364,7 +371,6 @@ class Network:
     produce a network with no cell-to-cell connections. As such,
     connectivity information contained in ``params`` will be ignored.
     """
-
     def __init__(self, params, add_drives_from_params=False,
                  legacy_mode=False, mesh_shape=(10, 10)):
         # Save the parameters used to create the Network
@@ -391,7 +397,8 @@ class Network:
                 stacklevel=1)
 
         # Source dict of names, first real ones only!
-        cell_types = {
+        # adding self before cell_types to make it an instance attribute
+        self.cell_types = {
             'L2_basket': basket(cell_name=_short_name('L2_basket')),
             'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
             'L5_basket': basket(cell_name=_short_name('L5_basket')),
@@ -433,12 +440,11 @@ class Network:
         self._layer_separation = 1307.4  # XXX hard-coded default
         self.set_cell_positions(inplane_distance=self._inplane_distance,
                                 layer_separation=self._layer_separation)
-
         # populates self.gid_ranges for the 1st time: order matters for
         # NetworkBuilder!
-        for cell_name in cell_types:
+        for cell_name in self.cell_types:
             self._add_cell_type(cell_name, self.pos_dict[cell_name],
-                                cell_template=cell_types[cell_name])
+                                cell_template=self.cell_types[cell_name])
 
         if add_drives_from_params:
             _add_drives_from_params(self)
@@ -512,7 +518,8 @@ class Network:
 
         pos = _create_cell_coords(n_pyr_x=self._N_pyr_x, n_pyr_y=self._N_pyr_y,
                                   zdiff=layer_separation,
-                                  inplane_distance=inplane_distance)
+                                  inplane_distance=inplane_distance,
+                                  cell_types=self.cell_types)
         # update positions of the real cells
         for key in pos.keys():
             self.pos_dict[key] = pos[key]
@@ -1196,11 +1203,53 @@ class Network:
         ll = self._n_gids
         self._n_gids += len(pos)
         self.gid_ranges[cell_name] = range(ll, self._n_gids)
-
         self.pos_dict[cell_name] = pos
         if cell_template is not None:
             self.cell_types.update({cell_name: cell_template})
             self._n_cells += len(pos)
+
+    def rename_cell(self, original_name, new_name):
+        """Renames cells in the network and clears connectivity so user can
+        set new connections.
+
+        Parameters
+        ----------
+            original_name: str
+            The original cell name in the network to be changed
+            new_name: str
+            The desired new cell name in the network
+        """
+        if original_name not in self.cell_types.keys():
+            # Raises error if the original name is not in cell_types
+            raise ValueError(
+                f" '{original_name}' is not in cell_types!")
+        elif new_name in self.cell_types.keys():
+            # Raises error if the new name is already in cell_types
+            raise ValueError(f"'{new_name}' is already in cell_types!")
+        elif original_name is None or new_name is None:
+            # Raises error if either arguments are not present.
+            raise TypeError
+        elif not isinstance(original_name, str):
+            # Raises error when original_name is not a string
+            raise TypeError(f"'{original_name}' must be a string")
+        elif not isinstance(new_name, str):
+            # Raises error when new_name is not a string
+            raise TypeError(f"'{new_name}' must be a string")
+        elif original_name in self.cell_types.keys():
+            # Update cell name in places where order doesn't matter
+            self.cell_types[new_name] = self.cell_types.pop(original_name)
+            self.pos_dict[new_name] = self.pos_dict.pop(original_name)
+
+            # Update cell name in gid_ranges: order matters for consistency!
+            for _ in range(len(self.gid_ranges)):
+                name, gid_range = self.gid_ranges.popitem(last=False)
+                if name == original_name:
+                    # Insert the new name with the value of the original name
+                    self.gid_ranges[new_name] = gid_range
+                else:
+                    # Insert the value as it is
+                    self.gid_ranges[name] = gid_range
+        self.clear_connectivity()
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
