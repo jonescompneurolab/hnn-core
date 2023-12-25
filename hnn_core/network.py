@@ -28,7 +28,7 @@ from .externals.mne import copy_doc
 from typing import Union
 
 
-def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance, cell_types):
+def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance, cell_types, cell_types):
     """Creates coordinate grid and place cells in it.
 
     Parameters
@@ -94,21 +94,17 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance, cell_types):
     xxrange = np.arange(n_pyr_x) * inplane_distance
     yyrange = np.arange(n_pyr_y) * inplane_distance
 
-    cell_name_pos_mapping = {
-        'L5Pyr': _calc_pyramidal_coord(xxrange, yyrange, zdiff=0),
-        'L2Pyr': _calc_pyramidal_coord(xxrange, yyrange, zdiff=zdiff),
-        'L5Basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
-                                       inplane_distance, weight=0.2),
-        'L2Basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
-                                       inplane_distance, weight=0.8)
+    pos_dict = {
+        'L5_pyramidal': _calc_pyramidal_coord(xxrange, yyrange, zdiff=0),
+        'L2_pyramidal': _calc_pyramidal_coord(xxrange, yyrange, zdiff=zdiff),
+        'L5_basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
+                                        inplane_distance, weight=0.2
+                                        ),
+        'L2_basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
+                                        inplane_distance, weight=0.8
+                                        ),
+        'origin': _calc_origin(xxrange, yyrange, zdiff),
     }
-
-    pos_dict = dict()
-    for cell_net_name, cell_template in cell_types.items():
-        cell_name = cell_template.name
-        pos_dict[cell_net_name] = cell_name_pos_mapping[cell_name]
-
-    pos_dict['origin'] = _calc_origin(xxrange, yyrange, zdiff),
 
     return pos_dict
 
@@ -1198,6 +1194,49 @@ class Network:
         if cell_template is not None:
             self.cell_types.update({cell_name: cell_template})
             self._n_cells += len(pos)
+
+    def rename_cell(self, original_name, new_name):
+        """Renames cells in the network and clears connectivity so user can
+        set new connections.
+
+        Parameters
+        ----------
+            original_name: str
+            The original cell name in the network to be changed
+            new_name: str
+            The desired new cell name in the network
+        """
+        if original_name not in self.cell_types.keys():
+            # Raises error if the original name is not in cell_types
+            raise ValueError(
+                f" '{original_name}' is not in cell_types!")
+        elif new_name in self.cell_types.keys():
+            # Raises error if the new name is already in cell_types
+            raise ValueError(f"'{new_name}' is already in cell_types!")
+        elif original_name is None or new_name is None:
+            # Raises error if either arguments are not present.
+            raise TypeError
+        elif not isinstance(original_name, str):
+            # Raises error when original_name is not a string
+            raise TypeError(f"'{original_name}' must be a string")
+        elif not isinstance(new_name, str):
+            # Raises error when new_name is not a string
+            raise TypeError(f"'{new_name}' must be a string")
+        elif original_name in self.cell_types.keys():
+            # Update cell name in places where order doesn't matter
+            self.cell_types[new_name] = self.cell_types.pop(original_name)
+            self.pos_dict[new_name] = self.pos_dict.pop(original_name)
+
+            # Update cell name in gid_ranges: order matters for consistency!
+            for _ in range(len(self.gid_ranges)):
+                name, gid_range = self.gid_ranges.popitem(last=False)
+                if name == original_name:
+                    # Insert the new name with the value of the original name
+                    self.gid_ranges[new_name] = gid_range
+                else:
+                    # Insert the value as it is
+                    self.gid_ranges[name] = gid_range
+        self.clear_connectivity()
 
     def rename_cell(self, original_name, new_name):
         """Renames cells in the network and clears connectivity so user can

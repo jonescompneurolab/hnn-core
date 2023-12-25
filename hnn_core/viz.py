@@ -560,6 +560,7 @@ def plot_spikes_raster(cell_response, trial_idx=None, color=None,
         np.array(cell_response._spike_types, dtype=object)[trial_idx])
     spike_gids = np.concatenate(
         np.array(cell_response._spike_gids, dtype=object)[trial_idx])
+    cell_types = cell_response._cell_type_names
 
     _validate_type(color, (list, dict, None),
                    'color', 'list of str or dict')
