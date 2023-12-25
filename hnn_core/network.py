@@ -364,7 +364,7 @@ class Network(object):
 
         # Source dict of names, first real ones only!
         cell_types = {
-            'L2_basket': basket(cell_name=_short_name('L2_basket')),
+            'Ryan': basket(cell_name=_short_name('L2_basket')),
             'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
             'L5_basket': basket(cell_name=_short_name('L5_basket')),
             'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
