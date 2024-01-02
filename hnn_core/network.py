@@ -25,7 +25,7 @@ from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
 
 
-def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
+def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance, cell_names):
     """Creates coordinate grid and place cells in it.
 
     Parameters
@@ -83,7 +83,7 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
 
     pos_dict['L5_basket'] = [(pos_xy[0], pos_xy[1], 0.2 * zdiff) for
                              pos_xy in coords_sorted]
-    pos_dict['L2_basket'] = [(pos_xy[0], pos_xy[1], 0.8 * zdiff) for
+    pos_dict['Ryan'] = [(pos_xy[0], pos_xy[1], 0.8 * zdiff) for
                              pos_xy in coords_sorted]
 
     # ORIGIN
@@ -338,7 +338,7 @@ class Network(object):
     """
 
     def __init__(self, params, add_drives_from_params=False,
-                 legacy_mode=False):
+                 legacy_mode=False, cell_name_config):
         # Save the parameters used to create the Network
         _validate_type(params, dict, 'params')
         self._params = params
@@ -386,7 +386,9 @@ class Network(object):
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
         self._n_cells = 0  # used in tests and MPIBackend checks
-        self.pos_dict = dict()
+        self.cell_name_config = cell_name_config
+        self.pos_dict = _create_cell_coords(
+            params['n_pyr_x'], params['n_pyr_y'], params['zdiff'], params['inplane_distance'], self.cell_name_config)
         self.cell_types = dict()
 
         self._N_pyr_x = self._params['N_pyr_x']
