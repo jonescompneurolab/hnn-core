@@ -10,7 +10,8 @@ from .params import (_extract_bias_specs_from_hnn_params,
                      _extract_drive_specs_from_hnn_params)
 
 
-def _get_target_properties(weights_ampa, weights_nmda, synaptic_delays,
+def _get_target_properties(weights_ampa, weights_nmda, weights_gabaa,
+                           weights_gababb, synaptic_delays,
                            location, probability=1.0):
     """Retrieve drive properties associated with each target cell type
 
@@ -23,13 +24,23 @@ def _get_target_properties(weights_ampa, weights_nmda, synaptic_delays,
         weights_ampa = dict()
     if weights_nmda is None:
         weights_nmda = dict()
+    if weights_gabaa is None:
+        weights_gabaa = dict()
+    if weights_gababb is None:
+        weights_gababb = dict()
 
     weights_by_type = {cell_type: dict() for cell_type in
-                       (set(weights_ampa.keys()) | set(weights_nmda.keys()))}
+                       (set(weights_ampa.keys()) | set(weights_nmda.keys()) |
+                        set(weights_gabaa.keys()) |
+                        set(weights_gababb.keys()))}
     for cell_type in weights_ampa:
         weights_by_type[cell_type].update({'ampa': weights_ampa[cell_type]})
     for cell_type in weights_nmda:
         weights_by_type[cell_type].update({'nmda': weights_nmda[cell_type]})
+    for cell_type in weights_gabaa:
+        weights_by_type[cell_type].update({'gabaa': weights_gabaa[cell_type]})
+    for cell_type in weights_gababb:
+        weights_by_type[cell_type].update({'gabab': weights_gababb[cell_type]})
 
     target_populations = set(weights_by_type)
     if not target_populations:
