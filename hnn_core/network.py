@@ -25,7 +25,7 @@ from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
 
 
-def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance, cell_names=None):
+def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance, cell_types):
     """Creates coordinate grid and place cells in it.
 
     Parameters
@@ -58,34 +58,49 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance, cell_names=No
     Sort of a hack bc of redundancy
     """
     pos_dict = dict()
-    if cell_names == None:
-        cell_names = {'L2_pyramidal':'L2_pyramidal', 'L5_pyramidal': 'L5_pyramidal', 'L2_basket': 'L2_basket', 'L5_basket':'L5_basket' }
-        
+    
     # PYRAMIDAL CELLS
-    xxrange = np.arange(n_pyr_x) * inplane_distance
-    yyrange = np.arange(n_pyr_y) * inplane_distance
-
-    pos_dict[cell_names['L5_pyramidal']] = [
-        pos for pos in it.product(xxrange, yyrange, [0])]
-    pos_dict[cell_names['L2_pyramidal']] = [
-        pos for pos in it.product(xxrange, yyrange, [zdiff])]
-
+    for cell_net_name, cell_value in cell_types.items():
+        cell_name = cell_value.name
+        if cell_name == 'L5_pyramidal':
+            xxrange = np.arange(n_pyr_x) * inplane_distance
+            yyrange = np.arange(n_pyr_y) * inplane_distance
+            pos_dict[cell_net_name] = [
+                pos for pos in it.product(xxrange, yyrange, [0])]
+        
+        if cell_name == 'L2_pyramidal':
+            xxrange = np.arange(n_pyr_x) * inplane_distance
+            yyrange = np.arange(n_pyr_y) * inplane_distance
+            pos_dict[cell_net_name] = [
+                pos for pos in it.product(xxrange, yyrange, [zdiff])]
     # BASKET CELLS
-    xzero = np.arange(0, n_pyr_x, 3) * inplane_distance
-    xone = np.arange(1, n_pyr_x, 3) * inplane_distance
-    # split even and odd y vals
-    yeven = np.arange(0, n_pyr_y, 2) * inplane_distance
-    yodd = np.arange(1, n_pyr_y, 2) * inplane_distance
-    # create general list of x,y coords and sort it
-    coords = [pos for pos in it.product(
-        xzero, yeven)] + [pos for pos in it.product(xone, yodd)]
-    coords_sorted = sorted(coords, key=lambda pos: pos[1])
-    # append the z value for position for L2 and L5
-    # print(len(coords_sorted))
-
-    pos_dict[cell_names['L5_basket']] = [(pos_xy[0], pos_xy[1], 0.2 * zdiff) for
+        if cell_name == 'L5_basket':
+            xzero = np.arange(0, n_pyr_x, 3) * inplane_distance
+            xone = np.arange(1, n_pyr_x, 3) * inplane_distance
+            # split even and odd y vals
+            yeven = np.arange(0, n_pyr_y, 2) * inplane_distance
+            yodd = np.arange(1, n_pyr_y, 2) * inplane_distance
+            # create general list of x,y coords and sort it
+            coords = [pos for pos in it.product(
+                xzero, yeven)] + [pos for pos in it.product(xone, yodd)]
+            coords_sorted = sorted(coords, key=lambda pos: pos[1])
+            # append the z value for position for L2 and L5
+            # print(len(coords_sorted))  
+            pos_dict[cell_net_name] = [(pos_xy[0], pos_xy[1], 0.2 * zdiff) for
                              pos_xy in coords_sorted]
-    pos_dict[cell_names['L2_basket']] = [(pos_xy[0], pos_xy[1], 0.8 * zdiff) for
+            if cell_name == 'L2_basket':
+                xzero = np.arange(0, n_pyr_x, 3) * inplane_distance
+                xone = np.arange(1, n_pyr_x, 3) * inplane_distance
+                # split even and odd y vals
+                yeven = np.arange(0, n_pyr_y, 2) * inplane_distance
+                yodd = np.arange(1, n_pyr_y, 2) * inplane_distance
+                # create general list of x,y coords and sort it
+                coords = [pos for pos in it.product(
+                    xzero, yeven)] + [pos for pos in it.product(xone, yodd)]
+                coords_sorted = sorted(coords, key=lambda pos: pos[1])
+                # append the z value for position for L2 and L5
+                # print(len(coords_sorted))
+                pos_dict[cell_net_name] = [(pos_xy[0], pos_xy[1], 0.8 * zdiff) for
                              pos_xy in coords_sorted]
 
     # ORIGIN
@@ -337,14 +352,12 @@ class Network(object):
     produce a network with no cell-to-cell connections. As such,
     connectivity information contained in ``params`` will be ignored.
     """
-
     def __init__(self, params, add_drives_from_params=False, legacy_mode=False):
         # Save the parameters used to create the Network
         _validate_type(params, dict, 'params')
         self._params = params
         # Update the cell names -if needed
-        # self.cell_name_config = cell_name_config   # Line added by WAGDY    
-        
+        # self.cell_name_config = cell_name_config   # Line added by WAGDY
         # Initialise a dictionary of cell ID's, which get used when the
         # network is constructed ('built') in NetworkBuilder
         # We want it to remain in each Network object, so that the user can
@@ -366,12 +379,11 @@ class Network(object):
                 stacklevel=1)
 
         # Source dict of names, first real ones only!
-        cell_types = cell_names
-        #{
-        #    'L2_basket': basket(cell_name=_short_name('L2_basket')),
-         #   'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
-          ## 'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
-        #}
+        cell_types = {
+            'L2_basket': basket(cell_name=_short_name('L2_basket')),
+            'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
+            'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
+        }
 
         self.cell_response = None
         # external drives and biases
