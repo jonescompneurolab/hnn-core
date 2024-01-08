@@ -25,7 +25,7 @@ from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
 
 
-def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance, cell_names):
+def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance, cell_names=None):
     """Creates coordinate grid and place cells in it.
 
     Parameters
@@ -44,7 +44,7 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance, cell_names):
         The grid spacing of pyramidal cells (in um). Note that basket cells are
         placed in an uneven formation. Each one of them lies on a grid point
         together with a pyramidal cell, though (overlapping).
-
+    cell_names: a dictionary of cells {'L2_pyramidal': 'L2_pyramidal'}
     Returns
     -------
     pos_dict : dict of list of tuple (x, y, z)
@@ -58,14 +58,16 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance, cell_names):
     Sort of a hack bc of redundancy
     """
     pos_dict = dict()
-
+    if cell_names == None:
+        cell_names = {'L2_pyramidal':'L2_pyramidal', 'L5_pyramidal': 'L5_pyramidal', 'L2_basket': 'L2_basket', 'L5_basket':'L5_basket' }
+        
     # PYRAMIDAL CELLS
     xxrange = np.arange(n_pyr_x) * inplane_distance
     yyrange = np.arange(n_pyr_y) * inplane_distance
 
-    pos_dict['L5_pyramidal'] = [
+    pos_dict[cell_names['L5_pyramidal']] = [
         pos for pos in it.product(xxrange, yyrange, [0])]
-    pos_dict['L2_pyramidal'] = [
+    pos_dict[cell_names['L2_pyramidal']] = [
         pos for pos in it.product(xxrange, yyrange, [zdiff])]
 
     # BASKET CELLS
@@ -81,9 +83,9 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance, cell_names):
     # append the z value for position for L2 and L5
     # print(len(coords_sorted))
 
-    pos_dict['L5_basket'] = [(pos_xy[0], pos_xy[1], 0.2 * zdiff) for
+    pos_dict[cell_names['L5_basket']] = [(pos_xy[0], pos_xy[1], 0.2 * zdiff) for
                              pos_xy in coords_sorted]
-    pos_dict['Ryan'] = [(pos_xy[0], pos_xy[1], 0.8 * zdiff) for
+    pos_dict[cell_names['L2_basket']] = [(pos_xy[0], pos_xy[1], 0.8 * zdiff) for
                              pos_xy in coords_sorted]
 
     # ORIGIN
@@ -214,7 +216,6 @@ def pick_connection(net, src_gids=None, target_gids=None,
                            valid_srcs, 'src_gids', same_type=False)
     target_gids = _check_gids(target_gids, net.gid_ranges,
                               valid_targets, 'target_gids', same_type=False)
-
     _validate_type(loc, (str, list, None), 'loc', 'str, list, or None')
     _validate_type(receptor, (str, list, None), 'receptor',
                    'str, list, or None')
@@ -337,11 +338,13 @@ class Network(object):
     connectivity information contained in ``params`` will be ignored.
     """
 
-    def __init__(self, params, add_drives_from_params=False,
-                 legacy_mode=False, cell_name_config):
+    def __init__(self, params, add_drives_from_params=False, legacy_mode=False):
         # Save the parameters used to create the Network
         _validate_type(params, dict, 'params')
         self._params = params
+        # Update the cell names -if needed
+        # self.cell_name_config = cell_name_config   # Line added by WAGDY    
+        
         # Initialise a dictionary of cell ID's, which get used when the
         # network is constructed ('built') in NetworkBuilder
         # We want it to remain in each Network object, so that the user can
@@ -363,12 +366,12 @@ class Network(object):
                 stacklevel=1)
 
         # Source dict of names, first real ones only!
-        cell_types = {
-            'Ryan': basket(cell_name=_short_name('L2_basket')),
-            'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
-            'L5_basket': basket(cell_name=_short_name('L5_basket')),
-            'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
-        }
+        cell_types = cell_names
+        #{
+        #    'L2_basket': basket(cell_name=_short_name('L2_basket')),
+         #   'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
+          ## 'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
+        #}
 
         self.cell_response = None
         # external drives and biases
@@ -386,7 +389,6 @@ class Network(object):
         # contents of pos_dict determines all downstream inferences of
         # cell counts, real and artificial
         self._n_cells = 0  # used in tests and MPIBackend checks
-        self.cell_name_config = cell_name_config
         self.pos_dict = _create_cell_coords(
             params['n_pyr_x'], params['n_pyr_y'], params['zdiff'], params['inplane_distance'], self.cell_name_config)
         self.cell_types = dict()
@@ -449,7 +451,7 @@ class Network(object):
 
         pos = _create_cell_coords(n_pyr_x=self._N_pyr_x, n_pyr_y=self._N_pyr_y,
                                   zdiff=layer_separation,
-                                  inplane_distance=inplane_distance)
+                                  inplane_distance=inplane_distance, cell_names=None)
         # update positions of the real cells
         for key in pos.keys():
             self.pos_dict[key] = pos[key]
