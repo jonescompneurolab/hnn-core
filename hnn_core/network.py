@@ -100,20 +100,19 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance, cell_types):
             # print(len(coords_sorted))
             pos_dict[cell_net_name] = [(pos_xy[0], pos_xy[1], 0.8 * zdiff)
                                        for pos_xy in coords_sorted]
+        # ORIGIN
+        # origin's z component isn't really used in
+        # calculating distance functions from origin
+        # these will be forced as ints!
+        origin_x = xxrange[int((len(xxrange) - 1) // 2)]
+        origin_y = yyrange[int((len(yyrange) - 1) // 2)]
+        origin_z = np.floor(zdiff / 2)
+        origin = (origin_x, origin_y, origin_z)
 
-    # ORIGIN
-    # origin's z component isn't really used in
-    # calculating distance functions from origin
-    # these will be forced as ints!
-    origin_x = xxrange[int((len(xxrange) - 1) // 2)]
-    origin_y = yyrange[int((len(yyrange) - 1) // 2)]
-    origin_z = np.floor(zdiff / 2)
-    origin = (origin_x, origin_y, origin_z)
+        # save the origin for adding external drives later
+        pos_dict['origin'] = origin
 
-    # save the origin for adding external drives later
-    pos_dict['origin'] = origin
-
-    return pos_dict
+        return pos_dict
 
 
 def _connection_probability(conn, probability, conn_seed=None):
