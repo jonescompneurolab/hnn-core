@@ -460,7 +460,8 @@ class Network(object):
 
         pos = _create_cell_coords(n_pyr_x=self._N_pyr_x, n_pyr_y=self._N_pyr_y,
                                   zdiff=layer_separation,
-                                  inplane_distance=inplane_distance,cell_types= cell_types)
+                                  inplane_distance=inplane_distance,
+                                  cell_types=self.cell_types)
         # update positions of the real cells
         for key in pos.keys():
             self.pos_dict[key] = pos[key]
