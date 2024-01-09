@@ -1459,7 +1459,7 @@ class _NetworkDrive(dict):
         Each artificial drive cell has seed = event_seed + gid
     conn_seed : int
         Optional initial seed for random number generator.
-        Used to randomly remove connections when probablity < 1.0.
+        Used to randomly remove connections when probability < 1.0.
     target_types : set or list of str
         Names of cell types targeted by this drive (must be subset of
         net.cell_types.keys()).
