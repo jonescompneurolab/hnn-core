@@ -409,6 +409,7 @@ class Network(object):
         self.set_cell_positions(inplane_distance=self._inplane_distance,
                                 layer_separation=self._layer_separation)
 
+
         # populates self.gid_ranges for the 1st time: order matters for
         # NetworkBuilder!
         for cell_name in cell_types:
