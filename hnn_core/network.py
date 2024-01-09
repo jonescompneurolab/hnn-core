@@ -402,7 +402,9 @@ class Network(object):
         # cell counts, real and artificial
         self._n_cells = 0  # used in tests and MPIBackend checks
         self.pos_dict = _create_cell_coords(
-            params['n_pyr_x'], params['n_pyr_y'], params['zdiff'], params['inplane_distance'], self.cell_name_config)
+            params['n_pyr_x'], params['n_pyr_y'], 
+            params['zdiff'], params['inplane_distance'], 
+            self.cell_name_config)
         self.cell_types = dict()
 
         self._N_pyr_x = self._params['N_pyr_x']
@@ -463,7 +465,7 @@ class Network(object):
 
         pos = _create_cell_coords(n_pyr_x=self._N_pyr_x, n_pyr_y=self._N_pyr_y,
                                   zdiff=layer_separation,
-                                  inplane_distance=inplane_distance, cell_names=None)
+                                  inplane_distance=inplane_distance)
         # update positions of the real cells
         for key in pos.keys():
             self.pos_dict[key] = pos[key]
