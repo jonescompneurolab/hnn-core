@@ -376,8 +376,9 @@ class Network(object):
                 stacklevel=1)
 
         # Source dict of names, first real ones only!
+        # adding self before cell_types to make it an instance attribute
         self.cell_types = {
-            'L2_basket': basket(cell_name=_short_name('L2_basket')),
+            'Ryan': basket(cell_name=_short_name('L2_basket')),
             'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
             'L5_basket': basket(cell_name=_short_name('L5_basket')),
             'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
@@ -400,7 +401,7 @@ class Network(object):
         # cell counts, real and artificial
         self._n_cells = 0  # used in tests and MPIBackend checks
         self.pos_dict = dict()
-        self.cell_types = dict()
+        # COMMENTED By WAGDY #self.cell_types = dict()
 
         self._N_pyr_x = self._params['N_pyr_x']
         self._N_pyr_y = self._params['N_pyr_y']
