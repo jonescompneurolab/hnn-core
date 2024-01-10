@@ -376,7 +376,7 @@ class Network(object):
                 stacklevel=1)
 
         # Source dict of names, first real ones only!
-        cell_types = {
+        self.cell_types = {
             'L2_basket': basket(cell_name=_short_name('L2_basket')),
             'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
             'L5_basket': basket(cell_name=_short_name('L5_basket')),
@@ -408,13 +408,11 @@ class Network(object):
         self._layer_separation = 1307.4  # XXX hard-coded default
         self.set_cell_positions(inplane_distance=self._inplane_distance,
                                 layer_separation=self._layer_separation)
-
-
         # populates self.gid_ranges for the 1st time: order matters for
         # NetworkBuilder!
-        for cell_name in cell_types:
+        for cell_name in self.cell_types:
             self._add_cell_type(cell_name, self.pos_dict[cell_name],
-                                cell_template=cell_types[cell_name])
+                                cell_template=self.cell_types[cell_name])
 
         if add_drives_from_params:
             _add_drives_from_params(self)
