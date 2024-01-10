@@ -18,7 +18,7 @@
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=fd10adb8"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.1/dist/embed-amd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
 
@@ -148,6 +148,7 @@
 <span class="kn">import</span> <span class="nn">urllib.request</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">IFrame</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="p">(</span><span class="n">HTML</span><span class="p">,</span> <span class="n">Accordion</span><span class="p">,</span> <span class="n">AppLayout</span><span class="p">,</span> <span class="n">BoundedFloatText</span><span class="p">,</span>
                         <span class="n">BoundedIntText</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">Dropdown</span><span class="p">,</span> <span class="n">FileUpload</span><span class="p">,</span> <span class="n">VBox</span><span class="p">,</span>
@@ -575,8 +576,7 @@
             <span class="s1">&#39;Layer 2/3 Pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;Layer 5 Pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;Layer 2 Basket&#39;</span><span class="p">,</span>
             <span class="s1">&#39;Layer 5 Basket&#39;</span><span class="p">)</span>
         <span class="n">cell_connectivity</span> <span class="o">=</span> <span class="n">Accordion</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="n">connectivity_boxes</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">connectivity_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">connectivity_names</span><span class="p">):</span>
-            <span class="n">cell_connectivity</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">connectivity_name</span><span class="p">)</span>
+        <span class="n">cell_connectivity</span><span class="o">.</span><span class="n">titles</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">connectivity_names</span><span class="p">]</span>
 
         <span class="n">drive_selections</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_drive_button</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_drive_type_selection</span><span class="p">,</span>
@@ -753,15 +753,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">load_drives_button</span><span class="o">.</span><span class="n">set_trait</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">uploaded_value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_simulate_left_tab_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_title</span><span class="p">):</span>
-        <span class="n">tab_index</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Get left tab group object</span>
         <span class="n">left_tab</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_layout</span><span class="o">.</span><span class="n">left_sidebar</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">left_tab</span><span class="o">.</span><span class="n">_titles</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">tab_title</span> <span class="o">==</span> <span class="n">left_tab</span><span class="o">.</span><span class="n">_titles</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span>
-                <span class="n">tab_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
-                <span class="k">break</span>
-        <span class="k">if</span> <span class="n">tab_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect tab title&quot;</span><span class="p">)</span>
-        <span class="n">left_tab</span><span class="o">.</span><span class="n">selected_index</span> <span class="o">=</span> <span class="n">tab_index</span>
+        <span class="c1"># Check that the title is in the tab group</span>
+        <span class="k">if</span> <span class="n">tab_title</span> <span class="ow">in</span> <span class="n">left_tab</span><span class="o">.</span><span class="n">titles</span><span class="p">:</span>
+            <span class="c1"># Simulate the user clicking on the tab</span>
+            <span class="n">left_tab</span><span class="o">.</span><span class="n">selected_index</span> <span class="o">=</span> <span class="n">left_tab</span><span class="o">.</span><span class="n">titles</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">tab_title</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Tab title does not exist.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_simulate_make_figure</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_simulate_left_tab_click</span><span class="p">(</span><span class="s2">&quot;Visualization&quot;</span><span class="p">)</span>
@@ -792,16 +791,13 @@
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
         <span class="n">content</span> <span class="o">+=</span> <span class="n">line</span>
 
-    <span class="k">return</span> <span class="p">{</span>
-        <span class="n">params_name</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;metadata&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">params_name</span><span class="p">,</span>
-                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="p">),</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">content</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
+    <span class="k">return</span> <span class="p">[{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">params_name</span><span class="p">,</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="p">),</span>
+        <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">content</span><span class="p">,</span>
+        <span class="s1">&#39;last_modified&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="p">}]</span>
 
 
 <span class="k">def</span> <span class="nf">create_expanded_button</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">button_style</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -1270,14 +1266,14 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Empty change&quot;</span><span class="p">)</span>
         <span class="k">return</span>
 
-    <span class="n">key</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">data_dict</span> <span class="o">=</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="n">data_fname</span> <span class="o">=</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;.txt&#39;</span><span class="p">)</span>
+    <span class="n">data_fname</span> <span class="o">=</span> <span class="n">data_dict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;.txt&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">data_fname</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;simulation_data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found existing data: </span><span class="si">{</span><span class="n">data_fname</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
         <span class="k">return</span>
 
-    <span class="n">ext_content</span> <span class="o">=</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;content&#39;</span><span class="p">]</span>
+    <span class="n">ext_content</span> <span class="o">=</span> <span class="n">data_dict</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">]</span>
     <span class="n">ext_content</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">ext_content</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
     <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
         <span class="n">data</span><span class="p">[</span><span class="s1">&#39;simulation_data&#39;</span><span class="p">][</span><span class="n">data_fname</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;net&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;dpls&#39;</span><span class="p">:</span> <span class="p">[</span>
@@ -1300,10 +1296,9 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Empty change&quot;</span><span class="p">)</span>
         <span class="k">return</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading connectivity...&quot;</span><span class="p">)</span>
-    <span class="n">key</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
-
-    <span class="n">params_fname</span> <span class="o">=</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
-    <span class="n">param_data</span> <span class="o">=</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;content&#39;</span><span class="p">]</span>
+    <span class="n">param_dict</span> <span class="o">=</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">params_fname</span> <span class="o">=</span> <span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+    <span class="n">param_data</span> <span class="o">=</span> <span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">]</span>
 
     <span class="n">param_data</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">param_data</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
 
@@ -1328,9 +1323,8 @@
                       <span class="n">layout</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span>
-
-    <span class="n">change</span><span class="p">[</span><span class="s1">&#39;owner&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_trait</span><span class="p">(</span><span class="s1">&#39;_counter&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="n">change</span><span class="p">[</span><span class="s1">&#39;owner&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_trait</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="p">{})</span>
+    <span class="c1"># Resets file counter to 0</span>
+    <span class="n">change</span><span class="p">[</span><span class="s1">&#39;owner&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_trait</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="p">([]))</span>
 
 
 <span class="k">def</span> <span class="nf">_init_network_from_widgets</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">single_simulation_data</span><span class="p">,</span>
