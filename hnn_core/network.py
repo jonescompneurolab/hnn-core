@@ -61,18 +61,18 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance, cell_types):
     # PYRAMIDAL CELLS
     for cell_net_name, cell_value in cell_types.items():
         cell_name = cell_value.name
-        if cell_name == 'L5_pyramidal':
+        if cell_name == 'L5Pyr':
             xxrange = np.arange(n_pyr_x) * inplane_distance
             yyrange = np.arange(n_pyr_y) * inplane_distance
             pos_dict[cell_net_name] = [
                 pos for pos in it.product(xxrange, yyrange, [0])]
-        if cell_name == 'L2_pyramidal':
+        if cell_name == 'L2Pyr':
             xxrange = np.arange(n_pyr_x) * inplane_distance
             yyrange = np.arange(n_pyr_y) * inplane_distance
             pos_dict[cell_net_name] = [
                 pos for pos in it.product(xxrange, yyrange, [zdiff])]
     # BASKET CELLS
-        if cell_name == 'L5_basket':
+        if cell_name == 'L5Basket':
             xzero = np.arange(0, n_pyr_x, 3) * inplane_distance
             xone = np.arange(1, n_pyr_x, 3) * inplane_distance
             # split even and odd y vals
@@ -86,7 +86,7 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance, cell_types):
             # print(len(coords_sorted))
             pos_dict[cell_net_name] = [(pos_xy[0], pos_xy[1], 0.2 * zdiff) for
                                        pos_xy in coords_sorted]
-        if cell_name == 'L2_basket':
+        if cell_name == 'L2Basket':
             xzero = np.arange(0, n_pyr_x, 3) * inplane_distance
             xone = np.arange(1, n_pyr_x, 3) * inplane_distance
             # split even and odd y vals
