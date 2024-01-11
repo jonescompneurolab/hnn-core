@@ -90,6 +90,7 @@ if __name__ == "__main__":
                      extras['docs'] + extras['gui']
                      )
 
+
     setup(name=DISTNAME,
           maintainer=MAINTAINER,
           maintainer_email=MAINTAINER_EMAIL,
