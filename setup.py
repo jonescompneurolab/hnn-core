@@ -78,7 +78,7 @@ class build_py_mod(build_py):
 if __name__ == "__main__":
     extras = {
         'opt': ['scikit-learn'],
-        'parallel': ['joblib', 'psutil', 'mpi4py'],
+        'parallel': ['joblib', 'psutil'],
         'test': ['flake8', 'pytest', 'pytest-cov', ],
         'docs': ['mne', 'sphinx', 'nbsphinx', 'sphinx-gallery',
                  'sphinx_bootstrap_theme', 'sphinx-copybutton', 'pillow',
