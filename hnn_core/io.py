@@ -21,7 +21,7 @@ def _str_to_node(node_string):
 
 @fill_doc
 def write_network(net, fname, overwrite=True, write_output=True):
-    """Write network to a file.
+    """Write network to a HDF5 file.
 
     Parameters
     ----------
@@ -37,54 +37,45 @@ def write_network(net, fname, overwrite=True, write_output=True):
     if overwrite is False and os.path.exists(fname):
         raise FileExistsError('File already exists at path %s. Rename '
                               'the file or set overwrite=True.' % (fname,))
-    net_data = dict()
-    net_data['object_type'] = "Network"
-    net_data['N_pyr_x'] = net._N_pyr_x
-    net_data['N_pyr_y'] = net._N_pyr_y
-    net_data['celsius'] = net._params['celsius']
-    cell_types_data = dict()
-    for key in net.cell_types:
-        cell_types_data[key] = net.cell_types[key].to_dict()
-    net_data['cell_types'] = cell_types_data
-    # Write gid_ranges
-    gid_ranges_data = dict()
-    for key in net.gid_ranges:
-        gid_ranges_data[key] = dict()
-        gid_ranges_data[key]['start'] = net.gid_ranges[key].start
-        gid_ranges_data[key]['stop'] = net.gid_ranges[key].stop
-    net_data['gid_ranges'] = gid_ranges_data
-    # Write pos_dict
-    pos_dict_data = dict()
-    for key in net.pos_dict:
-        pos_dict_data[key] = net.pos_dict[key]
-    net_data['pos_dict'] = pos_dict_data
-    # Write cell_response
-    if (not net.cell_response) or (not write_output):
-        net_data['cell_response'] = None
-    else:
-        net_data['cell_response'] = net.cell_response.to_dict()
-    # Write External drives
-    external_drives_data = dict()
-    for key in net.external_drives.keys():
-        external_drives_data[key] = (_external_drive_to_dict
-                                     (net.external_drives[key],
-                                      write_output))
-    net_data['external_drives'] = external_drives_data
-    # Write External biases
-    net_data['external_biases'] = net.external_biases
-    # Write connectivity
-    net_data['connectivity'] = _write_connectivity(net.connectivity)
-    # Write rec arrays
-    net_data['rec_arrays'] = dict()
-    for key in net.rec_arrays.keys():
-        rec_array_copy = net.rec_arrays[key].copy()
+
+    def _write_cell_response(net, write_output):
+        # Write cell_response
+        if (not net.cell_response) or (not write_output):
+            return None
+        else:
+            return net.cell_response.to_dict()
+
+    def _write_rec_arrays(value, write_output):
+        rec_array_copy = value.copy()
         if not write_output:
             rec_array_copy._reset()
-        net_data['rec_arrays'][key] = rec_array_copy.to_dict()
-    # Write threshold
-    net_data['threshold'] = net.threshold
-    # Write delay
-    net_data['delay'] = net.delay
+        rec_array_copy_dict = rec_array_copy.to_dict()
+        return rec_array_copy_dict
+
+    net_data = {
+        'object_type': 'Network',
+        'N_pyr_x': net._N_pyr_x,
+        'N_pyr_y': net._N_pyr_y,
+        'celsius': net._params['celsius'],
+        'cell_types': {name: template.to_dict()
+                       for name, template in net.cell_types.items()
+                       },
+        'gid_ranges': {cell: {'start': c_range.start, 'stop': c_range.stop}
+                       for cell, c_range in net.gid_ranges.items()
+                       },
+        'pos_dict': {cell: pos for cell, pos in net.pos_dict.items()},
+        'cell_response': _write_cell_response(net, write_output),
+        'external_drives': {drive: _external_drive_to_dict(params, write_output)
+                            for drive, params in net.external_drives.items()
+                            },
+        'external_biases': net.external_biases,
+        'connectivity': _write_connectivity(net.connectivity),
+        'rec_arrays': {ra_name: _write_rec_arrays(ex_array, write_output)
+                       for ra_name, ex_array in net.rec_arrays.items()
+                       },
+        'threshold': net.threshold,
+        'delay': net.delay,
+    }
 
     # Saving file
     write_hdf5(fname, net_data, overwrite=overwrite)
