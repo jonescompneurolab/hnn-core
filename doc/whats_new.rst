@@ -21,6 +21,12 @@ Changelog
 - Update minimum supported version of Python to 3.8, by `Ryan Thorpe`_ in
   :gh:`678`.
 
+- Update GUI to use ipywidgets v8.0.0+ API, by `George Dang`_ in
+  :gh:`696`.
+
+- Add dependency groups to setup.py and update CI workflows to reference
+  dependency groups, by `George Dang`_ in :gh:`703`.
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
@@ -28,6 +34,9 @@ Bug
 
 - Objective function called by :func:`~hnn_core/optimization/optimize_evoked`
   now returns a scalar instead of tuple, by `Ryan Thorpe`_ in :gh:`670`.
+
+- Fix GUI plotting bug due to deprecation of matplotlib color cycling method,
+  by `George Dang`_ in :gh:`695`.
 
 API
 ~~~
