@@ -59,46 +59,52 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
     Common positions are all located at origin.
     Sort of a hack because of redundancy.
     """
-    pos_dict = dict()
+    def _calc_pyramidal_coord(xxrange, yyrange, zdiff):
+        list_coords = [pos for pos in it.product(xxrange, yyrange, [zdiff])]
+        return list_coords
 
-    # PYRAMIDAL CELLS
+    def _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
+                                 inplane_distance, weight):
+        xzero = np.arange(0, n_pyr_x, 3) * inplane_distance
+        xone = np.arange(1, n_pyr_x, 3) * inplane_distance
+        # split even and odd y vals
+        yeven = np.arange(0, n_pyr_y, 2) * inplane_distance
+        yodd = np.arange(1, n_pyr_y, 2) * inplane_distance
+        # create general list of x,y coords and sort it
+        coords = [pos for pos in it.product(
+            xzero, yeven)] + [pos for pos in it.product(xone, yodd)]
+        coords_sorted = sorted(coords, key=lambda pos: pos[1])
+
+        # append the z value for position
+        list_coords = [(pos_xy[0], pos_xy[1], weight * zdiff)
+                       for pos_xy in coords_sorted]
+
+        return list_coords
+
+    def _calc_origin(xxrange, yyrange, zdiff):
+        # origin's z component isn't used in calculating distance functions.
+        # will be used for adding external drives.
+        origin_x = xxrange[int((len(xxrange) - 1) // 2)]
+        origin_y = yyrange[int((len(yyrange) - 1) // 2)]
+        origin_z = np.floor(zdiff / 2)
+        origin = (origin_x, origin_y, origin_z)
+        return origin
+
+    # Calculate distances
     xxrange = np.arange(n_pyr_x) * inplane_distance
     yyrange = np.arange(n_pyr_y) * inplane_distance
 
-    pos_dict['L5_pyramidal'] = [
-        pos for pos in it.product(xxrange, yyrange, [0])]
-    pos_dict['L2_pyramidal'] = [
-        pos for pos in it.product(xxrange, yyrange, [zdiff])]
-
-    # BASKET CELLS
-    xzero = np.arange(0, n_pyr_x, 3) * inplane_distance
-    xone = np.arange(1, n_pyr_x, 3) * inplane_distance
-    # split even and odd y vals
-    yeven = np.arange(0, n_pyr_y, 2) * inplane_distance
-    yodd = np.arange(1, n_pyr_y, 2) * inplane_distance
-    # create general list of x,y coords and sort it
-    coords = [pos for pos in it.product(
-        xzero, yeven)] + [pos for pos in it.product(xone, yodd)]
-    coords_sorted = sorted(coords, key=lambda pos: pos[1])
-    # append the z value for position for L2 and L5
-    # print(len(coords_sorted))
-
-    pos_dict['L5_basket'] = [(pos_xy[0], pos_xy[1], 0.2 * zdiff) for
-                             pos_xy in coords_sorted]
-    pos_dict['L2_basket'] = [(pos_xy[0], pos_xy[1], 0.8 * zdiff) for
-                             pos_xy in coords_sorted]
-
-    # ORIGIN
-    # origin's z component isn't really used in
-    # calculating distance functions from origin
-    # these will be forced as ints!
-    origin_x = xxrange[int((len(xxrange) - 1) // 2)]
-    origin_y = yyrange[int((len(yyrange) - 1) // 2)]
-    origin_z = np.floor(zdiff / 2)
-    origin = (origin_x, origin_y, origin_z)
-
-    # save the origin for adding external drives later
-    pos_dict['origin'] = origin
+    pos_dict = {
+        'L5_pyramidal': _calc_pyramidal_coord(xxrange, yyrange, zdiff=0),
+        'L2_pyramidal': _calc_pyramidal_coord(xxrange, yyrange, zdiff=zdiff),
+        'L5_basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
+                                        inplane_distance, weight=0.2
+                                        ),
+        'L2_basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
+                                        inplane_distance, weight=0.8
+                                        ),
+        'origin': _calc_origin(xxrange, yyrange, zdiff),
+    }
 
     return pos_dict
 
