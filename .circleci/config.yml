@@ -30,15 +30,13 @@ jobs:
                   conda create -n testenv --yes pip python=3.8
                   source activate testenv
                   conda install --yes scipy numpy matplotlib
-                  pip install mne pooch tqdm psutil mpi4py joblib nibabel
+                  pip install pooch tqdm mpi4py
 
           - run:
               name: Setup doc building stuff
               command: |
                   source ~/miniconda/bin/activate testenv
                   sudo apt-get install pandoc
-                  pip install sphinx numpydoc sphinx_bootstrap_theme sphinx-copybutton pillow nbsphinx
-                  pip install --user -U https://api.github.com/repos/sphinx-gallery/sphinx-gallery/zipball/master
 
           - run:
               name: Setup Neuron
@@ -51,7 +49,7 @@ jobs:
               command: |
                   source ~/miniconda/bin/activate testenv
                   pip install -U pip setuptools virtualenv
-                  pip install '.[gui]'
+                  pip install '.[parallel, docs, gui]'
 
           - restore_cache:
               keys:
