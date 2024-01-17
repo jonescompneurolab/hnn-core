@@ -449,3 +449,4 @@ People who contributed to this release (in alphabetical order):
 .. _Stephanie R. Jones: https://github.com/stephanie-r-jones
 .. _Steven Brandt: https://github.com/spbrandt
 .. _Kaisu Lankinen: https://github.com/klankinen
+.. _George Dang: https://github.com/gtdang
