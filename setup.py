@@ -80,9 +80,10 @@ if __name__ == "__main__":
         'opt': ['scikit-learn'],
         'parallel': ['joblib', 'psutil'],
         'test': ['flake8', 'pytest', 'pytest-cov', ],
-        'docs': ['mne', 'nibabel', 'sphinx', 'nbsphinx', 'sphinx-gallery',
-                 'sphinx_bootstrap_theme', 'sphinx-copybutton', 'pillow',
-                 'numpydoc',
+        'docs': ['mne', 'nibabel', 'pooch', 'tdqm',
+                 'sphinx', 'nbsphinx', 'sphinx-gallery',
+                 'sphinx_bootstrap_theme', 'sphinx-copybutton',
+                 'pillow', 'numpydoc',
                  ],
         'gui': ['ipywidgets>=8.0.0', 'ipykernel', 'ipympl', 'voila', ],
     }
