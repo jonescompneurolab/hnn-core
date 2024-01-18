@@ -1,16 +1,12 @@
-import os.path as op
+from pathlib import Path
 from numpy.testing import assert_allclose
 from h5io import write_hdf5
 import pytest
 
-import hnn_core
-from hnn_core import read_network
-from hnn_core import simulate_dipole
-from hnn_core import read_params
-from hnn_core import jones_2009_model, law_2021_model, calcium_model
+from hnn_core import (read_network, simulate_dipole, read_params,
+                      jones_2009_model, law_2021_model, calcium_model)
 
-hnn_core_root = op.dirname(hnn_core.__file__)
-params_fname = op.join(hnn_core_root, 'param', 'default.json')
+hnn_core_root = Path(__file__).parents[1]
 
 
 @pytest.mark.parametrize("network_model",
@@ -18,9 +14,8 @@ params_fname = op.join(hnn_core_root, 'param', 'default.json')
                           jones_2009_model])
 def test_network_io(tmp_path, network_model):
     # For simulation to be shorter(Discuss)
-    params = op.join(hnn_core_root, 'param', 'default.json')
-    if isinstance(params, str):
-        params = read_params(params)
+    params_path = Path(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_path)
     params['N_pyr_x'] = 3
     params['N_pyr_y'] = 3
     params['celsius'] = 37.0
