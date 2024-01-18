@@ -265,10 +265,13 @@ version of hnn-core. For that you need to have the git cloned <code class="docut
 repository and use pip with the editable (<code class="docutils literal notranslate"><span class="pre">-e</span></code>) flag:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/jonescompneurolab/hnn-core
 $ cd hnn-core
-$ pip install -e &#39;.[gui]&#39;
+$ pip install -e &#39;.[dev]&#39;
 $ python setup.py build_mod
 </pre></div>
 </div>
+<p>The <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">'.[dev]'</span></code> step will install all extra packages used by
+developers to access all features and to perform testing and building of
+documentation.</p>
 <p>The last step builds <code class="docutils literal notranslate"><span class="pre">mod</span></code> files which specifies the dynamics of specific
 cellular mechanisms. These are converted to C, and hence require a compilation
 step. In the normal course of development, you will not have to edit these
@@ -285,10 +288,6 @@ for running the tests. Tests help ensure integrity of the package after
 your change has been made. We recommend developers to run tests locally
 on their computers after making changes.</p>
 <p>We use the <code class="docutils literal notranslate"><span class="pre">pytest</span></code> testing framework.</p>
-<p>Install the following python packages:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install flake8 pytest pytest-cov
-</pre></div>
-</div>
 <p>To run the tests simply type into your terminal:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make test
 </pre></div>
@@ -311,19 +310,12 @@ check whether the documentation renders correctly in HTML.</p>
 pull requests.</p>
 <section id="building-the-documentation">
 <h3>Building the documentation<a class="headerlink" href="#building-the-documentation" title="Permalink to this heading">¶</a></h3>
-<p>The documentation can be built using sphinx. For that, please additionally
-install the following:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme sphinx-copybutton pillow joblib psutil nbsphinx
-</pre></div>
-</div>
+<p>The documentation can be built using sphinx.</p>
 <p>You can build the documentation locally using the command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd doc/
 $ make html
 </pre></div>
 </div>
-<p>While MNE is not needed to install hnn-core, as a developer you will need to
-install it to run all the examples successfully. Please find the installation
-instructions on the <a class="reference external" href="https://mne.tools/stable/install/index.html">MNE website</a>.</p>
 <p>If you want to build the documentation locally without running all the examples,
 use the command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make html-noplot
