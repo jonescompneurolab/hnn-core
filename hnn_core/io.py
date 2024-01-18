@@ -149,24 +149,26 @@ def read_network(fname, read_output=True, read_drives=True):
 
 
 def _write_connectivity(connectivity):
-    conns_data = list()
-    for conn in connectivity:
-        conn_data = dict()
-        conn_data['target_type'] = conn['target_type']
-        conn_data['target_gids'] = list(conn['target_gids'])
-        conn_data['num_targets'] = conn['num_targets']
-        conn_data['src_type'] = conn['src_type']
-        conn_data['src_gids'] = list(conn['src_gids'])
-        conn_data['num_srcs'] = conn['num_srcs']
-        gid_pairs = (dict((str(key), val)
-                     for key, val in conn['gid_pairs'].items()))
-        conn_data['gid_pairs'] = gid_pairs
-        conn_data['loc'] = conn['loc']
-        conn_data['receptor'] = conn['receptor']
-        conn_data['nc_dict'] = conn['nc_dict']
-        conn_data['allow_autapses'] = int(conn['allow_autapses'])
-        conn_data['probability'] = conn['probability']
-        conns_data.append(conn_data)
+
+    def _write_conn_dict(conn):
+        conn_data = {
+            'target_type': conn['target_type'],
+            'target_gids': list(conn['target_gids']),
+            'num_targets': conn['num_targets'],
+            'src_type': conn['src_type'],
+            'src_gids': list(conn['src_gids']),
+            'num_srcs': conn['num_srcs'],
+            'gid_pairs': {str(key): val for key, val in conn['gid_pairs'].items()},
+            'loc': conn['loc'],
+            'receptor': conn['receptor'],
+            'nc_dict': conn['nc_dict'],
+            'allow_autapses': int(conn['allow_autapses']),
+            'probability': conn['probability'],
+        }
+        return conn_data
+
+    conns_data = [_write_conn_dict(conn) for conn in connectivity]
+
     return conns_data
 
 
