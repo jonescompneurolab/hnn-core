@@ -158,7 +158,8 @@ def _write_connectivity(connectivity):
             'src_type': conn['src_type'],
             'src_gids': list(conn['src_gids']),
             'num_srcs': conn['num_srcs'],
-            'gid_pairs': {str(key): val for key, val in conn['gid_pairs'].items()},
+            'gid_pairs': {str(key): val
+                          for key, val in conn['gid_pairs'].items()},
             'loc': conn['loc'],
             'receptor': conn['receptor'],
             'nc_dict': conn['nc_dict'],

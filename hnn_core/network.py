@@ -23,7 +23,7 @@ from .viz import plot_cells
 from .externals.mne import _validate_type, _check_option
 from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
-from .io import write_network
+from .hnn_io import write_network
 from .externals.mne import copy_doc
 
 
