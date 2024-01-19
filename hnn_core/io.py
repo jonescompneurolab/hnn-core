@@ -38,14 +38,14 @@ def write_network(net, fname, overwrite=True, write_output=True):
         raise FileExistsError('File already exists at path %s. Rename '
                               'the file or set overwrite=True.' % (fname,))
 
-    def _write_cell_response(net, write_output):
+    def _cell_response_to_dict(net, write_output):
         # Write cell_response
         if (not net.cell_response) or (not write_output):
             return None
         else:
             return net.cell_response.to_dict()
 
-    def _write_rec_arrays(value, write_output):
+    def _rec_array_to_dict(value, write_output):
         rec_array_copy = value.copy()
         if not write_output:
             rec_array_copy._reset()
@@ -64,13 +64,13 @@ def write_network(net, fname, overwrite=True, write_output=True):
                        for cell, c_range in net.gid_ranges.items()
                        },
         'pos_dict': {cell: pos for cell, pos in net.pos_dict.items()},
-        'cell_response': _write_cell_response(net, write_output),
+        'cell_response': _cell_response_to_dict(net, write_output),
         'external_drives': {drive: _external_drive_to_dict(params, write_output)
                             for drive, params in net.external_drives.items()
                             },
         'external_biases': net.external_biases,
         'connectivity': _write_connectivity(net.connectivity),
-        'rec_arrays': {ra_name: _write_rec_arrays(ex_array, write_output)
+        'rec_arrays': {ra_name: _rec_array_to_dict(ex_array, write_output)
                        for ra_name, ex_array in net.rec_arrays.items()
                        },
         'threshold': net.threshold,
@@ -150,7 +150,7 @@ def read_network(fname, read_output=True, read_drives=True):
 
 def _write_connectivity(connectivity):
 
-    def _write_conn_dict(conn):
+    def _conn_to_dict(conn):
         conn_data = {
             'target_type': conn['target_type'],
             'target_gids': list(conn['target_gids']),
@@ -167,7 +167,7 @@ def _write_connectivity(connectivity):
         }
         return conn_data
 
-    conns_data = [_write_conn_dict(conn) for conn in connectivity]
+    conns_data = [_conn_to_dict(conn) for conn in connectivity]
 
     return conns_data
 
