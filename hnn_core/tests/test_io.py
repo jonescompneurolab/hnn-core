@@ -9,7 +9,8 @@ from hnn_core import (read_network, simulate_dipole, read_params,
                       )
 
 from hnn_core.hnn_io import (_cell_response_to_dict, _rec_array_to_dict,
-                             _connectivity_to_list_of_dicts
+                             _connectivity_to_list_of_dicts,
+                             _external_drive_to_dict,
                              )
 
 hnn_core_root = Path(__file__).parents[1]
@@ -164,6 +165,32 @@ def test_connectivity_to_list_of_dicts(jones_2009_network):
                                       'threshold': 0.0},
                          'allow_autapses': 1,
                          'probability': 1.0}
+
+
+def test_external_drive_to_dict(jones_2009_network):
+    net = jones_2009_network
+
+    simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
+    first_key = list(net.external_drives.keys())[0]
+    result = _external_drive_to_dict(net.external_drives[first_key],
+                                     write_output=True
+                                     )
+    assert isinstance(result, dict)
+    assert all([key in result for key in ['type', 'location', 'n_drive_cells',
+                                          'event_seed', 'conn_seed',
+                                          'dynamics', 'events', 'weights_ampa',
+                                          'weights_nmda', 'synaptic_delays',
+                                          'probability', 'name',
+                                          'target_types', 'cell_specific'
+                                          ]
+                ]
+               )
+    assert len(result['events'][0]) == 21
+
+    result2 = _external_drive_to_dict(net.external_drives[first_key],
+                                      write_output=False
+                                      )
+    assert len(result2['events']) == 0
 
 
 @pytest.mark.parametrize("network_model",
