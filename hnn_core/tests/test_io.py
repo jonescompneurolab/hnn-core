@@ -2,11 +2,168 @@ from pathlib import Path
 from numpy.testing import assert_allclose
 from h5io import write_hdf5
 import pytest
+import numpy as np
 
 from hnn_core import (read_network, simulate_dipole, read_params,
-                      jones_2009_model, law_2021_model, calcium_model)
+                      jones_2009_model, law_2021_model, calcium_model,
+                      )
+
+from hnn_core.hnn_io import (_cell_response_to_dict, _rec_array_to_dict,
+                             _connectivity_to_list_of_dicts
+                             )
 
 hnn_core_root = Path(__file__).parents[1]
+
+
+@pytest.fixture
+def params():
+    params_path = Path(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_path)
+    params['N_pyr_x'] = 3
+    params['N_pyr_y'] = 3
+    params['celsius'] = 37.0
+    params['threshold'] = 0.0
+
+    return params
+
+
+@pytest.fixture
+def jones_2009_network(params):
+
+    # Instantiating network along with drives
+    net = jones_2009_model(params=params, add_drives_from_params=True)
+
+    # Adding bias
+    net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
+
+    # Adding electrode arrays
+    electrode_pos = (1, 2, 3)
+    net.add_electrode_array('el1', electrode_pos)
+    electrode_pos = [(1, 2, 3), (-1, -2, -3)]
+    net.add_electrode_array('arr1', electrode_pos)
+
+    return net
+
+
+@pytest.fixture
+def calcium_network(params):
+    # Instantiating network along with drives
+    net = calcium_model(params=params, add_drives_from_params=True)
+
+    # Adding bias
+    net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
+
+    # Adding electrode arrays
+    electrode_pos = (1, 2, 3)
+    net.add_electrode_array('el1', electrode_pos)
+    electrode_pos = [(1, 2, 3), (-1, -2, -3)]
+    net.add_electrode_array('arr1', electrode_pos)
+
+    return net
+
+
+def test_eq(jones_2009_network, calcium_network):
+
+    assert jones_2009_network == jones_2009_network
+    assert not jones_2009_network == calcium_network
+
+
+def test_write_network(tmp_path, jones_2009_network):
+    """ Tests that a hdf5 file is written """
+    path_out = tmp_path / 'net.hdf5'
+    assert not path_out.is_file()
+
+    # Write network check
+    jones_2009_network.write(path_out)
+    assert path_out.is_file()
+
+    # Overwrite network check
+    last_mod_time1 = path_out.stat().st_mtime
+    jones_2009_network.write(path_out)
+    last_mod_time2 = path_out.stat().st_mtime
+    assert last_mod_time1 < last_mod_time2
+
+    # No overwrite check
+    with pytest.raises(FileExistsError,
+                       match="File already exists at path "):
+        jones_2009_network.write(path_out, overwrite=False)
+
+
+def test_overwrite(tmp_path, jones_2009_network):
+
+    path_out = tmp_path / 'net_ow.hdf5'
+
+    # Write network
+    jones_2009_network.write(path_out)
+    assert path_out.is_file()
+
+    # Testing when overwrite is False and same filename is used
+    with pytest.raises(FileExistsError,
+                       match="File already exists at path "):
+        jones_2009_network.write(path_out, overwrite=False)
+
+
+def test_cell_response_to_dict(jones_2009_network):
+    net = jones_2009_network
+
+    # No simulation so should have None for cell response
+    result1 = _cell_response_to_dict(net, write_output=True)
+    assert result1 is None
+
+    # Check for cell response dictionary after a simulation
+    simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
+    assert net.cell_response is not None
+    result2 = _cell_response_to_dict(net, write_output=True)
+    assert bool(result2) and isinstance(result2, dict)
+
+    # Check for None if kw supplied
+    result3 = _cell_response_to_dict(net, write_output=False)
+    assert result3 is None
+
+
+def test_rec_array_to_dict(jones_2009_network):
+    net = jones_2009_network
+
+    # Check rec array times and voltages are in dict after simulation
+    simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
+    result = _rec_array_to_dict(net.rec_arrays['el1'], write_output=True)
+    assert isinstance(result, dict)
+    assert all([key in result for key in ['positions', 'conductivity',
+                                          'method', 'min_distance',
+                                          'times', 'voltages'
+                                          ]
+                ]
+               )
+    assert np.array_equal(result['times'], [0.0, 0.5, 1.0, 1.5, 2.0])
+    assert result['voltages'].shape == (1, 1, 5)
+
+    # Check values are empty if write_output keyword is false
+    result2 = _rec_array_to_dict(net.rec_arrays['el1'], write_output=False)
+    assert result2['times'].size == 0
+    assert result2['voltages'].size == 0
+
+
+def test_connectivity_to_list_of_dicts(jones_2009_network):
+    net = jones_2009_network
+
+    result = _connectivity_to_list_of_dicts(net.connectivity[0:2])
+    assert isinstance(result, list)
+    assert len(result) == 2
+    assert result[0] == {'target_type': 'L2_basket',
+                         'target_gids': [0, 1, 2],
+                         'num_targets': 3,
+                         'src_type': 'evdist1',
+                         'src_gids': [24, 25, 26],
+                         'num_srcs': 3,
+                         'gid_pairs': {'24': [0], '25': [1], '26': [2]},
+                         'loc': 'distal',
+                         'receptor': 'ampa',
+                         'nc_dict': {'A_delay': 0.1,
+                                      'A_weight': 0.006562,
+                                      'lamtha': 3.0,
+                                      'threshold': 0.0},
+                         'allow_autapses': 1,
+                         'probability': 1.0}
 
 
 @pytest.mark.parametrize("network_model",
