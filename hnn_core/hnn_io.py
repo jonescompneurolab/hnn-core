@@ -12,140 +12,20 @@ from .cell_response import CellResponse
 from .externals.mne import fill_doc
 
 
-def _str_to_node(node_string):
-    node_tuple = node_string.split(',')
-    node_tuple[1] = int(node_tuple[1])
-    node = (node_tuple[0], node_tuple[1])
-    return node
+def _cell_response_to_dict(net, write_output):
+    # Write cell_response as dict
+    if (not net.cell_response) or (not write_output):
+        return None
+    else:
+        return net.cell_response.to_dict()
 
 
-@fill_doc
-def write_network(net, fname, overwrite=True, write_output=True):
-    """Write network to a HDF5 file.
-
-    Parameters
-    ----------
-    %(net)s
-    %(fname)s
-    %(overwrite)s
-    %(write_output)s
-
-    Yields
-    ------
-    A hdf5 file containing the Network object.
-    """
-    if overwrite is False and os.path.exists(fname):
-        raise FileExistsError('File already exists at path %s. Rename '
-                              'the file or set overwrite=True.' % (fname,))
-
-    def _cell_response_to_dict(net, write_output):
-        # Write cell_response as dict
-        if (not net.cell_response) or (not write_output):
-            return None
-        else:
-            return net.cell_response.to_dict()
-
-    def _rec_array_to_dict(value, write_output):
-        rec_array_copy = value.copy()
-        if not write_output:
-            rec_array_copy._reset()
-        rec_array_copy_dict = rec_array_copy.to_dict()
-        return rec_array_copy_dict
-
-    net_data = {
-        'object_type': 'Network',
-        'N_pyr_x': net._N_pyr_x,
-        'N_pyr_y': net._N_pyr_y,
-        'celsius': net._params['celsius'],
-        'cell_types': {name: template.to_dict()
-                       for name, template in net.cell_types.items()
-                       },
-        'gid_ranges': {cell: {'start': c_range.start, 'stop': c_range.stop}
-                       for cell, c_range in net.gid_ranges.items()
-                       },
-        'pos_dict': {cell: pos for cell, pos in net.pos_dict.items()},
-        'cell_response': _cell_response_to_dict(net, write_output),
-        'external_drives': {drive: _external_drive_to_dict(params, write_output)
-                            for drive, params in net.external_drives.items()
-                            },
-        'external_biases': net.external_biases,
-        'connectivity': _connectivity_to_dict(net.connectivity),
-        'rec_arrays': {ra_name: _rec_array_to_dict(ex_array, write_output)
-                       for ra_name, ex_array in net.rec_arrays.items()
-                       },
-        'threshold': net.threshold,
-        'delay': net.delay,
-    }
-
-    # Saving file
-    write_hdf5(fname, net_data, overwrite=overwrite)
-
-
-@fill_doc
-def read_network(fname, read_output=True, read_drives=True):
-    """Read network from a file.
-
-    Parameters
-    ----------
-    %(fname)s
-    %(read_output)s
-
-    Yields
-    ------
-    %(net)s
-    """
-    # Importing Network.
-    # Cannot do this globally due to circular import.
-    from .network import Network
-    net_data = read_hdf5(fname)
-    if 'object_type' not in net_data:
-        raise NameError('The given file is not compatible. '
-                        'The file should contain information'
-                        ' about object type to be read.')
-    if net_data['object_type'] != 'Network':
-        raise ValueError('The object should be of type Network. '
-                         'The file contains object of '
-                         'type %s' % (net_data['object_type'],))
-    params = dict()
-    params['N_pyr_x'] = net_data['N_pyr_x']
-    params['N_pyr_y'] = net_data['N_pyr_y']
-    params['celsius'] = net_data['celsius']
-    params['threshold'] = net_data['threshold']
-
-    # Instantiating network
-    net = Network(params)
-
-    # Setting attributes
-    # Set cell types
-    net.cell_types = _read_cell_types(net_data['cell_types'])
-    # Set gid ranges
-    gid_ranges_data = dict()
-    for key in net_data['gid_ranges']:
-        start = net_data['gid_ranges'][key]['start']
-        stop = net_data['gid_ranges'][key]['stop']
-        gid_ranges_data[key] = range(start, stop)
-    net.gid_ranges = gid_ranges_data
-    # Set pos_dict
-    net.pos_dict = net_data['pos_dict']
-    # Set cell_response
-    net.cell_response = _read_cell_response(net_data['cell_response'],
-                                            read_output)
-    # Set external drives
-    for key in net_data['external_drives'].keys():
-        _read_external_drive(net, net_data['external_drives'][key],
-                             read_output, read_drives)
-    # Set external biases
-    net.external_biases = net_data['external_biases']
-    # Set connectivity
-    _read_connectivity(net, net_data['connectivity'])
-    # Set rec_arrays
-    _read_rec_arrays(net, net_data['rec_arrays'], read_output)
-    # Set threshold
-    net.threshold = net_data['threshold']
-    # Set delay
-    net.delay = net_data['delay']
-
-    return net
+def _rec_array_to_dict(value, write_output):
+    rec_array_copy = value.copy()
+    if not write_output:
+        rec_array_copy._reset()
+    rec_array_copy_dict = rec_array_copy.to_dict()
+    return rec_array_copy_dict
 
 
 def _connectivity_to_dict(connectivity):
@@ -184,6 +64,13 @@ def _external_drive_to_dict(drive, write_output):
     if not write_output:
         drive_data['events'] = list()
     return drive_data
+
+
+def _str_to_node(node_string):
+    node_tuple = node_string.split(',')
+    node_tuple[1] = int(node_tuple[1])
+    node = (node_tuple[0], node_tuple[1])
+    return node
 
 
 def _read_cell_types(cell_types_data):
@@ -333,3 +220,119 @@ def _read_rec_arrays(net, rec_arrays_data, read_output):
         net.rec_arrays[key]._data = rec_array['voltages']
         if not read_output:
             net.rec_arrays[key]._reset()
+
+
+@fill_doc
+def write_network(net, fname, overwrite=True, write_output=True):
+    """Write network to a HDF5 file.
+
+    Parameters
+    ----------
+    %(net)s
+    %(fname)s
+    %(overwrite)s
+    %(write_output)s
+
+    Yields
+    ------
+    A hdf5 file containing the Network object.
+    """
+    if overwrite is False and os.path.exists(fname):
+        raise FileExistsError('File already exists at path %s. Rename '
+                              'the file or set overwrite=True.' % (fname,))
+
+    net_data = {
+        'object_type': 'Network',
+        'N_pyr_x': net._N_pyr_x,
+        'N_pyr_y': net._N_pyr_y,
+        'celsius': net._params['celsius'],
+        'cell_types': {name: template.to_dict()
+                       for name, template in net.cell_types.items()
+                       },
+        'gid_ranges': {cell: {'start': c_range.start, 'stop': c_range.stop}
+                       for cell, c_range in net.gid_ranges.items()
+                       },
+        'pos_dict': {cell: pos for cell, pos in net.pos_dict.items()},
+        'cell_response': _cell_response_to_dict(net, write_output),
+        'external_drives': {drive: _external_drive_to_dict(params, write_output)
+                            for drive, params in net.external_drives.items()
+                            },
+        'external_biases': net.external_biases,
+        'connectivity': _connectivity_to_dict(net.connectivity),
+        'rec_arrays': {ra_name: _rec_array_to_dict(ex_array, write_output)
+                       for ra_name, ex_array in net.rec_arrays.items()
+                       },
+        'threshold': net.threshold,
+        'delay': net.delay,
+    }
+
+    # Saving file
+    write_hdf5(fname, net_data, overwrite=overwrite)
+
+
+@fill_doc
+def read_network(fname, read_output=True, read_drives=True):
+    """Read network from a file.
+
+    Parameters
+    ----------
+    %(fname)s
+    %(read_output)s
+
+    Yields
+    ------
+    %(net)s
+    """
+    # Importing Network.
+    # Cannot do this globally due to circular import.
+    from .network import Network
+    net_data = read_hdf5(fname)
+    if 'object_type' not in net_data:
+        raise NameError('The given file is not compatible. '
+                        'The file should contain information'
+                        ' about object type to be read.')
+    if net_data['object_type'] != 'Network':
+        raise ValueError('The object should be of type Network. '
+                         'The file contains object of '
+                         'type %s' % (net_data['object_type'],))
+    params = dict()
+    params['N_pyr_x'] = net_data['N_pyr_x']
+    params['N_pyr_y'] = net_data['N_pyr_y']
+    params['celsius'] = net_data['celsius']
+    params['threshold'] = net_data['threshold']
+
+    # Instantiating network
+    net = Network(params)
+
+    # Setting attributes
+    # Set cell types
+    net.cell_types = _read_cell_types(net_data['cell_types'])
+    # Set gid ranges
+    gid_ranges_data = dict()
+    for key in net_data['gid_ranges']:
+        start = net_data['gid_ranges'][key]['start']
+        stop = net_data['gid_ranges'][key]['stop']
+        gid_ranges_data[key] = range(start, stop)
+    net.gid_ranges = gid_ranges_data
+    # Set pos_dict
+    net.pos_dict = net_data['pos_dict']
+    # Set cell_response
+    net.cell_response = _read_cell_response(net_data['cell_response'],
+                                            read_output)
+    # Set external drives
+    for key in net_data['external_drives'].keys():
+        _read_external_drive(net, net_data['external_drives'][key],
+                             read_output, read_drives)
+    # Set external biases
+    net.external_biases = net_data['external_biases']
+    # Set connectivity
+    _read_connectivity(net, net_data['connectivity'])
+    # Set rec_arrays
+    _read_rec_arrays(net, net_data['rec_arrays'], read_output)
+    # Set threshold
+    net.threshold = net_data['threshold']
+    # Set delay
+    net.delay = net_data['delay']
+
+    return net
+
