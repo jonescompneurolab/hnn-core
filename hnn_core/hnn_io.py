@@ -39,7 +39,7 @@ def write_network(net, fname, overwrite=True, write_output=True):
                               'the file or set overwrite=True.' % (fname,))
 
     def _cell_response_to_dict(net, write_output):
-        # Write cell_response
+        # Write cell_response as dict
         if (not net.cell_response) or (not write_output):
             return None
         else:
@@ -69,7 +69,7 @@ def write_network(net, fname, overwrite=True, write_output=True):
                             for drive, params in net.external_drives.items()
                             },
         'external_biases': net.external_biases,
-        'connectivity': _write_connectivity(net.connectivity),
+        'connectivity': _connectivity_to_dict(net.connectivity),
         'rec_arrays': {ra_name: _rec_array_to_dict(ex_array, write_output)
                        for ra_name, ex_array in net.rec_arrays.items()
                        },
@@ -148,7 +148,7 @@ def read_network(fname, read_output=True, read_drives=True):
     return net
 
 
-def _write_connectivity(connectivity):
+def _connectivity_to_dict(connectivity):
 
     def _conn_to_dict(conn):
         conn_data = {
