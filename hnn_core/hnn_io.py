@@ -28,7 +28,7 @@ def _rec_array_to_dict(value, write_output):
     return rec_array_copy_dict
 
 
-def _connectivity_to_dict(connectivity):
+def _connectivity_to_list_of_dicts(connectivity):
 
     def _conn_to_dict(conn):
         conn_data = {
@@ -258,7 +258,7 @@ def write_network(net, fname, overwrite=True, write_output=True):
                             for drive, params in net.external_drives.items()
                             },
         'external_biases': net.external_biases,
-        'connectivity': _connectivity_to_dict(net.connectivity),
+        'connectivity': _connectivity_to_list_of_dicts(net.connectivity),
         'rec_arrays': {ra_name: _rec_array_to_dict(ex_array, write_output)
                        for ra_name, ex_array in net.rec_arrays.items()
                        },
