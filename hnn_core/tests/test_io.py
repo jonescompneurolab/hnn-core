@@ -64,9 +64,34 @@ def calcium_network(params):
 
 
 def test_eq(jones_2009_network, calcium_network):
+    net1 = jones_2009_network
+    net2 = calcium_network
 
-    assert jones_2009_network == jones_2009_network
-    assert not jones_2009_network == calcium_network
+    # Check eq of same network
+    assert net1 == net1
+    # Check eq of different networks
+    assert not net1 == net2
+
+    # Check a change in connectivity
+    net1_clear_conn = net1.copy()
+    net1_clear_conn.clear_connectivity()
+    assert net1_clear_conn != net1
+
+    # Hardwired change in connectivity attribute
+    net1_hard_change_conn = net1.copy()
+    net1_hard_change_conn.connectivity[0]['gid_pairs'] = {}
+    assert net1_hard_change_conn != net1
+
+    # Check change in drives
+    net1_clear_drive = net1.copy()
+    net1_clear_drive.clear_drives()
+    assert net1_clear_drive != net1
+
+    # Hardwired change in drive attribute
+    net1_hard_change_drive = net1.copy()
+    net1_hard_change_drive.external_drives['type'] = ''
+    assert net1_hard_change_drive != net1
+
 
 
 def test_write_network(tmp_path, jones_2009_network):
