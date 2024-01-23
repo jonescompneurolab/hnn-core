@@ -451,9 +451,13 @@ class Network(object):
                                           target_gids=target_gids,
                                           loc=conn['loc'],
                                           receptor=conn['receptor'])
-            if len(match_conns) == 0:
+            if len(match_conns) == 1:
+                # check if connections are equal
+                if conn != other.connectivity[match_conns[0]]:
+                    return False
+            else:
                 return False
-        # print(dir(self))
+
         all_attrs = dir(self)
         attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
         attrs_to_ignore.extend(['add_bursty_drive', 'add_connection',
