@@ -115,20 +115,6 @@ def test_write_network(tmp_path, jones_2009_network):
         jones_2009_network.write(path_out, overwrite=False)
 
 
-def test_overwrite(tmp_path, jones_2009_network):
-
-    path_out = tmp_path / 'net_ow.hdf5'
-
-    # Write network
-    jones_2009_network.write(path_out)
-    assert path_out.is_file()
-
-    # Testing when overwrite is False and same filename is used
-    with pytest.raises(FileExistsError,
-                       match="File already exists at path "):
-        jones_2009_network.write(path_out, overwrite=False)
-
-
 def test_cell_response_to_dict(jones_2009_network):
     net = jones_2009_network
 
