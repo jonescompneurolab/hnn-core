@@ -10,7 +10,7 @@ from hnn_core import (read_network, simulate_dipole, read_params,
 
 from hnn_core.hnn_io import (_cell_response_to_dict, _rec_array_to_dict,
                              _connectivity_to_list_of_dicts,
-                             _external_drive_to_dict,
+                             _external_drive_to_dict, _str_to_node
                              )
 
 hnn_core_root = Path(__file__).parents[1]
@@ -191,6 +191,14 @@ def test_external_drive_to_dict(jones_2009_network):
                                       write_output=False
                                       )
     assert len(result2['events']) == 0
+
+
+def test_str_to_node():
+    """ Creates a tuple (str,int) from string with a comma """
+    result = _str_to_node('cell_name,0')
+    assert isinstance(result, tuple)
+    assert isinstance(result[0], str)
+    assert isinstance(result[1], int)
 
 
 @pytest.mark.parametrize("network_model",
