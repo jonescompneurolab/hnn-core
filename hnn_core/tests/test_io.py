@@ -1,6 +1,6 @@
 from pathlib import Path
 from numpy.testing import assert_allclose
-from h5io import write_hdf5
+from h5io import write_hdf5, read_hdf5
 import pytest
 import numpy as np
 
@@ -93,9 +93,10 @@ def test_eq(jones_2009_network, calcium_network):
     assert net1_hard_change_drive != net1
 
 
-
 def test_write_network(tmp_path, jones_2009_network):
     """ Tests that a hdf5 file is written """
+
+    # Check no file is already written
     path_out = tmp_path / 'net.hdf5'
     assert not path_out.is_file()
 
@@ -113,6 +114,32 @@ def test_write_network(tmp_path, jones_2009_network):
     with pytest.raises(FileExistsError,
                        match="File already exists at path "):
         jones_2009_network.write(path_out, overwrite=False)
+
+
+def test_write_network_no_output(tmp_path, jones_2009_network):
+    net = jones_2009_network.copy()
+    path_out = tmp_path / 'net.hdf5'
+
+    # Simulate and check for output
+    simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
+    assert np.array_equal(net.rec_arrays['el1'].times,
+                          [0.0, 0.5, 1.0, 1.5, 2.0]
+                          )
+
+    # Write to file
+    net.write(path_out, write_output=False)
+
+    # Read in file and check no outputs were written
+    hdf5_read = read_hdf5(path_out)
+    assert not any([bool(val['times'])
+                    for val in hdf5_read['rec_arrays'].values()]
+                   )
+    assert not any([bool(val['voltages'])
+                    for val in hdf5_read['rec_arrays'].values()]
+                   )
+    assert not any([bool(val['events'])
+                    for val in hdf5_read['external_drives'].values()]
+                   )
 
 
 def test_cell_response_to_dict(jones_2009_network):
