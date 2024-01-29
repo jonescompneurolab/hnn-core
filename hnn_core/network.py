@@ -288,9 +288,8 @@ class Network(object):
     legacy_mode : bool
         Set to True by default to enable matching HNN GUI output when drives
         are added suitably. Will be deprecated in a future release.
-    mesh_shape : tuple of int
+    mesh_shape : tuple of int (default: (10, 10))
         Defines the (n_x, n_y) shape of the grid of pyramidal cells.
-        Default: None (use values from params which is a 10x10 grid).
 
 
     Attributes
@@ -342,7 +341,7 @@ class Network(object):
     """
 
     def __init__(self, params, add_drives_from_params=False,
-                 legacy_mode=False, mesh_shape=None):
+                 legacy_mode=False, mesh_shape=(10, 10)):
         # Save the parameters used to create the Network
         _validate_type(params, dict, 'params')
         self._params = params
@@ -393,20 +392,17 @@ class Network(object):
         self.pos_dict = dict()
         self.cell_types = dict()
 
-        if mesh_shape is None:
-            self._N_pyr_x = self._params['N_pyr_x']
-            self._N_pyr_y = self._params['N_pyr_y']
-        else:
-            _validate_type(mesh_shape, tuple, 'mesh_shape')
-            _validate_type(mesh_shape[0], int, 'mesh_shape[0]')
-            _validate_type(mesh_shape[1], int, 'mesh_shape[1]')
+        # set the mesh shape
+        _validate_type(mesh_shape, tuple, 'mesh_shape')
+        _validate_type(mesh_shape[0], int, 'mesh_shape[0]')
+        _validate_type(mesh_shape[1], int, 'mesh_shape[1]')
 
-            if mesh_shape[0] < 1 or mesh_shape[1] < 1:
-                raise ValueError('mesh_shape must be a tuple of positive '
-                                 f'integers, got: {mesh_shape}')
+        if mesh_shape[0] < 1 or mesh_shape[1] < 1:
+            raise ValueError('mesh_shape must be a tuple of positive '
+                             f'integers, got: {mesh_shape}')
 
-            self._N_pyr_x = mesh_shape[0]
-            self._N_pyr_y = mesh_shape[1]
+        self._N_pyr_x = mesh_shape[0]
+        self._N_pyr_y = mesh_shape[1]
 
         self._inplane_distance = 1.0  # XXX hard-coded default
         self._layer_separation = 1307.4  # XXX hard-coded default

@@ -207,11 +207,10 @@ def test_rec_array_calculation():
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
-    params.update({'N_pyr_x': 3,
-                   'N_pyr_y': 3,
-                   't_evprox_1': 7,
+    params.update({'t_evprox_1': 7,
                    't_evdist_1': 17})
-    net = jones_2009_model(params, add_drives_from_params=True)
+    net = jones_2009_model(params, mesh_shape=(3, 3),
+                           add_drives_from_params=True)
 
     # one electrode inside, one above the active elements of the network,
     # and two more to allow calculation of CSD (2nd spatial derivative)

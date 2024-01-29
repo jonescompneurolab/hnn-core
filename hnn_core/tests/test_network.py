@@ -921,11 +921,18 @@ def test_network_mesh():
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
 
+    # Test custom mesh_shape
     mesh_shape = (2, 3)
     net = Network(params, mesh_shape=mesh_shape)
     assert net._N_pyr_x == mesh_shape[0]
     assert net._N_pyr_y == mesh_shape[1]
     assert net.gid_ranges['L2_basket'] == range(0, 3)
+
+    # Test default mesh_shape loaded
+    net = Network(params)
+    assert net._N_pyr_x == 10
+    assert net._N_pyr_y == 10
+    assert net.gid_ranges['L2_basket'] == range(0, 35)
 
     with pytest.raises(ValueError, match='mesh_shape must be'):
         net = Network(params, mesh_shape=(-2, 3))
