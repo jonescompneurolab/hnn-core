@@ -27,6 +27,9 @@ Changelog
 - Add dependency groups to setup.py and update CI workflows to reference
   dependency groups, by `George Dang`_ in :gh:`703`.
 
+- Add ability to specify number of cells in :class:`~hnn_core.Network`,
+  by `Nick Tolley`_ in :gh:`705`
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
