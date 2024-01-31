@@ -184,7 +184,7 @@ class TestParallelBackends():
         # force oversubscription + hyperthreading, but make sure there are
         # always enough cells in the network
         oversubscribed_procs = cpu_count() + 1
-        n_grid_1d = np.ceil(np.sqrt(oversubscribed_procs)).astype(int)
+        n_grid_1d = int(np.ceil(np.sqrt(oversubscribed_procs)))
         params.update({'t_evprox_1': 5,
                        't_evdist_1': 10,
                        't_evprox_2': 20,
