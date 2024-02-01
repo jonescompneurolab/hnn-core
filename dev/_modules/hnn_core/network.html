@@ -192,7 +192,7 @@
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    Common positions are all located at origin.</span>
-<span class="sd">    Sort of a hack bc of redundancy</span>
+<span class="sd">    Sort of a hack because of redundancy.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">pos_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
@@ -425,6 +425,9 @@
 <span class="sd">    legacy_mode : bool</span>
 <span class="sd">        Set to True by default to enable matching HNN GUI output when drives</span>
 <span class="sd">        are added suitably. Will be deprecated in a future release.</span>
+<span class="sd">    mesh_shape : tuple of int (default: (10, 10))</span>
+<span class="sd">        Defines the (n_x, n_y) shape of the grid of pyramidal cells.</span>
+
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -475,7 +478,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                 <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)):</span>
         <span class="c1"># Save the parameters used to create the Network</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="s1">&#39;params&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">params</span>
@@ -526,8 +529,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_N_pyr_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;N_pyr_x&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_N_pyr_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;N_pyr_y&#39;</span><span class="p">]</span>
+        <span class="c1"># set the mesh shape</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">mesh_shape</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="s1">&#39;mesh_shape&#39;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">mesh_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;mesh_shape[0]&#39;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">mesh_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;mesh_shape[1]&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">mesh_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">mesh_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;mesh_shape must be a tuple of positive &#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;integers, got: </span><span class="si">{</span><span class="n">mesh_shape</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_N_pyr_x</span> <span class="o">=</span> <span class="n">mesh_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_N_pyr_y</span> <span class="o">=</span> <span class="n">mesh_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_inplane_distance</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># XXX hard-coded default</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_layer_separation</span> <span class="o">=</span> <span class="mf">1307.4</span>  <span class="c1"># XXX hard-coded default</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_cell_positions</span><span class="p">(</span><span class="n">inplane_distance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_inplane_distance</span><span class="p">,</span>
