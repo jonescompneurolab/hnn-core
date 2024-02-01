@@ -86,17 +86,18 @@ def run_hnn_core_fixture():
         tstop = 170.
         legacy_mode = True
         if reduced:
-            params.update({'N_pyr_x': 3,
-                           'N_pyr_y': 3,
-                           't_evprox_1': 5,
+            mesh_shape = (3, 3)
+            params.update({'t_evprox_1': 5,
                            't_evdist_1': 10,
                            't_evprox_2': 20,
                            'N_trials': 2})
             tstop = 40.
             legacy_mode = False
+        else:
+            mesh_shape = (10, 10)
         # Legacy mode necessary for exact dipole comparison test
         net = jones_2009_model(params, add_drives_from_params=True,
-                               legacy_mode=legacy_mode)
+                               legacy_mode=legacy_mode, mesh_shape=mesh_shape)
         if electrode_array is not None:
             for name, positions in electrode_array.items():
                 net.add_electrode_array(name, positions)

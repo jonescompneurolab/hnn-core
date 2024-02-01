@@ -12,7 +12,7 @@ from .externals.mne import _validate_type
 
 
 def jones_2009_model(params=None, add_drives_from_params=False,
-                     legacy_mode=False):
+                     legacy_mode=False, mesh_shape=(10, 10)):
     """Instantiate the network model described in
     Jones et al. J. of Neurophys. 2009 [1]_
 
@@ -29,6 +29,8 @@ def jones_2009_model(params=None, add_drives_from_params=False,
     legacy_mode : bool
         Set to False by default. Enables matching HNN GUI output when drives
         are added suitably. Will be deprecated in a future release.
+    mesh_shape : tuple of int (default: (10, 10))
+        Defines the (n_x, n_y) shape of the grid of pyramidal cells.
 
     Returns
     -------
@@ -59,7 +61,7 @@ def jones_2009_model(params=None, add_drives_from_params=False,
         params = read_params(params)
 
     net = Network(params, add_drives_from_params=add_drives_from_params,
-                  legacy_mode=legacy_mode)
+                  legacy_mode=legacy_mode, mesh_shape=mesh_shape)
 
     delay = net.delay
 
@@ -174,7 +176,7 @@ def jones_2009_model(params=None, add_drives_from_params=False,
 
 
 def law_2021_model(params=None, add_drives_from_params=False,
-                   legacy_mode=False):
+                   legacy_mode=False, mesh_shape=(10, 10)):
     """Instantiate the expansion of Jones 2009 model to study beta
     modulated ERPs as described in
     Law et al. Cereb. Cortex 2021 [1]_
@@ -208,7 +210,8 @@ def law_2021_model(params=None, add_drives_from_params=False,
            Perception." Cerebral Cortex, 32, 668–688 (2022).
     """
 
-    net = jones_2009_model(params, add_drives_from_params, legacy_mode)
+    net = jones_2009_model(params, add_drives_from_params, legacy_mode,
+                           mesh_shape=mesh_shape)
 
     # Update biophysics (increase gabab duration of inhibition)
     net.cell_types['L2_pyramidal'].synapses['gabab']['tau1'] = 45.0
@@ -260,7 +263,7 @@ def law_2021_model(params=None, add_drives_from_params=False,
 # Remove params argument after updating examples
 # (only relevant for Jones 2009 model)
 def calcium_model(params=None, add_drives_from_params=False,
-                  legacy_mode=False):
+                  legacy_mode=False, mesh_shape=(10, 10)):
     """Instantiate the Jones 2009 model with improved calcium dynamics in
     L5 pyramidal neurons. For more details on changes to calcium dynamics
     see Kohl et al. Brain Topragr 2022 [1]_
@@ -294,7 +297,8 @@ def calcium_model(params=None, add_drives_from_params=False,
     if params is None:
         params = read_params(params_fname)
 
-    net = jones_2009_model(params, add_drives_from_params, legacy_mode)
+    net = jones_2009_model(params, add_drives_from_params, legacy_mode,
+                           mesh_shape=mesh_shape)
 
     # Replace L5 pyramidal cell template with updated calcium
     cell_name = 'L5_pyramidal'

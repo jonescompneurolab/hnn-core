@@ -55,7 +55,7 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
     Notes
     -----
     Common positions are all located at origin.
-    Sort of a hack bc of redundancy
+    Sort of a hack because of redundancy.
     """
     pos_dict = dict()
 
@@ -288,6 +288,9 @@ class Network(object):
     legacy_mode : bool
         Set to True by default to enable matching HNN GUI output when drives
         are added suitably. Will be deprecated in a future release.
+    mesh_shape : tuple of int (default: (10, 10))
+        Defines the (n_x, n_y) shape of the grid of pyramidal cells.
+
 
     Attributes
     ----------
@@ -338,7 +341,7 @@ class Network(object):
     """
 
     def __init__(self, params, add_drives_from_params=False,
-                 legacy_mode=False):
+                 legacy_mode=False, mesh_shape=(10, 10)):
         # Save the parameters used to create the Network
         _validate_type(params, dict, 'params')
         self._params = params
@@ -389,8 +392,18 @@ class Network(object):
         self.pos_dict = dict()
         self.cell_types = dict()
 
-        self._N_pyr_x = self._params['N_pyr_x']
-        self._N_pyr_y = self._params['N_pyr_y']
+        # set the mesh shape
+        _validate_type(mesh_shape, tuple, 'mesh_shape')
+        _validate_type(mesh_shape[0], int, 'mesh_shape[0]')
+        _validate_type(mesh_shape[1], int, 'mesh_shape[1]')
+
+        if mesh_shape[0] < 1 or mesh_shape[1] < 1:
+            raise ValueError('mesh_shape must be a tuple of positive '
+                             f'integers, got: {mesh_shape}')
+
+        self._N_pyr_x = mesh_shape[0]
+        self._N_pyr_y = mesh_shape[1]
+
         self._inplane_distance = 1.0  # XXX hard-coded default
         self._layer_separation = 1307.4  # XXX hard-coded default
         self.set_cell_positions(inplane_distance=self._inplane_distance,

@@ -31,9 +31,7 @@ def test_network_visualization():
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
-    params.update({'N_pyr_x': 3,
-                   'N_pyr_y': 3})
-    net = jones_2009_model(params)
+    net = jones_2009_model(params, mesh_shape=(3, 3))
     plot_cells(net)
     ax = net.cell_types['L2_pyramidal'].plot_morphology()
     assert len(ax.lines) == 8
@@ -105,9 +103,7 @@ def test_dipole_visualization():
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
-    params.update({'N_pyr_x': 3,
-                   'N_pyr_y': 3})
-    net = jones_2009_model(params)
+    net = jones_2009_model(params, mesh_shape=(3, 3))
     weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
     syn_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
 

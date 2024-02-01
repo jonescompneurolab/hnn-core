@@ -173,13 +173,12 @@ def test_dipole_simulation():
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
-    params.update({'N_pyr_x': 3,
-                   'N_pyr_y': 3,
-                   'dipole_smooth_win': 5,
+    params.update({'dipole_smooth_win': 5,
                    't_evprox_1': 5,
                    't_evdist_1': 10,
                    't_evprox_2': 20})
-    net = jones_2009_model(params, add_drives_from_params=True)
+    net = jones_2009_model(params, add_drives_from_params=True,
+                           mesh_shape=(3, 3))
     with pytest.raises(ValueError, match="Invalid number of simulations: 0"):
         simulate_dipole(net, tstop=25., n_trials=0)
     with pytest.raises(ValueError, match="Invalid value for the"):

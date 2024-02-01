@@ -130,13 +130,12 @@ class TestParallelBackends():
         hnn_core_root = op.dirname(hnn_core.__file__)
         params_fname = op.join(hnn_core_root, 'param', 'default.json')
         params = read_params(params_fname)
-        params.update({'N_pyr_x': 3,
-                       'N_pyr_y': 3,
-                       't_evprox_1': 5,
+        params.update({'t_evprox_1': 5,
                        't_evdist_1': 10,
                        't_evprox_2': 20,
                        'N_trials': 2})
-        net = jones_2009_model(params, add_drives_from_params=True)
+        net = jones_2009_model(params, add_drives_from_params=True,
+                               mesh_shape=(3, 3))
 
         with MPIBackend() as backend:
             event = Event()
@@ -167,13 +166,12 @@ class TestParallelBackends():
         hnn_core_root = op.dirname(hnn_core.__file__)
         params_fname = op.join(hnn_core_root, 'param', 'default.json')
         params = read_params(params_fname)
-        params.update({'N_pyr_x': 3,
-                       'N_pyr_y': 3,
-                       't_evprox_1': 5,
+        params.update({'t_evprox_1': 5,
                        't_evdist_1': 10,
                        't_evprox_2': 20,
                        'N_trials': 2})
-        net = jones_2009_model(params, add_drives_from_params=True)
+        net = jones_2009_model(params, add_drives_from_params=True,
+                               mesh_shape=(3, 3))
 
         # try running with more procs than cells in the network (will probably
         # oversubscribe)
@@ -186,14 +184,13 @@ class TestParallelBackends():
         # force oversubscription + hyperthreading, but make sure there are
         # always enough cells in the network
         oversubscribed_procs = cpu_count() + 1
-        n_grid_1d = np.ceil(np.sqrt(oversubscribed_procs))
-        params.update({'N_pyr_x': n_grid_1d,
-                       'N_pyr_y': n_grid_1d,
-                       't_evprox_1': 5,
+        n_grid_1d = int(np.ceil(np.sqrt(oversubscribed_procs)))
+        params.update({'t_evprox_1': 5,
                        't_evdist_1': 10,
                        't_evprox_2': 20,
                        'N_trials': 2})
-        net = jones_2009_model(params, add_drives_from_params=True)
+        net = jones_2009_model(params, add_drives_from_params=True,
+                               mesh_shape=(n_grid_1d, n_grid_1d))
         with MPIBackend(n_procs=oversubscribed_procs) as backend:
             assert backend.n_procs == oversubscribed_procs
             simulate_dipole(net, tstop=40)

@@ -911,3 +911,39 @@ def test_tonic_biases():
     assert net.external_biases['tonic']['L2_pyramidal']['t0'] == 0
     with pytest.raises(ValueError, match=r'Tonic bias already defined for.*$'):
         net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
+
+
+def test_network_mesh():
+    """Test mesh for defining cell positions biases."""
+    hnn_core_root = op.dirname(hnn_core.__file__)
+
+    # default params
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+
+    # Test custom mesh_shape
+    mesh_shape = (2, 3)
+    net = Network(params, mesh_shape=mesh_shape)
+    assert net._N_pyr_x == mesh_shape[0]
+    assert net._N_pyr_y == mesh_shape[1]
+    assert net.gid_ranges['L2_basket'] == range(0, 3)
+
+    # Test default mesh_shape loaded
+    net = Network(params)
+    assert net._N_pyr_x == 10
+    assert net._N_pyr_y == 10
+    assert net.gid_ranges['L2_basket'] == range(0, 35)
+
+    with pytest.raises(ValueError, match='mesh_shape must be'):
+        net = Network(params, mesh_shape=(-2, 3))
+
+    with pytest.raises(TypeError, match='mesh_shape\\[0\\] must be'):
+        net = Network(params, mesh_shape=(2.0, 3))
+
+    with pytest.raises(TypeError, match='mesh_shape must be'):
+        net = Network(params, mesh_shape='abc')
+
+    # Smoke test for all models
+    _ = jones_2009_model(mesh_shape=mesh_shape)
+    _ = calcium_model(mesh_shape=mesh_shape)
+    _ = law_2021_model(mesh_shape=mesh_shape)

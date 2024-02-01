@@ -89,25 +89,23 @@ def test_optimize_evoked():
 
     # simulate a dipole to establish ground-truth drive parameters
     mu_orig = 6.
-    params.update({'N_pyr_x': 3,
-                   'N_pyr_y': 3,
-                   't_evprox_1': mu_orig,
+    params.update({'t_evprox_1': mu_orig,
                    'sigma_t_evprox_1': 2.,
                    't_evdist_1': mu_orig + 2,
                    'sigma_t_evdist_1': 2.})
-    net_orig = jones_2009_model(params, add_drives_from_params=True)
+    net_orig = jones_2009_model(params, add_drives_from_params=True,
+                                mesh_shape=(3, 3))
     del net_orig.external_drives['evprox2']
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
     # simulate a dipole with a time-shifted drive
     mu_offset = 4.
-    params.update({'N_pyr_x': 3,
-                   'N_pyr_y': 3,
-                   't_evprox_1': mu_offset,
+    params.update({'t_evprox_1': mu_offset,
                    'sigma_t_evprox_1': 2.,
                    't_evdist_1': mu_offset + 2,
                    'sigma_t_evdist_1': 2.})
-    net_offset = jones_2009_model(params, add_drives_from_params=True)
+    net_offset = jones_2009_model(params, add_drives_from_params=True,
+                                  mesh_shape=(3, 3))
     del net_offset.external_drives['evprox2']
     dpl_offset = simulate_dipole(net_offset, tstop=tstop, n_trials=n_trials)[0]
     # get drive params from the pre-optimization Network instance
