@@ -239,6 +239,87 @@ def test_str_to_node():
     assert isinstance(result[1], int)
 
 
+def test_read_hdf5(jones_2009_network):
+
+    # This file is written from the jones_2009_network
+    net = read_network(Path('assets', 'jones2009_test_read.hdf5'))
+    assert net == jones_2009_network
+
+
+def test_read_hdf5_with_simulation(jones_2009_network):
+    # Test reading a network with simulation
+    net_sim = read_network(
+        Path('assets', 'jones2009_simple_sim_test_read.hdf5')
+    )
+    assert net_sim.rec_arrays['el1'].voltages.size != 0
+    assert len(net_sim.external_drives['evdist1']['events']) > 0
+
+    # Test reading file without simulation information
+    net_sim_output_false = read_network(
+        Path('assets', 'jones2009_simple_sim_test_read.hdf5'),
+        read_output=False
+    )
+    assert net_sim_output_false.rec_arrays['el1'].voltages.size == 0
+    assert len(net_sim_output_false.external_drives['evdist1']['events']) == 0
+
+    # Test reading file with simulation and without drive information
+    net_sim_drives_false = read_network(
+        Path('assets', 'jones2009_simple_sim_test_read.hdf5'),
+        read_output=True,
+        read_drives=False
+    )
+    assert net_sim_drives_false.rec_arrays['el1'].voltages.size != 0
+    assert not bool(net_sim_drives_false.external_drives)
+
+    # Test reading file without simulation and drive information
+    net_sim_output_false_drives_false = read_network(
+        Path('assets', 'jones2009_simple_sim_test_read.hdf5'),
+        read_output=False,
+        read_drives=False
+    )
+    assert net_sim_output_false_drives_false.rec_arrays['el1'].voltages.size == 0
+    assert not bool(net_sim_output_false_drives_false.external_drives)
+
+
+def test_read_incorrect_format(tmp_path):
+
+    # Checking object type field not exists error
+    dummy_data = dict()
+    dummy_data['objective'] = "Check Object type errors"
+    write_hdf5(tmp_path / 'not_net.hdf5', dummy_data, overwrite=True)
+    with pytest.raises(NameError,
+                       match="The given file is not compatible."):
+        read_network(tmp_path / 'not_net.hdf5')
+
+    # Checking wrong object type error
+    dummy_data['object_type'] = "net"
+    write_hdf5(tmp_path / 'not_net.hdf5', dummy_data, overwrite=True)
+    with pytest.raises(ValueError,
+                       match="The object should be of type Network."):
+        read_network(tmp_path / 'not_net.hdf5')
+
+
+def test_simulate_from_read(jones_2009_network):
+    """
+    Tests a simulation from a read-in network creates a similar simulation to
+    the reference network the input file was created from.
+    """
+    net = jones_2009_network
+    dpls1 = simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
+
+    net_read = read_network(Path('assets', 'jones2009_test_read.hdf5'))
+    dpls2 = simulate_dipole(net_read, tstop=2, n_trials=1, dt=0.5)
+
+    for dpl1, dpl2 in zip(dpls1, dpls2):
+        assert_allclose(dpl1.times, dpl2.times, rtol=0.00051, atol=0)
+        for dpl_key in dpl1.data.keys():
+            assert_allclose(dpl1.data[dpl_key],
+                            dpl2.data[dpl_key], rtol=0.000051, atol=0)
+
+    # Smoke test
+    net_read.plot_cells(show=False)
+
+
 @pytest.mark.parametrize("network_model",
                          [law_2021_model, calcium_model,
                           jones_2009_model])
