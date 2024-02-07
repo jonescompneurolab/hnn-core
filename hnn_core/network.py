@@ -1355,8 +1355,41 @@ class Network(object):
             The matplotlib figure handle.
         """
         return plot_cells(net=self, ax=ax, show=show)
+    def rename_cell(self, original_name, new_name):
+        """Renames cells in the network
 
+        Args:
+            original_name (string): The original cell name in the network to be changed
+            new_name (string): The desired new cell name in the network
+        """
+        if 'bas' in original_name:
+            self._rename_basket(original_name, new_name)
+        #elif 'pyr' in original_name:
+        #   self._rename_pyramidal(original_name, new_name)
+        # check for drives too     
+   
+    def _rename_basket(self, original_name, new_name):
+        """A subfunction within rename_cell function. Renames basket cells. 
 
+        Args:
+            original_name (string): The original cell name in the network to be changed (aquired from rename_cell function)
+            new_name (string): The desired new cell name in the network (aquired from rename_cell function)
+        """
+        self.cell_types[new_name] = self.cell_types.pop(original_name)
+        self.clear_connectivity() 
+        self.gid_ranges = OrderedDict()
+        self._n_gids = 0
+        self.pos_dict = dict()
+        self.set_cell_positions(inplane_distance=self._inplane_distance,
+                                layer_separation=self._layer_separation)
+        print(self.cell_types.keys())
+        print(self.pos_dict.keys())
+        # start with empty dict
+        for cell_name in self.cell_types.keys():
+            self._add_cell_type(cell_name, self.pos_dict[cell_name],
+                                cell_template=self.cell_types[cell_name])
+
+        
 class _Connectivity(dict):
     """A class for containing the connectivity details of the network
 
