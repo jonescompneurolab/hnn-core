@@ -194,11 +194,14 @@ def _read_external_drive(net, drive_data, read_output, read_drives):
 def _read_connectivity(net, conns_data):
     # Overwrite drive connections
     net.connectivity = list()
-    for conn_data in conns_data:
+
+    for i, conn_data in enumerate(conns_data):
+        src_gids = [int(s) for s in conn_data['gid_pairs'].keys()]
+        target_gids_nested = [target_gid for target_gid
+                              in conn_data['gid_pairs'].values()]
         conn_data['allow_autapses'] = bool(conn_data['allow_autapses'])
-        # conn_data['allow_autapses'] = bool(conn_data['allow_autapses'])
-        net.add_connection(src_gids=conn_data['src_type'],
-                           target_gids=conn_data['target_type'],
+        net.add_connection(src_gids=src_gids,
+                           target_gids=target_gids_nested,
                            loc=conn_data['loc'],
                            receptor=conn_data['receptor'],
                            weight=conn_data['nc_dict']['A_weight'],
