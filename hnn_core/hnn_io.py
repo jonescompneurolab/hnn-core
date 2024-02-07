@@ -296,13 +296,13 @@ def read_network(fname, read_output=True, read_drives=True):
                          'The file contains object of '
                          'type %s' % (net_data['object_type'],))
     params = dict()
-    params['N_pyr_x'] = net_data['N_pyr_x']
-    params['N_pyr_y'] = net_data['N_pyr_y']
     params['celsius'] = net_data['celsius']
     params['threshold'] = net_data['threshold']
 
+    mesh_shape = (net_data['N_pyr_x'], net_data['N_pyr_y'])
+
     # Instantiating network
-    net = Network(params)
+    net = Network(params, mesh_shape=mesh_shape)
 
     # Setting attributes
     # Set cell types
