@@ -1377,19 +1377,17 @@ class Network(object):
         """
         self.cell_types[new_name] = self.cell_types.pop(original_name)
         self.clear_connectivity() 
+        # Start with empty dicts of gid_ranges, ._n_gids, and pos_dict
         self.gid_ranges = OrderedDict()
         self._n_gids = 0
         self.pos_dict = dict()
         self.set_cell_positions(inplane_distance=self._inplane_distance,
                                 layer_separation=self._layer_separation)
-        print(self.cell_types.keys())
-        print(self.pos_dict.keys())
-        # start with empty dict
         for cell_name in self.cell_types.keys():
             self._add_cell_type(cell_name, self.pos_dict[cell_name],
                                 cell_template=self.cell_types[cell_name])
 
-        
+
 class _Connectivity(dict):
     """A class for containing the connectivity details of the network
 
