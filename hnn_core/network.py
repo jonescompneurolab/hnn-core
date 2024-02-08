@@ -451,10 +451,10 @@ class Network(object):
                                           target_gids=target_gids,
                                           loc=conn['loc'],
                                           receptor=conn['receptor'])
+
             if len(match_conns) >= 1:
                 if not any([conn == other.connectivity[match] for match in match_conns]):
                     return False
-
             else:
                 return False
 
