@@ -82,6 +82,11 @@ def test_eq(jones_2009_network, calcium_network):
     net1_hard_change_conn.connectivity[0]['gid_pairs'] = {}
     assert net1_hard_change_conn != net1
 
+    # Hardwired change in connectivity nc_dict
+    net1_hard_change_conn = net1.copy()
+    net1_hard_change_conn.connectivity[0]['nc_dict']['A_weight'] = 0
+    assert net1_hard_change_conn != net1
+
     # Check change in drives
     net1_clear_drive = net1.copy()
     net1_clear_drive.clear_drives()
@@ -90,6 +95,12 @@ def test_eq(jones_2009_network, calcium_network):
     # Hardwired change in drive attribute
     net1_hard_change_drive = net1.copy()
     net1_hard_change_drive.external_drives['type'] = ''
+    assert net1_hard_change_drive != net1
+
+    # Hardwired change in drive weights
+    net1_hard_change_drive = net1.copy()
+    (net1_hard_change_drive.external_drives['evdist1']['weights_ampa']
+     ['L2_basket']) = 0
     assert net1_hard_change_drive != net1
 
 
