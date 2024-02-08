@@ -241,7 +241,7 @@ class Section:
             if np.testing.assert_almost_equal(self_end_pt,
                                               other_end_pt, 5) is not None:
                 return False
-        
+
         all_attrs = dir(self)
         attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
         attrs_to_ignore.extend(['end_pts', 'mechs', 'to_dict'])
@@ -412,7 +412,7 @@ class Cell:
     def __eq__(self, other):
         if not isinstance(other, Cell):
             return NotImplemented
-        
+
         all_attrs = dir(self)
         attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
         attrs_to_ignore.extend(['build', 'copy', 'create_tonic_bias',

@@ -257,7 +257,8 @@ def write_network(net, fname, overwrite=True, write_output=True):
                        },
         'pos_dict': {cell: pos for cell, pos in net.pos_dict.items()},
         'cell_response': _cell_response_to_dict(net, write_output),
-        'external_drives': {drive: _external_drive_to_dict(params, write_output)
+        'external_drives': {drive: _external_drive_to_dict(params,
+                                                           write_output)
                             for drive, params in net.external_drives.items()
                             },
         'external_biases': net.external_biases,
@@ -338,4 +339,3 @@ def read_network(fname, read_output=True, read_drives=True):
     net.delay = net_data['delay']
 
     return net
-

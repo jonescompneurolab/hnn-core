@@ -63,8 +63,7 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
         list_coords = [pos for pos in it.product(xxrange, yyrange, [zdiff])]
         return list_coords
 
-    def _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
-                                 inplane_distance, weight):
+    def _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff, inplane_distance, weight):
         xzero = np.arange(0, n_pyr_x, 3) * inplane_distance
         xone = np.arange(1, n_pyr_x, 3) * inplane_distance
         # split even and odd y vals
@@ -453,7 +452,8 @@ class Network(object):
                                           receptor=conn['receptor'])
 
             if len(match_conns) >= 1:
-                if not any([conn == other.connectivity[match] for match in match_conns]):
+                if not any([conn == other.connectivity[match]
+                            for match in match_conns]):
                     return False
             else:
                 return False

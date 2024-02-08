@@ -357,7 +357,7 @@ class ExtracellularArray:
     def __eq__(self, other):
         if not isinstance(other, ExtracellularArray):
             return NotImplemented
-        
+
         all_attrs = dir(self)
         attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
         attrs_to_ignore.extend(['conductivity', 'copy', 'n_contacts',
