@@ -1,3 +1,7 @@
+
+# Authors: George Dang <george_dang@brown.edu>
+#          Rajat Partani <rajatpartani@gmail.com>
+
 from pathlib import Path
 from numpy.testing import assert_allclose
 from h5io import write_hdf5, read_hdf5

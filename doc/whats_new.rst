@@ -30,6 +30,9 @@ Changelog
 - Add ability to specify number of cells in :class:`~hnn_core.Network`,
   by `Nick Tolley`_ in :gh:`705`
 
+- Add feature to read/write :class:`~hnn_core.Network` from/to HDF5 format,
+  by `Rajat Partani`_ and `George Dang`_ in :gh:`704`
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by

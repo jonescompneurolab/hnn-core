@@ -3,6 +3,7 @@
 # Authors: Rajat Partani <rajatpartani@gmail.com>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 #          Nick Tolley <nicholas_tolley@brown.edu>
+#          George Dang <george_dang@brown.edu>
 
 import os
 from h5io import write_hdf5, read_hdf5
