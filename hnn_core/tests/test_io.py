@@ -14,6 +14,7 @@ from hnn_core.hnn_io import (_cell_response_to_dict, _rec_array_to_dict,
                              )
 
 hnn_core_root = Path(__file__).parents[1]
+assets_path = Path(hnn_core_root, 'tests', 'assets')
 
 
 @pytest.fixture
@@ -254,21 +255,21 @@ def test_read_hdf5(jones_2009_network):
 
     # jones_2009_network.write(Path('.', 'assets/jones2009_test_read.hdf5'))
     # This file is written from the jones_2009_network
-    net = read_network(Path('assets', 'jones2009_test_read.hdf5'))
+    net = read_network(Path(assets_path, 'jones2009_test_read.hdf5'))
     assert net == jones_2009_network
 
 
 def test_read_hdf5_with_simulation(jones_2009_network):
     # Test reading a network with simulation
     net_sim = read_network(
-        Path('assets', 'jones2009_simple_sim_test_read.hdf5')
+        Path(assets_path, 'jones2009_simple_sim_test_read.hdf5')
     )
     assert net_sim.rec_arrays['el1'].voltages.size != 0
     assert len(net_sim.external_drives['evdist1']['events']) > 0
 
     # Test reading file without simulation information
     net_sim_output_false = read_network(
-        Path('assets', 'jones2009_simple_sim_test_read.hdf5'),
+        Path(assets_path, 'jones2009_simple_sim_test_read.hdf5'),
         read_output=False
     )
     assert net_sim_output_false.rec_arrays['el1'].voltages.size == 0
@@ -276,7 +277,7 @@ def test_read_hdf5_with_simulation(jones_2009_network):
 
     # Test reading file with simulation and without drive information
     net_sim_drives_false = read_network(
-        Path('assets', 'jones2009_simple_sim_test_read.hdf5'),
+        Path(assets_path, 'jones2009_simple_sim_test_read.hdf5'),
         read_output=True,
         read_drives=False
     )
@@ -285,7 +286,7 @@ def test_read_hdf5_with_simulation(jones_2009_network):
 
     # Test reading file without simulation and drive information
     net_sim_output_false_drives_false = read_network(
-        Path('assets', 'jones2009_simple_sim_test_read.hdf5'),
+        Path(assets_path, 'jones2009_simple_sim_test_read.hdf5'),
         read_output=False,
         read_drives=False
     )
@@ -320,7 +321,7 @@ def test_simulate_from_read(jones_2009_network):
     net = jones_2009_network
     dpls1 = simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
 
-    net_read = read_network(Path('assets', 'jones2009_test_read.hdf5'))
+    net_read = read_network(Path(assets_path, 'jones2009_test_read.hdf5'))
     dpls2 = simulate_dipole(net_read, tstop=2, n_trials=1, dt=0.5)
 
     for dpl1, dpl2 in zip(dpls1, dpls2):
