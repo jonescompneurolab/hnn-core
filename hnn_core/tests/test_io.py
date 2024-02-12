@@ -77,21 +77,6 @@ def test_eq(jones_2009_network, calcium_network):
     # Check eq of different networks
     assert not net1 == net2
 
-    # Check a change in connectivity
-    net1_clear_conn = net1.copy()
-    net1_clear_conn.clear_connectivity()
-    assert net1_clear_conn != net1
-
-    # Hardwired change in connectivity attribute
-    net1_hard_change_conn = net1.copy()
-    net1_hard_change_conn.connectivity[0]['gid_pairs'] = {}
-    assert net1_hard_change_conn != net1
-
-    # Hardwired change in connectivity nc_dict
-    net1_hard_change_conn = net1.copy()
-    net1_hard_change_conn.connectivity[0]['nc_dict']['A_weight'] = 0
-    assert net1_hard_change_conn != net1
-
     # Check change in drives
     net1_clear_drive = net1.copy()
     net1_clear_drive.clear_drives()
@@ -107,6 +92,37 @@ def test_eq(jones_2009_network, calcium_network):
     (net1_hard_change_drive.external_drives['evdist1']['weights_ampa']
      ['L2_basket']) = 0
     assert net1_hard_change_drive != net1
+
+
+def test_eq_conn(jones_2009_network):
+    net1 = jones_2009_network
+
+    # Check a change in connectivity
+    net1_clear_conn = net1.copy()
+    net1_clear_conn.clear_connectivity()
+    assert net1_clear_conn != net1
+
+    # Hardwired change in connectivity attribute
+    net1_hard_change_conn = net1.copy()
+    net1_hard_change_conn.connectivity[0]['gid_pairs'] = {}
+    assert net1_hard_change_conn != net1
+
+    # Hardwired change in connectivity nc_dict
+    net1_hard_change_conn = net1.copy()
+    net1_hard_change_conn.connectivity[0]['nc_dict']['A_weight'] = 0
+    assert net1_hard_change_conn != net1
+
+    # Check edge case, same number of connections, different replicate in conn
+    net1_alt_conn1 = net1.copy()
+    net1_alt_conn2 = net1.copy()
+    l_conn = net1_alt_conn1.connectivity
+    l_conn_rep_start = [l_conn[0]] + l_conn
+    l_conn_rep_end = l_conn + [l_conn[-1]]
+    net1_alt_conn1.connectivity = l_conn_rep_start
+    net1_alt_conn2.connectivity = l_conn_rep_end
+    assert net1 != net1_alt_conn1
+    assert net1_alt_conn1 == net1_alt_conn1
+    assert net1_alt_conn1 != net1_alt_conn2
 
 
 def test_write_network(tmp_path, jones_2009_network):

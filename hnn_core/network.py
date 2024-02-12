@@ -108,6 +108,21 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
     return pos_dict
 
 
+def _compare_lists(s, t):
+    """
+    Compares lists for equality
+
+    From https://stackoverflow.com/a/7829388
+    """
+    t = list(t)  # make a mutable copy
+    try:
+        for elem in s:
+            t.remove(elem)
+    except ValueError:
+        return False
+    return not t
+
+
 def _connection_probability(conn, probability, conn_seed=None):
     """Remove/keep a random subset of connections.
 
@@ -439,25 +454,11 @@ class Network(object):
             return NotImplemented
 
         # Check connectivity
-        if not (len(self.connectivity) == len(other.connectivity)):
+        if ((len(self.connectivity) != len(other.connectivity)) or
+                not (_compare_lists(self.connectivity, other.connectivity))):
             return False
-        # order of connections doesn't matter
-        for conn in self.connectivity:
-            src_gids = list(conn['src_gids'])
-            target_gids = list(conn['target_gids'])
-            match_conns = pick_connection(other,
-                                          src_gids=src_gids,
-                                          target_gids=target_gids,
-                                          loc=conn['loc'],
-                                          receptor=conn['receptor'])
 
-            if len(match_conns) >= 1:
-                if not any([conn == other.connectivity[match]
-                            for match in match_conns]):
-                    return False
-            else:
-                return False
-
+        # Check all other attributes
         all_attrs = dir(self)
         attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
         attrs_to_ignore.extend(['add_bursty_drive', 'add_connection',
@@ -468,7 +469,6 @@ class Network(object):
                                 'plot_cells', 'set_cell_positions', 'write'])
         attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
 
-        # Check all other attributes
         for attr in attrs_to_check:
             if getattr(self, attr) != getattr(other, attr):
                 return False
