@@ -157,7 +157,7 @@
 <section id="file-content-description">
 <h2>File Content Description<a class="headerlink" href="#file-content-description" title="Permalink to this heading">¶</a></h2>
 <p>hdf5 is the file format used for storing the Network object. The network is stored in a layered format. The first layer consists of the network attributes.
-The attributes of the network are then broken down until the network can be representated as a collection of key value pairs. For example - cell_types is a network
+The attributes of the network are then broken down until the network can be represented as a collection of key value pairs. For example - cell_types is a network
 attribute therefore in the first layer. The description of each cell type is in layer 2. Each cell has various sections. The description of a section is in layer 3.
 Below are the attributes of the network.</p>
 <dl class="simple">
@@ -275,7 +275,7 @@ etc.).</p>
 </dd>
 <dt>location<span class="classifier">str</span></dt><dd><p>Target location of synapses.</p>
 </dd>
-<dt>cell_specific<span class="classifier">bool</span></dt><dd><p>Whether each artifical drive cell has 1-to-1 (True, default) or
+<dt>cell_specific<span class="classifier">bool</span></dt><dd><p>Whether each artificial drive cell has 1-to-1 (True, default) or
 all-to-all (False) connection parameters.</p>
 </dd>
 <dt>weights_ampa<span class="classifier">dict or None</span></dt><dd><p>Synaptic weights (in uS) of AMPA receptors on each targeted cell
@@ -320,7 +320,7 @@ time distribution (mu, sigma).</p>
 <dl class="simple">
 <dt>target_types<span class="classifier">str</span></dt><dd><p>Cell type of target gids.</p>
 </dd>
-<dt>target_gids<span class="classifier">list of int</span></dt><dd><p>Identifer for targets of source cells.</p>
+<dt>target_gids<span class="classifier">list of int</span></dt><dd><p>Identifier for targets of source cells.</p>
 </dd>
 <dt>num_targets<span class="classifier">int</span></dt><dd><p>Number of unique target gids.</p>
 </dd>
