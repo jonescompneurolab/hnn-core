@@ -9,7 +9,7 @@ Network File Content
 File Content Description
 ------------------------
 hdf5 is the file format used for storing the Network object. The network is stored in a layered format. The first layer consists of the network attributes.
-The attributes of the network are then broken down until the network can be representated as a collection of key value pairs. For example - cell_types is a network
+The attributes of the network are then broken down until the network can be represented as a collection of key value pairs. For example - cell_types is a network
 attribute therefore in the first layer. The description of each cell type is in layer 2. Each cell has various sections. The description of a section is in layer 3.
 Below are the attributes of the network.
 
@@ -124,7 +124,7 @@ dynamics : dict
 location : str
     Target location of synapses.
 cell_specific : bool
-    Whether each artifical drive cell has 1-to-1 (True, default) or
+    Whether each artificial drive cell has 1-to-1 (True, default) or
     all-to-all (False) connection parameters.
 weights_ampa : dict or None
     Synaptic weights (in uS) of AMPA receptors on each targeted cell
@@ -167,7 +167,7 @@ Connection Description
 target_types : str
     Cell type of target gids.
 target_gids : list of int
-    Identifer for targets of source cells.
+    Identifier for targets of source cells.
 num_targets : int
     Number of unique target gids.
 src_type : str
