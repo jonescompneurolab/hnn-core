@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Network File Content &#8212; hnn-core  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css?v=9afac83c" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=fd10adb8"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-199741045-1');
+</script>
+
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">
+          hnn-core</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.4.dev0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="auto_examples/index.html">Examples</a></li>
+                <li><a href="gui/index.html">GUI</a></li>
+                <li><a href="api.html">API</a></li>
+                <li><a href="glossary.html">Glossary</a></li>
+                <li><a href="whats_new.html">What's new</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">Network File Content</a><ul>
+<li><a class="reference internal" href="#file-content-description">File Content Description</a></li>
+<li><a class="reference internal" href="#cell-type-description">Cell Type Description</a></li>
+<li><a class="reference internal" href="#section-description">Section Description</a></li>
+<li><a class="reference internal" href="#gid-range-description">Gid Range Description</a></li>
+<li><a class="reference internal" href="#external-drive-description">External Drive Description</a></li>
+<li><a class="reference internal" href="#external-bias-description">External Bias Description</a></li>
+<li><a class="reference internal" href="#connection-description">Connection Description</a></li>
+<li><a class="reference internal" href="#extracellular-array-description">Extracellular Array Description</a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="_sources/network_file_desc.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+<div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
+  <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
+    v0.4.dev0
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/index.html">Development</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.2/index.html">v0.2</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.3/index.html">v0.3</a></li>
+  </ul>
+</div>
+
+
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="network-file-content">
+<span id="id1"></span><h1>Network File Content<a class="headerlink" href="#network-file-content" title="Permalink to this heading">¶</a></h1>
+<section id="file-content-description">
+<h2>File Content Description<a class="headerlink" href="#file-content-description" title="Permalink to this heading">¶</a></h2>
+<p>hdf5 is the file format used for storing the Network object. The network is stored in a layered format. The first layer consists of the network attributes.
+The attributes of the network are then broken down until the network can be representated as a collection of key value pairs. For example - cell_types is a network
+attribute therefore in the first layer. The description of each cell type is in layer 2. Each cell has various sections. The description of a section is in layer 3.
+Below are the attributes of the network.</p>
+<dl class="simple">
+<dt>object_type<span class="classifier">str</span></dt><dd><p>Type of object (Network) saved.</p>
+</dd>
+<dt>N_pyr_x<span class="classifier">int</span></dt><dd><p>Nr of cells (x).</p>
+</dd>
+<dt>N_pyr_y<span class="classifier">int</span></dt><dd><p>Nr of cells (y).</p>
+</dd>
+<dt>threshold<span class="classifier">float</span></dt><dd><p>Firing threshold of all cells.</p>
+</dd>
+<dt>celsius<span class="classifier">float</span></dt><dd><p>Temperature in degree celsius.</p>
+</dd>
+<dt>cell_types<span class="classifier">dict of Cell Object</span></dt><dd><p>key : name of cell type.
+value : Cell object.</p>
+</dd>
+<dt>gid_ranges<span class="classifier">dict of dict</span></dt><dd><p>key : cell name or drive name.
+value : dict.</p>
+</dd>
+<dt>pos_dict<span class="classifier">dict</span></dt><dd><p>key : cell type name.
+value : All co-ordintes of the cell types.</p>
+</dd>
+<dt>cell_response<span class="classifier">Instance of Cell Response Object</span></dt><dd><p>The Cell Response object.</p>
+</dd>
+<dt>external_drives<span class="classifier">dict of dict</span></dt><dd><p>key : external drive name.
+value : dict.</p>
+</dd>
+<dt>external_biases<span class="classifier">dict of dict</span></dt><dd><p>key : external bias name.
+value : dict.</p>
+</dd>
+<dt>connectivity<span class="classifier">list of dict</span></dt><dd><p>Contains connection info between cells and
+cells and external drives.</p>
+</dd>
+<dt>rec_arrays<span class="classifier">dict of Extracellular Arrays</span></dt><dd><p>key : extracellular array name.
+value : Instance of Extracellular Array object.</p>
+</dd>
+<dt>delay<span class="classifier">float</span></dt><dd><p>Synaptic delay in ms.</p>
+</dd>
+</dl>
+</section>
+<section id="cell-type-description">
+<h2>Cell Type Description<a class="headerlink" href="#cell-type-description" title="Permalink to this heading">¶</a></h2>
+<dl class="simple">
+<dt>cell_name<span class="classifier">str</span></dt><dd><p>Name of the cell.</p>
+</dd>
+<dt>pos<span class="classifier">tuple</span></dt><dd><p>The (x, y, z) coordinates.</p>
+</dd>
+<dt>sections<span class="classifier">dict of Section</span></dt><dd><p>Dictionary with keys as section name.</p>
+</dd>
+<dt>synapses<span class="classifier">dict of dict</span></dt><dd><p>Keys are name of synaptic mechanism. Each synaptic mechanism
+has keys for parameters of the mechanism, e.g., ‘e’, ‘tau1’,
+‘tau2’.</p>
+</dd>
+<dt>cell_tree<span class="classifier">dict of list</span></dt><dd><p>Stores the tree representation of a cell.</p>
+</dd>
+<dt>sect_loc<span class="classifier">dict of list</span></dt><dd><p>Can have keys ‘proximal’ or ‘distal’ each containing
+names of section locations that are proximal or distal.</p>
+</dd>
+<dt>gid<span class="classifier">int</span></dt><dd><p>GID of the cell in a network (or None if not yet assigned).</p>
+</dd>
+<dt>dipole_pp<span class="classifier">list of h.Dipole()</span></dt><dd><p>The Dipole objects (see dipole.mod).</p>
+</dd>
+<dt>vsec<span class="classifier">dict</span></dt><dd><p>Recording of section specific voltage. Must be enabled
+by running simulate_dipole(net, record_vsec=True) or
+simulate_dipole(net, record_vsoma=True).</p>
+</dd>
+<dt>isec<span class="classifier">dict</span></dt><dd><p>Contains recording of section specific currents indexed
+by synapse type (keys can be soma_gabaa, soma_gabab etc.).
+Must be enabled by running simulate_dipole(net, record_isec=True)
+or simulate_dipole(net, record_isoma=True).</p>
+</dd>
+<dt>tonic_biases<span class="classifier">list of h.IClamp</span></dt><dd><p>The current clamps inserted at each section of the cell
+for tonic biasing inputs.</p>
+</dd>
+</dl>
+</section>
+<section id="section-description">
+<h2>Section Description<a class="headerlink" href="#section-description" title="Permalink to this heading">¶</a></h2>
+<dl class="simple">
+<dt>L<span class="classifier">float</span></dt><dd><p>length of a section in microns.</p>
+</dd>
+<dt>diam<span class="classifier">float</span></dt><dd><p>diameter of a section in microns.</p>
+</dd>
+<dt>cm<span class="classifier">float</span></dt><dd><p>membrane capacitance in micro-Farads.</p>
+</dd>
+<dt>Ra<span class="classifier">float</span></dt><dd><p>axial resistivity in ohm-cm.</p>
+</dd>
+<dt>end_pts<span class="classifier">list of [x, y, z]</span></dt><dd><p>The start and stop points of the section.</p>
+</dd>
+<dt>syns<span class="classifier">list of str</span></dt><dd><p>The synaptic mechanisms to add in this section.</p>
+</dd>
+<dt>mechs<span class="classifier">dict</span></dt><dd><p>Mechanisms to insert in this section. The keys
+are the names of the mechanisms and values
+are the properties.</p>
+</dd>
+</dl>
+</section>
+<section id="gid-range-description">
+<h2>Gid Range Description<a class="headerlink" href="#gid-range-description" title="Permalink to this heading">¶</a></h2>
+<dl class="simple">
+<dt>start<span class="classifier">int</span></dt><dd><p>Start of the gid_range.</p>
+</dd>
+<dt>stop<span class="classifier">int</span></dt><dd><p>End of the gid_range.</p>
+</dd>
+</dl>
+</section>
+<section id="external-drive-description">
+<h2>External Drive Description<a class="headerlink" href="#external-drive-description" title="Permalink to this heading">¶</a></h2>
+<dl class="simple">
+<dt>name<span class="classifier">str</span></dt><dd><p>Unique name for the drive.</p>
+</dd>
+<dt>dynamics<span class="classifier">dict</span></dt><dd><p>Parameters describing how the temporal dynamics of spike trains in the
+drive. The keys are specific to the type of drive (‘evoked’, ‘bursty’,
+etc.).</p>
+</dd>
+<dt>location<span class="classifier">str</span></dt><dd><p>Target location of synapses.</p>
+</dd>
+<dt>cell_specific<span class="classifier">bool</span></dt><dd><p>Whether each artifical drive cell has 1-to-1 (True, default) or
+all-to-all (False) connection parameters.</p>
+</dd>
+<dt>weights_ampa<span class="classifier">dict or None</span></dt><dd><p>Synaptic weights (in uS) of AMPA receptors on each targeted cell
+type (dict keys).</p>
+</dd>
+<dt>weights_nmda<span class="classifier">dict or None</span></dt><dd><p>Synaptic weights (in uS) of NMDA receptors on each targeted cell
+type (dict keys).</p>
+</dd>
+<dt>probability<span class="classifier">dict or float</span></dt><dd><p>Probability of connection between any src-target pair.</p>
+</dd>
+<dt>synaptic_delays<span class="classifier">dict or float</span></dt><dd><p>Synaptic delay (in ms) at the column origin, dispersed laterally as
+a function of the space_constant. If float, applies to all target
+cell types.</p>
+</dd>
+<dt>event_seed<span class="classifier">int</span></dt><dd><p>Optional initial seed for random number generator.</p>
+</dd>
+<dt>conn_seed<span class="classifier">int</span></dt><dd><p>Optional initial seed for random number generator.</p>
+</dd>
+<dt>n_drive_cells<span class="classifier">int | ‘n_cells’</span></dt><dd><p>The number of drive cells that each contribute an independently
+sampled synaptic spike to the network according to the Gaussian
+time distribution (mu, sigma).</p>
+</dd>
+<dt>events<span class="classifier">list</span></dt><dd><p>Contains the spike times of exogeneous inputs.</p>
+</dd>
+</dl>
+</section>
+<section id="external-bias-description">
+<h2>External Bias Description<a class="headerlink" href="#external-bias-description" title="Permalink to this heading">¶</a></h2>
+<dl class="simple">
+<dt>cell_type<span class="classifier">str</span></dt><dd><p>The cell type whose cells will get the tonic input.</p>
+</dd>
+<dt>amplitude<span class="classifier">float</span></dt><dd><p>The amplitude of the input.</p>
+</dd>
+<dt>t0<span class="classifier">float</span></dt><dd><p>The start time of tonic input (in ms).</p>
+</dd>
+<dt>tstop<span class="classifier">float</span></dt><dd><p>The end time of tonic input (in ms).</p>
+</dd>
+</dl>
+</section>
+<section id="connection-description">
+<h2>Connection Description<a class="headerlink" href="#connection-description" title="Permalink to this heading">¶</a></h2>
+<dl class="simple">
+<dt>target_types<span class="classifier">str</span></dt><dd><p>Cell type of target gids.</p>
+</dd>
+<dt>target_gids<span class="classifier">list of int</span></dt><dd><p>Identifer for targets of source cells.</p>
+</dd>
+<dt>num_targets<span class="classifier">int</span></dt><dd><p>Number of unique target gids.</p>
+</dd>
+<dt>src_type<span class="classifier">str</span></dt><dd><p>Cell type of source gids.</p>
+</dd>
+<dt>src_gids<span class="classifier">list of int</span></dt><dd><p>Identifier for source cells.</p>
+</dd>
+<dt>num_srcs<span class="classifier">int</span></dt><dd><p>Number of unique source gids.</p>
+</dd>
+<dt>gid_pairs<span class="classifier">dict</span></dt><dd><p>dict indexed by src gids.</p>
+</dd>
+<dt>loc<span class="classifier">str</span></dt><dd><p>Target location of synapses.</p>
+</dd>
+<dt>receptor<span class="classifier">str</span></dt><dd><p>Synaptic receptor of connection.</p>
+</dd>
+<dt>nc_dict<span class="classifier">dict</span></dt><dd><p>Contains information about delay, weight, lamtha etc.</p>
+</dd>
+<dt>allow_autapses<span class="classifier">bool</span></dt><dd><p>If True, allow connecting neuron to itself.</p>
+</dd>
+<dt>probability<span class="classifier">float</span></dt><dd><p>Probability of connection between any src-target pair.</p>
+</dd>
+</dl>
+</section>
+<section id="extracellular-array-description">
+<h2>Extracellular Array Description<a class="headerlink" href="#extracellular-array-description" title="Permalink to this heading">¶</a></h2>
+<dl class="simple">
+<dt>positions<span class="classifier">tuple | list of tuple</span></dt><dd><p>The (x, y, z) coordinates (in um) of the extracellular electrodes.</p>
+</dd>
+<dt>conductivity<span class="classifier">float</span></dt><dd><p>Extracellular conductivity, in S/m.</p>
+</dd>
+<dt>method<span class="classifier">str</span></dt><dd><p>Approximation to use.</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2023, HNN Developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

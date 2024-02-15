@@ -273,7 +273,9 @@
                        <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="n">other</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">]</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">times_self</span> <span class="o">==</span> <span class="n">times_other</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_spike_gids</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_spike_gids</span> <span class="ow">and</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_spike_types</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_spike_types</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_spike_types</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_spike_types</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vsec</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">vsec</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">isec</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">isec</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CellResponse.__getitem__"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid_item</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a CellResponse object with a copied subset filtered by gid.</span>

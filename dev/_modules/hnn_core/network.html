@@ -160,6 +160,8 @@
 <span class="kn">from</span> <span class="nn">.externals.mne</span> <span class="kn">import</span> <span class="n">_validate_type</span><span class="p">,</span> <span class="n">_check_option</span>
 <span class="kn">from</span> <span class="nn">.extracellular</span> <span class="kn">import</span> <span class="n">ExtracellularArray</span>
 <span class="kn">from</span> <span class="nn">.check</span> <span class="kn">import</span> <span class="n">_check_gids</span><span class="p">,</span> <span class="n">_gid_to_type</span><span class="p">,</span> <span class="n">_string_input_to_list</span>
+<span class="kn">from</span> <span class="nn">.hnn_io</span> <span class="kn">import</span> <span class="n">write_network</span>
+<span class="kn">from</span> <span class="nn">.externals.mne</span> <span class="kn">import</span> <span class="n">copy_doc</span>
 
 
 <span class="k">def</span> <span class="nf">_create_cell_coords</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="p">):</span>
@@ -194,48 +196,68 @@
 <span class="sd">    Common positions are all located at origin.</span>
 <span class="sd">    Sort of a hack because of redundancy.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">pos_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">_calc_pyramidal_coord</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">):</span>
+        <span class="n">list_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">pos</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="p">[</span><span class="n">zdiff</span><span class="p">])]</span>
+        <span class="k">return</span> <span class="n">list_coords</span>
 
-    <span class="c1"># PYRAMIDAL CELLS</span>
+    <span class="k">def</span> <span class="nf">_calc_basket_coord</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
+        <span class="n">xzero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_pyr_x</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
+        <span class="n">xone</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_pyr_x</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
+        <span class="c1"># split even and odd y vals</span>
+        <span class="n">yeven</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
+        <span class="n">yodd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
+        <span class="c1"># create general list of x,y coords and sort it</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">pos</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span>
+            <span class="n">xzero</span><span class="p">,</span> <span class="n">yeven</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="n">pos</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">xone</span><span class="p">,</span> <span class="n">yodd</span><span class="p">)]</span>
+        <span class="n">coords_sorted</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">pos</span><span class="p">:</span> <span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># append the z value for position</span>
+        <span class="n">list_coords</span> <span class="o">=</span> <span class="p">[(</span><span class="n">pos_xy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pos_xy</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">weight</span> <span class="o">*</span> <span class="n">zdiff</span><span class="p">)</span>
+                       <span class="k">for</span> <span class="n">pos_xy</span> <span class="ow">in</span> <span class="n">coords_sorted</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">list_coords</span>
+
+    <span class="k">def</span> <span class="nf">_calc_origin</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">):</span>
+        <span class="c1"># origin&#39;s z component isn&#39;t used in calculating distance functions.</span>
+        <span class="c1"># will be used for adding external drives.</span>
+        <span class="n">origin_x</span> <span class="o">=</span> <span class="n">xxrange</span><span class="p">[</span><span class="nb">int</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">xxrange</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)]</span>
+        <span class="n">origin_y</span> <span class="o">=</span> <span class="n">yyrange</span><span class="p">[</span><span class="nb">int</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">yyrange</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)]</span>
+        <span class="n">origin_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">zdiff</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="p">(</span><span class="n">origin_x</span><span class="p">,</span> <span class="n">origin_y</span><span class="p">,</span> <span class="n">origin_z</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">origin</span>
+
+    <span class="c1"># Calculate distances</span>
     <span class="n">xxrange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
     <span class="n">yyrange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_pyr_y</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
 
-    <span class="n">pos_dict</span><span class="p">[</span><span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">pos</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
-    <span class="n">pos_dict</span><span class="p">[</span><span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">pos</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="p">[</span><span class="n">zdiff</span><span class="p">])]</span>
-
-    <span class="c1"># BASKET CELLS</span>
-    <span class="n">xzero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_pyr_x</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
-    <span class="n">xone</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_pyr_x</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
-    <span class="c1"># split even and odd y vals</span>
-    <span class="n">yeven</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
-    <span class="n">yodd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
-    <span class="c1"># create general list of x,y coords and sort it</span>
-    <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">pos</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span>
-        <span class="n">xzero</span><span class="p">,</span> <span class="n">yeven</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="n">pos</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">xone</span><span class="p">,</span> <span class="n">yodd</span><span class="p">)]</span>
-    <span class="n">coords_sorted</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">pos</span><span class="p">:</span> <span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="c1"># append the z value for position for L2 and L5</span>
-    <span class="c1"># print(len(coords_sorted))</span>
-
-    <span class="n">pos_dict</span><span class="p">[</span><span class="s1">&#39;L5_basket&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="n">pos_xy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pos_xy</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">0.2</span> <span class="o">*</span> <span class="n">zdiff</span><span class="p">)</span> <span class="k">for</span>
-                             <span class="n">pos_xy</span> <span class="ow">in</span> <span class="n">coords_sorted</span><span class="p">]</span>
-    <span class="n">pos_dict</span><span class="p">[</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="n">pos_xy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pos_xy</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">0.8</span> <span class="o">*</span> <span class="n">zdiff</span><span class="p">)</span> <span class="k">for</span>
-                             <span class="n">pos_xy</span> <span class="ow">in</span> <span class="n">coords_sorted</span><span class="p">]</span>
-
-    <span class="c1"># ORIGIN</span>
-    <span class="c1"># origin&#39;s z component isn&#39;t really used in</span>
-    <span class="c1"># calculating distance functions from origin</span>
-    <span class="c1"># these will be forced as ints!</span>
-    <span class="n">origin_x</span> <span class="o">=</span> <span class="n">xxrange</span><span class="p">[</span><span class="nb">int</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">xxrange</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)]</span>
-    <span class="n">origin_y</span> <span class="o">=</span> <span class="n">yyrange</span><span class="p">[</span><span class="nb">int</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">yyrange</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)]</span>
-    <span class="n">origin_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">zdiff</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="n">origin</span> <span class="o">=</span> <span class="p">(</span><span class="n">origin_x</span><span class="p">,</span> <span class="n">origin_y</span><span class="p">,</span> <span class="n">origin_z</span><span class="p">)</span>
-
-    <span class="c1"># save the origin for adding external drives later</span>
-    <span class="n">pos_dict</span><span class="p">[</span><span class="s1">&#39;origin&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span>
+    <span class="n">pos_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="n">_calc_pyramidal_coord</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">zdiff</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="n">_calc_pyramidal_coord</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">zdiff</span><span class="o">=</span><span class="n">zdiff</span><span class="p">),</span>
+        <span class="s1">&#39;L5_basket&#39;</span><span class="p">:</span> <span class="n">_calc_basket_coord</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">,</span>
+                                        <span class="n">inplane_distance</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">0.2</span>
+                                        <span class="p">),</span>
+        <span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="n">_calc_basket_coord</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">,</span>
+                                        <span class="n">inplane_distance</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">0.8</span>
+                                        <span class="p">),</span>
+        <span class="s1">&#39;origin&#39;</span><span class="p">:</span> <span class="n">_calc_origin</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">),</span>
+    <span class="p">}</span>
 
     <span class="k">return</span> <span class="n">pos_dict</span>
+
+
+<span class="k">def</span> <span class="nf">_compare_lists</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compares lists for equality</span>
+
+<span class="sd">    From https://stackoverflow.com/a/7829388</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>  <span class="c1"># make a mutable copy</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">s</span><span class="p">:</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="n">t</span>
 
 
 <span class="k">def</span> <span class="nf">_connection_probability</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">probability</span><span class="p">,</span> <span class="n">conn_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -564,6 +586,32 @@
                  <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="s1">&#39;L5_basket&#39;</span><span class="p">])))</span>
         <span class="k">return</span> <span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1"> | </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span></div>
 
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Network</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+
+        <span class="c1"># Check connectivity</span>
+        <span class="k">if</span> <span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connectivity</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">connectivity</span><span class="p">))</span> <span class="ow">or</span>
+                <span class="ow">not</span> <span class="p">(</span><span class="n">_compare_lists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connectivity</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">connectivity</span><span class="p">))):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Check all other attributes</span>
+        <span class="n">all_attrs</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">attrs_to_ignore</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_attrs</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)]</span>
+        <span class="n">attrs_to_ignore</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;add_bursty_drive&#39;</span><span class="p">,</span> <span class="s1">&#39;add_connection&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;add_electrode_array&#39;</span><span class="p">,</span> <span class="s1">&#39;add_evoked_drive&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;add_poisson_drive&#39;</span><span class="p">,</span> <span class="s1">&#39;add_tonic_bias&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;clear_connectivity&#39;</span><span class="p">,</span> <span class="s1">&#39;clear_drives&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;connectivity&#39;</span><span class="p">,</span> <span class="s1">&#39;copy&#39;</span><span class="p">,</span> <span class="s1">&#39;gid_to_type&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;plot_cells&#39;</span><span class="p">,</span> <span class="s1">&#39;set_cell_positions&#39;</span><span class="p">,</span> <span class="s1">&#39;write&#39;</span><span class="p">])</span>
+        <span class="n">attrs_to_check</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_attrs</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attrs_to_ignore</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs_to_check</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span>
+
 <div class="viewcode-block" id="Network.set_cell_positions"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.set_cell_positions">[docs]</a>    <span class="k">def</span> <span class="nf">set_cell_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                            <span class="n">layer_separation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set relative positions of cells arranged in a square grid</span>
@@ -729,6 +777,11 @@
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;conn_seed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">conn_seed</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">numspikes</span><span class="o">=</span><span class="n">numspikes</span><span class="p">)</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;events&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="c1"># Need to save this information</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights_ampa</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_nmda&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights_nmda</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;synaptic_delays&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">synaptic_delays</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;probability&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">probability</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_attach_drive</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">drive</span><span class="p">,</span> <span class="n">weights_ampa</span><span class="p">,</span> <span class="n">weights_nmda</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span>
                            <span class="n">space_constant</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="p">,</span>
@@ -838,6 +891,11 @@
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;dynamics&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">tstart</span><span class="o">=</span><span class="n">tstart</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
                                  <span class="n">rate_constant</span><span class="o">=</span><span class="n">rate_constant</span><span class="p">)</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;events&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="c1"># Need to save this information</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights_ampa</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_nmda&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights_nmda</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;synaptic_delays&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">synaptic_delays</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;probability&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">probability</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_attach_drive</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">drive</span><span class="p">,</span> <span class="n">weights_ampa</span><span class="p">,</span> <span class="n">weights_nmda</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span>
                            <span class="n">space_constant</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="p">,</span>
@@ -944,6 +1002,11 @@
                                  <span class="n">burst_rate</span><span class="o">=</span><span class="n">burst_rate</span><span class="p">,</span> <span class="n">burst_std</span><span class="o">=</span><span class="n">burst_std</span><span class="p">,</span>
                                  <span class="n">numspikes</span><span class="o">=</span><span class="n">numspikes</span><span class="p">,</span> <span class="n">spike_isi</span><span class="o">=</span><span class="n">spike_isi</span><span class="p">)</span>
         <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;events&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="c1"># Need to save this information</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights_ampa</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_nmda&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights_nmda</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;synaptic_delays&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">synaptic_delays</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;probability&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">probability</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_attach_drive</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">drive</span><span class="p">,</span> <span class="n">weights_ampa</span><span class="p">,</span> <span class="n">weights_nmda</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span>
                            <span class="n">space_constant</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="p">,</span>
@@ -1413,6 +1476,7 @@
             <span class="n">_connection_probability</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">probability</span><span class="p">,</span> <span class="n">conn_seed</span><span class="p">)</span>
 
         <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;probability&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">probability</span>
+        <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;allow_autapses&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">allow_autapses</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">connectivity</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">conn</span><span class="p">))</span></div>
 
@@ -1488,7 +1552,11 @@
 <span class="sd">        fig : instance of matplotlib Figure</span>
 <span class="sd">            The matplotlib figure handle.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">plot_cells</span><span class="p">(</span><span class="n">net</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">plot_cells</span><span class="p">(</span><span class="n">net</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Network.write"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.write">[docs]</a>    <span class="nd">@copy_doc</span><span class="p">(</span><span class="n">write_network</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">write_output</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">write_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">,</span> <span class="n">write_output</span><span class="p">)</span></div></div>
 
 
 <span class="k">class</span> <span class="nc">_Connectivity</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>

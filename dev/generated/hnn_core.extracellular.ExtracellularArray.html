@@ -98,6 +98,7 @@
 <li><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.plot_lfp"><code class="docutils literal notranslate"><span class="pre">ExtracellularArray.plot_lfp()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.sfreq"><code class="docutils literal notranslate"><span class="pre">ExtracellularArray.sfreq</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.smooth"><code class="docutils literal notranslate"><span class="pre">ExtracellularArray.smooth()</span></code></a></li>
+<li><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.to_dict"><code class="docutils literal notranslate"><span class="pre">ExtracellularArray.to_dict()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -226,6 +227,9 @@ measured values of conductivity in rat cortex (note units there are mS/cm)</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.smooth" title="hnn_core.extracellular.ExtracellularArray.smooth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">smooth</span></code></a>(window_len)</p></td>
 <td><p>Smooth extracellular waveforms using Hamming-windowed convolution</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.to_dict" title="hnn_core.extracellular.ExtracellularArray.to_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code></a>()</p></td>
+<td><p>Converts an object of ExtracellularArray class to a dictionary.</p></td>
+</tr>
 </tbody>
 </table>
 <dl class="py method">
@@ -301,7 +305,7 @@ a list of ints can be provided. These are applied successively.</p>
 standard color strings may be used (e.g., ‘b’ for blue). A color
 can also be defined as an RGBA-quadruplet, or an array of
 RGBA-values (one for each electrode contact trace to plot). An
-instance of <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="(in Matplotlib v3.8.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ListedColormap</span></code></a> may also be
+instance of <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="(in Matplotlib v3.8.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ListedColormap</span></code></a> may also be
 provided.</p>
 </dd>
 <dt><strong>voltage_offset</strong><span class="classifier">float | None (optional)</span></dt><dd><p>Amount to offset traces by on the voltage-axis. Useful for plotting
@@ -348,6 +352,20 @@ data with.</p>
 <dd class="field-even"><dl class="simple">
 <dt><strong>extracellular_copy</strong><span class="classifier">instance of ExtraCellularArray</span></dt><dd><p>The modified ExtraCellularArray instance.</p>
 </dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.extracellular.ExtracellularArray.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/extracellular.html#ExtracellularArray.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.extracellular.ExtracellularArray.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts an object of ExtracellularArray class to a
+dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>dictionary form of an object of ExtracellularArray class.</dt><dd></dd>
 </dl>
 </dd>
 </dl>

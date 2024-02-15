@@ -201,8 +201,8 @@
         <span class="n">dpl</span> <span class="o">=</span> <span class="n">Dipole</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="n">sim_data</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;times&#39;</span><span class="p">],</span>
                      <span class="n">data</span><span class="o">=</span><span class="n">sim_data</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="s1">&#39;dpl_data&#39;</span><span class="p">])</span>
 
-        <span class="n">N_pyr_x</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;N_pyr_x&#39;</span><span class="p">]</span>
-        <span class="n">N_pyr_y</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;N_pyr_y&#39;</span><span class="p">]</span>
+        <span class="n">N_pyr_x</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_N_pyr_x</span>
+        <span class="n">N_pyr_y</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_N_pyr_y</span>
         <span class="n">dpl</span><span class="o">.</span><span class="n">_baseline_renormalize</span><span class="p">(</span><span class="n">N_pyr_x</span><span class="p">,</span> <span class="n">N_pyr_y</span><span class="p">)</span>  <span class="c1"># XXX cf. #270</span>
         <span class="n">dpl</span><span class="o">.</span><span class="n">_convert_fAm_to_nAm</span><span class="p">()</span>  <span class="c1"># always applied, cf. #264</span>
         <span class="k">if</span> <span class="n">postproc</span><span class="p">:</span>

@@ -104,6 +104,7 @@
 <li><a class="reference internal" href="#hnn_core.Cell.record"><code class="docutils literal notranslate"><span class="pre">Cell.record()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.Cell.setup_source_netcon"><code class="docutils literal notranslate"><span class="pre">Cell.setup_source_netcon()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.Cell.syn_create"><code class="docutils literal notranslate"><span class="pre">Cell.syn_create()</span></code></a></li>
+<li><a class="reference internal" href="#hnn_core.Cell.to_dict"><code class="docutils literal notranslate"><span class="pre">Cell.to_dict()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -281,6 +282,9 @@ list of nodes (children nodes) connected to the parent node.</p>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.syn_create" title="hnn_core.Cell.syn_create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">syn_create</span></code></a>(secloc, e, tau1, tau2)</p></td>
 <td><p>Create an h.Exp2Syn synapse.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.to_dict" title="hnn_core.Cell.to_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_dict</span></code></a>()</p></td>
+<td><p>Converts an object of Cell class to a dictionary.</p></td>
 </tr>
 </tbody>
 </table>
@@ -508,6 +512,19 @@ the soma (‘soma’). Default: False.</p>
 <dd class="field-even"><dl class="simple">
 <dt><strong>syn</strong><span class="classifier">instance of h.Exp2Syn</span></dt><dd><p>A two state kinetic scheme synapse.</p>
 </dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Cell.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.to_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts an object of Cell class to a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>dictionary form of an object of Cell class.</dt><dd></dd>
 </dl>
 </dd>
 </dl>
