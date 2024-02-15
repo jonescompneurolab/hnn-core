@@ -3,8 +3,11 @@ import functools
 
 from warnings import warn
 from pathlib import Path
+import sys
 
 import numpy as np
+
+from hnn_core.docs import docdict
 
 
 ####################################################
@@ -765,3 +768,112 @@ def _check_tfr_param(freqs, sfreq, method, zero_mean, n_cycles,
     _check_option('method', method, ['multitaper', 'morlet'])
 
     return freqs, sfreq, zero_mean, n_cycles, time_bandwidth, decim
+
+
+####################################################
+# mne/utils/docs.py
+docdict_indented = {}
+
+
+def fill_doc(f):
+    """Fill a docstring with docdict entries.
+
+    Parameters
+    ----------
+    f : callable
+        The function to fill the docstring of. Will be modified in place.
+
+    Returns
+    -------
+    f : callable
+        The function, potentially with an updated ``__doc__``.
+    """
+    docstring = f.__doc__
+    if not docstring:
+        return f
+    lines = docstring.splitlines()
+    # Find the minimum indent of the main docstring, after first line
+    if len(lines) < 2:
+        icount = 0
+    else:
+        icount = _indentcount_lines(lines[1:])
+    # Insert this indent to dictionary docstrings
+    try:
+        indented = docdict_indented[icount]
+    except KeyError:
+        indent = " " * icount
+        docdict_indented[icount] = indented = {}
+        for name, dstr in docdict.items():
+            lines = dstr.splitlines()
+            try:
+                newlines = [lines[0]]
+                for line in lines[1:]:
+                    newlines.append(indent + line)
+                indented[name] = "\n".join(newlines)
+            except IndexError:
+                indented[name] = dstr
+    try:
+        f.__doc__ = docstring % indented
+    except (TypeError, ValueError, KeyError) as exp:
+        funcname = f.__name__
+        funcname = docstring.split("\n")[0] if funcname is None else funcname
+        raise RuntimeError("Error documenting %s:\n%s" % (funcname, str(exp)))
+    return f
+
+
+def copy_doc(source):
+    """Copy the docstring from another function (decorator).
+
+    The docstring of the source function is prepepended to the docstring of the
+    function wrapped by this decorator.
+
+    This is useful when inheriting from a class and overloading a method. This
+    decorator can be used to copy the docstring of the original method.
+
+    Parameters
+    ----------
+    source : function
+        Function to copy the docstring from
+
+    Returns
+    -------
+    wrapper : function
+        The decorated function
+
+    Examples
+    --------
+    >>> class A:
+    ...     def m1():
+    ...         '''Docstring for m1'''
+    ...         pass
+    >>> class B (A):
+    ...     @copy_doc(A.m1)
+    ...     def m1():
+    ...         ''' this gets appended'''
+    ...         pass
+    >>> print(B.m1.__doc__)
+    Docstring for m1 this gets appended
+    """
+
+    def wrapper(func):
+        if source.__doc__ is None or len(source.__doc__) == 0:
+            raise ValueError("Cannot copy docstring: docstring was empty.")
+        doc = source.__doc__
+        if func.__doc__ is not None:
+            doc += func.__doc__
+        func.__doc__ = doc
+        return func
+
+    return wrapper
+
+
+def _indentcount_lines(lines):
+    """Compute minimum indent for all lines in line list."""
+    indentno = sys.maxsize
+    for line in lines:
+        stripped = line.lstrip()
+        if stripped:
+            indentno = min(indentno, len(line) - len(stripped))
+    if indentno == sys.maxsize:
+        return 0
+    return indentno

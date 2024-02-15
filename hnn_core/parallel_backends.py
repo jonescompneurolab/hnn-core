@@ -64,8 +64,8 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
         dpl = Dipole(times=sim_data[idx]['times'],
                      data=sim_data[idx]['dpl_data'])
 
-        N_pyr_x = net._params['N_pyr_x']
-        N_pyr_y = net._params['N_pyr_y']
+        N_pyr_x = net._N_pyr_x
+        N_pyr_y = net._N_pyr_y
         dpl._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
         dpl._convert_fAm_to_nAm()  # always applied, cf. #264
         if postproc:

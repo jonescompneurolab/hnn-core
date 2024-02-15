@@ -354,6 +354,28 @@ class ExtracellularArray:
     def __len__(self):
         return len(self._data)  # length == number of trials
 
+    def __eq__(self, other):
+        if not isinstance(other, ExtracellularArray):
+            return NotImplemented
+
+        all_attrs = dir(self)
+        attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
+        attrs_to_ignore.extend(['conductivity', 'copy', 'n_contacts',
+                                'plot_csd', 'plot_lfp', 'sfreq', 'smooth',
+                                'voltages', 'to_dict', 'times', 'voltages'])
+        attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
+
+        # Check all other attributes
+        for attr in attrs_to_check:
+            if getattr(self, attr) != getattr(other, attr):
+                return False
+
+        if not ((self.times == other.times).all() and
+                (self.voltages == other.voltages).all()):
+            return False
+
+        return True
+
     def copy(self):
         """Return a copy of the ExtracellularArray instance
 
@@ -523,6 +545,24 @@ class ExtracellularArray:
                                colorbar=colorbar, show=show)
 
         return fig
+
+    def to_dict(self):
+        """Converts an object of ExtracellularArray class to a
+        dictionary.
+
+        Returns
+        -------
+        dictionary form of an object of ExtracellularArray class.
+        """
+        rec_array_data = dict()
+        rec_array_data['positions'] = self.positions
+        rec_array_data['conductivity'] = self.conductivity
+        rec_array_data['method'] = self.method
+        rec_array_data['min_distance'] = self.min_distance
+        rec_array_data['times'] = self.times
+        rec_array_data['voltages'] = self.voltages
+
+        return rec_array_data
 
 
 class _ExtracellularArrayBuilder(object):

@@ -23,6 +23,8 @@ from .viz import plot_cells
 from .externals.mne import _validate_type, _check_option
 from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
+from .hnn_io import write_network
+from .externals.mne import copy_doc
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
@@ -57,48 +59,68 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
     Common positions are all located at origin.
     Sort of a hack because of redundancy.
     """
-    pos_dict = dict()
+    def _calc_pyramidal_coord(xxrange, yyrange, zdiff):
+        list_coords = [pos for pos in it.product(xxrange, yyrange, [zdiff])]
+        return list_coords
 
-    # PYRAMIDAL CELLS
+    def _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff, inplane_distance, weight):
+        xzero = np.arange(0, n_pyr_x, 3) * inplane_distance
+        xone = np.arange(1, n_pyr_x, 3) * inplane_distance
+        # split even and odd y vals
+        yeven = np.arange(0, n_pyr_y, 2) * inplane_distance
+        yodd = np.arange(1, n_pyr_y, 2) * inplane_distance
+        # create general list of x,y coords and sort it
+        coords = [pos for pos in it.product(
+            xzero, yeven)] + [pos for pos in it.product(xone, yodd)]
+        coords_sorted = sorted(coords, key=lambda pos: pos[1])
+
+        # append the z value for position
+        list_coords = [(pos_xy[0], pos_xy[1], weight * zdiff)
+                       for pos_xy in coords_sorted]
+
+        return list_coords
+
+    def _calc_origin(xxrange, yyrange, zdiff):
+        # origin's z component isn't used in calculating distance functions.
+        # will be used for adding external drives.
+        origin_x = xxrange[int((len(xxrange) - 1) // 2)]
+        origin_y = yyrange[int((len(yyrange) - 1) // 2)]
+        origin_z = np.floor(zdiff / 2)
+        origin = (origin_x, origin_y, origin_z)
+        return origin
+
+    # Calculate distances
     xxrange = np.arange(n_pyr_x) * inplane_distance
     yyrange = np.arange(n_pyr_y) * inplane_distance
 
-    pos_dict['L5_pyramidal'] = [
-        pos for pos in it.product(xxrange, yyrange, [0])]
-    pos_dict['L2_pyramidal'] = [
-        pos for pos in it.product(xxrange, yyrange, [zdiff])]
-
-    # BASKET CELLS
-    xzero = np.arange(0, n_pyr_x, 3) * inplane_distance
-    xone = np.arange(1, n_pyr_x, 3) * inplane_distance
-    # split even and odd y vals
-    yeven = np.arange(0, n_pyr_y, 2) * inplane_distance
-    yodd = np.arange(1, n_pyr_y, 2) * inplane_distance
-    # create general list of x,y coords and sort it
-    coords = [pos for pos in it.product(
-        xzero, yeven)] + [pos for pos in it.product(xone, yodd)]
-    coords_sorted = sorted(coords, key=lambda pos: pos[1])
-    # append the z value for position for L2 and L5
-    # print(len(coords_sorted))
-
-    pos_dict['L5_basket'] = [(pos_xy[0], pos_xy[1], 0.2 * zdiff) for
-                             pos_xy in coords_sorted]
-    pos_dict['L2_basket'] = [(pos_xy[0], pos_xy[1], 0.8 * zdiff) for
-                             pos_xy in coords_sorted]
-
-    # ORIGIN
-    # origin's z component isn't really used in
-    # calculating distance functions from origin
-    # these will be forced as ints!
-    origin_x = xxrange[int((len(xxrange) - 1) // 2)]
-    origin_y = yyrange[int((len(yyrange) - 1) // 2)]
-    origin_z = np.floor(zdiff / 2)
-    origin = (origin_x, origin_y, origin_z)
-
-    # save the origin for adding external drives later
-    pos_dict['origin'] = origin
+    pos_dict = {
+        'L5_pyramidal': _calc_pyramidal_coord(xxrange, yyrange, zdiff=0),
+        'L2_pyramidal': _calc_pyramidal_coord(xxrange, yyrange, zdiff=zdiff),
+        'L5_basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
+                                        inplane_distance, weight=0.2
+                                        ),
+        'L2_basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
+                                        inplane_distance, weight=0.8
+                                        ),
+        'origin': _calc_origin(xxrange, yyrange, zdiff),
+    }
 
     return pos_dict
+
+
+def _compare_lists(s, t):
+    """
+    Compares lists for equality
+
+    From https://stackoverflow.com/a/7829388
+    """
+    t = list(t)  # make a mutable copy
+    try:
+        for elem in s:
+            t.remove(elem)
+    except ValueError:
+        return False
+    return not t
 
 
 def _connection_probability(conn, probability, conn_seed=None):
@@ -427,6 +449,32 @@ class Network(object):
                  len(self.pos_dict['L5_basket'])))
         return '<%s | %s>' % (class_name, s)
 
+    def __eq__(self, other):
+        if not isinstance(other, Network):
+            return NotImplemented
+
+        # Check connectivity
+        if ((len(self.connectivity) != len(other.connectivity)) or
+                not (_compare_lists(self.connectivity, other.connectivity))):
+            return False
+
+        # Check all other attributes
+        all_attrs = dir(self)
+        attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
+        attrs_to_ignore.extend(['add_bursty_drive', 'add_connection',
+                                'add_electrode_array', 'add_evoked_drive',
+                                'add_poisson_drive', 'add_tonic_bias',
+                                'clear_connectivity', 'clear_drives',
+                                'connectivity', 'copy', 'gid_to_type',
+                                'plot_cells', 'set_cell_positions', 'write'])
+        attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
+
+        for attr in attrs_to_check:
+            if getattr(self, attr) != getattr(other, attr):
+                return False
+
+        return True
+
     def set_cell_positions(self, *, inplane_distance=None,
                            layer_separation=None):
         """Set relative positions of cells arranged in a square grid
@@ -592,6 +640,11 @@ class Network(object):
         drive['conn_seed'] = conn_seed
         drive['dynamics'] = dict(mu=mu, sigma=sigma, numspikes=numspikes)
         drive['events'] = list()
+        # Need to save this information
+        drive['weights_ampa'] = weights_ampa
+        drive['weights_nmda'] = weights_nmda
+        drive['synaptic_delays'] = synaptic_delays
+        drive['probability'] = probability
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
@@ -701,6 +754,11 @@ class Network(object):
         drive['dynamics'] = dict(tstart=tstart, tstop=tstop,
                                  rate_constant=rate_constant)
         drive['events'] = list()
+        # Need to save this information
+        drive['weights_ampa'] = weights_ampa
+        drive['weights_nmda'] = weights_nmda
+        drive['synaptic_delays'] = synaptic_delays
+        drive['probability'] = probability
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
@@ -807,6 +865,11 @@ class Network(object):
                                  burst_rate=burst_rate, burst_std=burst_std,
                                  numspikes=numspikes, spike_isi=spike_isi)
         drive['events'] = list()
+        # Need to save this information
+        drive['weights_ampa'] = weights_ampa
+        drive['weights_nmda'] = weights_nmda
+        drive['synaptic_delays'] = synaptic_delays
+        drive['probability'] = probability
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
@@ -1276,6 +1339,7 @@ class Network(object):
             _connection_probability(conn, probability, conn_seed)
 
         conn['probability'] = probability
+        conn['allow_autapses'] = allow_autapses
 
         self.connectivity.append(deepcopy(conn))
 
@@ -1352,6 +1416,10 @@ class Network(object):
             The matplotlib figure handle.
         """
         return plot_cells(net=self, ax=ax, show=show)
+
+    @copy_doc(write_network)
+    def write(self, fname, overwrite=True, write_output=True):
+        write_network(self, fname, overwrite, write_output)
 
 
 class _Connectivity(dict):

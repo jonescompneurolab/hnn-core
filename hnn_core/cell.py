@@ -95,6 +95,10 @@ def _get_gaussian_connection(src_pos, target_pos, nc_dict,
     return weight, delay
 
 
+def node_to_str(node):
+    return node[0] + "," + str(node[1])
+
+
 class _ArtificialCell:
     """The ArtificialCell class for initializing a NEURON feed source.
 
@@ -219,6 +223,56 @@ class Section:
 
     def __repr__(self):
         return f'L={self.L}, diam={self.diam}, cm={self.cm}, Ra={self.Ra}'
+
+    def __eq__(self, other):
+        if not isinstance(other, Section):
+            return NotImplemented
+
+        # Check equality for mechs
+        for mech_name in self.mechs.keys():
+            self_mech = self.mechs[mech_name]
+            other_mech = other.mechs[mech_name]
+            for attr in self_mech.keys():
+                if self_mech[attr] != other_mech[attr]:
+                    return False
+
+        # Check end_pts
+        for self_end_pt, other_end_pt in zip(self.end_pts, other.end_pts):
+            if np.testing.assert_almost_equal(self_end_pt,
+                                              other_end_pt, 5) is not None:
+                return False
+
+        all_attrs = dir(self)
+        attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
+        attrs_to_ignore.extend(['end_pts', 'mechs', 'to_dict'])
+        attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
+
+        # Check all other attributes
+        for attr in attrs_to_check:
+            if getattr(self, attr) != getattr(other, attr):
+                return False
+
+        return True
+
+    def to_dict(self):
+        """Converts an object of Section class to a dictionary.
+
+        Returns
+        -------
+        dictionary form of an object of Section class.
+        """
+        section_data = dict()
+        section_data['L'] = self.L
+        section_data['diam'] = self.diam
+        section_data['cm'] = self.cm
+        section_data['Ra'] = self.Ra
+        section_data['end_pts'] = self.end_pts
+        section_data['nseg'] = self.nseg
+        # Need to solve the partial function problem
+        # in mechs
+        section_data['mechs'] = self.mechs
+        section_data['syns'] = self.syns
+        return section_data
 
     @property
     def L(self):
@@ -355,6 +409,68 @@ class Cell:
         class_name = self.__class__.__name__
         return f'<{class_name} | gid={self._gid}>'
 
+    def __eq__(self, other):
+        if not isinstance(other, Cell):
+            return NotImplemented
+
+        all_attrs = dir(self)
+        attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
+        attrs_to_ignore.extend(['build', 'copy', 'create_tonic_bias',
+                                'define_shape', 'distance_section', 'gid',
+                                'list_IClamp', 'modify_section',
+                                'parconnect_from_src', 'plot_morphology',
+                                'record', 'sections', 'setup_source_netcon',
+                                'syn_create', 'to_dict'])
+        attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
+
+        # Check all other attributes
+        for attr in attrs_to_check:
+            if getattr(self, attr) != getattr(other, attr):
+                return False
+
+        if not (self.sections.keys() == other.sections.keys()):
+            return False
+
+        for key in self.sections.keys():
+            if self.sections[key] != other.sections[key]:
+                return False
+
+        return True
+
+    def to_dict(self):
+        """Converts an object of Cell class to a dictionary.
+
+        Returns
+        -------
+        dictionary form of an object of Cell class.
+        """
+        cell_data = dict()
+        cell_data['name'] = self.name
+        cell_data['pos'] = self.pos
+        cell_data['sections'] = dict()
+        for key in self.sections:
+            cell_data['sections'][key] = self.sections[key].to_dict()
+        cell_data['synapses'] = self.synapses
+        # cell_data['cell_tree'] = self.cell_tree
+        if self.cell_tree is None:
+            cell_data['cell_tree'] = None
+        else:
+            cell_tree_dict = dict()
+            for parent, children in self.cell_tree.items():
+                key = node_to_str(parent)
+                value = list()
+                for child in children:
+                    value.append(node_to_str(child))
+                cell_tree_dict[key] = value
+            cell_data['cell_tree'] = cell_tree_dict
+        cell_data['sect_loc'] = self.sect_loc
+        cell_data['gid'] = self.gid
+        cell_data['dipole_pp'] = self.dipole_pp
+        cell_data['vsec'] = self.vsec
+        cell_data['isec'] = self.isec
+        cell_data['tonic_biases'] = self.tonic_biases
+        return cell_data
+
     @property
     def gid(self):
         return self._gid
@@ -444,8 +560,6 @@ class Cell:
                     if isinstance(val, list):
                         seg_xs, seg_vals = val[0], val[1]
                         for seg, seg_x, seg_val in zip(sec, seg_xs, seg_vals):
-                            # Checking equality till 5 decimal places
-                            np.testing.assert_almost_equal(seg.x, seg_x, 5)
                             setattr(seg, attr, seg_val)
                     else:
                         setattr(sec, attr, val)
