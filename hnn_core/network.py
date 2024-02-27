@@ -1421,7 +1421,8 @@ class Network(object):
 
     @copy_doc(write_network)
     def write(self, fname, overwrite=True, write_output=True):
-        write_network(self, fname, overwrite, write_output)
+        write_network(self, fname, overwrite=overwrite,
+                      write_output=write_output)
 
 
 class _Connectivity(dict):

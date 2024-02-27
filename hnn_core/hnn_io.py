@@ -246,7 +246,8 @@ def _read_rec_arrays(net, rec_arrays_data, read_output):
 
 
 @fill_doc
-def write_network(net, fname, overwrite=True, write_output=True):
+def write_network(net, fname, title='hnn-network', overwrite=True,
+                  write_output=True):
     """Write network to a HDF5 file.
 
     Parameters
@@ -263,6 +264,8 @@ def write_network(net, fname, overwrite=True, write_output=True):
     if overwrite is False and os.path.exists(fname):
         raise FileExistsError('File already exists at path %s. Rename '
                               'the file or set overwrite=True.' % (fname,))
+    d_net = _network_to_dict(net, write_output)
+    write_hdf5(fname, d_net, title=title, overwrite=overwrite)
 
     net_data = {
         'object_type': 'Network',
@@ -328,7 +331,7 @@ def _order_drives(gid_ranges, external_drives):
 
 
 @fill_doc
-def read_network(fname, read_output=True, read_drives=True):
+def read_network(fname, title='hnn-network', read_output=True, read_drives=True):
     """Read network from a file.
 
     Parameters
@@ -343,7 +346,7 @@ def read_network(fname, read_output=True, read_drives=True):
     # Importing Network.
     # Cannot do this globally due to circular import.
     from .network import Network
-    net_data = read_hdf5(fname)
+    net_data = read_hdf5(fname, title=title)
     if 'object_type' not in net_data:
         raise NameError('The given file is not compatible. '
                         'The file should contain information'
