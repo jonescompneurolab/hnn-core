@@ -272,14 +272,18 @@ def test_str_to_node():
 
 
 def test_read_hdf5(jones_2009_network):
-
+    # Test file is written from the jones_2009_network
     # jones_2009_network.write(Path('.', 'assets/jones2009_test_read.hdf5'))
-    # This file is written from the jones_2009_network
     net = read_network(Path(assets_path, 'jones2009_test_read.hdf5'))
     assert net == jones_2009_network
 
 
 def test_read_hdf5_with_simulation(jones_2009_network):
+    # Test file is written from the jones_2009_network with a simple simulation
+    # net = jones_2009_network
+    # simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
+    # net.write(Path('.', 'assets/jones2009_simple_sim_test_read.hdf5'))
+
     # Test reading a network with simulation
     net_sim = read_network(
         Path(assets_path, 'jones2009_simple_sim_test_read.hdf5')
