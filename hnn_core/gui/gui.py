@@ -1185,7 +1185,8 @@ def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
     params_fname = param_dict['name']
     param_data = param_dict['content']
 
-    param_data = codecs.decode(param_data, encoding="utf-8")
+    # Decode from memoryview
+    param_data = param_data.tobytes()
 
     ext = Path(params_fname).suffix
     read_func = {'.json': _read_json, '.param': _read_legacy_params}
