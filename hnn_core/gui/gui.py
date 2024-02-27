@@ -8,7 +8,7 @@ import logging
 import multiprocessing
 import sys
 import urllib.parse
-import urllib.request
+import requests
 from collections import defaultdict
 from pathlib import Path
 from datetime import datetime
@@ -24,7 +24,7 @@ from hnn_core.gui._logging import logger
 from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
 from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
-                             _read_legacy_params)
+                             _read_legacy_params, _read_hdf5)
 
 
 class _OutputWidgetHandler(logging.Handler):
@@ -648,19 +648,40 @@ class HNNGUI:
 
 
 def _prepare_upload_file_from_url(file_url):
-    params_name = file_url.split("/")[-1]
-    data = urllib.request.urlopen(file_url)
-    content = b""
-    for line in data:
-        content += line
+    """Returns a dictionary with file attributes from a file hosted at a url.
 
-    return [{
-        'name': params_name,
-        'type': 'application/json',
-        'size': len(content),
+    This is used to simulate file uploads for GUI testing. The dictionary is in
+    the format that the ipywidgets FileUpload generates when loading a file.
+    """
+    def _download_as_memoryview(url):
+        response = requests.get(url)
+        if response.status_code == 200:
+            # Convert the content to a memory view
+            content = memoryview(response.content)
+            return content
+        else:
+            # If the request was not successful, print an error message
+            print("Error: Failed to fetch the file from the URL.")
+            return None
+
+    file_name = file_url.split("/")[-1]
+    file_type = Path(file_name).suffix[1:]
+    d_mimetypes = {'hdf5': 'application/x-hdf',
+                   'txt': 'text/plain',
+                   'json': 'application/json',
+                   'param': 'text/plain',
+                   }
+
+    content = _download_as_memoryview(file_url)
+    d_file_attributes = {
+        'name': file_name,
+        'type': d_mimetypes[file_type.lower()],
+        'size': content.nbytes,
         'content': content,
-        'last_modified': datetime.now()
-    }]
+        'last_modified': datetime.now(),
+    }
+
+    return [d_file_attributes]
 
 
 def create_expanded_button(description, button_style, layout, disabled=False,
