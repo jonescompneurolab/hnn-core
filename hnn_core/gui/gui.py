@@ -254,12 +254,12 @@ class HNNGUI:
             button_color=self.layout['theme_color'])
 
         self.load_connectivity_button = FileUpload(
-            accept='.json,.param', multiple=False,
+            accept='.json,.param,.hdf5', multiple=False,
             style={'button_color': self.layout['theme_color']},
             description='Load local network connectivity',
             layout=self.layout['btn_full_w'], button_style='success')
         self.load_drives_button = FileUpload(
-            accept='.json,.param', multiple=False,
+            accept='.json,.param,.hdf5', multiple=False,
             style={'button_color': self.layout['theme_color']},
             description='Load external drives', layout=self.layout['btn'],
             button_style='success')
