@@ -1180,16 +1180,20 @@ def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
         logger.info("Empty change")
         return
     logger.info("Loading connectivity...")
+    # Parse file data
     param_dict = change['new'][0]
     params_fname = param_dict['name']
+    params_suffix = Path(params_fname).suffix[1:]
     param_data = param_dict['content']
 
     # Decode from memoryview
     param_data = param_data.tobytes()
 
-    ext = Path(params_fname).suffix
-    read_func = {'.json': _read_json, '.param': _read_legacy_params}
-    params_network = read_func[ext](param_data)
+    # Parse data to dict
+    read_func = {'json': _read_json,
+                 'param': _read_legacy_params,
+                 'hdf5': _read_hdf5}
+    params_network = read_func[params_suffix.lower()](param_data)
 
     # update simulation settings and params
     log_out.clear_output()
