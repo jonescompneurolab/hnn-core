@@ -44,7 +44,10 @@ def _read_hdf5(param_data):
 
     with h5py.File(io.BytesIO(param_data), 'r') as f:
         net = read_network(f)
-    return net
+        d_net = net.to_dict()
+        #TODO Parse d_net into param dict format. Need a way to map values.
+
+    return d_net
 
 
 def _read_json(param_data):
