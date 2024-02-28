@@ -23,8 +23,7 @@ from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
 from hnn_core.gui._logging import logger
 from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
-from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
-                             _read_legacy_params, _read_hdf5)
+from hnn_core.params import _extract_drive_specs_from_hnn_params, _read_hdf5
 
 
 class _OutputWidgetHandler(logging.Handler):
@@ -254,12 +253,12 @@ class HNNGUI:
             button_color=self.layout['theme_color'])
 
         self.load_connectivity_button = FileUpload(
-            accept='.json,.param,.hdf5', multiple=False,
+            accept='.hdf5', multiple=False,
             style={'button_color': self.layout['theme_color']},
             description='Load local network connectivity',
             layout=self.layout['btn_full_w'], button_style='success')
         self.load_drives_button = FileUpload(
-            accept='.json,.param,.hdf5', multiple=False,
+            accept='.hdf5', multiple=False,
             style={'button_color': self.layout['theme_color']},
             description='Load external drives', layout=self.layout['btn'],
             button_style='success')
@@ -397,7 +396,7 @@ class HNNGUI:
                 self.widget_simulation_name, self._log_out, self.drive_widgets,
                 self.data, self.widget_dt, self.widget_tstop,
                 self.widget_ntrials, self.widget_backend_selection,
-                self.widget_mpi_cmd, self.widget_n_jobs, self.params,
+                self.widget_mpi_cmd, self.widget_n_jobs, self.param_net,
                 self._simulation_status_bar, self._simulation_status_contents,
                 self.connectivity_widgets, self.viz_manager)
 
@@ -1181,16 +1180,20 @@ def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
         logger.info("Empty change")
         return
     logger.info("Loading connectivity...")
+    # Parse file data
     param_dict = change['new'][0]
     params_fname = param_dict['name']
+    params_suffix = Path(params_fname).suffix[1:]
     param_data = param_dict['content']
 
     # Decode from memoryview
     param_data = param_data.tobytes()
 
-    ext = Path(params_fname).suffix
-    read_func = {'.json': _read_json, '.param': _read_legacy_params}
-    params_network = read_func[ext](param_data)
+    # Parse data to dict
+    read_func = {'json': _read_json,
+                 'param': _read_legacy_params,
+                 'hdf5': _read_hdf5}
+    params_network = read_func[params_suffix.lower()](param_data)
 
     # update simulation settings and params
     log_out.clear_output()

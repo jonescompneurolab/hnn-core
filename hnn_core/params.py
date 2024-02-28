@@ -3,12 +3,15 @@
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Sam Neymotin <samnemo@gmail.com>
 
+import io
 import json
 import fnmatch
+import h5py
 import os.path as op
 from pathlib import Path
 from copy import deepcopy
 
+from hnn_core.hnn_io import read_network
 from .params_default import get_params_default
 from .externals.mne import _validate_type
 
@@ -25,6 +28,26 @@ def _count_evoked_inputs(d):
             elif k.count('evdist') > 0:
                 ndist += 1
     return nprox, ndist
+
+
+def _read_hdf5(param_data):
+    """Read param values from a .hdf5 file.
+        Parameters
+        ----------
+        param_data : ByteString of hdf5 network object
+
+        Returns
+        -------
+        params_input : dict
+            Dictionary of network object
+        """
+
+    with h5py.File(io.BytesIO(param_data), 'r') as f:
+        net = read_network(f)
+        d_net = net.to_dict()
+        #TODO Parse d_net into param dict format. Need a way to map values.
+
+    return d_net
 
 
 def _read_json(param_data):
