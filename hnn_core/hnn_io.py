@@ -66,6 +66,39 @@ def _external_drive_to_dict(drive, write_output):
     return drive_data
 
 
+def _network_to_dict(net, write_output=True):
+    """
+    Returns network object attributes as a dictionary.
+    """
+    net_data = {
+        'object_type': 'Network',
+        'N_pyr_x': net._N_pyr_x,
+        'N_pyr_y': net._N_pyr_y,
+        'celsius': net._params['celsius'],
+        'cell_types': {name: template.to_dict()
+                       for name, template in net.cell_types.items()
+                       },
+        'gid_ranges': {cell: {'start': c_range.start, 'stop': c_range.stop}
+                       for cell, c_range in net.gid_ranges.items()
+                       },
+        'pos_dict': {cell: pos for cell, pos in net.pos_dict.items()},
+        'cell_response': _cell_response_to_dict(net, write_output),
+        'external_drives': {drive: _external_drive_to_dict(params,
+                                                           write_output)
+                            for drive, params in net.external_drives.items()
+                            },
+        'external_biases': net.external_biases,
+        'connectivity': _connectivity_to_list_of_dicts(net.connectivity),
+        'rec_arrays': {ra_name: _rec_array_to_dict(ex_array, write_output)
+                       for ra_name, ex_array in net.rec_arrays.items()
+                       },
+        'threshold': net.threshold,
+        'delay': net.delay,
+    }
+
+    return net_data
+
+
 def _str_to_node(node_string):
     """Returns tuple of node values from a comma-separated string format."""
     node_tuple = node_string.split(',')

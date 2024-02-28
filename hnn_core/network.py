@@ -23,7 +23,7 @@ from .viz import plot_cells
 from .externals.mne import _validate_type, _check_option
 from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
-from .hnn_io import write_network
+from .hnn_io import write_network, _network_to_dict
 from .externals.mne import copy_doc
 
 
@@ -468,7 +468,8 @@ class Network(object):
                                 'add_poisson_drive', 'add_tonic_bias',
                                 'clear_connectivity', 'clear_drives',
                                 'connectivity', 'copy', 'gid_to_type',
-                                'plot_cells', 'set_cell_positions', 'write'])
+                                'plot_cells', 'set_cell_positions', 'to_dict',
+                                'write'])
         attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
 
         for attr in attrs_to_check:
@@ -1418,6 +1419,10 @@ class Network(object):
             The matplotlib figure handle.
         """
         return plot_cells(net=self, ax=ax, show=show)
+
+    @copy_doc(_network_to_dict)
+    def to_dict(self,  write_output=True):
+        return _network_to_dict(self, write_output)
 
     @copy_doc(write_network)
     def write(self, fname, overwrite=True, write_output=True):
