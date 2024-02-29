@@ -546,6 +546,7 @@ class Network(object):
     def add_evoked_drive(self, name, *, mu, sigma, numspikes, location,
                          n_drive_cells='n_cells', cell_specific=True,
                          weights_ampa=None, weights_nmda=None,
+                         weights_gabaa=None, weights_gabab=None,
                          space_constant=3., synaptic_delays=0.1,
                          probability=1.0, event_seed=2, conn_seed=3):
         """Add an 'evoked' external drive to the network
@@ -588,6 +589,12 @@ class Network(object):
             type (dict keys). Cell types omitted from the dict are set to zero.
         weights_nmda : dict or None
             Synaptic weights (in uS) of NMDA receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
+        weights_gabaa : dict or None
+            Synaptic weights (in uS) of GABAa receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
+        weights_gabab : dict or None
+            Synaptic weights (in uS) of GABAb receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
         synaptic_delays : dict or float
             Synaptic delay (in ms) at the column origin, dispersed laterally as
@@ -646,14 +653,16 @@ class Network(object):
         drive['synaptic_delays'] = synaptic_delays
         drive['probability'] = probability
 
-        self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
+        self._attach_drive(name, drive, weights_ampa, weights_nmda,
+                           weights_gabaa, weights_gabab, location,
                            space_constant, synaptic_delays,
                            n_drive_cells, cell_specific, probability)
 
     def add_poisson_drive(self, name, *, tstart=0, tstop=None, rate_constant,
                           location, n_drive_cells='n_cells',
                           cell_specific=True, weights_ampa=None,
-                          weights_nmda=None, space_constant=100.,
+                          weights_nmda=None, weights_gabaa=None,
+                          weights_gabab=None, space_constant=100.,
                           synaptic_delays=0.1, probability=1.0, event_seed=2,
                           conn_seed=3):
         """Add a Poisson-distributed external drive to the network
@@ -701,6 +710,12 @@ class Network(object):
         weights_nmda : dict or None
             Synaptic weights (in uS) of NMDA receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
+        weights_gabaa : dict or None
+            Synaptic weights (in uS) of GABAa receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
+        weights_gabab : dict or None
+            Synaptic weights (in uS) of GABAb receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
         synaptic_delays : dict or float
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant. If float, applies to all target
@@ -730,6 +745,8 @@ class Network(object):
                                       tstop=tstop)
         target_populations = _get_target_properties(weights_ampa,
                                                     weights_nmda,
+                                                    weights_gabaa,
+                                                    weights_gabab,
                                                     synaptic_delays,
                                                     location)[0]
         _check_poisson_rates(rate_constant, target_populations,
@@ -760,7 +777,8 @@ class Network(object):
         drive['synaptic_delays'] = synaptic_delays
         drive['probability'] = probability
 
-        self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
+        self._attach_drive(name, drive, weights_ampa, weights_nmda,
+                           weights_gabaa, weights_gabab, location,
                            space_constant, synaptic_delays,
                            n_drive_cells, cell_specific, probability)
 
@@ -768,6 +786,7 @@ class Network(object):
                          location, burst_rate, burst_std=0, numspikes=2,
                          spike_isi=10, n_drive_cells=1, cell_specific=False,
                          weights_ampa=None, weights_nmda=None,
+                         weights_gabaa=None, weights_gabab=None,
                          synaptic_delays=0.1, space_constant=100.,
                          probability=1.0, event_seed=2, conn_seed=3):
         """Add a bursty (rhythmic) external drive to all cells of the network
@@ -822,6 +841,12 @@ class Network(object):
         weights_nmda : dict or None
             Synaptic weights (in uS) of NMDA receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
+        weights_gabaa : dict or None
+            Synaptic weights (in uS) of GABAa receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
+        weights_gabab : dict or None
+            Synaptic weights (in uS) of GABAb receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
         synaptic_delays : dict or float
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant. If float, applies to all target
@@ -871,11 +896,13 @@ class Network(object):
         drive['synaptic_delays'] = synaptic_delays
         drive['probability'] = probability
 
-        self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
+        self._attach_drive(name, drive, weights_ampa, weights_nmda,
+                           weights_gabaa, weights_gabab, location,
                            space_constant, synaptic_delays,
                            n_drive_cells, cell_specific, probability)
 
-    def _attach_drive(self, name, drive, weights_ampa, weights_nmda, location,
+    def _attach_drive(self, name, drive, weights_ampa, weights_nmda,
+                      weights_gabaa, weights_gabab, location,
                       space_constant, synaptic_delays, n_drive_cells,
                       cell_specific, probability):
         """Attach a drive to network based on connectivity information
@@ -891,6 +918,12 @@ class Network(object):
             type (dict keys). Cell types omitted from the dict are set to zero.
         weights_nmda : dict or None
             Synaptic weights (in uS) of NMDA receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
+        weights_gabaa : dict or None
+            Synaptic weights (in uS) of GABAa receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
+        weights_gabab : dict or None
+            Synaptic weights (in uS) of GABAb receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
         location : str
             Target location of synapses. Must be an element of
@@ -942,7 +975,8 @@ class Network(object):
         # allow passing weights as None, convert to dict here
         (target_populations, weights_by_type, delays_by_type,
          probability_by_type) = \
-            _get_target_properties(weights_ampa, weights_nmda, synaptic_delays,
+            _get_target_properties(weights_ampa, weights_nmda, weights_gabaa,
+                                   weights_gabab, synaptic_delays,
                                    location, probability)
 
         # weights passed must correspond to cells in the network
@@ -1053,8 +1087,8 @@ class Network(object):
                         receptor=receptor, weight=weights, delay=delays,
                         lamtha=space_constant, probability=probability,
                         conn_seed=drive['conn_seed'] + seed_increment)
-                    # Ensure that AMPA/NMDA connections target the same gids
-                    # when probability < 1
+                    # Ensure that multireceptor connections target the
+                    # same gids when probability < 1
                     if receptor_idx > 0:
                         self.connectivity[-1]['src_gids'] = \
                             self.connectivity[-2]['src_gids']

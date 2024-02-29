@@ -149,6 +149,7 @@ def get_params_default(nprox=2, ndist=1):
         'record_isoma': 0,  # whether to record somatic currents
         'record_vsec': 0,  # whether to record voltages
         'record_isec': 0,  # whether to record currents
+        'record_dcell': 0,  # whether to record cell dipoles
 
         # numerics
         # N_trials of 1 means that seed is set by rank

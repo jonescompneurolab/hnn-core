@@ -53,6 +53,7 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
         net.cell_response.update_types(net.gid_ranges)
         net.cell_response._vsec.append(sim_data[idx]['vsec'])
         net.cell_response._isec.append(sim_data[idx]['isec'])
+        net.cell_response._dcell.append(sim_data[idx]['dcell'])
 
         # extracellular array
         for arr_name, arr in net.rec_arrays.items():
