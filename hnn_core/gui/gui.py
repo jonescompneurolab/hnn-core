@@ -606,7 +606,7 @@ class HNNGUI:
         uploaded_value = _prepare_upload_file_from_url(file_url)
         self.load_data_button.set_trait('value', uploaded_value)
 
-    def _simulate_upload_connectivity(self, file_url):
+    def _simulate_upload_connectivity(self, file_url: str):
         uploaded_value = _prepare_upload_file_from_url(file_url)
         self.load_connectivity_button.set_trait('value', uploaded_value)
 
@@ -646,7 +646,7 @@ class HNNGUI:
         action(*args, **kwargs)
 
 
-def _prepare_upload_file_from_url(file_url):
+def _prepare_upload_file_from_url(file_url: str) -> list[dict]:
     """Returns a dictionary with file attributes from a file hosted at a url.
 
     This is used to simulate file uploads for GUI testing. The dictionary is in
