@@ -21,7 +21,8 @@ def download_folder_contents(owner, repo, path):
                     print(f"Downloaded: {file_name}")
         return temp_dir
     else:
-        print(f"Failed to retrieve contents. Status code: {response.status_code}")
+        print(f"Failed to retrieve contents. Status code: "
+              f"{response.status_code}")
         return None
 
 
@@ -55,6 +56,3 @@ if __name__ == '__main__':
     convert_param_files_from_repo(owner='jonescompneurolab',
                                   repo='hnn-core',
                                   path='hnn_core/param')
-
-
-

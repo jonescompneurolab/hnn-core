@@ -113,4 +113,3 @@ def test_convert_to_hdf5_legacy(tmp_path):
     convert_to_hdf5(params_base_fname, outpath)
     net_hdf5 = read_network(outpath)
     assert net_hdf5 == net_params
-
