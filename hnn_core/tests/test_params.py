@@ -77,7 +77,7 @@ def test_base_params():
 
 
 def test_convert_to_hdf5(tmp_path):
-
+    """Tests conversion of a json file to hdf5"""
     # Download params
     param_url = ('https://raw.githubusercontent.com/hnn-core/'
                  'hnn_core/param/default.json')
@@ -99,7 +99,7 @@ def test_convert_to_hdf5(tmp_path):
 
 
 def test_convert_to_hdf5_legacy(tmp_path):
-
+    """Tests conversion of a param legacy file to hdf5"""
     # Download params
     param_url = ('https://raw.githubusercontent.com/hnnsolver/'
                  'hnn-core/test_data/default.param')
