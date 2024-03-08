@@ -1,3 +1,9 @@
+"""Script converting legacy param and json parameter files to hdf5.
+This script downloads the legacy files directly from the GitHub repositories.
+"""
+# Author: George Dang <george_dang@brown.edu.com>
+
+
 import shutil
 import requests
 import os
@@ -7,6 +13,21 @@ import tempfile
 
 
 def download_folder_contents(owner, repo, path):
+    """Download files from a GitHub repository folder into temporary space
+
+    Parameters
+    ----------
+    owner : str
+        github account
+    repo : str
+        repository name
+    path : str
+        path to directory
+
+    Returns
+    -------
+    Path to temporary directory or None
+    """
     url = f"https://api.github.com/repos/{owner}/{repo}/contents/{path}"
     response = requests.get(url)
     if response.status_code == 200:
@@ -27,6 +48,21 @@ def download_folder_contents(owner, repo, path):
 
 
 def convert_param_files_from_repo(owner, repo, path):
+    """Converts param and json parameter files to a hdf5 file.
+
+    Parameters
+    ----------
+    owner : str
+        github account
+    repo : str
+        repository name
+    path : str
+        path to directory
+
+    Returns
+    -------
+    None
+    """
     # Download param files
     temp_dir = download_folder_contents(owner, repo, path)
     # Get list of json and param files
