@@ -1,0 +1,60 @@
+import shutil
+import requests
+import os
+from pathlib import Path
+from hnn_core import convert_to_hdf5
+import tempfile
+
+
+def download_folder_contents(owner, repo, path):
+    url = f"https://api.github.com/repos/{owner}/{repo}/contents/{path}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        temp_dir = tempfile.mkdtemp()
+        contents = response.json()
+        for item in contents:
+            if item['type'] == 'file':
+                download_url = item['download_url']
+                file_name = os.path.join(temp_dir, item['name'])
+                with open(file_name, 'wb') as f:
+                    f.write(requests.get(download_url).content)
+                    print(f"Downloaded: {file_name}")
+        return temp_dir
+    else:
+        print(f"Failed to retrieve contents. Status code: {response.status_code}")
+        return None
+
+
+def convert_param_files_from_repo(owner, repo, path):
+    # Download param files
+    temp_dir = download_folder_contents(owner, repo, path)
+    # Get list of json and param files
+    file_list = [Path(temp_dir, f)
+                 for f in os.listdir(temp_dir)
+                 if f.endswith('.param') or f.endswith('.json')]
+    # Assign output location and names
+    output_dir = Path(__file__).parents[1] / 'hnn_core' / 'param'
+    output_filenames = [Path(output_dir, f.name.split('.')[0])
+                        for f in file_list]
+
+    # Conversion
+    [convert_to_hdf5(file, outfile)
+     for (file, outfile) in zip(file_list, output_filenames)]
+
+    # Delete downloads
+    shutil.rmtree(temp_dir)
+
+
+if __name__ == '__main__':
+
+    # hnn param files
+    convert_param_files_from_repo(owner='jonescompneurolab',
+                                  repo='hnn',
+                                  path='param')
+    # hnn-core json files
+    convert_param_files_from_repo(owner='jonescompneurolab',
+                                  repo='hnn-core',
+                                  path='hnn_core/param')
+
+
+
