@@ -262,7 +262,7 @@ def law_2021_model(params=None, add_drives_from_params=False,
 
 # Remove params argument after updating examples
 # (only relevant for Jones 2009 model)
-def calcium_model(params=None, add_drives_from_params=False,
+def Kohl_2021(params=None, add_drives_from_params=False,
                   legacy_mode=False, mesh_shape=(10, 10)):
     """Instantiate the Jones 2009 model with improved calcium dynamics in
     L5 pyramidal neurons. For more details on changes to calcium dynamics

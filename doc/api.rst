@@ -30,7 +30,7 @@ Network Models (:py:mod:`hnn_core`):
 
    jones_2009_model
    law_2021_model
-   calcium_model
+   Kohl_2021
 
 Optimization (:py:mod:`hnn_core.optimization`):
 -----------------------------------------------

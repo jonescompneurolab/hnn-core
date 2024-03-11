@@ -8,7 +8,7 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, CellResponse, Network
-from hnn_core import jones_2009_model, law_2021_model, calcium_model
+from hnn_core import jones_2009_model, law_2021_model, Kohl_2021
 from hnn_core.network_models import add_erp_drives_to_jones_model
 from hnn_core.network_builder import NetworkBuilder
 from hnn_core.network import pick_connection
@@ -45,7 +45,7 @@ def test_network_models():
     assert len(net_default.connectivity) == n_conn + 14
 
     # Ensure distant dependent calcium gbar
-    net_calcium = calcium_model()
+    net_calcium = Kohl_2021()
     # instantiate drive events for NetworkBuilder
     net_calcium._instantiate_drives(tstop=net_calcium._params['tstop'],
                                     n_trials=net_calcium._params['N_trials'])
@@ -399,7 +399,7 @@ def test_network_drives_legacy():
     with pytest.warns(DeprecationWarning, match='Legacy mode'):
         _ = jones_2009_model(legacy_mode=True)
         _ = law_2021_model(legacy_mode=True)
-        _ = calcium_model(legacy_mode=True)
+        _ = Kohl_2021(legacy_mode=True)
         _ = Network(params, legacy_mode=True)
 
     net = jones_2009_model(params, legacy_mode=True,
@@ -945,5 +945,5 @@ def test_network_mesh():
 
     # Smoke test for all models
     _ = jones_2009_model(mesh_shape=mesh_shape)
-    _ = calcium_model(mesh_shape=mesh_shape)
+    _ = Kohl_2021(mesh_shape=mesh_shape)
     _ = law_2021_model(mesh_shape=mesh_shape)

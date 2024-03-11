@@ -9,7 +9,7 @@ import pytest
 import numpy as np
 
 from hnn_core import (read_network, simulate_dipole, read_params,
-                      jones_2009_model, calcium_model,
+                      jones_2009_model, Kohl_2021,
                       )
 
 from hnn_core.hnn_io import (_cell_response_to_dict, _rec_array_to_dict,
@@ -53,7 +53,7 @@ def jones_2009_network(params):
 @pytest.fixture
 def calcium_network(params):
     # Instantiating network along with drives
-    net = calcium_model(params=params, add_drives_from_params=True,
+    net = Kohl_2021(params=params, add_drives_from_params=True,
                         mesh_shape=(3, 3))
 
     # Adding bias
