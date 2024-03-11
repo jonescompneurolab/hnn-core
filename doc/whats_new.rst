@@ -33,6 +33,9 @@ Changelog
 - Add feature to read/write :class:`~hnn_core.Network` from/to HDF5 format,
   by `Rajat Partani`_ and `George Dang`_ in :gh:`704`
 
+- Add feature to convert param and json files to HDF5 format, by `George Dang`_
+  in :gh:`723`
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
