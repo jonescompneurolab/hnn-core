@@ -19,7 +19,7 @@ from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
 from ipywidgets.embed import embed_minimal_html
 import hnn_core
 from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
-                      simulate_dipole)
+                      simulate_dipole, read_network)
 from hnn_core.gui._logging import logger
 from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
@@ -197,7 +197,7 @@ class HNNGUI:
         }
 
         # load default parameters
-        self.params = self.load_parameters()
+        self.param_net = self.load_parameters()
 
         # In-memory storage of all simulation and visualization related data
         self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
@@ -345,8 +345,8 @@ class HNNGUI:
         if not params_fname:
             # by default load default.json
             hnn_core_root = Path(hnn_core.__file__).parent
-            params_fname = hnn_core_root / 'param/default.json'
-        return read_params(params_fname)
+            params_fname = hnn_core_root / 'param/default.hdf5'
+        return read_network(params_fname)
 
     def _link_callbacks(self):
         """Link callbacks to UI components."""
@@ -373,7 +373,7 @@ class HNNGUI:
 
         def _on_upload_connectivity(change):
             return on_upload_params_change(
-                change, self.params, self.widget_tstop, self.widget_dt,
+                self, change, self.widget_tstop, self.widget_dt,
                 self._log_out, self.drive_boxes, self.drive_widgets,
                 self._drives_out, self._connectivity_out,
                 self.connectivity_widgets, self.layout['drive_textbox'],
@@ -381,7 +381,7 @@ class HNNGUI:
 
         def _on_upload_drives(change):
             return on_upload_params_change(
-                change, self.params, self.widget_tstop, self.widget_dt,
+                self, change, self.widget_tstop, self.widget_dt,
                 self._log_out, self.drive_boxes, self.drive_widgets,
                 self._drives_out, self._connectivity_out,
                 self.connectivity_widgets, self.layout['drive_textbox'],
@@ -491,7 +491,7 @@ class HNNGUI:
         # self.simulation_data[self.widget_simulation_name.value]
 
         # initialize drive and connectivity ipywidgets
-        load_drive_and_connectivity(self.params, self._log_out,
+        load_drive_and_connectivity(self.param_net, self._log_out,
                                     self._drives_out, self.drive_widgets,
                                     self.drive_boxes, self._connectivity_out,
                                     self.connectivity_widgets,
@@ -1036,10 +1036,10 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
             display(accordion)
 
 
-def add_connectivity_tab(params, connectivity_out,
+def add_connectivity_tab(param_net, connectivity_out,
                          connectivity_textfields):
     """Add all possible connectivity boxes to connectivity tab."""
-    net = jones_2009_model(params)
+    net = param_net
     cell_types = [ct for ct in net.cell_types.keys()]
     receptors = ('ampa', 'nmda', 'gabaa', 'gabab')
     locations = ('proximal', 'distal', 'soma')
@@ -1095,9 +1095,9 @@ def add_connectivity_tab(params, connectivity_out,
     return net
 
 
-def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
+def add_drive_tab(param_net, drives_out, drive_widgets, drive_boxes, tstop,
                   layout):
-    net = jones_2009_model(params)
+    net = param_net
     drive_specs = _extract_drive_specs_from_hnn_params(
         params, list(net.cell_types.keys()), legacy_mode=net._legacy_mode)
 
@@ -1131,16 +1131,16 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
         )
 
 
-def load_drive_and_connectivity(params, log_out, drives_out,
+def load_drive_and_connectivity(param_net, log_out, drives_out,
                                 drive_widgets, drive_boxes, connectivity_out,
                                 connectivity_textfields, tstop, layout):
     """Add drive and connectivity ipywidgets from params."""
     log_out.clear_output()
     with log_out:
         # Add connectivity
-        add_connectivity_tab(params, connectivity_out, connectivity_textfields)
+        add_connectivity_tab(param_net, connectivity_out, connectivity_textfields)
         # Add drives
-        add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
+        add_drive_tab(param_net, drives_out, drive_widgets, drive_boxes, tstop,
                       layout)
 
 
@@ -1173,7 +1173,7 @@ def on_upload_data_change(change, data, viz_manager, log_out):
         change['owner'].value = []
 
 
-def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
+def on_upload_params_change(gui, change, tstop, dt, log_out, drive_boxes,
                             drive_widgets, drives_out, connectivity_out,
                             connectivity_textfields, layout, load_type):
     if len(change['owner'].value) == 0:
@@ -1190,25 +1190,24 @@ def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
     param_data = param_data.tobytes()
 
     # Parse data to dict
-    read_func = {'json': _read_json,
-                 'param': _read_legacy_params,
-                 'hdf5': _read_hdf5}
+    read_func = {'hdf5': _read_hdf5}
     params_network = read_func[params_suffix.lower()](param_data)
 
     # update simulation settings and params
     log_out.clear_output()
     with log_out:
+        #TODO Find out where these are in the network object
         if 'tstop' in params_network.keys():
             tstop.value = params_network['tstop']
         if 'dt' in params_network.keys():
             dt.value = params_network['dt']
-
-        params.update(params_network)
+        # Replace GUI's param_net
+        gui.param_net = params_network
     # init network, add drives & connectivity
     if load_type == 'connectivity':
-        add_connectivity_tab(params, connectivity_out, connectivity_textfields)
+        add_connectivity_tab(gui.param_net, connectivity_out, connectivity_textfields)
     elif load_type == 'drives':
-        add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
+        add_drive_tab(gui.param_net, drives_out, drive_widgets, drive_boxes, tstop,
                       layout)
     else:
         raise ValueError
