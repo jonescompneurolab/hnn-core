@@ -46,8 +46,8 @@ def test_gui_upload_params():
     original_tstep = gui.widget_dt.value
     gui.widget_dt.value = 1
     # simulate upload default.json
-    file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json" # noqa
-    file2_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/gamma_L5weak_L2weak.json" # noqa
+    file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json"  # noqa
+    file2_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/gamma_L5weak_L2weak.json"  # noqa
     gui._simulate_upload_connectivity(file1_url)
     gui._simulate_upload_drives(file1_url)
 
@@ -421,6 +421,7 @@ def test_gui_adaptive_spectrogram():
     assert len(gui.viz_manager.figs[1].axes) == 2
     plt.close('all')
 
+
 def test_gui_layer2_dipole():
     gui = HNNGUI()
     gui.compose()
@@ -441,6 +442,7 @@ def test_gui_layer2_dipole():
     assert gui.viz_manager.figs[figid].axes[0].has_data()
     assert gui.viz_manager.figs[figid].axes[1].has_data()
     plt.close('all')
+
 
 def test_gui_layer5_dipole():
     gui = HNNGUI()
@@ -463,6 +465,7 @@ def test_gui_layer5_dipole():
     assert gui.viz_manager.figs[figid].axes[1].has_data()
     plt.close('all')
 
+
 def test_gui_spikes():
     gui = HNNGUI()
     gui.compose()
@@ -484,45 +487,48 @@ def test_gui_spikes():
     assert gui.viz_manager.figs[figid].axes[1].has_data()
     plt.close('all')
 
+
 def test_gui_PSD():
     gui = HNNGUI()
     gui.compose()
     gui.params['N_pyr_x'] = 3
     gui.params['N_pyr_y'] = 3
-    
+
     gui.run_button.click()
     figid = 1
     figname = f'Figure {figid}'
     axname = 'ax1'
     gui._simulate_viz_action("edit_figure", figname, axname, 'default',
-                                'PSD', {}, 'clear')
+                             'PSD', {}, 'clear')
     gui._simulate_viz_action("edit_figure", figname, axname, 'default',
-                                'PSD', {}, 'plot')
+                             'PSD', {}, 'plot')
     # Check if data is plotted on the axes
     assert len(gui.viz_manager.figs[figid].axes) == 2
     # Check default figs have data on their axis
     assert gui.viz_manager.figs[figid].axes[0].has_data()
     assert gui.viz_manager.figs[figid].axes[1].has_data()
 
+
 def test_gui_network():
     gui = HNNGUI()
     gui.compose()
     gui.params['N_pyr_x'] = 3
     gui.params['N_pyr_y'] = 3
-    
+
     gui.run_button.click()
     figid = 1
     figname = f'Figure {figid}'
     axname = 'ax1'
     gui._simulate_viz_action("edit_figure", figname, axname, 'default',
-                                'network', {}, 'clear')
+                             'network', {}, 'clear')
     gui._simulate_viz_action("edit_figure", figname, axname, 'default',
-                                'network', {}, 'plot')
+                             'network', {}, 'plot')
     # Check if data is plotted on the axes
     assert len(gui.viz_manager.figs[figid].axes) == 2
     # Check default figs have data on their axis
     assert gui.viz_manager.figs[figid].axes[0].has_data()
-    assert gui.viz_manager.figs[figid].axes[1].has_data() 
+    assert gui.viz_manager.figs[figid].axes[1].has_data()
+
 
 def test_unlink_relink_widget():
     """Tests the unlinking and relinking of widgets decorator."""
