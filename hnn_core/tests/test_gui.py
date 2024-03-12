@@ -309,8 +309,8 @@ def test_gui_add_figure():
     assert gui.viz_manager.fig_idx['idx'] == 2
 
     # Check default figs have data on their axis
-    for ax_id, ax in enumerate(gui.viz_manager.figs[1].axes):
-        assert ax.has_data(), f"Axis {ax_id} on Figure 1 is empty"
+    assert gui.viz_manager.figs[1].axes[0].has_data()
+    assert gui.viz_manager.figs[1].axes[1].has_data()
 
     for idx in range(3):
         n_fig = idx + 2
