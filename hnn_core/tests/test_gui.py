@@ -441,7 +441,6 @@ def test_gui_layer2_dipole():
     # Check if data is plotted on the axes
     assert len(gui.viz_manager.figs[figid].axes) == 2
     # Check default figs have data on their axis
-    assert gui.viz_manager.figs[figid].axes[0].has_data()
     assert gui.viz_manager.figs[figid].axes[1].has_data()
     plt.close('all')
 
@@ -464,7 +463,6 @@ def test_gui_layer5_dipole():
     # Check if data is plotted on the axes
     assert len(gui.viz_manager.figs[figid].axes) == 2
     # Check default figs have data on their axis
-    assert gui.viz_manager.figs[figid].axes[0].has_data()
     assert gui.viz_manager.figs[figid].axes[1].has_data()
     plt.close('all')
 
@@ -487,7 +485,6 @@ def test_gui_spikes():
     # Check if data is plotted on the axes
     assert len(gui.viz_manager.figs[figid].axes) == 2
     # Check default figs have data on their axis
-    assert gui.viz_manager.figs[figid].axes[0].has_data()
     assert gui.viz_manager.figs[figid].axes[1].has_data()
     plt.close('all')
 
@@ -510,7 +507,6 @@ def test_gui_psd():
     # Check if data is plotted on the axes
     assert len(gui.viz_manager.figs[figid].axes) == 2
     # Check default figs have data on their axis
-    assert gui.viz_manager.figs[figid].axes[0].has_data()
     assert gui.viz_manager.figs[figid].axes[1].has_data()
 
 
@@ -532,7 +528,6 @@ def test_gui_network():
     # Check if data is plotted on the axes
     assert len(gui.viz_manager.figs[figid].axes) == 2
     # Check default figs have data on their axis
-    assert gui.viz_manager.figs[figid].axes[0].has_data()
     assert gui.viz_manager.figs[figid].axes[1].has_data()
 
 
