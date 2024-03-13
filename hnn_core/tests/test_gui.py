@@ -396,6 +396,7 @@ def test_gui_figure_overlay():
 
 
 def test_gui_adaptive_spectrogram():
+    """Test the adaptive spectrogram functionality of the HNNGUI."""
     gui = HNNGUI()
     gui.compose()
     gui.params['N_pyr_x'] = 3
@@ -420,6 +421,34 @@ def test_gui_adaptive_spectrogram():
                 for attr in dir(gui.viz_manager.figs[figid])]) is False
     assert len(gui.viz_manager.figs[1].axes) == 2
     plt.close('all')
+
+
+@pytest.fixture
+def setup_gui():
+    gui = HNNGUI()
+    gui.compose()
+    gui.params['N_pyr_x'] = 3
+    gui.params['N_pyr_y'] = 3
+    gui.run_button.click()
+    return gui
+
+
+@pytest.mark.parametrize("viz_type", ["layer2 dipole", "layer5 dipole",
+                                      "spikes", "PSD", "network"])
+def test_gui_visualization(setup_gui, viz_type):
+    """Test visualization functionality in the HNNGUI."""
+    gui = setup_gui
+    figid = 1
+    figname = f'Figure {figid}'
+    axname = 'ax1'
+    gui._simulate_viz_action("edit_figure", figname,
+                             axname, 'default', viz_type, {}, 'clear')
+    gui._simulate_viz_action("edit_figure", figname,
+                             axname, 'default', viz_type, {}, 'plot')
+    # Check if data is plotted on the axes
+    assert len(gui.viz_manager.figs[figid].axes) == 2
+    # Check default figs have data on their axis
+    assert gui.viz_manager.figs[figid].axes[1].has_data()
 
 
 def test_unlink_relink_widget():
