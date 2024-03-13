@@ -3,13 +3,12 @@ This script downloads the legacy files directly from the GitHub repositories.
 """
 # Author: George Dang <george_dang@brown.edu.com>
 
-
-import shutil
-import requests
 import os
+import requests
+import shutil
+import tempfile
 from pathlib import Path
 from hnn_core import convert_to_hdf5
-import tempfile
 
 
 def download_folder_contents(owner, repo, path):
