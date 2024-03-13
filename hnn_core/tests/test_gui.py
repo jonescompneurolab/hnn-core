@@ -423,108 +423,28 @@ def test_gui_adaptive_spectrogram():
     plt.close('all')
 
 
-def test_gui_layer2_dipole():
-    """Test the visualization of layer 2 dipole in the HNNGUI."""
+@pytest.fixture
+def setup_gui():
     gui = HNNGUI()
     gui.compose()
     gui.params['N_pyr_x'] = 3
     gui.params['N_pyr_y'] = 3
-
     gui.run_button.click()
+    return gui
+
+
+@pytest.mark.parametrize("viz_type", ["layer2 dipole", "layer5 dipole",
+                                      "spikes", "PSD", "network"])
+def test_gui_visualization(setup_gui, viz_type):
+    """Test visualization functionality in the HNNGUI."""
+    gui = setup_gui
     figid = 1
     figname = f'Figure {figid}'
     axname = 'ax1'
-    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
-                             'layer2 dipole', {}, 'clear')
-    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
-                             'layer2 dipole', {}, 'plot')
-    # Check if data is plotted on the axes
-    assert len(gui.viz_manager.figs[figid].axes) == 2
-    # Check default figs have data on their axis
-    assert gui.viz_manager.figs[figid].axes[1].has_data()
-    plt.close('all')
-
-
-def test_gui_layer5_dipole():
-    """Test the visualization of layer 5 dipole in the HNNGUI."""
-    gui = HNNGUI()
-    gui.compose()
-    gui.params['N_pyr_x'] = 3
-    gui.params['N_pyr_y'] = 3
-
-    gui.run_button.click()
-    figid = 1
-    figname = f'Figure {figid}'
-    axname = 'ax1'
-    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
-                             'layer5 dipole', {}, 'clear')
-    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
-                             'layer5 dipole', {}, 'plot')
-    # Check if data is plotted on the axes
-    assert len(gui.viz_manager.figs[figid].axes) == 2
-    # Check default figs have data on their axis
-    assert gui.viz_manager.figs[figid].axes[1].has_data()
-    plt.close('all')
-
-
-def test_gui_spikes():
-    """Test the visualization of spikes in the GUI."""
-    gui = HNNGUI()
-    gui.compose()
-    gui.params['N_pyr_x'] = 3
-    gui.params['N_pyr_y'] = 3
-
-    gui.run_button.click()
-    figid = 1
-    figname = f'Figure {figid}'
-    axname = 'ax1'
-    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
-                             'spikes', {}, 'clear')
-    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
-                             'spikes', {}, 'plot')
-    # Check if data is plotted on the axes
-    assert len(gui.viz_manager.figs[figid].axes) == 2
-    # Check default figs have data on their axis
-    assert gui.viz_manager.figs[figid].axes[1].has_data()
-    plt.close('all')
-
-
-def test_gui_psd():
-    """Test the PSD visualization in the HNNGUI."""
-    gui = HNNGUI()
-    gui.compose()
-    gui.params['N_pyr_x'] = 3
-    gui.params['N_pyr_y'] = 3
-
-    gui.run_button.click()
-    figid = 1
-    figname = f'Figure {figid}'
-    axname = 'ax1'
-    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
-                             'PSD', {}, 'clear')
-    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
-                             'PSD', {}, 'plot')
-    # Check if data is plotted on the axes
-    assert len(gui.viz_manager.figs[figid].axes) == 2
-    # Check default figs have data on their axis
-    assert gui.viz_manager.figs[figid].axes[1].has_data()
-
-
-def test_gui_network():
-    """Test the network visualization functionality of the HNNGUI."""
-    gui = HNNGUI()
-    gui.compose()
-    gui.params['N_pyr_x'] = 3
-    gui.params['N_pyr_y'] = 3
-
-    gui.run_button.click()
-    figid = 1
-    figname = f'Figure {figid}'
-    axname = 'ax1'
-    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
-                             'network', {}, 'clear')
-    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
-                             'network', {}, 'plot')
+    gui._simulate_viz_action("edit_figure", figname,
+                             axname, 'default', viz_type, {}, 'clear')
+    gui._simulate_viz_action("edit_figure", figname,
+                             axname, 'default', viz_type, {}, 'plot')
     # Check if data is plotted on the axes
     assert len(gui.viz_manager.figs[figid].axes) == 2
     # Check default figs have data on their axis
