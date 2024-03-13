@@ -396,6 +396,7 @@ def test_gui_figure_overlay():
 
 
 def test_gui_adaptive_spectrogram():
+    """Test the adaptive spectrogram functionality of the HNNGUI."""
     gui = HNNGUI()
     gui.compose()
     gui.params['N_pyr_x'] = 3
@@ -423,6 +424,7 @@ def test_gui_adaptive_spectrogram():
 
 
 def test_gui_layer2_dipole():
+    """Test the visualization of layer 2 dipole in the HNNGUI."""
     gui = HNNGUI()
     gui.compose()
     gui.params['N_pyr_x'] = 3
@@ -445,6 +447,7 @@ def test_gui_layer2_dipole():
 
 
 def test_gui_layer5_dipole():
+    """Test the visualization of layer 5 dipole in the HNNGUI."""
     gui = HNNGUI()
     gui.compose()
     gui.params['N_pyr_x'] = 3
@@ -467,6 +470,7 @@ def test_gui_layer5_dipole():
 
 
 def test_gui_spikes():
+    """Test the visualization of spikes in the GUI."""
     gui = HNNGUI()
     gui.compose()
     gui.params['N_pyr_x'] = 3
@@ -488,7 +492,8 @@ def test_gui_spikes():
     plt.close('all')
 
 
-def test_gui_PSD():
+def test_gui_psd():
+    """Test the PSD visualization in the HNNGUI."""
     gui = HNNGUI()
     gui.compose()
     gui.params['N_pyr_x'] = 3
@@ -510,6 +515,7 @@ def test_gui_PSD():
 
 
 def test_gui_network():
+    """Test the network visualization functionality of the HNNGUI."""
     gui = HNNGUI()
     gui.compose()
     gui.params['N_pyr_x'] = 3
