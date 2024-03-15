@@ -10,7 +10,6 @@
 import itertools as it
 from copy import deepcopy
 from collections import OrderedDict
-
 import numpy as np
 import warnings
 
@@ -389,7 +388,7 @@ class Network(object):
 
         # Source dict of names, first real ones only!
         cell_types = {
-            'L2_basket': basket(cell_name=_short_name('L2_basket')),
+            'L2_i': basket(cell_name=_short_name('L2_basket')),
             'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
             'L5_basket': basket(cell_name=_short_name('L5_basket')),
             'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
@@ -430,7 +429,6 @@ class Network(object):
         self._layer_separation = 1307.4  # XXX hard-coded default
         self.set_cell_positions(inplane_distance=self._inplane_distance,
                                 layer_separation=self._layer_separation)
-
         # populates self.gid_ranges for the 1st time: order matters for
         # NetworkBuilder!
         for cell_name in cell_types:
@@ -520,7 +518,34 @@ class Network(object):
 
         self._inplane_distance = inplane_distance
         self._layer_separation = layer_separation
-
+    
+    def celltype_rename(self, oldcell_type, newcell_type):
+        """ Renames cell_types and assigns them gid ranges
+        Paramters
+        oldcell_type: str
+            This is the cell type to be replaced;
+            takes 4 types: 'L2_basket', 'L2_pyramidal',
+            'L5_basket', 'L5_pyramidal'
+        newcell_type: str
+            This is new cell type name replacing
+            the old cell type
+            e.g. 'L2_basket' to 'L2_basket_column1' 
+            for multiple cortical column models
+            """
+        if oldcell_type in self.cell_types:
+            self.cell_types[newcell_type] = self.cell_types.pop(oldcell_type)
+            self.gid_ranges[newcell_type] = self.gid_ranges.pop(oldcell_type)
+            self.pos_dict[newcell_type] = self.pos_dict.pop(oldcell_type)
+          #  if oldcell_type in PyrTuple:
+                
+         #   self.cell_response._cell_type_names[self.cell_response._cell_type_names.index(oldcell_type)] = newcell_type
+          #  self.cell_response.spike_types[self.cell_response.spike_types.index(oldcell_type)] = newcell_type
+            for cell_dict in self.connectivity:
+                for key, value in cell_dict.items():
+                    if value == oldcell_type:
+                        cell_dict[key] = newcell_type              
+        else:
+            print(f"'{oldcell_type}' not found in cell_types!")
     def copy(self):
         """Return a copy of the Network instance
 

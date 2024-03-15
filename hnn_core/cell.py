@@ -660,7 +660,6 @@ class Cell:
             raise ValueError(f'sec_name_apical must be an existing '
                              f'section of the current cell or None. '
                              f'Got {sec_name_apical}.')
-
     def copy(self):
         """Return copy of instance."""
         return deepcopy(self)
@@ -722,6 +721,10 @@ class Cell:
             # set the pp dipole's ztan value to the last value from seg_lens_z
             dpp.ztan = seg_lens_z[-1]
         self.dipole = h.Vector().record(self.dpl_ref)
+    # ElSayed: The next two lines were supposed to switch knowing self_name_apical to sec_name_dipole
+     #   if self.sec_name_dipole not in self.section:
+      #      return
+
 
     def create_tonic_bias(self, amplitude, t0, tstop, loc=0.5):
         """Create tonic bias at the soma.
