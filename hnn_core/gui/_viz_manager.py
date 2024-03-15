@@ -117,17 +117,25 @@ def unlink_relink(attribute):
     def _unlink_relink(f):
         @wraps(f)
         def wrapper(self, *args, **kwargs):
-            # Unlink the widgets using the provided link object
-            link_attribute: link = getattr(self, attribute)
-            link_attribute.unlink()
 
-            # Call the original function
-            result = f(self, *args, **kwargs)
+            # For development purposes only
+            # Remove after gui development
+            try:
+                # Unlink the widgets using the provided link object
+                link_attribute: link = getattr(self, attribute)
+                link_attribute.unlink()
 
-            # Re-link the widgets
-            link_attribute.link()
+                # Call the original function
+                result = f(self, *args, **kwargs)
 
-            return result
+                # Re-link the widgets
+                link_attribute.link()
+
+                return result
+            except Exception as e:
+                # Handle the exception and print it
+                print(f"An error occurred: {e}")
+
         return wrapper
     return _unlink_relink
 
