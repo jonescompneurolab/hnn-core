@@ -17,6 +17,7 @@ from hnn_core.dipole import average_dipoles, _rmse
 from hnn_core.gui._logging import logger
 from hnn_core.viz import plot_dipole
 
+
 _fig_placeholder = 'Run simulation to add figures here.'
 
 _plot_types = [
@@ -116,17 +117,21 @@ def unlink_relink(attribute):
     def _unlink_relink(f):
         @wraps(f)
         def wrapper(self, *args, **kwargs):
-            # Unlink the widgets using the provided link object
-            link_attribute: link = getattr(self, attribute)
-            link_attribute.unlink()
+            try:
+                # Unlink the widgets using the provided link object
+                link_attribute: link = getattr(self, attribute)
+                link_attribute.unlink()
 
-            # Call the original function
-            result = f(self, *args, **kwargs)
+                # Call the original function
+                result = f(self, *args, **kwargs)
 
-            # Re-link the widgets
-            link_attribute.link()
+                # Re-link the widgets
+                link_attribute.link()
 
-            return result
+                return result
+            except Exception as e:
+                # Handle the exception and print it
+                print(f"An error occurred: {e}")
         return wrapper
     return _unlink_relink
 
@@ -273,10 +278,10 @@ def _dynamic_rerender(fig):
     fig.tight_layout()
 
 
-def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
-                  target_simulations,
+def _plot_on_axes(b, simulations_widget, widgets_plot_type,
+                  data_widget,
                   spectrogram_colormap_selection, dipole_smooth,
-                  max_spectral_frequency, dipole_scaling, widgets, data,
+                  max_spectral_frequency, dipole_scaling,data_smooth,data_scaling, widgets, data,
                   fig_idx, fig, ax, existing_plots):
     """Plotting different types of data on the given axes.
 
@@ -314,7 +319,7 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
     existing_plots : ipywidgets.VBox
         A VBox widget that contains all the existing plots.
     """
-    sim_name = widgets_simulation.value
+    sim_name = simulations_widget.value
     plot_type = widgets_plot_type.value
     # disable add plots for types that do not support overlay
     if plot_type in _no_overlay_plot_types:
@@ -325,7 +330,7 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
 
     single_simulation = data['simulations'][sim_name]
 
-    plot_config = {
+    simulation_plot_config = {
         "max_spectral_frequency": max_spectral_frequency.value,
         "dipole_scaling": dipole_scaling.value,
         "dipole_smooth": dipole_smooth.value,
@@ -333,24 +338,31 @@ def _plot_on_axes(b, widgets_simulation, widgets_plot_type,
     }
 
     dpls_processed = _update_ax(fig, ax, single_simulation, sim_name,
-                                plot_type, plot_config)
+                                plot_type, simulation_plot_config)
 
     # If target_simulations is not None and we are plotting a dipole,
     # we need to plot the target dipole as well.
-    if target_simulations.value in data['simulations'].keys(
+    if data_widget.value in data['simulations'].keys(
     ) and plot_type == 'current dipole':
 
-        target_sim_name = target_simulations.value
+        target_sim_name = data_widget.value
         target_sim = data['simulations'][target_sim_name]
+
+        data_plot_config = {
+            "max_spectral_frequency": max_spectral_frequency.value,
+            "dipole_scaling": data_scaling.value,
+            "dipole_smooth": data_smooth.value,
+            "spectrogram_cm": spectrogram_colormap_selection.value
+        }
 
         # plot the target dipole.
         # disable scaling for the target dipole.
-        plot_config['dipole_scaling'] = 1.
+        simulation_plot_config['dipole_scaling'] = 1.
 
         # plot the target dipole.
         target_dpl_processed = _update_ax(
             fig, ax, target_sim, target_sim_name, plot_type,
-            plot_config)[0]  # we assume there is only one dipole.
+            data_plot_config)[0]  # we assume there is only one dipole.
 
         # calculate the RMSE between the two dipoles.
         t0 = 0.0
@@ -447,13 +459,23 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         layout=layout,
         style=analysis_style,
     )
-    dipole_smooth = FloatText(value=30,
+    simulation_dipole_smooth = FloatText(value=30,
                               description='Dipole Smooth Window (ms):',
                               disabled=False,
                               layout=layout,
                               style=analysis_style)
-    dipole_scaling = FloatText(value=3000,
-                               description='Dipole Scaling:',
+    simulation_dipole_scaling = FloatText(value=3000,
+                               description='Simulation Dipole Scaling:',
+                               disabled=False,
+                               layout=layout,
+                               style=analysis_style)
+    data_dipole_smooth = FloatText(value=30,
+                              description='Data Smooth Window (ms):',
+                              disabled=False,
+                              layout=layout,
+                              style=analysis_style)
+    data_dipole_scaling = FloatText(value=3000,
+                               description='Data Dipole Scaling:',
                                disabled=False,
                                layout=layout,
                                style=analysis_style)
@@ -505,9 +527,11 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
             widgets_plot_type=plot_type_selection,
             target_simulations=target_data_selection,
             spectrogram_colormap_selection=spectrogram_colormap_selection,
-            dipole_smooth=dipole_smooth,
+            dipole_smooth=simulation_dipole_smooth,
             max_spectral_frequency=max_spectral_frequency,
-            dipole_scaling=dipole_scaling,
+            dipole_scaling=simulation_dipole_scaling,
+            data_smooth=data_dipole_smooth,
+            data_scaling=data_dipole_scaling,
             widgets=widgets,
             data=data,
             fig_idx=fig_idx,
@@ -517,8 +541,9 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         ))
 
     vbox = VBox([
-        simulation_selection, plot_type_selection, target_data_selection,
-        dipole_smooth, dipole_scaling, max_spectral_frequency,
+        plot_type_selection,simulation_selection, simulation_dipole_smooth, 
+        simulation_dipole_scaling,target_data_selection, data_dipole_smooth,
+        data_dipole_scaling,max_spectral_frequency,
         spectrogram_colormap_selection,
         HBox(
             [plot_button, clear_button],
