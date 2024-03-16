@@ -1375,7 +1375,7 @@ class Network(object):
         elif new_name in self.cell_types.keys():
             # Raises error if the new name is already in cell_types
             raise KeyError(f"The key '{new_name}' is"
-                           "already in cell_types!")
+                           "  already in cell_types!")
         elif original_name in self.cell_types.keys():
             # Updating cell_types first
             self.cell_types[new_name] = self.cell_types.pop(original_name)
