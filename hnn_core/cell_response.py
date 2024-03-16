@@ -87,10 +87,6 @@ class CellResponse(object):
         if times is None:
             times = list()
 
-       # if cell_type_names is None:
-           # cell_type_names = ['L2_basket', 'L2_pyramidal',
-                #               'L5_basket', 'L5_pyramidal']
-
         # Validate arguments
         arg_names = ['spike_times', 'spike_gids', 'spike_types']
         for arg_idx, arg in enumerate([spike_times, spike_gids, spike_types]):

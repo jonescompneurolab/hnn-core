@@ -526,10 +526,15 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
         spike_times = np.array([])
         spike_types = np.array([])
         spike_gids = np.array([])
-    
     cell_types = cell_response._cell_type_names  # ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
-    cell_type_colors = {'L5_pyramidal': 'r', 'L5_basket': 'b',
-                        'L2_pyramidal': 'g', 'L2_basket': 'w'}
+    cell_type_colors = ['r', 'b', 'g', 'w']
+    # Ensure cell_types list matches the size of cell_type_colors dictionary
+    if len(cell_types) != len(cell_type_colors):
+        raise ValueError("cell_types list must "
+                         "match the number of items in cell_type_colors.")
+
+    # Create a new dictionary with the new keys and old values
+    new_cell_type_colors = dict(zip(cell_types, cell_type_colors))
 
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
@@ -548,7 +553,7 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
         if cell_type_times:
             events.append(
                 ax.eventplot(cell_type_times, lineoffsets=cell_type_ypos,
-                             color=cell_type_colors[cell_type],
+                             color=new_cell_type_colors[cell_type],
                              label=cell_type, linelengths=5))
 
     ax.legend(handles=[e[0] for e in events], loc=1)
