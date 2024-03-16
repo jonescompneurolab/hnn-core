@@ -1377,8 +1377,23 @@ class Network(object):
             raise KeyError(f"The key '{new_name}' is"
                            "  already in cell_types!")
         elif original_name in self.cell_types.keys():
-            # Updating cell_types first
-            self.cell_types[new_name] = self.cell_types.pop(original_name)
+            # Convert cell_types items to 
+            # a list of tuples (cell_name, cell_type)
+            # This is essential because order in
+            # cell_types determine order in
+            # cell_response._cell_type_names
+            tuple_cell_types = list(self.cell_types.items())
+            # Modify the list to replace old_key with new_key
+            for index, (cell_name, cell_type) in enumerate(tuple_cell_types):
+                if cell_name == original_name:
+                    tuple_cell_types[index] = (new_name, cell_type)
+                    break  # Stop after finding the key
+
+            # Rebuild the dictionary from the modified list of items
+            # Clear the original dictionary
+            self.cell_types.clear()
+            # Update the dictionary with the modified items
+            self.cell_types.update(tuple_cell_types)
             self.clear_connectivity()
             self._n_gids = 0
             # creating a temporary gid_ranges OrderedDict
