@@ -587,12 +587,11 @@ def plot_cells(net, ax=None, show=True):
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-
-    colors = {'L5_pyramidal': 'b', 'L2_pyramidal': 'c',
-              'L5_basket': 'r', 'L2_basket': 'm'}
-    markers = {'L5_pyramidal': '^', 'L2_pyramidal': '^',
-               'L5_basket': 'x', 'L2_basket': 'x'}
-
+    # re-arranged cell_colors to match old colors dictionary
+    cell_colors = ['m', 'c', 'r', 'b']
+    colors = dict(zip(net.cell_types.keys(), cell_colors))
+    cell_markers = ['x', '^', 'x', '^']
+    markers = dict(zip(net.cell_types.keys(), cell_markers))
     for cell_type in net.cell_types:
         x = [pos[0] for pos in net.pos_dict[cell_type]]
         y = [pos[1] for pos in net.pos_dict[cell_type]]
