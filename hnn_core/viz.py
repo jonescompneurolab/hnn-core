@@ -397,10 +397,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     unique_types = np.unique(spike_types_data)
     spike_types_mask = {s_type: np.in1d(spike_types_data, s_type)
                         for s_type in unique_types}
-    # cell_types here will get the names from gid_ranges which will be in cell_response cell_response.gid_ranges
     cell_types = cell_response._cell_type_names
-    # keep all except dist, prox
-    #['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
     input_types = np.setdiff1d(unique_types, cell_types)
 
     if isinstance(spike_types, str):
