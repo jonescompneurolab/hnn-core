@@ -526,7 +526,7 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
         spike_times = np.array([])
         spike_types = np.array([])
         spike_gids = np.array([])
-    cell_types = cell_response._cell_type_names  # ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
+    cell_types = cell_response._cell_type_names
     cell_type_colors = ['r', 'b', 'g', 'w']
     # Ensure cell_types list matches the size of cell_type_colors dictionary
     if len(cell_types) != len(cell_type_colors):
