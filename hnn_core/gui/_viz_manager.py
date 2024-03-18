@@ -523,9 +523,9 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
     plot_button.on_click(
         partial(
             _plot_on_axes,
-            widgets_simulation=simulation_selection,
+            simulations_widget=simulation_selection,
             widgets_plot_type=plot_type_selection,
-            target_simulations=target_data_selection,
+            data_widget=target_data_selection,
             spectrogram_colormap_selection=spectrogram_colormap_selection,
             dipole_smooth=simulation_dipole_smooth,
             max_spectral_frequency=max_spectral_frequency,
@@ -841,11 +841,11 @@ class _VizManager:
         ax_control_tabs.selected_index = ax_idx
 
         # ax config
-        simulation_ctrl = ax_control_tabs.children[ax_idx].children[0]
+        simulation_ctrl = ax_control_tabs.children[ax_idx].children[1]
         # return simulation_ctrl
         simulation_ctrl.value = simulation_name
 
-        plot_type_ctrl = ax_control_tabs.children[ax_idx].children[1]
+        plot_type_ctrl = ax_control_tabs.children[ax_idx].children[0]
         plot_type_ctrl.value = plot_type
 
         config_name_idx = {
