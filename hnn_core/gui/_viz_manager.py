@@ -281,7 +281,8 @@ def _dynamic_rerender(fig):
 def _plot_on_axes(b, simulations_widget, widgets_plot_type,
                   data_widget,
                   spectrogram_colormap_selection, dipole_smooth,
-                  max_spectral_frequency, dipole_scaling,data_smooth,data_scaling, widgets, data,
+                  max_spectral_frequency, dipole_scaling, data_smooth,
+                  data_scaling, widgets, data,
                   fig_idx, fig, ax, existing_plots):
     """Plotting different types of data on the given axes.
 
@@ -459,26 +460,33 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         layout=layout,
         style=analysis_style,
     )
-    simulation_dipole_smooth = FloatText(value=30,
-                              description='Dipole Smooth Window (ms):',
-                              disabled=False,
-                              layout=layout,
-                              style=analysis_style)
-    simulation_dipole_scaling = FloatText(value=3000,
-                               description='Simulation Dipole Scaling:',
-                               disabled=False,
-                               layout=layout,
-                               style=analysis_style)
-    data_dipole_smooth = FloatText(value=30,
-                              description='Data Smooth Window (ms):',
-                              disabled=False,
-                              layout=layout,
-                              style=analysis_style)
-    data_dipole_scaling = FloatText(value=3000,
-                               description='Data Dipole Scaling:',
-                               disabled=False,
-                               layout=layout,
-                               style=analysis_style)
+    simulation_dipole_smooth = FloatText(
+        value=30,
+        description='Dipole Smooth Window (ms):',
+        disabled=False,
+        layout=layout,
+        style=analysis_style)
+
+    simulation_dipole_scaling = FloatText(
+        value=3000,
+        description='Simulation Dipole Scaling:',
+        disabled=False,
+        layout=layout,
+        style=analysis_style)
+
+    data_dipole_smooth = FloatText(
+        value=30,
+        description='Data Smooth Window (ms):',
+        disabled=False,
+        layout=layout,
+        style=analysis_style)
+
+    data_dipole_scaling = FloatText(
+        value=3000,
+        description='Data Dipole Scaling:',
+        disabled=False,
+        layout=layout,
+        style=analysis_style)
 
     max_spectral_frequency = FloatText(
         value=100,
@@ -541,9 +549,9 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         ))
 
     vbox = VBox([
-        plot_type_selection,simulation_selection, simulation_dipole_smooth, 
-        simulation_dipole_scaling,target_data_selection, data_dipole_smooth,
-        data_dipole_scaling,max_spectral_frequency,
+        plot_type_selection, simulation_selection, simulation_dipole_smooth,
+        simulation_dipole_scaling, target_data_selection, data_dipole_smooth,
+        data_dipole_scaling, max_spectral_frequency,
         spectrogram_colormap_selection,
         HBox(
             [plot_button, clear_button],
