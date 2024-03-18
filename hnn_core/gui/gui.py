@@ -1123,10 +1123,12 @@ def load_drive_and_connectivity(params, log_out, drives_out,
         add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
                       layout)
 
+
 def is_loaded_data(simulation_data):
     if 'net' in simulation_data:
         return True
     return False
+
 
 def on_upload_data_change(change, data, viz_manager, log_out):
     if len(change['owner'].value) == 0:
@@ -1139,7 +1141,7 @@ def on_upload_data_change(change, data, viz_manager, log_out):
     if data_fname in data['simulation_data'].keys():
         logger.error(f"Found existing data: {data_fname}.")
         return
-    
+
     ext_content = data_dict['content']
     ext_content = codecs.decode(ext_content, encoding="utf-8")
     with log_out:
