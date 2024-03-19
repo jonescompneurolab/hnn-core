@@ -113,3 +113,32 @@ def test_convert_to_hdf5_legacy(tmp_path):
     convert_to_hdf5(params_base_fname, outpath)
     net_hdf5 = read_network(outpath)
     assert net_hdf5 == net_params
+
+
+def test_convert_to_hdf5_bad_type():
+    """Tests type validation in convert_to_hdf5 function"""
+    good_path = hnn_core_root
+    path_str = good_path.__str__()
+    bad_path = 5
+
+    # Valid path and string, but not actual files
+    with pytest.raises(
+            ValueError,
+            match="Unrecognized extension, expected one of .json, .param."
+    ):
+        convert_to_hdf5(good_path, path_str)
+        convert_to_hdf5(path_str, good_path)
+
+    # Bad params_fname
+    with pytest.raises(
+            TypeError,
+            match="params_fname must be an instance of str or Path"
+    ):
+        convert_to_hdf5(bad_path, good_path)
+
+    # Bad out_fname
+    with pytest.raises(
+            TypeError,
+            match="out_fname must be an instance of str or Path"
+    ):
+        convert_to_hdf5(good_path, bad_path)
