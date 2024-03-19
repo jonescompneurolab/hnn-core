@@ -323,7 +323,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 
 
 def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
-                     color=None, show=True):
+                     color=None, show=True, **kwargs_hist):
     """Plot the histogram of spiking activity across trials.
 
     Parameters
@@ -369,6 +369,8 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         If None, default color cycle used.
     show : bool
         If True, show the figure.
+    **kwargs : dict
+        Additional keyword arguments to pass to ax.hist.
 
     Returns
     -------
@@ -473,7 +475,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     for spike_label, plot_data in spike_type_times.items():
         hist_color = spike_color[spike_label]
         ax.hist(plot_data, bins,
-                label=spike_label, color=hist_color)
+                label=spike_label, color=hist_color, **kwargs_hist)
 
     ax.set_ylabel("Counts")
     ax.legend()
