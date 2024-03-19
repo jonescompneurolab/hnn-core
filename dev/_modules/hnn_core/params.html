@@ -143,9 +143,11 @@
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">fnmatch</span>
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 
 <span class="kn">from</span> <span class="nn">.params_default</span> <span class="kn">import</span> <span class="n">get_params_default</span>
+<span class="kn">from</span> <span class="nn">.externals.mne</span> <span class="kn">import</span> <span class="n">_validate_type</span>
 
 
 <span class="c1"># return number of evoked inputs (proximal, distal)</span>
@@ -790,6 +792,46 @@
         <span class="n">d1</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">d2</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">d1</span>
+
+
+<span class="k">def</span> <span class="nf">_convert_to_path</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">convert_to_hdf5</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span> <span class="n">out_fname</span><span class="p">,</span>
+                    <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">write_output</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts json or param format to hdf5</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    params_fname : str or Path</span>
+<span class="sd">        Path to file</span>
+<span class="sd">    out_fname: str</span>
+<span class="sd">        Path to output</span>
+<span class="sd">    overwrite: bool, default=True</span>
+<span class="sd">        Overwrite file</span>
+<span class="sd">    write_output: bool, default=False</span>
+<span class="sd">        Write out simulations</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">.network</span> <span class="kn">import</span> <span class="n">Network</span>
+
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">),</span> <span class="s1">&#39;params_fname&#39;</span><span class="p">)</span>
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">out_fname</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">),</span> <span class="s1">&#39;out_fname&#39;</span><span class="p">)</span>
+
+    <span class="n">params_fname</span> <span class="o">=</span> <span class="n">_convert_to_path</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
+    <span class="n">out_fname</span> <span class="o">=</span> <span class="n">_convert_to_path</span><span class="p">(</span><span class="n">out_fname</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">out_fname</span><span class="o">.</span><span class="n">suffix</span> <span class="o">!=</span> <span class="s1">&#39;.hdf5&#39;</span><span class="p">:</span>
+        <span class="n">out_fname</span> <span class="o">=</span> <span class="n">out_fname</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s1">&#39;.hdf5&#39;</span><span class="p">)</span>
+
+    <span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
+    <span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="n">net</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out_fname</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">,</span> <span class="n">write_output</span><span class="p">)</span>
+    <span class="k">return</span>
 
 
 <span class="c1"># debug test function</span>
