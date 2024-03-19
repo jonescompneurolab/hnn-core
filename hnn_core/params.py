@@ -13,6 +13,7 @@ from copy import deepcopy
 
 from hnn_core.hnn_io import read_network
 from .params_default import get_params_default
+from .externals.mne import _validate_type
 
 
 # return number of evoked inputs (proximal, distal)
@@ -701,6 +702,9 @@ def convert_to_hdf5(params_fname, out_fname,
     None
     """
     from .network import Network
+
+    _validate_type(params_fname, (str, Path), 'params_fname')
+    _validate_type(out_fname, (str, Path), 'out_fname')
 
     params_fname = _convert_to_path(params_fname)
     out_fname = _convert_to_path(out_fname)
