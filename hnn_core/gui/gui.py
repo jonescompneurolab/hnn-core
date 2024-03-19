@@ -134,67 +134,12 @@ class HNNGUI:
         # set up styling.
         self.total_height = total_height
         self.total_width = total_width
-
-        viz_win_width = self.total_width - left_sidebar_width
-        main_content_height = self.total_height - status_height
-
-        config_box_height = main_content_height - (log_window_height +
-                                                   operation_box_height)
-        self.layout = {
-            "dpi": dpi,
-            "header_height": f"{header_height}px",
-            "theme_color": theme_color,
-            "btn": Layout(height=f"{button_height}px", width='auto'),
-            "btn_full_w": Layout(height=f"{button_height}px", width='100%'),
-            "del_fig_btn": Layout(height=f"{button_height}px", width='auto'),
-            "log_out": Layout(border='1px solid gray',
-                              height=f"{log_window_height-10}px",
-                              overflow='auto'),
-            "viz_config": Layout(width='99%'),
-            "visualization_window": Layout(
-                width=f"{viz_win_width-10}px",
-                height=f"{main_content_height-10}px",
-                border='1px solid gray',
-                overflow='scroll'),
-            "visualization_output": Layout(
-                width=f"{viz_win_width-50}px",
-                height=f"{main_content_height-100}px",
-                border='1px solid gray',
-                overflow='scroll'),
-            "left_sidebar": Layout(width=f"{left_sidebar_width}px",
-                                   height=f"{main_content_height}px"),
-            "left_tab": Layout(width=f"{left_sidebar_width}px",
-                               height=f"{config_box_height}px"),
-            "operation_box": Layout(width=f"{left_sidebar_width}px",
-                                    height=f"{operation_box_height}px",
-                                    flex_wrap="wrap",
-                                    ),
-            "config_box": Layout(width=f"{left_sidebar_width}px",
-                                 height=f"{config_box_height-100}px"),
-            "drive_widget": Layout(width="auto"),
-            "drive_textbox": Layout(width='270px', height='auto'),
-            # simulation status related
-            "simulation_status_height": f"{status_height}px",
-            "simulation_status_common": "background:gray;padding-left:10px",
-            "simulation_status_running": "background:orange;padding-left:10px",
-            "simulation_status_failed": "background:red;padding-left:10px",
-            "simulation_status_finished": "background:green;padding-left:10px",
-        }
-
-        self._simulation_status_contents = {
-            "not_running":
-            f"""<div style='{self.layout['simulation_status_common']};
-            color:white;'>Not running</div>""",
-            "running":
-            f"""<div style='{self.layout['simulation_status_running']};
-            color:white;'>Running...</div>""",
-            "finished":
-            f"""<div style='{self.layout['simulation_status_finished']};
-            color:white;'>Simulation finished</div>""",
-            "failed":
-            f"""<div style='{self.layout['simulation_status_failed']};
-            color:white;'>Simulation failed</div>""",
-        }
+        self.layout = self._set_layout(
+            dpi, header_height, theme_color, button_height,
+            log_window_height, left_sidebar_width, operation_box_height,
+            status_height,
+        )
+        self._simulation_status_contents = self._set_simulation_status_contents()
 
         # load default parameters
         self.param_net = self.load_parameters()
@@ -268,7 +213,6 @@ class HNNGUI:
             button_color=self.layout['theme_color'])
 
         # Plotting window
-
         # Visualization figure related dicts
         self.plot_outputs_dict = dict()
         self.plot_dropdown_types_dict = dict()
@@ -284,11 +228,72 @@ class HNNGUI:
         self._init_ui_components()
         self.add_logging_window_logger()
 
-    def add_logging_window_logger(self):
-        handler = _OutputWidgetHandler(self._log_out)
-        handler.setFormatter(
-            logging.Formatter('%(asctime)s  - [%(levelname)s] %(message)s'))
-        logger.addHandler(handler)
+    def _set_layout(self, dpi, header_height, theme_color, button_height,
+                    log_window_height, left_sidebar_width,
+                    operation_box_height,status_height):
+
+        viz_win_width = self.total_width - left_sidebar_width
+        main_content_height = self.total_height - status_height
+        config_box_height = main_content_height - (log_window_height +
+                                                   operation_box_height)
+        layout = {
+            "dpi": dpi,
+            "header_height": f"{header_height}px",
+            "theme_color": theme_color,
+            "btn": Layout(height=f"{button_height}px", width='auto'),
+            "btn_full_w": Layout(height=f"{button_height}px", width='100%'),
+            "del_fig_btn": Layout(height=f"{button_height}px", width='auto'),
+            "log_out": Layout(border='1px solid gray',
+                              height=f"{log_window_height - 10}px",
+                              overflow='auto'),
+            "viz_config": Layout(width='99%'),
+            "visualization_window": Layout(
+                width=f"{viz_win_width - 10}px",
+                height=f"{main_content_height - 10}px",
+                border='1px solid gray',
+                overflow='scroll'),
+            "visualization_output": Layout(
+                width=f"{viz_win_width - 50}px",
+                height=f"{main_content_height - 100}px",
+                border='1px solid gray',
+                overflow='scroll'),
+            "left_sidebar": Layout(width=f"{left_sidebar_width}px",
+                                   height=f"{main_content_height}px"),
+            "left_tab": Layout(width=f"{left_sidebar_width}px",
+                               height=f"{config_box_height}px"),
+            "operation_box": Layout(width=f"{left_sidebar_width}px",
+                                    height=f"{operation_box_height}px",
+                                    flex_wrap="wrap",
+                                    ),
+            "config_box": Layout(width=f"{left_sidebar_width}px",
+                                 height=f"{config_box_height - 100}px"),
+            "drive_widget": Layout(width="auto"),
+            "drive_textbox": Layout(width='270px', height='auto'),
+            # simulation status related
+            "simulation_status_height": f"{status_height}px",
+            "simulation_status_common": "background:gray;padding-left:10px",
+            "simulation_status_running": "background:orange;padding-left:10px",
+            "simulation_status_failed": "background:red;padding-left:10px",
+            "simulation_status_finished": "background:green;padding-left:10px",
+        }
+        return layout
+
+    def _set_simulation_status_contents(self):
+        statuses = {
+            "not_running":
+                f"""<div style='{self.layout['simulation_status_common']};
+                    color:white;'>Not running</div>""",
+            "running":
+                f"""<div style='{self.layout['simulation_status_running']};
+                    color:white;'>Running...</div>""",
+            "finished":
+                f"""<div style='{self.layout['simulation_status_finished']};
+                    color:white;'>Simulation finished</div>""",
+            "failed":
+                f"""<div style='{self.layout['simulation_status_failed']};
+                    color:white;'>Simulation failed</div>""",
+        }
+        return statuses
 
     def _init_ui_components(self):
         """Initialize larger UI components and dynamical output windows.
@@ -321,6 +326,12 @@ class HNNGUI:
             style='background:{self.layout['theme_color']};
             text-align:center;color:white;'>
             HUMAN NEOCORTICAL NEUROSOLVER</div>""")
+
+    def add_logging_window_logger(self):
+        handler = _OutputWidgetHandler(self._log_out)
+        handler.setFormatter(
+            logging.Formatter('%(asctime)s  - [%(levelname)s] %(message)s'))
+        logger.addHandler(handler)
 
     @property
     def analysis_config(self):
