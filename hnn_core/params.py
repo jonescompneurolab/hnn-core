@@ -663,7 +663,7 @@ def _convert_to_path(value):
     return value
 
 
-def convert_to_hdf5(params_fname, out_fname,
+def convert_to_hdf5(params_fname, out_fname, include_drives=True,
                     overwrite=True, write_output=False):
     """Converts json or param format to hdf5
 
@@ -673,6 +673,8 @@ def convert_to_hdf5(params_fname, out_fname,
         Path to file
     out_fname: str
         Path to output
+    include_drives: bool, default=True
+        Include drives from params file
     overwrite: bool, default=True
         Overwrite file
     write_output: bool, default=False
@@ -692,7 +694,7 @@ def convert_to_hdf5(params_fname, out_fname,
         out_fname = out_fname.with_suffix('.hdf5')
 
     params = read_params(params_fname)
-    net = Network(params)
+    net = Network(params, add_drives_from_params=include_drives)
     net.write(out_fname, overwrite, write_output)
     return
 
