@@ -117,6 +117,7 @@ def test_convert_to_hdf5_legacy(tmp_path):
         urlretrieve(param_url, params_base_fname)
     net_params = Network(read_params(params_base_fname),
                          add_drives_from_params=True,
+                         legacy_mode=True
                          )
 
     # Write hdf5 and check if constructed network is equal
