@@ -139,7 +139,10 @@ class HNNGUI:
             log_window_height, left_sidebar_width, operation_box_height,
             status_height,
         )
-        self._simulation_status_contents = self._set_simulation_status_contents()
+        self.app_layout = None
+        self._simulation_status_contents = (
+            self._set_simulation_status_contents()
+        )
 
         # load default parameters
         self.param_net = self.load_parameters()
