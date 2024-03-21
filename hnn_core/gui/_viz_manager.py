@@ -330,11 +330,13 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
     widgets_plot_type.disabled = True
 
     single_simulation = data['simulations'][sim_name]
-
+    target_is_sim = True if single_simulation['net'] is not None else False
+    scaling = dipole_scaling.value if target_is_sim else data_scaling.value
+    smooth = dipole_smooth.value if target_is_sim else data_smooth.value
     simulation_plot_config = {
         "max_spectral_frequency": max_spectral_frequency.value,
-        "dipole_scaling": dipole_scaling.value,
-        "dipole_smooth": dipole_smooth.value,
+        "dipole_scaling": scaling,
+        "dipole_smooth": smooth,
         "spectrogram_cm": spectrogram_colormap_selection.value
     }
 
@@ -348,11 +350,13 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
 
         target_sim_name = data_widget.value
         target_sim = data['simulations'][target_sim_name]
-
+        target_is_sim = True if target_sim['net'] is not None else False
+        scaling = dipole_scaling.value if target_is_sim else data_scaling.value
+        smooth = dipole_smooth.value if target_is_sim else data_smooth.value
         data_plot_config = {
             "max_spectral_frequency": max_spectral_frequency.value,
-            "dipole_scaling": data_scaling.value,
-            "dipole_smooth": data_smooth.value,
+            "dipole_scaling": scaling,
+            "dipole_smooth": smooth,
             "spectrogram_cm": spectrogram_colormap_selection.value
         }
 
@@ -414,6 +418,7 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
     layout = Layout(width="98%")
     simulation_names = tuple(data['simulations'].keys())
     sim_name_default = simulation_names[-1]
+
     if len(simulation_names) == 0:
         simulation_names = [
             "None",
@@ -421,7 +426,7 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
 
     simulation_selection = Dropdown(
         options=simulation_names,
-        value=sim_name_default,
+        value=simulation_names[0],
         description='Simulation Data:',
         disabled=False,
         layout=layout,
@@ -444,8 +449,12 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         style=analysis_style,
     )
 
+    tagert_names = simulation_names[0:-1]
+    if len(simulation_names) > 1:
+        tagert_names = simulation_names[1:]
+
     target_data_selection = Dropdown(
-        options=simulation_names[:-1] + ('None',),
+        options=tagert_names + ('None',),
         value='None',
         description='Data to Compare:',
         disabled=False,
@@ -475,14 +484,14 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         style=analysis_style)
 
     data_dipole_smooth = FloatText(
-        value=30,
+        value=0,
         description='Data Smooth Window (ms):',
         disabled=False,
         layout=layout,
         style=analysis_style)
 
     data_dipole_scaling = FloatText(
-        value=3000,
+        value=1,
         description='Data Dipole Scaling:',
         disabled=False,
         layout=layout,
