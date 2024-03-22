@@ -278,12 +278,26 @@ def _dynamic_rerender(fig):
     fig.tight_layout()
 
 
+def create_plot_config(data, dipole_scaling, data_scaling, dipole_smooth,
+                       data_smooth, max_spectral_frequency,
+                       spectrogram_colormap_selection):
+
+    target_is_sim = data['net'] is not None
+    scaling = dipole_scaling.value if target_is_sim else data_scaling.value
+    smooth = dipole_smooth.value if target_is_sim else data_smooth.value
+    return {
+        "max_spectral_frequency": max_spectral_frequency.value,
+        "dipole_scaling": scaling,
+        "dipole_smooth": smooth,
+        "spectrogram_cm": spectrogram_colormap_selection.value
+    }
+
+
 def _plot_on_axes(b, simulations_widget, widgets_plot_type,
                   data_widget,
-                  spectrogram_colormap_selection, dipole_smooth,
-                  max_spectral_frequency, dipole_scaling, data_smooth,
-                  data_scaling, widgets, data,
-                  fig_idx, fig, ax, existing_plots):
+                  spectrogram_colormap_selection, max_spectral_frequency,
+                  dipole_smooth, dipole_scaling, data_smooth, data_scaling,
+                  widgets, data, fig_idx, fig, ax, existing_plots):
     """Plotting different types of data on the given axes.
 
     Now this function is also responsible for comparing multiple simulations,
@@ -330,15 +344,14 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
     widgets_plot_type.disabled = True
 
     single_simulation = data['simulations'][sim_name]
-    target_is_sim = True if single_simulation['net'] is not None else False
-    scaling = dipole_scaling.value if target_is_sim else data_scaling.value
-    smooth = dipole_smooth.value if target_is_sim else data_smooth.value
-    simulation_plot_config = {
-        "max_spectral_frequency": max_spectral_frequency.value,
-        "dipole_scaling": scaling,
-        "dipole_smooth": smooth,
-        "spectrogram_cm": spectrogram_colormap_selection.value
-    }
+    simulation_plot_config = create_plot_config(
+        data=single_simulation,
+        dipole_scaling=dipole_scaling,
+        data_scaling=data_scaling,
+        dipole_smooth=dipole_smooth,
+        data_smooth=data_smooth,
+        max_spectral_frequency=max_spectral_frequency,
+        spectrogram_colormap_selection=spectrogram_colormap_selection)
 
     dpls_processed = _update_ax(fig, ax, single_simulation, sim_name,
                                 plot_type, simulation_plot_config)
@@ -350,19 +363,14 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
 
         target_sim_name = data_widget.value
         target_sim = data['simulations'][target_sim_name]
-        target_is_sim = True if target_sim['net'] is not None else False
-        scaling = dipole_scaling.value if target_is_sim else data_scaling.value
-        smooth = dipole_smooth.value if target_is_sim else data_smooth.value
-        data_plot_config = {
-            "max_spectral_frequency": max_spectral_frequency.value,
-            "dipole_scaling": scaling,
-            "dipole_smooth": smooth,
-            "spectrogram_cm": spectrogram_colormap_selection.value
-        }
-
-        # plot the target dipole.
-        # disable scaling for the target dipole.
-        simulation_plot_config['dipole_scaling'] = 1.
+        data_plot_config = create_plot_config(
+            data=target_sim,
+            dipole_scaling=dipole_scaling,
+            data_scaling=data_scaling,
+            dipole_smooth=dipole_smooth,
+            data_smooth=data_smooth,
+            max_spectral_frequency=max_spectral_frequency,
+            spectrogram_colormap_selection=spectrogram_colormap_selection)
 
         # plot the target dipole.
         target_dpl_processed = _update_ax(
@@ -449,7 +457,7 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         style=analysis_style,
     )
 
-    tagert_names = simulation_names[0:-1]
+    tagert_names = simulation_names[:-1]
     if len(simulation_names) > 1:
         tagert_names = simulation_names[1:]
 
@@ -544,8 +552,8 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
             widgets_plot_type=plot_type_selection,
             data_widget=target_data_selection,
             spectrogram_colormap_selection=spectrogram_colormap_selection,
-            dipole_smooth=simulation_dipole_smooth,
             max_spectral_frequency=max_spectral_frequency,
+            dipole_smooth=simulation_dipole_smooth,
             dipole_scaling=simulation_dipole_scaling,
             data_smooth=data_dipole_smooth,
             data_scaling=data_dipole_scaling,
