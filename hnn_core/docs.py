@@ -46,7 +46,7 @@ docdict[
 ] = """
 source : str
     Original source of the hdf5 file. [obj, param, json]
-        obj: From an instance of a Network object 
+        obj: From an instance of a Network object
         param: From a converted param parameter file
         json: From a converted json parameter file
 """

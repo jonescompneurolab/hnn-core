@@ -209,7 +209,7 @@ def _read_connectivity(net, conns_data):
     # Overwrite drive connections
     net.connectivity = list()
 
-    for i, conn_data in enumerate(conns_data):
+    for _i, conn_data in enumerate(conns_data):
         src_gids = [int(s) for s in conn_data['gid_pairs'].keys()]
         target_gids_nested = [target_gid for target_gid
                               in conn_data['gid_pairs'].values()]
