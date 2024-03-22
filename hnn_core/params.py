@@ -684,18 +684,29 @@ def convert_to_hdf5(params_fname, out_fname, include_drives=True,
     None
     """
     from .network import Network
-
+    # Validate inputs
     _validate_type(params_fname, (str, Path), 'params_fname')
     _validate_type(out_fname, (str, Path), 'out_fname')
+    params_fname, out_fname = (
+        [_convert_to_path(file) for file in (params_fname, out_fname)]
+    )
+    params_suffix = params_fname.suffix.lower().split('.')[-1]
+    if params_suffix.lower() not in ['param', 'json']:
+        raise ValueError("Extension must be .param or .json")
 
-    params_fname = _convert_to_path(params_fname)
-    out_fname = _convert_to_path(out_fname)
+    # Add suffix if not supplied
     if out_fname.suffix != '.hdf5':
         out_fname = out_fname.with_suffix('.hdf5')
 
-    params = read_params(params_fname)
-    net = Network(params, add_drives_from_params=include_drives)
-    net.write(out_fname, overwrite, write_output)
+    net = Network(params=read_params(params_fname),
+                  add_drives_from_params=include_drives,
+                  legacy_mode=True if params_suffix == 'param' else False,
+                  )
+    net.write(fname=out_fname,
+              overwrite=overwrite,
+              write_output=write_output,
+              source=params_suffix,
+              )
     return
 
 
