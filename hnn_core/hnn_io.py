@@ -139,7 +139,19 @@ def _read_cell_response(cell_response_data, read_output):
 def _read_external_drive(net, drive_data, read_output, read_drives):
     if not read_drives:
         return None
-    if drive_data['type'] == 'evoked':
+
+    def _set_from_cell_specific(drive_data):
+        """Returns number of drive cells based on cell_specific bool
+
+        The n_drive_cells keyword for add_poisson_drive and add_bursty_drive
+        methods accept either an int or string (n_cells). If the bool keyword
+        cell_specific = True, n_drive_cells must be 'n_cells'.
+        """
+        if drive_data['cell_specific']:
+            return 'n_cells'
+        return drive_data['n_drive_cells']
+
+    if (drive_data['type'] == 'evoked') or (drive_data['type'] == 'gaussian'):
         # Skipped n_drive_cells here
         net.add_evoked_drive(name=drive_data['name'],
                              mu=drive_data['dynamics']['mu'],
@@ -160,7 +172,8 @@ def _read_external_drive(net, drive_data, read_output, read_drives):
                               rate_constant=(drive_data['dynamics']
                                                        ['rate_constant']),
                               location=drive_data['location'],
-                              n_drive_cells=drive_data['n_drive_cells'],
+                              n_drive_cells=(
+                                  _set_from_cell_specific(drive_data)),
                               cell_specific=drive_data['cell_specific'],
                               weights_ampa=drive_data['weights_ampa'],
                               weights_nmda=drive_data['weights_nmda'],
@@ -175,10 +188,10 @@ def _read_external_drive(net, drive_data, read_output, read_drives):
                              tstop=drive_data['dynamics']['tstop'],
                              burst_rate=drive_data['dynamics']['burst_rate'],
                              burst_std=drive_data['dynamics']['burst_std'],
-                             num_spikes=drive_data['dynamics']['num_spikes'],
+                             numspikes=drive_data['dynamics']['numspikes'],
                              spike_isi=drive_data['dynamics']['spike_isi'],
                              location=drive_data['location'],
-                             n_drive_cells=drive_data['n_drive_cells'],
+                             n_drive_cells=_set_from_cell_specific(drive_data),
                              cell_specific=drive_data['cell_specific'],
                              weights_ampa=drive_data['weights_ampa'],
                              weights_nmda=drive_data['weights_nmda'],
