@@ -136,10 +136,9 @@ def test_convert_to_hdf5_bad_type():
     # Valid path and string, but not actual files
     with pytest.raises(
             ValueError,
-            match="Unrecognized extension, expected one of .json, .param."
+            match="Extension must be .param or .json"
     ):
         convert_to_hdf5(good_path, path_str)
-        convert_to_hdf5(path_str, good_path)
 
     # Bad params_fname
     with pytest.raises(
