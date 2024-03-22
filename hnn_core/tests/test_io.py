@@ -68,6 +68,14 @@ def calcium_network(params):
     return net
 
 
+def generate_test_files(jones_2009_network):
+    """ Generates files used in read-in tests """
+    net = jones_2009_network
+    net.write(Path('.', 'assets/jones2009_test_read.hdf5'))
+    simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
+    net.write(Path('.', 'assets/jones2009_simple_sim_test_read.hdf5'))
+
+
 def test_eq(jones_2009_network, calcium_network):
     net1 = jones_2009_network
     net2 = calcium_network
@@ -149,6 +157,7 @@ def test_write_network(tmp_path, jones_2009_network):
 
 
 def test_write_network_no_output(tmp_path, jones_2009_network):
+    """ Tests that a hdf5 file is written without output """
     net = jones_2009_network.copy()
     path_out = tmp_path / 'net.hdf5'
 
@@ -175,6 +184,7 @@ def test_write_network_no_output(tmp_path, jones_2009_network):
 
 
 def test_cell_response_to_dict(jones_2009_network):
+    """ Tests _cell_response_to_dict function """
     net = jones_2009_network
 
     # No simulation so should have None for cell response
@@ -193,6 +203,7 @@ def test_cell_response_to_dict(jones_2009_network):
 
 
 def test_rec_array_to_dict(jones_2009_network):
+    """ Tests _rec_array_to_dict function """
     net = jones_2009_network
 
     # Check rec array times and voltages are in dict after simulation
@@ -215,6 +226,7 @@ def test_rec_array_to_dict(jones_2009_network):
 
 
 def test_connectivity_to_list_of_dicts(jones_2009_network):
+    """ Tests _connectivity_to_list_of_dicts function """
     net = jones_2009_network
 
     result = _connectivity_to_list_of_dicts(net.connectivity[0:2])
@@ -238,6 +250,7 @@ def test_connectivity_to_list_of_dicts(jones_2009_network):
 
 
 def test_external_drive_to_dict(jones_2009_network):
+    """ Tests _external_drive_to_dict function """
     net = jones_2009_network
 
     simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
@@ -272,14 +285,13 @@ def test_str_to_node():
 
 
 def test_read_hdf5(jones_2009_network):
-
-    # jones_2009_network.write(Path('.', 'assets/jones2009_test_read.hdf5'))
-    # This file is written from the jones_2009_network
+    """ Read-in of a hdf5 file """
     net = read_network(Path(assets_path, 'jones2009_test_read.hdf5'))
     assert net == jones_2009_network
 
 
 def test_read_hdf5_with_simulation(jones_2009_network):
+    """ Read-in of a hdf5 file with simulation"""
     # Test reading a network with simulation
     net_sim = read_network(
         Path(assets_path, 'jones2009_simple_sim_test_read.hdf5')
