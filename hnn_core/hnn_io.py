@@ -227,7 +227,7 @@ def _read_rec_arrays(net, rec_arrays_data, read_output):
 
 
 @fill_doc
-def write_network(net, fname, overwrite=True, write_output=True):
+def write_network(net, fname, overwrite=True, write_output=True, source='obj'):
     """Write network to a HDF5 file.
 
     Parameters
@@ -236,6 +236,7 @@ def write_network(net, fname, overwrite=True, write_output=True):
     %(fname)s
     %(overwrite)s
     %(write_output)s
+    %(source)s
 
     Yields
     ------
@@ -247,6 +248,7 @@ def write_network(net, fname, overwrite=True, write_output=True):
 
     net_data = {
         'object_type': 'Network',
+        'source': source,
         'N_pyr_x': net._N_pyr_x,
         'N_pyr_y': net._N_pyr_y,
         'celsius': net._params['celsius'],
