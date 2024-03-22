@@ -705,7 +705,6 @@ def convert_to_hdf5(params_fname, out_fname, include_drives=True,
     net.write(fname=out_fname,
               overwrite=overwrite,
               write_output=write_output,
-              source=params_suffix,
               )
     return
 

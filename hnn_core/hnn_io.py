@@ -240,7 +240,7 @@ def _read_rec_arrays(net, rec_arrays_data, read_output):
 
 
 @fill_doc
-def write_network(net, fname, overwrite=True, write_output=True, source='obj'):
+def write_network(net, fname, overwrite=True, write_output=True):
     """Write network to a HDF5 file.
 
     Parameters
@@ -249,7 +249,6 @@ def write_network(net, fname, overwrite=True, write_output=True, source='obj'):
     %(fname)s
     %(overwrite)s
     %(write_output)s
-    %(source)s
 
     Yields
     ------
@@ -261,7 +260,7 @@ def write_network(net, fname, overwrite=True, write_output=True, source='obj'):
 
     net_data = {
         'object_type': 'Network',
-        'source': source,
+        'legacy_mode': net._legacy_mode,
         'N_pyr_x': net._N_pyr_x,
         'N_pyr_y': net._N_pyr_y,
         'celsius': net._params['celsius'],
@@ -315,9 +314,6 @@ def read_network(fname, read_output=True, read_drives=True):
         raise ValueError('The object should be of type Network. '
                          'The file contains object of '
                          'type %s' % (net_data['object_type'],))
-    legacy_mode = False
-    if net_data['source'] == 'param':
-        legacy_mode = True
 
     params = dict()
     params['celsius'] = net_data['celsius']
@@ -326,7 +322,10 @@ def read_network(fname, read_output=True, read_drives=True):
     mesh_shape = (net_data['N_pyr_x'], net_data['N_pyr_y'])
 
     # Instantiating network
-    net = Network(params, mesh_shape=mesh_shape, legacy_mode=legacy_mode)
+    net = Network(params,
+                  mesh_shape=mesh_shape,
+                  legacy_mode=net_data['legacy_mode']
+                  )
 
     # Setting attributes
     # Set cell types
