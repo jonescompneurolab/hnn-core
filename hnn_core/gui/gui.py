@@ -1124,12 +1124,6 @@ def load_drive_and_connectivity(params, log_out, drives_out,
                       layout)
 
 
-def is_loaded_data(simulation_data):
-    if 'net' in simulation_data:
-        return True
-    return False
-
-
 def on_upload_data_change(change, data, viz_manager, log_out):
     if len(change['owner'].value) == 0:
         logger.info("Empty change")
