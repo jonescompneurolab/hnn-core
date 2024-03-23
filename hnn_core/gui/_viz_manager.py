@@ -292,21 +292,23 @@ def create_plot_config(data, dipole_scaling, dipole_smooth,
     sim_name (str):
      The name of the simulation to access within the 'simulations' dictionary.
     dipole_scaling (ipywidgets.FloatText):
-     An object with a 'value' attribute for dipole scaling in simulations.
+     textfield widget  for dipole scaling in simulations.
     data_scaling (ipywidgets.FloatText):
-     An object with a 'value' attribute for scaling in data visualizations.
+     textfield widget for scaling in data visualizations.
     dipole_smooth (ipywidgets.FloatText):
-     An object with a 'value' attribute for dipole smoothing in simulations.
+     textfield widget for dipole smoothing in simulations.
     data_smooth (ipywidgets.FloatText):
-     An object with a 'value' attribute for smoothing in data visualizations.
+     textfield widget for smoothing in data visualizations.
     max_spectral_frequency (ipywidgets.FloatText):
-     An object with a 'value' attribute representing the maximum spectral frequency for the plot.
+     textfield widget representing the maximum spectral frequency for the plot.
     spectrogram_colormap_selection (ipywidgets.Dropdown):
-     An object with a 'value' attribute specifying the colormap for the spectrogram.
+     textfield widget specifying the colormap for the spectrogram.
 
     Returns:
-    dict: A dictionary containing the plot configuration with keys 'max_spectral_frequency',
-          'dipole_scaling', 'dipole_smooth', and 'spectrogram_cm'.
+    dict: A dictionary containing the plot configuration with keys:
+      'max_spectral_frequency',
+      'dipole_scaling',
+      'dipole_smooth', and 'spectrogram_cm'.
 
     """
     target_is_sim = data['net'] is not None
