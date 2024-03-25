@@ -1425,8 +1425,11 @@ class Network(object):
         return _network_to_dict(self, write_output)
 
     @copy_doc(write_network)
-    def write(self, fname, overwrite=True, write_output=True):
-        write_network(self, fname, overwrite=overwrite,
+    def write(self, fname,
+              title='hnn-network',
+              overwrite=True,
+              write_output=True):
+        write_network(self, fname, title=title, overwrite=overwrite,
                       write_output=write_output)
 
 
