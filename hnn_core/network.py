@@ -1114,7 +1114,6 @@ class Network(object):
 # if self.gid_ranges[cell_name]
         self.pos_dict[cell_name] = pos
         if cell_template is not None:
-            self.cell_types.update({cell_name: cell_template})
             self._n_cells += len(pos)
 
     def gid_to_type(self, gid):
@@ -1377,37 +1376,20 @@ class Network(object):
             raise KeyError(f"The key '{new_name}' is"
                            "  already in cell_types!")
         elif original_name in self.cell_types.keys():
-            # Convert cell_types items to 
-            # a list of tuples (cell_name, cell_type)
-            # This is essential because order in
-            # cell_types determine order in
-            # cell_response._cell_type_names
-            tuple_cell_types = list(self.cell_types.items())
             # Modify the list to replace old_key with new_key
-            for index, (cell_name, cell_type) in enumerate(tuple_cell_types):
-                if cell_name == original_name:
-                    tuple_cell_types[index] = (new_name, cell_type)
-                    break  # Stop after finding the key
+            self.cell_types[new_name] = self.cell_types.pop(original_name)
+            self.pos_dict[new_name] = self.pos_dict.pop(original_name)
 
-            # Rebuild the dictionary from the modified list of items
-            # Clear the original dictionary
-            self.cell_types.clear()
-            # Update the dictionary with the modified items
-            self.cell_types.update(tuple_cell_types)
-            self.clear_connectivity()
-            self._n_gids = 0
-            # creating a temporary gid_ranges OrderedDict
             temp_gid_ranges = OrderedDict()
-            for cellname, cellID in list(self.gid_ranges.items()):
-                if cellname == original_name:
+            for cell_name, gid_range in self.gid_ranges.items():
+                if cell_name == original_name:
                     # Insert the new name with the value of the original name
-                    temp_gid_ranges[new_name] = cellID
+                    temp_gid_ranges[new_name] = gid_range
                 else:
                     # Insert the value as it is
-                    temp_gid_ranges[cellname] = cellID
-            # Updating gid_ranges from temp_gid_ranges
+                    temp_gid_ranges[cell_name] = gid_range
             self.gid_ranges = temp_gid_ranges
-            self.pos_dict[new_name] = self.pos_dict.pop(original_name)
+            self.clear_connectivity()
 
 
 class _Connectivity(dict):
