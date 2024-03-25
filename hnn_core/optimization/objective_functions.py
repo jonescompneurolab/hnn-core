@@ -91,7 +91,7 @@ def _maximize_psd(initial_net, initial_params, set_params, predicted_params,
     Returns
     -------
     obj : float
-        Normalized RMSE between recorded and simulated dipole.
+        Sum of the weighted frequency bands PSDs relative to total signal PSD.
 
     Notes
     -----
@@ -117,8 +117,6 @@ def _maximize_psd(initial_net, initial_params, set_params, predicted_params,
     dpl.scale(scale_factor)
     if smooth_window_len is not None:
         dpl.smooth(smooth_window_len)
-
-    # resample?
 
     # get psd of simulated dpl
     freqs_simulated, psd_simulated = periodogram(dpl.data['agg'], dpl.sfreq,
