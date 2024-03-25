@@ -78,12 +78,12 @@ def set_params(net, params):
 constraints = dict()
 constraints.update({'alpha_prox_weight': (4.4e-5, 6.4e-5),
                     'alpha_prox_tstart': (45, 55),
-                    'alpha_prox_burst_rate': (8, 12),
-                    'alpha_prox_burst_std': (10, 25),
+                    'alpha_prox_burst_rate': (1, 30),
+                    'alpha_prox_burst_std': (10, 30),
                     'alpha_dist_weight': (4.4e-5, 6.4e-5),
                     'alpha_dist_tstart': (45, 55),
-                    'alpha_dist_burst_rate': (8, 12),
-                    'alpha_dist_burst_std': (10, 25)})
+                    'alpha_dist_burst_rate': (1, 30),
+                    'alpha_dist_burst_std': (10, 30)})
 
 ###############################################################################
 # Now we define and fit the optimizer.
@@ -94,14 +94,15 @@ scale_factor = 3000
 smooth_window_len = 20
 
 net = jones_2009_model()
+
 optim = Optimizer(net, tstop=tstop, constraints=constraints,
                   set_params=set_params, scale_factor=scale_factor,
                   smooth_window_len=smooth_window_len, obj_fun='maximize_psd')
 
-# 8-12 Hz (alpha) and 18-22 Hz (beta) are the frequency bands whose
+# 8-15 Hz (alpha) and 15-30 Hz (beta) are the frequency bands whose
 # power we wish to maximize in a ratio of 1 to 2.
 with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
-    optim.fit(f_bands=[(8, 12), (18, 22)], relative_bandpower=(1, 2))
+    optim.fit(f_bands=[(8, 15), (15, 30)], relative_bandpower=(1, 2))
 
 ###############################################################################
 # Finally, we can plot the optimized dipole, power spectral density (PSD), and

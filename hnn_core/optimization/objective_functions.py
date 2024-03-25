@@ -63,7 +63,7 @@ def _rmse_evoked(initial_net, initial_params, set_params, predicted_params,
 def _maximize_psd(initial_net, initial_params, set_params, predicted_params,
                   update_params, obj_values, scale_factor, smooth_window_len,
                   tstop, **kwargs):
-    """The objective function for evoked responses.
+    """The objective function for PSDs.
 
     Parameters
     ----------
@@ -92,6 +92,14 @@ def _maximize_psd(initial_net, initial_params, set_params, predicted_params,
     -------
     obj : float
         Normalized RMSE between recorded and simulated dipole.
+
+    Notes
+    -----
+    The objective function minimizes the sum of the weighted (user-defined)
+    frequency band PSDs (user-defined) relative to the total PSD of the signal.
+    The objective function can be represented as -Σc[ΣPSD(i)/ΣPSD(j)] where c
+    is the weight for each frequency band, PSD(i) is the PSD for each frequency
+    band, and PSD(j) is the total PSD of the signal.
     """
 
     import numpy as np
@@ -121,11 +129,11 @@ def _maximize_psd(initial_net, initial_params, set_params, predicted_params,
     for idx, f_band in enumerate(kwargs['f_bands']):
         f_band_idx = np.where(np.logical_and(freqs_simulated >= f_band[0],
                                              freqs_simulated <= f_band[1]))[0]
-        f_bands_psds.append((-kwargs['relative_bandpower'][idx] * sum(
-            psd_simulated[f_band_idx])) / sum(psd_simulated))
+        f_bands_psds.append(-kwargs['relative_bandpower'][idx] *
+                            sum(psd_simulated[f_band_idx]))
 
     # grand sum
-    obj = sum(f_bands_psds)
+    obj = sum(f_bands_psds) / sum(psd_simulated)
 
     obj_values.append(obj)
 
