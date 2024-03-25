@@ -33,6 +33,9 @@ Changelog
 - Add feature to read/write :class:`~hnn_core.Network` from/to HDF5 format,
   by `Rajat Partani`_ and `George Dang`_ in :gh:`704`
 
+- Added `kwargs` options to `plot_spikes_hist` for HNN-style histograms,
+by `Abdul Samad`_ in :gh:`732`.
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
