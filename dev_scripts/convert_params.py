@@ -8,6 +8,8 @@ import requests
 import shutil
 import tempfile
 from pathlib import Path
+from requests.exceptions import HTTPError
+
 from hnn_core import convert_to_hdf5
 
 
@@ -28,22 +30,23 @@ def download_folder_contents(owner, repo, path):
     Path to temporary directory or None
     """
     url = f"https://api.github.com/repos/{owner}/{repo}/contents/{path}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        temp_dir = tempfile.mkdtemp()
-        contents = response.json()
-        for item in contents:
-            if item['type'] == 'file':
-                download_url = item['download_url']
-                file_name = os.path.join(temp_dir, item['name'])
-                with open(file_name, 'wb') as f:
-                    f.write(requests.get(download_url).content)
-                    print(f"Downloaded: {file_name}")
-        return temp_dir
-    else:
-        print(f"Failed to retrieve contents. Status code: "
-              f"{response.status_code}")
-        return None
+
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+    except HTTPError as e:
+        raise e
+
+    temp_dir = tempfile.mkdtemp()
+    contents = response.json()
+    for item in contents:
+        if item['type'] == 'file':
+            download_url = item['download_url']
+            file_name = os.path.join(temp_dir, item['name'])
+            with open(file_name, 'wb') as f:
+                f.write(requests.get(download_url).content)
+                print(f"Downloaded: {file_name}")
+    return temp_dir
 
 
 def convert_param_files_from_repo(owner, repo, path):
@@ -73,7 +76,6 @@ def convert_param_files_from_repo(owner, repo, path):
     output_filenames = [Path(output_dir, f.name.split('.')[0])
                         for f in file_list]
 
-    # Conversion
     [convert_to_hdf5(file, outfile)
      for (file, outfile) in zip(file_list, output_filenames)]
 
