@@ -94,7 +94,6 @@ scale_factor = 3000
 smooth_window_len = 20
 
 net = jones_2009_model()
-
 optim = Optimizer(net, tstop=tstop, constraints=constraints,
                   set_params=set_params, scale_factor=scale_factor,
                   smooth_window_len=smooth_window_len, obj_fun='maximize_psd')
