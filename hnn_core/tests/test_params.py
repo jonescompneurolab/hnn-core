@@ -101,7 +101,7 @@ def test_convert_to_hdf5(tmp_path):
     assert net_hdf5_no_drives != net_hdf5
     assert bool(net_hdf5_no_drives.external_drives) is False
 
-    # Check if writing with no extension will add one
+    # Check that writing with no extension will add one
     outpath_no_ext = Path(tmp_path, 'default_no_ext')
     convert_to_hdf5(params_base_fname, outpath_no_ext)
     assert outpath_no_ext.with_suffix('.hdf5').exists()
@@ -130,7 +130,7 @@ def test_convert_to_hdf5_legacy(tmp_path):
 def test_convert_to_hdf5_bad_type():
     """Tests type validation in convert_to_hdf5 function"""
     good_path = hnn_core_root
-    path_str = good_path.__str__()
+    path_str = str(good_path)
     bad_path = 5
 
     # Valid path and string, but not actual files
