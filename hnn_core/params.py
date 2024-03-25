@@ -657,12 +657,6 @@ def compare_dictionaries(d1, d2):
     return d1
 
 
-def _convert_to_path(value):
-    if isinstance(value, str):
-        value = Path(value)
-    return value
-
-
 def convert_to_hdf5(params_fname, out_fname, include_drives=True,
                     overwrite=True, write_output=False):
     """Converts json or param format to hdf5
