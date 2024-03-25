@@ -1376,19 +1376,19 @@ class Network(object):
             raise KeyError(f"The key '{new_name}' is"
                            "  already in cell_types!")
         elif original_name in self.cell_types.keys():
-            # Modify the list to replace old_key with new_key
+            # Update cell name in places where order doesn't matter
             self.cell_types[new_name] = self.cell_types.pop(original_name)
             self.pos_dict[new_name] = self.pos_dict.pop(original_name)
 
-            temp_gid_ranges = OrderedDict()
-            for cell_name, gid_range in self.gid_ranges.items():
-                if cell_name == original_name:
+            # Update cell name in gid_ranges: order matters for consistency!
+            for _ in range(len(self.gid_ranges)):
+                name, gid_range = self.gid_ranges.popitem(last=False)
+                if name == original_name:
                     # Insert the new name with the value of the original name
-                    temp_gid_ranges[new_name] = gid_range
+                    self.gid_ranges[new_name] = gid_range
                 else:
                     # Insert the value as it is
-                    temp_gid_ranges[cell_name] = gid_range
-            self.gid_ranges = temp_gid_ranges
+                    self.gid_ranges[name] = gid_range
             self.clear_connectivity()
 
 
