@@ -23,6 +23,8 @@ from .viz import plot_cells
 from .externals.mne import _validate_type, _check_option
 from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
+from .hnn_io import write_network
+from .externals.mne import copy_doc
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
@@ -55,50 +57,70 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
     Notes
     -----
     Common positions are all located at origin.
-    Sort of a hack bc of redundancy
+    Sort of a hack because of redundancy.
     """
-    pos_dict = dict()
+    def _calc_pyramidal_coord(xxrange, yyrange, zdiff):
+        list_coords = [pos for pos in it.product(xxrange, yyrange, [zdiff])]
+        return list_coords
 
-    # PYRAMIDAL CELLS
+    def _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff, inplane_distance, weight):
+        xzero = np.arange(0, n_pyr_x, 3) * inplane_distance
+        xone = np.arange(1, n_pyr_x, 3) * inplane_distance
+        # split even and odd y vals
+        yeven = np.arange(0, n_pyr_y, 2) * inplane_distance
+        yodd = np.arange(1, n_pyr_y, 2) * inplane_distance
+        # create general list of x,y coords and sort it
+        coords = [pos for pos in it.product(
+            xzero, yeven)] + [pos for pos in it.product(xone, yodd)]
+        coords_sorted = sorted(coords, key=lambda pos: pos[1])
+
+        # append the z value for position
+        list_coords = [(pos_xy[0], pos_xy[1], weight * zdiff)
+                       for pos_xy in coords_sorted]
+
+        return list_coords
+
+    def _calc_origin(xxrange, yyrange, zdiff):
+        # origin's z component isn't used in calculating distance functions.
+        # will be used for adding external drives.
+        origin_x = xxrange[int((len(xxrange) - 1) // 2)]
+        origin_y = yyrange[int((len(yyrange) - 1) // 2)]
+        origin_z = np.floor(zdiff / 2)
+        origin = (origin_x, origin_y, origin_z)
+        return origin
+
+    # Calculate distances
     xxrange = np.arange(n_pyr_x) * inplane_distance
     yyrange = np.arange(n_pyr_y) * inplane_distance
 
-    pos_dict['L5_pyramidal'] = [
-        pos for pos in it.product(xxrange, yyrange, [0])]
-    pos_dict['L2_pyramidal'] = [
-        pos for pos in it.product(xxrange, yyrange, [zdiff])]
-
-    # BASKET CELLS
-    xzero = np.arange(0, n_pyr_x, 3) * inplane_distance
-    xone = np.arange(1, n_pyr_x, 3) * inplane_distance
-    # split even and odd y vals
-    yeven = np.arange(0, n_pyr_y, 2) * inplane_distance
-    yodd = np.arange(1, n_pyr_y, 2) * inplane_distance
-    # create general list of x,y coords and sort it
-    coords = [pos for pos in it.product(
-        xzero, yeven)] + [pos for pos in it.product(xone, yodd)]
-    coords_sorted = sorted(coords, key=lambda pos: pos[1])
-    # append the z value for position for L2 and L5
-    # print(len(coords_sorted))
-
-    pos_dict['L5_basket'] = [(pos_xy[0], pos_xy[1], 0.2 * zdiff) for
-                             pos_xy in coords_sorted]
-    pos_dict['L2_basket'] = [(pos_xy[0], pos_xy[1], 0.8 * zdiff) for
-                             pos_xy in coords_sorted]
-
-    # ORIGIN
-    # origin's z component isn't really used in
-    # calculating distance functions from origin
-    # these will be forced as ints!
-    origin_x = xxrange[int((len(xxrange) - 1) // 2)]
-    origin_y = yyrange[int((len(yyrange) - 1) // 2)]
-    origin_z = np.floor(zdiff / 2)
-    origin = (origin_x, origin_y, origin_z)
-
-    # save the origin for adding external drives later
-    pos_dict['origin'] = origin
+    pos_dict = {
+        'L5_pyramidal': _calc_pyramidal_coord(xxrange, yyrange, zdiff=0),
+        'L2_pyramidal': _calc_pyramidal_coord(xxrange, yyrange, zdiff=zdiff),
+        'L5_basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
+                                        inplane_distance, weight=0.2
+                                        ),
+        'L2_basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
+                                        inplane_distance, weight=0.8
+                                        ),
+        'origin': _calc_origin(xxrange, yyrange, zdiff),
+    }
 
     return pos_dict
+
+
+def _compare_lists(s, t):
+    """
+    Compares lists for equality
+
+    From https://stackoverflow.com/a/7829388
+    """
+    t = list(t)  # make a mutable copy
+    try:
+        for elem in s:
+            t.remove(elem)
+    except ValueError:
+        return False
+    return not t
 
 
 def _connection_probability(conn, probability, conn_seed=None):
@@ -114,7 +136,7 @@ def _connection_probability(conn, probability, conn_seed=None):
         Defaults to 1.0 producing an all-to-all pattern.
     conn_seed : int
         Optional initial seed for random number generator (default: None).
-        Used to randomly remove connections when probablity < 1.0.
+        Used to randomly remove connections when probability < 1.0.
 
     Notes
     -----
@@ -171,12 +193,12 @@ def pick_connection(net, src_gids=None, target_gids=None,
     src_gids : str | int | range | list of int | None
         Identifier for source cells. Passing str arguments
         ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
-        equivalent to passing a list of gids for the relvant cell type.
+        equivalent to passing a list of gids for the relevant cell type.
         source - target connections are made in an all-to-all pattern.
     target_gids : str | int | range | list of int | None
-        Identifer for targets of source cells. Passing str arguments
+        Identifier for targets of source cells. Passing str arguments
         ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
-        equivalent to passing a list of gids for the relvant cell type.
+        equivalent to passing a list of gids for the relevant cell type.
         source - target connections are made in an all-to-all pattern.
     loc : str | list of str | None
         Location of synapse on target cell. Must be
@@ -253,7 +275,7 @@ def pick_connection(net, src_gids=None, target_gids=None,
         else:
             receptor_dict[conn['receptor']] = [conn_idx]
 
-    # Look up conn indeces that match search terms and add to set.
+    # Look up conn indices that match search terms and add to set.
     conn_set = set()
     search_pairs = [(src_gids, src_dict), (target_gids, target_dict),
                     (loc, loc_dict), (receptor, receptor_dict)]
@@ -288,6 +310,9 @@ class Network(object):
     legacy_mode : bool
         Set to True by default to enable matching HNN GUI output when drives
         are added suitably. Will be deprecated in a future release.
+    mesh_shape : tuple of int (default: (10, 10))
+        Defines the (n_x, n_y) shape of the grid of pyramidal cells.
+
 
     Attributes
     ----------
@@ -331,14 +356,14 @@ class Network(object):
 
     Notes
     -----
-    ``net = jones_2009_model(params)`` is the reccomended path for creating a
+    ``net = jones_2009_model(params)`` is the recommended path for creating a
     network. Instantiating the network as ``net = Network(params)`` will
     produce a network with no cell-to-cell connections. As such,
     connectivity information contained in ``params`` will be ignored.
     """
 
     def __init__(self, params, add_drives_from_params=False,
-                 legacy_mode=False):
+                 legacy_mode=False, mesh_shape=(10, 10)):
         # Save the parameters used to create the Network
         _validate_type(params, dict, 'params')
         self._params = params
@@ -348,7 +373,7 @@ class Network(object):
         # interrogate a built and simulated net. In addition, CellResponse is
         # attached to a Network during simulation---Network is the natural
         # place to keep this information. Order matters: cell gids first, then
-        # artifical drive cells
+        # artificial drive cells
         self.gid_ranges = OrderedDict()
         self._n_gids = 0  # utility: keep track of last GID
 
@@ -389,8 +414,18 @@ class Network(object):
         self.pos_dict = dict()
         self.cell_types = dict()
 
-        self._N_pyr_x = self._params['N_pyr_x']
-        self._N_pyr_y = self._params['N_pyr_y']
+        # set the mesh shape
+        _validate_type(mesh_shape, tuple, 'mesh_shape')
+        _validate_type(mesh_shape[0], int, 'mesh_shape[0]')
+        _validate_type(mesh_shape[1], int, 'mesh_shape[1]')
+
+        if mesh_shape[0] < 1 or mesh_shape[1] < 1:
+            raise ValueError('mesh_shape must be a tuple of positive '
+                             f'integers, got: {mesh_shape}')
+
+        self._N_pyr_x = mesh_shape[0]
+        self._N_pyr_y = mesh_shape[1]
+
         self._inplane_distance = 1.0  # XXX hard-coded default
         self._layer_separation = 1307.4  # XXX hard-coded default
         self.set_cell_positions(inplane_distance=self._inplane_distance,
@@ -413,6 +448,32 @@ class Network(object):
               % (len(self.pos_dict['L2_basket']),
                  len(self.pos_dict['L5_basket'])))
         return '<%s | %s>' % (class_name, s)
+
+    def __eq__(self, other):
+        if not isinstance(other, Network):
+            return NotImplemented
+
+        # Check connectivity
+        if ((len(self.connectivity) != len(other.connectivity)) or
+                not (_compare_lists(self.connectivity, other.connectivity))):
+            return False
+
+        # Check all other attributes
+        all_attrs = dir(self)
+        attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
+        attrs_to_ignore.extend(['add_bursty_drive', 'add_connection',
+                                'add_electrode_array', 'add_evoked_drive',
+                                'add_poisson_drive', 'add_tonic_bias',
+                                'clear_connectivity', 'clear_drives',
+                                'connectivity', 'copy', 'gid_to_type',
+                                'plot_cells', 'set_cell_positions', 'write'])
+        attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
+
+        for attr in attrs_to_check:
+            if getattr(self, attr) != getattr(other, attr):
+                return False
+
+        return True
 
     def set_cell_positions(self, *, inplane_distance=None,
                            layer_separation=None):
@@ -517,7 +578,7 @@ class Network(object):
             this evoked drive across the network in a given trial with one
             spike, set n_drive_cells=1 and cell_specific=False.
         cell_specific : bool
-            Whether each artifical drive cell has 1-to-1 (True, default) or
+            Whether each artificial drive cell has 1-to-1 (True, default) or
             all-to-all (False) connection parameters. Note that 1-to-1
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
             denotes the number of all available cells that this drive can
@@ -551,7 +612,7 @@ class Network(object):
             Not fixed across trials (see Notes)
         conn_seed : int
             Optional initial seed for random number generator (default: 3).
-            Used to randomly remove connections when probablity < 1.0.
+            Used to randomly remove connections when probability < 1.0.
             Fixed across trials (see Notes)
 
         Notes
@@ -579,6 +640,11 @@ class Network(object):
         drive['conn_seed'] = conn_seed
         drive['dynamics'] = dict(mu=mu, sigma=sigma, numspikes=numspikes)
         drive['events'] = list()
+        # Need to save this information
+        drive['weights_ampa'] = weights_ampa
+        drive['weights_nmda'] = weights_nmda
+        drive['synaptic_delays'] = synaptic_delays
+        drive['probability'] = probability
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
@@ -624,7 +690,7 @@ class Network(object):
             to synchronize the timing of Poisson drive across the network in a
             given trial, set n_drive_cells=1 and cell_specific=False.
         cell_specific : bool
-            Whether each artifical drive cell has 1-to-1 (True, default) or
+            Whether each artificial drive cell has 1-to-1 (True, default) or
             all-to-all (False) connection parameters. Note that 1-to-1
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
             denotes the number of all available cells that this drive can
@@ -657,7 +723,7 @@ class Network(object):
             Used to generate event times for drive cells.
         conn_seed : int
             Optional initial seed for random number generator (default: 3).
-            Used to randomly remove connections when probablity < 1.0.
+            Used to randomly remove connections when probability < 1.0.
         """
 
         _check_drive_parameter_values('Poisson', tstart=tstart,
@@ -688,6 +754,11 @@ class Network(object):
         drive['dynamics'] = dict(tstart=tstart, tstop=tstop,
                                  rate_constant=rate_constant)
         drive['events'] = list()
+        # Need to save this information
+        drive['weights_ampa'] = weights_ampa
+        drive['weights_nmda'] = weights_nmda
+        drive['synaptic_delays'] = synaptic_delays
+        drive['probability'] = probability
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
@@ -740,7 +811,7 @@ class Network(object):
             all-to-all connectivity and provide synchronous input to cells in
             the network.
         cell_specific : bool
-            Whether each artifical drive cell has 1-to-1 (True) or all-to-all
+            Whether each artificial drive cell has 1-to-1 (True) or all-to-all
             (False, default) connection parameters. Note that 1-to-1
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
             denotes the number of all available cells that this drive can
@@ -773,7 +844,7 @@ class Network(object):
             Used to generate event times for drive cells.
         conn_seed : int
             Optional initial seed for random number generator (default: 3).
-            Used to randomly remove connections when probablity < 1.0.
+            Used to randomly remove connections when probability < 1.0.
         """
         if not self._legacy_mode:
             _check_drive_parameter_values('bursty', tstart=tstart, tstop=tstop,
@@ -794,6 +865,11 @@ class Network(object):
                                  burst_rate=burst_rate, burst_std=burst_std,
                                  numspikes=numspikes, spike_isi=spike_isi)
         drive['events'] = list()
+        # Need to save this information
+        drive['weights_ampa'] = weights_ampa
+        drive['weights_nmda'] = weights_nmda
+        drive['synaptic_delays'] = synaptic_delays
+        drive['probability'] = probability
 
         self._attach_drive(name, drive, weights_ampa, weights_nmda, location,
                            space_constant, synaptic_delays,
@@ -845,7 +921,7 @@ class Network(object):
             drive across the network in a given trial with one spike, set
             n_drive_cells=1 and cell_specific=False.
         cell_specific : bool
-            Whether each artifical drive cell has 1-to-1 (True) or all-to-all
+            Whether each artificial drive cell has 1-to-1 (True) or all-to-all
             (False) connection parameters. Note that 1-to-1
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
             denotes the number of all available cells that this drive can
@@ -1005,7 +1081,7 @@ class Network(object):
 
         NB this must be a separate method because dipole.py:simulate_dipole
         accepts an n_trials-argument, which overrides the N_trials-parameter
-        used at intialisation time. The good news is that only the event_times
+        used at initialisation time. The good news is that only the event_times
         need to be recalculated, all the GIDs etc remain the same.
         """
         self._reset_drives()
@@ -1114,7 +1190,7 @@ class Network(object):
             equivalent to passing a list of gids for the relevant cell type.
             source - target connections are made in an all-to-all pattern.
         target_gids : str | int | range | list of int
-            Identifer for targets of source cells. Passing str arguments
+            Identifier for targets of source cells. Passing str arguments
             ('L2_pyramidal', 'L2_basket', 'L5_pyramidal', 'L5_basket') is
             equivalent to passing a list of gids for the relevant cell type.
             source - target connections are made in an all-to-all pattern.
@@ -1141,7 +1217,7 @@ class Network(object):
             Defaults to 1.0 producing an all-to-all pattern.
         conn_seed : int
             Optional initial seed for random number generator (default: None).
-            Used to randomly remove connections when probablity < 1.0.
+            Used to randomly remove connections when probability < 1.0.
 
         Notes
         -----
@@ -1263,6 +1339,7 @@ class Network(object):
             _connection_probability(conn, probability, conn_seed)
 
         conn['probability'] = probability
+        conn['allow_autapses'] = allow_autapses
 
         self.connectivity.append(deepcopy(conn))
 
@@ -1339,6 +1416,10 @@ class Network(object):
             The matplotlib figure handle.
         """
         return plot_cells(net=self, ax=ax, show=show)
+
+    @copy_doc(write_network)
+    def write(self, fname, overwrite=True, write_output=True):
+        write_network(self, fname, overwrite, write_output)
 
 
 class _Connectivity(dict):
@@ -1434,7 +1515,7 @@ class _NetworkDrive(dict):
         Each artificial drive cell has seed = event_seed + gid
     conn_seed : int
         Optional initial seed for random number generator.
-        Used to randomly remove connections when probablity < 1.0.
+        Used to randomly remove connections when probability < 1.0.
     target_types : set or list of str
         Names of cell types targeted by this drive (must be subset of
         net.cell_types.keys()).

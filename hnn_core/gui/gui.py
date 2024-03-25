@@ -11,6 +11,7 @@ import urllib.parse
 import urllib.request
 from collections import defaultdict
 from pathlib import Path
+from datetime import datetime
 from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload, VBox,
@@ -431,15 +432,14 @@ class HNNGUI:
             self._connectivity_out,
         ])
 
-        # accordians to group local-connectivity by cell type
+        # accordions to group local-connectivity by cell type
         connectivity_boxes = [
             VBox(slider) for slider in self.connectivity_widgets]
         connectivity_names = (
             'Layer 2/3 Pyramidal', 'Layer 5 Pyramidal', 'Layer 2 Basket',
             'Layer 5 Basket')
         cell_connectivity = Accordion(children=connectivity_boxes)
-        for idx, connectivity_name in enumerate(connectivity_names):
-            cell_connectivity.set_title(idx, connectivity_name)
+        cell_connectivity.titles = [s for s in connectivity_names]
 
         drive_selections = VBox([
             self.add_drive_button, self.widget_drive_type_selection,
@@ -616,15 +616,14 @@ class HNNGUI:
         self.load_drives_button.set_trait('value', uploaded_value)
 
     def _simulate_left_tab_click(self, tab_title):
-        tab_index = None
+        # Get left tab group object
         left_tab = self.app_layout.left_sidebar.children[0].children[0]
-        for idx in left_tab._titles.keys():
-            if tab_title == left_tab._titles[idx]:
-                tab_index = int(idx)
-                break
-        if tab_index is None:
-            raise ValueError("Incorrect tab title")
-        left_tab.selected_index = tab_index
+        # Check that the title is in the tab group
+        if tab_title in left_tab.titles:
+            # Simulate the user clicking on the tab
+            left_tab.selected_index = left_tab.titles.index(tab_title)
+        else:
+            raise ValueError("Tab title does not exist.")
 
     def _simulate_make_figure(self,):
         self._simulate_left_tab_click("Visualization")
@@ -655,16 +654,13 @@ def _prepare_upload_file_from_url(file_url):
     for line in data:
         content += line
 
-    return {
-        params_name: {
-            'metadata': {
-                'name': params_name,
-                'type': 'application/json',
-                'size': len(content),
-            },
-            'content': content
-        }
-    }
+    return [{
+        'name': params_name,
+        'type': 'application/json',
+        'size': len(content),
+        'content': content,
+        'last_modified': datetime.now()
+    }]
 
 
 def create_expanded_button(description, button_style, layout, disabled=False,
@@ -1133,14 +1129,14 @@ def on_upload_data_change(change, data, viz_manager, log_out):
         logger.info("Empty change")
         return
 
-    key = list(change['new'].keys())[0]
+    data_dict = change['new'][0]
 
-    data_fname = change['new'][key]['metadata']['name'].rstrip('.txt')
+    data_fname = data_dict['name'].rstrip('.txt')
     if data_fname in data['simulation_data'].keys():
         logger.error(f"Found existing data: {data_fname}.")
         return
 
-    ext_content = change['new'][key]['content']
+    ext_content = data_dict['content']
     ext_content = codecs.decode(ext_content, encoding="utf-8")
     with log_out:
         data['simulation_data'][data_fname] = {'net': None, 'dpls': [
@@ -1163,10 +1159,9 @@ def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
         logger.info("Empty change")
         return
     logger.info("Loading connectivity...")
-    key = list(change['new'].keys())[0]
-
-    params_fname = change['new'][key]['metadata']['name']
-    param_data = change['new'][key]['content']
+    param_dict = change['new'][0]
+    params_fname = param_dict['name']
+    param_data = param_dict['content']
 
     param_data = codecs.decode(param_data, encoding="utf-8")
 
@@ -1191,9 +1186,8 @@ def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
                       layout)
     else:
         raise ValueError
-
-    change['owner'].set_trait('_counter', 0)
-    change['owner'].set_trait('value', {})
+    # Resets file counter to 0
+    change['owner'].set_trait('value', ([]))
 
 
 def _init_network_from_widgets(params, dt, tstop, single_simulation_data,

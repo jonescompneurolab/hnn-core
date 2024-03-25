@@ -133,7 +133,7 @@ class MPISimulation(object):
             # only rank 0 has data that should be sent back to MPIBackend
             sim_data.append(single_sim_data)
 
-        # flush output buffers from all ranks (any errors or status mesages)
+        # flush output buffers from all ranks (any errors or status messages)
         sys.stdout.flush()
         sys.stderr.flush()
 

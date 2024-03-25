@@ -4,7 +4,7 @@
 
 import copy
 import io
-from functools import partial
+from functools import partial, wraps
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -99,6 +99,38 @@ def plot_type_coupled_change(new_plot_type, target_data_selection):
         target_data_selection.disabled = False
 
 
+def unlink_relink(attribute):
+    """
+    Decorator function to unlink widgets and re-link widgets.
+
+    Unlinks linked widgets, runs the wrapped function, and relinks the widgets
+    upon completion. To be used as a decorator on class methods. The class must
+    have an attribute containing an ipywidgets/traitlets link object.
+
+    Parameters
+    ----------
+    attribute: (str) The class attribute containing link object of ipywidgets
+               widgets
+
+    """
+    def _unlink_relink(f):
+        @wraps(f)
+        def wrapper(self, *args, **kwargs):
+            # Unlink the widgets using the provided link object
+            link_attribute: link = getattr(self, attribute)
+            link_attribute.unlink()
+
+            # Call the original function
+            result = f(self, *args, **kwargs)
+
+            # Re-link the widgets
+            link_attribute.link()
+
+            return result
+        return wrapper
+    return _unlink_relink
+
+
 def _idx2figname(idx):
     return f"Figure {idx}"
 
@@ -150,7 +182,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
 
     elif plot_type == 'PSD':
         if len(dpls_copied) > 0:
-            color = next(ax._get_lines.prop_cycler)['color']
+            color = ax._get_lines.get_next_color()
             dpls_copied[0].plot_psd(fmin=0, fmax=50, ax=ax, color=color,
                                     label=sim_name, show=False)
 
@@ -175,7 +207,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
             else:
                 label = sim_name
 
-            color = next(ax._get_lines.prop_cycler)['color']
+            color = ax._get_lines.get_next_color()
             if plot_type == 'current dipole':
                 plot_dipole(dpls_copied,
                             ax=ax,
@@ -226,9 +258,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
 def _static_rerender(widgets, fig, fig_idx):
     logger.debug('_static_re_render is called')
     figs_tabs = widgets['figs_tabs']
-    titles = [
-        figs_tabs.get_title(idx) for idx in range(len(figs_tabs.children))
-    ]
+    titles = figs_tabs.titles
     fig_tab_idx = titles.index(_idx2figname(fig_idx))
     fig_output = widgets['figs_tabs'].children[fig_tab_idx]
     fig_output.clear_output()
@@ -501,18 +531,25 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
 def _close_figure(b, widgets, data, fig_idx):
     fig_related_widgets = [widgets['figs_tabs'], widgets['axes_config_tabs']]
     for w_idx, tab in enumerate(fig_related_widgets):
+        # Get tab object's list of children and their titles
         tab_children = list(tab.children)
-        titles = [tab.get_title(idx) for idx in range(len(tab.children))]
+        titles = list(tab.titles)
+        # Get the index based on the title
         tab_idx = titles.index(_idx2figname(fig_idx))
+        # Remove the child and title specified
         print(f"Del fig_idx={fig_idx}, fig_idx={fig_idx}")
-        del tab_children[tab_idx], titles[tab_idx]
+        tab_children.pop(tab_idx)
+        titles.pop(tab_idx)
+        # Reset children and titles of the tab object
+        tab.children = tab_children
+        tab.titles = titles
 
-        tab.children = tuple(tab_children)
-        [tab.set_title(idx, title) for idx, title in enumerate(titles)]
-
+        # If the figure tab group...
         if w_idx == 0:
+            # Close figure and delete the data
             plt.close(data['figs'][fig_idx])
-            del data['figs'][fig_idx]
+            data['figs'].pop(fig_idx)
+            # Redisplay the remaining children
             n_tabs = len(tab.children)
             for idx in range(n_tabs):
                 _fig_idx = _figname2idx(tab.get_title(idx))
@@ -522,10 +559,11 @@ def _close_figure(b, widgets, data, fig_idx):
                 with tab.children[idx]:
                     display(data['figs'][_fig_idx].canvas)
 
-        if n_tabs == 0:
-            widgets['figs_output'].clear_output()
-            with widgets['figs_output']:
-                display(Label(_fig_placeholder))
+            # If all children have been deleted display the placeholder
+            if n_tabs == 0:
+                widgets['figs_output'].clear_output()
+                with widgets['figs_output']:
+                    display(Label(_fig_placeholder))
 
 
 def _add_axes_controls(widgets, data, fig, axd):
@@ -565,8 +603,9 @@ def _add_figure(b, widgets, data, scale=0.95, dpi=96):
         with widgets['figs_output']:
             display(widgets['figs_tabs'])
 
-    widgets['figs_tabs'].children = widgets['figs_tabs'].children + (
-        fig_outputs, )
+    widgets['figs_tabs'].children = (
+        [s for s in widgets['figs_tabs'].children] + [fig_outputs]
+    )
     widgets['figs_tabs'].set_title(n_tabs, _idx2figname(fig_idx))
 
     with fig_outputs:
@@ -627,7 +666,7 @@ class _VizManager:
         self.figs_tabs = Tab()
         self.axes_config_tabs.selected_index = None
         self.figs_tabs.selected_index = None
-        link(
+        self.figs_config_tab_link = link(
             (self.axes_config_tabs, 'selected_index'),
             (self.figs_tabs, 'selected_index'),
         )
@@ -711,6 +750,7 @@ class _VizManager:
         ])
         return config_panel, fig_output_container
 
+    @unlink_relink(attribute='figs_config_tab_link')
     def add_figure(self, b=None):
         """Add a figure and corresponding config tabs to the dashboard.
         """
@@ -729,7 +769,7 @@ class _VizManager:
 
     def _simulate_delete_figure(self, fig_name):
         tab = self.axes_config_tabs
-        titles = [tab.get_title(idx) for idx in range(len(tab.children))]
+        titles = tab.titles
         assert fig_name in titles
         tab_idx = titles.index(fig_name)
 
@@ -746,7 +786,7 @@ class _VizManager:
             fig_name : str
                 The figure name shown in the GUI, e.g., 'Figure 1'.
             ax_name : str
-                Axis name shwon in the left side of GUI, like, 'ax0'.
+                Axis name shown in the left side of GUI, like, 'ax0'.
             simulation_name : str
                 The name of simulation you want to visualize
             plot_type : str
@@ -764,16 +804,13 @@ class _VizManager:
         assert operation in ("plot", "clear")
 
         tab = self.axes_config_tabs
-        titles = [tab.get_title(idx) for idx in range(len(tab.children))]
+        titles = tab.titles
         assert fig_name in titles, "No such figure"
         tab_idx = titles.index(fig_name)
         self.axes_config_tabs.selected_index = tab_idx
 
         ax_control_tabs = self.axes_config_tabs.children[tab_idx].children[1]
-        ax_titles = [
-            ax_control_tabs.get_title(idx)
-            for idx in range(len(ax_control_tabs.children))
-        ]
+        ax_titles = ax_control_tabs.titles
         assert ax_name in ax_titles, "No such axis"
         ax_idx = ax_titles.index(ax_name)
         ax_control_tabs.selected_index = ax_idx

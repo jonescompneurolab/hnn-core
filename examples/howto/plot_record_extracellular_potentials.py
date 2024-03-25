@@ -39,7 +39,7 @@ add_erp_drives_to_jones_model(net)
 net.set_cell_positions(inplane_distance=30.)
 
 ###############################################################################
-# Extracellular recordings require specifying the electrode postions. It can be
+# Extracellular recordings require specifying the electrode positions. It can be
 # useful to visualize the cells of the network to decide on the placement of
 # each electrode.
 net.plot_cells()

@@ -25,9 +25,7 @@ def test_optimize_evoked(solver):
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
 
-    params.update({'N_pyr_x': 3,
-                   'N_pyr_y': 3})
-    net_orig = jones_2009_model(params)
+    net_orig = jones_2009_model(params, mesh_shape=(3, 3))
 
     mu_orig = 2.
     weights_ampa = {'L2_basket': 0.5,

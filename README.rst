@@ -1,18 +1,50 @@
 hnn-core
 ========
 
-|tests| |CircleCI| |Codecov| |PyPI| |Gitter|
+|tests| |CircleCI| |Codecov| |PyPI| |Gitter| |JOSS|
 
 |HNN-GUI|
 
-This is a leaner and cleaner version of the code based off the `HNN repository <https://github.com/jonescompneurolab/hnn>`_.
+About
+-----
+This is a leaner and cleaner version of the code based off the
+`HNN repository <https://github.com/jonescompneurolab/hnn>`_.
+
+The **Human Neocortical Neurosolver (HNN)** is an open-source neural modeling
+tool designed to help researchers/clinicians interpret human brain imaging
+data. Based off the original
+`HNN repository <https://github.com/jonescompneurolab/hnn>`_, **HNN-core**
+provides a convenient way to run simulations of an anatomically
+and biophysically detailed dynamical system model of human thalamocortical
+brain circuits with only a few lines of code. Given its modular,
+object-oriented design, HNN-core makes it easy to generate and evaluate
+hypotheses on the mechanistic origin of signals measured with
+magnetoencephalography (MEG), electroencephalography (EEG), or
+intracranial electrocorticography (ECoG). A unique feature of the HNN model is
+that it accounts for the biophysics generating the primary electric currents
+underlying such data, so simulation results are directly comparable to source
+localized data (current dipoles in units of nano-Ampere-meters); this enables
+precise tuning of model parameters to match characteristics of recorded
+signals. Multimodal neurophysiology data such as local field potential (LFP),
+current-source density (CSD), and spiking dynamics can also be simulated
+simultaneously with current dipoles.
+
+While the HNN-core API is designed to be flexible and serve users with varying
+levels of coding expertise, the HNN-core GUI is designed to be useful
+to researchers with no formal computational neural modeling or coding
+experience.
+
+For more information visit `https://hnn.brown.edu <https://hnn.brown.edu>`_.
+There, we describe the use of HNN in studying the circuit-level origin of some
+of the most commonly measured MEG/EEG and ECoG signals: event related
+potentials (ERPs) and low frequency rhythms (alpha/beta/gamma).
 
 Contributors are very welcome. Please read our
 `contributing guide`_ if you are interested.
 
 Dependencies
 ------------
-hnn-core requires Python (>=3.7) and the following packages:
+hnn-core requires Python (>=3.8) and the following packages:
 
 * numpy
 * scipy
@@ -25,8 +57,10 @@ Optional dependencies
 GUI
 ~~~
 
-* ipywidgets (<=7.7.1)
-* voila (<=0.3.6)
+* ipywidgets (>=8.0.0)
+* voila
+* ipympl
+* ipykernel
 
 Optimization
 ~~~~~~~~~~~~
@@ -142,6 +176,16 @@ Roadmap
 
 Read our `roadmap`_.
 
+Citing
+======
+
+If you use HNN-core in your work, please cite our
+`publication in JOSS <https://doi.org/10.21105/joss.05848>`_:
+
+   Jas et al., (2023). HNN-core: A Python software for cellular and
+   circuit-level interpretation of human MEG/EEG. *Journal of Open Source
+   Software*, 8(92), 5848, https://doi.org/10.21105/joss.05848
+
 .. _precompiled installers: https://www.neuron.yale.edu/neuron/download
 .. _NEURON forum: https://www.neuron.yale.edu/phpbb/
 .. _contributing guide: https://jonescompneurolab.github.io/hnn-core/dev/contributing.html
@@ -163,3 +207,6 @@ Read our `roadmap`_.
 
 .. |Gitter| image:: https://badges.gitter.im/jonescompneurolab/hnn_core.svg
    :target: https://gitter.im/jonescompneurolab/hnn-core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+
+.. |JOSS| image:: https://joss.theoj.org/papers/10.21105/joss.05848/status.svg
+   :target: https://doi.org/10.21105/joss.05848

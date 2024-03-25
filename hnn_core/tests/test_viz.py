@@ -1,7 +1,7 @@
-from functools import partial
 import os.path as op
 
 import matplotlib
+from matplotlib import backend_bases
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.testing import assert_allclose
@@ -19,8 +19,11 @@ matplotlib.use('agg')
 def _fake_click(fig, ax, point, button=1):
     """Fake a click at a point within axes."""
     x, y = ax.transData.transform_point(point)
-    func = partial(fig.canvas.button_press_event, x=x, y=y, button=button)
-    func(guiEvent=None)
+    button_press_event = backend_bases.MouseEvent(
+        name='button_press_event', canvas=fig.canvas,
+        x=x, y=y, button=button
+    )
+    fig.canvas.callbacks.process('button_press_event', button_press_event)
 
 
 def test_network_visualization():
@@ -28,9 +31,7 @@ def test_network_visualization():
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
-    params.update({'N_pyr_x': 3,
-                   'N_pyr_y': 3})
-    net = jones_2009_model(params)
+    net = jones_2009_model(params, mesh_shape=(3, 3))
     plot_cells(net)
     ax = net.cell_types['L2_pyramidal'].plot_morphology()
     assert len(ax.lines) == 8
@@ -102,9 +103,7 @@ def test_dipole_visualization():
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
-    params.update({'N_pyr_x': 3,
-                   'N_pyr_y': 3})
-    net = jones_2009_model(params)
+    net = jones_2009_model(params, mesh_shape=(3, 3))
     weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
     syn_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
 

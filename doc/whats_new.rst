@@ -18,6 +18,24 @@ Changelog
 - Add ability to manually define colors in spike histogram plots,
   by `Nick Tolley`_ in :gh:`640`
 
+- Update minimum supported version of Python to 3.8, by `Ryan Thorpe`_ in
+  :gh:`678`.
+
+- Update GUI to use ipywidgets v8.0.0+ API, by `George Dang`_ in
+  :gh:`696`.
+
+- Add dependency groups to setup.py and update CI workflows to reference
+  dependency groups, by `George Dang`_ in :gh:`703`.
+
+- Add ability to specify number of cells in :class:`~hnn_core.Network`,
+  by `Nick Tolley`_ in :gh:`705`
+
+- Add feature to read/write :class:`~hnn_core.Network` from/to HDF5 format,
+  by `Rajat Partani`_ and `George Dang`_ in :gh:`704`
+
+- Add feature to convert param and json files to HDF5 format, by `George Dang`_
+  in :gh:`723`
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
@@ -25,6 +43,9 @@ Bug
 
 - Objective function called by :func:`~hnn_core/optimization/optimize_evoked`
   now returns a scalar instead of tuple, by `Ryan Thorpe`_ in :gh:`670`.
+
+- Fix GUI plotting bug due to deprecation of matplotlib color cycling method,
+  by `George Dang`_ in :gh:`695`.
 
 API
 ~~~
@@ -237,7 +258,7 @@ Changelog
 
 - Add method for setting in-plane cell distances and layer separation in the network :func:`~hnn_core.Network.set_cell_positions`, by `Christopher Bailey`_ in `#370 <https://github.com/jonescompneurolab/hnn-core/pull/370>`_
 
-- External drives API now accepts probability argument for targetting subsets of cells,
+- External drives API now accepts probability argument for targeting subsets of cells,
   by `Nick Tolley`_ in :gh:`416`
 
 Bug
@@ -272,7 +293,7 @@ API
   :func:`~hnn_core.Network.add_connection`, by `Nick Tolley`_ in :gh:`276`
 
 - Remove :class:`~hnn_core.L2Pyr`, :class:`~hnn_core.L5Pyr`, :class:`~hnn_core.L2Basket`,
-  and :class:`~hnn_core.L5Basket` classes in favor of instantation through functions and
+  and :class:`~hnn_core.L5Basket` classes in favor of instantiation through functions and
   a more consistent :class:`~hnn_core.Cell` class by `Mainak Jas`_ in  :gh:`322`
 
 - Remove parameter ``distribution`` in :func:`~hnn_core.Network.add_bursty_drive`.
@@ -437,3 +458,4 @@ People who contributed to this release (in alphabetical order):
 .. _Stephanie R. Jones: https://github.com/stephanie-r-jones
 .. _Steven Brandt: https://github.com/spbrandt
 .. _Kaisu Lankinen: https://github.com/klankinen
+.. _George Dang: https://github.com/gtdang

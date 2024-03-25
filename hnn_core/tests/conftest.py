@@ -22,13 +22,13 @@ def pytest_runtest_makereport(item, call):
     if "incremental" in item.keywords:
         # incremental marker is used
 
-        # The following condition was modifed from the example linked above.
+        # The following condition was modified from the example linked above.
         # We don't want to step out of the incremental testing block if
         # a previous test was marked "Skipped". For instance if MPI tests
         # are skipped because mpi4py is not installed, still continue with
         # all other tests that do not require mpi4py
         if call.excinfo is not None and not call.excinfo.typename == "Skipped":
-            # the test has failed, but was not skiped
+            # the test has failed, but was not skipped
 
             # retrieve the class name of the test
             cls_name = str(item.cls)
@@ -86,17 +86,18 @@ def run_hnn_core_fixture():
         tstop = 170.
         legacy_mode = True
         if reduced:
-            params.update({'N_pyr_x': 3,
-                           'N_pyr_y': 3,
-                           't_evprox_1': 5,
+            mesh_shape = (3, 3)
+            params.update({'t_evprox_1': 5,
                            't_evdist_1': 10,
                            't_evprox_2': 20,
                            'N_trials': 2})
             tstop = 40.
             legacy_mode = False
+        else:
+            mesh_shape = (10, 10)
         # Legacy mode necessary for exact dipole comparison test
         net = jones_2009_model(params, add_drives_from_params=True,
-                               legacy_mode=legacy_mode)
+                               legacy_mode=legacy_mode, mesh_shape=mesh_shape)
         if electrode_array is not None:
             for name, positions in electrode_array.items():
                 net.add_electrode_array(name, positions)

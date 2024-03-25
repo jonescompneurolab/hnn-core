@@ -3,13 +3,16 @@
 
 import os.path as op
 import json
+from pathlib import Path
 from urllib.request import urlretrieve
 
 import pytest
 
-import hnn_core
-from hnn_core import read_params, Params, jones_2009_model
-hnn_core_root = op.dirname(hnn_core.__file__)
+from hnn_core import (read_params, Params, jones_2009_model, convert_to_hdf5,
+                      Network)
+from hnn_core.hnn_io import read_network
+
+hnn_core_root = Path(__file__).parents[1]
 
 
 def test_read_params():
@@ -71,3 +74,71 @@ def test_base_params():
     params_base['spec_cmap'] = 'viridis'
     params = Params(params_base)
     assert params == params_base
+
+
+def test_convert_to_hdf5(tmp_path):
+    """Tests conversion of a json file to hdf5"""
+    # Download params
+    param_url = ('https://raw.githubusercontent.com/hnn-core/'
+                 'hnn_core/param/default.json')
+    params_base_fname = Path(hnn_core_root, 'param', 'default.json')
+    if not op.exists(params_base_fname):
+        urlretrieve(param_url, params_base_fname)
+    net_params = Network(read_params(params_base_fname))
+
+    # Write hdf5 and check if constructed network is equal
+    outpath = Path(tmp_path, 'default.hdf5')
+    convert_to_hdf5(params_base_fname, outpath)
+    net_hdf5 = read_network(outpath)
+    assert net_hdf5 == net_params
+
+    # Check if writing with no extension will add one
+    outpath_no_ext = Path(tmp_path, 'default_no_ext')
+    convert_to_hdf5(params_base_fname, outpath_no_ext)
+    assert outpath_no_ext.with_suffix('.hdf5').exists()
+
+
+def test_convert_to_hdf5_legacy(tmp_path):
+    """Tests conversion of a param legacy file to hdf5"""
+    # Download params
+    param_url = ('https://raw.githubusercontent.com/hnnsolver/'
+                 'hnn-core/test_data/default.param')
+    params_base_fname = Path(hnn_core_root, 'param', 'default.param')
+    if not op.exists(params_base_fname):
+        urlretrieve(param_url, params_base_fname)
+    net_params = Network(read_params(params_base_fname))
+
+    # Write hdf5 and check if constructed network is equal
+    outpath = Path(tmp_path, 'default.hdf5')
+    convert_to_hdf5(params_base_fname, outpath)
+    net_hdf5 = read_network(outpath)
+    assert net_hdf5 == net_params
+
+
+def test_convert_to_hdf5_bad_type():
+    """Tests type validation in convert_to_hdf5 function"""
+    good_path = hnn_core_root
+    path_str = good_path.__str__()
+    bad_path = 5
+
+    # Valid path and string, but not actual files
+    with pytest.raises(
+            ValueError,
+            match="Unrecognized extension, expected one of .json, .param."
+    ):
+        convert_to_hdf5(good_path, path_str)
+        convert_to_hdf5(path_str, good_path)
+
+    # Bad params_fname
+    with pytest.raises(
+            TypeError,
+            match="params_fname must be an instance of str or Path"
+    ):
+        convert_to_hdf5(bad_path, good_path)
+
+    # Bad out_fname
+    with pytest.raises(
+            TypeError,
+            match="out_fname must be an instance of str or Path"
+    ):
+        convert_to_hdf5(good_path, bad_path)

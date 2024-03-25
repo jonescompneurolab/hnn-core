@@ -107,7 +107,7 @@ init_dpl.smooth(smooth_window_len)
 #
 # First, we define a function that will tell the optimization routine how to
 # modify the network drive parameters. The function will take in the Network
-# object with no attached drives, and a dictionary of the paramters we wish to
+# object with no attached drives, and a dictionary of the parameters we wish to
 # optimize.
 
 

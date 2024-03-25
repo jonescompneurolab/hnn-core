@@ -96,7 +96,7 @@ def test_cell():
     new_Ra = 4.0
     cell.modify_section(sec_name, L=new_L, diam=new_diam, cm=new_cm, Ra=new_Ra)
 
-    # Make sure distance betweeen `Section.end_pts` matches `Section.L`
+    # Make sure distance between `Section.end_pts` matches `Section.L`
     new_pts = np.array(cell.sections[sec_name].end_pts)
     new_dist = np.linalg.norm(new_pts[0, :] - new_pts[1, :])
     np.isclose(new_L, new_dist)
@@ -108,6 +108,13 @@ def test_cell():
 
     # Testing update end pts using template cell
     cell1 = pyramidal(cell_name='L5Pyr')
+
+    # Test other not NotImplemented for Cell Class
+    assert (cell1 == "cell") is False
+
+    # Test other not NotImplemented for Section Class
+    assert (cell1.sections['soma'] == "section") is False
+
     end_pts_original = list()
     end_pts_new = list()
     for sec_name in cell1.sections.keys():

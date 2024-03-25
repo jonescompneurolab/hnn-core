@@ -364,7 +364,7 @@ def test_network_drives():
     assert network_builder._drive_cells[n_bursty_sources].gid ==\
         net._n_cells + n_bursty_sources
 
-    # check that Network drive connectivity tranfers to NetworkBuilder
+    # check that Network drive connectivity transfers to NetworkBuilder
     n_pyr = len(net.gid_ranges['L2_pyramidal'])
     n_basket = len(net.gid_ranges['L2_basket'])
 
@@ -572,7 +572,7 @@ def test_network_connectivity():
                             n_trials=1)
     network_builder = NetworkBuilder(net)
 
-    # start by checking that Network connectivity tranfers to NetworkBuilder
+    # start by checking that Network connectivity transfers to NetworkBuilder
     n_pyr = len(net.gid_ranges['L2_pyramidal'])
     n_basket = len(net.gid_ranges['L2_basket'])
 
@@ -763,7 +763,7 @@ def test_network_connectivity():
             assert 0 not in net.connectivity[conn_idx]['src_gids']
 
     # Check that pick_connection returns empty lists when searching for
-    # a drive targetting the wrong location
+    # a drive targeting the wrong location
     conn_idxs = pick_connection(net, src_gids='evdist1', loc='proximal')
     assert len(conn_idxs) == 0
     assert not pick_connection(net, src_gids='evprox1', loc='distal')
@@ -810,7 +810,7 @@ def test_network_connectivity():
             pick_connection(**kwargs)
 
     # Test removing connections from net.connectivity
-    # Needs to be updated if number of drives change in preceeding tests
+    # Needs to be updated if number of drives change in preceding tests
     net.clear_connectivity()
     assert len(net.connectivity) == 4  # 2 drives x 2 target cell types
     net.clear_drives()
@@ -911,3 +911,39 @@ def test_tonic_biases():
     assert net.external_biases['tonic']['L2_pyramidal']['t0'] == 0
     with pytest.raises(ValueError, match=r'Tonic bias already defined for.*$'):
         net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
+
+
+def test_network_mesh():
+    """Test mesh for defining cell positions biases."""
+    hnn_core_root = op.dirname(hnn_core.__file__)
+
+    # default params
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+
+    # Test custom mesh_shape
+    mesh_shape = (2, 3)
+    net = Network(params, mesh_shape=mesh_shape)
+    assert net._N_pyr_x == mesh_shape[0]
+    assert net._N_pyr_y == mesh_shape[1]
+    assert net.gid_ranges['L2_basket'] == range(0, 3)
+
+    # Test default mesh_shape loaded
+    net = Network(params)
+    assert net._N_pyr_x == 10
+    assert net._N_pyr_y == 10
+    assert net.gid_ranges['L2_basket'] == range(0, 35)
+
+    with pytest.raises(ValueError, match='mesh_shape must be'):
+        net = Network(params, mesh_shape=(-2, 3))
+
+    with pytest.raises(TypeError, match='mesh_shape\\[0\\] must be'):
+        net = Network(params, mesh_shape=(2.0, 3))
+
+    with pytest.raises(TypeError, match='mesh_shape must be'):
+        net = Network(params, mesh_shape='abc')
+
+    # Smoke test for all models
+    _ = jones_2009_model(mesh_shape=mesh_shape)
+    _ = calcium_model(mesh_shape=mesh_shape)
+    _ = law_2021_model(mesh_shape=mesh_shape)

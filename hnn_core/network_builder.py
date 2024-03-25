@@ -282,7 +282,7 @@ class NetworkBuilder(object):
         self._cells = list()
 
         # artificial cells must be appended to a list in order to preserve
-        # the NEURON hoc objects and the corresonding python references
+        # the NEURON hoc objects and the corresponding python references
         # initialized by _ArtificialCell()
         self._drive_cells = list()
 

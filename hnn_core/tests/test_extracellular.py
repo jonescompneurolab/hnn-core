@@ -33,6 +33,9 @@ def test_extracellular_api():
     assert len(net.rec_arrays) == 2
     assert len(net.rec_arrays['arr1'].positions) == 2
 
+    # Test other not NotImplemented for ExtracellularArray Class
+    assert (net.rec_arrays['arr1'] == "extArr") is False
+
     # ensure unique names
     pytest.raises(ValueError, net.add_electrode_array, 'arr1', [(6, 6, 800)])
     # all remaining input arguments checked by ExtracellularArray
@@ -91,7 +94,7 @@ def test_extracellular_api():
     with pytest.raises(ValueError, match='Electrode array positions must '
                        'contain more than 1 contact'):
         _, _ = _get_laminar_z_coords([(1, 2, 3)])
-    with pytest.raises(ValueError, match='Make sure the electrode postions '
+    with pytest.raises(ValueError, match='Make sure the electrode positions '
                        'are equispaced, colinear'):
         _, _ = _get_laminar_z_coords([(1, 1, 3), (1, 1, 4), (1, 1, 3.5)])
 
@@ -207,11 +210,10 @@ def test_rec_array_calculation():
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, 'param', 'default.json')
     params = read_params(params_fname)
-    params.update({'N_pyr_x': 3,
-                   'N_pyr_y': 3,
-                   't_evprox_1': 7,
+    params.update({'t_evprox_1': 7,
                    't_evdist_1': 17})
-    net = jones_2009_model(params, add_drives_from_params=True)
+    net = jones_2009_model(params, mesh_shape=(3, 3),
+                           add_drives_from_params=True)
 
     # one electrode inside, one above the active elements of the network,
     # and two more to allow calculation of CSD (2nd spatial derivative)

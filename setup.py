@@ -37,7 +37,7 @@ if version is None:
 #
 # to make sure there are no residual mod files
 #
-# also see following link to understand why build_py must be overriden:
+# also see following link to understand why build_py must be overridden:
 # https://stackoverflow.com/questions/51243633/python-setuptools-setup-py-install-does-not-automatically-call-build
 class BuildMod(Command):
     user_options = []
@@ -76,6 +76,22 @@ class build_py_mod(build_py):
 
 
 if __name__ == "__main__":
+    extras = {
+        'opt': ['scikit-learn'],
+        'parallel': ['joblib', 'psutil'],
+        'test': ['flake8', 'pytest', 'pytest-cov', ],
+        'docs': ['mne', 'nibabel', 'pooch', 'tdqm',
+                 'sphinx', 'nbsphinx', 'sphinx-gallery',
+                 'sphinx_bootstrap_theme', 'sphinx-copybutton',
+                 'pillow', 'numpydoc',
+                 ],
+        'gui': ['ipywidgets>=8.0.0', 'ipykernel', 'ipympl', 'voila', ],
+    }
+    extras['dev'] = (extras['opt'] + extras['parallel'] + extras['test'] +
+                     extras['docs'] + extras['gui']
+                     )
+
+
     setup(name=DISTNAME,
           maintainer=MAINTAINER,
           maintainer_email=MAINTAINER_EMAIL,
@@ -105,11 +121,8 @@ if __name__ == "__main__":
               'scipy',
               'h5io'
           ],
-          extras_require={
-              'gui': ['ipywidgets <=7.7.1', 'ipympl<0.9', 'voila<=0.3.6'],
-              'opt': ['scikit-learn']
-          },
-          python_requires='>=3.7',
+          extras_require=extras,
+          python_requires='>=3.8',
           packages=find_packages(),
           package_data={'hnn_core': [
               'param/*.json',

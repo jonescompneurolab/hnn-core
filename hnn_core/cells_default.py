@@ -312,7 +312,7 @@ def _exp_g_at_dist(x, zero_val, exp_term, offset):
     zero_val : float | int
         Value of function when x = 0
     exp_term : float | int
-        Mutiplier of x in the exponent
+        Multiplier of x in the exponent
     offset: float |int
         Offset value added to output
 

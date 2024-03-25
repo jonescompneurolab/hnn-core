@@ -115,8 +115,12 @@ repository and use pip with the editable (``-e``) flag::
 
     $ git clone https://github.com/jonescompneurolab/hnn-core
     $ cd hnn-core
-    $ pip install -e '.[gui]'
+    $ pip install -e '.[dev]'
     $ python setup.py build_mod
+
+The ``pip install -e '.[dev]'`` step will install all extra packages used by
+developers to access all features and to perform testing and building of
+documentation.
 
 The last step builds ``mod`` files which specifies the dynamics of specific
 cellular mechanisms. These are converted to C, and hence require a compilation
@@ -135,10 +139,6 @@ your change has been made. We recommend developers to run tests locally
 on their computers after making changes.
 
 We use the ``pytest`` testing framework.
-
-Install the following python packages::
-
-    $ pip install flake8 pytest pytest-cov
 
 To run the tests simply type into your terminal::
 
@@ -166,19 +166,12 @@ pull requests.
 Building the documentation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The documentation can be built using sphinx. For that, please additionally
-install the following::
-
-    $ pip install matplotlib sphinx numpydoc sphinx-gallery sphinx_bootstrap_theme sphinx-copybutton pillow joblib psutil nbsphinx
+The documentation can be built using sphinx.
 
 You can build the documentation locally using the command::
 
 $ cd doc/
 $ make html
-
-While MNE is not needed to install hnn-core, as a developer you will need to
-install it to run all the examples successfully. Please find the installation
-instructions on the `MNE website <https://mne.tools/stable/install/index.html>`_.
 
 If you want to build the documentation locally without running all the examples,
 use the command::

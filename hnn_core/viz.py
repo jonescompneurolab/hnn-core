@@ -1013,7 +1013,7 @@ def _update_target_plot(ax, conn, src_gid, src_type_pos, target_type_pos,
                         inplane_distance):
     from .cell import _get_gaussian_connection
 
-    # Extract indeces to get position in network
+    # Extract indices to get position in network
     # Index in gid range aligns with net.pos_dict
     target_src_pair = conn['gid_pairs'][src_gid]
     target_indeces = np.where(np.in1d(target_range, target_src_pair))[0]

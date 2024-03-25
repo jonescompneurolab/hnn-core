@@ -64,8 +64,8 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
         dpl = Dipole(times=sim_data[idx]['times'],
                      data=sim_data[idx]['dpl_data'])
 
-        N_pyr_x = net._params['N_pyr_x']
-        N_pyr_y = net._params['N_pyr_y']
+        N_pyr_x = net._N_pyr_x
+        N_pyr_y = net._N_pyr_y
         dpl._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
         dpl._convert_fAm_to_nAm()  # always applied, cf. #264
         if postproc:
@@ -112,7 +112,7 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     """
     proc_data_bytes = b''
     # each loop while waiting will involve two Queue.get() timeouts, each
-    # 0.01s. This caclulation will error on the side of a longer timeout
+    # 0.01s. This calculation will error on the side of a longer timeout
     # than is specified because more is done each loop that just Queue.get()
     timeout_cycles = timeout / 0.02
 
@@ -695,7 +695,7 @@ class MPIBackend(object):
 
         # just use the joblib backend for a single core
         if self.n_procs == 1:
-            print("MPIBackend is set to use 1 core: tranferring the "
+            print("MPIBackend is set to use 1 core: transferring the "
                   "simulation to JoblibBackend....")
             return JoblibBackend(n_jobs=1).simulate(net, tstop=tstop,
                                                     dt=dt,
