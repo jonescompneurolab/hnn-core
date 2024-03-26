@@ -6,9 +6,11 @@
 import json
 import fnmatch
 import os.path as op
+from pathlib import Path
 from copy import deepcopy
 
 from .params_default import get_params_default
+from .externals.mne import _validate_type
 
 
 # return number of evoked inputs (proximal, distal)
@@ -653,6 +655,46 @@ def compare_dictionaries(d1, d2):
         d1[key] = d2[key]
 
     return d1
+
+
+def _convert_to_path(value):
+    if isinstance(value, str):
+        value = Path(value)
+    return value
+
+
+def convert_to_hdf5(params_fname, out_fname,
+                    overwrite=True, write_output=False):
+    """Converts json or param format to hdf5
+
+    Parameters
+    ----------
+    params_fname : str or Path
+        Path to file
+    out_fname: str
+        Path to output
+    overwrite: bool, default=True
+        Overwrite file
+    write_output: bool, default=False
+        Write out simulations
+    Returns
+    -------
+    None
+    """
+    from .network import Network
+
+    _validate_type(params_fname, (str, Path), 'params_fname')
+    _validate_type(out_fname, (str, Path), 'out_fname')
+
+    params_fname = _convert_to_path(params_fname)
+    out_fname = _convert_to_path(out_fname)
+    if out_fname.suffix != '.hdf5':
+        out_fname = out_fname.with_suffix('.hdf5')
+
+    params = read_params(params_fname)
+    net = Network(params)
+    net.write(out_fname, overwrite, write_output)
+    return
 
 
 # debug test function
