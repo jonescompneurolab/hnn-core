@@ -1150,6 +1150,7 @@ def on_upload_data_change(change, data, viz_manager, log_out):
         for ax_name, plot_type in ax_plots:
             viz_manager._simulate_edit_figure(
                 fig_name, ax_name, data_fname, plot_type, {}, "plot")
+        change['owner'].value = []
 
 
 def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
