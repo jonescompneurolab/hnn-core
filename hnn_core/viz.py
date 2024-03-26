@@ -323,7 +323,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 
 
 def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
-                     color=None, show=True, **kwargs):
+                     color=None, show=True, **kwargs_hist):
     """Plot the histogram of spiking activity across trials.
 
     Parameters
