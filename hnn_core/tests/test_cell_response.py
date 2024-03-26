@@ -24,7 +24,9 @@ def test_cell_response(tmp_path):
                                  spike_gids=spike_gids,
                                  spike_types=spike_types,
                                  times=sim_times)
-    cell_response.plot_spikes_hist(show=False)
+    kwargs_hist = dict(linewidth=1.2,
+                       histtype="step")
+    cell_response.plot_spikes_hist(show=False, **kwargs_hist)
 
     # Testing writing using txt files
     with pytest.warns(DeprecationWarning,
