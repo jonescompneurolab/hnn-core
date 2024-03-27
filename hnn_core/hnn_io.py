@@ -136,20 +136,22 @@ def _read_cell_response(cell_response_data, read_output):
     return cell_response
 
 
+def _set_from_cell_specific(drive_data):
+    """Returns number of drive cells based on cell_specific bool
+
+    The n_drive_cells keyword for add_poisson_drive and add_bursty_drive
+    methods accept either an int or string (n_cells). If the bool keyword
+    cell_specific = True, n_drive_cells must be 'n_cells'.
+    """
+    if drive_data['cell_specific']:
+        return 'n_cells'
+    return drive_data['n_drive_cells']
+
+
 def _read_external_drive(net, drive_data, read_output, read_drives):
+    """Reads drives from a hdf5 data dict and adds them to a Network"""
     if not read_drives:
         return None
-
-    def _set_from_cell_specific(drive_data):
-        """Returns number of drive cells based on cell_specific bool
-
-        The n_drive_cells keyword for add_poisson_drive and add_bursty_drive
-        methods accept either an int or string (n_cells). If the bool keyword
-        cell_specific = True, n_drive_cells must be 'n_cells'.
-        """
-        if drive_data['cell_specific']:
-            return 'n_cells'
-        return drive_data['n_drive_cells']
 
     if (drive_data['type'] == 'evoked') or (drive_data['type'] == 'gaussian'):
         # Skipped n_drive_cells here
