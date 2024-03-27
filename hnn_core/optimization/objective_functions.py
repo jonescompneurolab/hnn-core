@@ -97,7 +97,7 @@ def _maximize_psd(initial_net, initial_params, set_params, predicted_params,
     -----
     The objective function minimizes the sum of the weighted (user-defined)
     frequency band PSDs (user-defined) relative to the total PSD of the signal.
-    The objective function can be represented as -Σc[ΣPSD(i)/PSD(j)] where c
+    The objective function can be represented as -Σc[ΣPSD(i)/ΣPSD(j)] where c
     is the weight for each frequency band, PSD(i) is the PSD for each frequency
     band, and PSD(j) is the total PSD of the signal.
     """
