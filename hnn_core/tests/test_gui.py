@@ -7,6 +7,7 @@ import traitlets
 
 from hnn_core import Dipole, Network, Params
 from hnn_core.gui import HNNGUI
+from hnn_core.gui.gui import _prepare_upload_file_from_url
 from hnn_core.gui._viz_manager import (_idx2figname, _no_overlay_plot_types,
                                        unlink_relink)
 from hnn_core.gui.gui import _init_network_from_widgets
@@ -28,6 +29,52 @@ def test_gui_load_params():
     print(gui.params)
     print(gui.params['L2Pyr*'])
     plt.close('all')
+
+
+def test_prepare_file_from_url():
+    file_url_json = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json" # noqa
+    file_url_txt = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt" # noqa
+    file_url_hdf5 = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/tests/assets/jones2009_test_read.hdf5" # noqa
+
+    result_json = _prepare_upload_file_from_url(file_url_json)
+    assert result_json[0]['name'] == 'default.json'
+    assert result_json[0]['type'] == 'application/json'
+    assert isinstance(result_json[0]['content'], memoryview)
+    assert len(result_json[0]['content']) > 0
+
+    result_txt = _prepare_upload_file_from_url(file_url_txt)
+    assert result_txt[0]['name'] == 'S1_SupraT.txt'
+    assert result_txt[0]['type'] == 'text/plain'
+    assert isinstance(result_txt[0]['content'], memoryview)
+    assert len(result_txt[0]['content']) > 0
+
+    result_hdf5 = _prepare_upload_file_from_url(file_url_hdf5)
+    assert result_hdf5[0]['name'] == 'jones2009_test_read.hdf5'
+    assert result_hdf5[0]['type'] == 'application/x-hdf'
+    assert isinstance(result_hdf5[0]['content'], memoryview)
+    assert len(result_hdf5[0]['content']) > 0
+
+
+def test_gui_load_hdf5():
+    gui = HNNGUI()
+    _ = gui.compose()
+
+    # change the default loaded parameters
+    original_drive_count = len(gui.drive_widgets)
+    assert original_drive_count > 0
+    gui.delete_drive_button.click()
+    assert len(gui.drive_widgets) == 0
+
+    original_tstop = gui.widget_tstop.value
+    gui.widget_tstop.value = 1
+    original_tstep = gui.widget_dt.value
+    gui.widget_dt.value = 1
+    # simulate upload hdf5
+    file1_url = "https://raw.githubusercontent.com/brown-ccv/hnn-core-ccv/gui-hdf5-io/hnn_core/tests/assets/jones2009_test_read.hdf5" # noqa
+    # file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json" # noqa
+
+    gui._simulate_upload_connectivity(file1_url)
+    ...
 
 
 def test_gui_upload_params():

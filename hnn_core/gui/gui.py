@@ -8,7 +8,7 @@ import logging
 import multiprocessing
 import sys
 import urllib.parse
-import urllib.request
+import requests
 from collections import defaultdict
 from pathlib import Path
 from datetime import datetime
@@ -19,12 +19,12 @@ from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
 from ipywidgets.embed import embed_minimal_html
 import hnn_core
 from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
-                      simulate_dipole)
+                      simulate_dipole, read_network)
 from hnn_core.gui._logging import logger
 from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
 from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
-                             _read_legacy_params)
+                             _read_legacy_params, _read_hdf5)
 
 
 class _OutputWidgetHandler(logging.Handler):
@@ -198,7 +198,7 @@ class HNNGUI:
         }
 
         # load default parameters
-        self.params = self.load_parameters()
+        self.param_net = self.load_parameters()
 
         # In-memory storage of all simulation and visualization related data
         self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
@@ -254,12 +254,12 @@ class HNNGUI:
             button_color=self.layout['theme_color'])
 
         self.load_connectivity_button = FileUpload(
-            accept='.json,.param', multiple=False,
+            accept='.json,.param,.hdf5', multiple=False,
             style={'button_color': self.layout['theme_color']},
             description='Load local network connectivity',
             layout=self.layout['btn_full_w'], button_style='success')
         self.load_drives_button = FileUpload(
-            accept='.json,.param', multiple=False,
+            accept='.json,.param,.hdf5', multiple=False,
             style={'button_color': self.layout['theme_color']},
             description='Load external drives', layout=self.layout['btn'],
             button_style='success')
@@ -346,8 +346,8 @@ class HNNGUI:
         if not params_fname:
             # by default load default.json
             hnn_core_root = Path(hnn_core.__file__).parent
-            params_fname = hnn_core_root / 'param/default.json'
-        return read_params(params_fname)
+            params_fname = hnn_core_root / 'param/default.hdf5'
+        return read_network(params_fname)
 
     def _link_callbacks(self):
         """Link callbacks to UI components."""
@@ -374,7 +374,7 @@ class HNNGUI:
 
         def _on_upload_connectivity(change):
             return on_upload_params_change(
-                change, self.params, self.widget_tstop, self.widget_dt,
+                self, change, self.widget_tstop, self.widget_dt,
                 self._log_out, self.drive_boxes, self.drive_widgets,
                 self._drives_out, self._connectivity_out,
                 self.connectivity_widgets, self.layout['drive_textbox'],
@@ -382,7 +382,7 @@ class HNNGUI:
 
         def _on_upload_drives(change):
             return on_upload_params_change(
-                change, self.params, self.widget_tstop, self.widget_dt,
+                self, change, self.widget_tstop, self.widget_dt,
                 self._log_out, self.drive_boxes, self.drive_widgets,
                 self._drives_out, self._connectivity_out,
                 self.connectivity_widgets, self.layout['drive_textbox'],
@@ -492,7 +492,7 @@ class HNNGUI:
         # self.simulation_data[self.widget_simulation_name.value]
 
         # initialize drive and connectivity ipywidgets
-        load_drive_and_connectivity(self.params, self._log_out,
+        load_drive_and_connectivity(self.param_net, self._log_out,
                                     self._drives_out, self.drive_widgets,
                                     self.drive_boxes, self._connectivity_out,
                                     self.connectivity_widgets,
@@ -607,7 +607,7 @@ class HNNGUI:
         uploaded_value = _prepare_upload_file_from_url(file_url)
         self.load_data_button.set_trait('value', uploaded_value)
 
-    def _simulate_upload_connectivity(self, file_url):
+    def _simulate_upload_connectivity(self, file_url: str):
         uploaded_value = _prepare_upload_file_from_url(file_url)
         self.load_connectivity_button.set_trait('value', uploaded_value)
 
@@ -647,20 +647,41 @@ class HNNGUI:
         action(*args, **kwargs)
 
 
-def _prepare_upload_file_from_url(file_url):
-    params_name = file_url.split("/")[-1]
-    data = urllib.request.urlopen(file_url)
-    content = b""
-    for line in data:
-        content += line
+def _prepare_upload_file_from_url(file_url: str) -> list[dict]:
+    """Returns a dictionary with file attributes from a file hosted at a url.
 
-    return [{
-        'name': params_name,
-        'type': 'application/json',
-        'size': len(content),
+    This is used to simulate file uploads for GUI testing. The dictionary is in
+    the format that the ipywidgets FileUpload generates when loading a file.
+    """
+    def _download_as_memoryview(url):
+        response = requests.get(url)
+        if response.status_code == 200:
+            # Convert the content to a memory view
+            content = memoryview(response.content)
+            return content
+        else:
+            # If the request was not successful, print an error message
+            print("Error: Failed to fetch the file from the URL.")
+            return None
+
+    file_name = file_url.split("/")[-1]
+    file_type = Path(file_name).suffix[1:]
+    d_mimetypes = {'hdf5': 'application/x-hdf',
+                   'txt': 'text/plain',
+                   'json': 'application/json',
+                   'param': 'text/plain',
+                   }
+
+    content = _download_as_memoryview(file_url)
+    d_file_attributes = {
+        'name': file_name,
+        'type': d_mimetypes[file_type.lower()],
+        'size': content.nbytes,
         'content': content,
-        'last_modified': datetime.now()
-    }]
+        'last_modified': datetime.now(),
+    }
+
+    return [d_file_attributes]
 
 
 def create_expanded_button(description, button_style, layout, disabled=False,
@@ -1016,10 +1037,10 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
             display(accordion)
 
 
-def add_connectivity_tab(params, connectivity_out,
+def add_connectivity_tab(param_net, connectivity_out,
                          connectivity_textfields):
     """Add all possible connectivity boxes to connectivity tab."""
-    net = jones_2009_model(params)
+    net = param_net
     cell_types = [ct for ct in net.cell_types.keys()]
     receptors = ('ampa', 'nmda', 'gabaa', 'gabab')
     locations = ('proximal', 'distal', 'soma')
@@ -1075,9 +1096,9 @@ def add_connectivity_tab(params, connectivity_out,
     return net
 
 
-def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
+def add_drive_tab(param_net, drives_out, drive_widgets, drive_boxes, tstop,
                   layout):
-    net = jones_2009_model(params)
+    net = param_net
     drive_specs = _extract_drive_specs_from_hnn_params(
         params, list(net.cell_types.keys()), legacy_mode=net._legacy_mode)
 
@@ -1111,16 +1132,16 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
         )
 
 
-def load_drive_and_connectivity(params, log_out, drives_out,
+def load_drive_and_connectivity(param_net, log_out, drives_out,
                                 drive_widgets, drive_boxes, connectivity_out,
                                 connectivity_textfields, tstop, layout):
     """Add drive and connectivity ipywidgets from params."""
     log_out.clear_output()
     with log_out:
         # Add connectivity
-        add_connectivity_tab(params, connectivity_out, connectivity_textfields)
+        add_connectivity_tab(param_net, connectivity_out, connectivity_textfields)
         # Add drives
-        add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
+        add_drive_tab(param_net, drives_out, drive_widgets, drive_boxes, tstop,
                       layout)
 
 
@@ -1153,37 +1174,41 @@ def on_upload_data_change(change, data, viz_manager, log_out):
         change['owner'].value = []
 
 
-def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
+def on_upload_params_change(gui, change, tstop, dt, log_out, drive_boxes,
                             drive_widgets, drives_out, connectivity_out,
                             connectivity_textfields, layout, load_type):
     if len(change['owner'].value) == 0:
         logger.info("Empty change")
         return
     logger.info("Loading connectivity...")
+    # Parse file data
     param_dict = change['new'][0]
     params_fname = param_dict['name']
+    params_suffix = Path(params_fname).suffix[1:]
     param_data = param_dict['content']
 
-    param_data = codecs.decode(param_data, encoding="utf-8")
+    # Decode from memoryview
+    param_data = param_data.tobytes()
 
-    ext = Path(params_fname).suffix
-    read_func = {'.json': _read_json, '.param': _read_legacy_params}
-    params_network = read_func[ext](param_data)
+    # Parse data to dict
+    read_func = {'hdf5': _read_hdf5}
+    params_network = read_func[params_suffix.lower()](param_data)
 
     # update simulation settings and params
     log_out.clear_output()
     with log_out:
+        #TODO Find out where these are in the network object
         if 'tstop' in params_network.keys():
             tstop.value = params_network['tstop']
         if 'dt' in params_network.keys():
             dt.value = params_network['dt']
-
-        params.update(params_network)
+        # Replace GUI's param_net
+        gui.param_net = params_network
     # init network, add drives & connectivity
     if load_type == 'connectivity':
-        add_connectivity_tab(params, connectivity_out, connectivity_textfields)
+        add_connectivity_tab(gui.param_net, connectivity_out, connectivity_textfields)
     elif load_type == 'drives':
-        add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
+        add_drive_tab(gui.param_net, drives_out, drive_widgets, drive_boxes, tstop,
                       layout)
     else:
         raise ValueError

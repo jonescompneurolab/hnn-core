@@ -162,7 +162,7 @@ def test_write_network_no_output(tmp_path, jones_2009_network):
     net.write(path_out, write_output=False)
 
     # Read in file and check no outputs were written
-    hdf5_read = read_hdf5(path_out)
+    hdf5_read = read_hdf5(path_out, title='hnn-network')
     assert not any([bool(val['times'])
                     for val in hdf5_read['rec_arrays'].values()]
                    )
@@ -272,14 +272,18 @@ def test_str_to_node():
 
 
 def test_read_hdf5(jones_2009_network):
-
+    # Test file is written from the jones_2009_network
     # jones_2009_network.write(Path('.', 'assets/jones2009_test_read.hdf5'))
-    # This file is written from the jones_2009_network
     net = read_network(Path(assets_path, 'jones2009_test_read.hdf5'))
     assert net == jones_2009_network
 
 
 def test_read_hdf5_with_simulation(jones_2009_network):
+    # Test file is written from the jones_2009_network with a simple simulation
+    # net = jones_2009_network
+    # simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
+    # net.write(Path('.', 'assets/jones2009_simple_sim_test_read.hdf5'))
+
     # Test reading a network with simulation
     net_sim = read_network(
         Path(assets_path, 'jones2009_simple_sim_test_read.hdf5')
@@ -320,14 +324,16 @@ def test_read_incorrect_format(tmp_path):
     # Checking object type field not exists error
     dummy_data = dict()
     dummy_data['objective'] = "Check Object type errors"
-    write_hdf5(tmp_path / 'not_net.hdf5', dummy_data, overwrite=True)
+    write_hdf5(tmp_path / 'not_net.hdf5', dummy_data, title='hnn-network',
+               overwrite=True)
     with pytest.raises(NameError,
                        match="The given file is not compatible."):
         read_network(tmp_path / 'not_net.hdf5')
 
     # Checking wrong object type error
     dummy_data['object_type'] = "net"
-    write_hdf5(tmp_path / 'not_net.hdf5', dummy_data, overwrite=True)
+    write_hdf5(tmp_path / 'not_net.hdf5', dummy_data, title='hnn-network',
+               overwrite=True)
     with pytest.raises(ValueError,
                        match="The object should be of type Network."):
         read_network(tmp_path / 'not_net.hdf5')

@@ -67,6 +67,39 @@ def _external_drive_to_dict(drive, write_output):
     return drive_data
 
 
+def _network_to_dict(net, write_output=True):
+    """
+    Returns network object attributes as a dictionary.
+    """
+    net_data = {
+        'object_type': 'Network',
+        'N_pyr_x': net._N_pyr_x,
+        'N_pyr_y': net._N_pyr_y,
+        'celsius': net._params['celsius'],
+        'cell_types': {name: template.to_dict()
+                       for name, template in net.cell_types.items()
+                       },
+        'gid_ranges': {cell: {'start': c_range.start, 'stop': c_range.stop}
+                       for cell, c_range in net.gid_ranges.items()
+                       },
+        'pos_dict': {cell: pos for cell, pos in net.pos_dict.items()},
+        'cell_response': _cell_response_to_dict(net, write_output),
+        'external_drives': {drive: _external_drive_to_dict(params,
+                                                           write_output)
+                            for drive, params in net.external_drives.items()
+                            },
+        'external_biases': net.external_biases,
+        'connectivity': _connectivity_to_list_of_dicts(net.connectivity),
+        'rec_arrays': {ra_name: _rec_array_to_dict(ex_array, write_output)
+                       for ra_name, ex_array in net.rec_arrays.items()
+                       },
+        'threshold': net.threshold,
+        'delay': net.delay,
+    }
+
+    return net_data
+
+
 def _str_to_node(node_string):
     node_tuple = node_string.split(',')
     node_tuple[1] = int(node_tuple[1])
@@ -227,7 +260,8 @@ def _read_rec_arrays(net, rec_arrays_data, read_output):
 
 
 @fill_doc
-def write_network(net, fname, overwrite=True, write_output=True):
+def write_network(net, fname, title='hnn-network', overwrite=True,
+                  write_output=True):
     """Write network to a HDF5 file.
 
     Parameters
@@ -244,39 +278,12 @@ def write_network(net, fname, overwrite=True, write_output=True):
     if overwrite is False and os.path.exists(fname):
         raise FileExistsError('File already exists at path %s. Rename '
                               'the file or set overwrite=True.' % (fname,))
-
-    net_data = {
-        'object_type': 'Network',
-        'N_pyr_x': net._N_pyr_x,
-        'N_pyr_y': net._N_pyr_y,
-        'celsius': net._params['celsius'],
-        'cell_types': {name: template.to_dict()
-                       for name, template in net.cell_types.items()
-                       },
-        'gid_ranges': {cell: {'start': c_range.start, 'stop': c_range.stop}
-                       for cell, c_range in net.gid_ranges.items()
-                       },
-        'pos_dict': {cell: pos for cell, pos in net.pos_dict.items()},
-        'cell_response': _cell_response_to_dict(net, write_output),
-        'external_drives': {drive: _external_drive_to_dict(params,
-                                                           write_output)
-                            for drive, params in net.external_drives.items()
-                            },
-        'external_biases': net.external_biases,
-        'connectivity': _connectivity_to_list_of_dicts(net.connectivity),
-        'rec_arrays': {ra_name: _rec_array_to_dict(ex_array, write_output)
-                       for ra_name, ex_array in net.rec_arrays.items()
-                       },
-        'threshold': net.threshold,
-        'delay': net.delay,
-    }
-
-    # Saving file
-    write_hdf5(fname, net_data, overwrite=overwrite)
+    d_net = _network_to_dict(net, write_output)
+    write_hdf5(fname, d_net, title=title, overwrite=overwrite)
 
 
 @fill_doc
-def read_network(fname, read_output=True, read_drives=True):
+def read_network(fname, title='hnn-network', read_output=True, read_drives=True):
     """Read network from a file.
 
     Parameters
@@ -291,7 +298,7 @@ def read_network(fname, read_output=True, read_drives=True):
     # Importing Network.
     # Cannot do this globally due to circular import.
     from .network import Network
-    net_data = read_hdf5(fname)
+    net_data = read_hdf5(fname, title=title)
     if 'object_type' not in net_data:
         raise NameError('The given file is not compatible. '
                         'The file should contain information'
