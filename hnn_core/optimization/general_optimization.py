@@ -12,7 +12,7 @@ from .objective_functions import _rmse_evoked, _maximize_psd
 
 class Optimizer:
     def __init__(self, initial_net, tstop, constraints, set_params,
-                 solver='cobyla', obj_fun='dipole_rmse', scale_factor=1.,
+                 solver='bayesian', obj_fun='dipole_rmse', scale_factor=1.,
                  smooth_window_len=None, max_iter=200):
         """Parameter optimization.
 

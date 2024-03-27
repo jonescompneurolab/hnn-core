@@ -110,7 +110,7 @@ optim = Optimizer(net, tstop=tstop, constraints=constraints,
 # 8-15 Hz (alpha) and 15-30 Hz (beta) are the frequency bands whose
 # power we wish to maximize in a ratio of 1 to 2.
 with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
-    optim.fit(f_bands=[(8, 15), (15, 30)], relative_bandpower=(1, 2))
+    optim.fit(f_bands=[(9, 11), (19, 21)], relative_bandpower=(1, 2))
 
 ###############################################################################
 # Finally, we can plot the optimized dipole, power spectral density (PSD), and
