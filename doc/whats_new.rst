@@ -36,6 +36,9 @@ Changelog
 - Add feature to convert param and json files to HDF5 format, by `George Dang`_
   in :gh:`723`
 
+- Added kwargs options to `plot_spikes_hist` for adjusting the histogram plots of spiking activity,
+by `Abdul Samad`_ in :gh:`732`.
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
