@@ -657,13 +657,7 @@ def compare_dictionaries(d1, d2):
     return d1
 
 
-def _convert_to_path(value):
-    if isinstance(value, str):
-        value = Path(value)
-    return value
-
-
-def convert_to_hdf5(params_fname, out_fname,
+def convert_to_hdf5(params_fname, out_fname, include_drives=True,
                     overwrite=True, write_output=False):
     """Converts json or param format to hdf5
 
@@ -673,6 +667,8 @@ def convert_to_hdf5(params_fname, out_fname,
         Path to file
     out_fname: str
         Path to output
+    include_drives: bool, default=True
+        Include drives from params file
     overwrite: bool, default=True
         Overwrite file
     write_output: bool, default=False
@@ -682,18 +678,26 @@ def convert_to_hdf5(params_fname, out_fname,
     None
     """
     from .network import Network
-
+    # Validate inputs
     _validate_type(params_fname, (str, Path), 'params_fname')
     _validate_type(out_fname, (str, Path), 'out_fname')
+    # Convert to Path
+    params_fname = Path(params_fname)
+    out_fname = Path(out_fname)
+    params_suffix = params_fname.suffix.lower().split('.')[-1]
 
-    params_fname = _convert_to_path(params_fname)
-    out_fname = _convert_to_path(out_fname)
+    # Add suffix if not supplied
     if out_fname.suffix != '.hdf5':
         out_fname = out_fname.with_suffix('.hdf5')
 
-    params = read_params(params_fname)
-    net = Network(params)
-    net.write(out_fname, overwrite, write_output)
+    net = Network(params=read_params(params_fname),
+                  add_drives_from_params=include_drives,
+                  legacy_mode=True if params_suffix == 'param' else False,
+                  )
+    net.write(fname=out_fname,
+              overwrite=overwrite,
+              write_output=write_output,
+              )
     return
 
 

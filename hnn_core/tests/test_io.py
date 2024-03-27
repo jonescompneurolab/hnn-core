@@ -13,8 +13,8 @@ from hnn_core import (read_network, simulate_dipole, read_params,
                       )
 
 from hnn_core.hnn_io import (_cell_response_to_dict, _rec_array_to_dict,
-                             _connectivity_to_list_of_dicts,
-                             _external_drive_to_dict, _str_to_node
+                             _external_drive_to_dict, _str_to_node,
+                             _conn_to_dict
                              )
 
 hnn_core_root = Path(__file__).parents[1]
@@ -66,6 +66,14 @@ def calcium_network(params):
     net.add_electrode_array('arr1', electrode_pos)
 
     return net
+
+
+def generate_test_files(jones_2009_network):
+    """ Generates files used in read-in tests """
+    net = jones_2009_network
+    net.write(Path('.', 'assets/jones2009_3x3_drives.hdf5'))
+    simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
+    net.write(Path('.', 'assets/jones2009_3x3_drives_sim.hdf5'))
 
 
 def test_eq(jones_2009_network, calcium_network):
@@ -149,6 +157,7 @@ def test_write_network(tmp_path, jones_2009_network):
 
 
 def test_write_network_no_output(tmp_path, jones_2009_network):
+    """ Tests that a hdf5 file is written without output """
     net = jones_2009_network.copy()
     path_out = tmp_path / 'net.hdf5'
 
@@ -175,6 +184,7 @@ def test_write_network_no_output(tmp_path, jones_2009_network):
 
 
 def test_cell_response_to_dict(jones_2009_network):
+    """ Tests _cell_response_to_dict function """
     net = jones_2009_network
 
     # No simulation so should have None for cell response
@@ -193,6 +203,7 @@ def test_cell_response_to_dict(jones_2009_network):
 
 
 def test_rec_array_to_dict(jones_2009_network):
+    """ Tests _rec_array_to_dict function """
     net = jones_2009_network
 
     # Check rec array times and voltages are in dict after simulation
@@ -214,30 +225,31 @@ def test_rec_array_to_dict(jones_2009_network):
     assert result2['voltages'].size == 0
 
 
-def test_connectivity_to_list_of_dicts(jones_2009_network):
+def test_conn_to_dict(jones_2009_network):
+    """ Tests _connectivity_to_list_of_dicts function """
     net = jones_2009_network
 
-    result = _connectivity_to_list_of_dicts(net.connectivity[0:2])
-    assert isinstance(result, list)
-    assert len(result) == 2
-    assert result[0] == {'target_type': 'L2_basket',
-                         'target_gids': [0, 1, 2],
-                         'num_targets': 3,
-                         'src_type': 'evdist1',
-                         'src_gids': [24, 25, 26],
-                         'num_srcs': 3,
-                         'gid_pairs': {'24': [0], '25': [1], '26': [2]},
-                         'loc': 'distal',
-                         'receptor': 'ampa',
-                         'nc_dict': {'A_delay': 0.1,
-                                     'A_weight': 0.006562,
-                                     'lamtha': 3.0,
-                                     'threshold': 0.0},
-                         'allow_autapses': 1,
-                         'probability': 1.0}
+    result = _conn_to_dict(net.connectivity[0])
+    assert isinstance(result, dict)
+    assert result == {'target_type': 'L2_basket',
+                      'target_gids': [0, 1, 2],
+                      'num_targets': 3,
+                      'src_type': 'evdist1',
+                      'src_gids': [24, 25, 26],
+                      'num_srcs': 3,
+                      'gid_pairs': {'24': [0], '25': [1], '26': [2]},
+                      'loc': 'distal',
+                      'receptor': 'ampa',
+                      'nc_dict': {'A_delay': 0.1,
+                                  'A_weight': 0.006562,
+                                  'lamtha': 3.0,
+                                  'threshold': 0.0},
+                      'allow_autapses': 1,
+                      'probability': 1.0}
 
 
 def test_external_drive_to_dict(jones_2009_network):
+    """ Tests _external_drive_to_dict function """
     net = jones_2009_network
 
     simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
@@ -272,24 +284,23 @@ def test_str_to_node():
 
 
 def test_read_hdf5(jones_2009_network):
-
-    # jones_2009_network.write(Path('.', 'assets/jones2009_test_read.hdf5'))
-    # This file is written from the jones_2009_network
-    net = read_network(Path(assets_path, 'jones2009_test_read.hdf5'))
+    """ Read-in of a hdf5 file """
+    net = read_network(Path(assets_path, 'jones2009_3x3_drives.hdf5'))
     assert net == jones_2009_network
 
 
 def test_read_hdf5_with_simulation(jones_2009_network):
+    """ Read-in of a hdf5 file with simulation"""
     # Test reading a network with simulation
     net_sim = read_network(
-        Path(assets_path, 'jones2009_simple_sim_test_read.hdf5')
+        Path(assets_path, 'jones2009_3x3_drives_sim.hdf5')
     )
     assert net_sim.rec_arrays['el1'].voltages.size != 0
     assert len(net_sim.external_drives['evdist1']['events']) > 0
 
     # Test reading file without simulation information
     net_sim_output_false = read_network(
-        Path(assets_path, 'jones2009_simple_sim_test_read.hdf5'),
+        Path(assets_path, 'jones2009_3x3_drives_sim.hdf5'),
         read_output=False
     )
     assert net_sim_output_false.rec_arrays['el1'].voltages.size == 0
@@ -297,7 +308,7 @@ def test_read_hdf5_with_simulation(jones_2009_network):
 
     # Test reading file with simulation and without drive information
     net_sim_drives_false = read_network(
-        Path(assets_path, 'jones2009_simple_sim_test_read.hdf5'),
+        Path(assets_path, 'jones2009_3x3_drives_sim.hdf5'),
         read_output=True,
         read_drives=False
     )
@@ -306,7 +317,7 @@ def test_read_hdf5_with_simulation(jones_2009_network):
 
     # Test reading file without simulation and drive information
     net_sim_output_false_drives_false = read_network(
-        Path(assets_path, 'jones2009_simple_sim_test_read.hdf5'),
+        Path(assets_path, 'jones2009_3x3_drives_sim.hdf5'),
         read_output=False,
         read_drives=False
     )
@@ -341,7 +352,7 @@ def test_simulate_from_read(jones_2009_network):
     net = jones_2009_network
     dpls1 = simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
 
-    net_read = read_network(Path(assets_path, 'jones2009_test_read.hdf5'))
+    net_read = read_network(Path(assets_path, 'jones2009_3x3_drives.hdf5'))
     dpls2 = simulate_dipole(net_read, tstop=2, n_trials=1, dt=0.5)
 
     for dpl1, dpl2 in zip(dpls1, dpls2):

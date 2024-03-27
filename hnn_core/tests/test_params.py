@@ -84,7 +84,9 @@ def test_convert_to_hdf5(tmp_path):
     params_base_fname = Path(hnn_core_root, 'param', 'default.json')
     if not op.exists(params_base_fname):
         urlretrieve(param_url, params_base_fname)
-    net_params = Network(read_params(params_base_fname))
+    net_params = Network(read_params(params_base_fname),
+                         add_drives_from_params=True,
+                         )
 
     # Write hdf5 and check if constructed network is equal
     outpath = Path(tmp_path, 'default.hdf5')
@@ -92,7 +94,14 @@ def test_convert_to_hdf5(tmp_path):
     net_hdf5 = read_network(outpath)
     assert net_hdf5 == net_params
 
-    # Check if writing with no extension will add one
+    # Write hdf5 without drives
+    outpath_no_drives = Path(tmp_path, 'default_no_drives.hdf5')
+    convert_to_hdf5(params_base_fname, outpath_no_drives, include_drives=False)
+    net_hdf5_no_drives = read_network(outpath_no_drives)
+    assert net_hdf5_no_drives != net_hdf5
+    assert bool(net_hdf5_no_drives.external_drives) is False
+
+    # Check that writing with no extension will add one
     outpath_no_ext = Path(tmp_path, 'default_no_ext')
     convert_to_hdf5(params_base_fname, outpath_no_ext)
     assert outpath_no_ext.with_suffix('.hdf5').exists()
@@ -106,7 +115,10 @@ def test_convert_to_hdf5_legacy(tmp_path):
     params_base_fname = Path(hnn_core_root, 'param', 'default.param')
     if not op.exists(params_base_fname):
         urlretrieve(param_url, params_base_fname)
-    net_params = Network(read_params(params_base_fname))
+    net_params = Network(read_params(params_base_fname),
+                         add_drives_from_params=True,
+                         legacy_mode=True
+                         )
 
     # Write hdf5 and check if constructed network is equal
     outpath = Path(tmp_path, 'default.hdf5')
@@ -118,16 +130,15 @@ def test_convert_to_hdf5_legacy(tmp_path):
 def test_convert_to_hdf5_bad_type():
     """Tests type validation in convert_to_hdf5 function"""
     good_path = hnn_core_root
-    path_str = good_path.__str__()
+    path_str = str(good_path)
     bad_path = 5
 
     # Valid path and string, but not actual files
     with pytest.raises(
             ValueError,
-            match="Unrecognized extension, expected one of .json, .param."
+            match="Unrecognized extension, expected one of"
     ):
         convert_to_hdf5(good_path, path_str)
-        convert_to_hdf5(path_str, good_path)
 
     # Bad params_fname
     with pytest.raises(

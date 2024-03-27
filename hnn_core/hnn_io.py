@@ -14,6 +14,7 @@ from .externals.mne import fill_doc
 
 
 def _cell_response_to_dict(net, write_output):
+    """Returns a dict of cell response data."""
     # Write cell_response as dict
     if (not net.cell_response) or (not write_output):
         return None
@@ -22,6 +23,7 @@ def _cell_response_to_dict(net, write_output):
 
 
 def _rec_array_to_dict(value, write_output):
+    """Returns a dict of rec_array data."""
     rec_array_copy = value.copy()
     if not write_output:
         rec_array_copy._reset()
@@ -29,32 +31,28 @@ def _rec_array_to_dict(value, write_output):
     return rec_array_copy_dict
 
 
-def _connectivity_to_list_of_dicts(connectivity):
-
-    def _conn_to_dict(conn):
-        conn_data = {
-            'target_type': conn['target_type'],
-            'target_gids': list(conn['target_gids']),
-            'num_targets': conn['num_targets'],
-            'src_type': conn['src_type'],
-            'src_gids': list(conn['src_gids']),
-            'num_srcs': conn['num_srcs'],
-            'gid_pairs': {str(key): val
-                          for key, val in conn['gid_pairs'].items()},
-            'loc': conn['loc'],
-            'receptor': conn['receptor'],
-            'nc_dict': conn['nc_dict'],
-            'allow_autapses': int(conn['allow_autapses']),
-            'probability': conn['probability'],
-        }
-        return conn_data
-
-    conns_data = [_conn_to_dict(conn) for conn in connectivity]
-
-    return conns_data
+def _conn_to_dict(conn):
+    """Converts a Connectivity object parameters to a dict format."""
+    conn_data = {
+        'target_type': conn['target_type'],
+        'target_gids': list(conn['target_gids']),
+        'num_targets': conn['num_targets'],
+        'src_type': conn['src_type'],
+        'src_gids': list(conn['src_gids']),
+        'num_srcs': conn['num_srcs'],
+        'gid_pairs': {str(key): val
+                      for key, val in conn['gid_pairs'].items()},
+        'loc': conn['loc'],
+        'receptor': conn['receptor'],
+        'nc_dict': conn['nc_dict'],
+        'allow_autapses': int(conn['allow_autapses']),
+        'probability': conn['probability'],
+    }
+    return conn_data
 
 
 def _external_drive_to_dict(drive, write_output):
+    """Returns dict of drive data from a Drive object."""
     drive_data = dict()
     for key in drive.keys():
         # Cannot store sets with hdf5
@@ -68,6 +66,7 @@ def _external_drive_to_dict(drive, write_output):
 
 
 def _str_to_node(node_string):
+    """Returns tuple of node values from a comma-separated string format."""
     node_tuple = node_string.split(',')
     node_tuple[1] = int(node_tuple[1])
     node = (node_tuple[0], node_tuple[1])
@@ -75,6 +74,7 @@ def _str_to_node(node_string):
 
 
 def _read_cell_types(cell_types_data):
+    """Returns a dict of Cell objects from hdf5 encoded data"""
     cell_types = dict()
     for cell_name in cell_types_data:
         cell_data = cell_types_data[cell_name]
@@ -118,6 +118,7 @@ def _read_cell_types(cell_types_data):
 
 
 def _read_cell_response(cell_response_data, read_output):
+    """Returns CellResponse from hdf5 encoded data"""
     if (not cell_response_data) or (not read_output):
         return None
     cell_response = CellResponse(spike_times=cell_response_data['spike_times'],
@@ -136,10 +137,24 @@ def _read_cell_response(cell_response_data, read_output):
     return cell_response
 
 
+def _set_from_cell_specific(drive_data):
+    """Returns number of drive cells based on cell_specific bool
+
+    The n_drive_cells keyword for add_poisson_drive and add_bursty_drive
+    methods accept either an int or string (n_cells). If the bool keyword
+    cell_specific = True, n_drive_cells must be 'n_cells'.
+    """
+    if drive_data['cell_specific']:
+        return 'n_cells'
+    return drive_data['n_drive_cells']
+
+
 def _read_external_drive(net, drive_data, read_output, read_drives):
+    """Adds drives encoded in hdf5 data to a Network"""
     if not read_drives:
         return None
-    if drive_data['type'] == 'evoked':
+
+    if (drive_data['type'] == 'evoked') or (drive_data['type'] == 'gaussian'):
         # Skipped n_drive_cells here
         net.add_evoked_drive(name=drive_data['name'],
                              mu=drive_data['dynamics']['mu'],
@@ -160,7 +175,8 @@ def _read_external_drive(net, drive_data, read_output, read_drives):
                               rate_constant=(drive_data['dynamics']
                                                        ['rate_constant']),
                               location=drive_data['location'],
-                              n_drive_cells=drive_data['n_drive_cells'],
+                              n_drive_cells=(
+                                  _set_from_cell_specific(drive_data)),
                               cell_specific=drive_data['cell_specific'],
                               weights_ampa=drive_data['weights_ampa'],
                               weights_nmda=drive_data['weights_nmda'],
@@ -175,10 +191,10 @@ def _read_external_drive(net, drive_data, read_output, read_drives):
                              tstop=drive_data['dynamics']['tstop'],
                              burst_rate=drive_data['dynamics']['burst_rate'],
                              burst_std=drive_data['dynamics']['burst_std'],
-                             num_spikes=drive_data['dynamics']['num_spikes'],
+                             numspikes=drive_data['dynamics']['numspikes'],
                              spike_isi=drive_data['dynamics']['spike_isi'],
                              location=drive_data['location'],
-                             n_drive_cells=drive_data['n_drive_cells'],
+                             n_drive_cells=_set_from_cell_specific(drive_data),
                              cell_specific=drive_data['cell_specific'],
                              weights_ampa=drive_data['weights_ampa'],
                              weights_nmda=drive_data['weights_nmda'],
@@ -193,10 +209,11 @@ def _read_external_drive(net, drive_data, read_output, read_drives):
 
 
 def _read_connectivity(net, conns_data):
+    """Adds connections to a Network from hdf5 encoded connectivity"""
     # Overwrite drive connections
     net.connectivity = list()
 
-    for i, conn_data in enumerate(conns_data):
+    for conn_data in conns_data:
         src_gids = [int(s) for s in conn_data['gid_pairs'].keys()]
         target_gids_nested = [target_gid for target_gid
                               in conn_data['gid_pairs'].values()]
@@ -213,6 +230,7 @@ def _read_connectivity(net, conns_data):
 
 
 def _read_rec_arrays(net, rec_arrays_data, read_output):
+    """Adds rec arrays to Network from hdf5 data."""
     for key in rec_arrays_data:
         rec_array = rec_arrays_data[key]
         net.add_electrode_array(name=key,
@@ -247,6 +265,7 @@ def write_network(net, fname, overwrite=True, write_output=True):
 
     net_data = {
         'object_type': 'Network',
+        'legacy_mode': net._legacy_mode,
         'N_pyr_x': net._N_pyr_x,
         'N_pyr_y': net._N_pyr_y,
         'celsius': net._params['celsius'],
@@ -263,7 +282,7 @@ def write_network(net, fname, overwrite=True, write_output=True):
                             for drive, params in net.external_drives.items()
                             },
         'external_biases': net.external_biases,
-        'connectivity': _connectivity_to_list_of_dicts(net.connectivity),
+        'connectivity': [_conn_to_dict(conn) for conn in net.connectivity],
         'rec_arrays': {ra_name: _rec_array_to_dict(ex_array, write_output)
                        for ra_name, ex_array in net.rec_arrays.items()
                        },
@@ -300,6 +319,7 @@ def read_network(fname, read_output=True, read_drives=True):
         raise ValueError('The object should be of type Network. '
                          'The file contains object of '
                          'type %s' % (net_data['object_type'],))
+
     params = dict()
     params['celsius'] = net_data['celsius']
     params['threshold'] = net_data['threshold']
@@ -307,7 +327,10 @@ def read_network(fname, read_output=True, read_drives=True):
     mesh_shape = (net_data['N_pyr_x'], net_data['N_pyr_y'])
 
     # Instantiating network
-    net = Network(params, mesh_shape=mesh_shape)
+    net = Network(params,
+                  mesh_shape=mesh_shape,
+                  legacy_mode=net_data['legacy_mode']
+                  )
 
     # Setting attributes
     # Set cell types
