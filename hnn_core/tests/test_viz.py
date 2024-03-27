@@ -3,14 +3,17 @@ import os.path as op
 import matplotlib
 from matplotlib import backend_bases
 import matplotlib.pyplot as plt
+from matplotlib.colorbar import Colorbar
+
 import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
 import hnn_core
 from hnn_core import read_params, jones_2009_model
-from hnn_core.viz import plot_cells, plot_dipole, plot_psd, plot_tfr_morlet
-from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
+from hnn_core.viz import (plot_cells, plot_dipole, plot_psd, plot_tfr_morlet,
+                          plot_connectivity_matrix, plot_cell_connectivity,
+                          NetworkPlotter)
 from hnn_core.dipole import simulate_dipole
 
 matplotlib.use('agg')
@@ -79,6 +82,14 @@ def test_network_visualization():
     with pytest.raises(TypeError, match='color must be'):
         cell_type.plot_morphology(color=123)
 
+    cell_type.plot_morphology(pos=(1.0, 2.0, 3.0))
+    with pytest.raises(TypeError, match='pos must be'):
+        cell_type.plot_morphology(pos=123)
+    with pytest.raises(ValueError, match='pos must be a tuple of 3 elements'):
+        cell_type.plot_morphology(pos=(1, 2, 3, 4))
+    with pytest.raises(TypeError, match='pos\\[idx\\] must be'):
+        cell_type.plot_morphology(pos=(1, '2', 3))
+
     plt.close('all')
 
     # test interactive clicking updates the position of src_cell in plot
@@ -119,7 +130,7 @@ def test_dipole_visualization():
         weights_ampa=weights_ampa, synaptic_delays=syn_delays,
         event_seed=14)
 
-    dpls = simulate_dipole(net, tstop=100., n_trials=2)
+    dpls = simulate_dipole(net, tstop=100., n_trials=2, record_vsec='all')
     fig = dpls[0].plot()  # plot the first dipole alone
     axes = fig.get_axes()[0]
     dpls[0].copy().smooth(window_len=10).plot(ax=axes)  # add smoothed versions
@@ -206,5 +217,118 @@ def test_dipole_visualization():
                                                   'beta_dist': 'g'})
     with pytest.raises(ValueError, match="'beta_dist' must be"):
         net.cell_response.plot_spikes_hist(color={'beta_prox': 'r'})
+
+    # test NetworkPlotter class
+    with pytest.raises(TypeError, match='xlim must be'):
+        _ = NetworkPlotter(net, xlim='blah')
+    with pytest.raises(TypeError, match='ylim must be'):
+        _ = NetworkPlotter(net, ylim='blah')
+    with pytest.raises(TypeError, match='zlim must be'):
+        _ = NetworkPlotter(net, zlim='blah')
+    with pytest.raises(TypeError, match='elev must be'):
+        _ = NetworkPlotter(net, elev='blah')
+    with pytest.raises(TypeError, match='azim must be'):
+        _ = NetworkPlotter(net, azim='blah')
+    with pytest.raises(TypeError, match='vmin must be'):
+        _ = NetworkPlotter(net, vmin='blah')
+    with pytest.raises(TypeError, match='vmax must be'):
+        _ = NetworkPlotter(net, vmax='blah')
+    with pytest.raises(TypeError, match='trial_idx must be'):
+        _ = NetworkPlotter(net, trial_idx=1.0)
+    with pytest.raises(TypeError, match='time_idx must be'):
+        _ = NetworkPlotter(net, time_idx=1.0)
+    with pytest.raises(TypeError, match='colorbar must be'):
+        _ = NetworkPlotter(net, colorbar='blah')
+
+    net = jones_2009_model(params)
+    net_plot = NetworkPlotter(net)
+
+    assert net_plot.vsec_array.shape == (159, 1)
+    assert net_plot.color_array.shape == (159, 1, 4)
+    assert net_plot._vsec_recorded is False
+
+    # Errors if vsec isn't recorded
+    with pytest.raises(RuntimeError, match='Network must be simulated'):
+        net_plot.export_movie('demo.gif', dpi=200)
+
+    # Errors if vsec isn't recorded with record_vsec='all'
+    _ = simulate_dipole(net, dt=0.5, tstop=10, record_vsec='soma')
+    net_plot = NetworkPlotter(net)
+
+    assert net_plot.vsec_array.shape == (159, 1)
+    assert net_plot.color_array.shape == (159, 1, 4)
+    assert net_plot._vsec_recorded is False
+
+    with pytest.raises(RuntimeError, match='Network must be simulated'):
+        net_plot.export_movie('demo.gif', dpi=200)
+
+    # Simulate with record_vsec='all' to test voltage plotting
+    net = jones_2009_model(params)
+    _ = simulate_dipole(net, dt=0.5, tstop=10, n_trials=2,
+                        record_vsec='all')
+    net_plot = NetworkPlotter(net)
+
+    assert net_plot.vsec_array.shape == (159, 21)
+    assert net_plot.color_array.shape == (159, 21, 4)
+    assert net_plot._vsec_recorded is True
+    assert isinstance(net_plot._cbar, Colorbar)
+
+    # Type check errors
+    with pytest.raises(TypeError, match='xlim must be'):
+        net_plot.xlim = 'blah'
+    with pytest.raises(TypeError, match='ylim must be'):
+        net_plot.ylim = 'blah'
+    with pytest.raises(TypeError, match='zlim must be'):
+        net_plot.zlim = 'blah'
+    with pytest.raises(TypeError, match='elev must be'):
+        net_plot.elev = 'blah'
+    with pytest.raises(TypeError, match='azim must be'):
+        net_plot.azim = 'blah'
+    with pytest.raises(TypeError, match='vmin must be'):
+        net_plot.vmin = 'blah'
+    with pytest.raises(TypeError, match='vmax must be'):
+        net_plot.vmax = 'blah'
+    with pytest.raises(TypeError, match='trial_idx must be'):
+        net_plot.trial_idx = 1.0
+    with pytest.raises(TypeError, match='time_idx must be'):
+        net_plot.time_idx = 1.0
+    with pytest.raises(TypeError, match='colorbar must be'):
+        net_plot.colorbar = 'blah'
+
+    # Check that the setters work
+    net_plot.xlim = (-100, 100)
+    net_plot.ylim = (-100, 100)
+    net_plot.zlim = (-100, 100)
+    net_plot.elev = 10
+    net_plot.azim = 10
+    net_plot.vmin = 0
+    net_plot.vmax = 100
+    net_plot.trial_idx = 1
+    net_plot.time_idx = 5
+    net_plot.bgcolor = 'white'
+    net_plot.voltage_colormap = 'jet'
+
+    net_plot.colorbar = False
+    # check later that net._cbar is None
+    assert net_plot._cbar is None
+
+    # Check that the getters work
+    assert net_plot.xlim == (-100, 100)
+    assert net_plot.ylim == (-100, 100)
+    assert net_plot.zlim == (-100, 100)
+    assert net_plot.elev == 10
+    assert net_plot.azim == 10
+    assert net_plot.vmin == 0
+    assert net_plot.vmax == 100
+    assert net_plot.trial_idx == 1
+    assert net_plot.time_idx == 5
+
+    assert net_plot.bgcolor == 'white'
+    assert net_plot.fig.get_facecolor() == (1.0, 1.0, 1.0, 1.0)
+
+    assert net_plot.voltage_colormap == 'jet'
+
+    # Test animation export and voltage plotting
+    net_plot.export_movie('demo.gif', dpi=200, decim=100, writer='pillow')
 
     plt.close('all')

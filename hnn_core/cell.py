@@ -863,7 +863,9 @@ class Cell:
 
         return nc
 
-    def plot_morphology(self, ax=None, color=None, show=True):
+    def plot_morphology(self, ax=None, color=None, pos=(0, 0, 0),
+                        xlim=(-250, 150), ylim=(-100, 100), zlim=(-100, 1200),
+                        show=True):
         """Plot the cell morphology.
 
         Parameters
@@ -875,8 +877,11 @@ class Cell:
             color indicated by str. If dict, colors of individual sections
             can be specified. Must have a key for every section in cell as
             defined in the `Cell.sections` attribute.
-        | Ex: ``{'apical_trunk': 'r', 'soma': 'b', ...}``
 
+        | Ex: ``{'apical_trunk': 'r', 'soma': 'b', ...}``
+        pos : tuple of int or float | None
+            Position of cell soma. Must be a tuple of 3 elements for the
+            (x, y, z) position of the soma in 3D space. Default: (0, 0, 0)
         show : bool
             If True, show the plot
 
@@ -885,7 +890,8 @@ class Cell:
         axes : instance of Axes3D
             The matplotlib 3D axis handle.
         """
-        return plot_cell_morphology(self, ax=ax, color=color, show=show)
+        return plot_cell_morphology(self, ax=ax, color=color, pos=pos,
+                                    xlim=xlim, ylim=ylim, zlim=zlim, show=show)
 
     def _update_section_end_pts_L(self, node, dpt):
         if self.cell_tree is None:

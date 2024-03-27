@@ -847,7 +847,9 @@ def _linewidth_from_data_units(ax, linewidth):
     return linewidth * (length / value_range)
 
 
-def plot_cell_morphology(cell, ax, color=None, show=True):
+def plot_cell_morphology(
+        cell, ax, color=None, pos=(0, 0, 0), xlim=(-250, 150),
+        ylim=(-100, 100), zlim=(-100, 1200), show=True):
     """Plot the cell morphology.
 
     Parameters
@@ -865,6 +867,9 @@ def plot_cell_morphology(cell, ax, color=None, show=True):
         defined in the `Cell.sections` attribute.
 
         | Ex: ``{'apical_trunk': 'r', 'soma': 'b', ...}``
+    pos : tuple of int or float | None
+        Position of cell soma. Must be a tuple of 3 elements for the
+        (x, y, z) position of the soma in 3D space. Default: (0, 0, 0)
 
     Returns
     -------
@@ -887,18 +892,26 @@ def plot_cell_morphology(cell, ax, color=None, show=True):
     if isinstance(color, dict):
         section_colors = color
 
+    _validate_type(pos, tuple, 'pos')
+    if isinstance(pos, tuple):
+        if len(pos) != 3:
+            raise ValueError('pos must be a tuple of 3 elements')
+        for pos_idx in pos:
+            _validate_type(pos_idx, (float, int), 'pos[idx]')
+
     # Cell is in XZ plane
-    ax.set_xlim((cell.pos[1] - 250, cell.pos[1] + 150))
-    ax.set_zlim((cell.pos[2] - 100, cell.pos[2] + 1200))
+    ax.set_xlim((pos[0] + xlim[0], pos[0] + xlim[1]))
+    ax.set_zlim((pos[1] + zlim[0], pos[1] + zlim[1]))
+    ax.set_ylim((pos[2] + ylim[0], pos[2] + ylim[1]))
 
     for sec_name, section in cell.sections.items():
         linewidth = _linewidth_from_data_units(ax, section.diam)
         end_pts = section.end_pts
         xs, ys, zs = list(), list(), list()
         for pt in end_pts:
-            dx = cell.pos[0] - cell.sections['soma'].end_pts[0][0]
-            dy = cell.pos[1] - cell.sections['soma'].end_pts[0][1]
-            dz = cell.pos[2] - cell.sections['soma'].end_pts[0][2]
+            dx = pos[0] - cell.sections['soma'].end_pts[0][0]
+            dy = pos[1] - cell.sections['soma'].end_pts[0][1]
+            dz = pos[2] - cell.sections['soma'].end_pts[0][2]
             xs.append(pt[0] + dx)
             ys.append(pt[1] + dz)
             zs.append(pt[2] + dy)
@@ -1192,7 +1205,7 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
     ax : instance of matplotlib figure | None
         The matplotlib axis.
     colorbar : bool
-        If the colorbar is presented.
+        If True (default), adjust figure to include colorbar.
     contact_labels : list
         Labels associated with the contacts to plot. Passed as-is to
         :func:`~matplotlib.axes.Axes.set_yticklabels`.
@@ -1222,3 +1235,365 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
     plt_show(show)
 
     return ax.get_figure()
+
+
+class NetworkPlotter:
+    """Helper class to visualize full morphology of HNN model.
+
+    Parameters
+    ----------
+    net : Instance of Network object
+        The Network object
+    ax : instance of matplotlib Axes3D | None
+        An axis object from matplotlib. If None,
+        a new figure is created.
+    vmin : int | float
+        Lower limit of colormap for plotting voltage
+        Default: -100 mV
+    vmax : int | float
+        Upper limit of colormap for plotting voltage
+        Default: 50 mV
+    bg_color : str
+        Background color of ax. Default: 'black'
+    colorbar : bool
+        If True (default), adjust figure to include colorbar.
+    voltage_colormap : str
+        Colormap used for plotting voltages
+        Default: 'viridis'
+    elev : int | float
+        Elevation 3D plot viewpoint, default: 10
+    azim : int | float
+        Azimuth of 3D plot view point, default: 20
+    xlim : tuple of int | tuple of float
+        x limits of plot window. Default (-200, 3100)
+    ylim : tuple of int | tuple of float
+        y limits of plot window. Default (-200, 3100)
+    zlim : tuple of int | tuple of float
+        z limits of plot window. Default (-300, 2200)
+    trial_idx : int
+        Index of simulation trial plotted. Default: 0
+    time_idx : int
+        Index of time point plotted. Default: 0
+    """
+    def __init__(self, net, ax=None, vmin=-100, vmax=50, bg_color='black',
+                 colorbar=True, voltage_colormap='viridis', elev=10, azim=-500,
+                 xlim=(-200, 3100), ylim=(-200, 3100), zlim=(-300, 2200),
+                 trial_idx=0, time_idx=0):
+        import matplotlib.pyplot as plt
+        from matplotlib import colormaps
+        self.net = net
+
+        # Check if network simulated
+        if net.cell_response is not None:
+            self.times = net.cell_response.times
+
+            # Check if voltage recorded
+            if net._params['record_vsec'] == 'all':
+                self._vsec_recorded = True
+            else:
+                self._vsec_recorded = False
+        else:
+            self._vsec_recorded = False
+            self.times = None
+
+        _validate_type(vmin, (int, float), 'vmin')
+        _validate_type(vmax, (int, float), 'vmax')
+        self._vmin = vmin
+        self._vmax = vmax
+
+        self._bg_color = bg_color
+        self._voltage_colormap = voltage_colormap
+
+        self._colormaps = colormaps  # Saved for voltage_colormap update method
+        self._colormap = colormaps[voltage_colormap]
+
+        # Axes limits and view positions
+        _validate_type(xlim, tuple, 'xlim')
+        _validate_type(ylim, tuple, 'ylim')
+        _validate_type(zlim, tuple, 'zlim')
+        _validate_type(elev, (int, float), 'elev')
+        _validate_type(azim, (int, float), 'azim')
+
+        self._xlim = xlim
+        self._ylim = ylim
+        self._zlim = zlim
+        self._elev = elev
+        self._azim = azim
+
+        # Trial and time indices
+        _validate_type(trial_idx, int, 'trial_idx')
+        _validate_type(time_idx, int, 'time_idx')
+
+        self._trial_idx = trial_idx
+        self._time_idx = time_idx
+
+        # Get voltage data and corresponding colors
+        self.vsec_array = self._get_voltages()
+        self.color_array = self._colormap(self.vsec_array)
+
+        # Create figure
+        if ax is None:
+            self.fig = plt.figure()
+            self.ax = self.fig.add_subplot(projection='3d')
+            self.ax.set_facecolor(self._bg_color)
+        else:
+            self.ax = ax
+            self.fig = None
+        self._init_network_plot()
+        self._update_axes()
+
+        _validate_type(colorbar, bool, 'colorbar')
+        self._colorbar = colorbar
+        if self._colorbar:
+            self._update_colorbar()
+        else:
+            self._cbar = None
+
+    def _get_voltages(self):
+        vsec_list = list()
+        for cell_type in self.net.cell_types:
+            gid_range = self.net.gid_ranges[cell_type]
+            for gid in gid_range:
+                cell = self.net.cell_types[cell_type]
+                for sec_name in cell.sections.keys():
+                    if self._vsec_recorded is True:
+                        vsec = np.array(self.net.cell_response.vsec[
+                            self.trial_idx][gid][sec_name])
+                        vsec_list.append(vsec)
+                    else:  # Populate with zeros if no voltage recording
+                        vsec_list.append([0.0])
+
+        vsec_array = np.vstack(vsec_list)
+        vsec_array = (vsec_array - self.vmin) / (self.vmax - self.vmin)
+        return vsec_array
+
+    def _update_section_voltages(self, t_idx):
+        if not self._vsec_recorded:
+            raise RuntimeError("Network must be simulated with"
+                               "`simulate_dipole(record_vsec='all')` before"
+                               "plotting voltages.")
+        color_list = self.color_array[:, t_idx]
+        for line, color in zip(self.ax.lines, color_list):
+            line.set_color(color)
+
+    def _init_network_plot(self):
+        for cell_type in self.net.cell_types:
+            gid_range = self.net.gid_ranges[cell_type]
+            for gid_idx, gid in enumerate(gid_range):
+
+                cell = self.net.cell_types[cell_type]
+
+                pos = self.net.pos_dict[cell_type][gid_idx]
+                pos = (float(pos[0]), float(pos[2]), float(pos[1]))
+
+                cell.plot_morphology(ax=self.ax, show=False,
+                                     pos=pos, xlim=self.xlim,
+                                     ylim=self.ylim, zlim=self.zlim)
+
+    def _update_axes(self):
+        self.ax.set_xlim(self._xlim)
+        self.ax.set_ylim(self._ylim)
+        self.ax.set_zlim(self._zlim)
+
+        self.ax.view_init(self._elev, self._azim)
+
+    def _update_colorbar(self):
+        import matplotlib.pyplot as plt
+        import matplotlib.colors as mc
+
+        fig = self.ax.get_figure()
+        sm = plt.cm.ScalarMappable(
+            cmap=self.voltage_colormap,
+            norm=mc.Normalize(vmin=self.vmin, vmax=self.vmax))
+        self._cbar = fig.colorbar(sm, ax=self.ax)
+
+    def export_movie(self, fname, fps=30, dpi=300, decim=10,
+                     interval=30, frame_start=0, frame_stop=None,
+                     writer='pillow'):
+        """Export movie of network activity
+
+        Parameters
+        ----------
+        fname : str
+            Filename of exported movie
+        fps : int
+            Frames per second, default: 30
+        dpi : int
+            Dots per inch, default: 300
+        decim : int
+            Decimation factor for frames, default: 10
+        interval : int
+            Delay between frames, default: 30
+        frame_start : int
+            Index of first frame, default: 0
+        frame_stop : int | None
+            Index of last frame, default: None
+            If None, entire simulation is animated
+        writer : str
+            Movie writer, default: 'pillow'.
+            Alternative movie writers can be found at
+            https://matplotlib.org/stable/api/animation_api.html
+        """
+        import matplotlib.animation as animation
+
+        if not self._vsec_recorded:
+            raise RuntimeError("Network must be simulated with"
+                               "`simulate_dipole(record_vsec='all')` before"
+                               "plotting voltages.")
+        if frame_stop is None:
+            frame_stop = len(self.times) - 1
+
+        frames = np.arange(frame_start, frame_stop, decim)
+        ani = animation.FuncAnimation(
+            self.fig, self._set_time_idx, frames, interval=interval)
+
+        writer = animation.writers[writer](fps=fps)
+        ani.save(fname, writer=writer, dpi=dpi)
+        return ani
+
+    # Axis limits
+    @property
+    def xlim(self):
+        return self._xlim
+
+    @xlim.setter
+    def xlim(self, xlim):
+        _validate_type(xlim, tuple, 'xlim')
+        self._xlim = xlim
+        self.ax.set_xlim(self._xlim)
+
+    @property
+    def ylim(self):
+        return self._ylim
+
+    @ylim.setter
+    def ylim(self, ylim):
+        _validate_type(ylim, tuple, 'ylim')
+        self._ylim = ylim
+        self.ax.set_ylim(self._ylim)
+
+    @property
+    def zlim(self):
+        return self._zlim
+
+    @zlim.setter
+    def zlim(self, zlim):
+        _validate_type(zlim, tuple, 'zlim')
+        self._zlim = zlim
+        self.ax.set_zlim(self._zlim)
+
+    # Eleevation and azimuth of 3D viewpoint
+    @property
+    def elev(self):
+        return self._elev
+
+    @elev.setter
+    def elev(self, elev):
+        _validate_type(elev, (int, float), 'elev')
+        self._elev = elev
+        self.ax.view_init(self._elev, self._azim)
+
+    @property
+    def azim(self):
+        return self._azim
+
+    @azim.setter
+    def azim(self, azim):
+        _validate_type(azim, (int, float), 'azim')
+        self._azim = azim
+        self.ax.view_init(self._elev, self._azim)
+
+    # Minimum and maximum voltages
+    @property
+    def vmin(self):
+        return self._vmin
+
+    @vmin.setter
+    def vmin(self, vmin):
+        _validate_type(vmin, (int, float), 'vmin')
+        self._vmin = vmin
+        self.vsec_array = self._get_voltages()
+        self.color_array = self._colormap(self.vsec_array)
+        if self._colorbar:
+            self._cbar.remove()
+            self._update_colorbar()
+
+    @property
+    def vmax(self):
+        return self._vmax
+
+    @vmax.setter
+    def vmax(self, vmax):
+        _validate_type(vmax, (int, float), 'vmax')
+        self._vmax = vmax
+        self.vsec_array = self._get_voltages()
+        self.color_array = self._colormap(self.vsec_array)
+        if self._colorbar:
+            self._cbar.remove()
+            self._update_colorbar()
+
+    # Time and trial indices
+    @property
+    def trial_idx(self):
+        return self._trial_idx
+
+    @trial_idx.setter
+    def trial_idx(self, trial_idx):
+        _validate_type(trial_idx, int, 'trial_idx')
+        self._trial_idx = trial_idx
+        self.vsec_array = self._get_voltages()
+        self.color_array = self._colormap(self.vsec_array)
+
+    @property
+    def time_idx(self):
+        return self._time_idx
+
+    @time_idx.setter
+    def time_idx(self, time_idx):
+        _validate_type(time_idx, (int, np.integer), 'time_idx')
+        self._time_idx = time_idx
+        self._update_section_voltages(self._time_idx)
+
+    # Callable update function for making animations
+    def _set_time_idx(self, time_idx):
+        self.time_idx = time_idx
+
+    # Background color and voltage colormaps
+    @property
+    def bg_color(self):
+        return self._bg_color
+
+    @bg_color.setter
+    def bg_color(self, bg_color):
+        self._bg_color = bg_color
+        self.ax.set_facecolor(self._bg_color)
+
+    @property
+    def voltage_colormap(self):
+        return self._voltage_colormap
+
+    @voltage_colormap.setter
+    def voltage_colormap(self, voltage_colormap):
+        self._voltage_colormap = voltage_colormap
+        self._colormap = self._colormaps[self._voltage_colormap]
+        self.color_array = self._colormap(self.vsec_array)
+        if self._colorbar:
+            self._cbar.remove()
+            self._update_colorbar()
+
+    @property
+    def colorbar(self):
+        return self._colorbar
+
+    @colorbar.setter
+    def colorbar(self, colorbar):
+        _validate_type(colorbar, bool, 'colorbar')
+        self._colorbar = colorbar
+        if self._colorbar:
+            # Remove old colorbar if already exists
+            if self._cbar is not None:
+                self._cbar.remove()
+            self._update_colorbar()
+        else:
+            self._cbar.remove()
+            self._cbar = None
