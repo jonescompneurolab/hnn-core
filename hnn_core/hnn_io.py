@@ -14,6 +14,7 @@ from .externals.mne import fill_doc
 
 
 def _cell_response_to_dict(net, write_output):
+    """Returns a dict of cell response data."""
     # Write cell_response as dict
     if (not net.cell_response) or (not write_output):
         return None
@@ -22,6 +23,7 @@ def _cell_response_to_dict(net, write_output):
 
 
 def _rec_array_to_dict(value, write_output):
+    """Returns a dict of rec_array data."""
     rec_array_copy = value.copy()
     if not write_output:
         rec_array_copy._reset()
@@ -50,6 +52,7 @@ def _conn_to_dict(conn):
 
 
 def _external_drive_to_dict(drive, write_output):
+    """Returns dict of drive data from a Drive object."""
     drive_data = dict()
     for key in drive.keys():
         # Cannot store sets with hdf5
@@ -63,6 +66,7 @@ def _external_drive_to_dict(drive, write_output):
 
 
 def _str_to_node(node_string):
+    """Returns tuple of node values from a comma-separated string format."""
     node_tuple = node_string.split(',')
     node_tuple[1] = int(node_tuple[1])
     node = (node_tuple[0], node_tuple[1])
@@ -70,6 +74,7 @@ def _str_to_node(node_string):
 
 
 def _read_cell_types(cell_types_data):
+    """Returns a dict of Cell objects from hdf5 encoded data"""
     cell_types = dict()
     for cell_name in cell_types_data:
         cell_data = cell_types_data[cell_name]
@@ -113,6 +118,7 @@ def _read_cell_types(cell_types_data):
 
 
 def _read_cell_response(cell_response_data, read_output):
+    """Returns CellResponse from hdf5 encoded data"""
     if (not cell_response_data) or (not read_output):
         return None
     cell_response = CellResponse(spike_times=cell_response_data['spike_times'],
@@ -144,7 +150,7 @@ def _set_from_cell_specific(drive_data):
 
 
 def _read_external_drive(net, drive_data, read_output, read_drives):
-    """Reads drives from a hdf5 data dict and adds them to a Network"""
+    """Adds drives encoded in hdf5 data to a Network"""
     if not read_drives:
         return None
 
@@ -203,6 +209,7 @@ def _read_external_drive(net, drive_data, read_output, read_drives):
 
 
 def _read_connectivity(net, conns_data):
+    """Adds connections to a Network from hdf5 encoded connectivity"""
     # Overwrite drive connections
     net.connectivity = list()
 
@@ -223,6 +230,7 @@ def _read_connectivity(net, conns_data):
 
 
 def _read_rec_arrays(net, rec_arrays_data, read_output):
+    """Adds rec arrays to Network from hdf5 data."""
     for key in rec_arrays_data:
         rec_array = rec_arrays_data[key]
         net.add_electrode_array(name=key,
