@@ -359,7 +359,7 @@ def test_gui_edit_figure():
         assert len(axes_config_tabs.children) == n_figs
 
         axes_config = axes_config_tabs.children[-1].children[1]
-        simulation_selection = axes_config.children[0].children[0]
+        simulation_selection = axes_config.children[0].children[1]
         assert simulation_selection.options == tuple(sim_names[:n_figs])
     plt.close('all')
 
@@ -378,7 +378,7 @@ def test_gui_figure_overlay():
         for controls in tab.children[1].children:
             add_plot_button = controls.children[-2].children[0]
             clear_ax_button = controls.children[-2].children[1]
-            plot_type_selection = controls.children[1]
+            plot_type_selection = controls.children[0]
 
             assert plot_type_selection.disabled is True
             clear_ax_button.click()
