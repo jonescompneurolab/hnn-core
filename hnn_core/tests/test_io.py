@@ -13,8 +13,8 @@ from hnn_core import (read_network, simulate_dipole, read_params,
                       )
 
 from hnn_core.hnn_io import (_cell_response_to_dict, _rec_array_to_dict,
-                             _connectivity_to_list_of_dicts,
-                             _external_drive_to_dict, _str_to_node
+                             _external_drive_to_dict, _str_to_node,
+                             _conn_to_dict
                              )
 
 hnn_core_root = Path(__file__).parents[1]
@@ -225,28 +225,27 @@ def test_rec_array_to_dict(jones_2009_network):
     assert result2['voltages'].size == 0
 
 
-def test_connectivity_to_list_of_dicts(jones_2009_network):
+def test_conn_to_dict(jones_2009_network):
     """ Tests _connectivity_to_list_of_dicts function """
     net = jones_2009_network
 
-    result = _connectivity_to_list_of_dicts(net.connectivity[0:2])
-    assert isinstance(result, list)
-    assert len(result) == 2
-    assert result[0] == {'target_type': 'L2_basket',
-                         'target_gids': [0, 1, 2],
-                         'num_targets': 3,
-                         'src_type': 'evdist1',
-                         'src_gids': [24, 25, 26],
-                         'num_srcs': 3,
-                         'gid_pairs': {'24': [0], '25': [1], '26': [2]},
-                         'loc': 'distal',
-                         'receptor': 'ampa',
-                         'nc_dict': {'A_delay': 0.1,
-                                     'A_weight': 0.006562,
-                                     'lamtha': 3.0,
-                                     'threshold': 0.0},
-                         'allow_autapses': 1,
-                         'probability': 1.0}
+    result = _conn_to_dict(net.connectivity[0])
+    assert isinstance(result, dict)
+    assert result == {'target_type': 'L2_basket',
+                      'target_gids': [0, 1, 2],
+                      'num_targets': 3,
+                      'src_type': 'evdist1',
+                      'src_gids': [24, 25, 26],
+                      'num_srcs': 3,
+                      'gid_pairs': {'24': [0], '25': [1], '26': [2]},
+                      'loc': 'distal',
+                      'receptor': 'ampa',
+                      'nc_dict': {'A_delay': 0.1,
+                                  'A_weight': 0.006562,
+                                  'lamtha': 3.0,
+                                  'threshold': 0.0},
+                      'allow_autapses': 1,
+                      'probability': 1.0}
 
 
 def test_external_drive_to_dict(jones_2009_network):

@@ -29,29 +29,24 @@ def _rec_array_to_dict(value, write_output):
     return rec_array_copy_dict
 
 
-def _connectivity_to_list_of_dicts(connectivity):
-
-    def _conn_to_dict(conn):
-        conn_data = {
-            'target_type': conn['target_type'],
-            'target_gids': list(conn['target_gids']),
-            'num_targets': conn['num_targets'],
-            'src_type': conn['src_type'],
-            'src_gids': list(conn['src_gids']),
-            'num_srcs': conn['num_srcs'],
-            'gid_pairs': {str(key): val
-                          for key, val in conn['gid_pairs'].items()},
-            'loc': conn['loc'],
-            'receptor': conn['receptor'],
-            'nc_dict': conn['nc_dict'],
-            'allow_autapses': int(conn['allow_autapses']),
-            'probability': conn['probability'],
-        }
-        return conn_data
-
-    conns_data = [_conn_to_dict(conn) for conn in connectivity]
-
-    return conns_data
+def _conn_to_dict(conn):
+    """Converts a Connectivity object parameters to a dict format."""
+    conn_data = {
+        'target_type': conn['target_type'],
+        'target_gids': list(conn['target_gids']),
+        'num_targets': conn['num_targets'],
+        'src_type': conn['src_type'],
+        'src_gids': list(conn['src_gids']),
+        'num_srcs': conn['num_srcs'],
+        'gid_pairs': {str(key): val
+                      for key, val in conn['gid_pairs'].items()},
+        'loc': conn['loc'],
+        'receptor': conn['receptor'],
+        'nc_dict': conn['nc_dict'],
+        'allow_autapses': int(conn['allow_autapses']),
+        'probability': conn['probability'],
+    }
+    return conn_data
 
 
 def _external_drive_to_dict(drive, write_output):
@@ -279,7 +274,7 @@ def write_network(net, fname, overwrite=True, write_output=True):
                             for drive, params in net.external_drives.items()
                             },
         'external_biases': net.external_biases,
-        'connectivity': _connectivity_to_list_of_dicts(net.connectivity),
+        'connectivity': [_conn_to_dict(conn) for conn in net.connectivity],
         'rec_arrays': {ra_name: _rec_array_to_dict(ex_array, write_output)
                        for ra_name, ex_array in net.rec_arrays.items()
                        },
