@@ -9,7 +9,7 @@
 
 import itertools as it
 from copy import deepcopy
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 import numpy as np
 import warnings
@@ -232,9 +232,9 @@ def pick_connection(net, src_gids=None, target_gids=None,
     # Convert src and target gids to lists
     valid_srcs = list(net.gid_ranges.keys())  # includes drives as srcs
     valid_targets = list(net.cell_types.keys())
-    src_gids = _check_gids(src_gids, net.gid_ranges,
+    src_gids_checked = _check_gids(src_gids, net.gid_ranges,
                            valid_srcs, 'src_gids', same_type=False)
-    target_gids = _check_gids(target_gids, net.gid_ranges,
+    target_gids_checked = _check_gids(target_gids, net.gid_ranges,
                               valid_targets, 'target_gids', same_type=False)
 
     _validate_type(loc, (str, list, None), 'loc', 'str, list, or None')
@@ -245,53 +245,53 @@ def pick_connection(net, src_gids=None, target_gids=None,
     valid_receptor = ['ampa', 'nmda', 'gabaa', 'gabab']
 
     # Convert receptor and loc to list
-    loc = _string_input_to_list(loc, valid_loc, 'loc')
-    receptor = _string_input_to_list(receptor, valid_receptor, 'receptor')
+    loc_list = _string_input_to_list(loc, valid_loc, 'loc')
+    receptor_list = _string_input_to_list(receptor, valid_receptor, 'receptor')
 
     # Create lookup dictionaries
-    src_dict, target_dict = dict(), dict()
-    loc_dict, receptor_dict = dict(), dict()
+    src_dict, target_dict = defaultdict(list), defaultdict(list)
+    loc_dict, receptor_dict = defaultdict(list), defaultdict(list)
     for conn_idx, conn in enumerate(net.connectivity):
         # Store connections matching each src_gid
         for src_gid in conn['src_gids']:
-            if src_gid in src_dict:
-                src_dict[src_gid].append(conn_idx)
-            else:
-                src_dict[src_gid] = [conn_idx]
+            src_dict[src_gid].append(conn_idx)
+
         # Store connections matching each target_gid
         for target_gid in conn['target_gids']:
-            if target_gid in target_dict:
-                target_dict[target_gid].append(conn_idx)
-            else:
-                target_dict[target_gid] = [conn_idx]
+            target_dict[target_gid].append(conn_idx)
+
         # Store connections matching each location
-        if conn['loc'] in loc_dict:
-            loc_dict[conn['loc']].append(conn_idx)
-        else:
-            loc_dict[conn['loc']] = [conn_idx]
+        loc_dict[conn['loc']].append(conn_idx)
+
         # Store connections matching each receptor
-        if conn['receptor'] in receptor_dict:
-            receptor_dict[conn['receptor']].append(conn_idx)
-        else:
-            receptor_dict[conn['receptor']] = [conn_idx]
+        receptor_dict[conn['receptor']].append(conn_idx)
 
     # Look up conn indices that match search terms and add to set.
     conn_set = set()
-    search_pairs = [(src_gids, src_dict), (target_gids, target_dict),
-                    (loc, loc_dict), (receptor, receptor_dict)]
-    for search_terms, search_dict in search_pairs:
-        inner_set = set()
-        # Union of indices which match inputs for single parameter
-        for term in search_terms:
-            inner_set = inner_set.union(search_dict.get(term, list()))
-        # Intersection across parameters
-        if conn_set and inner_set:
-            conn_set = conn_set.intersection(inner_set)
-            # If at any point there's no matching elements, return empty
-            if not conn_set:
-                return list()
-        else:
-            conn_set = conn_set.union(inner_set)
+    search_pairs = [(src_gids, src_gids_checked, src_dict),
+                    (target_gids, target_gids_checked, target_dict),
+                    (loc, loc_list, loc_dict),
+                    (receptor, receptor_list, receptor_dict),
+                    ]
+    for arg_input, search_terms, search_dict in search_pairs:
+        if arg_input is not None:
+            inner_set = set()
+            # Union of indices which match inputs for single parameter
+            for term in search_terms:
+                inner_set = inner_set.union(search_dict.get(term, list()))
+
+            # Empty search
+            if not inner_set:
+                return []
+            # Initial search has results
+            elif inner_set and not conn_set:
+                conn_set = inner_set.copy()
+            # Intersect across parameters
+            elif inner_set and conn_set:
+                conn_set = conn_set.intersection(inner_set)
+                # If at any point there's no matching elements, return empty
+                if not conn_set:
+                    return []
 
     return sorted(conn_set)
 
