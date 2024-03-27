@@ -684,10 +684,7 @@ def convert_to_hdf5(params_fname, out_fname, include_drives=True,
     # Convert to Path
     params_fname = Path(params_fname)
     out_fname = Path(out_fname)
-
     params_suffix = params_fname.suffix.lower().split('.')[-1]
-    if params_suffix.lower() not in ['param', 'json']:
-        raise ValueError("Extension must be .param or .json")
 
     # Add suffix if not supplied
     if out_fname.suffix != '.hdf5':
