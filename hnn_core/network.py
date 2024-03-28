@@ -286,8 +286,9 @@ def pick_connection(net, src_gids=None, target_gids=None,
             # Initial search has results
             elif inner_set and not conn_set:
                 conn_set = inner_set.copy()
-            # Intersect across parameters
+            # Subsequent searches have results
             elif inner_set and conn_set:
+                # Intersect across parameters
                 conn_set = conn_set.intersection(inner_set)
                 # If at any point there's no matching elements, return empty
                 if not conn_set:
