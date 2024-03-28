@@ -809,6 +809,15 @@ def test_network_connectivity():
             kwargs[arg] = string_arg
             pick_connection(**kwargs)
 
+    # Test network with only drive information
+    # Searching for cell connection should return empty list
+    net_only_drives = Network(params, add_drives_from_params=True,
+                              legacy_mode=False)
+    indices = pick_connection(net_only_drives,
+                              src_gids='L2_basket',
+                              target_gids='L2_basket')
+    assert len(indices) == 0
+
     # Test removing connections from net.connectivity
     # Needs to be updated if number of drives change in preceding tests
     net.clear_connectivity()
