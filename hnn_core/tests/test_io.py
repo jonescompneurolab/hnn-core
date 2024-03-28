@@ -73,7 +73,7 @@ def generate_test_files(jones_2009_network):
     net = jones_2009_network
     net.write(Path('.', 'assets/jones2009_3x3_drives.hdf5'))
     simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
-    net.write(Path('.', 'assets/jones2009_3x3_drives_sim.hdf5'))
+    net.write(Path('.', 'assets/jones2009_3x3_drives_simulated.hdf5'))
 
 
 def test_eq(jones_2009_network, calcium_network):
@@ -293,14 +293,14 @@ def test_read_hdf5_with_simulation(jones_2009_network):
     """ Read-in of a hdf5 file with simulation"""
     # Test reading a network with simulation
     net_sim = read_network(
-        Path(assets_path, 'jones2009_3x3_drives_sim.hdf5')
+        Path(assets_path, 'jones2009_3x3_drives_simulated.hdf5')
     )
     assert net_sim.rec_arrays['el1'].voltages.size != 0
     assert len(net_sim.external_drives['evdist1']['events']) > 0
 
     # Test reading file without simulation information
     net_sim_output_false = read_network(
-        Path(assets_path, 'jones2009_3x3_drives_sim.hdf5'),
+        Path(assets_path, 'jones2009_3x3_drives_simulated.hdf5'),
         read_output=False
     )
     assert net_sim_output_false.rec_arrays['el1'].voltages.size == 0
@@ -308,7 +308,7 @@ def test_read_hdf5_with_simulation(jones_2009_network):
 
     # Test reading file with simulation and without drive information
     net_sim_drives_false = read_network(
-        Path(assets_path, 'jones2009_3x3_drives_sim.hdf5'),
+        Path(assets_path, 'jones2009_3x3_drives_simulated.hdf5'),
         read_output=True,
         read_drives=False
     )
@@ -317,7 +317,7 @@ def test_read_hdf5_with_simulation(jones_2009_network):
 
     # Test reading file without simulation and drive information
     net_sim_output_false_drives_false = read_network(
-        Path(assets_path, 'jones2009_3x3_drives_sim.hdf5'),
+        Path(assets_path, 'jones2009_3x3_drives_simulated.hdf5'),
         read_output=False,
         read_drives=False
     )
