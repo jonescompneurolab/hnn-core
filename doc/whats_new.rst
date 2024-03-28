@@ -12,6 +12,9 @@ Current
 
 Changelog
 ~~~~~~~~~
+- Fixed figure annotation overlap in multiple sub-plots, 
+  by `Camilo Diaz`_ in :gh:`741`
+
 - Add ability to customize plot colors for each cell section in
   :func:`~hnn_core.Cell.plot_morphology`, by `Nick Tolley`_ in :gh:`646`
   
