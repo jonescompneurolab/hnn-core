@@ -11,6 +11,12 @@ coverage
 *.xml
 .venv
 
+# Virtual environments
+env/
+venv/
+ENV/
+VENV/
+
 # Sphinx documentation
 doc/_build/**
 pip-log.txt
