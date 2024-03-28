@@ -117,25 +117,17 @@ def unlink_relink(attribute):
     def _unlink_relink(f):
         @wraps(f)
         def wrapper(self, *args, **kwargs):
+            # Unlink the widgets using the provided link object
+            link_attribute: link = getattr(self, attribute)
+            link_attribute.unlink()
 
-            # For development purposes only
-            # Remove after gui development
-            try:
-                # Unlink the widgets using the provided link object
-                link_attribute: link = getattr(self, attribute)
-                link_attribute.unlink()
+            # Call the original function
+            result = f(self, *args, **kwargs)
 
-                # Call the original function
-                result = f(self, *args, **kwargs)
+            # Re-link the widgets
+            link_attribute.link()
 
-                # Re-link the widgets
-                link_attribute.link()
-
-                return result
-            except Exception as e:
-                # Handle the exception and print it
-                print(f"An error occurred: {e}")
-
+            return result
         return wrapper
     return _unlink_relink
 
@@ -388,7 +380,8 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
                         verticalalignment='bottom',
                         fontsize=12)
 
-        rmse_logger_text = (f'RMSE({sim_name} smooth:{dipole_smooth.value} '
+        rmse_logger_text = (f'RMSE {rmse:.4f} ('
+                            f'{sim_name} smooth:{dipole_smooth.value} '
                             f'scale:{dipole_scaling.value} \n'
                             f'{target_sim_name} smooth:{data_smooth.value} '
                             f'scale:{data_scaling.value})')
