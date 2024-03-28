@@ -370,13 +370,30 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
         else:
             dpl = dpls_processed
         rmse = _rmse(dpl, target_dpl_processed, t0, tstop)
-        # Show the RMSE between the two dipoles.
-        ax.annotate(f'RMSE({sim_name}, {target_sim_name}): {rmse:.4f}',
-                    xy=(0.95, 0.05),
-                    xycoords='axes fraction',
-                    horizontalalignment='right',
-                    verticalalignment='bottom',
-                    fontsize=12)
+        annotation_text = f'RMSE({sim_name}, {target_sim_name}): {rmse:.4f}'
+
+        # find subplot's annotation
+        annotation = next((child for child in ax.get_children()
+                           if isinstance(child, plt.Annotation)), None)
+
+        # if the subplot already has an annotation, update its text.
+        # Otherwise, create a new one.
+        if annotation is not None:
+            annotation.set_text(annotation_text)
+        else:
+            ax.annotate(annotation_text,
+                        xy=(0.95, 0.05),
+                        xycoords='axes fraction',
+                        horizontalalignment='right',
+                        verticalalignment='bottom',
+                        fontsize=12)
+
+        rmse_logger_text = (f'RMSE({sim_name} smooth:{dipole_smooth.value} '
+                            f'scale:{dipole_scaling.value} \n'
+                            f'{target_sim_name} smooth:{data_smooth.value} '
+                            f'scale:{data_scaling.value})')
+
+        logger.info(rmse_logger_text)
 
     existing_plots.children = (*existing_plots.children,
                                Label(f"{sim_name}: {plot_type}"))
