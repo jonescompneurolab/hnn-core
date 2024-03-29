@@ -283,7 +283,7 @@ def pick_connection(net, src_gids=None, target_gids=None,
 
             # Empty search
             if not inner_set:
-                return []
+                return list()
             # Initial search has results
             elif inner_set and not conn_set:
                 conn_set = inner_set.copy()
@@ -293,7 +293,7 @@ def pick_connection(net, src_gids=None, target_gids=None,
                 conn_set = conn_set.intersection(inner_set)
                 # If at any point there's no matching elements, return empty
                 if not conn_set:
-                    return []
+                    return list()
 
     return sorted(conn_set)
 
