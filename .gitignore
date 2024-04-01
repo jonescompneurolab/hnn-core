@@ -9,7 +9,13 @@ dist/
 build
 coverage
 *.xml
+
+# Virtual environments
 .venv
+env/
+venv/
+ENV/
+VENV/
 
 # Sphinx documentation
 doc/_build/**
