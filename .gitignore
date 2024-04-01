@@ -9,9 +9,10 @@ dist/
 build
 coverage
 *.xml
-.venv
 
 # Virtual environments
+.venv
+.env
 env/
 venv/
 ENV/
