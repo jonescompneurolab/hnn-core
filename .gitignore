@@ -12,7 +12,6 @@ coverage
 
 # Virtual environments
 .venv
-.env
 env/
 venv/
 ENV/
