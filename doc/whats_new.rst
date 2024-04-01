@@ -12,9 +12,6 @@ Current
 
 Changelog
 ~~~~~~~~~
-- Fixed figure annotation overlap in multiple sub-plots, 
-  by `Camilo Diaz`_ in :gh:`741`
-
 - Add ability to customize plot colors for each cell section in
   :func:`~hnn_core.Cell.plot_morphology`, by `Nick Tolley`_ in :gh:`646`
   
@@ -38,6 +35,9 @@ Changelog
 
 - Add feature to convert param and json files to HDF5 format, by `George Dang`_
   in :gh:`723`
+  
+- Fixed figure annotation overlap in multiple sub-plots, 
+  by `Camilo Diaz`_ in :gh:`741`
 
 Bug
 ~~~
@@ -462,3 +462,5 @@ People who contributed to this release (in alphabetical order):
 .. _Steven Brandt: https://github.com/spbrandt
 .. _Kaisu Lankinen: https://github.com/klankinen
 .. _George Dang: https://github.com/gtdang
+.. _Camilo Diaz: https://github.com/kmilo9999
+
