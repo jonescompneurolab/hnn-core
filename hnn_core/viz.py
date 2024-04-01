@@ -577,11 +577,15 @@ def plot_cells(net, ax=None, show=True):
         The matplotlib figure handle.
     """
     import matplotlib.pyplot as plt
-    from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
+    from mpl_toolkits.mplot3d import Axes3D
 
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
+
+    elif not isinstance(ax, Axes3D):
+        raise TypeError("Expected 'ax' to be an instance of Axes3D, "
+                        f"but got {type(ax).__name__}")
 
     colors = {'L5_pyramidal': 'b', 'L2_pyramidal': 'c',
               'L5_basket': 'r', 'L2_basket': 'm'}
