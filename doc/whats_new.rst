@@ -36,7 +36,7 @@ Changelog
 - Add feature to convert param and json files to HDF5 format, by `George Dang`_
   in :gh:`723`
 
-- Fixed bug in :func:`~hnn_core/network/pick_connection` where connections were
+- Fix bug in :func:`~hnn_core/network/pick_connection` where connections are
   returned for cases when there should be no valid matches, by `George Dang`_
   in :gh:`739`
 
