@@ -79,6 +79,12 @@ def test_network_visualization():
     with pytest.raises(TypeError, match='color must be'):
         cell_type.plot_morphology(color=123)
 
+    # test for invalid Axes object to plot_cells
+    fig, axes = plt.subplots(1, 1)
+    with pytest.raises(TypeError,
+                       match="'ax' to be an instance of Axes3D, but got Axes"):
+        plot_cells(net, ax=axes, show=False)
+
     plt.close('all')
 
     # test interactive clicking updates the position of src_cell in plot
