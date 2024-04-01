@@ -7,6 +7,7 @@
 
 import os
 from h5io import write_hdf5, read_hdf5
+from collections import OrderedDict
 
 from .cell import Cell, Section
 from .cell_response import CellResponse
@@ -294,6 +295,38 @@ def write_network(net, fname, overwrite=True, write_output=True):
     write_hdf5(fname, net_data, overwrite=overwrite)
 
 
+def _order_drives(gid_ranges, external_drives):
+    """Returns an ordered dict of external drives by ascending gid ranges
+
+    Drive data from hdf5 are ordered alphabetically by name. This function
+    reorders the external drives by ascending gid ranges.
+
+    Parameters
+    ----------
+    gid_ranges : dict (keys: names) of range
+        Dictionary with connection or drive names as keys and ranges as values.
+    external_drives: dict (keys: drive names) of dict (keys: parameters)
+        Dictionary with drive name as keys and instances of _NetworkDrive as
+        values.
+
+    Returns
+    -------
+    OrderedDict : dict (keys: drive names) of dict (keys: parameters)
+        Ordered dict with drives by ascending gid ranges
+    """
+    ordered_drives = OrderedDict()
+    min_gid_to_drive = {min(gid_range): name
+                        for (name, gid_range) in gid_ranges.items()
+                        if name in external_drives.keys()
+                        }
+    min_gid_sorted = sorted(list(min_gid_to_drive.keys()))
+    for min_gid in min_gid_sorted:
+        drive_name = min_gid_to_drive[min_gid]
+        ordered_drives[drive_name] = external_drives[drive_name]
+
+    return ordered_drives
+
+
 @fill_doc
 def read_network(fname, read_output=True, read_drives=True):
     """Read network from a file.
@@ -348,8 +381,9 @@ def read_network(fname, read_output=True, read_drives=True):
     net.cell_response = _read_cell_response(net_data['cell_response'],
                                             read_output)
     # Set external drives
-    for key in net_data['external_drives'].keys():
-        _read_external_drive(net, net_data['external_drives'][key],
+    external_drive_data = _order_drives(net.gid_ranges, net_data['external_drives'])
+    for key in external_drive_data.keys():
+        _read_external_drive(net, external_drive_data[key],
                              read_output, read_drives)
     # Set external biases
     net.external_biases = net_data['external_biases']
