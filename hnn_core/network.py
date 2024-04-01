@@ -269,13 +269,13 @@ def pick_connection(net, src_gids=None, target_gids=None,
 
     # Look up conn indices that match search terms and add to set.
     conn_set = set()
-    search_pairs = [(src_gids, src_gids_checked, src_dict),
-                    (target_gids, target_gids_checked, target_dict),
-                    (loc, loc_list, loc_dict),
-                    (receptor, receptor_list, receptor_dict),
+    search_pairs = [(src_gids_checked, src_dict),
+                    (target_gids_checked, target_dict),
+                    (loc_list, loc_dict),
+                    (receptor_list, receptor_dict),
                     ]
-    for arg_input, search_terms, search_dict in search_pairs:
-        if arg_input is not None:
+    for search_terms, search_dict in search_pairs:
+        if search_terms:
             inner_set = set()
             # Union of indices which match inputs for single parameter
             for term in search_terms:
