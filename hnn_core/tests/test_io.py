@@ -14,7 +14,7 @@ from hnn_core import (read_network, simulate_dipole, read_params,
 
 from hnn_core.hnn_io import (_cell_response_to_dict, _rec_array_to_dict,
                              _external_drive_to_dict, _str_to_node,
-                             _conn_to_dict
+                             _conn_to_dict, _order_drives
                              )
 
 hnn_core_root = Path(__file__).parents[1]
@@ -300,6 +300,21 @@ def test_str_to_node():
     assert isinstance(result, tuple)
     assert isinstance(result[0], str)
     assert isinstance(result[1], int)
+
+
+def test_order_drives(jones_2009_network):
+    """ Reorders drive dict by ascending range order """
+    drive_names = list(jones_2009_network.external_drives.keys())
+    drive_names_alpha = sorted(drive_names)
+    drives_reordered = {name: jones_2009_network.external_drives
+                        for name in drive_names_alpha}
+    assert (list(drives_reordered.keys()) ==
+            ['alpha_prox', 'evdist1', 'evprox1', 'evprox2', 'poisson'])
+
+    drives_by_range = _order_drives(jones_2009_network.gid_ranges,
+                                    drives_reordered)
+    assert (list(drives_by_range.keys()) ==
+            ['evdist1', 'evprox1', 'evprox2', 'alpha_prox', 'poisson'])
 
 
 def test_read_hdf5(jones_2009_network):
