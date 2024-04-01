@@ -36,6 +36,10 @@ Changelog
 - Add feature to convert param and json files to HDF5 format, by `George Dang`_
   in :gh:`723`
 
+- Fixed bug in :func:`~hnn_core/network/pick_connection` where connections were
+  returned for cases when there should be no valid matches, by `George Dang`_
+  in :gh:`739`
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
