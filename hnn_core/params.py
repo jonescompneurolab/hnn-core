@@ -17,6 +17,25 @@ from .externals.mne import _validate_type
 # using dictionary d (or if d is a string, first load the dictionary from
 # filename d)
 def _count_evoked_inputs(d):
+    """Return the number of evoked inputs (proximal, distal).
+
+    This function counts the number of evoked inputs (proximal and distal)
+    based on the keys in the dictionary provided. If the input is a string,
+    it loads the dictionary from the filename specified by the string.
+
+    Parameters
+    ----------
+    d : dict or str
+        If a dictionary, the dictionary containing the keys to count. If a string,
+        the filename from which to load the dictionary.
+
+    Returns
+    -------
+    nprox : int
+        The number of evoked inputs proximal to the target cells.
+    ndist : int
+        The number of evoked inputs distal to the target cells.
+    """
     nprox = ndist = 0
     for k, _ in d.items():
         if k.startswith('t_'):
@@ -413,6 +432,25 @@ def _validate_feed(p_ext_d, tstop):
 
 
 def check_evoked_synkeys(p, nprox, ndist):
+    """Ensure that ampa and nmda gbar values are in the param dict for evoked inputs.
+
+    This function ensures that the ampa and nmda gbar values are present in the parameter
+    dictionary for evoked inputs. If the values are not present, they are set to the
+    existing weight for both ampa and nmda for backwards compatibility.
+
+    Parameters
+    ----------
+    p : dict
+        The parameter dictionary.
+    nprox : int
+        The number of evoked proximal target cell types.
+    ndist : int
+        The number of evoked distal target cell types.
+
+    Returns
+    -------
+    None
+    """
     # make sure ampa,nmda gbar values are in the param dict for evoked
     # inputs(for backwards compatibility)
     # evoked distal target cell types
@@ -436,6 +474,21 @@ def check_evoked_synkeys(p, nprox, ndist):
 
 
 def check_pois_synkeys(p):
+    """Ensure that ampa and nmda gbar values are in the param dict for Poisson inputs.
+
+    This function ensures that the ampa and nmda gbar values are present in the
+    parameter dictionary for Poisson inputs. If the values are not present, they are
+    set to 0.0 for backwards compatibility.
+
+    Parameters
+    ----------
+    p : dict
+        The parameter dictionary.
+
+    Returns
+    -------
+    None
+    """
     # make sure ampa,nmda gbar values are in the param dict for Poisson inputs
     # (for backwards compatibility)
     lct = ['L2Pyr', 'L5Pyr', 'L2Basket', 'L5Basket']  # target cell types
@@ -649,15 +702,45 @@ def create_pext(p, tstop):
 # if any match, updates the (key, value) pair of d1 to match that of d2
 # not real happy with variable names, but will have to do for now
 def compare_dictionaries(d1, d2):
+    """Compares keys in two dictionaries and updates d1 with values from d2.
+
+    Takes two dictionaries (d1 and d2) and compares the keys in d1 to those in d2.
+    If any keys match, updates the (key, value) pair of d1 to match that of d2.
+
+    Parameters
+    ----------
+    d1 : dict
+        The first dictionary to compare and update.
+    d2 : dict
+        The second dictionary whose values may be used to update d1.
+
+    Returns
+    -------
+    dict
+        The dictionary d1 after updating with values from d2.
+    """
     # iterate over intersection of key sets (i.e. any common keys)
     for key in d1.keys() and d2.keys():
-        # update d1 to have same (key, value) pair as d2
+         # update d1 to have same (key, value) pair as d2
         d1[key] = d2[key]
 
     return d1
 
 
 def _convert_to_path(value):
+    """Converts a string to a Path object if necessary.
+
+    Parameters
+    ----------
+    value : str or Path
+        The value to convert.
+
+    Returns
+    -------
+    value : Path
+        The converted value as a Path object.
+    """
+    
     if isinstance(value, str):
         value = Path(value)
     return value
