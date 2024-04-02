@@ -188,7 +188,7 @@ from hnn_core.optimization import Optimizer
 
 net = jones_2009_model()
 optim = Optimizer(net, tstop=tstop, constraints=constraints,
-                  set_params=set_params, max_iter=40)
+                  set_params=set_params)
 with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
     optim.fit(target=exp_dpl, scale_factor=scale_factor,
               smooth_window_len=smooth_window_len)
