@@ -113,13 +113,12 @@ class Optimizer:
         relative_bandpower : tuple (if obj_fun='maximize_psd')
             Weight for each frequency band.
         """
-
         if (self.obj_fun_name == 'dipole_rmse' and
                 'target' not in obj_fun_kwargs):
             raise Exception('target must be specified')
         elif (self.obj_fun_name == 'maximize_psd' and
-              'f_bands' not in obj_fun_kwargs or
-              'relative_bandpower' not in obj_fun_kwargs):
+              ('f_bands' not in obj_fun_kwargs or
+               'relative_bandpower' not in obj_fun_kwargs)):
             raise Exception('f_bands and relative_bandpower must be specified')
 
         constraints = self._assemble_constraints(self.constraints)
