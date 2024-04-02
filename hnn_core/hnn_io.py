@@ -381,7 +381,8 @@ def read_network(fname, read_output=True, read_drives=True):
     net.cell_response = _read_cell_response(net_data['cell_response'],
                                             read_output)
     # Set external drives
-    external_drive_data = _order_drives(net.gid_ranges, net_data['external_drives'])
+    external_drive_data = _order_drives(net.gid_ranges,
+                                        net_data['external_drives'])
     for key in external_drive_data.keys():
         _read_external_drive(net, external_drive_data[key],
                              read_output, read_drives)
