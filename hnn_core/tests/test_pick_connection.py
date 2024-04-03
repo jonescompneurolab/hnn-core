@@ -49,3 +49,68 @@ def base_network():
                          weights_ampa={'L2_basket': 0.1,
                                        'L2_pyramidal': 0.1})
     return net, params
+
+
+@pytest.mark.parametrize("arg_name",
+                         ["src_gids", "target_gids", "loc", "receptor"]
+                         )
+def test_pc_1arg_none(base_network, arg_name):
+    """ Tests passing None as an argument value. """
+    net, _ = base_network
+    kwargs = {'net': net, f'{arg_name}': None}
+    indices = pick_connection(**kwargs)
+    assert not indices
+
+
+@pytest.mark.parametrize("arg_name", ["src_gids", "target_gids"])
+def test_pc_1arg_range(base_network, arg_name):
+    """ Tests passing range as an argument value. """
+    net, _ = base_network
+    test_range = range(2)
+    kwargs = {'net': net, f'{arg_name}': test_range}
+    indices = pick_connection(**kwargs)
+
+    for conn_idx in indices:
+        assert set(test_range).issubset(net.connectivity[conn_idx][arg_name])
+
+
+@pytest.mark.parametrize("arg_name,value",
+                         [("src_gids", 'L2_pyramidal'),
+                          ("target_gids", 'L2_pyramidal'),
+                          ("loc", 'soma'),
+                          ("receptor", 'gabaa'),
+                          ])
+def test_pc_1arg_str(base_network, arg_name, value):
+    """ Tests passing string as an argument value. """
+    net, _ = base_network
+    kwargs = {'net': net, f'{arg_name}': value}
+    indices = pick_connection(**kwargs)
+
+    for conn_idx in indices:
+        if arg_name in ('src_gids', 'target_gids'):
+            # arg specifies a subset of item gids (within gid_ranges)
+            assert (net.connectivity[conn_idx][arg_name]
+                    .issubset(net.gid_ranges[value])
+                    )
+        else:
+            # arg and item specify equivalent string descriptors
+            assert net.connectivity[conn_idx][arg_name] == value
+
+
+@pytest.mark.parametrize("arg_name,value",
+                         [("src_gids", 0),
+                          ("target_gids", 35),
+                          ])
+def test_pc_1arg_int(base_network, arg_name, value):
+    """
+    Pick_connection is not missing qualifying connections with single gid.
+    """
+    net, _ = base_network
+    kwargs = {'net': net, f'{arg_name}': value}
+    indices = pick_connection(**kwargs)
+
+    for conn_idx in range(len(net.connectivity)):
+        if conn_idx in indices:
+            assert value in net.connectivity[conn_idx][arg_name]
+        else:
+            assert value not in net.connectivity[conn_idx][arg_name]
