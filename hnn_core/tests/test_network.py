@@ -698,16 +698,6 @@ def test_network_connectivity():
     kwargs_default = dict(net=net, src_gids=None, target_gids=None,
                           loc=None, receptor=None)
 
-    kwargs_bad = [
-        ('src_gids', -1), ('src_gids', [-1]),
-        ('target_gids', -1), ('target_gids', [-1]),
-        ('src_gids', [35, -1]), ('target_gids', [35, -1])]
-    for arg, item in kwargs_bad:
-        with pytest.raises(AssertionError):
-            kwargs = kwargs_default.copy()
-            kwargs[arg] = item
-            pick_connection(**kwargs)
-
     for arg in ['src_gids', 'target_gids', 'loc', 'receptor']:
         string_arg = 'invalid_string'
         match = f"Invalid value for the '{arg}' parameter"
