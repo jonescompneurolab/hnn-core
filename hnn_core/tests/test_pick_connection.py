@@ -114,3 +114,22 @@ def test_pc_1arg_int(base_network, arg_name, value):
             assert value in net.connectivity[conn_idx][arg_name]
         else:
             assert value not in net.connectivity[conn_idx][arg_name]
+
+
+@pytest.mark.parametrize("arg_name,value",
+                         [("src_gids", ['L2_basket', 'L5_basket']),
+                          ("target_gids", ['L2_pyramidal', 'L5_pyramidal']),
+                          ])
+def test_pc_1arg_list_str(base_network, arg_name, value):
+    """ Tests passing a list of valid strings """
+    net, _ = base_network
+    kwargs = {'net': net, f'{arg_name}': value}
+    indices = pick_connection(**kwargs)
+
+    true_gid_set = set(list(net.gid_ranges[value[0]]) +
+                       list(net.gid_ranges[value[1]])
+                       )
+    pick_gid_list = []
+    for idx in indices:
+        pick_gid_list.extend(net.connectivity[idx][arg_name])
+    assert true_gid_set == set(pick_gid_list)
