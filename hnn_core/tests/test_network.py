@@ -694,18 +694,6 @@ def test_network_connectivity():
         kwargs['receptor'] = 'ampa'
         net.add_connection(**kwargs)
 
-    # Test net.pick_connection()
-    kwargs_default = dict(net=net, src_gids=None, target_gids=None,
-                          loc=None, receptor=None)
-
-    for arg in ['src_gids', 'target_gids', 'loc', 'receptor']:
-        string_arg = 'invalid_string'
-        match = f"Invalid value for the '{arg}' parameter"
-        with pytest.raises(ValueError, match=match):
-            kwargs = kwargs_default.copy()
-            kwargs[arg] = string_arg
-            pick_connection(**kwargs)
-
     # Test network with only drive information
     # Searching for cell connection should return empty list
     net_only_drives = Network(params, add_drives_from_params=True,

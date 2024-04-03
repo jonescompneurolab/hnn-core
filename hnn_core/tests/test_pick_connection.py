@@ -188,3 +188,15 @@ def test_pc_invalid_int(base_network, src_gids, target_gids):
     match = ('not in net.gid_ranges')
     with pytest.raises(AssertionError, match=match):
         pick_connection(net, src_gids=src_gids, target_gids=target_gids)
+
+
+@pytest.mark.parametrize("arg_name",
+                         ["src_gids", "target_gids", "loc", "receptor"]
+                         )
+def test_invalid_str(base_network, arg_name):
+    """ Tests ValueError raises when passing unrecognized string. """
+    net, _ = base_network
+    match = f"Invalid value for the '{arg_name}' parameter"
+    with pytest.raises(ValueError, match=match):
+        kwargs = {'net': net, f'{arg_name}': 'invalid_string'}
+        pick_connection(**kwargs)
