@@ -699,18 +699,6 @@ def test_network_connectivity():
                           loc=None, receptor=None)
 
     kwargs_bad = [
-        ('src_gids', 0.0), ('src_gids', [0.0]),
-        ('target_gids', 35.0), ('target_gids', [35.0]),
-        ('target_gids', [35, [36.0]]), ('loc', 1.0),
-        ('receptor', 1.0)]
-    for arg, item in kwargs_bad:
-        match = ('must be an instance of')
-        with pytest.raises(TypeError, match=match):
-            kwargs = kwargs_default.copy()
-            kwargs[arg] = item
-            pick_connection(**kwargs)
-
-    kwargs_bad = [
         ('src_gids', -1), ('src_gids', [-1]),
         ('target_gids', -1), ('target_gids', [-1]),
         ('src_gids', [35, -1]), ('target_gids', [35, -1])]

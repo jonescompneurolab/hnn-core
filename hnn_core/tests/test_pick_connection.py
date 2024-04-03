@@ -153,3 +153,25 @@ def test_pc_no_match(base_network,
                               loc=loc,
                               receptor=receptor)
     assert len(indices) == 0
+
+
+@pytest.mark.parametrize("src_gids,target_gids,loc,receptor",
+                         [(0.0, None, None, None),
+                          ([0.0], None, None, None),
+                          (None, 35.0, None, None),
+                          (None, [35.0], None, None),
+                          (None, [35, [36.0]], None, None),
+                          (None, None, 1.0, None),
+                          (None, None, None, 1.0),
+                          ])
+def test_pc_type_error(base_network,
+                       src_gids, target_gids, loc, receptor):
+    """ Tests TypeError when passing floats. """
+    net, _ = base_network
+    match = ('must be an instance of')
+    with pytest.raises(TypeError, match=match):
+        pick_connection(net,
+                        src_gids=src_gids,
+                        target_gids=target_gids,
+                        loc=loc,
+                        receptor=receptor)
