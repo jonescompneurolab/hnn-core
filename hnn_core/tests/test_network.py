@@ -698,23 +698,6 @@ def test_network_connectivity():
     kwargs_default = dict(net=net, src_gids=None, target_gids=None,
                           loc=None, receptor=None)
 
-    # Check that pick_connection returns empty lists when searching for
-    # a drive targeting the wrong location
-    conn_idxs = pick_connection(net, src_gids='evdist1', loc='proximal')
-    assert len(conn_idxs) == 0
-    assert not pick_connection(net, src_gids='evprox1', loc='distal')
-
-    # Check conditions where no connections match
-    assert pick_connection(net, loc='distal', receptor='gabab') == list()
-    assert pick_connection(
-        net, src_gids='L2_pyramidal', receptor='gabab') == list()
-    assert pick_connection(
-        net, src_gids='L2_basket', target_gids='L2_basket',
-        loc='proximal', receptor='nmda') == list()
-    assert pick_connection(
-        net, src_gids='L2_pyramidal', target_gids='L2_basket',
-        loc='distal', receptor='gabab') == list()
-
     kwargs_bad = [
         ('src_gids', 0.0), ('src_gids', [0.0]),
         ('target_gids', 35.0), ('target_gids', [35.0]),

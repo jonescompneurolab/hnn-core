@@ -133,3 +133,23 @@ def test_pc_1arg_list_str(base_network, arg_name, value):
     for idx in indices:
         pick_gid_list.extend(net.connectivity[idx][arg_name])
     assert true_gid_set == set(pick_gid_list)
+
+
+@pytest.mark.parametrize("src_gids,target_gids,loc,receptor",
+                         [("evdist1", None, "proximal", None),
+                          ("evprox1", None, "distal", None),
+                          (None, None, "distal", "gabab"),
+                          ("L2_pyramidal", None, None, "gabab"),
+                          ("L2_basket", "L2_basket", "proximal", "nmda"),
+                          ("L2_pyramidal", "L2_basket", "distal", "gabab"),
+                          ])
+def test_pc_no_match(base_network,
+                     src_gids, target_gids, loc, receptor):
+    """ Tests no matches returned for non-configured connections. """
+    net, _ = base_network
+    indices = pick_connection(net,
+                              src_gids=src_gids,
+                              target_gids=target_gids,
+                              loc=loc,
+                              receptor=receptor)
+    assert len(indices) == 0
