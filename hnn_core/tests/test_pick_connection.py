@@ -135,6 +135,24 @@ def test_pc_1arg_list_str(base_network, arg_name, value):
     assert true_gid_set == set(pick_gid_list)
 
 
+@pytest.mark.parametrize("arg_name,value",
+                         [("src_gids", [0, 5]),
+                          ("target_gids", [35, 34]),
+                          ])
+def test_pc_1arg_list_int(base_network, arg_name, value):
+    """ Tests passing a list of valid ints """
+    net, _ = base_network
+    kwargs = {'net': net, f'{arg_name}': value}
+    indices = pick_connection(**kwargs)
+
+    true_idx_list = []
+    for idx, conn in enumerate(net.connectivity):
+        if any([val in conn[arg_name] for val in value]):
+            true_idx_list.append(idx)
+
+    assert indices == true_idx_list
+
+
 @pytest.mark.parametrize("src_gids,target_gids,loc,receptor",
                          [("evdist1", None, "proximal", None),
                           ("evprox1", None, "distal", None),
