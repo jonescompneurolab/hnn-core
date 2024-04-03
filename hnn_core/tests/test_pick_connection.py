@@ -175,3 +175,16 @@ def test_pc_type_error(base_network,
                         target_gids=target_gids,
                         loc=loc,
                         receptor=receptor)
+
+
+@pytest.mark.parametrize("src_gids,target_gids",
+                         [(-1, None), ([-1], None),
+                          (None, -1), (None, [-1]),
+                          ([35, -1], None), (None, [35, -1]),
+                          ])
+def test_pc_invalid_int(base_network, src_gids, target_gids):
+    """ Tests AssertionError when passing negative ints. """
+    net, _ = base_network
+    match = ('not in net.gid_ranges')
+    with pytest.raises(AssertionError, match=match):
+        pick_connection(net, src_gids=src_gids, target_gids=target_gids)
