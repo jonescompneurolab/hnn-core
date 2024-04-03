@@ -200,3 +200,19 @@ def test_invalid_str(base_network, arg_name):
     with pytest.raises(ValueError, match=match):
         kwargs = {'net': net, f'{arg_name}': 'invalid_string'}
         pick_connection(**kwargs)
+
+
+@pytest.mark.parametrize("src_gids,target_gids,expected",
+                         [("evdist1", "L5_pyramidal", 2),
+                          ("evprox1", "L2_basket", 2),
+                          ("L2_basket", "L2_basket", 0),
+                          ])
+def test_pc_drives_no_conn(base_network, src_gids, target_gids, expected):
+    """Tests searching a Network with only drive connections added.
+
+    Only drive connectivity should have results.
+    """
+    _, param = base_network
+    net = Network(param, add_drives_from_params=True)
+    indices = pick_connection(net, src_gids=src_gids, target_gids=target_gids)
+    assert len(indices) == expected
