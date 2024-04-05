@@ -44,7 +44,7 @@ Changelog
   in :gh:`739`
 
 - Added check for invalid Axes object in :func:`~hnn_core/viz/plot_cells` 
-  function, by `Abdul Samad Siddiqui`_ in :gh:`744`
+  function, by `Abdul Samad Siddiqui`_ in :gh:`744`.
 
 Bug
 ~~~
