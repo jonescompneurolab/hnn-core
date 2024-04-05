@@ -369,7 +369,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         If None, default color cycle used.
     show : bool
         If True, show the figure.
-    **kwargs : dict
+    **kwargs_hist : dict
         Additional keyword arguments to pass to ax.hist.
 
     Returns

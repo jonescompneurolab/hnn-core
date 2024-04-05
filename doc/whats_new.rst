@@ -46,8 +46,8 @@ Changelog
 - Added check for invalid Axes object in :func:`~hnn_core/viz/plot_cells` 
   function, by `Abdul Samad Siddiqui`_ in :gh:`744`.
 
-- Added kwargs options to `plot_spikes_hist` for adjusting the histogram plots of spiking activity,
-  by `Abdul Samad Siddiqui`_ in :gh:`732`.
+- Added kwargs options to `plot_spikes_hist` for adjusting the histogram plots 
+  of spiking activity, by `Abdul Samad Siddiqui`_ in :gh:`732`.
 
 Bug
 ~~~
