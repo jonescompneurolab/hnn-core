@@ -47,7 +47,7 @@ Changelog
   function, by `Abdul Samad Siddiqui`_ in :gh:`744`.
 
 - Added kwargs options to `plot_spikes_hist` for adjusting the histogram plots of spiking activity,
-  by `Abdul Samad`_ in :gh:`732`.
+  by `Abdul Samad Siddiqui`_ in :gh:`732`.
 
 Bug
 ~~~
