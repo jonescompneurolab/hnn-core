@@ -17,7 +17,6 @@ from hnn_core.dipole import average_dipoles, _rmse
 from hnn_core.gui._logging import logger
 from hnn_core.viz import plot_dipole
 
-
 _fig_placeholder = 'Run simulation to add figures here.'
 
 _plot_types = [
@@ -68,7 +67,43 @@ fig_templates = {
     "2row x 2col (1:1)": {
         "kwargs": "gridspec_kw={\"height_ratios\":[1,1]}",
         "mosaic": "01\n23",
+    }
+}
+
+data_templates = {
+    "Drive-Dipole": {
+        "kwargs": "gridspec_kw={\"height_ratios\":[1,3]}",
+        "mosaic": "00\n11",
+        "ax_plots": [("ax0", "input histogram"), ("ax1", "current dipole")]
     },
+    "Dipole Layers": {
+        "kwargs": "gridspec_kw={\"height_ratios\":[1,1,1]}",
+        "mosaic": "0\n1\n2",
+        "ax_plots": [("ax0", "layer2 dipole"), ("ax1", "layer5 dipole"),
+                     ("ax2", "current dipole")]
+    },
+    "Drive-Spikes": {
+        "kwargs": "gridspec_kw={\"height_ratios\":[1,3]}",
+        "mosaic": "00\n11",
+        "ax_plots": [("ax0", "input histogram"), ("ax1", "spikes")]
+    },
+    "Dipole-Spectrogram": {
+        "kwargs": "gridspec_kw={\"height_ratios\":[1,3]}",
+        "mosaic": "00\n11",
+        "ax_plots": [("ax0", "current dipole"), ("ax1", "spectrogram")]
+    },
+    "Drive-Dipole-Spectrogram": {
+        "kwargs": "gridspec_kw={\"height_ratios\":[1,1,2]}",
+        "mosaic": "0\n1\n2",
+        "ax_plots": [("ax0", "input histogram"), ("ax1", "current dipole"),
+                     ("ax2", "spectrogram")]
+    },
+    "PSD Layers": {
+        "kwargs": "gridspec_kw={\"height_ratios\":[1,1,1]}",
+        "mosaic": "0\n1\n2",
+        "ax_plots": [("ax0", "layer2 dipole"), ("ax1", "layer5 dipole"),
+                     ("ax2", "PSD")]
+    }
 }
 
 
@@ -85,6 +120,11 @@ def check_sim_plot_types(
     all_possible_targets.remove(new_sim_name.new)
     target_selection.options = all_possible_targets + ['None']
     target_selection.value = 'None'
+
+
+def check_templeta_type_is_data_dependant(template_name):
+    sim_data_options = list(data_templates.keys())
+    return template_name in sim_data_options
 
 
 def target_comparison_change(new_target_name, simulation_selection, data):
@@ -636,8 +676,7 @@ def _add_axes_controls(widgets, data, fig, axd):
     widgets['axes_config_tabs'].set_title(n_tabs, _idx2figname(fig_idx))
 
 
-def _add_figure(b, widgets, data, scale=0.95, dpi=96):
-    template_name = widgets['templates_dropdown'].value
+def _add_figure(b, widgets, data, template_type, scale=0.95, dpi=96):
     fig_idx = data['fig_idx']['idx']
     viz_output_layout = data['visualization_output']
     fig_outputs = Output()
@@ -656,8 +695,8 @@ def _add_figure(b, widgets, data, scale=0.95, dpi=96):
     with fig_outputs:
         figsize = (scale * ((int(viz_output_layout.width[:-2]) - 10) / dpi),
                    scale * ((int(viz_output_layout.height[:-2]) - 10) / dpi))
-        mosaic = fig_templates[template_name]['mosaic']
-        kwargs = eval(f"dict({fig_templates[template_name]['kwargs']})")
+        mosaic = template_type['mosaic']
+        kwargs = eval(f"dict({template_type['kwargs']})")
         plt.ioff()
         fig, axd = plt.subplot_mosaic(mosaic,
                                       figsize=figsize,
@@ -717,18 +756,29 @@ class _VizManager:
         )
 
         template_names = list(fig_templates.keys())
+        template_names.extend(list(data_templates.keys()))
         self.templates_dropdown = Dropdown(
             description='Layout template:',
             options=template_names,
             value=template_names[0],
             style={'description_width': 'initial'},
             layout=Layout(width="98%"))
+        self.templates_dropdown.observe(self.layout_template_change, 'value')
+
         self.make_fig_button = Button(
             description='Make figure',
             button_style="primary",
             style={'button_color': self.viz_layout['theme_color']},
             layout=self.viz_layout['btn'])
         self.make_fig_button.on_click(self.add_figure)
+
+        self.datasets_dropdown = Dropdown(
+            description='Dataset:',
+            options=[],
+            value=None,
+            style={'description_width': 'initial'},
+            layout=Layout(width="98%"))
+        self.datasets_dropdown.layout.visibility = "hidden"
 
         # data
         self.fig_idx = {"idx": 1}
@@ -741,7 +791,8 @@ class _VizManager:
             "figs_output": self.figs_output,
             "axes_config_tabs": self.axes_config_tabs,
             "figs_tabs": self.figs_tabs,
-            "templates_dropdown": self.templates_dropdown
+            "templates_dropdown": self.templates_dropdown,
+            "dataset_dropdown": self.datasets_dropdown
         }
 
     @property
@@ -782,6 +833,7 @@ class _VizManager:
             Box(
                 [
                     self.templates_dropdown,
+                    self.datasets_dropdown,
                     self.make_fig_button,
                 ],
                 layout=Layout(
@@ -795,15 +847,50 @@ class _VizManager:
         ])
         return config_panel, fig_output_container
 
+    def layout_template_change(self, template_type):
+        # check if plot set type requires loaded sim-data
+        if check_templeta_type_is_data_dependant(template_type.new):
+            sim_names = [
+                sim for sim in self.data["simulations"]
+            ]
+            self.datasets_dropdown.options = sim_names
+            self.datasets_dropdown.value = sim_names[0]
+            # show list of simulated or loaded data
+            self.datasets_dropdown.layout.visibility = "visible"
+        else:
+            # hide sim-data dropdown
+            self.datasets_dropdown.layout.visibility = "hidden"
+
     @unlink_relink(attribute='figs_config_tab_link')
     def add_figure(self, b=None):
         """Add a figure and corresponding config tabs to the dashboard.
         """
+        template_name = self.widgets['templates_dropdown'].value
+        is_data_template = check_templeta_type_is_data_dependant(template_name)
+        # if it's a data dependent layout use data_templates dictionary
+        template_type = (fig_templates[template_name]
+                         if not is_data_template
+                         else data_templates[template_name])
+
+        # set up plot fig according to template params
         _add_figure(None,
                     self.widgets,
                     self.data,
+                    template_type,
                     scale=0.97,
                     dpi=self.viz_layout['dpi'])
+
+        # check if plotting a data dependent template fig
+        num_data_sims = len(self.data["simulations"])
+        if is_data_template and num_data_sims > 0:
+            sim_name = self.widgets["dataset_dropdown"].value
+            fig_name = _idx2figname(self.data['fig_idx']['idx'] - 1)
+            # get figs per axis
+            ax_plots = data_templates[template_name]["ax_plots"]
+            for ax_name, plot_type in ax_plots:
+                # paint fig in axis
+                self._simulate_edit_figure(fig_name, ax_name, sim_name,
+                                           plot_type, {}, "plot")
 
     def _simulate_add_fig(self):
         self.make_fig_button.click()
