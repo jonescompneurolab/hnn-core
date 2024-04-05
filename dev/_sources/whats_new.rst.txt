@@ -43,6 +43,9 @@ Changelog
   returned for cases when there should be no valid matches, by `George Dang`_
   in :gh:`739`
 
+- Added check for invalid Axes object in :func:`~hnn_core/viz/plot_cells` 
+  function, by `Abdul Samad Siddiqui`_ in :gh:`744`.
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
@@ -467,4 +470,4 @@ People who contributed to this release (in alphabetical order):
 .. _Kaisu Lankinen: https://github.com/klankinen
 .. _George Dang: https://github.com/gtdang
 .. _Camilo Diaz: https://github.com/kmilo9999
-
+.. _Abdul Samad Siddiqui: https://github.com/samadpls
