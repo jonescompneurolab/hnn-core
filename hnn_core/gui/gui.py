@@ -1143,7 +1143,8 @@ def on_upload_data_change(change, data, viz_manager, log_out):
             hnn_core.read_dipole(io.StringIO(ext_content))
         ]}
         logger.info(f'External data {data_fname} loaded.')
-        viz_manager.reset_fig_config_tabs(template_name='single figure')
+        _template_name = "[Blank] single figure"
+        viz_manager.reset_fig_config_tabs(template_name=_template_name)
         viz_manager.add_figure()
         fig_name = _idx2figname(viz_manager.data['fig_idx']['idx'] - 1)
         ax_plots = [("ax0", "current dipole")]
