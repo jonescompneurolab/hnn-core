@@ -48,23 +48,23 @@ _spectrogram_color_maps = [
 ]
 
 fig_templates = {
-    "2row x 1col (1:3)": {
+    "[Blank] 2row x 1col (1:3)": {
         "kwargs": "gridspec_kw={\"height_ratios\":[1,3]}",
         "mosaic": "00\n11",
     },
-    "2row x 1col (1:1)": {
+    "[Blank] 2row x 1col (1:1)": {
         "kwargs": "gridspec_kw={\"height_ratios\":[1,1]}",
         "mosaic": "00\n11",
     },
-    "1row x 2col (1:1)": {
+    "[Blank] 1row x 2col (1:1)": {
         "kwargs": "gridspec_kw={\"height_ratios\":[1,1]}",
         "mosaic": "01\n01",
     },
-    "single figure": {
+    "[Blank] single figure": {
         "kwargs": "",
         "mosaic": "00\n00",
     },
-    "2row x 2col (1:1)": {
+    "[Blank] 2row x 2col (1:1)": {
         "kwargs": "gridspec_kw={\"height_ratios\":[1,1]}",
         "mosaic": "01\n23",
     }
@@ -122,7 +122,7 @@ def check_sim_plot_types(
     target_selection.value = 'None'
 
 
-def check_templeta_type_is_data_dependant(template_name):
+def check_template_type_is_data_dependant(template_name):
     sim_data_options = list(data_templates.keys())
     return template_name in sim_data_options
 
@@ -755,8 +755,8 @@ class _VizManager:
             (self.figs_tabs, 'selected_index'),
         )
 
-        template_names = list(fig_templates.keys())
-        template_names.extend(list(data_templates.keys()))
+        template_names = list(data_templates.keys())
+        template_names.extend(list(fig_templates.keys()))
         self.templates_dropdown = Dropdown(
             description='Layout template:',
             options=template_names,
@@ -849,13 +849,18 @@ class _VizManager:
 
     def layout_template_change(self, template_type):
         # check if plot set type requires loaded sim-data
-        if check_templeta_type_is_data_dependant(template_type.new):
-            sim_names = [
-                sim for sim in self.data["simulations"]
-            ]
+        if check_template_type_is_data_dependant(template_type.new):
+            # Add only simualated data
+            sim_names = [simulations for simulations, sim_name
+                         in self.data["simulations"].items()
+                         if sim_name['net'] is not None]
+
+            if len(sim_names) == 0:
+                sim_names = [" "]
+
             self.datasets_dropdown.options = sim_names
             self.datasets_dropdown.value = sim_names[0]
-            # show list of simulated or loaded data
+            # show list of simulated to gui dropdown
             self.datasets_dropdown.layout.visibility = "visible"
         else:
             # hide sim-data dropdown
@@ -866,7 +871,7 @@ class _VizManager:
         """Add a figure and corresponding config tabs to the dashboard.
         """
         template_name = self.widgets['templates_dropdown'].value
-        is_data_template = check_templeta_type_is_data_dependant(template_name)
+        is_data_template = check_template_type_is_data_dependant(template_name)
         # if it's a data dependent layout use data_templates dictionary
         template_type = (fig_templates[template_name]
                          if not is_data_template
