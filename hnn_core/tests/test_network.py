@@ -838,3 +838,181 @@ def test_network_mesh():
     _ = jones_2009_model(mesh_shape=mesh_shape)
     _ = calcium_model(mesh_shape=mesh_shape)
     _ = law_2021_model(mesh_shape=mesh_shape)
+
+
+class TestPickConnection:
+    """Tests for the pick_connection function."""
+    @pytest.mark.parametrize("arg_name",
+                             ["src_gids", "target_gids", "loc", "receptor"]
+                             )
+    def test_1argument_none(self, base_network, arg_name):
+        """ Tests passing None as an argument value. """
+        net, _ = base_network
+        kwargs = {'net': net, f'{arg_name}': None}
+        indices = pick_connection(**kwargs)
+        assert not indices
+
+    @pytest.mark.parametrize("arg_name", ["src_gids", "target_gids"])
+    def test_1argument_range(self, base_network, arg_name):
+        """ Tests passing range as an argument value. """
+        net, _ = base_network
+        test_range = range(2)
+        kwargs = {'net': net, f'{arg_name}': test_range}
+        indices = pick_connection(**kwargs)
+
+        for conn_idx in indices:
+            assert set(test_range).issubset(net.connectivity[conn_idx][arg_name])
+
+    @pytest.mark.parametrize("arg_name,value",
+                             [("src_gids", 'L2_pyramidal'),
+                              ("target_gids", 'L2_pyramidal'),
+                              ("loc", 'soma'),
+                              ("receptor", 'gabaa'),
+                              ])
+    def test_1argument_str(self, base_network, arg_name, value):
+        """ Tests passing string as an argument value. """
+        net, _ = base_network
+        kwargs = {'net': net, f'{arg_name}': value}
+        indices = pick_connection(**kwargs)
+
+        for conn_idx in indices:
+            if arg_name in ('src_gids', 'target_gids'):
+                # arg specifies a subset of item gids (within gid_ranges)
+                assert (net.connectivity[conn_idx][arg_name]
+                        .issubset(net.gid_ranges[value])
+                        )
+            else:
+                # arg and item specify equivalent string descriptors
+                assert net.connectivity[conn_idx][arg_name] == value
+
+    @pytest.mark.parametrize("arg_name,value",
+                             [("src_gids", 0),
+                              ("target_gids", 35),
+                              ])
+    def test_1argument_int(self, base_network, arg_name, value):
+        """
+        Tests that qualifying connections are not missing when passing one gid.
+        """
+        net, _ = base_network
+        kwargs = {'net': net, f'{arg_name}': value}
+        indices = pick_connection(**kwargs)
+
+        for conn_idx in range(len(net.connectivity)):
+            if conn_idx in indices:
+                assert value in net.connectivity[conn_idx][arg_name]
+            else:
+                assert value not in net.connectivity[conn_idx][arg_name]
+
+    @pytest.mark.parametrize("arg_name,value",
+                             [("src_gids", ['L2_basket', 'L5_basket']),
+                              ("target_gids", ['L2_pyramidal', 'L5_pyramidal']),
+                              ])
+    def test_1argument_list_of_str(self, base_network, arg_name, value):
+        """ Tests passing a list of valid strings """
+        net, _ = base_network
+        kwargs = {'net': net, f'{arg_name}': value}
+        indices = pick_connection(**kwargs)
+
+        true_gid_set = set(list(net.gid_ranges[value[0]]) +
+                           list(net.gid_ranges[value[1]])
+                           )
+        pick_gid_list = []
+        for idx in indices:
+            pick_gid_list.extend(net.connectivity[idx][arg_name])
+        assert true_gid_set == set(pick_gid_list)
+
+    @pytest.mark.parametrize("arg_name,value",
+                             [("src_gids", [0, 5]),
+                              ("target_gids", [35, 34]),
+                              ])
+    def test_1argument_list_of_int(self, base_network, arg_name, value):
+        """ Tests passing a list of valid ints """
+        net, _ = base_network
+        kwargs = {'net': net, f'{arg_name}': value}
+        indices = pick_connection(**kwargs)
+
+        true_idx_list = []
+        for idx, conn in enumerate(net.connectivity):
+            if any([val in conn[arg_name] for val in value]):
+                true_idx_list.append(idx)
+
+        assert indices == true_idx_list
+
+    @pytest.mark.parametrize("src_gids,target_gids,loc,receptor",
+                             [("evdist1", None, "proximal", None),
+                              ("evprox1", None, "distal", None),
+                              (None, None, "distal", "gabab"),
+                              ("L2_pyramidal", None, None, "gabab"),
+                              ("L2_basket", "L2_basket", "proximal", "nmda"),
+                              ("L2_pyramidal", "L2_basket", "distal", "gabab"),
+                              ])
+    def test_no_match(self, base_network,
+                         src_gids, target_gids, loc, receptor):
+        """ Tests no matches returned for non-configured connections. """
+        net, _ = base_network
+        indices = pick_connection(net,
+                                  src_gids=src_gids,
+                                  target_gids=target_gids,
+                                  loc=loc,
+                                  receptor=receptor)
+        assert len(indices) == 0
+
+    @pytest.mark.parametrize("src_gids,target_gids,loc,receptor",
+                             [(0.0, None, None, None),
+                              ([0.0], None, None, None),
+                              (None, 35.0, None, None),
+                              (None, [35.0], None, None),
+                              (None, [35, [36.0]], None, None),
+                              (None, None, 1.0, None),
+                              (None, None, None, 1.0),
+                              ])
+    def test_type_error(self, base_network,
+                           src_gids, target_gids, loc, receptor):
+        """ Tests TypeError when passing floats. """
+        net, _ = base_network
+        match = ('must be an instance of')
+        with pytest.raises(TypeError, match=match):
+            pick_connection(net,
+                            src_gids=src_gids,
+                            target_gids=target_gids,
+                            loc=loc,
+                            receptor=receptor)
+
+    @pytest.mark.parametrize("src_gids,target_gids",
+                             [(-1, None), ([-1], None),
+                              (None, -1), (None, [-1]),
+                              ([35, -1], None), (None, [35, -1]),
+                              ])
+    def test_invalid_int(self, base_network, src_gids, target_gids):
+        """ Tests AssertionError when passing negative ints. """
+        net, _ = base_network
+        match = ('not in net.gid_ranges')
+        with pytest.raises(AssertionError, match=match):
+            pick_connection(net, src_gids=src_gids, target_gids=target_gids)
+
+    @pytest.mark.parametrize("arg_name",
+                             ["src_gids", "target_gids", "loc", "receptor"]
+                             )
+    def test_invalid_str(self, base_network, arg_name):
+        """ Tests ValueError raises when passing unrecognized string. """
+        net, _ = base_network
+        match = f"Invalid value for the '{arg_name}' parameter"
+        with pytest.raises(ValueError, match=match):
+            kwargs = {'net': net, f'{arg_name}': 'invalid_string'}
+            pick_connection(**kwargs)
+
+    @pytest.mark.parametrize("src_gids,target_gids,expected",
+                             [("evdist1", "L5_pyramidal", 2),
+                              ("evprox1", "L2_basket", 2),
+                              ("L2_basket", "L2_basket", 0),
+                              ])
+    def test_only_drives_specified(self, base_network, src_gids,
+                                   target_gids, expected):
+        """Tests searching a Network with only drive connections added.
+
+        Only searches for drive connectivity should have results.
+        """
+        _, param = base_network
+        net = Network(param, add_drives_from_params=True)
+        indices = pick_connection(net, src_gids=src_gids, target_gids=target_gids)
+        assert len(indices) == expected
