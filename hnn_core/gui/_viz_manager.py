@@ -778,7 +778,6 @@ class _VizManager:
             value=None,
             style={'description_width': 'initial'},
             layout=Layout(width="98%"))
-        self.datasets_dropdown.layout.visibility = "hidden"
 
         # data
         self.fig_idx = {"idx": 1}
@@ -870,14 +869,24 @@ class _VizManager:
     def add_figure(self, b=None):
         """Add a figure and corresponding config tabs to the dashboard.
         """
+        if len(self.data["simulations"]) == 0:
+            logger.error("No data has been loaded")
+            return
+
         template_name = self.widgets['templates_dropdown'].value
         is_data_template = check_template_type_is_data_dependant(template_name)
-        # if it's a data dependent layout use data_templates dictionary
-        template_type = (fig_templates[template_name]
-                         if not is_data_template
-                         else data_templates[template_name])
+        if is_data_template:
+            sim_name = self.widgets["dataset_dropdown"].value
+            if sim_name not in self.data["simulations"]:
+                logger.error("No simulation data has been loaded")
+                return
 
-        # set up plot fig according to template params
+        # Use data_templates dictionary if it's a data dependent layout
+        template_type = (data_templates[template_name]
+                         if is_data_template
+                         else fig_templates[template_name])
+
+        # Add empty figure according to template arguments
         _add_figure(None,
                     self.widgets,
                     self.data,
@@ -885,10 +894,8 @@ class _VizManager:
                     scale=0.97,
                     dpi=self.viz_layout['dpi'])
 
-        # check if plotting a data dependent template fig
-        num_data_sims = len(self.data["simulations"])
-        if is_data_template and num_data_sims > 0:
-            sim_name = self.widgets["dataset_dropdown"].value
+        # Check if plotting a data dependent template figure
+        if is_data_template:
             fig_name = _idx2figname(self.data['fig_idx']['idx'] - 1)
             # get figs per axis
             ax_plots = data_templates[template_name]["ax_plots"]
@@ -896,12 +903,17 @@ class _VizManager:
                 # paint fig in axis
                 self._simulate_edit_figure(fig_name, ax_name, sim_name,
                                            plot_type, {}, "plot")
+            logger.info(f"Figure {template_name} for "
+                        f"simulation {sim_name} "
+                        "has been created"
+                        )
 
     def _simulate_add_fig(self):
         self.make_fig_button.click()
 
     def _simulate_switch_fig_template(self, template_name):
-        assert template_name in fig_templates.keys(), "No such template"
+        assert (template_name in fig_templates.keys() or
+                data_templates.keys()), "No such template"
         self.templates_dropdown.value = template_name
 
     def _simulate_delete_figure(self, fig_name):
