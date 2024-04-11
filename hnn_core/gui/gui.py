@@ -1148,6 +1148,8 @@ def on_upload_data_change(change, data, viz_manager, log_out):
         viz_manager.add_figure()
         fig_name = _idx2figname(viz_manager.data['fig_idx']['idx'] - 1)
         ax_plots = [("ax0", "current dipole")]
+
+        # these lines plot the data per axis
         for ax_name, plot_type in ax_plots:
             viz_manager._simulate_edit_figure(
                 fig_name, ax_name, data_fname, plot_type, {}, "plot")
