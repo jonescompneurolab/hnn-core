@@ -57,10 +57,13 @@ Optional dependencies
 GUI
 ~~~
 
-* ipywidgets (>=8.0.0)
+* ipywidgets
 * voila
 * ipympl
 * ipykernel
+
+*Note*: Please follow the **GUI installation** section to install the correct
+GUI dependency versions automatically.
 
 Optimization
 ~~~~~~~~~~~~
