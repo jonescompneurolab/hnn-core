@@ -49,57 +49,79 @@ _spectrogram_color_maps = [
 
 fig_templates = {
     "[Blank] 2row x 1col (1:3)": {
-        "kwargs": "gridspec_kw={\"height_ratios\":[1,3]}",
+        "kwargs": {
+            "gridspec_kw": {"height_ratios": [1, 3]}
+        },
         "mosaic": "00\n11",
     },
     "[Blank] 2row x 1col (1:1)": {
-        "kwargs": "gridspec_kw={\"height_ratios\":[1,1]}",
+        "kwargs": {
+            "gridspec_kw": {"height_ratios": [1, 1]}
+        },
         "mosaic": "00\n11",
     },
     "[Blank] 1row x 2col (1:1)": {
-        "kwargs": "gridspec_kw={\"height_ratios\":[1,1]}",
+        "kwargs": {
+            "gridspec_kw": {"height_ratios": [1, 1]}
+        },
         "mosaic": "01\n01",
     },
     "[Blank] single figure": {
-        "kwargs": "",
+        "kwargs": {
+            "gridspec_kw": ""
+        },
         "mosaic": "00\n00",
     },
     "[Blank] 2row x 2col (1:1)": {
-        "kwargs": "gridspec_kw={\"height_ratios\":[1,1]}",
+        "kwargs": {
+            "gridspec_kw": {"height_ratios": [1, 1]}
+        },
         "mosaic": "01\n23",
     }
 }
 
 data_templates = {
-    "Drive-Dipole": {
-        "kwargs": "gridspec_kw={\"height_ratios\":[1,3]}",
+    "Drive-Dipole (2X1)": {
+        "kwargs": {
+            "gridspec_kw": {"height_ratios": [1, 3]}
+        },
         "mosaic": "00\n11",
         "ax_plots": [("ax0", "input histogram"), ("ax1", "current dipole")]
     },
-    "Dipole Layers": {
-        "kwargs": "gridspec_kw={\"height_ratios\":[1,1,1]}",
+    "Dipole Layers (3x1)": {
+        "kwargs": {
+            "gridspec_kw": {"height_ratios": [1, 1, 1]}
+        },
         "mosaic": "0\n1\n2",
         "ax_plots": [("ax0", "layer2 dipole"), ("ax1", "layer5 dipole"),
                      ("ax2", "current dipole")]
     },
-    "Drive-Spikes": {
-        "kwargs": "gridspec_kw={\"height_ratios\":[1,3]}",
+    "Drive-Spikes (2x1)": {
+        "kwargs": {
+            "gridspec_kw": {"height_ratios": [1, 3]}
+        },
         "mosaic": "00\n11",
         "ax_plots": [("ax0", "input histogram"), ("ax1", "spikes")]
     },
-    "Dipole-Spectrogram": {
-        "kwargs": "gridspec_kw={\"height_ratios\":[1,3]}",
+    "Dipole-Spectrogram (2x1)": {
+        "kwargs": {
+            "gridspec_kw": {"height_ratios": [1, 3]}
+        },
         "mosaic": "00\n11",
         "ax_plots": [("ax0", "current dipole"), ("ax1", "spectrogram")]
     },
-    "Drive-Dipole-Spectrogram": {
-        "kwargs": "gridspec_kw={\"height_ratios\":[1,1,2]}",
+    "Drive-Dipole-Spectrogram (3x1)": {
+        "kwargs": {
+            "gridspec_kw": {"height_ratios": [1, 1, 2]}
+        },
         "mosaic": "0\n1\n2",
         "ax_plots": [("ax0", "input histogram"), ("ax1", "current dipole"),
                      ("ax2", "spectrogram")]
     },
-    "PSD Layers": {
-        "kwargs": "gridspec_kw={\"height_ratios\":[1,1,1]}",
+    "PSD Layers (3x1)": {
+        "kwargs": {
+            "gridspec_kw": {"height_ratios": [1, 1, 1]}
+        },
         "mosaic": "0\n1\n2",
         "ax_plots": [("ax0", "layer2 dipole"), ("ax1", "layer5 dipole"),
                      ("ax2", "PSD")]
@@ -122,7 +144,7 @@ def check_sim_plot_types(
     target_selection.value = 'None'
 
 
-def check_template_type_is_data_dependant(template_name):
+def _check_template_type_is_data_dependant(template_name):
     sim_data_options = list(data_templates.keys())
     return template_name in sim_data_options
 
@@ -696,7 +718,7 @@ def _add_figure(b, widgets, data, template_type, scale=0.95, dpi=96):
         figsize = (scale * ((int(viz_output_layout.width[:-2]) - 10) / dpi),
                    scale * ((int(viz_output_layout.height[:-2]) - 10) / dpi))
         mosaic = template_type['mosaic']
-        kwargs = eval(f"dict({template_type['kwargs']})")
+        kwargs = template_type['kwargs']
         plt.ioff()
         fig, axd = plt.subplot_mosaic(mosaic,
                                       figsize=figsize,
@@ -763,7 +785,7 @@ class _VizManager:
             value=template_names[0],
             style={'description_width': 'initial'},
             layout=Layout(width="98%"))
-        self.templates_dropdown.observe(self.layout_template_change, 'value')
+        self.templates_dropdown.observe(self._layout_template_change, 'value')
 
         self.make_fig_button = Button(
             description='Make figure',
@@ -846,9 +868,9 @@ class _VizManager:
         ])
         return config_panel, fig_output_container
 
-    def layout_template_change(self, template_type):
+    def _layout_template_change(self, template_type):
         # check if plot set type requires loaded sim-data
-        if check_template_type_is_data_dependant(template_type.new):
+        if _check_template_type_is_data_dependant(template_type.new):
             # Add only simualated data
             sim_names = [simulations for simulations, sim_name
                          in self.data["simulations"].items()
@@ -874,7 +896,8 @@ class _VizManager:
             return
 
         template_name = self.widgets['templates_dropdown'].value
-        is_data_template = check_template_type_is_data_dependant(template_name)
+        is_data_template = (_check_template_type_is_data_dependant
+                            (template_name))
         if is_data_template:
             sim_name = self.widgets["dataset_dropdown"].value
             if sim_name not in self.data["simulations"]:
