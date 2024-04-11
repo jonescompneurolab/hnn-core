@@ -861,7 +861,9 @@ class TestPickConnection:
         indices = pick_connection(**kwargs)
 
         for conn_idx in indices:
-            assert set(test_range).issubset(net.connectivity[conn_idx][arg_name])
+            assert set(test_range).issubset(
+                net.connectivity[conn_idx][arg_name]
+            )
 
     @pytest.mark.parametrize("arg_name,value",
                              [("src_gids", 'L2_pyramidal'),
@@ -905,7 +907,7 @@ class TestPickConnection:
 
     @pytest.mark.parametrize("arg_name,value",
                              [("src_gids", ['L2_basket', 'L5_basket']),
-                              ("target_gids", ['L2_pyramidal', 'L5_pyramidal']),
+                              ("target_gids", ['L2_pyramidal', 'L5_pyramidal'])
                               ])
     def test_1argument_list_of_str(self, base_network, arg_name, value):
         """ Tests passing a list of valid strings """
@@ -947,7 +949,7 @@ class TestPickConnection:
                               ("L2_pyramidal", "L2_basket", "distal", "gabab"),
                               ])
     def test_no_match(self, base_network,
-                         src_gids, target_gids, loc, receptor):
+                      src_gids, target_gids, loc, receptor):
         """ Tests no matches returned for non-configured connections. """
         net, _ = base_network
         indices = pick_connection(net,
@@ -967,7 +969,7 @@ class TestPickConnection:
                               (None, None, None, 1.0),
                               ])
     def test_type_error(self, base_network,
-                           src_gids, target_gids, loc, receptor):
+                        src_gids, target_gids, loc, receptor):
         """ Tests TypeError when passing floats. """
         net, _ = base_network
         match = ('must be an instance of')
@@ -1014,5 +1016,8 @@ class TestPickConnection:
         """
         _, param = base_network
         net = Network(param, add_drives_from_params=True)
-        indices = pick_connection(net, src_gids=src_gids, target_gids=target_gids)
+        indices = pick_connection(net,
+                                  src_gids=src_gids,
+                                  target_gids=target_gids
+                                  )
         assert len(indices) == expected
