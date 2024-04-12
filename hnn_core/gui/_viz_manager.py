@@ -81,7 +81,7 @@ fig_templates = {
 }
 
 data_templates = {
-    "Drive-Dipole (2X1)": {
+    "Drive-Dipole (2x1)": {
         "kwargs": {
             "gridspec_kw": {"height_ratios": [1, 3]}
         },

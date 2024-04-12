@@ -338,6 +338,45 @@ def test_gui_add_figure():
     plt.close('all')
 
 
+def test_gui_add_data_dependent_figure():
+    """Test if the GUI adds/deletes figs data dependent properly."""
+    gui = HNNGUI()
+    _ = gui.compose()
+    gui.params['N_pyr_x'] = 3
+    gui.params['N_pyr_y'] = 3
+
+    fig_tabs = gui.viz_manager.figs_tabs
+    axes_config_tabs = gui.viz_manager.axes_config_tabs
+    assert len(fig_tabs.children) == 0
+    assert len(axes_config_tabs.children) == 0
+
+    # after each run we should have a default fig
+    gui.run_button.click()
+    assert len(fig_tabs.children) == 1
+    assert len(axes_config_tabs.children) == 1
+    assert gui.viz_manager.fig_idx['idx'] == 2
+
+    template_names = [('Drive-Dipole (2x1)', 2),
+                      ('Dipole Layers (3x1)', 3),
+                      ('Drive-Spikes (2x1)', 2),
+                      ('Dipole-Spectrogram (2x1)', 2),
+                      ('Drive-Dipole-Spectrogram (3x1)', 3),
+                      ('PSD Layers (3x1)', 3)]
+
+    n_fig = 1
+    for template_name, num_axes in template_names:
+        gui.viz_manager.templates_dropdown.value = template_name
+        assert len(gui.viz_manager.datasets_dropdown.options) == 1
+        gui.viz_manager.make_fig_button.click()
+        # Check  figs have data on their axis
+        for ax in range(num_axes):
+            assert gui.viz_manager.figs[n_fig + 1].axes[ax].has_data()
+        n_fig = n_fig + 1
+
+    # test number of created figures
+    assert len(fig_tabs.children) == n_fig
+
+
 def test_gui_edit_figure():
     """Test if the GUI adds/deletes figs properly."""
     gui = HNNGUI()
