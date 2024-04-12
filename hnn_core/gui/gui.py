@@ -754,6 +754,25 @@ def _prepare_upload_file_from_url(file_url):
     }]
 
 
+def _update_nested_dict(original, update):
+    """Updates a dictionary with another dictionary
+
+    Will update nested dictionaries in the structure. New items from the
+    update dictionary are added and omitted items are retained from the
+    original dictionary.
+    """
+    original = original.copy()
+    for key, value in update.items():
+        if (isinstance(value, dict)
+                and key in original
+                and isinstance(original[key], dict)
+        ):
+            original[key] = _update_nested_dict(original[key], value)
+        else:
+            original[key] = value
+    return original
+
+
 def create_expanded_button(description, button_style, layout, disabled=False,
                            button_color="#8A2BE2"):
     return Button(description=description, button_style=button_style,
