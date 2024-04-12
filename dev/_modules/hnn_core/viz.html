@@ -460,7 +460,7 @@
 
 
 <div class="viewcode-block" id="plot_spikes_hist"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_spikes_hist.html#hnn_core.viz.plot_spikes_hist">[docs]</a><span class="k">def</span> <span class="nf">plot_spikes_hist</span><span class="p">(</span><span class="n">cell_response</span><span class="p">,</span> <span class="n">trial_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">spike_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                     <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                     <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs_hist</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the histogram of spiking activity across trials.</span>
 
 <span class="sd">    Parameters</span>
@@ -506,6 +506,8 @@
 <span class="sd">        If None, default color cycle used.</span>
 <span class="sd">    show : bool</span>
 <span class="sd">        If True, show the figure.</span>
+<span class="sd">    **kwargs_hist : dict</span>
+<span class="sd">        Additional keyword arguments to pass to ax.hist.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -610,7 +612,7 @@
     <span class="k">for</span> <span class="n">spike_label</span><span class="p">,</span> <span class="n">plot_data</span> <span class="ow">in</span> <span class="n">spike_type_times</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">hist_color</span> <span class="o">=</span> <span class="n">spike_color</span><span class="p">[</span><span class="n">spike_label</span><span class="p">]</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">plot_data</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span>
-                <span class="n">label</span><span class="o">=</span><span class="n">spike_label</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">hist_color</span><span class="p">)</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">spike_label</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">hist_color</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs_hist</span><span class="p">)</span>
 
     <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Counts&quot;</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
