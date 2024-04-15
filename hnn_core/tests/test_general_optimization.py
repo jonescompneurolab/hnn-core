@@ -240,7 +240,7 @@ def test_user_obj_fun(solver):
         electrode_pos = [(135, 135, dep) for dep in depths]
         new_net.add_electrode_array('shank1', electrode_pos)
 
-        dpl = simulate_dipole(new_net, tstop=tstop, n_trials=1)[0]
+        simulate_dipole(new_net, tstop=tstop, n_trials=1)[0]
 
         potentials = new_net.rec_arrays['shank1'][0]
 
@@ -263,8 +263,8 @@ def test_user_obj_fun(solver):
             depth_max = np.argmax(contact_labels >=
                                   obj_fun_kwargs['electrode_depths'][idx][1])
 
-            csd_subsets.append(sum(sum(csd[depth_min:depth_max+1,
-                                           t_min:t_max+1])))
+            csd_subsets.append(sum(sum(csd[depth_min:depth_max + 1,
+                                           t_min:t_max + 1])))
 
         obj = sum(csd_subsets) / sum(sum(csd))
         obj_values.append(obj)
