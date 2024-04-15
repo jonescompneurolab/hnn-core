@@ -32,8 +32,10 @@ class Optimizer:
             of the parameters that will be set inside the function.
         solver : str
             The optimizer, 'bayesian' or 'cobyla'.
-        obj_fun : str
-            The objective function to be minimized.
+        obj_fun : str | func
+            The objective function to be minimized. Can be 'dipole_rmse',
+            'maximize_psd', or a user-defined function. The default is
+            'dipole_rmse'.
         max_iter : int, optional
             The max number of calls to the objective function. The default is
             200.
@@ -87,7 +89,8 @@ class Optimizer:
             self.obj_fun = _maximize_psd
             self.obj_fun_name = 'maximize_psd'
         else:
-            raise ValueError("obj_fun must be 'dipole_rmse' or 'maximize_psd'")
+            self.obj_fun = obj_fun  # user-defined function
+            self.obj_fun_name = None
         self.tstop = tstop
         self.net_ = None
         self.obj_ = list()
@@ -112,6 +115,10 @@ class Optimizer:
             Lower and higher limit for each frequency band.
         relative_bandpower : tuple (if obj_fun='maximize_psd')
             Weight for each frequency band.
+        scale_factor : float, optional
+            The dipole scale factor.
+        smooth_window_len : float, optional
+            The smooth window length.
         """
         if (self.obj_fun_name == 'dipole_rmse' and
                 'target' not in obj_fun_kwargs):
