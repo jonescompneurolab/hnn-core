@@ -694,7 +694,12 @@ def convert_to_hdf5(params_fname,
                        'calcium_model': calcium_model
                        }
     if network_connectivity:
-        network_model = model_functions[network_connectivity]
+        try:
+            network_model = model_functions[network_connectivity]
+        except KeyError:
+            raise KeyError(f'Invalid network connectivity: '
+                           f'"{network_connectivity}"; '
+                           f'Valid options: {list(model_functions.keys())}')
     else:
         network_model = Network
 

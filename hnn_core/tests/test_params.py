@@ -184,6 +184,7 @@ class TestConvertToHDF5:
         good_path = hnn_core_root
         path_str = str(good_path)
         bad_path = 5
+        bad_network_conn = 'bad_model'
 
         # Valid path and string, but not actual files
         with pytest.raises(
@@ -205,3 +206,11 @@ class TestConvertToHDF5:
                 match="out_fname must be an instance of str or Path"
         ):
             convert_to_hdf5(good_path, bad_path)
+
+        # Bad network_connectivity
+        with pytest.raises(
+                KeyError,
+                match="Invalid network connectivity:"
+        ):
+            convert_to_hdf5(good_path, good_path,
+                            network_connectivity=bad_network_conn)
