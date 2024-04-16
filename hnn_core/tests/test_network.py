@@ -850,7 +850,7 @@ class TestPickConnection:
         net, _ = base_network
         kwargs = {'net': net, f'{arg_name}': None}
         indices = pick_connection(**kwargs)
-        assert not indices
+        assert len(indices) == 0
 
     @pytest.mark.parametrize("arg_name", ["src_gids", "target_gids"])
     def test_1argument_range(self, base_network, arg_name):
