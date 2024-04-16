@@ -853,7 +853,7 @@ class TestPickConnection:
         assert len(indices) == 0
 
     @pytest.mark.parametrize("arg_name", ["src_gids", "target_gids"])
-    def test_1argument_range(self, base_network, arg_name):
+    def test_1argument_gids_range(self, base_network, arg_name):
         """Tests passing range as an argument value."""
         net, _ = base_network
         test_range = range(2)
@@ -891,7 +891,7 @@ class TestPickConnection:
                              [("src_gids", 0),
                               ("target_gids", 35),
                               ])
-    def test_1argument_int(self, base_network, arg_name, value):
+    def test_1argument_gids_int(self, base_network, arg_name, value):
         """Tests that connections are not missing when passing one gid."""
         net, _ = base_network
         kwargs = {'net': net, f'{arg_name}': value}
@@ -907,7 +907,10 @@ class TestPickConnection:
                              [("src_gids", ['L2_basket', 'L5_basket']),
                               ("target_gids", ['L2_pyramidal', 'L5_pyramidal'])
                               ])
-    def test_1argument_list_of_str(self, base_network, arg_name, value):
+    def test_1argument_list_of_cell_types_str(self,
+                                              base_network,
+                                              arg_name,
+                                              value):
         """Tests passing a list of valid strings"""
         net, _ = base_network
         kwargs = {'net': net, f'{arg_name}': value}
@@ -925,7 +928,7 @@ class TestPickConnection:
                              [("src_gids", [0, 5]),
                               ("target_gids", [35, 34]),
                               ])
-    def test_1argument_list_of_int(self, base_network, arg_name, value):
+    def test_1argument_list_of_gids_int(self, base_network, arg_name, value):
         """Tests passing a list of valid ints."""
         net, _ = base_network
         kwargs = {'net': net, f'{arg_name}': value}
@@ -983,7 +986,7 @@ class TestPickConnection:
                               (None, -1), (None, [-1]),
                               ([35, -1], None), (None, [35, -1]),
                               ])
-    def test_invalid_int(self, base_network, src_gids, target_gids):
+    def test_invalid_gids_int(self, base_network, src_gids, target_gids):
         """Tests AssertionError when passing negative ints."""
         net, _ = base_network
         match = ('not in net.gid_ranges')
