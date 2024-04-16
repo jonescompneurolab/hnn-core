@@ -854,7 +854,7 @@ class TestPickConnection:
 
     @pytest.mark.parametrize("arg_name", ["src_gids", "target_gids"])
     def test_1argument_range(self, base_network, arg_name):
-        """ Tests passing range as an argument value. """
+        """Tests passing range as an argument value."""
         net, _ = base_network
         test_range = range(2)
         kwargs = {'net': net, f'{arg_name}': test_range}
@@ -872,7 +872,7 @@ class TestPickConnection:
                               ("receptor", 'gabaa'),
                               ])
     def test_1argument_str(self, base_network, arg_name, value):
-        """ Tests passing string as an argument value. """
+        """Tests passing string as an argument value."""
         net, _ = base_network
         kwargs = {'net': net, f'{arg_name}': value}
         indices = pick_connection(**kwargs)
@@ -892,9 +892,7 @@ class TestPickConnection:
                               ("target_gids", 35),
                               ])
     def test_1argument_int(self, base_network, arg_name, value):
-        """
-        Tests that qualifying connections are not missing when passing one gid.
-        """
+        """Tests that connections are not missing when passing one gid."""
         net, _ = base_network
         kwargs = {'net': net, f'{arg_name}': value}
         indices = pick_connection(**kwargs)
@@ -910,7 +908,7 @@ class TestPickConnection:
                               ("target_gids", ['L2_pyramidal', 'L5_pyramidal'])
                               ])
     def test_1argument_list_of_str(self, base_network, arg_name, value):
-        """ Tests passing a list of valid strings """
+        """Tests passing a list of valid strings"""
         net, _ = base_network
         kwargs = {'net': net, f'{arg_name}': value}
         indices = pick_connection(**kwargs)
@@ -928,7 +926,7 @@ class TestPickConnection:
                               ("target_gids", [35, 34]),
                               ])
     def test_1argument_list_of_int(self, base_network, arg_name, value):
-        """ Tests passing a list of valid ints """
+        """Tests passing a list of valid ints."""
         net, _ = base_network
         kwargs = {'net': net, f'{arg_name}': value}
         indices = pick_connection(**kwargs)
@@ -950,7 +948,7 @@ class TestPickConnection:
                               ])
     def test_no_match(self, base_network,
                       src_gids, target_gids, loc, receptor):
-        """ Tests no matches returned for non-configured connections. """
+        """Tests no matches returned for non-configured connections."""
         net, _ = base_network
         indices = pick_connection(net,
                                   src_gids=src_gids,
@@ -970,7 +968,7 @@ class TestPickConnection:
                               ])
     def test_type_error(self, base_network,
                         src_gids, target_gids, loc, receptor):
-        """ Tests TypeError when passing floats. """
+        """Tests TypeError when passing floats."""
         net, _ = base_network
         match = ('must be an instance of')
         with pytest.raises(TypeError, match=match):
@@ -986,7 +984,7 @@ class TestPickConnection:
                               ([35, -1], None), (None, [35, -1]),
                               ])
     def test_invalid_int(self, base_network, src_gids, target_gids):
-        """ Tests AssertionError when passing negative ints. """
+        """Tests AssertionError when passing negative ints."""
         net, _ = base_network
         match = ('not in net.gid_ranges')
         with pytest.raises(AssertionError, match=match):
@@ -996,7 +994,7 @@ class TestPickConnection:
                              ["src_gids", "target_gids", "loc", "receptor"]
                              )
     def test_invalid_str(self, base_network, arg_name):
-        """ Tests ValueError raises when passing unrecognized string. """
+        """Tests ValueError raises when passing unrecognized string."""
         net, _ = base_network
         match = f"Invalid value for the '{arg_name}' parameter"
         with pytest.raises(ValueError, match=match):
