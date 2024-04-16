@@ -671,10 +671,11 @@ def convert_to_hdf5(params_fname,
         Path to file
     out_fname: str
         Path to output
-    network_connectivity: str or None, default="jones_2009_model"
-        Neocortical network model to use. Models are defined in
-        network_models.py. If None, the base Network object with no defined
-        network connectivity will be used.
+    network_connectivity: str or None, default:' jones_2009_model'
+        Options: ['jones_2009_model', 'law_2021_model', 'calcium_model', None]
+        Neocortical network model to use. Models are defined in network_models.
+        If None, the base Network object with no defined network connectivity
+        will be used.
     include_drives: bool, default=True
         Include drives from params file
     overwrite: bool, default=True
