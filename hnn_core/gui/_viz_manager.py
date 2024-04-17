@@ -110,6 +110,13 @@ data_templates = {
         "mosaic": "00\n11",
         "ax_plots": [("ax0", "current dipole"), ("ax1", "spectrogram")]
     },
+    "Dipole-Spikes (2x1)": {
+        "kwargs": {
+            "gridspec_kw": {"height_ratios": [1, 1]}
+        },
+        "mosaic": "00\n11",
+        "ax_plots": [("ax0", "current dipole"), ("ax1", "spikes")]
+    },
     "Drive-Dipole-Spectrogram (3x1)": {
         "kwargs": {
             "gridspec_kw": {"height_ratios": [1, 1, 2]}
@@ -917,7 +924,7 @@ class _VizManager:
                     scale=0.97,
                     dpi=self.viz_layout['dpi'])
 
-        # Check if plotting a data dependent template figure
+        # Plot data if it is a data-dependent template
         if is_data_template:
             fig_name = _idx2figname(self.data['fig_idx']['idx'] - 1)
             # get figs per axis
