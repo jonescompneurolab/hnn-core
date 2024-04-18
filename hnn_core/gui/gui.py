@@ -15,7 +15,8 @@ from datetime import datetime
 from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload, VBox,
-                        HBox, IntText, Layout, Output, RadioButtons, Tab, Text)
+                        HBox, IntText, Layout, Output, RadioButtons, Tab, Text,
+                        Checkbox)
 from ipywidgets.embed import embed_minimal_html
 import hnn_core
 from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
@@ -795,6 +796,9 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
     seedcore = IntText(value=default_data['seedcore'],
                        description='Seed',
                        **kwargs)
+    synch_inputs = Checkbox(value=False,
+                            description='Synchronous Inputs',
+                            **kwargs)
 
     widgets_list, widgets_dict = _get_cell_specific_widgets(
         layout,
@@ -806,9 +810,12 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
             'delays': default_delays,
         },
     )
-    drive_box = VBox(
-        [tstart, tstart_std, tstop, burst_rate, burst_std, repeats, seedcore] +
-        widgets_list)
+
+    drive_box = VBox([tstart, tstart_std, tstop,
+                      burst_rate, burst_std, repeats,
+                      seedcore, synch_inputs] +
+                     widgets_list)
+
     drive = dict(type='Rhythmic',
                  name=name,
                  tstart=tstart,
@@ -818,7 +825,8 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
                  repeats=repeats,
                  seedcore=seedcore,
                  location=location,
-                 tstop=tstop)
+                 tstop=tstop,
+                 is_synch_inputs=synch_inputs)
     drive.update(widgets_dict)
     return drive, drive_box
 
@@ -854,6 +862,11 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
                        layout=layout,
                        style=style)
 
+    synch_inputs = Checkbox(value=False,
+                            description='Synch Inputs',
+                            layout=layout,
+                            style=style)
+
     cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket', 'L2_basket']
     rate_constant = dict()
     for cell_type in cell_types:
@@ -876,7 +889,7 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
     widgets_list.extend([HTML(value="<b>Rate constants</b>")] +
                         list(widgets_dict['rate_constant'].values()))
 
-    drive_box = VBox([tstart, tstop, seedcore] + widgets_list)
+    drive_box = VBox([tstart, tstop, seedcore, synch_inputs] + widgets_list)
     drive = dict(
         type='Poisson',
         name=name,
@@ -885,6 +898,7 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
         rate_constant=rate_constant,
         seedcore=seedcore,
         location=location,  # notice this is a widget but a str!
+        is_synch_inputs=synch_inputs,
     )
     drive.update(widgets_dict)
     return drive, drive_box
@@ -915,6 +929,10 @@ def _get_evoked_widget(name, layout, style, location, data=None,
                        description='Seed: ',
                        **kwargs)
 
+    synch_inputs = Checkbox(value=False,
+                            description='Synchronous Inputs',
+                            **kwargs)
+
     widgets_list, widgets_dict = _get_cell_specific_widgets(
         layout,
         style,
@@ -926,7 +944,8 @@ def _get_evoked_widget(name, layout, style, location, data=None,
         },
     )
 
-    drive_box = VBox([mu, sigma, numspikes, seedcore] + widgets_list)
+    drive_box = VBox([mu, sigma, numspikes, seedcore, synch_inputs] +
+                     widgets_list)
     drive = dict(type='Evoked',
                  name=name,
                  mu=mu,
@@ -934,7 +953,8 @@ def _get_evoked_widget(name, layout, style, location, data=None,
                  numspikes=numspikes,
                  seedcore=seedcore,
                  location=location,
-                 sync_within_trial=False)
+                 sync_within_trial=False,
+                 is_synch_inputs=synch_inputs)
     drive.update(widgets_dict)
     return drive, drive_box
 
@@ -1227,6 +1247,11 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
         return
     # add drives to network
     for drive in drive_widgets:
+        synch_inputs_kwargs = {}
+        if drive['is_synch_inputs'].value:
+            synch_inputs_kwargs['n_drive_cells'] = 1
+            synch_inputs_kwargs['cell_specific'] = False
+
         weights_ampa = {
             k: v.value
             for k, v in drive['weights_ampa'].items()
@@ -1261,7 +1286,8 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                 weights_nmda=weights_nmda,
                 synaptic_delays=synaptic_delays,
                 space_constant=100.0,
-                event_seed=drive['seedcore'].value)
+                event_seed=drive['seedcore'].value,
+                **synch_inputs_kwargs)
         elif drive['type'] in ('Evoked', 'Gaussian'):
             single_simulation_data['net'].add_evoked_drive(
                 name=drive['name'],
@@ -1273,7 +1299,8 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                 weights_nmda=weights_nmda,
                 synaptic_delays=synaptic_delays,
                 space_constant=3.0,
-                event_seed=drive['seedcore'].value)
+                event_seed=drive['seedcore'].value,
+                **synch_inputs_kwargs)
         elif drive['type'] in ('Rhythmic', 'Bursty'):
             single_simulation_data['net'].add_bursty_drive(
                 name=drive['name'],
@@ -1286,7 +1313,8 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                 weights_ampa=weights_ampa,
                 weights_nmda=weights_nmda,
                 synaptic_delays=synaptic_delays,
-                event_seed=drive['seedcore'].value)
+                event_seed=drive['seedcore'].value,
+                **synch_inputs_kwargs)
 
 
 def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
