@@ -1280,10 +1280,13 @@
             <span class="n">hnn_core</span><span class="o">.</span><span class="n">read_dipole</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">ext_content</span><span class="p">))</span>
         <span class="p">]}</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;External data </span><span class="si">{</span><span class="n">data_fname</span><span class="si">}</span><span class="s1"> loaded.&#39;</span><span class="p">)</span>
-        <span class="n">viz_manager</span><span class="o">.</span><span class="n">reset_fig_config_tabs</span><span class="p">(</span><span class="n">template_name</span><span class="o">=</span><span class="s1">&#39;single figure&#39;</span><span class="p">)</span>
+        <span class="n">_template_name</span> <span class="o">=</span> <span class="s2">&quot;[Blank] single figure&quot;</span>
+        <span class="n">viz_manager</span><span class="o">.</span><span class="n">reset_fig_config_tabs</span><span class="p">(</span><span class="n">template_name</span><span class="o">=</span><span class="n">_template_name</span><span class="p">)</span>
         <span class="n">viz_manager</span><span class="o">.</span><span class="n">add_figure</span><span class="p">()</span>
         <span class="n">fig_name</span> <span class="o">=</span> <span class="n">_idx2figname</span><span class="p">(</span><span class="n">viz_manager</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;fig_idx&#39;</span><span class="p">][</span><span class="s1">&#39;idx&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
         <span class="n">ax_plots</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;ax0&quot;</span><span class="p">,</span> <span class="s2">&quot;current dipole&quot;</span><span class="p">)]</span>
+
+        <span class="c1"># these lines plot the data per axis</span>
         <span class="k">for</span> <span class="n">ax_name</span><span class="p">,</span> <span class="n">plot_type</span> <span class="ow">in</span> <span class="n">ax_plots</span><span class="p">:</span>
             <span class="n">viz_manager</span><span class="o">.</span><span class="n">_simulate_edit_figure</span><span class="p">(</span>
                 <span class="n">fig_name</span><span class="p">,</span> <span class="n">ax_name</span><span class="p">,</span> <span class="n">data_fname</span><span class="p">,</span> <span class="n">plot_type</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;plot&quot;</span><span class="p">)</span>

@@ -48,6 +48,9 @@ Changelog
 
 - Added kwargs options to `plot_spikes_hist` for adjusting the histogram plots 
   of spiking activity, by `Abdul Samad Siddiqui`_ in :gh:`732`.
+  
+- Added pre defined plot sets for simulated data, 
+  by `Camilo Diaz`_ in :gh:`746`
 
 Bug
 ~~~
