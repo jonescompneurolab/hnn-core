@@ -404,6 +404,34 @@ def test_gui_edit_figure():
     plt.close('all')
 
 
+def test_gui_synchronous_inputs():
+    """Test if the GUI creates plot using synchronous_inputs."""
+    gui = HNNGUI()
+    _ = gui.compose()
+    gui.params['N_pyr_x'] = 3
+    gui.params['N_pyr_y'] = 3
+
+    gui.widget_dt.value = 0.85
+    
+    # set synch inputs to first driver in simulation
+    driver_name = gui.drive_widgets[0]['name']
+    gui.drive_widgets[0]['is_synch_inputs'].value = True
+    
+    # Run simulation
+    gui.run_button.click()
+
+    sim = gui.viz_manager.data['simulations']['default']
+    network_connections  = sim['net'].connectivity
+    #Filter connections for specific driver_name first
+    driver_connections = [conn for conn in network_connections if conn['src_type'] == driver_name]
+    
+    # Check src_gids lenght
+    for connectivity  in driver_connections :
+        assert(len(connectivity['src_gids'])) == 1
+    
+    
+
+
 def test_gui_figure_overlay():
     """Test if the GUI adds/deletes figs properly."""
     gui = HNNGUI()
