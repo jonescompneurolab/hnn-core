@@ -245,24 +245,19 @@ def _read_rec_arrays(net, rec_arrays_data, read_output):
             net.rec_arrays[key]._reset()
 
 
-@fill_doc
-def write_network(net, fname, overwrite=True, write_output=True):
-    """Write network to a HDF5 file.
+def network_to_dict(net, write_output=False):
+    """Returns a dict of parameters and outputs from Network.
 
     Parameters
     ----------
-    %(net)s
-    %(fname)s
-    %(overwrite)s
-    %(write_output)s
-
-    Yields
-    ------
-    A hdf5 file containing the Network object.
+    net : Network
+        hnn-core Network object
+    write_output : bool
+        Includes simulation-associated data.
+    Returns
+    -------
+    dict
     """
-    if overwrite is False and os.path.exists(fname):
-        raise FileExistsError('File already exists at path %s. Rename '
-                              'the file or set overwrite=True.' % (fname,))
 
     net_data = {
         'object_type': 'Network',
@@ -290,9 +285,60 @@ def write_network(net, fname, overwrite=True, write_output=True):
         'threshold': net.threshold,
         'delay': net.delay,
     }
+    return net_data
+
+
+@fill_doc
+def write_network(net, fname, overwrite=True, write_output=True):
+    """Write network to a HDF5 file.
+
+    Parameters
+    ----------
+    %(net)s
+    %(fname)s
+    %(overwrite)s
+    %(write_output)s
+
+    Yields
+    ------
+    A hdf5 file containing the Network object.
+    """
+
+    if overwrite is False and os.path.exists(fname):
+        raise FileExistsError('File already exists at path %s. Rename '
+                              'the file or set overwrite=True.' % (fname,))
+    net_data = net.to_dict(write_output=write_output)
 
     # Saving file
     write_hdf5(fname, net_data, overwrite=overwrite)
+
+
+def write_network_json(net, fname, overwrite=True, write_output=True):
+    """Write network to a json file.
+
+    Parameters
+    ----------
+    %(net)s
+    %(fname)s
+    %(overwrite)s
+    %(write_output)s
+
+    Yields
+    ------
+    A hdf5 file containing the Network object.
+    """
+
+    import json
+
+    if overwrite is False and os.path.exists(fname):
+        raise FileExistsError('File already exists at path %s. Rename '
+                              'the file or set overwrite=True.' % (fname,))
+
+    net_data = net.to_dict(write_output=write_output)
+
+    # Saving file
+    with open(fname, 'w', encoding='utf-8') as f:
+        json.dump(net_data, f, ensure_ascii=False, indent=4)
 
 
 def _order_drives(gid_ranges, external_drives):
