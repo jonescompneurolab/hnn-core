@@ -18,7 +18,7 @@ def _cell_response_to_dict(net, write_output):
     """Returns a dict of cell response data."""
     # Write cell_response as dict
     if (not net.cell_response) or (not write_output):
-        return None
+        return dict()
     else:
         return net.cell_response.to_dict()
 
