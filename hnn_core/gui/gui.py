@@ -759,7 +759,8 @@ def _get_cell_specific_widgets(layout, style, location, data=None):
 
 def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
                          data=None, default_weights_ampa=None,
-                         default_weights_nmda=None, default_delays=None):
+                         default_weights_nmda=None, default_delays=None,
+                         sync_evinput=False):
     default_data = {
         'tstart': 0.,
         'tstart_std': 0.,
@@ -796,7 +797,7 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
     seedcore = IntText(value=default_data['seedcore'],
                        description='Seed',
                        **kwargs)
-    synch_inputs = Checkbox(value=False,
+    synch_inputs = Checkbox(value=sync_evinput,
                             description='Synchronous Inputs',
                             **kwargs)
 
@@ -833,7 +834,7 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
 
 def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
                         default_weights_ampa=None, default_weights_nmda=None,
-                        default_delays=None):
+                        default_delays=None, sync_evinput=False):
     default_data = {
         'tstart': 0.0,
         'tstop': 0.0,
@@ -862,7 +863,7 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
                        layout=layout,
                        style=style)
 
-    synch_inputs = Checkbox(value=False,
+    synch_inputs = Checkbox(value=sync_evinput,
                             description='Synch Inputs',
                             layout=layout,
                             style=style)
@@ -906,7 +907,7 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
 
 def _get_evoked_widget(name, layout, style, location, data=None,
                        default_weights_ampa=None, default_weights_nmda=None,
-                       default_delays=None):
+                       default_delays=None, sync_evinput=False):
     default_data = {
         'mu': 0,
         'sigma': 1,
@@ -929,7 +930,7 @@ def _get_evoked_widget(name, layout, style, location, data=None,
                        description='Seed: ',
                        **kwargs)
 
-    synch_inputs = Checkbox(value=False,
+    synch_inputs = Checkbox(value=sync_evinput,
                             description='Synchronous Inputs',
                             **kwargs)
 
@@ -966,7 +967,8 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                      prespecified_weights_ampa=None,
                      prespecified_weights_nmda=None,
                      prespecified_delays=None, render=True,
-                     expand_last_drive=True, event_seed=14):
+                     expand_last_drive=True, event_seed=14,
+                     sync_evinput=False):
     """Add a widget for a new drive."""
 
     style = {'description_width': '150px'}
@@ -991,6 +993,7 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                 default_weights_ampa=prespecified_weights_ampa,
                 default_weights_nmda=prespecified_weights_nmda,
                 default_delays=prespecified_delays,
+                sync_evinput=sync_evinput
             )
         elif drive_type == 'Poisson':
             drive, drive_box = _get_poisson_widget(
@@ -1003,6 +1006,7 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                 default_weights_ampa=prespecified_weights_ampa,
                 default_weights_nmda=prespecified_weights_nmda,
                 default_delays=prespecified_delays,
+                sync_evinput=sync_evinput
             )
         elif drive_type in ('Evoked', 'Gaussian'):
             drive, drive_box = _get_evoked_widget(
@@ -1014,6 +1018,7 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                 default_weights_ampa=prespecified_weights_ampa,
                 default_weights_nmda=prespecified_weights_nmda,
                 default_delays=prespecified_delays,
+                sync_evinput=sync_evinput
             )
 
         if drive_type in [
@@ -1112,6 +1117,9 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
         specs = drive_specs[drive_name]
         should_render = idx == (len(drive_names) - 1)
 
+        is_sync_evinput = (True if not specs['cell_specific'] and
+                           specs['dynamics']['n_drive_cells'] == 1 else False)
+
         add_drive_widget(
             specs['type'].capitalize(),
             drive_boxes,
@@ -1128,6 +1136,7 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
             render=should_render,
             expand_last_drive=False,
             event_seed=specs['event_seed'],
+            sync_evinput=is_sync_evinput
         )
 
 
