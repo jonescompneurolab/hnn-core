@@ -23,7 +23,7 @@ from .viz import plot_cells
 from .externals.mne import _validate_type, _check_option
 from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
-from .hnn_io import write_network
+from .hnn_io import write_network, network_to_dict
 from .externals.mne import copy_doc
 
 
@@ -1418,6 +1418,9 @@ class Network(object):
             The matplotlib figure handle.
         """
         return plot_cells(net=self, ax=ax, show=show)
+
+    def to_dict(self, write_output=False):
+        return network_to_dict(self, write_output=write_output)
 
     @copy_doc(write_network)
     def write(self, fname, overwrite=True, write_output=True):
