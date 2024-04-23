@@ -1,20 +1,19 @@
-
+import json
 # Authors: George Dang <george_dang@brown.edu>
 #          Rajat Partani <rajatpartani@gmail.com>
 
 from pathlib import Path
-from numpy.testing import assert_allclose
-from h5io import write_hdf5, read_hdf5
 import pytest
 import numpy as np
 
-from hnn_core import (read_network, simulate_dipole, read_params,
+from hnn_core import (simulate_dipole, read_params,
                       jones_2009_model, calcium_model,
                       )
 
 from hnn_core.hnn_io import (_cell_response_to_dict, _rec_array_to_dict,
                              _external_drive_to_dict, _str_to_node,
-                             _conn_to_dict, _order_drives
+                             _conn_to_dict, _order_drives,
+                             read_network_configuration
                              )
 
 hnn_core_root = Path(__file__).parents[1]
@@ -92,7 +91,8 @@ def generate_test_files(jones_2009_network):
     net = jones_2009_network
     net.write_configuration(Path('.', 'assets/jones2009_3x3_drives.json'))
     simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
-    net.write_configuration(Path('.', 'assets/jones2009_3x3_drives_simulated.json'))
+    net.write_configuration(Path('.',
+                                 'assets/jones2009_3x3_drives_simulated.json'))
 
 
 def test_eq(jones_2009_network, calcium_network):
@@ -152,11 +152,14 @@ def test_eq_conn(jones_2009_network):
     assert net1_alt_conn1 != net1_alt_conn2
 
 
-def test_write_network(tmp_path, jones_2009_network):
-    """ Tests that a hdf5 file is written """
+def test_write_configuration(tmp_path, jones_2009_network):
+    """ Tests that a json file is written """
+
+    net = jones_2009_network.copy()
+    simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
 
     # Check no file is already written
-    path_out = tmp_path / 'net.hdf5'
+    path_out = tmp_path / 'net.json'
     assert not path_out.is_file()
 
     # Write network check
@@ -174,32 +177,20 @@ def test_write_network(tmp_path, jones_2009_network):
                        match="File already exists at path "):
         jones_2009_network.write_configuration(path_out, overwrite=False)
 
+    # Check no outputs were written
+    with open(path_out) as file:
+        read_in = json.load(file)
 
-def test_write_network_no_output(tmp_path, jones_2009_network):
-    """ Tests that a hdf5 file is written without output """
-    net = jones_2009_network.copy()
-    path_out = tmp_path / 'net.hdf5'
-
-    # Simulate and check for output
-    simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
-    assert np.array_equal(net.rec_arrays['el1'].times,
-                          [0.0, 0.5, 1.0, 1.5, 2.0]
-                          )
-
-    # Write to file
-    net.write_configuration(path_out, write_output=False)
-
-    # Read in file and check no outputs were written
-    hdf5_read = read_hdf5(path_out)
     assert not any([bool(val['times'])
-                    for val in hdf5_read['rec_arrays'].values()]
+                    for val in read_in['rec_arrays'].values()]
                    )
     assert not any([bool(val['voltages'])
-                    for val in hdf5_read['rec_arrays'].values()]
+                    for val in read_in['rec_arrays'].values()]
                    )
     assert not any([bool(val['events'])
-                    for val in hdf5_read['external_drives'].values()]
+                    for val in read_in['external_drives'].values()]
                    )
+    assert read_in['cell_response'] == {}
 
 
 def test_cell_response_to_dict(jones_2009_network):
@@ -317,83 +308,25 @@ def test_order_drives(jones_2009_network):
             ['evdist1', 'evprox1', 'evprox2', 'alpha_prox', 'poisson'])
 
 
-def test_read_hdf5(jones_2009_network):
+def test_read_configuration_json(jones_2009_network):
     """ Read-in of a hdf5 file """
-    net = read_network(Path(assets_path, 'jones2009_3x3_drives.hdf5'))
+    net = read_network_configuration(Path(assets_path,
+                                          'jones2009_3x3_drives.json')
+                                     )
     assert net == jones_2009_network
 
 
-def test_read_hdf5_with_simulation(jones_2009_network):
-    """ Read-in of a hdf5 file with simulation"""
-    # Test reading a network with simulation
-    net_sim = read_network(
-        Path(assets_path, 'jones2009_3x3_drives_simulated.hdf5')
-    )
-    assert net_sim.rec_arrays['el1'].voltages.size != 0
-    assert len(net_sim.external_drives['evdist1']['events']) > 0
-
-    # Test reading file without simulation information
-    net_sim_output_false = read_network(
-        Path(assets_path, 'jones2009_3x3_drives_simulated.hdf5'),
-        read_output=False
-    )
-    assert net_sim_output_false.rec_arrays['el1'].voltages.size == 0
-    assert len(net_sim_output_false.external_drives['evdist1']['events']) == 0
-
-    # Test reading file with simulation and without drive information
-    net_sim_drives_false = read_network(
-        Path(assets_path, 'jones2009_3x3_drives_simulated.hdf5'),
-        read_output=True,
-        read_drives=False
-    )
-    assert net_sim_drives_false.rec_arrays['el1'].voltages.size != 0
-    assert not bool(net_sim_drives_false.external_drives)
-
-    # Test reading file without simulation and drive information
-    net_sim_output_false_drives_false = read_network(
-        Path(assets_path, 'jones2009_3x3_drives_simulated.hdf5'),
-        read_output=False,
-        read_drives=False
-    )
-    assert (net_sim_output_false_drives_false
-            .rec_arrays['el1'].voltages.size == 0)
-    assert not bool(net_sim_output_false_drives_false.external_drives)
-
-
 def test_read_incorrect_format(tmp_path):
+    """Test that error raise when the json do not have a Network label."""
 
     # Checking object type field not exists error
     dummy_data = dict()
-    dummy_data['objective'] = "Check Object type errors"
-    write_hdf5(tmp_path / 'not_net.hdf5', dummy_data, overwrite=True)
-    with pytest.raises(NameError,
-                       match="The given file is not compatible."):
-        read_network(tmp_path / 'not_net.hdf5')
 
-    # Checking wrong object type error
-    dummy_data['object_type'] = "net"
-    write_hdf5(tmp_path / 'not_net.hdf5', dummy_data, overwrite=True)
+    dummy_data['object_type'] = "NotNetwork"
+    file_path = tmp_path / 'not_net.json'
+    with open(file_path, 'w') as file:
+        json.dump(dummy_data, file)
+
     with pytest.raises(ValueError,
-                       match="The object should be of type Network."):
-        read_network(tmp_path / 'not_net.hdf5')
-
-
-def test_simulate_from_read(jones_2009_network):
-    """
-    Tests a simulation from a read-in network creates a similar simulation to
-    the reference network the input file was created from.
-    """
-    net = jones_2009_network
-    dpls1 = simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
-
-    net_read = read_network(Path(assets_path, 'jones2009_3x3_drives.hdf5'))
-    dpls2 = simulate_dipole(net_read, tstop=2, n_trials=1, dt=0.5)
-
-    for dpl1, dpl2 in zip(dpls1, dpls2):
-        assert_allclose(dpl1.times, dpl2.times, rtol=0.00051, atol=0)
-        for dpl_key in dpl1.data.keys():
-            assert_allclose(dpl1.data[dpl_key],
-                            dpl2.data[dpl_key], rtol=0.000051, atol=0)
-
-    # Smoke test
-    net_read.plot_cells(show=False)
+                       match="The json should encode a Network object."):
+        read_network_configuration(file_path)
