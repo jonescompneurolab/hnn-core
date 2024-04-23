@@ -6,7 +6,6 @@
 
 import os
 import json
-from h5io import read_hdf5
 import numpy as np
 
 from h5io import read_hdf5
@@ -94,7 +93,7 @@ def _str_to_node(node_string):
 
 
 def _read_cell_types(cell_types_data):
-    """Returns a dict of Cell objects from hdf5 encoded data"""
+    """Returns a dict of Cell objects from json encoded data"""
     cell_types = dict()
     for cell_name in cell_types_data:
         cell_data = cell_types_data[cell_name]
@@ -122,7 +121,7 @@ def _read_cell_types(cell_types_data):
                 cell_tree[key] = value
 
         cell_types[cell_name] = Cell(name=cell_data['name'],
-                                     pos=cell_data['pos'],
+                                     pos=tuple(cell_data['pos']),
                                      sections=sections,
                                      synapses=cell_data['synapses'],
                                      cell_tree=cell_tree,
@@ -138,7 +137,7 @@ def _read_cell_types(cell_types_data):
 
 
 def _read_cell_response(cell_response_data, read_output):
-    """Returns CellResponse from hdf5 encoded data"""
+    """Returns CellResponse from json encoded data"""
     if (not cell_response_data) or (not read_output):
         return None
     cell_response = CellResponse(spike_times=cell_response_data['spike_times'],
@@ -169,8 +168,8 @@ def _set_from_cell_specific(drive_data):
     return drive_data['n_drive_cells']
 
 
-def _read_external_drive(net, drive_data, read_output, read_drives):
-    """Adds drives encoded in hdf5 data to a Network"""
+def _read_external_drive(net, drive_data, read_drives, read_output):
+    """Adds drives encoded in json data to a Network"""
     if not read_drives:
         return None
 
@@ -229,7 +228,7 @@ def _read_external_drive(net, drive_data, read_output, read_drives):
 
 
 def _read_connectivity(net, conns_data):
-    """Adds connections to a Network from hdf5 encoded connectivity"""
+    """Adds connections to a Network from json encoded connectivity"""
     # Overwrite drive connections
     net.connectivity = list()
 
@@ -250,11 +249,14 @@ def _read_connectivity(net, conns_data):
 
 
 def _read_rec_arrays(net, rec_arrays_data, read_output):
-    """Adds rec arrays to Network from hdf5 data."""
+    """Adds rec arrays to Network from json data."""
     for key in rec_arrays_data:
         rec_array = rec_arrays_data[key]
         net.add_electrode_array(name=key,
-                                electrode_pos=rec_array['positions'],
+                                electrode_pos=[
+                                    tuple(pos) for
+                                    pos in rec_array['positions']
+                                ],
                                 conductivity=rec_array['conductivity'],
                                 method=rec_array['method'],
                                 min_distance=rec_array['min_distance'])
@@ -262,6 +264,17 @@ def _read_rec_arrays(net, rec_arrays_data, read_output):
         net.rec_arrays[key]._data = rec_array['voltages']
         if not read_output:
             net.rec_arrays[key]._reset()
+
+
+def _read_pos_dict(pos_dict):
+    """Returns position dictionary with nested positions converted to tuple."""
+    pos_dict_converted = dict()
+    for key, value in pos_dict.items():
+        if key == 'origin':
+            pos_dict_converted[key] = tuple(value)
+        else:
+            pos_dict_converted[key] = [tuple(position) for position in value]
+    return pos_dict_converted
 
 
 def network_to_dict(net, write_output=False):
@@ -441,3 +454,76 @@ def read_network(fname, read_output=True, read_drives=True):
     net.delay = net_data['delay']
 
     return net
+
+
+@fill_doc
+def read_network_configuration(fname, read_drives=True):
+    """Read network from a json configuration file.
+
+    Parameters
+    ----------
+    %(fname)s
+    %(read_drives)s
+
+    Yields
+    ------
+    %(net)s
+    """
+    # Importing Network.
+    # Cannot do this globally due to circular import.
+    from .network import Network
+
+    with open(fname, 'r') as file:
+        net_data = json.load(file)
+
+    if net_data.get('object_type') != 'Network':
+        raise ValueError('The json should encode a Network object. '
+                         'The file contains object of '
+                         'type %s' % (net_data.get('object_type')))
+
+    params = dict()
+    params['celsius'] = net_data['celsius']
+    params['threshold'] = net_data['threshold']
+
+    mesh_shape = (net_data['N_pyr_x'], net_data['N_pyr_y'])
+
+    # Instantiating network
+    net = Network(params,
+                  mesh_shape=mesh_shape,
+                  legacy_mode=net_data['legacy_mode']
+                  )
+
+    # Setting attributes
+    # Set cell types
+    net.cell_types = _read_cell_types(net_data['cell_types'])
+    # Set gid ranges
+    gid_ranges_data = dict()
+    for key in net_data['gid_ranges']:
+        start = net_data['gid_ranges'][key]['start']
+        stop = net_data['gid_ranges'][key]['stop']
+        gid_ranges_data[key] = range(start, stop)
+    net.gid_ranges = gid_ranges_data
+    # Set pos_dict
+    net.pos_dict = _read_pos_dict(net_data['pos_dict'])
+    # Set cell_response
+    net.cell_response = _read_cell_response(net_data['cell_response'],
+                                            read_output=False)
+    # Set external drives
+    external_drive_data = _order_drives(net.gid_ranges,
+                                        net_data['external_drives'])
+    for key in external_drive_data.keys():
+        _read_external_drive(net, external_drive_data[key],
+                             read_output=False, read_drives=read_drives)
+    # Set external biases
+    net.external_biases = net_data['external_biases']
+    # Set connectivity
+    _read_connectivity(net, net_data['connectivity'])
+    # Set rec_arrays
+    _read_rec_arrays(net, net_data['rec_arrays'], read_output=False)
+    # Set threshold
+    net.threshold = net_data['threshold']
+    # Set delay
+    net.delay = net_data['delay']
+
+    return net
+

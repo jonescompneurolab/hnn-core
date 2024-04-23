@@ -40,3 +40,11 @@ read_output : Boolean
     True : Read network with simulation results.
     False : Read network without simulation results.
 """
+
+docdict[
+    "read_drives"
+] = """
+read_output : Boolean
+    True : Read drives from configuration file.
+    False : Do not read drives from the configuration file.
+"""
