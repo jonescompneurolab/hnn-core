@@ -90,9 +90,9 @@ def calcium_network(params):
 def generate_test_files(jones_2009_network):
     """ Generates files used in read-in tests """
     net = jones_2009_network
-    net.write(Path('.', 'assets/jones2009_3x3_drives.hdf5'))
+    net.write_configuration(Path('.', 'assets/jones2009_3x3_drives.json'))
     simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
-    net.write(Path('.', 'assets/jones2009_3x3_drives_simulated.hdf5'))
+    net.write_configuration(Path('.', 'assets/jones2009_3x3_drives_simulated.json'))
 
 
 def test_eq(jones_2009_network, calcium_network):
@@ -160,19 +160,19 @@ def test_write_network(tmp_path, jones_2009_network):
     assert not path_out.is_file()
 
     # Write network check
-    jones_2009_network.write(path_out)
+    jones_2009_network.write_configuration(path_out)
     assert path_out.is_file()
 
     # Overwrite network check
     last_mod_time1 = path_out.stat().st_mtime
-    jones_2009_network.write(path_out)
+    jones_2009_network.write_configuration(path_out)
     last_mod_time2 = path_out.stat().st_mtime
     assert last_mod_time1 < last_mod_time2
 
     # No overwrite check
     with pytest.raises(FileExistsError,
                        match="File already exists at path "):
-        jones_2009_network.write(path_out, overwrite=False)
+        jones_2009_network.write_configuration(path_out, overwrite=False)
 
 
 def test_write_network_no_output(tmp_path, jones_2009_network):
@@ -187,7 +187,7 @@ def test_write_network_no_output(tmp_path, jones_2009_network):
                           )
 
     # Write to file
-    net.write(path_out, write_output=False)
+    net.write_configuration(path_out, write_output=False)
 
     # Read in file and check no outputs were written
     hdf5_read = read_hdf5(path_out)
