@@ -797,7 +797,7 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
     seedcore = IntText(value=default_data['seedcore'],
                        description='Seed',
                        **kwargs)
-    synch_inputs = Checkbox(value=sync_evinput,
+    sync_inputs = Checkbox(value=sync_evinput,
                             description='Synchronous Inputs',
                             **kwargs)
 
@@ -814,7 +814,7 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
 
     drive_box = VBox([tstart, tstart_std, tstop,
                       burst_rate, burst_std, repeats,
-                      seedcore, synch_inputs] +
+                      seedcore, sync_inputs] +
                      widgets_list)
 
     drive = dict(type='Rhythmic',
@@ -827,7 +827,7 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
                  seedcore=seedcore,
                  location=location,
                  tstop=tstop,
-                 is_synch_inputs=synch_inputs)
+                 is_synch_inputs=sync_inputs)
     drive.update(widgets_dict)
     return drive, drive_box
 
@@ -863,7 +863,7 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
                        layout=layout,
                        style=style)
 
-    synch_inputs = Checkbox(value=sync_evinput,
+    sync_inputs = Checkbox(value=sync_evinput,
                             description='Synchronous Inputs',
                             layout=layout,
                             style=style)
@@ -890,7 +890,7 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
     widgets_list.extend([HTML(value="<b>Rate constants</b>")] +
                         list(widgets_dict['rate_constant'].values()))
 
-    drive_box = VBox([tstart, tstop, seedcore, synch_inputs] + widgets_list)
+    drive_box = VBox([tstart, tstop, seedcore, sync_inputs] + widgets_list)
     drive = dict(
         type='Poisson',
         name=name,
@@ -899,7 +899,7 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
         rate_constant=rate_constant,
         seedcore=seedcore,
         location=location,  # notice this is a widget but a str!
-        is_synch_inputs=synch_inputs,
+        is_synch_inputs=sync_inputs,
     )
     drive.update(widgets_dict)
     return drive, drive_box
@@ -930,7 +930,7 @@ def _get_evoked_widget(name, layout, style, location, data=None,
                        description='Seed: ',
                        **kwargs)
 
-    synch_inputs = Checkbox(value=sync_evinput,
+    sync_inputs = Checkbox(value=sync_evinput,
                             description='Synchronous Inputs',
                             **kwargs)
 
@@ -945,7 +945,7 @@ def _get_evoked_widget(name, layout, style, location, data=None,
         },
     )
 
-    drive_box = VBox([mu, sigma, numspikes, seedcore, synch_inputs] +
+    drive_box = VBox([mu, sigma, numspikes, seedcore, sync_inputs] +
                      widgets_list)
     drive = dict(type='Evoked',
                  name=name,
@@ -955,7 +955,7 @@ def _get_evoked_widget(name, layout, style, location, data=None,
                  seedcore=seedcore,
                  location=location,
                  sync_within_trial=False,
-                 is_synch_inputs=synch_inputs)
+                 is_synch_inputs=sync_inputs)
     drive.update(widgets_dict)
     return drive, drive_box
 
