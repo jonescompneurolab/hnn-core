@@ -1,17 +1,35 @@
 """Network io"""
-
 # Authors: Rajat Partani <rajatpartani@gmail.com>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 #          Nick Tolley <nicholas_tolley@brown.edu>
 #          George Dang <george_dang@brown.edu>
 
 import os
-from h5io import write_hdf5, read_hdf5
+import json
+import numpy as np
+
+from h5io import read_hdf5
 from collections import OrderedDict
 
 from .cell import Cell, Section
 from .cell_response import CellResponse
 from .externals.mne import fill_doc
+
+
+def _convert_np_array_to_list(obj):
+    """Returns object with np.arrays converted to lists
+
+    Converts np.arrays to lists. Dicts or lists with nested np.arrays will
+    have nested arrays converted to lists.
+    """
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, dict):
+        return {k: _convert_np_array_to_list(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [_convert_np_array_to_list(item) for item in obj]
+    else:
+        return obj
 
 
 def _cell_response_to_dict(net, write_output):
@@ -289,56 +307,34 @@ def network_to_dict(net, write_output=False):
 
 
 @fill_doc
-def write_network(net, fname, overwrite=True, write_output=True):
-    """Write network to a HDF5 file.
+def write_network_configuration(net, fname, overwrite=True):
+    """Writes network configuration to a json file.
+
+    Writes network configurations as a hierarchical json similar to the Network
+    object's structure. Outputs recorded during simulation such as currents and
+    voltages are not saved due to size.
 
     Parameters
     ----------
     %(net)s
     %(fname)s
     %(overwrite)s
-    %(write_output)s
 
     Yields
     ------
-    A hdf5 file containing the Network object.
+    A json file containing the Network configurations.
     """
 
     if overwrite is False and os.path.exists(fname):
         raise FileExistsError('File already exists at path %s. Rename '
                               'the file or set overwrite=True.' % (fname,))
-    net_data = net.to_dict(write_output=write_output)
 
-    # Saving file
-    write_hdf5(fname, net_data, overwrite=overwrite)
-
-
-def write_network_json(net, fname, overwrite=True, write_output=True):
-    """Write network to a json file.
-
-    Parameters
-    ----------
-    %(net)s
-    %(fname)s
-    %(overwrite)s
-    %(write_output)s
-
-    Yields
-    ------
-    A hdf5 file containing the Network object.
-    """
-
-    import json
-
-    if overwrite is False and os.path.exists(fname):
-        raise FileExistsError('File already exists at path %s. Rename '
-                              'the file or set overwrite=True.' % (fname,))
-
-    net_data = net.to_dict(write_output=write_output)
+    net_data = net.to_dict(write_output=False)
+    net_data_converted = _convert_np_array_to_list(net_data)
 
     # Saving file
     with open(fname, 'w', encoding='utf-8') as f:
-        json.dump(net_data, f, ensure_ascii=False, indent=4)
+        json.dump(net_data_converted, f, ensure_ascii=False, indent=4)
 
 
 def _order_drives(gid_ranges, external_drives):
