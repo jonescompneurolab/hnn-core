@@ -864,7 +864,7 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
                        style=style)
 
     synch_inputs = Checkbox(value=sync_evinput,
-                            description='Synch Inputs',
+                            description='Synchronous Inputs',
                             layout=layout,
                             style=style)
 
@@ -971,7 +971,7 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                      sync_evinput=False):
     """Add a widget for a new drive."""
 
-    style = {'description_width': '150px'}
+    style = {'description_width': '125px'}
     drives_out.clear_output()
     if not prespecified_drive_data:
         prespecified_drive_data = {}
