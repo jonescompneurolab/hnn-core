@@ -52,6 +52,9 @@ Changelog
 - Added pre defined plot sets for simulated data, 
   by `Camilo Diaz`_ in :gh:`746`
 
+- Added gui widget to enable/disable synchronous input in simulations, 
+  by `Camilo Diaz`_ in :gh:`750`
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
