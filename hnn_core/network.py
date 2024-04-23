@@ -468,7 +468,8 @@ class Network(object):
                                 'add_poisson_drive', 'add_tonic_bias',
                                 'clear_connectivity', 'clear_drives',
                                 'connectivity', 'copy', 'gid_to_type',
-                                'plot_cells', 'set_cell_positions', 'write'])
+                                'plot_cells', 'set_cell_positions',
+                                'to_dict', 'write_configuration'])
         attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
 
         for attr in attrs_to_check:
