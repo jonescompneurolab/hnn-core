@@ -798,8 +798,8 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
                        description='Seed',
                        **kwargs)
     sync_inputs = Checkbox(value=sync_evinput,
-                            description='Synchronous Inputs',
-                            **kwargs)
+                           description='Synchronous Inputs',
+                           **kwargs)
 
     widgets_list, widgets_dict = _get_cell_specific_widgets(
         layout,
@@ -864,9 +864,9 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
                        style=style)
 
     sync_inputs = Checkbox(value=sync_evinput,
-                            description='Synchronous Inputs',
-                            layout=layout,
-                            style=style)
+                           description='Synchronous Inputs',
+                           layout=layout,
+                           style=style)
 
     cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket', 'L2_basket']
     rate_constant = dict()
@@ -931,8 +931,8 @@ def _get_evoked_widget(name, layout, style, location, data=None,
                        **kwargs)
 
     sync_inputs = Checkbox(value=sync_evinput,
-                            description='Synchronous Inputs',
-                            **kwargs)
+                           description='Synchronous Inputs',
+                           **kwargs)
 
     widgets_list, widgets_dict = _get_cell_specific_widgets(
         layout,
