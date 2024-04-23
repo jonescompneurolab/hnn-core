@@ -6,6 +6,7 @@
 
 import os
 import json
+from h5io import read_hdf5
 import numpy as np
 
 from h5io import read_hdf5
