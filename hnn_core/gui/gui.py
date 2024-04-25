@@ -26,6 +26,7 @@ from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
 from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
                              _read_legacy_params)
+import base64
 
 
 class _OutputWidgetHandler(logging.Handler):
@@ -147,12 +148,14 @@ class HNNGUI:
             "header_height": f"{header_height}px",
             "theme_color": theme_color,
             "btn": Layout(height=f"{button_height}px", width='auto'),
+            "run_btn": Layout(height=f"{button_height}px", width='10%'),
             "btn_full_w": Layout(height=f"{button_height}px", width='100%'),
             "del_fig_btn": Layout(height=f"{button_height}px", width='auto'),
             "log_out": Layout(border='1px solid gray',
                               height=f"{log_window_height-10}px",
                               overflow='auto'),
             "viz_config": Layout(width='99%'),
+            "simulations_list": Layout(width=f'{left_sidebar_width-50}px'),
             "visualization_window": Layout(
                 width=f"{viz_win_width-10}px",
                 height=f"{main_content_height-10}px",
@@ -234,6 +237,35 @@ class HNNGUI:
             description='Load data',
             button_style='success')
 
+        b64 = base64.b64encode("".encode())
+        payload = b64.decode()
+        # Initialliting HTML code for download button
+        self.html_download_button = '''<html>
+        <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        </head>
+        <body>
+        <a download="{filename}" href="data:text/csv;base64,{payload}"
+          download>
+        <button style="background:{color_theme}"
+        class="p-Widget jupyter-widgets jupyter-button
+          widget-button mod-warning" {is_disabled} >Save Simulation</button>
+        </a>
+        </body>
+        </html>
+        '''
+        # Create widget wrapper
+        self.save_simuation_button = (
+            HTML(self.html_download_button.
+                 format(payload=payload,
+                        filename={""},
+                        is_disabled="disabled",
+                        color_theme=self.layout['theme_color'])))
+
+        self.simulation_list_widget = Dropdown(options=[],
+                                               value=None,
+                                               description='',
+                                               layout={'width': 'max-content'})
         # Drive selection
         self.widget_drive_type_selection = RadioButtons(
             options=['Evoked', 'Poisson', 'Rhythmic'],
@@ -251,7 +283,7 @@ class HNNGUI:
 
         # Dashboard level buttons
         self.run_button = create_expanded_button(
-            'Run', 'success', layout=self.layout['btn'],
+            'Run', 'success', layout=self.layout['run_btn'],
             button_color=self.layout['theme_color'])
 
         self.load_connectivity_button = FileUpload(
@@ -316,7 +348,9 @@ class HNNGUI:
 
         self._log_window = HBox([self._log_out], layout=self.layout['log_out'])
         self._operation_buttons = HBox(
-            [self.run_button, self.load_data_button],
+            [self.run_button, self.load_data_button,
+             self.save_simuation_button,
+             self.simulation_list_widget],
             layout=self.layout['operation_box'])
         # title
         self._header = HTML(value=f"""<div
@@ -400,7 +434,20 @@ class HNNGUI:
                 self.widget_ntrials, self.widget_backend_selection,
                 self.widget_mpi_cmd, self.widget_n_jobs, self.params,
                 self._simulation_status_bar, self._simulation_status_contents,
-                self.connectivity_widgets, self.viz_manager)
+                self.connectivity_widgets, self.viz_manager,
+                self.simulation_list_widget)
+
+        def _simulation_list_change(value):
+            csv_string = _simulation_in_csv_format(self._log_out,
+                                                   self.viz_manager,
+                                                   self.simulation_list_widget)
+            result_file = f"{value.new}.csv"
+            b64 = base64.b64encode(csv_string.encode())
+            payload = b64.decode()
+            self.save_simuation_button.value = (
+                self.html_download_button.format(
+                    payload=payload, filename=result_file,
+                    is_disabled="", color_theme=self.layout['theme_color']))
 
         self.widget_backend_selection.observe(_handle_backend_change, 'value')
         self.add_drive_button.on_click(_add_drive_button_clicked)
@@ -409,8 +456,8 @@ class HNNGUI:
                                               names='value')
         self.load_drives_button.observe(_on_upload_drives, names='value')
         self.run_button.on_click(_run_button_clicked)
-
         self.load_data_button.observe(_on_upload_data, names='value')
+        self.simulation_list_widget.observe(_simulation_list_change, 'value')
 
     def compose(self, return_layout=True):
         """Compose widgets.
@@ -1330,7 +1377,7 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
                        all_data, dt, tstop, ntrials, backend_selection,
                        mpi_cmd, n_jobs, params, simulation_status_bar,
                        simulation_status_contents, connectivity_textfields,
-                       viz_manager):
+                       viz_manager, simulations_list_widget):
     """Run the simulation and plot outputs."""
     log_out.clear_output()
     simulation_data = all_data["simulation_data"]
@@ -1369,6 +1416,11 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
             simulation_status_bar.value = simulation_status_contents[
                 'finished']
 
+            sim_names = [sim_name for sim_name
+                         in simulation_data]
+            simulations_list_widget.options = sim_names
+            simulations_list_widget.value = sim_names[0]
+
     viz_manager.reset_fig_config_tabs()
     viz_manager.add_figure()
     fig_name = _idx2figname(viz_manager.data['fig_idx']['idx'] - 1)
@@ -1376,6 +1428,14 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
     for ax_name, plot_type in ax_plots:
         viz_manager._simulate_edit_figure(fig_name, ax_name, _sim_name,
                                           plot_type, {}, "plot")
+
+
+def _simulation_in_csv_format(log_out, viz_manager, simulation_list_widget):
+    # Only download if there is there is at least one simulation
+    sin_name = simulation_list_widget.value
+    with log_out:
+        logger.info(f"Saving {sin_name}.txt")
+        return viz_manager.save_simulation_csv(sin_name)
 
 
 def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
