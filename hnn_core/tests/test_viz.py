@@ -202,7 +202,8 @@ def test_dipole_visualization(setup_net):
     with pytest.raises(TypeError, match="trial_idx must be an instance of"):
         net.cell_response.plot_spikes_raster(trial_idx='blah', show=False)
     net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
-    net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
+    fig = net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
+    assert len(fig.axes[0].collections) > 0, "No data plotted in raster plot"
 
     with pytest.raises(TypeError, match="trial_idx must be an instance of"):
         net.cell_response.plot_spikes_hist(trial_idx='blah')
