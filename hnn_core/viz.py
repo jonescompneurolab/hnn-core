@@ -552,6 +552,13 @@ def plot_spikes_raster(cell_response, trial_idx=None, color=None,
         spike_gids = np.array([])
     cell_types = cell_response._cell_type_names
 
+    spike_times = np.concatenate(
+        np.array(cell_response._spike_times, dtype=object)[trial_idx])
+    spike_types = np.concatenate(
+        np.array(cell_response._spike_types, dtype=object)[trial_idx])
+    spike_gids = np.concatenate(
+        np.array(cell_response._spike_gids, dtype=object)[trial_idx])
+
     _validate_type(color, (list, dict, None),
                    'color', 'list of str or dict')
     color_map = ['r', 'g', 'b', 'y', 'm', 'c']
@@ -574,7 +581,6 @@ def plot_spikes_raster(cell_response, trial_idx=None, color=None,
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
-    ypos = 0
     events = []
     for cell_type in cell_types:
         cell_type_gids = np.unique(spike_gids[spike_types == cell_type])
@@ -582,13 +588,17 @@ def plot_spikes_raster(cell_response, trial_idx=None, color=None,
         for gid in cell_type_gids:
             gid_time = spike_times[spike_gids == gid]
             cell_type_times.append(gid_time)
-            cell_type_ypos.append(ypos)
-            ypos = ypos - 1
+            cell_type_ypos.append(-gid)
 
         if cell_type_times:
             events.append(
                 ax.eventplot(cell_type_times, lineoffsets=cell_type_ypos,
                              color=new_cell_type_colors[cell_type],
+                             label=cell_type, linelengths=5))
+        else:
+            events.append(
+                ax.eventplot([-1], lineoffsets=[-1],
+                             color=cell_type_colors[cell_type],
                              label=cell_type, linelengths=5))
 
     ax.legend(handles=[e[0] for e in events], loc=1)
