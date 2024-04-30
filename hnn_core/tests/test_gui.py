@@ -10,6 +10,7 @@ from hnn_core.gui import HNNGUI
 from hnn_core.gui._viz_manager import (_idx2figname, _no_overlay_plot_types,
                                        unlink_relink)
 from hnn_core.gui.gui import _init_network_from_widgets
+from hnn_core.gui.gui import serialize_simulation
 from hnn_core.network import pick_connection
 from hnn_core.network_models import jones_2009_model
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
@@ -563,3 +564,42 @@ def test_unlink_relink_widget():
     # Check if the widgets are relinked, the selected index should be synced
     gui.tab_group_1.selected_index = 0
     assert gui.tab_group_2.selected_index == 0
+
+
+def test_gui_download_simulation():
+    """Test the GUI download simulation pipeline."""
+    gui = HNNGUI()
+    _ = gui.compose()
+    gui.params['N_pyr_x'] = 3
+    gui.params['N_pyr_y'] = 3
+
+    # Run a simulation with 3 trials
+    gui.widget_dt.value = 0.85
+    gui.widget_ntrials.value = 2
+
+    # Initiate 1rs simulation
+    sim_name = "sim1"
+    gui.widget_simulation_name.value = sim_name
+
+    # Run simulation
+    gui.run_button.click()
+
+    _, file_extension = (
+        serialize_simulation(gui.data, sim_name))
+    # result is a zip file
+    assert file_extension == ".zip"
+
+    # Run a simulation with 1 trials
+    gui.widget_dt.value = 0.85
+    gui.widget_ntrials.value = 1
+
+    # Initiate 2nd simulation
+    sim_name2 = "sim2"
+    gui.widget_simulation_name.value = sim_name2
+
+    # Run simulation
+    gui.run_button.click()
+    _, file_extension = (
+        serialize_simulation(gui.data, sim_name2))
+    # result is a single csv file
+    assert file_extension == ".csv"
