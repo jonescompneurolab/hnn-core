@@ -21,6 +21,7 @@ jobs:
         with:
           activate-environment: test
           python-version: ${{ matrix.python-version }}
+          fetch-depth: 2
       - name: Install ubuntu dependencies
         shell: bash -el {0}
         run: |
