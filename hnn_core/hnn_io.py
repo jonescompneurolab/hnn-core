@@ -8,7 +8,6 @@ import os
 import json
 import numpy as np
 
-from h5io import read_hdf5
 from collections import OrderedDict
 
 from .cell import Cell, Section
@@ -453,4 +452,3 @@ def read_network_configuration(fname, read_drives=True):
     net.delay = net_data['delay']
 
     return net
-
