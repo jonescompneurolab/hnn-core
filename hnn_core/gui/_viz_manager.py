@@ -17,7 +17,6 @@ from hnn_core.dipole import average_dipoles, _rmse
 from hnn_core.gui._logging import logger
 from hnn_core.viz import plot_dipole
 
-
 _fig_placeholder = 'Run simulation to add figures here.'
 
 _plot_types = [
@@ -894,26 +893,6 @@ class _VizManager:
         else:
             # hide sim-data dropdown
             self.datasets_dropdown.layout.visibility = "hidden"
-
-    def save_simulation_csv(self, simulation_name):
-        # pre-allocate np.matrix to save
-        signals_matrix = (np.zeros((self.data["simulations"][simulation_name]
-                                    ['dpls'][0].data['agg'].size, 4)))
-        signals_matrix[:, 0] = (self.data["simulations"][simulation_name]
-                                ['dpls'][0].times)
-        signals_matrix[:, 1] = (self.data["simulations"][simulation_name]
-                                ['dpls'][0].data['agg'])
-        signals_matrix[:, 2] = (self.data["simulations"][simulation_name]
-                                ['dpls'][0].data['L2'])
-        signals_matrix[:, 3] = (self.data["simulations"][simulation_name]
-                                ['dpls'][0].data['L5'])
-        output = io.StringIO()
-        np.savetxt(output, signals_matrix, delimiter=',',
-                   header='times,agg,L2,L5', fmt='%f, %f, %f, %f')
-
-        # Get the string from StringIO
-        csv_string = output.getvalue()
-        return csv_string
 
     @unlink_relink(attribute='figs_config_tab_link')
     def add_figure(self, b=None):
