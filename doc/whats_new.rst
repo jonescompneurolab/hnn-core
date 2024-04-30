@@ -30,9 +30,6 @@ Changelog
 - Add ability to specify number of cells in :class:`~hnn_core.Network`,
   by `Nick Tolley`_ in :gh:`705`
 
-- Add feature to read/write :class:`~hnn_core.Network` from/to HDF5 format,
-  by `Rajat Partani`_ and `George Dang`_ in :gh:`704`
-
 - Add feature to convert param and json files to HDF5 format, by `George Dang`_
   in :gh:`723`
   
@@ -54,6 +51,9 @@ Changelog
 
 - Added gui widget to enable/disable synchronous input in simulations, 
   by `Camilo Diaz`_ in :gh:`750`
+
+- Added feature to read/write :class:`~hnn_core.Network` configurations to
+  json, by `George Dang`_ and `Rajat Partani`_ in :gh:`757`
 
 Bug
 ~~~
