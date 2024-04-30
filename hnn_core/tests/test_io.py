@@ -215,7 +215,7 @@ def test_cell_response_to_dict(jones_2009_network):
     result2 = _cell_response_to_dict(net, write_output=True)
     assert bool(result2) and isinstance(result2, dict)
 
-    # Check for None if kw supplied
+    # Check for empty dict if kw supplied
     result3 = _cell_response_to_dict(net, write_output=False)
     assert result3 == dict()
 
