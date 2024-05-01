@@ -8,7 +8,10 @@ from urllib.request import urlretrieve
 
 import pytest
 
-from hnn_core import read_params, Params, jones_2009_model, convert_to_hdf5
+from hnn_core import (read_params, Params, jones_2009_model, convert_to_json,
+                      Network)
+from hnn_core.hnn_io import read_network_configuration
+
 
 hnn_core_root = Path(__file__).parents[1]
 
@@ -74,8 +77,59 @@ def test_base_params():
     assert params == params_base
 
 
-def test_convert_to_hdf5_bad_type():
-    """Tests type validation in convert_to_hdf5 function"""
+def test_convert_to_json(tmp_path):
+    """Tests conversion of a flat json file to hierarchical json"""
+    # Download params
+    param_url = ('https://raw.githubusercontent.com/hnn-core/'
+                 'hnn_core/param/default.json')
+    params_base_fname = Path(hnn_core_root, 'param', 'default.json')
+    if not op.exists(params_base_fname):
+        urlretrieve(param_url, params_base_fname)
+    net_params = Network(read_params(params_base_fname),
+                         add_drives_from_params=True,
+                         )
+
+    # Write hdf5 and check if constructed network is equal
+    outpath = Path(tmp_path, 'default.json')
+    convert_to_json(params_base_fname, outpath)
+    net_hjson = read_network_configuration(outpath)
+    assert net_hjson == net_params
+
+    # Write hdf5 without drives
+    outpath_no_drives = Path(tmp_path, 'default_no_drives.json')
+    convert_to_json(params_base_fname, outpath_no_drives, include_drives=False)
+    net_hjson_no_drives = read_network_configuration(outpath_no_drives)
+    assert net_hjson_no_drives != net_hjson
+    assert bool(net_hjson_no_drives.external_drives) is False
+
+    # Check that writing with no extension will add one
+    outpath_no_ext = Path(tmp_path, 'default_no_ext')
+    convert_to_json(params_base_fname, outpath_no_ext)
+    assert outpath_no_ext.with_suffix('.json').exists()
+
+
+def test_convert_to_hdf5_legacy(tmp_path):
+    """Tests conversion of a param legacy file to hdf5"""
+    # Download params
+    param_url = ('https://raw.githubusercontent.com/hnnsolver/'
+                 'hnn-core/test_data/default.param')
+    params_base_fname = Path(hnn_core_root, 'param', 'default.param')
+    if not op.exists(params_base_fname):
+        urlretrieve(param_url, params_base_fname)
+    net_params = Network(read_params(params_base_fname),
+                         add_drives_from_params=True,
+                         legacy_mode=True
+                         )
+
+    # Write hdf5 and check if constructed network is equal
+    outpath = Path(tmp_path, 'default.json')
+    convert_to_json(params_base_fname, outpath)
+    net_hdf5 = read_network_configuration(outpath)
+    assert net_hdf5 == net_params
+
+
+def test_convert_to_json_bad_type():
+    """Tests type validation in convert_to_json function"""
     good_path = hnn_core_root
     path_str = str(good_path)
     bad_path = 5
@@ -85,18 +139,18 @@ def test_convert_to_hdf5_bad_type():
             ValueError,
             match="Unrecognized extension, expected one of"
     ):
-        convert_to_hdf5(good_path, path_str)
+        convert_to_json(good_path, path_str)
 
     # Bad params_fname
     with pytest.raises(
             TypeError,
             match="params_fname must be an instance of str or Path"
     ):
-        convert_to_hdf5(bad_path, good_path)
+        convert_to_json(bad_path, good_path)
 
     # Bad out_fname
     with pytest.raises(
             TypeError,
             match="out_fname must be an instance of str or Path"
     ):
-        convert_to_hdf5(good_path, bad_path)
+        convert_to_json(good_path, bad_path)
