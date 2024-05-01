@@ -10,7 +10,9 @@ import tempfile
 from pathlib import Path
 from requests.exceptions import HTTPError
 
-from hnn_core import convert_to_hdf5
+from hnn_core import convert_to_json
+
+root_path = Path(__file__).parents[1]
 
 
 def download_folder_contents(owner, repo, path):
@@ -49,7 +51,7 @@ def download_folder_contents(owner, repo, path):
     return temp_dir
 
 
-def convert_param_files_from_repo(owner, repo, path):
+def convert_param_files_from_repo(owner, repo, repo_path, local_path):
     """Converts param and json parameter files to a hdf5 file.
 
     Parameters
@@ -66,17 +68,19 @@ def convert_param_files_from_repo(owner, repo, path):
     None
     """
     # Download param files
-    temp_dir = download_folder_contents(owner, repo, path)
+    temp_dir = download_folder_contents(owner, repo, repo_path)
     # Get list of json and param files
     file_list = [Path(temp_dir, f)
                  for f in os.listdir(temp_dir)
                  if f.endswith('.param') or f.endswith('.json')]
     # Assign output location and names
-    output_dir = Path(__file__).parents[1] / 'hnn_core' / 'param'
+    output_dir = Path(local_path)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
     output_filenames = [Path(output_dir, f.name.split('.')[0])
                         for f in file_list]
 
-    [convert_to_hdf5(file, outfile)
+    [convert_to_json(file, outfile)
      for (file, outfile) in zip(file_list, output_filenames)]
 
     # Delete downloads
@@ -88,8 +92,14 @@ if __name__ == '__main__':
     # hnn param files
     convert_param_files_from_repo(owner='jonescompneurolab',
                                   repo='hnn',
-                                  path='param')
+                                  repo_path='param',
+                                  local_path=(root_path /
+                                              'network_configuration'),
+                                  )
     # hnn-core json files
     convert_param_files_from_repo(owner='jonescompneurolab',
                                   repo='hnn-core',
-                                  path='hnn_core/param')
+                                  repo_path='hnn_core/param',
+                                  local_path=(root_path /
+                                              'network_configuration'),
+                                  )
