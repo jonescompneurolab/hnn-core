@@ -662,9 +662,9 @@ def compare_dictionaries(d1, d2):
     return d1
 
 
-def convert_to_hdf5(params_fname, out_fname, include_drives=True,
-                    overwrite=True, write_output=False):
-    """Converts json or param format to hdf5
+def convert_to_json(params_fname, out_fname, include_drives=True,
+                    overwrite=True):
+    """Converts legacy json or param format to hierarchical json format
 
     Parameters
     ----------
@@ -676,8 +676,6 @@ def convert_to_hdf5(params_fname, out_fname, include_drives=True,
         Include drives from params file
     overwrite: bool, default=True
         Overwrite file
-    write_output: bool, default=False
-        Write out simulations
     Returns
     -------
     None
@@ -692,17 +690,16 @@ def convert_to_hdf5(params_fname, out_fname, include_drives=True,
     params_suffix = params_fname.suffix.lower().split('.')[-1]
 
     # Add suffix if not supplied
-    if out_fname.suffix != '.hdf5':
-        out_fname = out_fname.with_suffix('.hdf5')
+    if out_fname.suffix != '.json':
+        out_fname = out_fname.with_suffix('.json')
 
     net = Network(params=read_params(params_fname),
                   add_drives_from_params=include_drives,
                   legacy_mode=True if params_suffix == 'param' else False,
                   )
-    net.write(fname=out_fname,
-              overwrite=overwrite,
-              write_output=write_output,
-              )
+    net.write_configuration(fname=out_fname,
+                            overwrite=overwrite,
+                            )
     return
 
 
