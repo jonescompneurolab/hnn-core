@@ -106,20 +106,25 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
     return dpls
 
 
-def _read_dipole_txt(fname):
+def _read_dipole_txt(fname, extension='.txt'):
     """Read dipole values from a txt file and create a Dipole instance.
 
     Parameters
     ----------
-    fname : str
-        Full path to the input file (.txt)
-
+    fname : str or io.StringIO
+        Full path to the input file (.txt or .csv) or
+        Content of file in memory as a StringIO
     Returns
     -------
     dpl : Dipole
         The instance of Dipole class
     """
-    dpl_data = np.loadtxt(fname, dtype=float)
+    if extension == '.csv':
+        # read from a csv file ignoring the headers
+        dpl_data = np.genfromtxt(fname, delimiter=',',
+                                 skip_header=1, dtype=float)
+    else:
+        dpl_data = np.loadtxt(fname, dtype=float)
     ncols = dpl_data.shape[1]
     if ncols not in (2, 4):
         raise ValueError(
@@ -173,10 +178,6 @@ def read_dipole(fname):
     dpl : Dipole
         The instance of Dipole class
     """
-
-    # For supporting tests in test_gui.py
-    if isinstance(fname, StringIO):
-        return _read_dipole_txt(fname)
 
     fname = str(fname)
     if not os.path.exists(fname):

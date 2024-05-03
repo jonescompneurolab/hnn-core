@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 import traitlets
+import os
 
 from hnn_core import Dipole, Network, Params
 from hnn_core.gui import HNNGUI
@@ -603,3 +604,40 @@ def test_gui_download_simulation():
         serialize_simulation(gui.data, sim_name2))
     # result is a single csv file
     assert file_extension == ".csv"
+
+
+def test_gui_upload_csv_simulation():
+    """Test if gui handles uploaded csv data"""
+    gui = HNNGUI()
+    _ = gui.compose()
+
+    assert len(gui.viz_manager.data['figs']) == 0
+    assert len(gui.data['simulation_data']) == 0
+
+    # Relative path to the file
+    file_relative_path = "./hnn_core/tests/assets/test_default.csv"
+    absolute_path = os.path.abspath(file_relative_path)
+    if os.name == 'nt':  # Windows
+        # Convert backslashes to forward slashes and
+        # ensure we have three slashes after 'file:'
+        file_url = 'file:///' + absolute_path.replace('\\', '/')
+    else:  # UNIX-like systems
+        file_url = 'file://' + absolute_path
+    _ = gui._simulate_upload_data(file_url)
+
+    # we are loading only 1 trial,
+    # assume all the data we need is in the [0] position
+    data_lengh = (
+        len(gui.data['simulation_data']['test_default']['dpls'][0].times))
+
+    assert len(gui.data['simulation_data']) == 1
+    assert 'test_default' in gui.data['simulation_data'].keys()
+    assert gui.data['simulation_data']['test_default']['net'] is None
+    assert type(gui.data['simulation_data']['test_default']['dpls']) is list
+    assert len(gui.viz_manager.data['figs']) == 1
+    assert (len(gui.data['simulation_data']['test_default']
+                ['dpls'][0].data['agg']) == data_lengh)
+    assert (len(gui.data['simulation_data']['test_default']
+                ['dpls'][0].data['L2']) == data_lengh)
+    assert (len(gui.data['simulation_data']['test_default']
+                ['dpls'][0].data['L5']) == data_lengh)
