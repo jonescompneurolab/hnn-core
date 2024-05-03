@@ -14,6 +14,7 @@ tasks.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -99,6 +100,8 @@ tasks.
       <div class="sphx-glr-thumbnail-title">05. Optimize simulated evoked response parameters</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 

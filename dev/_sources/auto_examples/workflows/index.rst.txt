@@ -26,6 +26,7 @@ help users get started.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -111,6 +112,8 @@ help users get started.
       <div class="sphx-glr-thumbnail-title">05. Simulate beta modulated ERP</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 
