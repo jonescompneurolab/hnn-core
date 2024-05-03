@@ -234,35 +234,18 @@ class HNNGUI:
                                             description='Cores:',
                                             disabled=False)
         self.load_data_button = FileUpload(
-            accept='.txt', multiple=False,
+            accept='.txt,.csv', multiple=False,
             style={'button_color': self.layout['theme_color']},
             description='Load data',
             button_style='success')
 
-        b64 = base64.b64encode("".encode())
-        payload = b64.decode()
-        # Initialliting HTML code for download button
-        self.html_download_button = '''
-        <a download="{filename}" href="data:text/csv;base64,{payload}"
-          download>
-        <button style="background:{color_theme}; height:{btn_height}"
-        class=" jupyter-button
-           mod-warning" {is_disabled} >Save Simulation</button>
-        </a>
-        '''
-        # Create widget wrapper
-        self.save_simuation_button = (
-            HTML(self.html_download_button.
-                 format(payload=payload,
-                        filename={""},
-                        is_disabled="disabled",
-                        btn_height=self.layout['run_btn'].height,
-                        color_theme=self.layout['theme_color'])))
+        # Create save simulation widget wrapper
+        self.save_simuation_button = self._init_html_download_button()
 
         self.simulation_list_widget = Dropdown(options=[],
                                                value=None,
                                                description='',
-                                               layout={'width': 'max-content'})
+                                               layout={'width': '15%'})
         # Drive selection
         self.widget_drive_type_selection = RadioButtons(
             options=['Evoked', 'Poisson', 'Rhythmic'],
@@ -314,6 +297,27 @@ class HNNGUI:
 
         self._init_ui_components()
         self.add_logging_window_logger()
+
+    def _init_html_download_button(self):
+        b64 = base64.b64encode("".encode())
+        payload = b64.decode()
+        # Initialliting HTML code for download button
+        self.html_download_button = '''
+        <a download="{filename}" href="data:text/csv;base64,{payload}"
+          download>
+        <button style="background:{color_theme}; height:{btn_height}"
+        class=" jupyter-button
+           mod-warning" {is_disabled} >Save Simulation</button>
+        </a>
+        '''
+        # Create widget wrapper
+        return (
+            HTML(self.html_download_button.
+                 format(payload=payload,
+                        filename={""},
+                        is_disabled="disabled",
+                        btn_height=self.layout['run_btn'].height,
+                        color_theme=self.layout['theme_color'])))
 
     def add_logging_window_logger(self):
         handler = _OutputWidgetHandler(self._log_out)
@@ -1211,7 +1215,10 @@ def on_upload_data_change(change, data, viz_manager, log_out):
 
     data_dict = change['new'][0]
 
-    data_fname = data_dict['name'].rstrip('.txt')
+    dict_name = data_dict['name'].rsplit('.', 1)
+    data_fname = dict_name[0]
+    file_extension = f".{dict_name[1]}"
+
     if data_fname in data['simulation_data'].keys():
         logger.error(f"Found existing data: {data_fname}.")
         return
@@ -1220,7 +1227,7 @@ def on_upload_data_change(change, data, viz_manager, log_out):
     ext_content = codecs.decode(ext_content, encoding="utf-8")
     with log_out:
         data['simulation_data'][data_fname] = {'net': None, 'dpls': [
-            hnn_core.read_dipole(io.StringIO(ext_content))
+            hnn_core._read_dipole_txt(io.StringIO(ext_content), file_extension)
         ]}
         logger.info(f'External data {data_fname} loaded.')
         _template_name = "[Blank] single figure"
@@ -1444,23 +1451,11 @@ def _serialize_simulation(log_out, sim_data, simulation_list_widget):
 
 
 def serialize_simulation(simulations_data, simulation_name):
-    """
-        Serializes the simulation data for a given simulation name
-        into either a single CSV file
-        or a ZIP file containing multiple CSVs, depending on the number
-        of trials in the simulation.
-        Parameters:
-        - simulation_name (str): The name of the simulation to serialize.
-                                 This name is used to access the corresponding
-                                 data in the 'simulations' dictionary
-                                 of the instance.
+    """Serializes simulation data to CSV.
 
-        Returns:
-        - tuple: A tuple where the first element is either
-                the CSV content (str) of a single trial
-                or the binary data of a ZIP file (bytes)
-                containing multiple CSV files, and the
-                second element is the file extension (either ".csv" or ".zip").
+        Creates a single CSV file or a ZIP file containing multiple CSVs,
+        depending on the number of trials in the simulation.
+
     """
     simulation_data = simulations_data["simulation_data"]
     csv_trials_output = []

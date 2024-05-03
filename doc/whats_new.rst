@@ -55,6 +55,9 @@ Changelog
 - Added gui widget to enable/disable synchronous input in simulations, 
   by `Camilo Diaz`_ in :gh:`750`
 
+- Added gui widgets to save simulation as csv and updated the file upload to support csv data,
+  by `Camilo Diaz`_ in :gh:`753`
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
