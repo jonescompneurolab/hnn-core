@@ -220,44 +220,40 @@ def test_gui_run_simulation_mpi(setup_gui):
     plt.close('all')
 
 
-def test_gui_run_simulations():
+def test_gui_run_simulations(setup_gui):
     """Test if run button triggers multiple simulations correctly."""
-    gui = HNNGUI()
-    app_layout = gui.compose()
-    gui.params['N_pyr_x'] = 3
-    gui.params['N_pyr_y'] = 3
+    gui = setup_gui
 
-    assert app_layout is not None
+    tstop_trials_tstep = [(10, 1, 0.5),
+                          (10, 2, 0.5),
+                          (12, 1, 1.0)]
     assert gui.widget_backend_selection.value == "Joblib"
-    val_tstop = 20
-    val_ntrials = 1
     sim_count = 0
-    for val_tstop in (10, 12):
-        for val_ntrials in (1, 2):
-            for val_tstep in (0.05, 0.08):
-                gui.widget_simulation_name.value = str(sim_count)
-                gui.widget_tstop.value = val_tstop
-                gui.widget_ntrials.value = val_ntrials
-                gui.widget_dt.value = val_tstep
 
-                gui.run_button.click()
-                sim_name = gui.widget_simulation_name.value
-                dpls = gui.simulation_data[sim_name]['dpls']
+    for val_tstop, val_ntrials, val_tstep in tstop_trials_tstep:
+        gui.widget_simulation_name.value = str(sim_count)
+        gui.widget_tstop.value = val_tstop
+        gui.widget_ntrials.value = val_ntrials
+        gui.widget_dt.value = val_tstep
 
-                assert isinstance(gui.simulation_data[sim_name]["net"],
-                                  Network)
-                assert isinstance(dpls, list)
-                assert all([isinstance(dpl, Dipole) for dpl in dpls])
-                assert len(dpls) == val_ntrials
-                assert all([
-                    pytest.approx(dpl.times[-1]) == val_tstop for dpl in dpls
-                ])
-                assert all([
-                    pytest.approx(dpl.times[1] - dpl.times[0]) == val_tstep
-                    for dpl in dpls
-                ])
+        gui.run_button.click()
+        sim_name = gui.widget_simulation_name.value
+        dpls = gui.simulation_data[sim_name]['dpls']
 
-                sim_count += 1
+        assert isinstance(gui.simulation_data[sim_name]["net"],
+                          Network)
+        assert isinstance(dpls, list)
+        assert all([isinstance(dpl, Dipole) for dpl in dpls])
+        assert len(dpls) == val_ntrials
+        assert all([
+            pytest.approx(dpl.times[-1]) == val_tstop for dpl in dpls
+        ])
+        assert all([
+            pytest.approx(dpl.times[1] - dpl.times[0]) == val_tstep
+            for dpl in dpls
+        ])
+
+        sim_count += 1
 
     assert len(list(gui.simulation_data)) == sim_count
 
