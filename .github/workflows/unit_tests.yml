@@ -51,7 +51,7 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
             directory: ./
-            fail_ci_if_error: true
+            fail_ci_if_error: false
             files: ./coverage.xml
             flags: unittests
             token: ${{ secrets.CODECOV_TOKEN }}
