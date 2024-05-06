@@ -21,6 +21,17 @@ from ipywidgets import Tab, Text, link
 matplotlib.use('agg')
 
 
+@pytest.fixture
+def setup_gui():
+    gui = HNNGUI()
+    gui.compose()
+    gui.params['N_pyr_x'] = 3
+    gui.params['N_pyr_y'] = 3
+    gui.widget_dt.value = 0.5  # speed up tests
+    gui.widget_tstop.value = 70  # speed up tests
+    return gui
+
+
 def test_gui_load_params():
     """Test if gui loads default parameters properly"""
     gui = HNNGUI()
@@ -195,15 +206,11 @@ def test_gui_init_network():
 
 @requires_mpi4py
 @requires_psutil
-def test_gui_run_simulation_mpi():
+def test_gui_run_simulation_mpi(setup_gui):
     """Test if run button triggers simulation with MPIBackend."""
-    gui = HNNGUI()
-    _ = gui.compose()
-    gui.params['N_pyr_x'] = 3
-    gui.params['N_pyr_y'] = 3
+    gui = setup_gui
 
     gui.widget_backend_selection.value = "MPI"
-    gui.widget_tstop.value = 30  # speed up tests
     gui.run_button.click()
     default_name = gui.widget_simulation_name.value
     dpls = gui.simulation_data[default_name]['dpls']
@@ -254,11 +261,10 @@ def test_gui_run_simulations():
 
     assert len(list(gui.simulation_data)) == sim_count
 
-    # make sure different simulations must have distinct names
-    gui = HNNGUI()
-    _ = gui.compose()
-    gui.params['N_pyr_x'] = 3
-    gui.params['N_pyr_y'] = 3
+
+def test_non_unique_name_error(setup_gui):
+    """ Checks that simulation fails if new name is not supplied. """
+    gui = setup_gui
 
     sim_name = gui.widget_simulation_name.value
 
@@ -289,12 +295,9 @@ def test_gui_take_screenshots():
     plt.close('all')
 
 
-def test_gui_add_figure():
+def test_gui_add_figure(setup_gui):
     """Test if the GUI adds/deletes figs properly."""
-    gui = HNNGUI()
-    _ = gui.compose()
-    gui.params['N_pyr_x'] = 3
-    gui.params['N_pyr_y'] = 3
+    gui = setup_gui
 
     fig_tabs = gui.viz_manager.figs_tabs
     axes_config_tabs = gui.viz_manager.axes_config_tabs
@@ -340,12 +343,9 @@ def test_gui_add_figure():
     plt.close('all')
 
 
-def test_gui_add_data_dependent_figure():
+def test_gui_add_data_dependent_figure(setup_gui):
     """Test if the GUI adds/deletes figs data dependent properly."""
-    gui = HNNGUI()
-    _ = gui.compose()
-    gui.params['N_pyr_x'] = 3
-    gui.params['N_pyr_y'] = 3
+    gui = setup_gui
 
     fig_tabs = gui.viz_manager.figs_tabs
     axes_config_tabs = gui.viz_manager.axes_config_tabs
@@ -380,12 +380,9 @@ def test_gui_add_data_dependent_figure():
     assert len(fig_tabs.children) == n_fig
 
 
-def test_gui_edit_figure():
+def test_gui_edit_figure(setup_gui):
     """Test if the GUI adds/deletes figs properly."""
-    gui = HNNGUI()
-    _ = gui.compose()
-    gui.params['N_pyr_x'] = 3
-    gui.params['N_pyr_y'] = 3
+    gui = setup_gui
 
     fig_tabs = gui.viz_manager.figs_tabs
     axes_config_tabs = gui.viz_manager.axes_config_tabs
@@ -406,14 +403,9 @@ def test_gui_edit_figure():
     plt.close('all')
 
 
-def test_gui_synchronous_inputs():
+def test_gui_synchronous_inputs(setup_gui):
     """Test if the GUI creates plot using synchronous_inputs."""
-    gui = HNNGUI()
-    _ = gui.compose()
-    gui.params['N_pyr_x'] = 3
-    gui.params['N_pyr_y'] = 3
-
-    gui.widget_dt.value = 0.85
+    gui = setup_gui
 
     # set synch inputs to first driver in simulation
     driver_name = gui.drive_widgets[0]['name']
@@ -433,12 +425,9 @@ def test_gui_synchronous_inputs():
         assert len(connectivity['src_gids']) == 1
 
 
-def test_gui_figure_overlay():
+def test_gui_figure_overlay(setup_gui):
     """Test if the GUI adds/deletes figs properly."""
-    gui = HNNGUI()
-    _ = gui.compose()
-    gui.params['N_pyr_x'] = 3
-    gui.params['N_pyr_y'] = 3
+    gui = setup_gui
 
     axes_config_tabs = gui.viz_manager.axes_config_tabs
 
@@ -464,12 +453,9 @@ def test_gui_figure_overlay():
     plt.close('all')
 
 
-def test_gui_adaptive_spectrogram():
+def test_gui_adaptive_spectrogram(setup_gui):
     """Test the adaptive spectrogram functionality of the HNNGUI."""
-    gui = HNNGUI()
-    gui.compose()
-    gui.params['N_pyr_x'] = 3
-    gui.params['N_pyr_y'] = 3
+    gui = setup_gui
 
     gui.run_button.click()
     figid = 1
@@ -492,21 +478,13 @@ def test_gui_adaptive_spectrogram():
     plt.close('all')
 
 
-@pytest.fixture
-def setup_gui():
-    gui = HNNGUI()
-    gui.compose()
-    gui.params['N_pyr_x'] = 3
-    gui.params['N_pyr_y'] = 3
-    gui.run_button.click()
-    return gui
-
-
 @pytest.mark.parametrize("viz_type", ["layer2 dipole", "layer5 dipole",
                                       "spikes", "PSD", "network"])
 def test_gui_visualization(setup_gui, viz_type):
     """Test visualization functionality in the HNNGUI."""
     gui = setup_gui
+    gui.run_button.click()
+
     figid = 1
     figname = f'Figure {figid}'
     axname = 'ax1'
