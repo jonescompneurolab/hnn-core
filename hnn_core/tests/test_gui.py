@@ -1,4 +1,6 @@
 # Authors: Huzi Cheng <hzcheng15@icloud.com>
+#          Camilo Diaz <camilo_diaz@brown.edu>
+#          George Dang <george_dang@brown.edu>
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
