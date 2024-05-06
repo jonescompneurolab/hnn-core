@@ -197,9 +197,9 @@ def test_cell_response_to_dict(jones_2009_network):
     """ Tests _cell_response_to_dict function """
     net = jones_2009_network
 
-    # No simulation so should have None for cell response
+    # When a simulation hasn't been run, return an empty dict
     result1 = _cell_response_to_dict(net, write_output=True)
-    assert result1 is None
+    assert result1 == dict()
 
     # Check for cell response dictionary after a simulation
     simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
@@ -209,7 +209,7 @@ def test_cell_response_to_dict(jones_2009_network):
 
     # Check for None if kw supplied
     result3 = _cell_response_to_dict(net, write_output=False)
-    assert result3 is None
+    assert result3 == dict()
 
 
 def test_rec_array_to_dict(jones_2009_network):
