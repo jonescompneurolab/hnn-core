@@ -48,10 +48,6 @@ jobs:
         run: |
           python -m pytest .  --cov=hnn_core hnn_core/tests/ --cov-report=xml
       - name:  Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-            directory: ./
-            fail_ci_if_error: true
-            files: ./coverage.xml
-            flags: unittests
-            token: ${{ secrets.CODECOV_TOKEN }}
+        shell: bash -el {0}
+        run: |
+          bash <(curl -s https://codecov.io/bash) -f ./coverage.xml
