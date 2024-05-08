@@ -543,15 +543,12 @@ def test_unlink_relink_widget():
     assert gui.tab_group_2.selected_index == 0
 
 
-def test_gui_download_simulation():
+def test_gui_download_simulation(setup_gui):
     """Test the GUI download simulation pipeline."""
-    gui = HNNGUI()
-    _ = gui.compose()
-    gui.params['N_pyr_x'] = 3
-    gui.params['N_pyr_y'] = 3
 
-    # Run a simulation with 3 trials
-    gui.widget_dt.value = 0.85
+    gui = setup_gui
+
+    # Run a simulation with 2 trials
     gui.widget_ntrials.value = 2
 
     # Initiate 1rs simulation
@@ -567,7 +564,6 @@ def test_gui_download_simulation():
     assert file_extension == ".zip"
 
     # Run a simulation with 1 trials
-    gui.widget_dt.value = 0.85
     gui.widget_ntrials.value = 1
 
     # Initiate 2nd simulation
@@ -582,10 +578,10 @@ def test_gui_download_simulation():
     assert file_extension == ".csv"
 
 
-def test_gui_upload_csv_simulation():
+def test_gui_upload_csv_simulation(setup_gui):
     """Test if gui handles uploaded csv data"""
-    gui = HNNGUI()
-    _ = gui.compose()
+
+    gui = setup_gui
 
     assert len(gui.viz_manager.data['figs']) == 0
     assert len(gui.data['simulation_data']) == 0
