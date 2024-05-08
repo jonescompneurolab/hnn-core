@@ -243,20 +243,25 @@
     <span class="k">return</span> <span class="n">dpls</span></div>
 
 
-<span class="k">def</span> <span class="nf">_read_dipole_txt</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_read_dipole_txt</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s1">&#39;.txt&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Read dipole values from a txt file and create a Dipole instance.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    fname : str</span>
-<span class="sd">        Full path to the input file (.txt)</span>
-
+<span class="sd">    fname : str or io.StringIO</span>
+<span class="sd">        Full path to the input file (.txt or .csv) or</span>
+<span class="sd">        Content of file in memory as a StringIO</span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dpl : Dipole</span>
 <span class="sd">        The instance of Dipole class</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">dpl_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s1">&#39;.csv&#39;</span><span class="p">:</span>
+        <span class="c1"># read from a csv file ignoring the headers</span>
+        <span class="n">dpl_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span>
+                                 <span class="n">skip_header</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dpl_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">ncols</span> <span class="o">=</span> <span class="n">dpl_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">ncols</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -310,10 +315,6 @@
 <span class="sd">    dpl : Dipole</span>
 <span class="sd">        The instance of Dipole class</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="c1"># For supporting tests in test_gui.py</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">StringIO</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">_read_dipole_txt</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
 
     <span class="n">fname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
