@@ -3,6 +3,7 @@ import json
 #          Rajat Partani <rajatpartani@gmail.com>
 
 from pathlib import Path
+from time import sleep
 import pytest
 import numpy as np
 
@@ -168,6 +169,7 @@ def test_write_configuration(tmp_path, jones_2009_network):
 
     # Overwrite network check
     last_mod_time1 = path_out.stat().st_mtime
+    sleep(0.05)
     jones_2009_network.write_configuration(path_out)
     last_mod_time2 = path_out.stat().st_mtime
     assert last_mod_time1 < last_mod_time2
