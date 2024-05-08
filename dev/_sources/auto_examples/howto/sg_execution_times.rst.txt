@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**02:58.748** total execution time for 5 files **from auto_examples/howto**:
+**04:09.186** total execution time for 5 files **from auto_examples/howto**:
 
 .. container::
 
@@ -33,16 +33,16 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_howto_plot_connectivity.py` (``plot_connectivity.py``)
-     - 01:28.336
+     - 02:03.791
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py` (``plot_record_extracellular_potentials.py``)
-     - 00:36.745
+     - 00:50.413
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_plot_firing_pattern.py` (``plot_firing_pattern.py``)
-     - 00:31.276
+     - 00:44.916
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_plot_simulate_mpi_backend.py` (``plot_simulate_mpi_backend.py``)
-     - 00:22.390
+     - 00:30.066
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_optimize_evoked.py` (``optimize_evoked.py``)
      - 00:00.000
