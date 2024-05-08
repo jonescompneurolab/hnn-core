@@ -8,6 +8,7 @@ import pytest
 import traitlets
 import os
 
+from pathlib import Path
 from hnn_core import Dipole, Network, Params
 from hnn_core.gui import HNNGUI
 from hnn_core.gui._viz_manager import (_idx2figname, _no_overlay_plot_types,
@@ -21,6 +22,8 @@ from IPython.display import IFrame
 from ipywidgets import Tab, Text, link
 
 matplotlib.use('agg')
+hnn_core_root = Path(__file__).parents[1]
+assets_path = Path(hnn_core_root, 'tests', 'assets')
 
 
 @pytest.fixture
@@ -586,15 +589,16 @@ def test_gui_upload_csv_simulation(setup_gui):
     assert len(gui.viz_manager.data['figs']) == 0
     assert len(gui.data['simulation_data']) == 0
 
-    # Relative path to the file
-    file_relative_path = "./hnn_core/tests/assets/test_default.csv"
-    absolute_path = os.path.abspath(file_relative_path)
+    # Formulate path to the file
+    file_path = assets_path / 'test_default.csv'
+    absolute_path = str(file_path.resolve())
     if os.name == 'nt':  # Windows
         # Convert backslashes to forward slashes and
         # ensure we have three slashes after 'file:'
         file_url = 'file:///' + absolute_path.replace('\\', '/')
     else:  # UNIX-like systems
         file_url = 'file://' + absolute_path
+
     _ = gui._simulate_upload_data(file_url)
 
     # we are loading only 1 trial,
