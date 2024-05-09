@@ -229,9 +229,9 @@ def test_gui_run_simulations(setup_gui):
     """Test if run button triggers multiple simulations correctly."""
     gui = setup_gui
 
-    tstop_trials_tstep = [(10, 1, 0.5),
+    tstop_trials_tstep = [(10, 1, 0.25),
                           (10, 2, 0.5),
-                          (12, 1, 1.0)]
+                          (12, 1, 0.5)]
     assert gui.widget_backend_selection.value == "Joblib"
     sim_count = 0
 
