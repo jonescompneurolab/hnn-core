@@ -188,12 +188,18 @@ def _add_drives_from_params(net):
                 event_seed=specs['event_seed'])
 
     # add tonic biases if present in params
-    for cellname in bias_specs['tonic']:
+    if bias_specs['tonic']:
+        _cell_types_amplitudes = dict()
+        for cellname in bias_specs['tonic']:
+            _cell_types_amplitudes[cellname] = (
+                bias_specs['tonic'][cellname]['amplitude'])
+
+        _t0 = bias_specs['tonic'][cellname]['t0']
+        _tstop = bias_specs['tonic'][cellname]['tstop']
         net.add_tonic_bias(
-            cell_type=cellname,
-            amplitude=bias_specs['tonic'][cellname]['amplitude'],
-            t0=bias_specs['tonic'][cellname]['t0'],
-            tstop=bias_specs['tonic'][cellname]['tstop'])
+            cell_types_amplitudes=_cell_types_amplitudes,
+            t0=_t0,
+            tstop=_tstop)
 
     # in HNN-GUI, seed is determined by "absolute GID" instead of the
     # gid offset with respect to the first cell of a population.

@@ -1127,42 +1127,48 @@ class Network(object):
                 self.external_drives[
                     drive['name']]['events'].append(event_times)
 
-    def add_tonic_bias(self, *, cell_type=None, amplitude=None,
-                       t0=None, tstop=None):
-        """Attach parameters of tonic biasing input for a given cell type.
+    def add_tonic_bias(self, *, cell_types_amplitudes, t0=0, tstop=None):
+        """Attach parameters of tonic biasing input for given cell types.
 
         Parameters
         ----------
-        cell_type : str
-            The cell type whose cells will get the tonic input.
-            Valid inputs are those in `net.cell_types`.
-        amplitude : float
-            The amplitude of the input.
+        cell_types_amplitudes : dic
+            Dictionary of cell_types<Key:str> that will get the tonic input,
+            and amplitudes<Value:float> of the input Valid inputs are
+            those in `net.cell_types`.
         t0 : float
             The start time of tonic input (in ms). Default: 0 (beginning of
-            simulation).
+            simulation). This value will be applied to all the cells in
+            cell_types_amplitudes
         tstop : float
             The end time of tonic input (in ms). Default: end of simulation.
+            This value will be applied to all the cells in
+            cell_types_amplitudes
         """
-        if (cell_type is None or amplitude is None):
-            raise ValueError('cell_type and amplitude must be defined'
-                             f', got {cell_type}, {amplitude}')
+        if (not isinstance(cell_types_amplitudes, dict)):
+            raise ValueError('cell_types_amplitudes parameter'
+                             'is not a dictionary')
+
+        if (len(cell_types_amplitudes) == 0):
+            warnings.warn('No bias have been defined', UserWarning,
+                          stacklevel=1)
+            return
         if 'tonic' not in self.external_biases:
             self.external_biases['tonic'] = dict()
-        if cell_type in self.external_biases['tonic']:
-            raise ValueError(f'Tonic bias already defined for {cell_type}')
-        if t0 is None:
-            t0 = 0
-        if cell_type not in self.cell_types:
-            raise ValueError(f'cell_type must be one of '
-                             f'{list(self.cell_types.keys())}. '
-                             f'Got {cell_type}')
 
-        self.external_biases['tonic'][cell_type] = {
-            'amplitude': amplitude,
-            't0': t0,
-            'tstop': tstop
-        }
+        for cell_type, amplitude in cell_types_amplitudes.items():
+            if cell_type not in self.cell_types:
+                raise ValueError(f'cell_type must be one of '
+                                 f'{list(self.cell_types.keys())}. '
+                                 f'Got {cell_type}')
+            if cell_type in self.external_biases['tonic']:
+                raise ValueError(f'Tonic bias already defined for {cell_type}')
+
+            self.external_biases['tonic'][cell_type] = {
+                'amplitude': amplitude,
+                't0': t0,
+                'tstop': tstop
+            }
 
     def _add_cell_type(self, cell_name, pos, cell_template=None):
         """Add cell type by updating pos_dict and gid_ranges."""
