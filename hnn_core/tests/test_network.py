@@ -756,20 +756,28 @@ def test_tonic_biases():
                        target_gids='L2_basket',
                        loc='soma', receptor='ampa', weight=1e-3,
                        delay=1.0, lamtha=3.0)
+
+    tonic_bias_1 = {
+        'name_nonexistent': 1.0
+    }
+
     with pytest.raises(ValueError, match=r'cell_type must be one of .*$'):
-        net.add_tonic_bias(cell_type='name_nonexistent', amplitude=1.0,
-                           t0=0.0, tstop=4.0)
+        net.add_tonic_bias(cell_types_amplitudes=tonic_bias_1, t0=0.0,
+                           tstop=4.0)
+    tonic_bias_2 = {
+        'L2_pyramidal': 1.0
+    }
 
     with pytest.raises(ValueError, match='Duration of tonic input cannot be'
                        ' negative'):
-        net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0,
+        net.add_tonic_bias(cell_types_amplitudes=tonic_bias_2,
                            t0=5.0, tstop=4.0)
         simulate_dipole(net, tstop=20.)
     net.external_biases = dict()
 
     with pytest.raises(ValueError, match='End time of tonic input cannot be'
                        ' negative'):
-        net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0,
+        net.add_tonic_bias(cell_types_amplitudes=tonic_bias_2,
                            t0=5.0, tstop=-1.0)
         simulate_dipole(net, tstop=5.)
 
@@ -796,12 +804,12 @@ def test_tonic_biases():
 
     # new API
     net = Network(params)
-    net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
+    net.add_tonic_bias(cell_types_amplitudes=tonic_bias_2)
     assert 'tonic' in net.external_biases
     assert 'L5_pyramidal' not in net.external_biases['tonic']
     assert net.external_biases['tonic']['L2_pyramidal']['t0'] == 0
     with pytest.raises(ValueError, match=r'Tonic bias already defined for.*$'):
-        net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
+        net.add_tonic_bias(cell_types_amplitudes=tonic_bias_2)
 
 
 def test_network_mesh():

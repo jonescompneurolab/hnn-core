@@ -39,7 +39,10 @@ def jones_2009_network(params):
                            mesh_shape=(3, 3))
 
     # Adding bias
-    net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
+    tonic_bias = {
+        'L2_pyramidal': 1.0
+    }
+    net.add_tonic_bias(cell_types_amplitudes=tonic_bias)
 
     # Add drives
     location = 'proximal'
@@ -76,7 +79,10 @@ def calcium_network(params):
                         mesh_shape=(3, 3))
 
     # Adding bias
-    net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0)
+    tonic_bias = {
+        'L2_pyramidal': 1.0
+    }
+    net.add_tonic_bias(cell_types_amplitudes=tonic_bias)
 
     # Adding electrode arrays
     electrode_pos = (1, 2, 3)
