@@ -479,9 +479,7 @@ def test_gui_adaptive_spectrogram(setup_gui):
     plt.close('all')
 
 
-@pytest.mark.parametrize("viz_type", ["layer2 dipole", "layer5 dipole",
-                                      "spikes", "PSD", "network"])
-def test_gui_visualization(setup_gui, viz_type):
+def test_gui_visualization(setup_gui):
     """Test visualization functionality in the HNNGUI."""
     gui = setup_gui
     gui.run_button.click()
@@ -489,14 +487,17 @@ def test_gui_visualization(setup_gui, viz_type):
     figid = 1
     figname = f'Figure {figid}'
     axname = 'ax1'
-    gui._simulate_viz_action("edit_figure", figname,
-                             axname, 'default', viz_type, {}, 'clear')
-    gui._simulate_viz_action("edit_figure", figname,
-                             axname, 'default', viz_type, {}, 'plot')
-    # Check if data is plotted on the axes
-    assert len(gui.viz_manager.figs[figid].axes) == 2
-    # Check default figs have data on their axis
-    assert gui.viz_manager.figs[figid].axes[1].has_data()
+
+    plot_types = ["layer2 dipole", "layer5 dipole", "spikes", "PSD", "network"]
+    for viz_type in plot_types:
+        gui._simulate_viz_action("edit_figure", figname,
+                                 axname, 'default', viz_type, {}, 'clear')
+        gui._simulate_viz_action("edit_figure", figname,
+                                 axname, 'default', viz_type, {}, 'plot')
+        # Check if data is plotted on the axes
+        assert len(gui.viz_manager.figs[figid].axes) == 2
+        # Check default figs have data on their axis
+        assert gui.viz_manager.figs[figid].axes[1].has_data()
 
 
 def test_unlink_relink_widget():
