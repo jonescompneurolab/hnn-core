@@ -197,7 +197,7 @@ def _add_drives_from_params(net):
         _t0 = bias_specs['tonic'][cellname]['t0']
         _tstop = bias_specs['tonic'][cellname]['tstop']
         net.add_tonic_bias(
-            cell_types_amplitudes=_cell_types_amplitudes,
+            amplitude=_cell_types_amplitudes,
             t0=_t0,
             tstop=_tstop)
 
