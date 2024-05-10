@@ -14,7 +14,6 @@ from .externals.mne import _check_option
 
 from .viz import plot_dipole, plot_psd, plot_tfr_morlet
 
-
 def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
                     record_isec=False, postproc=False):
     """Simulate a dipole given the experiment parameters.
@@ -106,25 +105,20 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
     return dpls
 
 
-def _read_dipole_txt(fname, extension='.txt'):
+def _read_dipole_txt(fname):
     """Read dipole values from a txt file and create a Dipole instance.
 
     Parameters
     ----------
-    fname : str or io.StringIO
-        Full path to the input file (.txt or .csv) or
-        Content of file in memory as a StringIO
+    fname : str
+        Full path to the input file (.txt)
+
     Returns
     -------
     dpl : Dipole
         The instance of Dipole class
     """
-    if extension == '.csv':
-        # read from a csv file ignoring the headers
-        dpl_data = np.genfromtxt(fname, delimiter=',',
-                                 skip_header=1, dtype=float)
-    else:
-        dpl_data = np.loadtxt(fname, dtype=float)
+    dpl_data = np.loadtxt(fname, dtype=float)
     ncols = dpl_data.shape[1]
     if ncols not in (2, 4):
         raise ValueError(
@@ -178,6 +172,10 @@ def read_dipole(fname):
     dpl : Dipole
         The instance of Dipole class
     """
+
+    # For supporting tests in test_gui.py
+    if isinstance(fname, StringIO):
+        return _read_dipole_txt(fname)
 
     fname = str(fname)
     if not os.path.exists(fname):
@@ -468,11 +466,18 @@ class Dipole(object):
                                             self.sfreq)
         return self
 
-    def plot(self, layer='agg', decim=None, ax=None, color='k', show=True):
+    def plot(self, tmin=None, tmax=None, layer='agg', decim=None, ax=None,
+             color='k', show=True):
         """Simple layer-specific plot function.
 
         Parameters
         ----------
+        tmin : float | None [deprecated]
+            Start time of plot in milliseconds.
+            If None, plot entire simulation.
+        tmax : float | None [deprecated]
+            End time of plot in milliseconds.
+            If None, plot entire simulation.
         layer : str
             The layer to plot. Can be one of 'agg', 'L2', and 'L5'
         decimate : int
@@ -484,13 +489,20 @@ class Dipole(object):
         show : bool
             If True, show the figure
 
+        (tmin and tmax are deprecated)
+        tmin : float or None
+            Start time of plot (in ms). If None, plot entire simulation.
+        tmax : float or None
+            End time of plot (in ms). If None, plot entire simulation.
+
         Returns
         -------
         fig : instance of plt.fig
             The matplotlib figure handle.
         """
-        return plot_dipole(self, ax=ax, layer=layer, decim=decim, color=color,
-                           show=show)
+
+        return plot_dipole(self, tmin=tmin, tmax=tmax, ax=ax, layer=layer,
+                           decim=decim, color=color, show=show)
 
     def plot_psd(self, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
                  color=None, label=None, ax=None, show=True):

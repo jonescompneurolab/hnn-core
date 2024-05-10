@@ -7,9 +7,9 @@
 import numpy as np
 from itertools import cycle
 import colorsys
+import warnings
 
 from .externals.mne import _validate_type
-
 
 def _lighten_color(color, amount=0.5):
     import matplotlib.colors as mc
@@ -21,7 +21,7 @@ def _lighten_color(color, amount=0.5):
     return colorsys.hls_to_rgb(c[0], 1 - amount * (1 - c[1]), c[2])
 
 
-def _get_plot_data_trange(times, data, tmin, tmax):
+def _get_plot_data_trange(times, data, tmin=None, tmax=None):
     """Get slices of times and data based on tmin and tmax"""
     if isinstance(times, list):
         times = np.array(times)
@@ -78,9 +78,9 @@ def plt_show(show=True, fig=None, **kwargs):
         (fig or plt).show(**kwargs)
 
 
-def plot_laminar_lfp(times, data, contact_labels, ax=None, decim=None,
-                     color='cividis', voltage_offset=50, voltage_scalebar=200,
-                     show=True):
+def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
+                     ax=None, decim=None, color='cividis', voltage_offset=50,
+                     voltage_scalebar=200, show=True):
     """Plot laminar extracellular electrode array voltage time series.
 
     Parameters
@@ -89,6 +89,11 @@ def plot_laminar_lfp(times, data, contact_labels, ax=None, decim=None,
         Sampling times (in ms).
     data : Two-dimensional Numpy array
         The extracellular voltages as an (n_contacts, n_times) array.
+    tmin : float | None [deprecated]
+        Start time of plot in milliseconds. If None, plot entire simulation.
+    tmax : float | None [deprecated]
+        End time of plot in milliseconds. If None, plot entire simulation.
+
     ax : instance of matplotlib figure | None
         The matplotlib axis
     decim : int | list of int | None (default)
@@ -178,7 +183,14 @@ def plot_laminar_lfp(times, data, contact_labels, ax=None, decim=None,
             col = color
         ax.plot(plot_times, plot_data + trace_offsets[contact_no],
                 label=f'C{contact_no}', color=col)
-        ax.set_xlim(right=times[-1])
+
+        # To be removed after deprecation cycle
+        if tmin is not None or tmax is not None:
+            ax.set_xlim(left=tmin, right=tmax)
+            warnings.warn('tmin and tmax are deprecated and will be removed in future releases of hnn-core.'
+                          'By default, dipoles and laminar LFPs are now plotted from 0 to tstop.', DeprecationWarning)
+        else:
+            ax.set_xlim(right=times[-1])
 
     if voltage_offset is not None:
         ax.set_ylim(-voltage_offset, n_offsets * voltage_offset)
@@ -217,7 +229,7 @@ def plot_laminar_lfp(times, data, contact_labels, ax=None, decim=None,
     return ax.get_figure()
 
 
-def plot_dipole(dpl, ax=None, layer='agg', decim=None,
+def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
                 color='k', label="average", average=False, show=True):
     """Simple layer-specific plot function.
 
@@ -225,6 +237,10 @@ def plot_dipole(dpl, ax=None, layer='agg', decim=None,
     ----------
     dpl : instance of Dipole | list of Dipole instances
         The Dipole object.
+    tmin : float | None [deprecated]
+        Start time of plot in milliseconds. If None, plot entire simulation.
+    tmax : float | None [deprecated]
+        End time of plot in milliseconds. If None, plot entire simulation.
     ax : instance of matplotlib figure | None
         The matplotlib axis
     layer : str
@@ -283,6 +299,12 @@ def plot_dipole(dpl, ax=None, layer='agg', decim=None,
                 # extract scaled data and times
                 data = dpl_trial.data[layer]
                 times = dpl_trial.times
+
+                # to be removed after deprecation cycle
+                if tmin is not None:
+                    data, times = _get_plot_data_trange(dpl_trial.times,
+                                                        dpl_trial.data[layer])
+
                 if decim is not None:
                     data, times = _decimate_plot_data(decim, data, times)
                 if idx == len(dpl) - 1 and average:
@@ -292,7 +314,14 @@ def plot_dipole(dpl, ax=None, layer='agg', decim=None,
                     alpha = 0.5 if average else 1.
                     ax.plot(times, data, color=_lighten_color(color, 0.5),
                             alpha=alpha, lw=1.)
-            ax.set_xlim(right=dpl_trial.times[-1])
+                    # To be removed after deprecation cycle
+            if tmin is not None or tmax is not None:
+                ax.set_xlim(left=tmin, right=tmax)
+                warnings.warn('tmin and tmax are deprecated and will be removed in future releases of hnn-core.'
+                              'By default, dipoles and laminar LFPs are now plotted from 0 to tstop.', DeprecationWarning)
+
+            else:
+                ax.set_xlim(right=times[-1])
         if average:
             ax.legend()
 
@@ -322,6 +351,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     ----------
     cell_response : instance of CellResponse
         The CellResponse object from net.cell_response
+        End time of plot in milliseconds. If None, plot entire simulation.
     trial_idx : int | list of int | None
         Index of trials to be plotted. If None, all trials plotted.
     ax : instance of matplotlib axis | None
@@ -471,7 +501,8 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
 
     ax.set_ylabel("Counts")
     ax.legend()
-    ax.set_xlim(right=cell_response.times[-1])
+
+    ax.set_xlim(left=0, right=cell_response.times[-1])
 
     plt_show(show)
     return ax.get_figure()
@@ -1210,9 +1241,7 @@ def plot_laminar_csd(times, data, contact_labels,
     import matplotlib.pyplot as plt
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
-    times, data = _get_plot_data_trange(times, data, times[0], times[-1])
-    _, contact_labels = _get_plot_data_trange(
-        times, contact_labels, times[0], times[-1])
+
     im = ax.pcolormesh(times, contact_labels, np.array(data),
                        cmap="jet_r", shading='auto')
     ax.set_title("CSD")

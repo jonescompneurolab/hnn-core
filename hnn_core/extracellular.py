@@ -27,7 +27,6 @@ from neuron import h
 
 from .externals.mne import _validate_type, _check_option
 
-
 def calculate_csd2d(lfp_data, delta=1):
     """Current source density (CSD) estimation
 
@@ -443,9 +442,9 @@ class ExtracellularArray:
 
         return self
 
-    def plot_lfp(self, *, trial_no=None, contact_no=None, ax=None, decim=None,
-                 color='cividis', voltage_offset=50, voltage_scalebar=200,
-                 show=True):
+    def plot_lfp(self, *, trial_no=None, contact_no=None, tmin=None, tmax=None,
+                 ax=None, decim=None, color='cividis', voltage_offset=50,
+                 voltage_scalebar=200, show=True):
         """Plot laminar local field potential time series.
 
         One plot is created for each trial. Multiple trials can be overlaid
@@ -457,6 +456,12 @@ class ExtracellularArray:
             Trial number(s) to plot
         contact_no : int | list of int | slice
             Electrode contact number(s) to plot
+        tmin : float | None [deprecated]
+            Start time of plot in milliseconds.
+            If None, plot entire simulation.
+        tmax : float | None [deprecated]
+            End time of plot in milliseconds.
+            If None, plot entire simulation.
         ax : instance of matplotlib figure | None
             The matplotlib axis
         decim : int | list of int | None (default)
@@ -503,7 +508,7 @@ class ExtracellularArray:
 
         for trial_data in plot_data:
             fig = plot_laminar_lfp(
-                self.times, trial_data, ax=ax,
+                self.times, trial_data, tmin=tmin, tmax=tmax, ax=ax,
                 decim=decim, color=color,
                 voltage_offset=voltage_offset,
                 voltage_scalebar=voltage_scalebar,
@@ -714,3 +719,4 @@ class _ExtracellularArrayBuilder(object):
             return self._nrn_times.to_python()
         else:
             raise RuntimeError('Simulation not yet run!')
+
