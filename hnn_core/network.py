@@ -1151,30 +1151,28 @@ class Network(object):
             self.external_biases['tonic'][cell_type] = cell_type_bias
 
     def add_tonic_bias(self, *, cell_type=None, amplitude, t0=0, tstop=None):
-        """Attach parameters of tonic biasing input for given cell types.
+        """Attaches parameters of tonic bias input for given cell types
 
         Parameters
         ----------
-        cell_types : str
-            If cell_types is a string, it indicates the cell type that
-            will receive the tonic input.whose cells will get the tonic input.
+        cell_types : str | None
+            The name of the cell type to add a tonic input. When supplied,
+            a float value must be provided with the `amplitude` keyword.
             Valid inputs are those listed in  `net.cell_types`.
-        amplitude: dict or float
-            If cell_types is None, amplitude should be a dictionary where the
-            keys are cell_types(str) that will receive the tonic input,
-            and the values are the amplitudes of the input.
+        amplitude: dict | float
+            A dictionary of cell type keys (str) to amplitude values (float).
             Valid inputs for cell types are those listed in `net.cell_types`.
             If `cell_types` is not None, `amplitude` should be
             a float indicating the amplitude of the tonic input
             for the specified cell type.
         t0 : float
             The start time of tonic input (in ms). Default: 0 (beginning of
-            simulation). This value will be applied to all the cells in
-            cell_types_amplitudes
+            simulation). This value will be applied to all the  tonic biases if
+            multiple are specified with the `amplitude` keyword.
         tstop : float
             The end time of tonic input (in ms). Default: end of simulation.
-            This value will be applied to all the cells in
-            cell_types_amplitudes
+            This value will be applied to all the  tonic biases if
+            multiple are specified with the `amplitude` keyword.
         """
 
         # old functionality single cell type - amplitude
