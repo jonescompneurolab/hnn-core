@@ -88,7 +88,7 @@ API
 
 - :func:`network.add_tonic_bias` argument `amplitue` now  accepts a 
   cell_type(str)-amplitude(float) dictionary in case `cell_type` argument is None,
-  othwerise `amplitue` is a float indicating the amplitude of the tonic input for the specific
+  otherwise `amplitue` is a float indicating the amplitude of the tonic input for the specific
   `cell_type`
   by `Camilo Diaz`_ in :gh:`766`
 
