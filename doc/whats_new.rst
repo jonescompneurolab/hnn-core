@@ -86,10 +86,8 @@ API
   convergence. User can constrain parameter ranges and specify solver,
   by `Carolina Fernandez Pujol`_ in :gh:`652`
 
-- :func:`network.add_tonic_bias` argument `amplitue` now  accepts a 
-  cell_type(str)-amplitude(float) dictionary in case `cell_type` argument is None,
-  otherwise `amplitue` is a float indicating the amplitude of the tonic input for the specific
-  `cell_type`
+- :func:`network.add_tonic_bias` cell-specific tonic bias can now be 
+  provided using the argument amplitude in network.add_tonic_bias`,
   by `Camilo Diaz`_ in :gh:`766`
 
 .. _0.3:
