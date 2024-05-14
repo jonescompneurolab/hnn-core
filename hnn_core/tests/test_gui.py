@@ -11,7 +11,9 @@ import os
 from pathlib import Path
 from hnn_core import Dipole, Network, Params
 from hnn_core.gui import HNNGUI
-from hnn_core.gui._viz_manager import (_idx2figname, _no_overlay_plot_types,
+from hnn_core.gui._viz_manager import (_idx2figname,
+                                       _plot_types,
+                                       _no_overlay_plot_types,
                                        unlink_relink)
 from hnn_core.gui.gui import _init_network_from_widgets
 from hnn_core.gui.gui import serialize_simulation
@@ -480,15 +482,28 @@ def test_gui_adaptive_spectrogram(setup_gui):
 
 
 def test_gui_visualization(setup_gui):
-    """Test visualization functionality in the HNNGUI."""
+    """ Tests updating a figure creates plots with data. """
+
     gui = setup_gui
     gui.run_button.click()
 
     figid = 1
     figname = f'Figure {figid}'
     axname = 'ax1'
+    # Spectrogram has a separate test and does not need to be tested here
+    gui_plots_no_spectrogram = [s for s in _plot_types if s != 'spectrogram']
 
-    plot_types = ["layer2 dipole", "layer5 dipole", "spikes", "PSD", "network"]
+    plot_types = ['current dipole',
+                  'layer2 dipole',
+                  'layer5 dipole',
+                  'input histogram',
+                  'spikes',
+                  'PSD',
+                  'network']
+    # Make sure all plot types are tested.
+    assert len(plot_types) == len(gui_plots_no_spectrogram)
+    assert all([name in gui_plots_no_spectrogram for name in plot_types])
+
     for viz_type in plot_types:
         gui._simulate_viz_action("edit_figure", figname,
                                  axname, 'default', viz_type, {}, 'clear')
@@ -498,6 +513,7 @@ def test_gui_visualization(setup_gui):
         assert len(gui.viz_manager.figs[figid].axes) == 2
         # Check default figs have data on their axis
         assert gui.viz_manager.figs[figid].axes[1].has_data()
+    plt.close('all')
 
 
 def test_unlink_relink_widget():
