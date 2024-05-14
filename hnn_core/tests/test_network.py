@@ -758,15 +758,23 @@ def test_tonic_biases():
                        delay=1.0, lamtha=3.0)
 
     tonic_bias_1 = {
+        'L2_pyramidal': 1.0,
         'name_nonexistent': 1.0
     }
 
     with pytest.raises(ValueError, match=r'cell_type must be one of .*$'):
         net.add_tonic_bias(amplitude=tonic_bias_1, t0=0.0,
                            tstop=4.0)
+    net.external_biases = dict()
+
+    with pytest.raises(TypeError,
+                       match='amplitude must be an instance of dict'):
+        net.add_tonic_bias(amplitude=0.1,
+                           t0=5.0, tstop=-1.0)
 
     tonic_bias_2 = {
-        'L2_pyramidal': 1.0
+        'L2_pyramidal': 1.0,
+        'L5_basket': 0.5
     }
 
     with pytest.raises(ValueError, match='Duration of tonic input cannot be'
@@ -781,29 +789,44 @@ def test_tonic_biases():
         net.add_tonic_bias(amplitude=tonic_bias_2,
                            t0=5.0, tstop=-1.0)
         simulate_dipole(net, tstop=5.)
+    net.external_biases = dict()
 
     with pytest.raises(ValueError, match='parameter may be missing'):
         params['Itonic_T_L2Pyr_soma'] = 5.0
         net = Network(params, add_drives_from_params=True)
+    net.external_biases = dict()
 
     # test adding single cell_type - amplitude (old API)
-    net.external_biases = dict()
     with pytest.raises(ValueError, match=r'cell_type must be one of .*$'):
-        net.add_tonic_bias(cell_type='name_nonexistent', amplitude=1.0,
-                           t0=0.0, tstop=4.0)
+        with pytest.warns(DeprecationWarning,
+                          match=r'cell_type argument will be deprecated'):
+            net.add_tonic_bias(cell_type='name_nonexistent', amplitude=1.0,
+                               t0=0.0, tstop=4.0)
+
+    with pytest.raises(TypeError,
+                       match='amplitude must be an instance of float'):
+        with pytest.warns(DeprecationWarning,
+                          match=r'cell_type argument will be deprecated'):
+            net.add_tonic_bias(cell_type='L5_pyramidal',
+                               amplitude={'L2_pyramidal': 0.1},
+                               t0=5.0, tstop=-1.0)
 
     with pytest.raises(ValueError, match='Duration of tonic input cannot be'
                        ' negative'):
-        net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0,
-                           t0=5.0, tstop=4.0)
-        simulate_dipole(net, tstop=20.)
+        with pytest.warns(DeprecationWarning,
+                          match=r'cell_type argument will be deprecated'):
+            net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0,
+                               t0=5.0, tstop=4.0)
+            simulate_dipole(net, tstop=20.)
     net.external_biases = dict()
 
     with pytest.raises(ValueError, match='End time of tonic input cannot be'
                        ' negative'):
-        net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0,
-                           t0=5.0, tstop=-1.0)
-        simulate_dipole(net, tstop=5.)
+        with pytest.warns(DeprecationWarning,
+                          match=r'cell_type argument will be deprecated'):
+            net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0,
+                               t0=5.0, tstop=-1.0)
+            simulate_dipole(net, tstop=5.)
 
     params.update({
         'N_pyr_x': 3, 'N_pyr_y': 3,

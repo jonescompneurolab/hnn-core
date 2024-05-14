@@ -25,6 +25,7 @@ from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
 from .hnn_io import write_network_configuration, network_to_dict
 from .externals.mne import copy_doc
+from typing import Union
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
@@ -298,7 +299,7 @@ def pick_connection(net, src_gids=None, target_gids=None,
     return sorted(conn_set)
 
 
-class Network(object):
+class Network:
     """The Network class.
 
     Parameters
@@ -1128,28 +1129,6 @@ class Network(object):
                 self.external_drives[
                     drive['name']]['events'].append(event_times)
 
-    def _add_cell_type_bias(self, *, cell_type=None, amplitude,
-                            t_0=0, t_stop=None):
-        if cell_type is not None:
-            # Validate cell_type value
-            if cell_type not in self.cell_types:
-                raise ValueError(f'cell_type must be one of '
-                                 f'{list(self.cell_types.keys())}. '
-                                 f'Got {cell_type}')
-
-            if 'tonic' not in self.external_biases:
-                self.external_biases['tonic'] = dict()
-
-            if cell_type in self.external_biases['tonic']:
-                raise ValueError(f'Tonic bias already defined for {cell_type}')
-
-            cell_type_bias = {
-                'amplitude': amplitude,
-                't0': t_0,
-                'tstop': t_stop
-            }
-            self.external_biases['tonic'][cell_type] = cell_type_bias
-
     def add_tonic_bias(self, *, cell_type=None, amplitude, t0=0, tstop=None):
         """Attaches parameters of tonic bias input for given cell types
 
@@ -1176,28 +1155,29 @@ class Network(object):
         """
 
         # old functionality single cell type - amplitude
-        if (cell_type is not None):
+        if cell_type is not None:
             warnings.warn('cell_type argument will be deprecated and '
-                          'removed in future releases', DeprecationWarning,
+                          'removed in future releases. Use amplitude as a '
+                          'cell_type:str,amplitude:float dictionary.'
+                          'Read the function docustring for more information',
+                          DeprecationWarning,
                           stacklevel=1)
-            if (not isinstance(amplitude, float)):
-                raise ValueError('amplitude parameter is not float')
+            _validate_type(amplitude, float, 'amplitude')
 
-            self._add_cell_type_bias(cell_type=cell_type, amplitude=amplitude,
-                                     t_0=t0, t_stop=tstop)
+            _add_cell_type_bias(network=self, cell_type=cell_type,
+                                amplitude=amplitude,
+                                t_0=t0, t_stop=tstop)
         else:
-            if (not isinstance(amplitude, dict)):
-                raise ValueError('amplitude parameter is not a dictionary')
-
-            if (len(amplitude) == 0):
+            _validate_type(amplitude, dict, 'amplitude')
+            if len(amplitude) == 0:
                 warnings.warn('No bias have been defined, no action taken',
                               UserWarning, stacklevel=1)
                 return
 
             for _cell_type, _amplitude in amplitude.items():
-                self._add_cell_type_bias(cell_type=_cell_type,
-                                         amplitude=_amplitude,
-                                         t_0=t0, t_stop=tstop)
+                _add_cell_type_bias(network=self, cell_type=_cell_type,
+                                    amplitude=_amplitude,
+                                    t_0=t0, t_stop=tstop)
 
     def _add_cell_type(self, cell_name, pos, cell_template=None):
         """Add cell type by updating pos_dict and gid_ranges."""
@@ -1582,3 +1562,35 @@ class _NetworkDrive(dict):
                      f"{len(self['events'])} trial{plurl}")
         entr += '>'
         return entr
+
+
+def _add_cell_type_bias(network: Network, amplitude: Union[float, dict],
+                        cell_type=None,
+                        t_0=0, t_stop=None):
+
+    if network is None:
+        raise ValueError('The "network" parameter is required '
+                         'but was not provided')
+    if amplitude is None:
+        raise ValueError('The "amplitude" parameter is required '
+                         'but was not provided')
+
+    if cell_type is not None:
+        # Validate cell_type value
+        if cell_type not in network.cell_types:
+            raise ValueError(f'cell_type must be one of '
+                             f'{list(network.cell_types.keys())}. '
+                             f'Got {cell_type}')
+
+        if 'tonic' not in network.external_biases:
+            network.external_biases['tonic'] = dict()
+
+        if cell_type in network.external_biases['tonic']:
+            raise ValueError(f'Tonic bias already defined for {cell_type}')
+
+        cell_type_bias = {
+            'amplitude': amplitude,
+            't0': t_0,
+            'tstop': t_stop
+        }
+        network.external_biases['tonic'][cell_type] = cell_type_bias
