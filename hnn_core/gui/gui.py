@@ -26,6 +26,8 @@ from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
 from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
                              _read_legacy_params)
+from hnn_core.dipole import _read_dipole_txt
+
 import base64
 import zipfile
 import numpy as np
@@ -1227,7 +1229,7 @@ def on_upload_data_change(change, data, viz_manager, log_out):
     ext_content = codecs.decode(ext_content, encoding="utf-8")
     with log_out:
         data['simulation_data'][data_fname] = {'net': None, 'dpls': [
-            hnn_core._read_dipole_txt(io.StringIO(ext_content), file_extension)
+            _read_dipole_txt(io.StringIO(ext_content), file_extension)
         ]}
         logger.info(f'External data {data_fname} loaded.')
         _template_name = "[Blank] single figure"
