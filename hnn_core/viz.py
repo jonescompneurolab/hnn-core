@@ -1293,75 +1293,82 @@ class NetworkPlotter:
                  colorbar=True, voltage_colormap='viridis', elev=10, azim=-500,
                  xlim=(-200, 3100), ylim=(-200, 3100), zlim=(-300, 2200),
                  trial_idx=0, time_idx=0):
-        import matplotlib.pyplot as plt
         from matplotlib import colormaps
+
+        self._validate_parameters(vmin, vmax, bg_color, voltage_colormap,
+                                  colorbar, elev, azim, xlim, ylim, zlim,
+                                  trial_idx, time_idx)
+
+        # Set init arguments
         self.net = net
-
-        # Check if network simulated
-        if net.cell_response is not None:
-            self.times = net.cell_response.times
-
-            # Check if voltage recorded
-            if net._params['record_vsec'] == 'all':
-                self._vsec_recorded = True
-            else:
-                self._vsec_recorded = False
-        else:
-            self._vsec_recorded = False
-            self.times = None
-
-        _validate_type(vmin, (int, float), 'vmin')
-        _validate_type(vmax, (int, float), 'vmax')
+        self.ax = ax
         self._vmin = vmin
         self._vmax = vmax
-
         self._bg_color = bg_color
+        self._colorbar = colorbar
         self._voltage_colormap = voltage_colormap
-
-        self._colormaps = colormaps  # Saved for voltage_colormap update method
-        self._colormap = colormaps[voltage_colormap]
-
-        # Axes limits and view positions
-        _validate_type(xlim, tuple, 'xlim')
-        _validate_type(ylim, tuple, 'ylim')
-        _validate_type(zlim, tuple, 'zlim')
-        _validate_type(elev, (int, float), 'elev')
-        _validate_type(azim, (int, float), 'azim')
-
+        self._colormaps = colormaps
         self._xlim = xlim
         self._ylim = ylim
         self._zlim = zlim
         self._elev = elev
         self._azim = azim
-
-        # Trial and time indices
-        _validate_type(trial_idx, int, 'trial_idx')
-        _validate_type(time_idx, int, 'time_idx')
-
         self._trial_idx = trial_idx
         self._time_idx = time_idx
 
-        # Get voltage data and corresponding colors
+        # Check if Network object is simulated
+        self.times, self._vsec_recorded = self._check_network_simulation()
+
+        # Initialize plots and colormap
+        self.fig = None
+        self._colormap = colormaps[voltage_colormap]
         self.vsec_array = self._get_voltages()
         self.color_array = self._colormap(self.vsec_array)
 
-        # Create figure
-        if ax is None:
-            self.fig = plt.figure()
-            self.ax = self.fig.add_subplot(projection='3d')
-            self.ax.set_facecolor(self._bg_color)
-        else:
-            self.ax = ax
-            self.fig = None
-        self._init_network_plot()
-        self._update_axes()
-
-        _validate_type(colorbar, bool, 'colorbar')
-        self._colorbar = colorbar
+        self._initialize_plots()
         if self._colorbar:
             self._update_colorbar()
         else:
             self._cbar = None
+
+    def _validate_parameters(self, vmin, vmax, bg_color, voltage_colormap,
+                             colorbar, elev, azim, xlim, ylim, zlim, trial_idx,
+                             time_idx):
+        _validate_type(vmin, (int, float), 'vmin')
+        _validate_type(vmax, (int, float), 'vmax')
+        _validate_type(bg_color, str, 'bg_color')
+        _validate_type(voltage_colormap, str, 'voltage_colormap')
+        _validate_type(colorbar, bool, 'colorbar')
+        _validate_type(xlim, tuple, 'xlim')
+        _validate_type(ylim, tuple, 'ylim')
+        _validate_type(zlim, tuple, 'zlim')
+        _validate_type(elev, (int, float), 'elev')
+        _validate_type(azim, (int, float), 'azim')
+        _validate_type(trial_idx, int, 'trial_idx')
+        _validate_type(time_idx, int, 'time_idx')
+
+    def _check_network_simulation(self):
+        times = None
+        vsec_recorded = False
+        # Check if network simulated
+        if self.net.cell_response is not None:
+            times = self.net.cell_response.times
+
+            # Check if voltage recorded
+            if self.net._params['record_vsec'] == 'all':
+                vsec_recorded = True
+        return times, vsec_recorded
+
+    def _initialize_plots(self):
+        import matplotlib.pyplot as plt
+        # Create figure
+        if self.ax is None:
+            self.fig = plt.figure()
+            self.ax = self.fig.add_subplot(projection='3d')
+            self.ax.set_facecolor(self._bg_color)
+
+        self._init_network_plot()
+        self._update_axes()
 
     def _get_voltages(self):
         vsec_list = list()
@@ -1554,6 +1561,10 @@ class NetworkPlotter:
     @trial_idx.setter
     def trial_idx(self, trial_idx):
         _validate_type(trial_idx, int, 'trial_idx')
+        if not self._vsec_recorded:
+            raise RuntimeError("Network must be simulated with"
+                               "`simulate_dipole(record_vsec='all')` before"
+                               "setting `trial_idx`.")
         self._trial_idx = trial_idx
         self.vsec_array = self._get_voltages()
         self.color_array = self._colormap(self.vsec_array)
@@ -1566,6 +1577,10 @@ class NetworkPlotter:
     @time_idx.setter
     def time_idx(self, time_idx):
         _validate_type(time_idx, (int, np.integer), 'time_idx')
+        if not self._vsec_recorded:
+            raise RuntimeError("Network must be simulated with"
+                               "`simulate_dipole(record_vsec='all')` before"
+                               "setting `time_idx`.")
         self._time_idx = time_idx
         self._update_section_voltages(self._time_idx)
 
