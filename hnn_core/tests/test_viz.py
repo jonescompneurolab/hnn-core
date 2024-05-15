@@ -233,26 +233,11 @@ def test_network_plotter_init(setup_net):
     """Test init keywords of NetworkPlotter class."""
     net = setup_net
     # test NetworkPlotter class
-    with pytest.raises(TypeError, match='xlim must be'):
-        _ = NetworkPlotter(net, xlim='blah')
-    with pytest.raises(TypeError, match='ylim must be'):
-        _ = NetworkPlotter(net, ylim='blah')
-    with pytest.raises(TypeError, match='zlim must be'):
-        _ = NetworkPlotter(net, zlim='blah')
-    with pytest.raises(TypeError, match='elev must be'):
-        _ = NetworkPlotter(net, elev='blah')
-    with pytest.raises(TypeError, match='azim must be'):
-        _ = NetworkPlotter(net, azim='blah')
-    with pytest.raises(TypeError, match='vmin must be'):
-        _ = NetworkPlotter(net, vmin='blah')
-    with pytest.raises(TypeError, match='vmax must be'):
-        _ = NetworkPlotter(net, vmax='blah')
-    with pytest.raises(TypeError, match='trial_idx must be'):
-        _ = NetworkPlotter(net, trial_idx=1.0)
-    with pytest.raises(TypeError, match='time_idx must be'):
-        _ = NetworkPlotter(net, time_idx=1.0)
-    with pytest.raises(TypeError, match='colorbar must be'):
-        _ = NetworkPlotter(net, colorbar='blah')
+    args = ['xlim', 'ylim', 'zlim', 'elev', 'azim', 'vmin', 'vmax',
+            'trial_idx', 'time_idx', 'colorbar']
+    for arg in args:
+        with pytest.raises(TypeError, match=f'{arg} must be'):
+            net_plot = NetworkPlotter(net, **{arg: 'blah'})
 
     net_plot = NetworkPlotter(net)
 
