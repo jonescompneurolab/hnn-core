@@ -245,7 +245,7 @@ def test_dipole_visualization():
     with pytest.raises(TypeError, match='colorbar must be'):
         _ = NetworkPlotter(net, colorbar='blah')
 
-    net = jones_2009_model(params)
+    net = jones_2009_model(params, mesh_shape=(3, 3))
     net_plot = NetworkPlotter(net)
 
     assert net_plot.vsec_array.shape == (159, 1)
@@ -268,7 +268,7 @@ def test_dipole_visualization():
         net_plot.export_movie('demo.gif', dpi=200)
 
     # Simulate with record_vsec='all' to test voltage plotting
-    net = jones_2009_model(params)
+    net = jones_2009_model(params, mesh_shape=(3, 3))
     _ = simulate_dipole(net, dt=0.5, tstop=10, n_trials=2,
                         record_vsec='all')
     net_plot = NetworkPlotter(net)
