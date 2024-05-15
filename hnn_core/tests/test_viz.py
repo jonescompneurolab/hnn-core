@@ -329,14 +329,20 @@ def test_network_plotter_setter(setup_net):
     plt.close('all')
 
 
-def test_network_plotter_export(setup_net):
+def test_network_plotter_export(tmp_path, setup_net):
     """Test NetworkPlotter class export methods."""
     net = setup_net
     _ = simulate_dipole(net, dt=0.5, tstop=10, n_trials=1,
                         record_vsec='all')
     net_plot = NetworkPlotter(net)
 
+    # Check no file is already written
+    path_out = tmp_path / 'demo.gif'
+    assert not path_out.is_file()
+
     # Test animation export and voltage plotting
-    net_plot.export_movie('demo.gif', dpi=200, decim=100, writer='pillow')
+    net_plot.export_movie(path_out, dpi=200, decim=100, writer='pillow')
+
+    assert path_out.is_file()
 
     plt.close('all')
