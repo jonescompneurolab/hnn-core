@@ -882,6 +882,12 @@ class Cell:
         pos : tuple of int or float | None
             Position of cell soma. Must be a tuple of 3 elements for the
             (x, y, z) position of the soma in 3D space. Default: (0, 0, 0)
+        xlim : tuple of int | tuple of float
+            x limits of plot window. Default (-250, 150)
+        ylim : tuple of int | tuple of float
+            y limits of plot window. Default (-100, 100)
+        zlim : tuple of int | tuple of float
+            z limits of plot window. Default (-100, 1200)
         show : bool
             If True, show the plot
 
