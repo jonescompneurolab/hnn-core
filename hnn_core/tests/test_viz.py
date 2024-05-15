@@ -28,6 +28,7 @@ def setup_net():
 
     return net
 
+
 def _fake_click(fig, ax, point, button=1):
     """Fake a click at a point within axes."""
     x, y = ax.transData.transform_point(point)
@@ -225,6 +226,7 @@ def test_dipole_visualization(setup_net):
                                                   'beta_dist': 'g'})
     with pytest.raises(ValueError, match="'beta_dist' must be"):
         net.cell_response.plot_spikes_hist(color={'beta_prox': 'r'})
+    plt.close('all')
 
 
 def test_network_plotter_init(setup_net):
@@ -257,6 +259,7 @@ def test_network_plotter_init(setup_net):
     assert net_plot.vsec_array.shape == (159, 1)
     assert net_plot.color_array.shape == (159, 1, 4)
     assert net_plot._vsec_recorded is False
+    plt.close('all')
 
 
 def test_network_plotter_simulation(setup_net):
@@ -279,16 +282,19 @@ def test_network_plotter_simulation(setup_net):
         net_plot.export_movie('demo.gif', dpi=200)
 
     net = setup_net
-    _ = simulate_dipole(net, dt=0.5, tstop=10, record_vsec='all')
+    _ = simulate_dipole(net, dt=0.5, tstop=10, record_vsec='all', n_trials=2)
     net_plot = NetworkPlotter(net)
-    # setter/getter test for time_idx
+    # setter/getter test for time_idx and trial_idx
     net_plot.time_idx = 5
     assert net_plot.time_idx == 5
+    net_plot.trial_idx = 1
+    assert net_plot.trial_idx == 1
 
     assert net_plot.vsec_array.shape == (159, 21)
     assert net_plot.color_array.shape == (159, 21, 4)
     assert net_plot._vsec_recorded is True
     assert isinstance(net_plot._cbar, Colorbar)
+    plt.close('all')
 
 
 def test_network_plotter_setter(setup_net):
@@ -296,40 +302,23 @@ def test_network_plotter_setter(setup_net):
     net = setup_net
     net_plot = NetworkPlotter(net)
     # Type check errors
-    with pytest.raises(TypeError, match='xlim must be'):
-        net_plot.xlim = 'blah'
-    with pytest.raises(TypeError, match='ylim must be'):
-        net_plot.ylim = 'blah'
-    with pytest.raises(TypeError, match='zlim must be'):
-        net_plot.zlim = 'blah'
-    with pytest.raises(TypeError, match='elev must be'):
-        net_plot.elev = 'blah'
-    with pytest.raises(TypeError, match='azim must be'):
-        net_plot.azim = 'blah'
-    with pytest.raises(TypeError, match='vmin must be'):
-        net_plot.vmin = 'blah'
-    with pytest.raises(TypeError, match='vmax must be'):
-        net_plot.vmax = 'blah'
-    with pytest.raises(TypeError, match='trial_idx must be'):
-        net_plot.trial_idx = 1.0
-    with pytest.raises(TypeError, match='time_idx must be'):
-        net_plot.time_idx = 1.0
-    with pytest.raises(TypeError, match='colorbar must be'):
-        net_plot.colorbar = 'blah'
+    args = ['xlim', 'ylim', 'zlim', 'elev', 'azim', 'vmin', 'vmax',
+            'trial_idx', 'time_idx', 'colorbar']
+    for arg in args:
+        with pytest.raises(TypeError, match=f'{arg} must be'):
+            setattr(net_plot, arg, 'blah')
 
-    # Check that the setters work
-    net_plot.xlim = (-100, 100)
-    net_plot.ylim = (-100, 100)
-    net_plot.zlim = (-100, 100)
-    net_plot.elev = 10
-    net_plot.azim = 10
-    net_plot.vmin = 0
-    net_plot.vmax = 100
-    net_plot.bgcolor = 'white'
-    net_plot.voltage_colormap = 'jet'
+    # Check that the setters and getters work
+    arg_dict = {'xlim': (-100, 100), 'ylim': (-100, 100), 'zlim': (-100, 100),
+                'elev': 10, 'azim': 10, 'vmin': 0, 'vmax': 100,
+                'bgcolor': 'white', 'voltage_colormap': 'jet',
+                'colorbar': False}
+    for arg, val in arg_dict.items():
+        setattr(net_plot, arg, val)
+        assert getattr(net_plot, arg) == val
 
-    net_plot.colorbar = False
     assert net_plot._cbar is None
+    assert net_plot.fig.get_facecolor() == (1.0, 1.0, 1.0, 1.0)
 
     # time_idx setter should raise an error if network is not simulated
     with pytest.raises(RuntimeError, match='Network must be simulated'):
@@ -337,21 +326,7 @@ def test_network_plotter_setter(setup_net):
 
     with pytest.raises(RuntimeError, match='Network must be simulated'):
         net_plot.trial_idx = 1
-
-    # Check that the getters work
-    assert net_plot.xlim == (-100, 100)
-    assert net_plot.ylim == (-100, 100)
-    assert net_plot.zlim == (-100, 100)
-    assert net_plot.elev == 10
-    assert net_plot.azim == 10
-    assert net_plot.vmin == 0
-    assert net_plot.vmax == 100
-    assert net_plot.trial_idx == 1
-
-    assert net_plot.bgcolor == 'white'
-    assert net_plot.fig.get_facecolor() == (1.0, 1.0, 1.0, 1.0)
-
-    assert net_plot.voltage_colormap == 'jet'
+    plt.close('all')
 
 
 def test_network_plotter_export(setup_net):
