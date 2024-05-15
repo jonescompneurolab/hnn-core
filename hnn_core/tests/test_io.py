@@ -1,4 +1,3 @@
-import json
 # Authors: George Dang <george_dang@brown.edu>
 #          Rajat Partani <rajatpartani@gmail.com>
 
@@ -6,6 +5,7 @@ from pathlib import Path
 from time import sleep
 import pytest
 import numpy as np
+import json
 
 from hnn_core import (simulate_dipole, read_params,
                       jones_2009_model, calcium_model,
