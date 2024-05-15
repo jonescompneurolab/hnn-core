@@ -19,6 +19,15 @@ from hnn_core.dipole import simulate_dipole
 matplotlib.use('agg')
 
 
+@pytest.fixture
+def setup_net():
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+    net = jones_2009_model(params, mesh_shape=(3, 3))
+
+    return net
+
 def _fake_click(fig, ax, point, button=1):
     """Fake a click at a point within axes."""
     x, y = ax.transData.transform_point(point)
@@ -29,12 +38,9 @@ def _fake_click(fig, ax, point, button=1):
     fig.canvas.callbacks.process('button_press_event', button_press_event)
 
 
-def test_network_visualization():
+def test_network_visualization(setup_net):
     """Test network visualisations."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
-    net = jones_2009_model(params, mesh_shape=(3, 3))
+    net = setup_net
     plot_cells(net)
     ax = net.cell_types['L2_pyramidal'].plot_morphology()
     assert len(ax.lines) == 8
@@ -114,12 +120,9 @@ def test_network_visualization():
     plt.close('all')
 
 
-def test_dipole_visualization():
+def test_dipole_visualization(setup_net):
     """Test dipole visualisations."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
-    net = jones_2009_model(params, mesh_shape=(3, 3))
+    net = setup_net
     weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
     syn_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
 
@@ -223,6 +226,10 @@ def test_dipole_visualization():
     with pytest.raises(ValueError, match="'beta_dist' must be"):
         net.cell_response.plot_spikes_hist(color={'beta_prox': 'r'})
 
+
+def test_network_plotter_init(setup_net):
+    """Test init keywords of NetworkPlotter class."""
+    net = setup_net
     # test NetworkPlotter class
     with pytest.raises(TypeError, match='xlim must be'):
         _ = NetworkPlotter(net, xlim='blah')
@@ -245,13 +252,17 @@ def test_dipole_visualization():
     with pytest.raises(TypeError, match='colorbar must be'):
         _ = NetworkPlotter(net, colorbar='blah')
 
-    net = jones_2009_model(params, mesh_shape=(3, 3))
     net_plot = NetworkPlotter(net)
 
     assert net_plot.vsec_array.shape == (159, 1)
     assert net_plot.color_array.shape == (159, 1, 4)
     assert net_plot._vsec_recorded is False
 
+
+def test_network_plotter_simulation(setup_net):
+    """Test NetworkPlotter class simulation warnings."""
+    net = setup_net
+    net_plot = NetworkPlotter(net)
     # Errors if vsec isn't recorded
     with pytest.raises(RuntimeError, match='Network must be simulated'):
         net_plot.export_movie('demo.gif', dpi=200)
@@ -267,17 +278,23 @@ def test_dipole_visualization():
     with pytest.raises(RuntimeError, match='Network must be simulated'):
         net_plot.export_movie('demo.gif', dpi=200)
 
-    # Simulate with record_vsec='all' to test voltage plotting
-    net = jones_2009_model(params, mesh_shape=(3, 3))
-    _ = simulate_dipole(net, dt=0.5, tstop=10, n_trials=2,
-                        record_vsec='all')
+    net = setup_net
+    _ = simulate_dipole(net, dt=0.5, tstop=10, record_vsec='all')
     net_plot = NetworkPlotter(net)
+    # setter/getter test for time_idx
+    net_plot.time_idx = 5
+    assert net_plot.time_idx == 5
 
     assert net_plot.vsec_array.shape == (159, 21)
     assert net_plot.color_array.shape == (159, 21, 4)
     assert net_plot._vsec_recorded is True
     assert isinstance(net_plot._cbar, Colorbar)
 
+
+def test_network_plotter_setter(setup_net):
+    """Test NetworkPlotter class setters and getters."""
+    net = setup_net
+    net_plot = NetworkPlotter(net)
     # Type check errors
     with pytest.raises(TypeError, match='xlim must be'):
         net_plot.xlim = 'blah'
@@ -308,14 +325,18 @@ def test_dipole_visualization():
     net_plot.azim = 10
     net_plot.vmin = 0
     net_plot.vmax = 100
-    net_plot.trial_idx = 1
-    net_plot.time_idx = 5
     net_plot.bgcolor = 'white'
     net_plot.voltage_colormap = 'jet'
 
     net_plot.colorbar = False
-    # check later that net._cbar is None
     assert net_plot._cbar is None
+
+    # time_idx setter should raise an error if network is not simulated
+    with pytest.raises(RuntimeError, match='Network must be simulated'):
+        net_plot.time_idx = 5
+
+    with pytest.raises(RuntimeError, match='Network must be simulated'):
+        net_plot.trial_idx = 1
 
     # Check that the getters work
     assert net_plot.xlim == (-100, 100)
@@ -326,12 +347,19 @@ def test_dipole_visualization():
     assert net_plot.vmin == 0
     assert net_plot.vmax == 100
     assert net_plot.trial_idx == 1
-    assert net_plot.time_idx == 5
 
     assert net_plot.bgcolor == 'white'
     assert net_plot.fig.get_facecolor() == (1.0, 1.0, 1.0, 1.0)
 
     assert net_plot.voltage_colormap == 'jet'
+
+
+def test_network_plotter_export(setup_net):
+    """Test NetworkPlotter class export methods."""
+    net = setup_net
+    _ = simulate_dipole(net, dt=0.5, tstop=10, n_trials=1,
+                        record_vsec='all')
+    net_plot = NetworkPlotter(net)
 
     # Test animation export and voltage plotting
     net_plot.export_movie('demo.gif', dpi=200, decim=100, writer='pillow')
