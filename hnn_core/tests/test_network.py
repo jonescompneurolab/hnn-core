@@ -765,6 +765,10 @@ def test_tonic_biases():
     with pytest.raises(ValueError, match=r'cell_type must be one of .*$'):
         net.add_tonic_bias(amplitude=tonic_bias_1, t0=0.0,
                            tstop=4.0)
+
+    # The previous test only adds L2_pyramidal and ignores name_nonexistent
+    # Testing the fist bias was added
+    assert net.external_biases['tonic']['L2_pyramidal'] is not None
     net.external_biases = dict()
 
     with pytest.raises(TypeError,
@@ -804,7 +808,7 @@ def test_tonic_biases():
                                t0=0.0, tstop=4.0)
 
     with pytest.raises(TypeError,
-                       match='amplitude must be an instance of float'):
+                       match='amplitude must be an instance of float or int'):
         with pytest.warns(DeprecationWarning,
                           match=r'cell_type argument will be deprecated'):
             net.add_tonic_bias(cell_type='L5_pyramidal',
@@ -815,7 +819,7 @@ def test_tonic_biases():
                        ' negative'):
         with pytest.warns(DeprecationWarning,
                           match=r'cell_type argument will be deprecated'):
-            net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1.0,
+            net.add_tonic_bias(cell_type='L2_pyramidal', amplitude=1,
                                t0=5.0, tstop=4.0)
             simulate_dipole(net, tstop=20.)
     net.external_biases = dict()
