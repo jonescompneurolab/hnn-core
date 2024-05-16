@@ -949,14 +949,14 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
         'tstop': 0.0,
         'seedcore': 14,
         'rate_constant': {
-            'L5_pyramidal': 8.5,
-            'L2_pyramidal': 8.5,
-            'L5_basket': 8.5,
-            'L2_basket': 8.5,
+            'L5_pyramidal': 40,
+            'L2_pyramidal': 40,
+            'L5_basket': 40,
+            'L2_basket': 40,
         }
     }
     if isinstance(data, dict):
-        default_data.update(data)
+        default_data = _update_nested_dict(default_data, data)
     tstart = BoundedFloatText(
         value=default_data['tstart'], description='Start time (ms)',
         min=0, max=1e6, layout=layout, style=style)
