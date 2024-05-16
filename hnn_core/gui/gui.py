@@ -28,7 +28,7 @@ from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
 from hnn_core.params import _extract_drive_specs_from_hnn_params
 from hnn_core.dipole import _read_dipole_txt
-
+from hnn_core.hnn_io import _dict_to_network
 import base64
 import zipfile
 import numpy as np
@@ -272,7 +272,7 @@ class HNNGUI:
             button_color=self.layout['theme_color'])
 
         self.load_connectivity_button = FileUpload(
-            accept='.json,.param', multiple=False,
+            accept='.json', multiple=False,
             style={'button_color': self.layout['theme_color']},
             description='Load local network connectivity',
             layout=self.layout['btn_full_w'], button_style='success')
@@ -1200,7 +1200,7 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
 def add_connectivity_tab(params, connectivity_out,
                          connectivity_textfields):
     """Add all possible connectivity boxes to connectivity tab."""
-    net = jones_2009_model(params)
+    net = _dict_to_network(params)
     cell_types = [ct for ct in net.cell_types.keys()]
     receptors = ('ampa', 'nmda', 'gabaa', 'gabab')
     locations = ('proximal', 'distal', 'soma')
