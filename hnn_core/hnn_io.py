@@ -380,31 +380,12 @@ def _order_drives(gid_ranges, external_drives):
     return ordered_drives
 
 
-@fill_doc
-def read_network_configuration(fname, read_drives=True):
-    """Read network from a json configuration file.
+def _dict_to_network(net_data, read_drives=True):
+    """ Convert dict of configurations to Network """
 
-    Parameters
-    ----------
-    %(fname)s
-    %(read_drives)s
-
-    Yields
-    ------
-    %(net)s
-    """
     # Importing Network.
     # Cannot do this globally due to circular import.
     from .network import Network
-
-    with open(fname, 'r') as file:
-        net_data = json.load(file)
-
-    if net_data.get('object_type') != 'Network':
-        raise ValueError('The json should encode a Network object. '
-                         'The file contains object of '
-                         'type %s' % (net_data.get('object_type')))
-
     params = dict()
     params['celsius'] = net_data['celsius']
     params['threshold'] = net_data['threshold']
@@ -451,5 +432,32 @@ def read_network_configuration(fname, read_drives=True):
 
     if not read_drives:
         net.clear_drives()
+
+    return net
+
+
+@fill_doc
+def read_network_configuration(fname, read_drives=True):
+    """Read network from a json configuration file.
+
+    Parameters
+    ----------
+    %(fname)s
+    %(read_drives)s
+
+    Yields
+    ------
+    %(net)s
+    """
+
+    with open(fname, 'r') as file:
+        net_data = json.load(file)
+
+    if net_data.get('object_type') != 'Network':
+        raise ValueError('The json should encode a Network object. '
+                         'The file contains object of '
+                         'type %s' % (net_data.get('object_type')))
+
+    net = _dict_to_network(net_data, read_drives)
 
     return net
