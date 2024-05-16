@@ -30,9 +30,6 @@ Changelog
 - Add ability to specify number of cells in :class:`~hnn_core.Network`,
   by `Nick Tolley`_ in :gh:`705`
 
-- Add feature to read/write :class:`~hnn_core.Network` from/to HDF5 format,
-  by `Rajat Partani`_ and `George Dang`_ in :gh:`704`
-
 - Add feature to convert param and json files to HDF5 format, by `George Dang`_
   in :gh:`723`
   
@@ -57,6 +54,9 @@ Changelog
 
 - Added gui widgets to save simulation as csv and updated the file upload to support csv data,
   by `Camilo Diaz`_ in :gh:`753`
+
+- Added feature to read/write :class:`~hnn_core.Network` configurations to
+  json, by `George Dang`_ and `Rajat Partani`_ in :gh:`757`
 
 Bug
 ~~~
@@ -85,6 +85,10 @@ API
 - Add ability to optimize parameters associated with evoked drives and plot 
   convergence. User can constrain parameter ranges and specify solver,
   by `Carolina Fernandez Pujol`_ in :gh:`652`
+
+- :func:`network.add_tonic_bias` cell-specific tonic bias can now be 
+  provided using the argument amplitude in network.add_tonic_bias`,
+  by `Camilo Diaz`_ in :gh:`766`
 
 .. _0.3:
 

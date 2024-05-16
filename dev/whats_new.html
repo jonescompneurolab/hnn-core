@@ -191,8 +191,6 @@ by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</
 dependency groups, by <a class="reference external" href="https://github.com/gtdang">George Dang</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/703">#703</a>.</p></li>
 <li><p>Add ability to specify number of cells in <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a>,
 by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/705">#705</a></p></li>
-<li><p>Add feature to read/write <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> from/to HDF5 format,
-by <a class="reference external" href="https://github.com/raj1701">Rajat Partani</a> and <a class="reference external" href="https://github.com/gtdang">George Dang</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/704">#704</a></p></li>
 <li><p>Add feature to convert param and json files to HDF5 format, by <a class="reference external" href="https://github.com/gtdang">George Dang</a>
 in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/723">#723</a></p></li>
 <li><p>Fixed figure annotation overlap in multiple sub-plots,
@@ -210,6 +208,8 @@ by <a class="reference external" href="https://github.com/kmilo9999">Camilo Diaz
 by <a class="reference external" href="https://github.com/kmilo9999">Camilo Diaz</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/750">#750</a></p></li>
 <li><p>Added gui widgets to save simulation as csv and updated the file upload to support csv data,
 by <a class="reference external" href="https://github.com/kmilo9999">Camilo Diaz</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/753">#753</a></p></li>
+<li><p>Added feature to read/write <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> configurations to
+json, by <a class="reference external" href="https://github.com/gtdang">George Dang</a> and <a class="reference external" href="https://github.com/raj1701">Rajat Partani</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/757">#757</a></p></li>
 </ul>
 </section>
 <section id="bug">
@@ -237,6 +237,9 @@ now support hdf5 format for read/write Dipole object, by
 <li><p>Add ability to optimize parameters associated with evoked drives and plot
 convergence. User can constrain parameter ranges and specify solver,
 by <a href="#id54"><span class="problematic" id="id55">`Carolina Fernandez Pujol`_</span></a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/652">#652</a></p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">network.add_tonic_bias()</span></code> cell-specific tonic bias can now be
+provided using the argument amplitude in network.add_tonic_bias`,
+by <a class="reference external" href="https://github.com/kmilo9999">Camilo Diaz</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/766">#766</a></p></li>
 </ul>
 </section>
 </section>

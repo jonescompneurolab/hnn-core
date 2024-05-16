@@ -105,7 +105,7 @@
 <li><a class="reference internal" href="#hnn_core.Network.gid_to_type"><code class="docutils literal notranslate"><span class="pre">Network.gid_to_type()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.Network.plot_cells"><code class="docutils literal notranslate"><span class="pre">Network.plot_cells()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.Network.set_cell_positions"><code class="docutils literal notranslate"><span class="pre">Network.set_cell_positions()</span></code></a></li>
-<li><a class="reference internal" href="#hnn_core.Network.write"><code class="docutils literal notranslate"><span class="pre">Network.write()</span></code></a></li>
+<li><a class="reference internal" href="#hnn_core.Network.write_configuration"><code class="docutils literal notranslate"><span class="pre">Network.write_configuration()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -250,8 +250,8 @@ instances of <a class="reference internal" href="hnn_core.extracellular.Extracel
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.add_poisson_drive" title="hnn_core.Network.add_poisson_drive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_poisson_drive</span></code></a>(name, *[, tstart, tstop, ...])</p></td>
 <td><p>Add a Poisson-distributed external drive to the network</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.add_tonic_bias" title="hnn_core.Network.add_tonic_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_tonic_bias</span></code></a>(*[, cell_type, amplitude, ...])</p></td>
-<td><p>Attach parameters of tonic biasing input for a given cell type.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.add_tonic_bias" title="hnn_core.Network.add_tonic_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_tonic_bias</span></code></a>(*[, cell_type, t0, tstop])</p></td>
+<td><p>Attaches parameters of tonic bias input for given cell types</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.clear_connectivity" title="hnn_core.Network.clear_connectivity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_connectivity</span></code></a>()</p></td>
 <td><p>Remove all connections defined in Network.connectivity</p></td>
@@ -271,8 +271,15 @@ instances of <a class="reference internal" href="hnn_core.extracellular.Extracel
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.set_cell_positions" title="hnn_core.Network.set_cell_positions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_cell_positions</span></code></a>(*[, inplane_distance, ...])</p></td>
 <td><p>Set relative positions of cells arranged in a square grid</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.write" title="hnn_core.Network.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code></a>(fname[, overwrite, write_output])</p></td>
-<td><p>Write network to a HDF5 file.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.write_configuration" title="hnn_core.Network.write_configuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_configuration</span></code></a>(fname[, overwrite])</p></td>
+<td><p>Writes network configuration to a json file.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>to_dict</strong></p></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -617,20 +624,28 @@ Used to randomly remove connections when probability &lt; 1.0.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.add_tonic_bias">
-<span class="sig-name descname"><span class="pre">add_tonic_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_tonic_bias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_tonic_bias" title="Permalink to this definition">¶</a></dt>
-<dd><p>Attach parameters of tonic biasing input for a given cell type.</p>
+<span class="sig-name descname"><span class="pre">add_tonic_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_tonic_bias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_tonic_bias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attaches parameters of tonic bias input for given cell types</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>cell_type</strong><span class="classifier">str</span></dt><dd><p>The cell type whose cells will get the tonic input.
-Valid inputs are those in <em class="xref py py-obj">net.cell_types</em>.</p>
+<dt><strong>cell_types</strong><span class="classifier">str | None</span></dt><dd><p>The name of the cell type to add a tonic input. When supplied,
+a float value must be provided with the <em class="xref py py-obj">amplitude</em> keyword.
+Valid inputs are those listed in  <em class="xref py py-obj">net.cell_types</em>.</p>
 </dd>
-<dt><strong>amplitude</strong><span class="classifier">float</span></dt><dd><p>The amplitude of the input.</p>
+<dt><strong>amplitude: dict | float</strong></dt><dd><p>A dictionary of cell type keys (str) to amplitude values (float).
+Valid inputs for cell types are those listed in <em class="xref py py-obj">net.cell_types</em>.
+If <em class="xref py py-obj">cell_types</em> is not None, <em class="xref py py-obj">amplitude</em> should be
+a float indicating the amplitude of the tonic input
+for the specified cell type.</p>
 </dd>
 <dt><strong>t0</strong><span class="classifier">float</span></dt><dd><p>The start time of tonic input (in ms). Default: 0 (beginning of
-simulation).</p>
+simulation). This value will be applied to all the  tonic biases if
+multiple are specified with the <em class="xref py py-obj">amplitude</em> keyword.</p>
 </dd>
-<dt><strong>tstop</strong><span class="classifier">float</span></dt><dd><p>The end time of tonic input (in ms). Default: end of simulation.</p>
+<dt><strong>tstop</strong><span class="classifier">float</span></dt><dd><p>The end time of tonic input (in ms). Default: end of simulation.
+This value will be applied to all the  tonic biases if
+multiple are specified with the <em class="xref py py-obj">amplitude</em> keyword.</p>
 </dd>
 </dl>
 </dd>
@@ -722,9 +737,12 @@ this parameter does not affect the amplitude of the dipole moment.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="hnn_core.Network.write">
-<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.write" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write network to a HDF5 file.</p>
+<dt class="sig sig-object py" id="hnn_core.Network.write_configuration">
+<span class="sig-name descname"><span class="pre">write_configuration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.write_configuration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.write_configuration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes network configuration to a json file.</p>
+<p>Writes network configurations as a hierarchical json similar to the Network
+object’s structure. Outputs recorded during simulation such as currents and
+voltages are not saved due to size.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -735,14 +753,11 @@ this parameter does not affect the amplitude of the dipole moment.</p>
 <dt><strong>overwrite</strong><span class="classifier">Boolean</span></dt><dd><p>True : Overwrite existing file.
 False : Throw error if file already exists.</p>
 </dd>
-<dt><strong>write_output</strong><span class="classifier">Boolean</span></dt><dd><p>True : Save the Network simulation output.
-False : Do not save the Network simulation output.</p>
-</dd>
 </dl>
 </dd>
 <dt class="field-even">Yields<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>A hdf5 file containing the Network object.</dt><dd></dd>
+<dt>A json file containing the Network configurations.</dt><dd></dd>
 </dl>
 </dd>
 </dl>
