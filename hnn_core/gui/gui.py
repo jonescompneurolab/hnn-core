@@ -5,6 +5,7 @@
 import codecs
 import io
 import logging
+import mimetypes
 import multiprocessing
 import sys
 import json
@@ -674,12 +675,20 @@ class HNNGUI:
         uploaded_value = _prepare_upload_file_from_url(file_url)
         self.load_data_button.set_trait('value', uploaded_value)
 
-    def _simulate_upload_connectivity(self, file_url):
-        uploaded_value = _prepare_upload_file_from_url(file_url)
+    def _simulate_upload_connectivity(self, path):
+        try:
+            uploaded_value = _prepare_upload_file_from_local(path)
+        except FileNotFoundError:
+            uploaded_value = _prepare_upload_file_from_url(path)
+
         self.load_connectivity_button.set_trait('value', uploaded_value)
 
-    def _simulate_upload_drives(self, file_url):
-        uploaded_value = _prepare_upload_file_from_url(file_url)
+    def _simulate_upload_drives(self, path):
+        try:
+            uploaded_value = _prepare_upload_file_from_local(path)
+        except FileNotFoundError:
+            uploaded_value = _prepare_upload_file_from_url(path)
+
         self.load_drives_button.set_trait('value', uploaded_value)
 
     def _simulate_left_tab_click(self, tab_title):
@@ -712,6 +721,22 @@ class HNNGUI:
         self._simulate_left_tab_click("Visualization")
         action = getattr(self.viz_manager, f"_simulate_{action_name}")
         action(*args, **kwargs)
+
+
+def _prepare_upload_file_from_local(path):
+    with open(path, 'rb') as file:
+        content = memoryview(file.read())
+
+    last_modified = datetime.fromtimestamp(path.stat().st_mtime)
+    uploaded_value = [{
+        'name': path.name,
+        'type': mimetypes.guess_type(path),
+        'size': path.stat().st_size,
+        'content': content,
+        'last_modified': last_modified,
+    }]
+
+    return uploaded_value
 
 
 def _prepare_upload_file_from_url(file_url):
