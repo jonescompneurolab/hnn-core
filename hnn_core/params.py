@@ -662,7 +662,10 @@ def compare_dictionaries(d1, d2):
     return d1
 
 
-def convert_to_json(params_fname, out_fname, include_drives=True,
+def convert_to_json(params_fname,
+                    out_fname,
+                    network_connectivity='jones_2009_model',
+                    include_drives=True,
                     overwrite=True):
     """Converts legacy json or param format to hierarchical json format
 
@@ -672,6 +675,11 @@ def convert_to_json(params_fname, out_fname, include_drives=True,
         Path to file
     out_fname: str
         Path to output
+    network_connectivity: str or None, default:' jones_2009_model'
+         Options: ['jones_2009_model', 'law_2021_model', 'calcium_model', None]
+         Neocortical network model to use. Models are defined in network_models.
+         If None, the base Network object with no defined network connectivity
+         will be used.
     include_drives: bool, default=True
         Include drives from params file
     overwrite: bool, default=True
@@ -681,6 +689,23 @@ def convert_to_json(params_fname, out_fname, include_drives=True,
     None
     """
     from .network import Network
+    from .network_models import jones_2009_model, law_2021_model, calcium_model
+
+    # Assign network model callables
+    model_functions = {'jones_2009_model': jones_2009_model,
+                       'law_2021_model': law_2021_model,
+                       'calcium_model': calcium_model
+                       }
+    if network_connectivity:
+        try:
+            network_model = model_functions[network_connectivity]
+        except KeyError:
+            raise KeyError(f'Invalid network connectivity: '
+                           f'"{network_connectivity}"; '
+                           f'Valid options: {list(model_functions.keys())}')
+    else:
+        network_model = Network
+
     # Validate inputs
     _validate_type(params_fname, (str, Path), 'params_fname')
     _validate_type(out_fname, (str, Path), 'out_fname')
@@ -693,10 +718,12 @@ def convert_to_json(params_fname, out_fname, include_drives=True,
     if out_fname.suffix != '.json':
         out_fname = out_fname.with_suffix('.json')
 
-    net = Network(params=read_params(params_fname),
-                  add_drives_from_params=include_drives,
-                  legacy_mode=True if params_suffix == 'param' else False,
-                  )
+    net = network_model(params=read_params(params_fname),
+                        add_drives_from_params=include_drives,
+                        legacy_mode=(True if params_suffix == 'param'
+                                     else False),
+                        )
+
     net.write_configuration(fname=out_fname,
                             overwrite=overwrite,
                             )
