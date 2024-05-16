@@ -1161,10 +1161,10 @@ class Network:
                           'Read the function docustring for more information',
                           DeprecationWarning,
                           stacklevel=1)
-            _validate_type(amplitude, float, 'amplitude')
+            _validate_type(amplitude, (float, int), 'amplitude')
 
             _add_cell_type_bias(network=self, cell_type=cell_type,
-                                amplitude=amplitude,
+                                amplitude=float(amplitude),
                                 t_0=t0, t_stop=tstop)
         else:
             _validate_type(amplitude, dict, 'amplitude')
