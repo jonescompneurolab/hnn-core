@@ -31,7 +31,7 @@ from hnn_core.dipole import _read_dipole_txt
 import base64
 import zipfile
 import numpy as np
-
+import debugpy
 
 class _OutputWidgetHandler(logging.Handler):
     def __init__(self, output_widget, *args, **kwargs):
@@ -250,7 +250,7 @@ class HNNGUI:
                                                layout={'width': '15%'})
         # Drive selection
         self.widget_drive_type_selection = RadioButtons(
-            options=['Evoked', 'Poisson', 'Rhythmic'],
+            options=['Evoked', 'Poisson', 'Rhythmic','Tonic'],
             value='Evoked',
             description='Drive:',
             disabled=False,
@@ -1016,6 +1016,62 @@ def _get_evoked_widget(name, layout, style, location, data=None,
     drive.update(widgets_dict)
     return drive, drive_box
 
+def _get_tonic_widget(name, layout, style, data=None):
+
+    from copy import deepcopy
+    default_data = {
+        'amplitude': 0,
+        't0': 0,
+        'tstop': 0,
+        'seedcore': 14,
+    }
+
+    cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket', 'L2_basket']
+
+    if isinstance(data, dict):
+        default_data.update(data)
+    kwargs = dict(layout=layout, style=style)
+
+    amplitudes, start_times, stop_times = dict(), dict(), dict()
+    for ct_idx, cell_type in enumerate(cell_types):
+        if cell_type in data:
+            default_data.update(data[cell_type])
+        amplitudes[cell_type] = BoundedFloatText(
+            value=deepcopy(default_data['amplitude']),
+            description=cell_type, min=0, max=1e6, step=0.01, **kwargs)
+        start_times[cell_type] = BoundedFloatText(
+            value=deepcopy(default_data['t0']), description=cell_type,
+            min=0, max=1e6, step=0.01, **kwargs)
+        stop_times[cell_type] = BoundedFloatText(
+            value=deepcopy(default_data['tstop']), description=cell_type,
+            min=-1, max=1e6, step=0.01, **kwargs)
+
+        # # link all t0 and tstop
+        # if ct_idx > 0:
+        #     ipywidgets.link((start_times[cell_type], 'value'),
+        #                     (start_times[cell_types[ct_idx - 1]], 'value'))
+        #     ipywidgets.link((stop_times[cell_type], 'value'),
+        #                     (stop_times[cell_types[ct_idx - 1]], 'value'))
+
+    widgets_dict = {
+        'amplitude': amplitudes,
+        't0': start_times,
+        'tstop': stop_times
+    }
+    widgets_list = ([HTML(value="<b>Amplitude (nA):</b>")] +
+                    list(amplitudes.values()) +
+                    [HTML(value="<b>Start time (ms):</b>")] +
+                    list(start_times.values()) +
+                    [HTML(value="<b>Stop time (ms):</b>")] +
+                    list(stop_times.values()))
+
+    drive_box = VBox(widgets_list)
+    drive = dict(type='Tonic',
+                 name=name,
+                 sync_within_trial=False)
+    drive.update(widgets_dict)
+    return drive, drive_box
+
 
 def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                      tstop_widget, location, layout,
@@ -1077,9 +1133,17 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                 default_delays=prespecified_delays,
                 sync_evinput=sync_evinput
             )
+        elif drive_type == 'Tonic':
+            name = drive_type + str(len(drive_boxes))
+            drive, drive_box = _get_tonic_widget(
+                name,
+                layout,
+                style,
+                data=prespecified_drive_data
+            )
 
         if drive_type in [
-                'Evoked', 'Poisson', 'Rhythmic', 'Bursty', 'Gaussian'
+                'Evoked', 'Poisson', 'Rhythmic', 'Bursty', 'Gaussian','Tonic'
         ]:
             drive_boxes.append(drive_box)
             drive_widgets.append(drive)
@@ -1514,5 +1578,8 @@ def launch():
     You can pass voila commandline parameters as usual.
     """
     from voila.app import main
+    debugpy.listen(5678)
+    print("Waiting for debugger attach")
+    debugpy.wait_for_client()
     notebook_path = Path(__file__).parent / 'hnn_widget.ipynb'
     main([str(notebook_path.resolve()), *sys.argv[1:]])
