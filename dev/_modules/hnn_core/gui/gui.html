@@ -163,6 +163,8 @@
 <span class="kn">from</span> <span class="nn">hnn_core.network</span> <span class="kn">import</span> <span class="n">pick_connection</span>
 <span class="kn">from</span> <span class="nn">hnn_core.params</span> <span class="kn">import</span> <span class="p">(</span><span class="n">_extract_drive_specs_from_hnn_params</span><span class="p">,</span> <span class="n">_read_json</span><span class="p">,</span>
                              <span class="n">_read_legacy_params</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">hnn_core.dipole</span> <span class="kn">import</span> <span class="n">_read_dipole_txt</span>
+
 <span class="kn">import</span> <span class="nn">base64</span>
 <span class="kn">import</span> <span class="nn">zipfile</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -1364,7 +1366,7 @@
     <span class="n">ext_content</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">ext_content</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
     <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
         <span class="n">data</span><span class="p">[</span><span class="s1">&#39;simulation_data&#39;</span><span class="p">][</span><span class="n">data_fname</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;net&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;dpls&#39;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="n">hnn_core</span><span class="o">.</span><span class="n">_read_dipole_txt</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">ext_content</span><span class="p">),</span> <span class="n">file_extension</span><span class="p">)</span>
+            <span class="n">_read_dipole_txt</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">ext_content</span><span class="p">),</span> <span class="n">file_extension</span><span class="p">)</span>
         <span class="p">]}</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;External data </span><span class="si">{</span><span class="n">data_fname</span><span class="si">}</span><span class="s1"> loaded.&#39;</span><span class="p">)</span>
         <span class="n">_template_name</span> <span class="o">=</span> <span class="s2">&quot;[Blank] single figure&quot;</span>
