@@ -65,8 +65,8 @@ Changelog
   and :func:`~plot_spikes_raster` now plotted from 0 to tstop. Inputs tmin and tmax are deprecated,
   by `Katharina Duecker`_ in :gh:`769`
 
-- Add feature to convert legacy param and json files to new json format,
-  by `George Dang`_ in :gh:`772`
+- Add function :func:`~hnn_core/params/convert_to_json` to convert legacy param
+  and json files to new json format, by `George Dang`_ in :gh:`772`
 
 Bug
 ~~~
