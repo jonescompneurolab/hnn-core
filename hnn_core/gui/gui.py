@@ -1021,7 +1021,7 @@ def _get_evoked_widget(name, layout, style, location, data=None,
     return drive, drive_box
 
 
-def _get_tonic_widget(name, layout, style, data=None, sync_evinput=False):
+def _get_tonic_widget(name, layout, style, data=None):
 
     default_data = {
         'amplitude': 0,
@@ -1051,19 +1051,15 @@ def _get_tonic_widget(name, layout, style, data=None, sync_evinput=False):
         value=deepcopy(default_data['tstop']), description="Stop time",
         min=-1, max=1e6, step=0.01, **kwargs)
 
-    sync_inputs = Checkbox(value=sync_evinput,
-                           description='Synchronous Inputs',
-                           **kwargs)
-
     widgets_dict = {
         'amplitude': amplitudes,
         't0': start_times,
         'tstop': stop_times
     }
-    widgets_list = ([HTML(value="<b>Amplitude (nA):</b>")] +
-                    list(amplitudes.values()) + [sync_inputs] +
-                    [HTML(value="<b>Times (ms):</b>")] +
-                    [start_times, stop_times])
+    widgets_list = ([HTML(value="<b>Times (ms):</b>")] +
+                    [start_times, stop_times] +
+                    [HTML(value="<b>Amplitude (nA):</b>")] +
+                    list(amplitudes.values()))
 
     drive_box = VBox(widgets_list)
     drive = dict(type='Tonic',
@@ -1071,7 +1067,7 @@ def _get_tonic_widget(name, layout, style, data=None, sync_evinput=False):
                  amplitude=amplitudes,
                  t0=start_times,
                  tstop=stop_times,
-                 is_synch_inputs=sync_inputs)
+                 is_synch_inputs=False)
 
     drive.update(widgets_dict)
     return drive, drive_box
@@ -1143,8 +1139,7 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                 name,
                 layout,
                 style,
-                data=prespecified_drive_data,
-                sync_evinput=sync_evinput
+                data=prespecified_drive_data
             )
 
         if drive_type in [
@@ -1387,11 +1382,6 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
         return
     # add drives to network
     for drive in drive_widgets:
-        synch_inputs_kwargs = {}
-        if drive['is_synch_inputs'].value:
-            synch_inputs_kwargs['n_drive_cells'] = 1
-            synch_inputs_kwargs['cell_specific'] = False
-
         if drive['type'] in ('Tonic'):
             weights_amplitudes = {
                 k: v.value
@@ -1401,71 +1391,75 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                 amplitude=weights_amplitudes,
                 t0=drive["t0"].value,
                 tstop=drive["tstop"].value)
-            return
+        else:
+            synch_inputs_kwargs = {}
+            if drive['is_synch_inputs'].value:
+                synch_inputs_kwargs['n_drive_cells'] = 1
+                synch_inputs_kwargs['cell_specific'] = False
 
-        weights_ampa = {
-            k: v.value
-            for k, v in drive['weights_ampa'].items()
-        }
-        weights_nmda = {
-            k: v.value
-            for k, v in drive['weights_nmda'].items()
-        }
-        synaptic_delays = {k: v.value for k, v in drive['delays'].items()}
-        print(
-            f"drive type is {drive['type']}, location={drive['location']}")
-        if drive['type'] == 'Poisson':
-            rate_constant = {
-                k: v.value
-                for k, v in drive['rate_constant'].items() if v.value > 0
-            }
             weights_ampa = {
-                k: v
-                for k, v in weights_ampa.items() if k in rate_constant
+                k: v.value
+                for k, v in drive['weights_ampa'].items()
             }
             weights_nmda = {
-                k: v
-                for k, v in weights_nmda.items() if k in rate_constant
+                k: v.value
+                for k, v in drive['weights_nmda'].items()
             }
-            single_simulation_data['net'].add_poisson_drive(
-                name=drive['name'],
-                tstart=drive['tstart'].value,
-                tstop=drive['tstop'].value,
-                rate_constant=rate_constant,
-                location=drive['location'],
-                weights_ampa=weights_ampa,
-                weights_nmda=weights_nmda,
-                synaptic_delays=synaptic_delays,
-                space_constant=100.0,
-                event_seed=drive['seedcore'].value,
-                **synch_inputs_kwargs)
-        elif drive['type'] in ('Evoked', 'Gaussian'):
-            single_simulation_data['net'].add_evoked_drive(
-                name=drive['name'],
-                mu=drive['mu'].value,
-                sigma=drive['sigma'].value,
-                numspikes=drive['numspikes'].value,
-                location=drive['location'],
-                weights_ampa=weights_ampa,
-                weights_nmda=weights_nmda,
-                synaptic_delays=synaptic_delays,
-                space_constant=3.0,
-                event_seed=drive['seedcore'].value,
-                **synch_inputs_kwargs)
-        elif drive['type'] in ('Rhythmic', 'Bursty'):
-            single_simulation_data['net'].add_bursty_drive(
-                name=drive['name'],
-                tstart=drive['tstart'].value,
-                tstart_std=drive['tstart_std'].value,
-                burst_rate=drive['burst_rate'].value,
-                burst_std=drive['burst_std'].value,
-                location=drive['location'],
-                tstop=drive['tstop'].value,
-                weights_ampa=weights_ampa,
-                weights_nmda=weights_nmda,
-                synaptic_delays=synaptic_delays,
-                event_seed=drive['seedcore'].value,
-                **synch_inputs_kwargs)
+            synaptic_delays = {k: v.value for k, v in drive['delays'].items()}
+            print(
+                f"drive type is {drive['type']}, location={drive['location']}")
+            if drive['type'] == 'Poisson':
+                rate_constant = {
+                    k: v.value
+                    for k, v in drive['rate_constant'].items() if v.value > 0
+                }
+                weights_ampa = {
+                    k: v
+                    for k, v in weights_ampa.items() if k in rate_constant
+                }
+                weights_nmda = {
+                    k: v
+                    for k, v in weights_nmda.items() if k in rate_constant
+                }
+                single_simulation_data['net'].add_poisson_drive(
+                    name=drive['name'],
+                    tstart=drive['tstart'].value,
+                    tstop=drive['tstop'].value,
+                    rate_constant=rate_constant,
+                    location=drive['location'],
+                    weights_ampa=weights_ampa,
+                    weights_nmda=weights_nmda,
+                    synaptic_delays=synaptic_delays,
+                    space_constant=100.0,
+                    event_seed=drive['seedcore'].value,
+                    **synch_inputs_kwargs)
+            elif drive['type'] in ('Evoked', 'Gaussian'):
+                single_simulation_data['net'].add_evoked_drive(
+                    name=drive['name'],
+                    mu=drive['mu'].value,
+                    sigma=drive['sigma'].value,
+                    numspikes=drive['numspikes'].value,
+                    location=drive['location'],
+                    weights_ampa=weights_ampa,
+                    weights_nmda=weights_nmda,
+                    synaptic_delays=synaptic_delays,
+                    space_constant=3.0,
+                    event_seed=drive['seedcore'].value,
+                    **synch_inputs_kwargs)
+            elif drive['type'] in ('Rhythmic', 'Bursty'):
+                single_simulation_data['net'].add_bursty_drive(
+                    name=drive['name'],
+                    tstart=drive['tstart'].value,
+                    tstart_std=drive['tstart_std'].value,
+                    burst_rate=drive['burst_rate'].value,
+                    burst_std=drive['burst_std'].value,
+                    location=drive['location'],
+                    tstop=drive['tstop'].value,
+                    weights_ampa=weights_ampa,
+                    weights_nmda=weights_nmda,
+                    synaptic_delays=synaptic_delays,
+                    event_seed=drive['seedcore'].value,
+                    **synch_inputs_kwargs)
 
 
 def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
@@ -1596,5 +1590,9 @@ def launch():
     You can pass voila commandline parameters as usual.
     """
     from voila.app import main
+    import debugpy
+    debugpy.listen(5678)
+    print("Waiting for debugger attach")
+    debugpy.wait_for_client()
     notebook_path = Path(__file__).parent / 'hnn_widget.ipynb'
     main([str(notebook_path.resolve()), *sys.argv[1:]])
