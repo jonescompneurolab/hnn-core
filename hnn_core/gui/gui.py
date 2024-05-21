@@ -31,7 +31,8 @@ from hnn_core.dipole import _read_dipole_txt
 import base64
 import zipfile
 import numpy as np
-import debugpy
+from copy import deepcopy
+
 
 class _OutputWidgetHandler(logging.Handler):
     def __init__(self, output_widget, *args, **kwargs):
@@ -250,7 +251,7 @@ class HNNGUI:
                                                layout={'width': '15%'})
         # Drive selection
         self.widget_drive_type_selection = RadioButtons(
-            options=['Evoked', 'Poisson', 'Rhythmic','Tonic'],
+            options=['Evoked', 'Poisson', 'Rhythmic', 'Tonic'],
             value='Evoked',
             description='Drive:',
             disabled=False,
@@ -459,6 +460,10 @@ class HNNGUI:
                     is_disabled="", btn_height=self.layout['run_btn'].height,
                     color_theme=self.layout['theme_color']))
 
+        def _driver_type_change(value):
+            self.widget_location_selection.disabled = (
+                True if value.new == "Tonic" else False)
+
         self.widget_backend_selection.observe(_handle_backend_change, 'value')
         self.add_drive_button.on_click(_add_drive_button_clicked)
         self.delete_drive_button.on_click(_delete_drives_clicked)
@@ -468,6 +473,7 @@ class HNNGUI:
         self.run_button.on_click(_run_button_clicked)
         self.load_data_button.observe(_on_upload_data, names='value')
         self.simulation_list_widget.observe(_simulation_list_change, 'value')
+        self.widget_drive_type_selection.observe(_driver_type_change, 'value')
 
     def compose(self, return_layout=True):
         """Compose widgets.
@@ -546,8 +552,6 @@ class HNNGUI:
         )
 
         self._link_callbacks()
-
-        # self.simulation_data[self.widget_simulation_name.value]
 
         # initialize drive and connectivity ipywidgets
         load_drive_and_connectivity(self.params, self._log_out,
@@ -1016,9 +1020,9 @@ def _get_evoked_widget(name, layout, style, location, data=None,
     drive.update(widgets_dict)
     return drive, drive_box
 
-def _get_tonic_widget(name, layout, style, data=None):
 
-    from copy import deepcopy
+def _get_tonic_widget(name, layout, style, data=None, sync_evinput=False):
+
     default_data = {
         'amplitude': 0,
         't0': 0,
@@ -1032,26 +1036,24 @@ def _get_tonic_widget(name, layout, style, data=None):
         default_data.update(data)
     kwargs = dict(layout=layout, style=style)
 
-    amplitudes, start_times, stop_times = dict(), dict(), dict()
-    for ct_idx, cell_type in enumerate(cell_types):
+    amplitudes = dict()
+    for cell_type in cell_types:
         if cell_type in data:
             default_data.update(data[cell_type])
         amplitudes[cell_type] = BoundedFloatText(
             value=deepcopy(default_data['amplitude']),
             description=cell_type, min=0, max=1e6, step=0.01, **kwargs)
-        start_times[cell_type] = BoundedFloatText(
-            value=deepcopy(default_data['t0']), description=cell_type,
-            min=0, max=1e6, step=0.01, **kwargs)
-        stop_times[cell_type] = BoundedFloatText(
-            value=deepcopy(default_data['tstop']), description=cell_type,
-            min=-1, max=1e6, step=0.01, **kwargs)
 
-        # # link all t0 and tstop
-        # if ct_idx > 0:
-        #     ipywidgets.link((start_times[cell_type], 'value'),
-        #                     (start_times[cell_types[ct_idx - 1]], 'value'))
-        #     ipywidgets.link((stop_times[cell_type], 'value'),
-        #                     (stop_times[cell_types[ct_idx - 1]], 'value'))
+    start_times = BoundedFloatText(
+        value=deepcopy(default_data['t0']), description="Start time",
+        min=0, max=1e6, step=0.01, **kwargs)
+    stop_times = BoundedFloatText(
+        value=deepcopy(default_data['tstop']), description="Stop time",
+        min=-1, max=1e6, step=0.01, **kwargs)
+
+    sync_inputs = Checkbox(value=sync_evinput,
+                           description='Synchronous Inputs',
+                           **kwargs)
 
     widgets_dict = {
         'amplitude': amplitudes,
@@ -1059,16 +1061,18 @@ def _get_tonic_widget(name, layout, style, data=None):
         'tstop': stop_times
     }
     widgets_list = ([HTML(value="<b>Amplitude (nA):</b>")] +
-                    list(amplitudes.values()) +
-                    [HTML(value="<b>Start time (ms):</b>")] +
-                    list(start_times.values()) +
-                    [HTML(value="<b>Stop time (ms):</b>")] +
-                    list(stop_times.values()))
+                    list(amplitudes.values()) + [sync_inputs] +
+                    [HTML(value="<b>Times (ms):</b>")] +
+                    [start_times, stop_times])
 
     drive_box = VBox(widgets_list)
     drive = dict(type='Tonic',
                  name=name,
-                 sync_within_trial=False)
+                 amplitude=amplitudes,
+                 t0=start_times,
+                 tstop=stop_times,
+                 is_synch_inputs=sync_inputs)
+
     drive.update(widgets_dict)
     return drive, drive_box
 
@@ -1139,11 +1143,12 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                 name,
                 layout,
                 style,
-                data=prespecified_drive_data
+                data=prespecified_drive_data,
+                sync_evinput=sync_evinput
             )
 
         if drive_type in [
-                'Evoked', 'Poisson', 'Rhythmic', 'Bursty', 'Gaussian','Tonic'
+                'Evoked', 'Poisson', 'Rhythmic', 'Bursty', 'Gaussian', 'Tonic'
         ]:
             drive_boxes.append(drive_box)
             drive_widgets.append(drive)
@@ -1156,8 +1161,10 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
             )
 
             for idx, drive in enumerate(drive_widgets):
-                accordion.set_title(idx,
-                                    f"{drive['name']} ({drive['location']})")
+                tab_name = drive['name']
+                if "Tonic" not in tab_name:
+                    tab_name += f" ({drive['location']})"
+                accordion.set_title(idx, tab_name)
 
             display(accordion)
 
@@ -1385,6 +1392,17 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
             synch_inputs_kwargs['n_drive_cells'] = 1
             synch_inputs_kwargs['cell_specific'] = False
 
+        if drive['type'] in ('Tonic'):
+            weights_amplitudes = {
+                k: v.value
+                for k, v in drive["amplitude"].items()
+            }
+            single_simulation_data['net'].add_tonic_bias(
+                amplitude=weights_amplitudes,
+                t0=drive["t0"].value,
+                tstop=drive["tstop"].value)
+            return
+
         weights_ampa = {
             k: v.value
             for k, v in drive['weights_ampa'].items()
@@ -1578,8 +1596,5 @@ def launch():
     You can pass voila commandline parameters as usual.
     """
     from voila.app import main
-    debugpy.listen(5678)
-    print("Waiting for debugger attach")
-    debugpy.wait_for_client()
     notebook_path = Path(__file__).parent / 'hnn_widget.ipynb'
     main([str(notebook_path.resolve()), *sys.argv[1:]])
