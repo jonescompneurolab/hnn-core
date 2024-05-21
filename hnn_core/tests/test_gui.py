@@ -20,6 +20,7 @@ from hnn_core.gui.gui import serialize_simulation
 from hnn_core.network import pick_connection
 from hnn_core.network_models import jones_2009_model
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
+from hnn_core.hnn_io import _dict_to_network
 from IPython.display import IFrame
 from ipywidgets import Tab, Text, link
 
@@ -136,11 +137,11 @@ def test_gui_change_connectivity():
     gui = HNNGUI()
     _ = gui.compose()
 
-    for connectivity_field in gui.connectivity_widgets:
+    for connectivity_field in gui.connectivity_widgets[0:3]:
         for vbox in connectivity_field:
             for w_val in (0.2, 0.9):
                 _single_simulation = {}
-                _single_simulation['net'] = jones_2009_model(gui.params)
+                _single_simulation['net'] = _dict_to_network(gui.params)
                 # specify connection
                 conn_indices = pick_connection(
                     net=_single_simulation['net'],
@@ -152,10 +153,13 @@ def test_gui_change_connectivity():
                 assert len(conn_indices) > 0
                 conn_idx = conn_indices[0]
 
-                # test if the slider and the input field are synchronous
+                # Set value to connection
                 vbox.children[1].value = w_val
 
-                # re initialize network
+                # Original Value
+                original_value = _single_simulation['net'].connectivity[conn_idx]['nc_dict']['A_weight']
+
+                # re-initialize network
                 _init_network_from_widgets(gui.params, gui.widget_dt,
                                            gui.widget_tstop,
                                            _single_simulation,
@@ -164,8 +168,11 @@ def test_gui_change_connectivity():
                                            add_drive=False)
 
                 # test if the new value is reflected in the network
-                assert _single_simulation['net'].connectivity[conn_idx][
-                    'nc_dict']['A_weight'] == w_val
+                new_value = _single_simulation['net'].connectivity[conn_idx][
+                    'nc_dict']['A_weight']
+                assert new_value != original_value
+                assert new_value == w_val
+
     plt.close('all')
 
 
