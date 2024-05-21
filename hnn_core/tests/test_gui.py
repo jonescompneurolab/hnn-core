@@ -634,3 +634,29 @@ def test_gui_upload_csv_simulation(setup_gui):
                 ['dpls'][0].data['L2']) == data_lengh)
     assert (len(gui.data['simulation_data']['test_default']
                 ['dpls'][0].data['L5']) == data_lengh)
+
+
+def test_gui_add_tonic_input(setup_gui):
+    """Test if gui add different type of drives."""
+    gui = setup_gui
+    _single_simulation = {}
+    _single_simulation['net'] = jones_2009_model(gui.params)
+
+    # Add tonic input widget
+    gui.widget_drive_type_selection.value = "Tonic"
+    gui.add_drive_button.click()
+
+    # Check last drive (Tonic)
+    last_drive_pos = len(gui.drive_widgets) - 1
+    assert gui.drive_widgets[last_drive_pos]['type'] == "Tonic"
+
+    gui.drive_widgets[last_drive_pos]['amplitude']["L5_pyramidal"].value = 10
+    gui.drive_widgets[last_drive_pos]['t0'].value = 0
+    gui.drive_widgets[last_drive_pos]['tstop'].value = 15
+
+    # Add tonic bias to the simulation
+    _init_network_from_widgets(gui.params, gui.widget_dt, gui.widget_tstop,
+                               _single_simulation, gui.drive_widgets,
+                               gui.connectivity_widgets)
+
+    assert _single_simulation['net'].external_biases['tonic'] is not None
