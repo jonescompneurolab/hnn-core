@@ -1084,6 +1084,10 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                      sync_evinput=False):
     """Add a widget for a new drive."""
 
+    # Check only adds 1 tonic input widget
+    if drive_type == "Tonic" and not _is_valid_add_tonic_input(drive_widgets):
+        return
+
     style = {'description_width': '125px'}
     drives_out.clear_output()
     if not prespecified_drive_data:
@@ -1134,7 +1138,7 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                 sync_evinput=sync_evinput
             )
         elif drive_type == 'Tonic':
-            name = drive_type + str(len(drive_boxes))
+            name = drive_type
             drive, drive_box = _get_tonic_widget(
                 name,
                 layout,
@@ -1582,6 +1586,13 @@ def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
             display(mpi_cmd)
         elif backend_type == "Joblib":
             display(n_jobs)
+
+
+def _is_valid_add_tonic_input(drive_widgets):
+    for drive in drive_widgets:
+        if "Tonic" in drive['name']:
+            return False
+    return True
 
 
 def launch():
