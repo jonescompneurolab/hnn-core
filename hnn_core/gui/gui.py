@@ -1030,7 +1030,7 @@ def _get_tonic_widget(name, layout, style, data=None):
         'seedcore': 14,
     }
 
-    cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket', 'L2_basket']
+    cell_types = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
 
     if isinstance(data, dict):
         default_data.update(data)
