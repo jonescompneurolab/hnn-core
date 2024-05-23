@@ -1503,7 +1503,7 @@ class NetworkPlotter:
         self._zlim = zlim
         self.ax.set_zlim(self._zlim)
 
-    # Eleevation and azimuth of 3D viewpoint
+    # Elevation and azimuth of 3D viewpoint
     @property
     def elev(self):
         return self._elev
