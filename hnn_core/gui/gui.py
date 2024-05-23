@@ -1026,8 +1026,7 @@ def _get_tonic_widget(name, layout, style, data=None):
     default_data = {
         'amplitude': 0,
         't0': 0,
-        'tstop': 0,
-        'seedcore': 14,
+        'tstop': 0
     }
 
     cell_types = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
@@ -1046,10 +1045,10 @@ def _get_tonic_widget(name, layout, style, data=None):
 
     start_times = BoundedFloatText(
         value=deepcopy(default_data['t0']), description="Start time",
-        min=0, max=1e6, step=0.01, **kwargs)
+        min=0, max=1e6, step=1.0, **kwargs)
     stop_times = BoundedFloatText(
         value=deepcopy(default_data['tstop']), description="Stop time",
-        min=-1, max=1e6, step=0.01, **kwargs)
+        min=-1, max=1e6, step=1.0, **kwargs)
 
     widgets_dict = {
         'amplitude': amplitudes,
