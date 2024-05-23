@@ -58,6 +58,9 @@ Changelog
 - Added feature to read/write :class:`~hnn_core.Network` configurations to
   json, by `George Dang`_ and `Rajat Partani`_ in :gh:`757`
 
+- Added :class:`~hnn_core/viz/NetworkPlotter` to visualize and animate network simulations,
+  by `Nick Tolley`_ in :gh:`649`.
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by

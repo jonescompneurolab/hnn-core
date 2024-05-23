@@ -990,7 +990,9 @@
     <span class="k">return</span> <span class="n">linewidth</span> <span class="o">*</span> <span class="p">(</span><span class="n">length</span> <span class="o">/</span> <span class="n">value_range</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="plot_cell_morphology"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_cell_morphology.html#hnn_core.viz.plot_cell_morphology">[docs]</a><span class="k">def</span> <span class="nf">plot_cell_morphology</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_cell_morphology"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_cell_morphology.html#hnn_core.viz.plot_cell_morphology">[docs]</a><span class="k">def</span> <span class="nf">plot_cell_morphology</span><span class="p">(</span>
+        <span class="n">cell</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">250</span><span class="p">,</span> <span class="mi">150</span><span class="p">),</span>
+        <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="n">zlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1200</span><span class="p">),</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the cell morphology.</span>
 
 <span class="sd">    Parameters</span>
@@ -1008,6 +1010,17 @@
 <span class="sd">        defined in the `Cell.sections` attribute.</span>
 
 <span class="sd">        | Ex: ``{&#39;apical_trunk&#39;: &#39;r&#39;, &#39;soma&#39;: &#39;b&#39;, ...}``</span>
+<span class="sd">    pos : tuple of int or float | None</span>
+<span class="sd">        Position of cell soma. Must be a tuple of 3 elements for the</span>
+<span class="sd">        (x, y, z) position of the soma in 3D space. Default: (0, 0, 0)</span>
+<span class="sd">    xlim : tuple of int | tuple of float</span>
+<span class="sd">        x limits of plot window. Default (-250, 150)</span>
+<span class="sd">    ylim : tuple of int | tuple of float</span>
+<span class="sd">        y limits of plot window. Default (-100, 100)</span>
+<span class="sd">    zlim : tuple of int | tuple of float</span>
+<span class="sd">        z limits of plot window. Default (-100, 1200)</span>
+<span class="sd">    show : bool</span>
+<span class="sd">        If True, show the plot</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1030,18 +1043,26 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">section_colors</span> <span class="o">=</span> <span class="n">color</span>
 
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="s1">&#39;pos&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;pos must be a tuple of 3 elements&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">pos_idx</span> <span class="ow">in</span> <span class="n">pos</span><span class="p">:</span>
+            <span class="n">_validate_type</span><span class="p">(</span><span class="n">pos_idx</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s1">&#39;pos[idx]&#39;</span><span class="p">)</span>
+
     <span class="c1"># Cell is in XZ plane</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="n">cell</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">250</span><span class="p">,</span> <span class="n">cell</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">150</span><span class="p">))</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_zlim</span><span class="p">((</span><span class="n">cell</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="mi">100</span><span class="p">,</span> <span class="n">cell</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1200</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_zlim</span><span class="p">((</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">zlim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">zlim</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">((</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">ylim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">ylim</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 
     <span class="k">for</span> <span class="n">sec_name</span><span class="p">,</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">cell</span><span class="o">.</span><span class="n">sections</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">linewidth</span> <span class="o">=</span> <span class="n">_linewidth_from_data_units</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">section</span><span class="o">.</span><span class="n">diam</span><span class="p">)</span>
         <span class="n">end_pts</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">end_pts</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">cell</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">cell</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">dz</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">cell</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
         <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">zs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(),</span> <span class="nb">list</span><span class="p">(),</span> <span class="nb">list</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">end_pts</span><span class="p">:</span>
-            <span class="n">dx</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">cell</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">dy</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">cell</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">dz</span> <span class="o">=</span> <span class="n">cell</span><span class="o">.</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">cell</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
             <span class="n">xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">dx</span><span class="p">)</span>
             <span class="n">ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">dz</span><span class="p">)</span>
             <span class="n">zs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">dy</span><span class="p">)</span>
@@ -1335,7 +1356,7 @@
 <span class="sd">    ax : instance of matplotlib figure | None</span>
 <span class="sd">        The matplotlib axis.</span>
 <span class="sd">    colorbar : bool</span>
-<span class="sd">        If the colorbar is presented.</span>
+<span class="sd">        If True (default), adjust figure to include colorbar.</span>
 <span class="sd">    contact_labels : list</span>
 <span class="sd">        Labels associated with the contacts to plot. Passed as-is to</span>
 <span class="sd">        :func:`~matplotlib.axes.Axes.set_yticklabels`.</span>
@@ -1365,6 +1386,384 @@
     <span class="n">plt_show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="NetworkPlotter"><a class="viewcode-back" href="../../generated/hnn_core.viz.NetworkPlotter.html#hnn_core.viz.NetworkPlotter">[docs]</a><span class="k">class</span> <span class="nc">NetworkPlotter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper class to visualize full morphology of HNN model.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    net : Instance of Network object</span>
+<span class="sd">        The Network object</span>
+<span class="sd">    ax : instance of matplotlib Axes3D | None</span>
+<span class="sd">        An axis object from matplotlib. If None,</span>
+<span class="sd">        a new figure is created.</span>
+<span class="sd">    vmin : int | float</span>
+<span class="sd">        Lower limit of colormap for plotting voltage</span>
+<span class="sd">        Default: -100 mV</span>
+<span class="sd">    vmax : int | float</span>
+<span class="sd">        Upper limit of colormap for plotting voltage</span>
+<span class="sd">        Default: 50 mV</span>
+<span class="sd">    bg_color : str</span>
+<span class="sd">        Background color of ax. Default: &#39;black&#39;</span>
+<span class="sd">    colorbar : bool</span>
+<span class="sd">        If True (default), adjust figure to include colorbar.</span>
+<span class="sd">    voltage_colormap : str</span>
+<span class="sd">        Colormap used for plotting voltages</span>
+<span class="sd">        Default: &#39;viridis&#39;</span>
+<span class="sd">    elev : int | float</span>
+<span class="sd">        Elevation 3D plot viewpoint, default: 10</span>
+<span class="sd">    azim : int | float</span>
+<span class="sd">        Azimuth of 3D plot view point, default: 20</span>
+<span class="sd">    xlim : tuple of int | tuple of float</span>
+<span class="sd">        x limits of plot window. Default (-200, 3100)</span>
+<span class="sd">    ylim : tuple of int | tuple of float</span>
+<span class="sd">        y limits of plot window. Default (-200, 3100)</span>
+<span class="sd">    zlim : tuple of int | tuple of float</span>
+<span class="sd">        z limits of plot window. Default (-300, 2200)</span>
+<span class="sd">    trial_idx : int</span>
+<span class="sd">        Index of simulation trial plotted. Default: 0</span>
+<span class="sd">    time_idx : int</span>
+<span class="sd">        Index of time point plotted. Default: 0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">100</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">bg_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span>
+                 <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">voltage_colormap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">elev</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">azim</span><span class="o">=-</span><span class="mi">500</span><span class="p">,</span>
+                 <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">200</span><span class="p">,</span> <span class="mi">3100</span><span class="p">),</span> <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">200</span><span class="p">,</span> <span class="mi">3100</span><span class="p">),</span> <span class="n">zlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">300</span><span class="p">,</span> <span class="mi">2200</span><span class="p">),</span>
+                 <span class="n">trial_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">colormaps</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_parameters</span><span class="p">(</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="p">,</span> <span class="n">bg_color</span><span class="p">,</span> <span class="n">voltage_colormap</span><span class="p">,</span>
+                                  <span class="n">colorbar</span><span class="p">,</span> <span class="n">elev</span><span class="p">,</span> <span class="n">azim</span><span class="p">,</span> <span class="n">xlim</span><span class="p">,</span> <span class="n">ylim</span><span class="p">,</span> <span class="n">zlim</span><span class="p">,</span>
+                                  <span class="n">trial_idx</span><span class="p">,</span> <span class="n">time_idx</span><span class="p">)</span>
+
+        <span class="c1"># Set init arguments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">net</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vmin</span> <span class="o">=</span> <span class="n">vmin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vmax</span> <span class="o">=</span> <span class="n">vmax</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bg_color</span> <span class="o">=</span> <span class="n">bg_color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_colorbar</span> <span class="o">=</span> <span class="n">colorbar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_voltage_colormap</span> <span class="o">=</span> <span class="n">voltage_colormap</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_colormaps</span> <span class="o">=</span> <span class="n">colormaps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span> <span class="o">=</span> <span class="n">xlim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ylim</span> <span class="o">=</span> <span class="n">ylim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zlim</span> <span class="o">=</span> <span class="n">zlim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_elev</span> <span class="o">=</span> <span class="n">elev</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_azim</span> <span class="o">=</span> <span class="n">azim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trial_idx</span> <span class="o">=</span> <span class="n">trial_idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_time_idx</span> <span class="o">=</span> <span class="n">time_idx</span>
+
+        <span class="c1"># Check if Network object is simulated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vsec_recorded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_network_simulation</span><span class="p">()</span>
+
+        <span class="c1"># Initialize plots and colormap</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_colormap</span> <span class="o">=</span> <span class="n">colormaps</span><span class="p">[</span><span class="n">voltage_colormap</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vsec_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_voltages</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colormap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vsec_array</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_plots</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colorbar</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_colorbar</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cbar</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_validate_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="p">,</span> <span class="n">bg_color</span><span class="p">,</span> <span class="n">voltage_colormap</span><span class="p">,</span>
+                             <span class="n">colorbar</span><span class="p">,</span> <span class="n">elev</span><span class="p">,</span> <span class="n">azim</span><span class="p">,</span> <span class="n">xlim</span><span class="p">,</span> <span class="n">ylim</span><span class="p">,</span> <span class="n">zlim</span><span class="p">,</span> <span class="n">trial_idx</span><span class="p">,</span>
+                             <span class="n">time_idx</span><span class="p">):</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">vmin</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;vmin&#39;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">vmax</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;vmax&#39;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">bg_color</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;bg_color&#39;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">voltage_colormap</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;voltage_colormap&#39;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">colorbar</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s1">&#39;colorbar&#39;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">xlim</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="s1">&#39;xlim&#39;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">ylim</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="s1">&#39;ylim&#39;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">zlim</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="s1">&#39;zlim&#39;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">elev</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;elev&#39;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">azim</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;azim&#39;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">trial_idx</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;trial_idx&#39;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">time_idx</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;time_idx&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_check_network_simulation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">vsec_recorded</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># Check if network simulated</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">cell_response</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">times</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">times</span>
+
+            <span class="c1"># Check if voltage recorded</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s1">&#39;record_vsec&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+                <span class="n">vsec_recorded</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">times</span><span class="p">,</span> <span class="n">vsec_recorded</span>
+
+    <span class="k">def</span> <span class="nf">_initialize_plots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+        <span class="c1"># Create figure</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bg_color</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_network_plot</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_axes</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_get_voltages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">vsec_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">:</span>
+            <span class="n">gid_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">gid</span> <span class="ow">in</span> <span class="n">gid_range</span><span class="p">:</span>
+                <span class="n">cell</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">sec_name</span> <span class="ow">in</span> <span class="n">cell</span><span class="o">.</span><span class="n">sections</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vsec_recorded</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                        <span class="n">vsec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">vsec</span><span class="p">[</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">trial_idx</span><span class="p">][</span><span class="n">gid</span><span class="p">][</span><span class="n">sec_name</span><span class="p">])</span>
+                        <span class="n">vsec_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vsec</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>  <span class="c1"># Populate with zeros if no voltage recording</span>
+                        <span class="n">vsec_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mf">0.0</span><span class="p">])</span>
+
+        <span class="n">vsec_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">vsec_list</span><span class="p">)</span>
+        <span class="n">vsec_array</span> <span class="o">=</span> <span class="p">(</span><span class="n">vsec_array</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">vmin</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vmax</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">vmin</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">vsec_array</span>
+
+    <span class="k">def</span> <span class="nf">_update_section_voltages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t_idx</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vsec_recorded</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Network must be simulated with&quot;</span>
+                               <span class="s2">&quot;`simulate_dipole(record_vsec=&#39;all&#39;)` before&quot;</span>
+                               <span class="s2">&quot;plotting voltages.&quot;</span><span class="p">)</span>
+        <span class="n">color_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">color_array</span><span class="p">[:,</span> <span class="n">t_idx</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">line</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">lines</span><span class="p">,</span> <span class="n">color_list</span><span class="p">):</span>
+            <span class="n">line</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_init_network_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">:</span>
+            <span class="n">gid_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">gid_idx</span><span class="p">,</span> <span class="n">gid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gid_range</span><span class="p">):</span>
+
+                <span class="n">cell</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span>
+
+                <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">cell_type</span><span class="p">][</span><span class="n">gid_idx</span><span class="p">]</span>
+                <span class="n">pos</span> <span class="o">=</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+                <span class="n">cell</span><span class="o">.</span><span class="n">plot_morphology</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                     <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">xlim</span><span class="p">,</span>
+                                     <span class="n">ylim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ylim</span><span class="p">,</span> <span class="n">zlim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zlim</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_update_axes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ylim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_zlim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zlim</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_elev</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_azim</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_update_colorbar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+        <span class="kn">import</span> <span class="nn">matplotlib.colors</span> <span class="k">as</span> <span class="nn">mc</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span>
+        <span class="n">sm</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span>
+            <span class="n">cmap</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">voltage_colormap</span><span class="p">,</span>
+            <span class="n">norm</span><span class="o">=</span><span class="n">mc</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vmax</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cbar</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sm</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="p">)</span>
+
+<div class="viewcode-block" id="NetworkPlotter.export_movie"><a class="viewcode-back" href="../../generated/hnn_core.viz.NetworkPlotter.html#hnn_core.viz.NetworkPlotter.export_movie">[docs]</a>    <span class="k">def</span> <span class="nf">export_movie</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                     <span class="n">interval</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">frame_start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">frame_stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">writer</span><span class="o">=</span><span class="s1">&#39;pillow&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export movie of network activity</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fname : str</span>
+<span class="sd">            Filename of exported movie</span>
+<span class="sd">        fps : int</span>
+<span class="sd">            Frames per second, default: 30</span>
+<span class="sd">        dpi : int</span>
+<span class="sd">            Dots per inch, default: 300</span>
+<span class="sd">        decim : int</span>
+<span class="sd">            Decimation factor for frames, default: 10</span>
+<span class="sd">        interval : int</span>
+<span class="sd">            Delay between frames, default: 30</span>
+<span class="sd">        frame_start : int</span>
+<span class="sd">            Index of first frame, default: 0</span>
+<span class="sd">        frame_stop : int | None</span>
+<span class="sd">            Index of last frame, default: None</span>
+<span class="sd">            If None, entire simulation is animated</span>
+<span class="sd">        writer : str</span>
+<span class="sd">            Movie writer, default: &#39;pillow&#39;.</span>
+<span class="sd">            Alternative movie writers can be found at</span>
+<span class="sd">            https://matplotlib.org/stable/api/animation_api.html</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">matplotlib.animation</span> <span class="k">as</span> <span class="nn">animation</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vsec_recorded</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Network must be simulated with&quot;</span>
+                               <span class="s2">&quot;`simulate_dipole(record_vsec=&#39;all&#39;)` before&quot;</span>
+                               <span class="s2">&quot;plotting voltages.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">frame_stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">frame_stop</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="n">frames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">frame_start</span><span class="p">,</span> <span class="n">frame_stop</span><span class="p">,</span> <span class="n">decim</span><span class="p">)</span>
+        <span class="n">ani</span> <span class="o">=</span> <span class="n">animation</span><span class="o">.</span><span class="n">FuncAnimation</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_time_idx</span><span class="p">,</span> <span class="n">frames</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
+
+        <span class="n">writer</span> <span class="o">=</span> <span class="n">animation</span><span class="o">.</span><span class="n">writers</span><span class="p">[</span><span class="n">writer</span><span class="p">](</span><span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">)</span>
+        <span class="n">ani</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">writer</span><span class="o">=</span><span class="n">writer</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ani</span></div>
+
+    <span class="c1"># Axis limits</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">xlim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span>
+
+    <span class="nd">@xlim</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">xlim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xlim</span><span class="p">):</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">xlim</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="s1">&#39;xlim&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span> <span class="o">=</span> <span class="n">xlim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ylim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ylim</span>
+
+    <span class="nd">@ylim</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">ylim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ylim</span><span class="p">):</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">ylim</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="s1">&#39;ylim&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ylim</span> <span class="o">=</span> <span class="n">ylim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ylim</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">zlim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zlim</span>
+
+    <span class="nd">@zlim</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">zlim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zlim</span><span class="p">):</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">zlim</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="s1">&#39;zlim&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zlim</span> <span class="o">=</span> <span class="n">zlim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_zlim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zlim</span><span class="p">)</span>
+
+    <span class="c1"># Elevation and azimuth of 3D viewpoint</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">elev</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_elev</span>
+
+    <span class="nd">@elev</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">elev</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elev</span><span class="p">):</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">elev</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;elev&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_elev</span> <span class="o">=</span> <span class="n">elev</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_elev</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_azim</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">azim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_azim</span>
+
+    <span class="nd">@azim</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">azim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">azim</span><span class="p">):</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">azim</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;azim&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_azim</span> <span class="o">=</span> <span class="n">azim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_elev</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_azim</span><span class="p">)</span>
+
+    <span class="c1"># Minimum and maximum voltages</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vmin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vmin</span>
+
+    <span class="nd">@vmin</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">vmin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vmin</span><span class="p">):</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">vmin</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;vmin&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vmin</span> <span class="o">=</span> <span class="n">vmin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vsec_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_voltages</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colormap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vsec_array</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colorbar</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cbar</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_colorbar</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vmax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vmax</span>
+
+    <span class="nd">@vmax</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">vmax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vmax</span><span class="p">):</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">vmax</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;vmax&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vmax</span> <span class="o">=</span> <span class="n">vmax</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vsec_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_voltages</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colormap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vsec_array</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colorbar</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cbar</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_colorbar</span><span class="p">()</span>
+
+    <span class="c1"># Time and trial indices</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">trial_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trial_idx</span>
+
+    <span class="nd">@trial_idx</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">trial_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_idx</span><span class="p">):</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">trial_idx</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;trial_idx&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vsec_recorded</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Network must be simulated with&quot;</span>
+                               <span class="s2">&quot;`simulate_dipole(record_vsec=&#39;all&#39;)` before&quot;</span>
+                               <span class="s2">&quot;setting `trial_idx`.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_trial_idx</span> <span class="o">=</span> <span class="n">trial_idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vsec_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_voltages</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colormap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vsec_array</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_section_voltages</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_time_idx</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">time_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_time_idx</span>
+
+    <span class="nd">@time_idx</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">time_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_idx</span><span class="p">):</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">time_idx</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">),</span> <span class="s1">&#39;time_idx&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vsec_recorded</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Network must be simulated with&quot;</span>
+                               <span class="s2">&quot;`simulate_dipole(record_vsec=&#39;all&#39;)` before&quot;</span>
+                               <span class="s2">&quot;setting `time_idx`.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_time_idx</span> <span class="o">=</span> <span class="n">time_idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_section_voltages</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_time_idx</span><span class="p">)</span>
+
+    <span class="c1"># Callable update function for making animations</span>
+    <span class="k">def</span> <span class="nf">_set_time_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_idx</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_idx</span> <span class="o">=</span> <span class="n">time_idx</span>
+
+    <span class="c1"># Background color and voltage colormaps</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bg_color</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bg_color</span>
+
+    <span class="nd">@bg_color</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">bg_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bg_color</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bg_color</span> <span class="o">=</span> <span class="n">bg_color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bg_color</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">voltage_colormap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_voltage_colormap</span>
+
+    <span class="nd">@voltage_colormap</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">voltage_colormap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">voltage_colormap</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_voltage_colormap</span> <span class="o">=</span> <span class="n">voltage_colormap</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_colormap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colormaps</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_voltage_colormap</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colormap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vsec_array</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colorbar</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cbar</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_colorbar</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">colorbar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colorbar</span>
+
+    <span class="nd">@colorbar</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">colorbar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colorbar</span><span class="p">):</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">colorbar</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s1">&#39;colorbar&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_colorbar</span> <span class="o">=</span> <span class="n">colorbar</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colorbar</span><span class="p">:</span>
+            <span class="c1"># Remove old colorbar if already exists</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cbar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_cbar</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_colorbar</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cbar</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cbar</span> <span class="o">=</span> <span class="kc">None</span></div>
 </pre></div>
 
     </div>

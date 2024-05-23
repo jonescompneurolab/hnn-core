@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>06. Animating HNN simulations &#8212; hnn-core  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=9afac83c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=fd10adb8"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-199741045-1');
+</script>
+
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html">
+          hnn-core</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.4.dev0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../index.html">Examples</a></li>
+                <li><a href="../../gui/index.html">GUI</a></li>
+                <li><a href="../../api.html">API</a></li>
+                <li><a href="../../glossary.html">Glossary</a></li>
+                <li><a href="../../whats_new.html">What's new</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">06. Animating HNN simulations</a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../../_sources/auto_examples/howto/plot_hnn_animation.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+<div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
+  <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
+    v0.4.dev0
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/index.html">Development</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.2/index.html">v0.2</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.3/index.html">v0.3</a></li>
+  </ul>
+</div>
+
+
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-auto-examples-howto-plot-hnn-animation-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code. or to run this example in your browser via Binder</p>
+</div>
+<section class="sphx-glr-example-title" id="animating-hnn-simulations">
+<span id="sphx-glr-auto-examples-howto-plot-hnn-animation-py"></span><h1>06. Animating HNN simulations<a class="headerlink" href="#animating-hnn-simulations" title="Permalink to this heading">¶</a></h1>
+<p>This example demonstrates how to animate HNN simulations</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Author: Nick Tolley &lt;nicholas_tolley@brown.edu&gt;</span>
+</pre></div>
+</div>
+<p>First, we’ll import the necessary modules for instantiating a network and
+running a simulation that we would like to animate.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+
+<span class="kn">import</span> <span class="nn">hnn_core</span>
+<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">,</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">,</span> <span class="n">read_params</span>
+<span class="kn">from</span> <span class="nn">hnn_core.network_models</span> <span class="kn">import</span> <span class="n">add_erp_drives_to_jones_model</span>
+</pre></div>
+</div>
+<p>We begin by instantiating the network. For this example, we will reduce the
+number of cells in the network to speed up the simulations.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">(</span><span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+<span class="c1"># Note that we move the cells further apart to allow better visualization of</span>
+<span class="c1"># the network (default inplane_distance=1.0 µm).</span>
+<a href="../../generated/hnn_core.Network.html#hnn_core.Network.set_cell_positions" title="hnn_core.Network.set_cell_positions" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">set_cell_positions</span></a><span class="p">(</span><span class="n">inplane_distance</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="../../generated/hnn_core.viz.NetworkPlotter.html#hnn_core.viz.NetworkPlotter" title="hnn_core.viz.NetworkPlotter"><code class="xref py py-class docutils literal notranslate"><span class="pre">hnn_core.viz.NetworkPlotter</span></code></a> class can be used to visualize
+the 3D structure of the network.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hnn_core.viz</span> <span class="kn">import</span> <span class="n">NetworkPlotter</span>
+
+<span class="n">net_plot</span> <span class="o">=</span> <span class="n">NetworkPlotter</span><span class="p">(</span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_plot</span><span class="o">.</span><span class="n">fig</span></a>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_plot_hnn_animation_001.png" srcset="../../_images/sphx_glr_plot_hnn_animation_001.png" alt="plot hnn animation" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/circleci/miniconda/envs/testenv/lib/python3.8/site-packages/hnn_core/viz.py:937: UserWarning: The figure layout has changed to tight
+  plt.tight_layout()
+
+&lt;Figure size 640x480 with 2 Axes&gt;
+</pre></div>
+</div>
+<p>We can also visualize the network from another angle by adjusting the
+azimuth and elevation parameters.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">net_plot</span><span class="o">.</span><span class="n">azim</span> <span class="o">=</span> <span class="mi">45</span>
+<span class="n">net_plot</span><span class="o">.</span><span class="n">elev</span> <span class="o">=</span> <span class="mi">40</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_plot</span><span class="o">.</span><span class="n">fig</span></a>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 640x480 with 2 Axes&gt;
+</pre></div>
+</div>
+<p>Next we add event related potential (ERP) producing drives to the network
+and run the simulation (see
+<span class="xref std std-ref">evoked example</span>
+for more details).
+To visualize the membrane potential of cells in the
+network, we need use <em class="xref py py-obj">simulate_dipole(…, record_vsec=’all’)</em> which turns
+on the recording of voltages in all sections of all cells in the network.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">add_erp_drives_to_jones_model</span><span class="p">(</span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpl</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">(</span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="mi">170</span><span class="p">,</span> <span class="n">record_vsec</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+<span class="n">net_plot</span> <span class="o">=</span> <span class="n">NetworkPlotter</span><span class="p">(</span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="p">)</span>  <span class="c1"># Reinitialize plotter with simulated network</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_plot_hnn_animation_002.png" srcset="../../_images/sphx_glr_plot_hnn_animation_002.png" alt="plot hnn animation" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Joblib will run 1 trial(s) in parallel by distributing trials over 1 jobs.
+Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.8/site-packages/hnn_core/mod/x86_64/libnrnmech.so
+Building the NEURON model
+[Done]
+Trial 1: 0.03 ms...
+Trial 1: 10.0 ms...
+Trial 1: 20.0 ms...
+Trial 1: 30.0 ms...
+Trial 1: 40.0 ms...
+Trial 1: 50.0 ms...
+Trial 1: 60.0 ms...
+Trial 1: 70.0 ms...
+Trial 1: 80.0 ms...
+Trial 1: 90.0 ms...
+Trial 1: 100.0 ms...
+Trial 1: 110.0 ms...
+Trial 1: 120.0 ms...
+Trial 1: 130.0 ms...
+Trial 1: 140.0 ms...
+Trial 1: 150.0 ms...
+Trial 1: 160.0 ms...
+</pre></div>
+</div>
+<p>Finally, we can animate the simulation using the <em class="xref py py-obj">export_movie()</em> method. We
+can adjust the xyz limits of the plot to better visualize the network.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">net_plot</span><span class="o">.</span><span class="n">xlim</span> <span class="o">=</span> <span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="mi">1600</span><span class="p">)</span>
+<span class="n">net_plot</span><span class="o">.</span><span class="n">ylim</span> <span class="o">=</span> <span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="mi">1600</span><span class="p">)</span>
+<span class="n">net_plot</span><span class="o">.</span><span class="n">zlim</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">500</span><span class="p">,</span> <span class="mi">1600</span><span class="p">)</span>
+<span class="n">net_plot</span><span class="o">.</span><span class="n">azim</span> <span class="o">=</span> <span class="mi">225</span>
+<span class="n">net_plot</span><span class="o">.</span><span class="n">export_movie</span><span class="p">(</span><span class="s1">&#39;animation_demo.gif&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.animation.FuncAnimation object at 0x7fdf6f260d60&gt;
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 6.520 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-hnn-animation-py">
+<div class="binder-badge docutils container">
+<a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_hnn_animation.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" width="150px" /></a>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/5cb39c19dab840f415c8c7e5f0e21c4e/plot_hnn_animation.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_hnn_animation.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/07e9387e7f5249fdef521023a411f25b/plot_hnn_animation.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_hnn_animation.py</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2023, HNN Developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
