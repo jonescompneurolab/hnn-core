@@ -238,6 +238,7 @@ class HNNGUI:
         self.load_data_button = FileUpload(
             accept='.txt,.csv', multiple=False,
             style={'button_color': self.layout['theme_color']},
+            layout=self.layout['btn'],
             description='Load data',
             button_style='success')
 
