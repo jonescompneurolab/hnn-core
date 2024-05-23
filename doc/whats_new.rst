@@ -59,7 +59,7 @@ Changelog
   json, by `George Dang`_ and `Rajat Partani`_ in :gh:`757`
 
 - Added :class:`~hnn_core/viz/NetworkPlotter` to visualize and animate network simulations,
-  by `Nick Tolley`_ in :gh:`649`
+  by `Nick Tolley`_ in :gh:`649`.
 
 Bug
 ~~~
