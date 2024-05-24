@@ -61,6 +61,9 @@ Changelog
 - Added :class:`~hnn_core/viz/NetworkPlotter` to visualize and animate network simulations,
   by `Nick Tolley`_ in :gh:`649`.
 
+- Added GUI feature to include Tonic input drives in simulations, 
+  by `Camilo Diaz` :gh:`773`
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
