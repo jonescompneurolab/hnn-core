@@ -150,8 +150,8 @@ API and Tutorial development
 The ability to interpret the neural origin of macroscale MEG/EEG signals in a 
 complex high-dimensional non-linear computational neural model is challenging. 
 A primary goal of HNN is to facilitate this interpretation with a clear API and examples 
-of use in HNN-core, and interactive GUI-based tutorals for all HNN-GUI functionality on our HNN website.  
-Following the process for creating new featuers in HNN, the process for documenting 
+of use in HNN-core, and interactive GUI-based tutorials for all HNN-GUI functionality on our HNN website.
+Following the process for creating new features in HNN, the process for documenting
 new features will be to first develop them with API and examples of use in HNN-core, followed
 by integration into the HNN-GUI, with corresponding GUI-based tutorials on the HNN-website. 
 Developmental goals are only complete once the corresponding documentation is available. 
