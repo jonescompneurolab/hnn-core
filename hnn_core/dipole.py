@@ -66,10 +66,11 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
         warnings.warn('No connections instantiated in network. Consider using '
                       'net = jones_2009_model() or net = law_2021_model() to '
                       'create a predefined network from published models.',
-                      UserWarning)
+                      UserWarning, stacklevel=2)
     # ADD DRIVE WARNINGS HERE
     if not net.external_drives and not net.external_biases:
-        warnings.warn('No external drives or biases loaded', UserWarning)
+        warnings.warn('No external drives or biases loaded', UserWarning,
+                      stacklevel=2)
 
     for _drive_name, drive in net.external_drives.items():
         if 'tstop' in drive['dynamics']:
@@ -100,7 +101,7 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
         warnings.warn('The postproc-argument is deprecated and will be removed'
                       ' in a future release of hnn-core. Please define '
                       'smoothing and scaling explicitly using Dipole methods.',
-                      DeprecationWarning)
+                      DeprecationWarning, stacklevel=2)
     dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc)
 
     return dpls
@@ -676,7 +677,7 @@ class Dipole(object):
 
         if self.nave > 1:
             warnings.warn("Saving Dipole to file that is an average of %d"
-                          " trials" % self.nave)
+                          " trials" % self.nave, stacklevel=2)
 
         X = [self.times]
         fmt = ['%3.3f']
