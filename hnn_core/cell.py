@@ -569,7 +569,7 @@ class Cell:
         for sec_name, section in sections.items():
             for _mech_name, p_mech in section.mechs.items():
                 for attr, val in p_mech.items():
-                    if hasattr(val, '__call__'):
+                    if callable(val):
                         seg_xs, seg_vals = list(), list()
                         section_distance = self.distance_section(sec_name,
                                                                  ('soma', 0))
