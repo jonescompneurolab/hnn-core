@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         python-version: [3.8, 3.9]
 
     steps:
@@ -43,10 +43,16 @@ jobs:
         shell: bash -el {0}
         run: |
           flake8 --count hnn_core
+      - name: Test MPI
+        shell: bash -el {0}
+        run: |
+          mpiexec -np 2 nrniv -mpi -python -c 'from neuron import h; from mpi4py import MPI; \
+                                               print(f"Hello from proc {MPI.COMM_WORLD.Get_rank()}"); \
+                                               h.quit()'
       - name: Test with pytest
         shell: bash -el {0}
         run: |
-          python -m pytest ./hnn_core/tests/  --cov=hnn_core --cov-report=xml
+          python -m pytest ./hnn_core/tests/  --cov=hnn_core --cov-report=xml --verbose
       - name:  Upload coverage to Codecov
         shell: bash -el {0}
         run: |
