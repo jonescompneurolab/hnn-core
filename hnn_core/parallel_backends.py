@@ -353,7 +353,7 @@ def requires_mpi4py(function):
         import mpi4py
         assert hasattr(mpi4py, '__version__')
         skip = False
-    except (ImportError, ModuleNotFoundError) as err:
+    except ImportError as err:
         if "TRAVIS_OS_NAME" not in os.environ:
             skip = True
         else:
@@ -370,7 +370,7 @@ def requires_psutil(function):
         import psutil
         assert hasattr(psutil, '__version__')
         skip = False
-    except (ImportError, ModuleNotFoundError) as err:
+    except ImportError as err:
         if "TRAVIS_OS_NAME" not in os.environ:
             skip = True
         else:
