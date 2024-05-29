@@ -125,8 +125,10 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     threads_started = False
 
     try:
-        proc = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE, *args,
-                     **kwargs)
+        kwargs.setdefault('stdin', PIPE)
+        kwargs.setdefault('stdout', PIPE)
+        kwargs.setdefault('stderr', PIPE)
+        proc = Popen(command, *args, **kwargs)
 
         # now that the process has started, add it to the queue
         # used by MPIBackend.terminate()
