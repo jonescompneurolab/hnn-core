@@ -46,6 +46,9 @@ jobs:
       - name: Test MPI
         shell: bash -el {0}
         run: |
+          if [ "${{ matrix.os }}" == "macos-latest" ]; then
+            export DYLD_FALLBACK_LIBRARY_PATH=${CONDA_PREFIX}/lib
+          fi;
           mpiexec -np 2 nrniv -mpi -python -c 'from neuron import h; from mpi4py import MPI; \
                                                print(f"Hello from proc {MPI.COMM_WORLD.Get_rank()}"); \
                                                h.quit()'
