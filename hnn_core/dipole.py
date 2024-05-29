@@ -71,12 +71,12 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
     if not net.external_drives and not net.external_biases:
         warnings.warn('No external drives or biases loaded', UserWarning)
 
-    for drive_name, drive in net.external_drives.items():
+    for _drive_name, drive in net.external_drives.items():
         if 'tstop' in drive['dynamics']:
             if drive['dynamics']['tstop'] is None:
                 drive['dynamics']['tstop'] = tstop
-    for bias_name, bias in net.external_biases.items():
-        for cell_type, bias_cell_type in bias.items():
+    for _bias_name, bias in net.external_biases.items():
+        for _cell_type, bias_cell_type in bias.items():
             if bias_cell_type['tstop'] is None:
                 bias_cell_type['tstop'] = tstop
             if bias_cell_type['tstop'] < 0.:

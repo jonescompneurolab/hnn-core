@@ -150,7 +150,7 @@ def load_custom_mechanisms():
     # recursively find the .so / .dll library
     mech_fname = list()
     mod_dir = op.join(op.dirname(__file__), 'mod')
-    for root, dirnames, filenames in os.walk(mod_dir):
+    for root, _dirnames, filenames in os.walk(mod_dir):
         for filename in filenames:
             if filename.endswith(('.so', '.dll')):
                 mech_fname.append(os.path.join(root, filename))
@@ -630,7 +630,7 @@ class NetworkBuilder(object):
         _PC.gid_clear()
 
         # dereference cell and NetConn objects
-        for gid, cell in zip(self._gid_list, self._cells):
+        for gid, _cell in zip(self._gid_list, self._cells):
             # only work on cells on this node
             if _PC.gid_exists(gid):
                 for nc_key in self.ncs:
