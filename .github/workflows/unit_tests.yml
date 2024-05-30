@@ -25,7 +25,7 @@ jobs:
       - name: Install ubuntu dependencies
         shell: bash -el {0}
         run: |
-          if [ "${{ matrix.os }}" == "ubuntu-"* ]; then
+          if [[ "${{ matrix.os }}" == "ubuntu-"* ]]; then
             sudo add-apt-repository ppa:ubuntu-toolchain-r/test
             sudo apt-get update
             sudo apt-get install libopenmpi-dev openmpi-bin
