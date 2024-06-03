@@ -174,6 +174,11 @@ Interested in Contributing?
 
 Read our `contributing guide`_.
 
+Governance Structure
+====================
+
+Read our `governance structure`_.
+
 Roadmap
 =======
 
@@ -193,6 +198,7 @@ If you use HNN-core in your work, please cite our
 .. _NEURON forum: https://www.neuron.yale.edu/phpbb/
 .. _contributing guide: https://jonescompneurolab.github.io/hnn-core/dev/contributing.html
 .. _parallel backend guide: https://jonescompneurolab.github.io/hnn-core/dev/parallel.html
+.. _governance structure: https://jonescompneurolab.github.io/hnn-core/dev/governance.html
 
 .. |tests| image:: https://github.com/jonescompneurolab/hnn-core/actions/workflows/unit_tests.yml/badge.svg?branch=master
    :target: https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:master+event:push
