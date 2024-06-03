@@ -9,8 +9,11 @@ import pickle
 import base64
 import re
 
-from hnn_core.parallel_backends import _extract_data, _extract_data_length
 
+from hnn_core.parallel_backends import _extract_data, _extract_data_length
+import logging
+logging.basicConfig(filename=f'k_mpi_log.txt', level=logging.DEBUG)
+logger = logging.getLogger()
 
 def _pickle_data(sim_data):
     # pickle the data and encode as base64 before sending to stderr
@@ -53,14 +56,21 @@ class MPISimulation(object):
         The rank for each processor part of the MPI communicator
     """
     def __init__(self, skip_mpi_import=False):
+        # Configure logging
+        
+        logger.info(f"MPISimulation::Init")
         self.skip_mpi_import = skip_mpi_import
         if skip_mpi_import:
             self.rank = 0
+            logger.info(f"Rank 0 ")
         else:
             from mpi4py import MPI
 
             self.comm = MPI.COMM_WORLD
             self.rank = self.comm.Get_rank()
+            size = self.comm.Get_size()
+            logger.info(f"Hello from rank {self.rank} out of {size} processors")
+            
 
     def __enter__(self):
         return self
@@ -75,14 +85,20 @@ class MPISimulation(object):
         """Read net broadcasted to all ranks on stdin"""
 
         # read Network from stdin
+        logger.info("_read_net 1")
         if self.rank == 0:
             input_str = ''
             while True:
+                logger.info("_read_net loop 1")
                 line = sys.stdin.readline()
+                logger.info("_read_net loop 2")
                 line = line.rstrip('\n')
+                logger.info("_read_net loop 3")
                 input_str += line
                 end_match = re.search(r'@end_of_net:\d+@', input_str)
+                logger.info("_read_net loop 4")
                 if end_match is not None:
+                    logger.info("_read_net END loop")
                     break
 
             net = _str_to_net(input_str)
@@ -126,13 +142,14 @@ class MPISimulation(object):
         from hnn_core.network_builder import _simulate_single_trial
 
         sim_data = list()
+        logger.info("MPISimulation 1")
         for trial_idx in range(n_trials):
             single_sim_data = _simulate_single_trial(net, tstop, dt, trial_idx)
-
+            logger.info(f"trial_idx {trial_idx}")
             # go ahead and append trial data for each rank, though
             # only rank 0 has data that should be sent back to MPIBackend
             sim_data.append(single_sim_data)
-
+        logger.info(f"MPISimulation end loop {trial_idx}")
         # flush output buffers from all ranks (any errors or status messages)
         sys.stdout.flush()
         sys.stderr.flush()
@@ -142,17 +159,22 @@ class MPISimulation(object):
 
 if __name__ == '__main__':
     """This file is called on command-line from nrniv"""
-
+    logger.info("MPICHILD.PY")
     import traceback
+   
     rc = 0
-
+    
     try:
         with MPISimulation() as mpi_sim:
             # XXX: _read_net -> _read_obj, fix later
+            logger.info("Process Inited")
             net, tstop, dt, n_trials = mpi_sim._read_net()
+            logger.info("End mpi_sim._read_net")
             sim_data = mpi_sim.run(net, tstop, dt, n_trials)
+            logger.info("End mpi_sim.run")
             mpi_sim._write_data_stderr(sim_data)
             mpi_sim._wait_for_exit_signal()
+
     except Exception:
         # This can be useful to indicate the problem to the
         # caller (in parallel_backends.py)

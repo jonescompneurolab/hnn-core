@@ -25,7 +25,8 @@ from hnn_core.gui._logging import logger
 from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
 from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
-                             _read_legacy_params)
+                             _read_legacy_params,
+                             _extract_bias_specs_from_hnn_params)
 from hnn_core.dipole import _read_dipole_txt
 
 import base64
@@ -1024,24 +1025,25 @@ def _get_evoked_widget(name, layout, style, location, data=None,
 
 def _get_tonic_widget(name, layout, style, data=None):
 
+    cell_types = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
+
     default_data = {
-        'amplitude': 0,
+        'amplitude':{cell_type: 0 for cell_type in cell_types},
         't0': 0,
         'tstop': 0
     }
 
-    cell_types = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
-
     if isinstance(data, dict):
-        default_data.update(data)
+        for cell_type in data:
+            if cell_type in default_data['amplitude']:
+                default_data['amplitude'][cell_type] = data[cell_type]['amplitude']
+
     kwargs = dict(layout=layout, style=style)
 
     amplitudes = dict()
     for cell_type in cell_types:
-        if cell_type in data:
-            default_data.update(data[cell_type])
         amplitudes[cell_type] = BoundedFloatText(
-            value=deepcopy(default_data['amplitude']),
+            value=deepcopy(default_data['amplitude'][cell_type]),
             description=cell_type, min=0, max=1e6, step=0.01, **kwargs)
 
     start_times = BoundedFloatText(
@@ -1232,7 +1234,9 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
     net = jones_2009_model(params)
     drive_specs = _extract_drive_specs_from_hnn_params(
         params, list(net.cell_types.keys()), legacy_mode=net._legacy_mode)
-
+    bias_specs = _extract_bias_specs_from_hnn_params(
+        params, list(net.cell_types.keys()))
+    print(bias_specs)
     # clear before adding drives
     drives_out.clear_output()
     while len(drive_widgets) > 0:
@@ -1265,6 +1269,17 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
             event_seed=specs['event_seed'],
             sync_evinput=is_sync_evinput
         )
+
+    for tonic_input in bias_specs.keys():
+        add_drive_widget(tonic_input.capitalize(),
+                         drive_boxes,
+                         drive_widgets,
+                         drives_out,
+                         tstop_widget = None,
+                         location = None,
+                         layout = layout,
+                         prespecified_drive_data=bias_specs[tonic_input])
+
 
 
 def load_drive_and_connectivity(params, log_out, drives_out,
@@ -1601,5 +1616,9 @@ def launch():
     You can pass voila commandline parameters as usual.
     """
     from voila.app import main
+    import debugpy
+    debugpy.listen(5678)
+    print("Waiting for debugger attach")
+    debugpy.wait_for_client()
     notebook_path = Path(__file__).parent / 'hnn_widget.ipynb'
     main([str(notebook_path.resolve()), *sys.argv[1:]])

@@ -21,7 +21,10 @@ from .dipole import Dipole
 from .network_builder import _simulate_single_trial
 
 _BACKEND = None
-
+import logging
+logging.basicConfig(filename=f'k_parallel_backends_log.txt', level=logging.DEBUG)
+logger = logging.getLogger()
+import subprocess
 
 def _thread_handler(event, out, queue):
     while not event.is_set():
@@ -125,9 +128,13 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     threads_started = False
 
     try:
-        proc = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE, *args,
+        logger.info(f"Parallel backends Popen")
+        proc = Popen(command, stdin=subprocess.PIPE, 
+                     stdout=subprocess.PIPE,
+                     stderr=subprocess.PIPE,
+                     *args,
                      **kwargs)
-
+        logger.info(f"Parallel backends after Popen")
         # now that the process has started, add it to the queue
         # used by MPIBackend.terminate()
         if proc_queue is not None:
@@ -149,37 +156,47 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
 
         # loop while the process is running the simulation
         while True:
+            logger.info(f"Parallel backends proc.poll()")
             child_terminated = proc.poll() is not None
 
             if not data_received:
                 if _echo_child_output(out_q):
                     count_since_last_output = 0
+                    logger.info(f" if _echo_child_output  ")
                 else:
                     count_since_last_output += 1
+                    logger.info(f" if no _echo_child_output ")
                 # look for data in stderr and print child stdout
                 data_len, proc_data_bytes = _get_data_from_child_err(err_q)
                 if data_len > 0:
                     data_received = True
                     _write_child_exit_signal(proc.stdin)
+                    logger.info(f"  if data_len > 0 {data_len} ")
                 elif child_terminated:
                     # child terminated early, and we already
                     # captured output left in queues
                     warn("Child process failed unexpectedly")
                     kill_proc_name('nrniv')
+                    logger.info(f"child_terminated  ")
                     break
+                else:
+                    logger.info(f"Nothing happend ")
 
             if not sent_network:
                 # Send network object to child so it can start
                 try:
+                    logger.info(f"if not sent_network try ")
                     _write_net(proc.stdin, pickled_obj)
                 except BrokenPipeError:
                     # child failed during _write_net(). get the
                     # output and break out of loop on the next
                     # iteration
+                    logger.info(f"if not sent_network except")
                     warn("Received BrokenPipeError exception. "
                          "Child process failed unexpectedly")
                     continue
                 else:
+                    logger.info(f"if not sent_network else ")
                     sent_network = True
                     # This is not the same as "network received", but we
                     # assume it was successful and move on to waiting for
@@ -188,6 +205,7 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
             if child_terminated and data_received:
                 # both exit conditions have been met (also we know that
                 # the network has been sent)
+                logger.info(f"child_terminated and data_received  ")
                 break
 
             if not child_terminated and \
@@ -195,11 +213,16 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
                 warn("Timeout exceeded while waiting for child process output"
                      ". Terminating...")
                 kill_proc_name('nrniv')
+                logger.info(f"not child_terminated and count_since_last_output > timeout_cycles ")
                 break
     except KeyboardInterrupt:
         warn("Received KeyboardInterrupt. Stopping simulation process...")
+    except Exception as e:
+        logger.info(f"Parallel backends An error occurred: {e}")
+        print(f"An error occurred: {e}")
 
     if threads_started:
+        logger.info(f"if threads_started")
         # stop the threads
         event.set()  # close signal
         out_t.join()
@@ -209,10 +232,20 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     # read any output at its end of life.
     try:
         outs, errs = proc.communicate(timeout=1)
+        if proc.returncode != 0:
+            logger.info(f"Error: {errs}")
+        else:
+            logger.info(f"Output:{outs}")
+        logger.info(f"proc.communicate(timeout=1)")
     except TimeoutExpired:
         proc.kill()
         # wait for output again after kill signal
         outs, errs = proc.communicate(timeout=1)
+        if proc.returncode != 0:
+            logger.info(f"Error: {errs}")
+        else:
+            logger.info(f"Output:{outs}")
+        logger.info(f"except TimeoutExpired")
 
     sys.stdout.write(outs)
     sys.stdout.write(errs)
@@ -222,14 +255,18 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
         # and exited the loop above, but the child process has not
         # yet terminated. This is unexpected unless KeyboarInterrupt
         # is caught
+        logger.info(f" if proc.returncode is None")
         proc.terminate()
         try:
+            logger.info(f" if proc.returncode is None Try")
             proc.wait(1)  # wait maximum of 1s
         except TimeoutExpired:
+            logger.info(f" if proc.returncode is None except")
             warn("Could not kill python subprocess: PID %d" % proc.pid)
 
     if not proc.returncode == 0:
         # simulation failed with a numeric return code
+        logger.info(proc)
         raise RuntimeError("MPI simulation failed. Return code: %d" %
                            proc.returncode)
 
@@ -289,6 +326,7 @@ def _echo_child_output(out_q):
             break
 
     if len(out) > 0:
+        logger.info(f"_echo_child_output {out}")
         sys.stdout.write(out)
         return True
     return False
@@ -641,7 +679,7 @@ class MPIBackend(object):
 
         self.mpi_cmd += ' -np ' + str(self.n_procs)
 
-        self.mpi_cmd += ' nrniv -python -mpi -nobanner ' + \
+        self.mpi_cmd += ' /mnt/c/Projects/Github/hnn-core/venv/bin/nrniv -python -mpi -nobanner ' + \
             sys.executable + ' ' + \
             os.path.join(os.path.dirname(sys.modules[__name__].__file__),
                          'mpi_child.py')
@@ -713,12 +751,12 @@ class MPIBackend(object):
               f"distributing network neurons over {self.n_procs} processes.")
 
         env = _get_mpi_env()
-
+        logger.info(f"Parallel backends 1")
         self.proc, sim_data = run_subprocess(
             command=self.mpi_cmd, obj=[net, tstop, dt, n_trials], timeout=30,
             proc_queue=self.proc_queue, env=env, cwd=os.getcwd(),
             universal_newlines=True)
-
+        logger.info(f"Parallel backends 2")
         dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
         return dpls
 

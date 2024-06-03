@@ -169,7 +169,21 @@ def get_params_default(nprox=2, ndist=1):
         'T_pois': -1,
         'dt': 0.025,
         'celsius': 37.0,
-        'threshold': 0.0  # firing threshold
+        'threshold': 0.0,  # firing threshold
+
+        # Tonic Inputs
+        # "Itonic_A_L2Pyr_soma": 0.0,
+        # "Itonic_t0_L2Pyr_soma": 0.0,
+        # "Itonic_T_L2Pyr_soma": -1.0,
+        # "Itonic_A_L2Basket": 0.0,
+        # "Itonic_t0_L2Basket": 0.0,
+        # "Itonic_T_L2Basket": -1.0,
+        # "Itonic_A_L5Pyr_soma": 0.0,
+        # "Itonic_t0_L5Pyr_soma": 0.0,
+        # "Itonic_T_L5Pyr_soma": -1.0,
+        # "Itonic_A_L5Basket": 0.0,
+        # "Itonic_t0_L5Basket": 0.0,
+        # "Itonic_T_L5Basket": -1.0
     }
 
     # grab cell-specific params and update p accordingly
