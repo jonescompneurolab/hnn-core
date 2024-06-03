@@ -1,5 +1,6 @@
 hnn-core
 ========
+dummy text
 
 |tests| |CircleCI| |Codecov| |PyPI| |Gitter| |JOSS|
 
