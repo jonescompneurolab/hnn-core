@@ -178,9 +178,9 @@ if __name__ == '__main__':
     """This file is called on command-line from nrniv"""
    
     #logging.basicConfig(filename=f'k_mpi_log.txt', level=logging.DEBUG)
-    
+    print(f"{__name__ } init main")
     import traceback
-   
+    logger.info(f"MPI::Init")
     rc = 0
     
     try:
