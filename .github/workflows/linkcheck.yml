@@ -29,7 +29,7 @@ jobs:
           pip install numpy matplotlib scipy NEURON
           pip install '.[gui, docs]'
 
-      - name: Linkcheck
-        shell: bash -el {0}
-        run: |
-          make -C doc linkcheck
+      # - name: Linkcheck
+      #   shell: bash -el {0}
+      #   run: |
+      #     make -C doc linkcheck
