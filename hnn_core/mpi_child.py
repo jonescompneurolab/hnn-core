@@ -105,15 +105,15 @@ class MPISimulation(object):
         logger.info("_read_net 1")
         if self.rank == 0:
             input_str = ''
-            while True:
-                logger.info("_read_net loop 1")
+            while True: 
+                #logger.info("_read_net loop 1")
                 line = sys.stdin.readline()
-                logger.info("_read_net loop 2")
+                #logger.info("_read_net loop 2")
                 line = line.rstrip('\n')
-                logger.info("_read_net loop 3")
+                #logger.info("_read_net loop 3")
                 input_str += line
                 end_match = re.search(r'@end_of_net:\d+@', input_str)
-                logger.info("_read_net loop 4")
+                #logger.info("_read_net loop 4")
                 if end_match is not None:
                     logger.info("_read_net END loop")
                     break
