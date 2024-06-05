@@ -693,7 +693,7 @@ class MPIBackend(object):
         self.mpi_cmd += ' -np ' + str(self.n_procs)
 
         #self.mpi_cmd += ' /mnt/c/Projects/Github/hnn-core/venv/bin/nrniv -python -mpi -nobanner ' + \
-        self.mpi_cmd += ' /mnt/c/Projects/Github/hnn-core/venv/bin/nrniv -python -mpi -nobanner ' + \
+        self.mpi_cmd += ' nrniv -python -mpi -nobanner ' + \
             sys.executable + ' ' + \
             os.path.join(os.path.dirname(sys.modules[__name__].__file__),
                          'mpi_child.py')
