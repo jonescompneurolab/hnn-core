@@ -23,8 +23,16 @@ from .network_builder import _simulate_single_trial
 _BACKEND = None
 import logging
 logging.basicConfig(filename=f'k_parallel_backends_log.txt', level=logging.DEBUG)
-logger = logging.getLogger()
-import subprocess
+logger = logging.getLogger(__name__)
+logger.info("parallel_backends.py")
+virtual_env = os.getenv('VIRTUAL_ENV')
+logger.info(f"parallel_backends.py {virtual_env}")
+if virtual_env is not None:
+    # Extract the name of the virtual environment from the path
+    env_name = os.path.basename(virtual_env)
+    print(f"parallel_backends.py Running in virtual environment: {env_name}")   
+else:
+    print("parallel_backends.py Not running in a virtual environment")
 
 def _thread_handler(event, out, queue):
     while not event.is_set():
@@ -128,10 +136,10 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     threads_started = False
 
     try:
-        logger.info(f"Parallel backends Popen")
-        proc = Popen(command, stdin=subprocess.PIPE, 
-                     stdout=subprocess.PIPE,
-                     stderr=subprocess.PIPE,
+        logger.info(f"Parallel backends Popen") 
+        proc = Popen(command, stdin=PIPE, 
+                     stdout=PIPE,
+                     stderr=PIPE,
                      *args,
                      **kwargs)
         logger.info(f"Parallel backends after Popen")
@@ -156,16 +164,16 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
 
         # loop while the process is running the simulation
         while True:
-            logger.info(f"Parallel backends proc.poll()")
+            #logger.info(f"Parallel backends proc.poll()")
             child_terminated = proc.poll() is not None
 
             if not data_received:
                 if _echo_child_output(out_q):
                     count_since_last_output = 0
-                    logger.info(f" if _echo_child_output  ")
+                    #logger.info(f" if _echo_child_output  ")
                 else:
                     count_since_last_output += 1
-                    logger.info(f" if no _echo_child_output ")
+                    #logger.info(f" if no _echo_child_output ")
                 # look for data in stderr and print child stdout
                 data_len, proc_data_bytes = _get_data_from_child_err(err_q)
                 if data_len > 0:
@@ -179,21 +187,23 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
                     kill_proc_name('nrniv')
                     logger.info(f"child_terminated  ")
                     break
-                else:
-                    logger.info(f"Nothing happend ")
+                # else:
+                #     logger.info(f"Nothing happend ")
 
             if not sent_network:
                 # Send network object to child so it can start
                 try:
                     logger.info(f"if not sent_network try ")
                     _write_net(proc.stdin, pickled_obj)
-                except BrokenPipeError:
+                except BrokenPipeError as e:
                     # child failed during _write_net(). get the
                     # output and break out of loop on the next
                     # iteration
+                    import traceback
                     logger.info(f"if not sent_network except")
                     warn("Received BrokenPipeError exception. "
                          "Child process failed unexpectedly")
+                    traceback.print_exc()
                     continue
                 else:
                     logger.info(f"if not sent_network else ")
@@ -231,21 +241,23 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     # wait for the process to terminate. we need use proc.communicate to
     # read any output at its end of life.
     try:
-        outs, errs = proc.communicate(timeout=1)
+        outs, errs = proc.communicate(timeout=2)
         if proc.returncode != 0:
             logger.info(f"Error: {errs}")
-        else:
             logger.info(f"Output:{outs}")
+
         logger.info(f"proc.communicate(timeout=1)")
     except TimeoutExpired:
         proc.kill()
         # wait for output again after kill signal
-        outs, errs = proc.communicate(timeout=1)
+        outs, errs = proc.communicate(timeout=2)
         if proc.returncode != 0:
             logger.info(f"Error: {errs}")
         else:
             logger.info(f"Output:{outs}")
         logger.info(f"except TimeoutExpired")
+    except Exception as e:
+        logger.info(f"An error occurred: {e}")
 
     sys.stdout.write(outs)
     sys.stdout.write(errs)
@@ -383,8 +395,8 @@ def _has_psutil():
 
 def requires_mpi4py(function):
     """Decorator for testing functions that require MPI."""
+    print("INIT requires_mpi4py")
     import pytest
-
     try:
         import mpi4py
         assert hasattr(mpi4py, '__version__')
@@ -400,6 +412,7 @@ def requires_mpi4py(function):
 
 def requires_psutil(function):
     """Decorator for testing functions that require psutil."""
+    print("INIT requires_psutil")
     import pytest
 
     try:
@@ -680,10 +693,11 @@ class MPIBackend(object):
         self.mpi_cmd += ' -np ' + str(self.n_procs)
 
         #self.mpi_cmd += ' /mnt/c/Projects/Github/hnn-core/venv/bin/nrniv -python -mpi -nobanner ' + \
-        self.mpi_cmd += ' nrniv -python -mpi -nobanner ' + \
+        self.mpi_cmd += ' /mnt/c/Projects/Github/hnn-core/venv/bin/nrniv -python -mpi -nobanner ' + \
             sys.executable + ' ' + \
             os.path.join(os.path.dirname(sys.modules[__name__].__file__),
                          'mpi_child.py')
+        logger.info(self.mpi_cmd)
 
         # Split the command into shell arguments for passing to Popen
         if 'win' in sys.platform:

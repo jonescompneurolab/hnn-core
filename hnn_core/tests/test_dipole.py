@@ -209,7 +209,7 @@ def test_dipole_simulation():
 @requires_psutil
 def test_cell_response_backends(run_hnn_core_fixture):
     """Test cell_response outputs across backends."""
-
+    print("INIT test_cell_response_backends")
     # reduced simulation has n_trials=2
     trial_idx, n_trials, gid = 0, 2, 7
     _, joblib_net = run_hnn_core_fixture(backend='joblib', n_jobs=1,

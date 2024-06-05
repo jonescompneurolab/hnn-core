@@ -8,12 +8,29 @@ import sys
 import pickle
 import base64
 import re
+import logging
+import os
+# import debugpy
+# debugpy.listen(("localhost", 5679))  # Use a different port for the subprocess
+# print("Waiting for debugger to attach to subprocess...")
+# debugpy.wait_for_client()
+# print("Debugger attached to subprocess")
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+logger.info("MPICHILD.PY")
+virtual_env = os.getenv('VIRTUAL_ENV')
+logger.info(f"MPICHILD.PY {virtual_env}")
+if virtual_env is not None:
+    # Extract the name of the virtual environment from the path
+    env_name = os.path.basename(virtual_env)
+    print(f"MPICHILD.PY Running in virtual environment: {env_name}")   
+else:
+    print("MPICHILD.PY Not running in a virtual environment")
 
 from hnn_core.parallel_backends import _extract_data, _extract_data_length
-import logging
-logging.basicConfig(filename=f'k_mpi_log.txt', level=logging.DEBUG)
-logger = logging.getLogger()
+
+
 
 def _pickle_data(sim_data):
     # pickle the data and encode as base64 before sending to stderr
@@ -159,7 +176,9 @@ class MPISimulation(object):
 
 if __name__ == '__main__':
     """This file is called on command-line from nrniv"""
-    logger.info("MPICHILD.PY")
+   
+    #logging.basicConfig(filename=f'k_mpi_log.txt', level=logging.DEBUG)
+    
     import traceback
    
     rc = 0
