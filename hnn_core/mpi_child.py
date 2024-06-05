@@ -106,9 +106,9 @@ class MPISimulation(object):
         if self.rank == 0:
             input_str = ''
             while True: 
-                #logger.info("_read_net loop 1")
+                logger.info("_read_net loop 1")
                 line = sys.stdin.readline()
-                #logger.info("_read_net loop 2")
+                logger.info("_read_net loop 2")
                 line = line.rstrip('\n')
                 #logger.info("_read_net loop 3")
                 input_str += line
