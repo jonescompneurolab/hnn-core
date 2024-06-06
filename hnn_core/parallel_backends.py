@@ -137,6 +137,7 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
 
     try:
         logger.info(f"Parallel backends Popen") 
+        print(command)
         proc = Popen(command, stdin=PIPE, 
                      stdout=PIPE,
                      stderr=PIPE,
