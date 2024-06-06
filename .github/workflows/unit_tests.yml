@@ -13,23 +13,20 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        python-version: [3.8, 3.9]
+        python-version: [3.8]
 
     steps:
       - uses: actions/checkout@v4
+      - name: Install ubuntu dependencies
+        shell: bash -el {0}
+        run: |
+          sudo DEBIAN_FRONTEND=noninteractive apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install libopenmpi-dev openmpi-bin
       - uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: test
           python-version: ${{ matrix.python-version }}
           fetch-depth: 2
-      - name: Install ubuntu dependencies
-        shell: bash -el {0}
-        run: |
-          if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-            sudo apt-get update
-            sudo apt-get install libopenmpi-dev openmpi-bin
-          fi;
       - name: Install dependencies
         shell: bash -el {0}
         run: |
@@ -43,6 +40,10 @@ jobs:
       #  shell: bash -el {0}
       #  run: |
       #    flake8 --count hnn_core
+      - name: Check MPI version
+        shell: bash -el {0}
+        run: |
+          mpiexec --version
       - name: Test with pytest
         shell: bash -el {0}
         run: |
