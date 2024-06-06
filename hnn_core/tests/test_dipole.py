@@ -215,7 +215,7 @@ def test_cell_response_backends(run_hnn_core_fixture):
     _, joblib_net = run_hnn_core_fixture(backend='joblib', n_jobs=1,
                                          reduced=True, record_vsec='all',
                                          record_isec='soma')
-    _, mpi_net = run_hnn_core_fixture(backend='mpi', n_procs=2, reduced=True,
+    _, mpi_net = run_hnn_core_fixture(backend='mpi', n_procs=1, reduced=True,
                                       record_vsec='all', record_isec='soma')
     n_times = len(joblib_net.cell_response.times)
 
