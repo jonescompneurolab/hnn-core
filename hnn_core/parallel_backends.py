@@ -195,6 +195,7 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
                 try:
                     logger.info(f"if not sent_network try ")
                     _write_net(proc.stdin, pickled_obj)
+                    print(f"data sent 1")
                 except BrokenPipeError as e:
                     # child failed during _write_net(). get the
                     # output and break out of loop on the next
@@ -206,6 +207,7 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
                     traceback.print_exc()
                     continue
                 else:
+                    print(f"data sent 2")
                     logger.info(f"if not sent_network else ")
                     sent_network = True
                     # This is not the same as "network received", but we
