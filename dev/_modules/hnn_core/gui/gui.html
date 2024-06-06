@@ -168,6 +168,7 @@
 <span class="kn">import</span> <span class="nn">base64</span>
 <span class="kn">import</span> <span class="nn">zipfile</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 
 
 <span class="k">class</span> <span class="nc">_OutputWidgetHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Handler</span><span class="p">):</span>
@@ -387,7 +388,7 @@
                                                <span class="n">layout</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;15%&#39;</span><span class="p">})</span>
         <span class="c1"># Drive selection</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_drive_type_selection</span> <span class="o">=</span> <span class="n">RadioButtons</span><span class="p">(</span>
-            <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Evoked&#39;</span><span class="p">,</span> <span class="s1">&#39;Poisson&#39;</span><span class="p">,</span> <span class="s1">&#39;Rhythmic&#39;</span><span class="p">],</span>
+            <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Evoked&#39;</span><span class="p">,</span> <span class="s1">&#39;Poisson&#39;</span><span class="p">,</span> <span class="s1">&#39;Rhythmic&#39;</span><span class="p">,</span> <span class="s1">&#39;Tonic&#39;</span><span class="p">],</span>
             <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Evoked&#39;</span><span class="p">,</span>
             <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Drive:&#39;</span><span class="p">,</span>
             <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -596,6 +597,10 @@
                     <span class="n">is_disabled</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">btn_height</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;run_btn&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
                     <span class="n">color_theme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">]))</span>
 
+        <span class="k">def</span> <span class="nf">_driver_type_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">widget_location_selection</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="kc">True</span> <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">new</span> <span class="o">==</span> <span class="s2">&quot;Tonic&quot;</span> <span class="k">else</span> <span class="kc">False</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_handle_backend_change</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_drive_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_add_drive_button_clicked</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">delete_drive_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_delete_drives_clicked</span><span class="p">)</span>
@@ -605,6 +610,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">run_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_run_button_clicked</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_data_button</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_on_upload_data</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_simulation_list_change</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_drive_type_selection</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_driver_type_change</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="HNNGUI.compose"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.compose">[docs]</a>    <span class="k">def</span> <span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose widgets.</span>
@@ -683,8 +689,6 @@
         <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_link_callbacks</span><span class="p">()</span>
-
-        <span class="c1"># self.simulation_data[self.widget_simulation_name.value]</span>
 
         <span class="c1"># initialize drive and connectivity ipywidgets</span>
         <span class="n">load_drive_and_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span>
@@ -1154,6 +1158,57 @@
     <span class="k">return</span> <span class="n">drive</span><span class="p">,</span> <span class="n">drive_box</span>
 
 
+<span class="k">def</span> <span class="nf">_get_tonic_widget</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+    <span class="n">default_data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;amplitude&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s1">&#39;t0&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s1">&#39;tstop&#39;</span><span class="p">:</span> <span class="mi">0</span>
+    <span class="p">}</span>
+
+    <span class="n">cell_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;L5_basket&#39;</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">default_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">)</span>
+
+    <span class="n">amplitudes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">cell_types</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">default_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">cell_type</span><span class="p">])</span>
+        <span class="n">amplitudes</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;amplitude&#39;</span><span class="p">]),</span>
+            <span class="n">description</span><span class="o">=</span><span class="n">cell_type</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">start_times</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;t0&#39;</span><span class="p">]),</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Start time&quot;</span><span class="p">,</span>
+        <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">stop_times</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]),</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Stop time&quot;</span><span class="p">,</span>
+        <span class="nb">min</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">widgets_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;amplitude&#39;</span><span class="p">:</span> <span class="n">amplitudes</span><span class="p">,</span>
+        <span class="s1">&#39;t0&#39;</span><span class="p">:</span> <span class="n">start_times</span><span class="p">,</span>
+        <span class="s1">&#39;tstop&#39;</span><span class="p">:</span> <span class="n">stop_times</span>
+    <span class="p">}</span>
+    <span class="n">widgets_list</span> <span class="o">=</span> <span class="p">([</span><span class="n">HTML</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;b&gt;Times (ms):&lt;/b&gt;&quot;</span><span class="p">)]</span> <span class="o">+</span>
+                    <span class="p">[</span><span class="n">start_times</span><span class="p">,</span> <span class="n">stop_times</span><span class="p">]</span> <span class="o">+</span>
+                    <span class="p">[</span><span class="n">HTML</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;b&gt;Amplitude (nA):&lt;/b&gt;&quot;</span><span class="p">)]</span> <span class="o">+</span>
+                    <span class="nb">list</span><span class="p">(</span><span class="n">amplitudes</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+
+    <span class="n">drive_box</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">widgets_list</span><span class="p">)</span>
+    <span class="n">drive</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s1">&#39;Tonic&#39;</span><span class="p">,</span>
+                 <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                 <span class="n">amplitude</span><span class="o">=</span><span class="n">amplitudes</span><span class="p">,</span>
+                 <span class="n">t0</span><span class="o">=</span><span class="n">start_times</span><span class="p">,</span>
+                 <span class="n">tstop</span><span class="o">=</span><span class="n">stop_times</span><span class="p">,</span>
+                 <span class="n">is_synch_inputs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">drive</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">widgets_dict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">drive</span><span class="p">,</span> <span class="n">drive_box</span>
+
+
 <span class="k">def</span> <span class="nf">add_drive_widget</span><span class="p">(</span><span class="n">drive_type</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span>
                      <span class="n">tstop_widget</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span>
                      <span class="n">prespecified_drive_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1164,6 +1219,10 @@
                      <span class="n">expand_last_drive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">event_seed</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
                      <span class="n">sync_evinput</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a widget for a new drive.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Check only adds 1 tonic input widget</span>
+    <span class="k">if</span> <span class="n">drive_type</span> <span class="o">==</span> <span class="s2">&quot;Tonic&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_is_valid_add_tonic_input</span><span class="p">(</span><span class="n">drive_widgets</span><span class="p">):</span>
+        <span class="k">return</span>
 
     <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description_width&#39;</span><span class="p">:</span> <span class="s1">&#39;125px&#39;</span><span class="p">}</span>
     <span class="n">drives_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
@@ -1214,9 +1273,17 @@
                 <span class="n">default_delays</span><span class="o">=</span><span class="n">prespecified_delays</span><span class="p">,</span>
                 <span class="n">sync_evinput</span><span class="o">=</span><span class="n">sync_evinput</span>
             <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">drive_type</span> <span class="o">==</span> <span class="s1">&#39;Tonic&#39;</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">drive_type</span>
+            <span class="n">drive</span><span class="p">,</span> <span class="n">drive_box</span> <span class="o">=</span> <span class="n">_get_tonic_widget</span><span class="p">(</span>
+                <span class="n">name</span><span class="p">,</span>
+                <span class="n">layout</span><span class="p">,</span>
+                <span class="n">style</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">prespecified_drive_data</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">drive_type</span> <span class="ow">in</span> <span class="p">[</span>
-                <span class="s1">&#39;Evoked&#39;</span><span class="p">,</span> <span class="s1">&#39;Poisson&#39;</span><span class="p">,</span> <span class="s1">&#39;Rhythmic&#39;</span><span class="p">,</span> <span class="s1">&#39;Bursty&#39;</span><span class="p">,</span> <span class="s1">&#39;Gaussian&#39;</span>
+                <span class="s1">&#39;Evoked&#39;</span><span class="p">,</span> <span class="s1">&#39;Poisson&#39;</span><span class="p">,</span> <span class="s1">&#39;Rhythmic&#39;</span><span class="p">,</span> <span class="s1">&#39;Bursty&#39;</span><span class="p">,</span> <span class="s1">&#39;Gaussian&#39;</span><span class="p">,</span> <span class="s1">&#39;Tonic&#39;</span>
         <span class="p">]:</span>
             <span class="n">drive_boxes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">drive_box</span><span class="p">)</span>
             <span class="n">drive_widgets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">drive</span><span class="p">)</span>
@@ -1229,8 +1296,10 @@
             <span class="p">)</span>
 
             <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">drive</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">drive_widgets</span><span class="p">):</span>
-                <span class="n">accordion</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span>
-                                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+                <span class="n">tab_name</span> <span class="o">=</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s2">&quot;Tonic&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tab_name</span><span class="p">:</span>
+                    <span class="n">tab_name</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="n">accordion</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">tab_name</span><span class="p">)</span>
 
             <span class="n">display</span><span class="p">(</span><span class="n">accordion</span><span class="p">)</span>
 
@@ -1453,74 +1522,84 @@
         <span class="k">return</span>
     <span class="c1"># add drives to network</span>
     <span class="k">for</span> <span class="n">drive</span> <span class="ow">in</span> <span class="n">drive_widgets</span><span class="p">:</span>
-        <span class="n">synch_inputs_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">if</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;is_synch_inputs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
-            <span class="n">synch_inputs_kwargs</span><span class="p">[</span><span class="s1">&#39;n_drive_cells&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">synch_inputs_kwargs</span><span class="p">[</span><span class="s1">&#39;cell_specific&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-
-        <span class="n">weights_ampa</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">value</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-        <span class="p">}</span>
-        <span class="n">weights_nmda</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">value</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_nmda&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-        <span class="p">}</span>
-        <span class="n">synaptic_delays</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;delays&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="nb">print</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;drive type is </span><span class="si">{</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, location=</span><span class="si">{</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Poisson&#39;</span><span class="p">:</span>
-            <span class="n">rate_constant</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;Tonic&#39;</span><span class="p">):</span>
+            <span class="n">weights_amplitudes</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">value</span>
-                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;rate_constant&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;amplitude&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="p">}</span>
+            <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add_tonic_bias</span><span class="p">(</span>
+                <span class="n">amplitude</span><span class="o">=</span><span class="n">weights_amplitudes</span><span class="p">,</span>
+                <span class="n">t0</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s2">&quot;t0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">tstop</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s2">&quot;tstop&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">synch_inputs_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;is_synch_inputs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">synch_inputs_kwargs</span><span class="p">[</span><span class="s1">&#39;n_drive_cells&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">synch_inputs_kwargs</span><span class="p">[</span><span class="s1">&#39;cell_specific&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
             <span class="n">weights_ampa</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
-                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">weights_ampa</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">rate_constant</span>
+                <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">value</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="p">}</span>
             <span class="n">weights_nmda</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
-                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">weights_nmda</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">rate_constant</span>
+                <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">value</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_nmda&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
             <span class="p">}</span>
-            <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add_poisson_drive</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
-                <span class="n">tstart</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;tstart&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">tstop</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">rate_constant</span><span class="o">=</span><span class="n">rate_constant</span><span class="p">,</span>
-                <span class="n">location</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">],</span>
-                <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa</span><span class="p">,</span>
-                <span class="n">weights_nmda</span><span class="o">=</span><span class="n">weights_nmda</span><span class="p">,</span>
-                <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">synaptic_delays</span><span class="p">,</span>
-                <span class="n">space_constant</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
-                <span class="n">event_seed</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">synch_inputs_kwargs</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;Evoked&#39;</span><span class="p">,</span> <span class="s1">&#39;Gaussian&#39;</span><span class="p">):</span>
-            <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add_evoked_drive</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
-                <span class="n">mu</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">sigma</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">numspikes</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;numspikes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">location</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">],</span>
-                <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa</span><span class="p">,</span>
-                <span class="n">weights_nmda</span><span class="o">=</span><span class="n">weights_nmda</span><span class="p">,</span>
-                <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">synaptic_delays</span><span class="p">,</span>
-                <span class="n">space_constant</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span>
-                <span class="n">event_seed</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">synch_inputs_kwargs</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;Rhythmic&#39;</span><span class="p">,</span> <span class="s1">&#39;Bursty&#39;</span><span class="p">):</span>
-            <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add_bursty_drive</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
-                <span class="n">tstart</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;tstart&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">tstart_std</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;tstart_std&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">burst_rate</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;burst_rate&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">burst_std</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;burst_std&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">location</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">],</span>
-                <span class="n">tstop</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa</span><span class="p">,</span>
-                <span class="n">weights_nmda</span><span class="o">=</span><span class="n">weights_nmda</span><span class="p">,</span>
-                <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">synaptic_delays</span><span class="p">,</span>
-                <span class="n">event_seed</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">synch_inputs_kwargs</span><span class="p">)</span>
+            <span class="n">synaptic_delays</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;delays&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;drive type is </span><span class="si">{</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, location=</span><span class="si">{</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Poisson&#39;</span><span class="p">:</span>
+                <span class="n">rate_constant</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">value</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;rate_constant&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">value</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                <span class="p">}</span>
+                <span class="n">weights_ampa</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">weights_ampa</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">rate_constant</span>
+                <span class="p">}</span>
+                <span class="n">weights_nmda</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">weights_nmda</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">rate_constant</span>
+                <span class="p">}</span>
+                <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add_poisson_drive</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                    <span class="n">tstart</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;tstart&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="n">tstop</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="n">rate_constant</span><span class="o">=</span><span class="n">rate_constant</span><span class="p">,</span>
+                    <span class="n">location</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">],</span>
+                    <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa</span><span class="p">,</span>
+                    <span class="n">weights_nmda</span><span class="o">=</span><span class="n">weights_nmda</span><span class="p">,</span>
+                    <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">synaptic_delays</span><span class="p">,</span>
+                    <span class="n">space_constant</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
+                    <span class="n">event_seed</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">synch_inputs_kwargs</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;Evoked&#39;</span><span class="p">,</span> <span class="s1">&#39;Gaussian&#39;</span><span class="p">):</span>
+                <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add_evoked_drive</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                    <span class="n">mu</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;mu&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="n">sigma</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="n">numspikes</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;numspikes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="n">location</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">],</span>
+                    <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa</span><span class="p">,</span>
+                    <span class="n">weights_nmda</span><span class="o">=</span><span class="n">weights_nmda</span><span class="p">,</span>
+                    <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">synaptic_delays</span><span class="p">,</span>
+                    <span class="n">space_constant</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span>
+                    <span class="n">event_seed</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">synch_inputs_kwargs</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;Rhythmic&#39;</span><span class="p">,</span> <span class="s1">&#39;Bursty&#39;</span><span class="p">):</span>
+                <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">add_bursty_drive</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                    <span class="n">tstart</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;tstart&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="n">tstart_std</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;tstart_std&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="n">burst_rate</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;burst_rate&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="n">burst_std</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;burst_std&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="n">location</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">],</span>
+                    <span class="n">tstop</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa</span><span class="p">,</span>
+                    <span class="n">weights_nmda</span><span class="o">=</span><span class="n">weights_nmda</span><span class="p">,</span>
+                    <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">synaptic_delays</span><span class="p">,</span>
+                    <span class="n">event_seed</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;seedcore&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">synch_inputs_kwargs</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">run_button_clicked</span><span class="p">(</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span>
@@ -1643,6 +1722,13 @@
             <span class="n">display</span><span class="p">(</span><span class="n">mpi_cmd</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">backend_type</span> <span class="o">==</span> <span class="s2">&quot;Joblib&quot;</span><span class="p">:</span>
             <span class="n">display</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_is_valid_add_tonic_input</span><span class="p">(</span><span class="n">drive_widgets</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">drive</span> <span class="ow">in</span> <span class="n">drive_widgets</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;Tonic&quot;</span> <span class="ow">in</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
 
 
 <span class="k">def</span> <span class="nf">launch</span><span class="p">():</span>
