@@ -23,6 +23,15 @@ jobs:
           sudo DEBIAN_FRONTEND=noninteractive apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential wget
           sudo DEBIAN_FRONTEND=noninteractive apt-get install libopenmpi-dev openmpi-bin
+      - name: Download and install PMIx
+        run: |
+          wget https://github.com/openpmix/openpmix/releases/download/v3.2.3/pmix-3.2.3.tar.gz
+          tar -xzf pmix-3.2.3.tar.gz
+          cd pmix-3.2.3
+          ./configure --prefix=/usr/local
+          make -j$(nproc)
+          sudo make install
+          sudo ldconfig
       - name: Download and install Open MPI 4.1.1
         run: |
           wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.1.tar.gz
