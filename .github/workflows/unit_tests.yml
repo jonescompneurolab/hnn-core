@@ -21,7 +21,21 @@ jobs:
         shell: bash -el {0}
         run: |
           sudo DEBIAN_FRONTEND=noninteractive apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential wget
           sudo DEBIAN_FRONTEND=noninteractive apt-get install libopenmpi-dev openmpi-bin
+      - name: Download and install Open MPI 4.1.1
+        run: |
+          wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.1.tar.gz
+          tar -xzf openmpi-4.1.1.tar.gz
+          cd openmpi-4.1.1
+          ./configure --prefix=/usr/local
+          make -j$(nproc)
+          sudo make install
+          sudo ldconfig 
+      - name: Check MPI version
+        shell: bash -el {0}
+        run: |
+          mpiexec --version
       - uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: test
@@ -40,10 +54,6 @@ jobs:
       #  shell: bash -el {0}
       #  run: |
       #    flake8 --count hnn_core
-      - name: Check MPI version
-        shell: bash -el {0}
-        run: |
-          mpiexec --version
       - name: Test with pytest
         shell: bash -el {0}
         run: |
