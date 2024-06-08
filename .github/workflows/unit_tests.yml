@@ -60,10 +60,10 @@ jobs:
       #  shell: bash -el {0}
       #  run: |
       #    flake8 --count hnn_core
-      # - name: Test with pytest
-      #   shell: bash -el {0}
-      #   run: |
-      #     python -m pytest ./hnn_core/tests/test_dipole.py  --cov=hnn_core --cov-report=xml -s
+      - name: Test with pytest
+        shell: bash -el {0}
+        run: |
+          python -m pytest ./hnn_core/tests/test_dipole.py  --cov=hnn_core --cov-report=xml -s
       # # - name:  Upload coverage to Codecov
       #   shell: bash -el {0}
       #   run: |
