@@ -59,7 +59,7 @@ jobs:
       - name: Run mpi command 
         shell: bash -el {0}
         run: |
-          mpiexec -np 2 /usr/share/miniconda/envs/test/python ./hnn_core/mpi_test.py
+          mpiexec -np 2 /usr/share/miniconda/envs/test/bin/python ./hnn_core/mpi_test.py
       #- name: Lint with flake8
       #  shell: bash -el {0}
       #  run: |
