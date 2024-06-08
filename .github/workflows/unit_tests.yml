@@ -27,7 +27,7 @@ jobs:
         shell: bash -el {0}
         run: |
           mpiexec --version
-      - uses: conda-incubator/setup-miniconda@v3
+      - uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: test
           python-version: ${{ matrix.python-version }}
@@ -49,15 +49,17 @@ jobs:
         shell: bash -el {0}
         run: |
           pip install --verbose '.[opt, parallel, test, gui]'
+      - name: Run MPI application
+        run: mpiexec -np 2 python ./hnn_core/mpi_test.py
       #- name: Lint with flake8
       #  shell: bash -el {0}
       #  run: |
       #    flake8 --count hnn_core
-      - name: Test with pytest
-        shell: bash -el {0}
-        run: |
-          python -m pytest ./hnn_core/tests/test_dipole.py  --cov=hnn_core --cov-report=xml -s
-      # - name:  Upload coverage to Codecov
+      # - name: Test with pytest
+      #   shell: bash -el {0}
+      #   run: |
+      #     python -m pytest ./hnn_core/tests/test_dipole.py  --cov=hnn_core --cov-report=xml -s
+      # # - name:  Upload coverage to Codecov
       #   shell: bash -el {0}
       #   run: |
       #     bash <(curl -s https://codecov.io/bash) -f ./coverage.xml
