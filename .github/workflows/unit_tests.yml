@@ -32,6 +32,11 @@ jobs:
           activate-environment: test
           python-version: ${{ matrix.python-version }}
           fetch-depth: 2
+      - name: Install dependencies
+        shell: bash -el {0}
+        run: |
+          python -m pip install --upgrade pip
+          conda install --yes -c conda-forge mpi4py openmpi
       - name: Print mpi4py config
         shell: bash -el {0}
         run: |
@@ -40,11 +45,6 @@ jobs:
         shell: bash -el {0}
         run: |
           which mpirun mpiexec
-      - name: Install dependencies
-        shell: bash -el {0}
-        run: |
-          python -m pip install --upgrade pip
-          conda install --yes -c conda-forge mpi4py openmpi
       - name: Install HNN-core
         shell: bash -el {0}
         run: |
