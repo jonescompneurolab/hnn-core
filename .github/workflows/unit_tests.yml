@@ -56,6 +56,10 @@ jobs:
         run: |
           conda activate test
           mpiexec -np 2 /usr/share/miniconda/envs/test/bin/python ./hnn_core/mpi_test.py
+      - name: Verify NEURON installation
+        run: |
+          conda activate test
+          nrniv -python -nobanner -mpi -c "from neuron import h; print(h)"
       - name: Run MPI application with NEURON
         shell: bash -el {0}
         run: |
