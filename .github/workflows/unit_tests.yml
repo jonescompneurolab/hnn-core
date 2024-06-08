@@ -56,9 +56,10 @@ jobs:
         run: |
           conda activate test
           mpiexec -np 2 /usr/share/miniconda/envs/test/bin/python ./hnn_core/mpi_test.py
-      - name: Run mpi command 
+      - name: Run MPI application with NEURON
         shell: bash -el {0}
         run: |
+          conda activate test
           mpiexec -np 2 -verbose nrniv -python -mpi -nobanner /usr/share/miniconda/envs/test/bin/python ./hnn_core/mpi_test.py
       #- name: Lint with flake8
       #  shell: bash -el {0}
