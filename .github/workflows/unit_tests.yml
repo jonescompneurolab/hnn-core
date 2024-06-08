@@ -32,6 +32,14 @@ jobs:
           activate-environment: test
           python-version: ${{ matrix.python-version }}
           fetch-depth: 2
+      - name: Print mpi4py config
+        shell: bash -el {0}
+        run: |
+          python ./hnn_core/mpi4py_test.py
+      - name: Print which mpirun mpiexec
+        shell: bash -el {0}
+        run: |
+          which mpirun mpiexec
       - name: Install dependencies
         shell: bash -el {0}
         run: |
