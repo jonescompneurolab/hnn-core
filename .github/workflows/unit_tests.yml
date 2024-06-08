@@ -55,7 +55,7 @@ jobs:
         shell: bash -el {0}
         run: |
           conda activate test
-          mpiexec -np 2 python ./hnn_core/mpi_test.py
+          mpiexec -np 2 /usr/share/miniconda/envs/test/bin/python ./hnn_core/mpi_test.py
       - name: Run mpi command 
         shell: bash -el {0}
         run: |
