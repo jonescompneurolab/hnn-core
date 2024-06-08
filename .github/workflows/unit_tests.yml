@@ -36,7 +36,7 @@ jobs:
         shell: bash -el {0}
         run: |
           python -m pip install --upgrade pip
-          conda install --yes -c conda-forge mpi4py openmpi
+          conda install --yes -c conda-forge openmpi mpi4py neuron  
       - name: Print mpi4py config
         shell: bash -el {0}
         run: |
@@ -59,7 +59,7 @@ jobs:
       - name: Run mpi command 
         shell: bash -el {0}
         run: |
-          mpiexec -np 2 nrniv -python -mpi -nobanner /usr/share/miniconda/envs/test/bin/python ./hnn_core/mpi_test.py
+          mpiexec -np 2 -verbose nrniv -python -mpi -nobanner /usr/share/miniconda/envs/test/bin/python ./hnn_core/mpi_test.py
       #- name: Lint with flake8
       #  shell: bash -el {0}
       #  run: |
