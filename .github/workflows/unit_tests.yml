@@ -44,13 +44,18 @@ jobs:
       - name: Print which mpirun mpiexec
         shell: bash -el {0}
         run: |
+          conda activate test
+          mpiexec --version
           which mpirun mpiexec
       - name: Install HNN-core
         shell: bash -el {0}
         run: |
           pip install --verbose '.[opt, parallel, test, gui]'
       - name: Run MPI application
-        run: mpiexec -np 2 python ./hnn_core/mpi_test.py
+        shell: bash -el {0}
+        run: |
+          conda activate test
+          mpiexec -np 2 python ./hnn_core/mpi_test.py
       #- name: Lint with flake8
       #  shell: bash -el {0}
       #  run: |
