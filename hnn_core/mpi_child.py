@@ -187,11 +187,11 @@ if __name__ == '__main__':
         with MPISimulation() as mpi_sim:
             # XXX: _read_net -> _read_obj, fix later
             logger.info("Process Inited")
-            net, tstop, dt, n_trials = mpi_sim._read_net()
+            #net, tstop, dt, n_trials = mpi_sim._read_net()
             logger.info("End mpi_sim._read_net")
-            sim_data = mpi_sim.run(net, tstop, dt, n_trials)
+            #sim_data = mpi_sim.run(net, tstop, dt, n_trials)
             logger.info("End mpi_sim.run")
-            mpi_sim._write_data_stderr(sim_data)
+            #mpi_sim._write_data_stderr(sim_data)
             mpi_sim._wait_for_exit_signal()
 
     except Exception:
