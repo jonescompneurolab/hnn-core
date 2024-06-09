@@ -38,6 +38,7 @@ jobs:
           python -m pip install --upgrade pip
           conda install --yes -c conda-forge openmpi mpi4py
       - name: Build and install NEURON with MPI support
+        shell: bash -el {0}
         run: |
           conda activate test
           git clone https://github.com/neuronsimulator/nrn.git
