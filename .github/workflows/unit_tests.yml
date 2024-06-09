@@ -20,6 +20,7 @@ jobs:
       - name: Install ubuntu dependencies
         shell: bash -el {0}
         run: |
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
           sudo DEBIAN_FRONTEND=noninteractive apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential wget
           sudo DEBIAN_FRONTEND=noninteractive apt-get install libopenmpi-dev openmpi-bin
