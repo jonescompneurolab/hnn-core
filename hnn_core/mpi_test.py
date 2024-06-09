@@ -9,17 +9,19 @@ rank = comm.Get_rank()
 size = comm.Get_size()
 
 logger.info(f"Process {rank} out of {size} processors")
-# Test NEURON MPI support
-try:
-    h('''
-    if (nrnmpi_use) {
-        printf("NEURON MPI is enabled. Running on %d processes\\n", nrnmpi_numprocs_world)
-    } else {
-        printf("NEURON MPI is not enabled.\\n")
-    }
-    ''')
-except Exception as e:
-    logger.error(f"Error testing NEURON MPI support: {e}")
+# Initialize NEURON with MPI support
+h('''
+objref pc
+pc = new ParallelContext()
+''')
+
+# Check if NEURON MPI is enabled
+is_mpi_enabled = int(h.pc.nhost() > 1)
+
+if is_mpi_enabled:
+    logger.info(f"NEURON MPI is enabled. Running on {int(h.pc.nhost())} processes")
+else:
+    logger.info("NEURON MPI is not enabled.")
 
 if rank == 0:
     print("NEURON MPI test completed")
