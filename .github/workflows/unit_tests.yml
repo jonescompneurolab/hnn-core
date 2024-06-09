@@ -36,7 +36,17 @@ jobs:
         shell: bash -el {0}
         run: |
           python -m pip install --upgrade pip
-          conda install --yes -c conda-forge openmpi mpi4py neuron  
+          conda install --yes -c conda-forge openmpi mpi4py
+      - name: Build and install NEURON with MPI support
+        run: |
+          conda activate test
+          git clone https://github.com/neuronsimulator/nrn.git
+          cd nrn
+          mkdir build
+          cd build
+          cmake .. -DNRN_ENABLE_MPI=ON -DNRN_ENABLE_INTERVIEWS=OFF -DNRN_ENABLE_RX3D=OFF -DCMAKE_INSTALL_PREFIX=$CONDA_PREFIX
+          make -j$(nproc)
+          make install  
       - name: Print mpi4py config
         shell: bash -el {0}
         run: |
@@ -47,10 +57,10 @@ jobs:
           conda activate test
           mpiexec --version
           which mpirun mpiexec
-      - name: Install HNN-core
-        shell: bash -el {0}
-        run: |
-          pip install --verbose '.[opt, parallel, test, gui]'
+      # - name: Install HNN-core
+      #   shell: bash -el {0}
+      #   run: |
+      #     pip install --verbose '.[opt, parallel, test, gui]'
       - name: Run MPI application
         shell: bash -el {0}
         run: |
