@@ -180,7 +180,7 @@ def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
             col = color
         ax.plot(plot_times, plot_data + trace_offsets[contact_no],
                 label=f'C{contact_no}', color=col)
-        
+
         # To be removed after deprecation cycle
         if tmin is not None or tmax is not None:
             ax.set_xlim(left=tmin, right=tmax)
@@ -291,7 +291,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 
             if layer in dpl_trial.data.keys():
 
-                 # extract scaled data and times
+                # extract scaled data and times
                 data = dpl_trial.data[layer]
                 times = dpl_trial.times
 
@@ -304,7 +304,7 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
                     alpha = 0.5 if average else 1.
                     ax.plot(times, data, color=_lighten_color(color, 0.5),
                             alpha=alpha, lw=1.)
-            
+
             # To be removed after deprecation cycle
             if tmin is not None or tmax is not None:
                 if tmin is not None or tmax is not None:
@@ -491,7 +491,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         hist_color = spike_color[spike_label]
         ax.hist(plot_data, bins,
                 label=spike_label, color=hist_color, **kwargs_hist)
-        
+
     if len(cell_response.times) > 0:
         ax.set_xlim(left=0, right=cell_response.times[-1])
     else:
@@ -579,7 +579,6 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
         ax.set_xlim(left=0, right=cell_response.times[-1])
     else:
         ax.set_xlim(left=0)
-        
     ax.set_xlim(left=0)
 
     plt_show(show)

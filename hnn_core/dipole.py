@@ -490,7 +490,7 @@ class Dipole(object):
         fig : instance of plt.fig
             The matplotlib figure handle.
         """
-        
+
         return plot_dipole(self, tmin=tmin, tmax=tmax, ax=ax, layer=layer,
                            decim=decim, color=color, show=show)
 
