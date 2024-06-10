@@ -70,6 +70,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install openmpi mpi4py neuron
+          export MPI_LIB_NRN_PATH=/opt/homebrew/Cellar/open-mpi/5.0.3_1/lib
+          echo $MPI_LIB_NRN_PATH
+      - name: Install dependencies
+        shell: bash -el {0}
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install openmpi mpi4py neuron
       # - name: Set environment variables
       #   run: |
       #     echo "export MPI_HOME=$CONDA_PREFIX" >> $GITHUB_ENV
