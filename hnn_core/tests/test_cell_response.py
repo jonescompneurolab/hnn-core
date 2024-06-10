@@ -48,14 +48,12 @@ def test_cell_response(tmp_path):
 
     # reset clears all recorded variables, but leaves simulation time intact
     assert len(cell_response.times) == len(sim_times)
-    sim_attributes = ['_spike_times', '_spike_gids', '_spike_types',
-                      '_vsec', '_isec', '_ca']
+    sim_attributes = ['_spike_times', '_spike_gids', '_spike_types'
+                      '_vsec', '_isec', '_ca', '_gid_ranges']
     net_attributes = ['_times', '_cell_type_names']  # `Network.__init__`
     # creates these check that we always know which response attributes are
     # simulated see #291 for discussion; objective is to keep cell_response
     # size small
-    print("cell_response.__dict__.keys():", sorted(list(cell_response.__dict__.keys())))
-    print("sim_attributes + net_attributes:", sorted(sim_attributes + net_attributes))
     assert sorted(list(cell_response.__dict__.keys())) == \
         sorted(sim_attributes + net_attributes)
 
