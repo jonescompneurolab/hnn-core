@@ -68,12 +68,10 @@ jobs:
       - name: Verify NEURON installation
         shell: bash -el {0}
         run: |
-          conda activate test
           nrniv -python -nobanner -mpi -c "from neuron import h; print(h)"
       - name: Run MPI application with NEURON
         shell: bash -el {0}
         run: |
-          conda activate test
           mpiexec -np 2 -verbose nrniv -python -mpi -nobanner python ./hnn_core/mpi_test.py
       #- name: Lint with flake8
       #  shell: bash -el {0}
