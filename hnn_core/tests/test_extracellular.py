@@ -258,3 +258,21 @@ def test_rec_array_calculation():
         assert_allclose(net.rec_arrays['arr1']._data[trial_idx][1],
                         net.rec_arrays['arr2']._data[trial_idx][1],
                         rtol=1e-3, atol=1e-3)
+
+def test_extracellular_viz():
+    """Test if deprecation warning is raised in plot_laminar_lfp."""
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+    params.update({'t_evprox_1': 7, 't_evdist_1': 17})
+    net = jones_2009_model(params, mesh_shape=(3, 3),
+                           add_drives_from_params=True)
+
+    # one electrode inside, one above the active elements of the network,
+    # and two more to allow calculation of CSD (2nd spatial derivative)
+    electrode_pos = [(1, 2, 1000), (2, 3, 3000), (3, 4, 5000), (4, 5, 7000)]
+    net.add_electrode_array('arr1', electrode_pos)
+    _ = simulate_dipole(net, tstop=5, n_trials=1)
+
+    with pytest.deprecated_call():
+        net.rec_arrays['arr1'].plot_lfp(show=False, tmin=10, tmax=100)

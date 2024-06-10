@@ -194,6 +194,10 @@ def test_dipole_visualization(setup_net):
         dpl_sfreq.sfreq /= 10
         plot_psd([dpls[0], dpl_sfreq])
 
+    # pytest deprecation warning for tmin and tmax
+    with pytest.deprecated_call():
+        plot_dipole(dpls[0], show=False, tmin=10, tmax=100)
+
     # test cell response plotting
     with pytest.raises(TypeError, match="trial_idx must be an instance of"):
         net.cell_response.plot_spikes_raster(trial_idx='blah', show=False)
