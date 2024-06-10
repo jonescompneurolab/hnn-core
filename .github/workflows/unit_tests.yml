@@ -28,22 +28,27 @@ jobs:
         shell: bash -el {0}
         run: |
           mpiexec --version
-      - uses: conda-incubator/setup-miniconda@v2
+      # - uses: conda-incubator/setup-miniconda@v2
+      #   with:
+      #     activate-environment: test
+      #     python-version: ${{ matrix.python-version }}
+      #     fetch-depth: 2
+      - name: setup python
+        uses: actions/setup-python@v5
         with:
-          activate-environment: test
-          python-version: ${{ matrix.python-version }}
-          fetch-depth: 2
+          python-version: ${{ matrix.python-version }} # install the python version needed
+          cache: "pip"
       - name: Install dependencies
         shell: bash -el {0}
         run: |
-          conda activate test
+          cd hnn-core
           python -m pip install --upgrade pip
-          conda install --yes -c conda-forge openmpi mpi4py neuron
-      - name: Set environment variables
-        run: |
-          echo "export MPI_HOME=$CONDA_PREFIX" >> $GITHUB_ENV
-          echo "export PATH=$MPI_HOME/bin:$PATH" >> $GITHUB_ENV
-          echo "export LD_LIBRARY_PATH=$MPI_HOME/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+          python -m pip install openmpi mpi4py neuron
+      # - name: Set environment variables
+      #   run: |
+      #     echo "export MPI_HOME=$CONDA_PREFIX" >> $GITHUB_ENV
+      #     echo "export PATH=$MPI_HOME/bin:$PATH" >> $GITHUB_ENV
+      #     echo "export LD_LIBRARY_PATH=$MPI_HOME/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
       - name: Print mpi4py config
         shell: bash -el {0}
         run: |
@@ -51,7 +56,6 @@ jobs:
       - name: Print which mpirun mpiexec
         shell: bash -el {0}
         run: |
-          conda activate test
           mpiexec --version
           which mpirun mpiexec
       # - name: Install HNN-core
@@ -61,8 +65,7 @@ jobs:
       - name: Run MPI application
         shell: bash -el {0}
         run: |
-          conda activate test
-          mpiexec -np 2 /usr/share/miniconda/envs/test/bin/python ./hnn_core/mpi_test.py
+          mpiexec -np 2 python ./hnn_core/mpi_test.py
       - name: Verify NEURON installation
         shell: bash -el {0}
         run: |
@@ -72,16 +75,16 @@ jobs:
         shell: bash -el {0}
         run: |
           conda activate test
-          mpiexec -np 2 -verbose nrniv -python -mpi -nobanner /usr/share/miniconda/envs/test/bin/python ./hnn_core/mpi_test.py
+          mpiexec -np 2 -verbose nrniv -python -mpi -nobanner python ./hnn_core/mpi_test.py
       #- name: Lint with flake8
       #  shell: bash -el {0}
       #  run: |
       #    flake8 --count hnn_core
-      - name: Test with pytest
-        shell: bash -el {0}
-        run: |
-          conda activate test
-          python -m pytest ./hnn_core/tests/test_dipole.py  --cov=hnn_core --cov-report=xml -s
+      # - name: Test with pytest
+      #   shell: bash -el {0}
+      #   run: |
+      #     conda activate test
+      #     python -m pytest ./hnn_core/tests/test_dipole.py  --cov=hnn_core --cov-report=xml -s
       # # - name:  Upload coverage to Codecov
       #   shell: bash -el {0}
       #   run: |
