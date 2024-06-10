@@ -31,6 +31,17 @@ jobs:
         run: |
           if [ "${{ matrix.os }}" == "macos-latest" ]; then
           brew install open-mpi
+          echo "export DYLD_LIBRARY_PATH=/usr/local/lib:$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
+          echo "export MPI_LIB_NRN_PATH=/usr/local/lib" >> $GITHUB_ENV
+          fi;
+      - name: Print which mpirun mpiexec
+        shell: bash -el {0}
+        run: |
+          mpiexec --version
+          which mpirun mpiexec
+          if [ "${{ matrix.os }}" == "macos-latest" ]; then
+          echo $DYLD_LIBRARY_PATH
+          echo $MPI_LIB_NRN_PATH
           fi;
       # - name: Install dependencies
       #   shell: bash -el {0}
@@ -65,11 +76,6 @@ jobs:
         shell: bash -el {0}
         run: |
           python ./hnn_core/mpi4py_test.py
-      - name: Print which mpirun mpiexec
-        shell: bash -el {0}
-        run: |
-          mpiexec --version
-          which mpirun mpiexec
       - name: Install HNN-core
         shell: bash -el {0}
         run: |
