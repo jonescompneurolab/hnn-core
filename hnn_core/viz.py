@@ -7,6 +7,7 @@
 import numpy as np
 from itertools import cycle
 import colorsys
+import warnings
 
 from .externals.mne import _validate_type
 
@@ -21,7 +22,7 @@ def _lighten_color(color, amount=0.5):
     return colorsys.hls_to_rgb(c[0], 1 - amount * (1 - c[1]), c[2])
 
 
-def _get_plot_data_trange(times, data, tmin, tmax):
+def _get_plot_data_trange(times, data, tmin=None, tmax=None):
     """Get slices of times and data based on tmin and tmax"""
     if isinstance(times, list):
         times = np.array(times)
@@ -89,10 +90,6 @@ def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
         Sampling times (in ms).
     data : Two-dimensional Numpy array
         The extracellular voltages as an (n_contacts, n_times) array.
-    tmin : float | None
-        Start time of plot in milliseconds. If None, plot entire simulation.
-    tmax : float | None
-        End time of plot in milliseconds. If None, plot entire simulation.
     ax : instance of matplotlib figure | None
         The matplotlib axis
     decim : int | list of int | None (default)
@@ -168,7 +165,8 @@ def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
         trace_offsets = np.arange(n_offsets)[:, np.newaxis] * voltage_offset
 
     for contact_no, trace in enumerate(np.atleast_2d(data)):
-        plot_data, plot_times = _get_plot_data_trange(times, trace, tmin, tmax)
+        plot_data = trace
+        plot_times = times
 
         if decim is not None:
             plot_data, plot_times = _decimate_plot_data(decim, plot_data,
@@ -182,7 +180,17 @@ def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
             col = color
         ax.plot(plot_times, plot_data + trace_offsets[contact_no],
                 label=f'C{contact_no}', color=col)
+        
+        # To be removed after deprecation cycle
+        if tmin is not None or tmax is not None:
+            ax.set_xlim(left=tmin, right=tmax)
+            warnings.warn('tmin and tmax are deprecated and will be '
+                          'removed in future releases of hnn-core. Please'
+                          'use matplotlib plt.xlim to set tmin and tmax.',
+                          DeprecationWarning)
 
+        else:
+            ax.set_xlim(left=times[0], right=times[-1])
     if voltage_offset is not None:
         ax.set_ylim(-voltage_offset, n_offsets * voltage_offset)
         ylabel = 'Individual contact traces'
@@ -228,10 +236,6 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     ----------
     dpl : instance of Dipole | list of Dipole instances
         The Dipole object.
-    tmin : float or None
-        Start time of plot in milliseconds. If None, plot entire simulation.
-    tmax : float or None
-        End time of plot in milliseconds. If None, plot entire simulation.
     ax : instance of matplotlib figure | None
         The matplotlib axis
     layer : str
@@ -287,10 +291,10 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 
             if layer in dpl_trial.data.keys():
 
-                # extract scaled data and times
-                data, times = _get_plot_data_trange(dpl_trial.times,
-                                                    dpl_trial.data[layer],
-                                                    tmin, tmax)
+                 # extract scaled data and times
+                data = dpl_trial.data[layer]
+                times = dpl_trial.times
+
                 if decim is not None:
                     data, times = _decimate_plot_data(decim, data, times)
                 if idx == len(dpl) - 1 and average:
@@ -300,7 +304,18 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
                     alpha = 0.5 if average else 1.
                     ax.plot(times, data, color=_lighten_color(color, 0.5),
                             alpha=alpha, lw=1.)
-
+            
+            # To be removed after deprecation cycle
+            if tmin is not None or tmax is not None:
+                if tmin is not None or tmax is not None:
+                    warnings.warn('tmin and tmax are deprecated and will be '
+                                  'removed in future releases of hnn-core. '
+                                  'Please use matplotlib plt.xlim to set tmin'
+                                  ' and tmax.',
+                                  DeprecationWarning)
+                ax.set_xlim(left=tmin, right=tmax)
+            else:
+                ax.set_xlim(left=0, right=times[-1])
         if average:
             ax.legend()
 
@@ -476,6 +491,11 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         hist_color = spike_color[spike_label]
         ax.hist(plot_data, bins,
                 label=spike_label, color=hist_color, **kwargs_hist)
+        
+    if len(cell_response.times) > 0:
+        ax.set_xlim(left=0, right=cell_response.times[-1])
+    else:
+        ax.set_xlim(left=0)
 
     ax.set_ylabel("Counts")
     ax.legend()
@@ -554,6 +574,12 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
     ax.set_facecolor('k')
     ax.set_xlabel('Time (ms)')
     ax.get_yaxis().set_visible(False)
+
+    if len(cell_response.times) > 0:
+        ax.set_xlim(left=0, right=cell_response.times[-1])
+    else:
+        ax.set_xlim(left=0)
+        
     ax.set_xlim(left=0)
 
     plt_show(show)

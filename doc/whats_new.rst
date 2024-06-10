@@ -64,6 +64,10 @@ Changelog
 - Added GUI feature to include Tonic input drives in simulations, 
   by `Camilo Diaz` :gh:`773`
 
+- :func:`~plot_laminar_lfp`, :func:`~plot_dipole`, :func:`~plot_spikes_hist`, 
+  and :func:`~plot_spikes_raster` now plotted from 0 to tstop. Inputs tmin and tmax are deprecated,
+  by `Aritra Sinha`_, `Tianqi Cheng`_, and `Katharina Duecker`_ in :gh:`769`
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
