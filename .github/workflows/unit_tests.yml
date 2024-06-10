@@ -39,6 +39,7 @@ jobs:
           ls /opt/homebrew/Cellar/open-mpi/5.0.3_1/lib
           export MPI_LIB_NRN_PATH=/opt/homebrew/Cellar/open-mpi/5.0.3_1/lib
           export DYLD_LIBRARY_PATH=/opt/homebrew/Cellar/open-mpi/5.0.3_1/lib:$DYLD_LIBRARY_PATH
+          echo "DYLD_LIBRARY_PATH $DYLD_LIBRARY_PATH"
           fi;
       - name: Print which mpirun mpiexec
         shell: bash -el {0}
