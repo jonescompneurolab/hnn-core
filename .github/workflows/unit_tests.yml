@@ -57,10 +57,10 @@ jobs:
         run: |
           mpiexec --version
           which mpirun mpiexec
-      # - name: Install HNN-core
-      #   shell: bash -el {0}
-      #   run: |
-      #     pip install --verbose '.[opt, parallel, test, gui]'
+      - name: Install HNN-core
+        shell: bash -el {0}
+        run: |
+          pip install --verbose '.[opt, parallel, test, gui]'
       - name: Run MPI application
         shell: bash -el {0}
         run: |
