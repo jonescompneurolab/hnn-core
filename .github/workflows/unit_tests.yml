@@ -33,7 +33,10 @@ jobs:
           brew install open-mpi
           echo "export DYLD_LIBRARY_PATH=/usr/local/lib:$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
           echo "export MPI_LIB_NRN_PATH=/usr/local/lib" >> $GITHUB_ENV
-          ls /opt/homebrew/
+          echo "List /opt/homebrew/lib"
+          ls /opt/homebrew/lib
+          echo "List /opt/homebrew/Cellar/open-mpi/5.0.3_1"
+          ls /opt/homebrew/Cellar/open-mpi/5.0.3_1
           fi;
       - name: Print which mpirun mpiexec
         shell: bash -el {0}
