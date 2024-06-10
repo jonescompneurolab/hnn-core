@@ -59,8 +59,8 @@ def test_cell_response(tmp_path):
     # creates these check that we always know which response attributes are
     # simulated see #291 for discussion; objective is to keep cell_response
     # size small
-    assert list(cell_response.__dict__.keys()) == \
-        sim_attributes + net_attributes
+    assert sorted(list(cell_response.__dict__.keys())) == \
+        sorted(sim_attributes + net_attributes)
 
     # Test recovery of empty spike files
     empty_spike = CellResponse(cell_type_names=['L2_basket', 'L2_pyramidal',

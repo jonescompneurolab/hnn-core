@@ -6,7 +6,6 @@
 
 from glob import glob
 from warnings import warn
-
 import numpy as np
 
 from .viz import plot_spikes_hist, plot_spikes_raster
@@ -499,7 +498,12 @@ def read_spikes(fname, gid_ranges=None):
             spike_gids += [list()]
             spike_types += [list()]
 
-    cell_response = CellResponse(spike_times=spike_times,
+    network_cell_names = ['L2_basket', 'L2_pyramidal',
+                          'L5_basket', 'L5_pyramidal']
+    cell_type_names = list(cell_name for cell_name in
+                           network_cell_names if cell_name in spike_types)
+    cell_response = CellResponse(cell_type_names=cell_type_names,
+                                 spike_times=spike_times,
                                  spike_gids=spike_gids,
                                  spike_types=spike_types)
     if gid_ranges is not None:
