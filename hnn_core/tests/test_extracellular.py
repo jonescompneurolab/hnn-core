@@ -259,6 +259,7 @@ def test_rec_array_calculation():
                         net.rec_arrays['arr2']._data[trial_idx][1],
                         rtol=1e-3, atol=1e-3)
 
+
 def test_extracellular_viz():
     """Test if deprecation warning is raised in plot_laminar_lfp."""
     hnn_core_root = op.dirname(hnn_core.__file__)
