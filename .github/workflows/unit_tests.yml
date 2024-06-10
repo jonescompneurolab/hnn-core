@@ -38,6 +38,7 @@ jobs:
           echo "List /opt/homebrew/Cellar/open-mpi/5.0.3_1/lib"
           ls /opt/homebrew/Cellar/open-mpi/5.0.3_1/lib
           export MPI_LIB_NRN_PATH=/opt/homebrew/Cellar/open-mpi/5.0.3_1/lib
+          export DYLD_LIBRARY_PATH=/opt/homebrew/Cellar/open-mpi/5.0.3_1/lib:$DYLD_LIBRARY_PATH
           fi;
       - name: Print which mpirun mpiexec
         shell: bash -el {0}
@@ -92,6 +93,8 @@ jobs:
       - name: Verify NEURON installation
         shell: bash -el {0}
         run: |
+          echo $MPI_LIB_NRN_PATH
+          echo $DYLD_LIBRARY_PATH
           nrniv -python -nobanner -mpi -c "from neuron import h; print(h)"
       - name: Run MPI application with NEURON
         shell: bash -el {0}
