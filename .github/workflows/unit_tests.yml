@@ -22,7 +22,7 @@ jobs:
         run: |
           sudo add-apt-repository ppa:ubuntu-toolchain-r/test
           sudo apt-get update
-          sudo install -y build-essential wget
+          sudo apt-get install build-essential wget
           sudo apt-get install libopenmpi-dev openmpi-bin
       - name: Check MPI version
         shell: bash -el {0}
