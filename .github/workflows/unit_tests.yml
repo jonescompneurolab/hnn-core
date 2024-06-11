@@ -35,10 +35,22 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           conda install --yes -c conda-forge mpi4py openmpi
+      - name: Check MPI version
+        shell: bash -el {0}
+        run: |
+          mpiexec --version
       - name: Install HNN-core
         shell: bash -el {0}
         run: |
           pip install --verbose '.[opt, parallel, test, gui]'
+          - name: Run MPI application
+          shell: bash -el {0}
+          run: |
+            mpiexec -np 2 python ./hnn_core/mpi_test.py
+      - name: Verify NEURON installation
+        shell: bash -el {0}
+        run: |
+          nrniv -python -nobanner -mpi -c "from neuron import h; print(h)"
       # - name: Lint with flake8
       #   shell: bash -el {0}
       #   run: |
