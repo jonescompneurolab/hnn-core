@@ -37,8 +37,9 @@ jobs:
           ls /opt/homebrew/lib
           echo "List /opt/homebrew/Cellar/open-mpi/5.0.3_1/lib"
           ls /opt/homebrew/Cellar/open-mpi/5.0.3_1/lib
-          export MPI_LIB_NRN_PATH=/opt/homebrew/Cellar/open-mpi/5.0.3_1/lib
-          export DYLD_LIBRARY_PATH=/opt/homebrew/Cellar/open-mpi/5.0.3_1/lib:$DYLD_LIBRARY_PATH
+          echo "export MPI_LIB_NRN_PATH=/opt/homebrew/Cellar/open-mpi/5.0.3_1/lib" >> $GITHUB_ENV
+          echo "export DYLD_LIBRARY_PATH=/opt/homebrew/Cellar/open-mpi/5.0.3_1/lib:$DYLD_LIBRARY_PATH" >> $GITHUB_ENV
+          echo "MPI_LIB_NRN_PATH $MPI_LIB_NRN_PATH"
           echo "DYLD_LIBRARY_PATH $DYLD_LIBRARY_PATH"
           fi;
       - name: Print which mpirun mpiexec
