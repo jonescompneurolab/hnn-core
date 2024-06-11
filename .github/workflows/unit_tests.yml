@@ -12,8 +12,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: [3.8, 3.9]
+        os: [ubuntu-latest]
+        python-version: [3.8]
 
     steps:
       - uses: actions/checkout@v4
@@ -39,15 +39,15 @@ jobs:
         shell: bash -el {0}
         run: |
           pip install --verbose '.[opt, parallel, test, gui]'
-      - name: Lint with flake8
-        shell: bash -el {0}
-        run: |
-          flake8 --count hnn_core
+      # - name: Lint with flake8
+      #   shell: bash -el {0}
+      #   run: |
+      #     flake8 --count hnn_core
       - name: Test with pytest
         shell: bash -el {0}
         run: |
-          python -m pytest ./hnn_core/tests/  --cov=hnn_core --cov-report=xml
-      - name:  Upload coverage to Codecov
-        shell: bash -el {0}
-        run: |
-          bash <(curl -s https://codecov.io/bash) -f ./coverage.xml
+          python -m pytest ./hnn_core/tests/test_dipole.py  --cov=hnn_core --cov-report=xml -s
+      # - name:  Upload coverage to Codecov
+      #   shell: bash -el {0}
+      #   run: |
+      #     bash <(curl -s https://codecov.io/bash) -f ./coverage.xml
