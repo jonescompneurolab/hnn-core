@@ -34,7 +34,6 @@ jobs:
 
         #Set an environment variable with the date range
         echo "$first_day..$last_day"
-        echo "last_month=$first_day..$last_day" >> "$GITHUB_ENV"
         echo "last_month=$2015-05-01..2023-05-31" >> "$GITHUB_ENV"
 
     - name: Run issue-metrics tool
