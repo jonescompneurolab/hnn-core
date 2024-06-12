@@ -30,7 +30,7 @@ jobs:
             sudo apt-get update
             sudo apt-get install libopenmpi-dev openmpi-bin
           fi;
-      - name: Install ubuntu dependencies
+      - name: Install MacOs dependencies
         shell: bash -el {0}
         run: |
           if [ "${{ matrix.os }}" == "macos-latest" ]; then
@@ -49,6 +49,12 @@ jobs:
         shell: bash -el {0}
         run: |
           pip install --verbose '.[opt, parallel, test, gui]'
+      - name: Set Env Variables
+        shell: bash -el {0}
+        run: |
+          if [ "${{ matrix.os }}" == "macos-latest" ]; then
+            echo "MPI_LIB_NRN_PATH=/opt/homebrew/lib" >> $GITHUB_ENV
+          fi;
       - name: Run MPI application
         shell: bash -el {0}
         run: |
