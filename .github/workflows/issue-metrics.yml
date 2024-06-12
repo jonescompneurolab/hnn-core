@@ -27,7 +27,7 @@ jobs:
       shell: bash
       run: |
         # Calculate the first day of the previous month
-        first_day=$(date -d "last month - 1 year" +%Y-%m-01)
+        first_day=$(date -d "last month - 10 year" +%Y-%m-01)
 
         # Calculate the last day of the previous month
         last_day=$(date -d "$first_day +2 month -1 day" +%Y-%m-%d)
