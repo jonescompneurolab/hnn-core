@@ -34,7 +34,7 @@ jobs:
         shell: bash -el {0}
         run: |
           if [ "${{ matrix.os }}" == "macos-latest" ]; then
-              brew install openmpi@4.1.2
+              brew install open-mpi@4.1.2
           fi;
       - name: Install dependencies
         shell: bash -el {0}
