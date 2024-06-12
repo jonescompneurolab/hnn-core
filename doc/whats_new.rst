@@ -66,7 +66,7 @@ Changelog
 
 - :func:`~plot_laminar_lfp`, :func:`~plot_dipole`, :func:`~plot_spikes_hist`, 
   and :func:`~plot_spikes_raster` now plotted from 0 to tstop. Inputs tmin and tmax are deprecated,
-  by `Aritra Sinha`_, `Tianqi Cheng`_, and `Katharina Duecker`_ in :gh:`769`
+  by `Katharina Duecker`_ in :gh:`769`
 
 Bug
 ~~~
@@ -497,3 +497,4 @@ People who contributed to this release (in alphabetical order):
 .. _George Dang: https://github.com/gtdang
 .. _Camilo Diaz: https://github.com/kmilo9999
 .. _Abdul Samad Siddiqui: https://github.com/samadpls
+.. _Katharina Duecker: https://github.com/katduecker
