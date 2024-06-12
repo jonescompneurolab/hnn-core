@@ -11,7 +11,7 @@ on:
     branches: [master]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -39,13 +39,12 @@ jobs:
     - name: Run issue-metrics tool
       uses: github/issue-metrics@v3
       env:
-        GH_TOKEN: ${{ secrets.ISSUE_METRICS }}
-        # SEARCH_QUERY: 'repo:${{ github.repository }} created:${{ env.last_month }}'
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SEARCH_QUERY: 'repo:jonescompneurolab/hnn-core is:issue created:${{ env.last_month }}'
 
     - name: Create issue
       uses: peter-evans/create-issue-from-file@v4
       with:
         title: Monthly issue metrics report
-        token: ${{ secrets.ISSUE_METRICS }}
+        token: ${{ secrets.GITHUB_TOKEN }}
         content-filepath: ./issue_metrics.md
