@@ -221,14 +221,14 @@ can adjust the xyz limits of the plot to better visualize the network.
  .. code-block:: none
 
 
-    <matplotlib.animation.FuncAnimation object at 0x7f504437a850>
+    <matplotlib.animation.FuncAnimation object at 0x7f229499d460>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 6.198 seconds)
+   **Total running time of the script:** (1 minutes 2.735 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_hnn_animation.py:
