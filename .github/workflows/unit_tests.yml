@@ -76,7 +76,7 @@ jobs:
       - name: Test with pytest
         shell: bash -el {0}
         run: |
-          python -m pytest ./hnn_core/tests/test_dipole.py  --cov=hnn_core --cov-report=xml -s
+          python -m pytest ./hnn_core/tests/  --cov=hnn_core --cov-report=xml
       # - name:  Upload coverage to Codecov
       #   shell: bash -el {0}
       #   run: |
