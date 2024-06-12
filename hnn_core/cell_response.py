@@ -35,6 +35,11 @@ class CellResponse(object):
     cell_type_names : list
         List of unique cell type names that are explicitly modeled in the
         network
+    vsec : list (n_trials,) of dict, shape
+        Each element of the outer list is a trial.
+        Dictionary indexed by gids containing voltages for cell sections.
+    isec : list (n_trials,) of dict, shape
+        Each element of the outer list is a trial.
 
     Attributes
     ----------
