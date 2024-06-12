@@ -99,6 +99,13 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
         for sec_name, isec in isec_dict.items():
             isec_py[gid][sec_name] = {
                 key: isec.to_python() for key, isec in isec.items()}
+    
+    ca_py = dict()
+    for gid, ca_dict in neuron_net._ca.items():
+        ca_py[gid] = dict()
+        for sec_name, ca in ca_dict.items():
+            if ca is not None:
+                ca_py[gid][sec_name] = ca.to_python()           
 
     dpl_data = np.c_[
         neuron_net._nrn_dipoles['L2_pyramidal'].as_numpy() +
@@ -119,6 +126,7 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
             'gid_ranges': net.gid_ranges,
             'vsec': vsec_py,
             'isec': isec_py,
+            'ca': ca_py,
             'rec_data': rec_arr_py,
             'rec_times': rec_times_py,
             'times': times.to_python()}
@@ -291,6 +299,7 @@ class NetworkBuilder(object):
 
         self._vsec = dict()
         self._isec = dict()
+        self._ca = dict()
         self._nrn_rec_arrays = dict()
         self._nrn_rec_callbacks = list()
 
@@ -327,9 +336,11 @@ class NetworkBuilder(object):
 
         record_vsec = self.net._params['record_vsec']
         record_isec = self.net._params['record_isec']
+        record_ca = self.net._params['record_ca']
         self._create_cells_and_drives(threshold=self.net._params['threshold'],
                                       record_vsec=record_vsec,
-                                      record_isec=record_isec)
+                                      record_isec=record_isec,
+                                      record_ca=record_ca)
 
         self.state_init()
 
@@ -399,7 +410,7 @@ class NetworkBuilder(object):
         self._gid_list.sort()
 
     def _create_cells_and_drives(self, threshold, record_vsec=False,
-                                 record_isec=False):
+                                 record_isec=False, record_ca=False):
         """Parallel create cells AND external drives
 
         NB: _Cell.__init__ calls h.Section -> non-picklable!
@@ -434,7 +445,7 @@ class NetworkBuilder(object):
                         src_type in self.net.external_biases['tonic']):
                     cell.create_tonic_bias(**self.net.external_biases
                                            ['tonic'][src_type])
-                cell.record(record_vsec, record_isec)
+                cell.record(record_vsec, record_isec, record_ca)
 
                 # this call could belong in init of a _Cell (with threshold)?
                 nrn_netcon = cell.setup_source_netcon(threshold)
@@ -564,6 +575,7 @@ class NetworkBuilder(object):
 
             self._vsec[cell.gid] = cell.vsec
             self._isec[cell.gid] = cell.isec
+            self._ca[cell.gid] = cell.ca
 
         # reduce across threads
         for nrn_dpl in self._nrn_dipoles.values():
@@ -574,6 +586,7 @@ class NetworkBuilder(object):
         # aggregate the currents and voltages independently on each proc
         vsec_list = _PC.py_gather(self._vsec, 0)
         isec_list = _PC.py_gather(self._isec, 0)
+        ca_list = _PC.py_gather(self._ca, 0)
 
         # combine spiking data from each proc
         spike_times_list = _PC.py_gather(self._spike_times, 0)
@@ -589,6 +602,8 @@ class NetworkBuilder(object):
                 self._vsec.update(vsec)
             for isec in isec_list:
                 self._isec.update(isec)
+            for ca in ca_list:
+                self._ca.update(ca)
 
         _PC.barrier()  # get all nodes to this place before continuing
 
