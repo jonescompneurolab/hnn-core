@@ -465,7 +465,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     elif isinstance(color, list):
         color_cycle = cycle(color)
 
-    bins = np.linspace(0, cell_response.times[-1], 50)
+    bins = np.linspace(0, spike_times[-1], 50)
 
     # Create dictionary to aggregate spike times that have the same spike_label
     spike_type_times = {spike_label: list() for
