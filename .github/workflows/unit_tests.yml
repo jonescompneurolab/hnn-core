@@ -64,15 +64,15 @@ jobs:
       - name: Run MPI application
         shell: bash -el {0}
         run: |
-            mpiexec -np 2 python ./hnn_core/mpi_test.py
+            mpiexec -np 2 '${{ steps.cp310.outputs.python-path }}' ./hnn_core/mpi_test.py
       - name: Verify NEURON installation
         shell: bash -el {0}
         run: |
-          nrniv -python -nobanner -mpi -c "from neuron import h; print(h)"
+          nrniv -python -nobanner -mpi '${{ steps.cp310.outputs.python-path }}' "from neuron import h; print(h)"
       - name: Run MPI application with NEURON
         shell: bash -el {0}
         run: |
-          mpiexec -np 2 -verbose nrniv -python -mpi -nobanner python ./hnn_core/mpi_test.py
+          mpiexec -np 2 -verbose nrniv -python -mpi -nobanner '${{ steps.cp310.outputs.python-path }}' ./hnn_core/mpi_test.py
       # - name: Lint with flake8
       #   shell: bash -el {0}
       #   run: |
