@@ -45,6 +45,10 @@ jobs:
         shell: bash -el {0}
         run: |
           mpiexec --version
+      - name: Check Python version
+        shell: bash -el {0}
+        run: |
+            python --version
       - name: Install HNN-core
         shell: bash -el {0}
         run: |
