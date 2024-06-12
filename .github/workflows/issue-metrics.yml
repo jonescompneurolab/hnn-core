@@ -1,8 +1,14 @@
 name: Monthly issue metrics
+
+# on:
+#   workflow_dispatch:
+#   schedule:
+#     - cron: '3 2 1 * *'
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: '3 2 1 * *'
+  push:
+    branches: ['issue_metrics']
+  pull_request:
+    branches: ['issue_metrics']
 
 permissions:
   contents: read
