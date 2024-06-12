@@ -16,7 +16,7 @@ from .viz import plot_dipole, plot_psd, plot_tfr_morlet
 
 
 def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
-                    record_isec=False, postproc=False):
+                    record_isec=False, record_ca=False, postproc=False):
     """Simulate a dipole given the experiment parameters.
 
     Parameters
@@ -37,6 +37,9 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
     record_isec : 'all' | 'soma' | False
         Option to record voltages from all sections ('all'), or just
         the soma ('soma'). Default: False.
+    record_ca : 'all' | 'soma' | False
+        Option to record calcium concentration from all sections ('all'), 
+        or just the soma ('soma'). Default: False.
     postproc : bool
         If True, smoothing (``dipole_smooth_win``) and scaling
         (``dipole_scalefctr``) values are read from the parameter file, and
@@ -95,6 +98,10 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
     _check_option('record_isec', record_isec, ['all', 'soma', False])
 
     net._params['record_isec'] = record_isec
+
+    _check_option('record_ca', record_ca, ['all', 'soma', False])
+
+    net._params['record_ca'] = record_ca
 
     if postproc:
         warnings.warn('The postproc-argument is deprecated and will be removed'

@@ -55,6 +55,10 @@ class CellResponse(object):
     isec : list (n_trials,) of dict, shape
         Each element of the outer list is a trial.
         Dictionary indexed by gids containing currents for cell sections.
+    ca : list (n_trials,) of dict, shape
+        Each element of the outer list is a trial.
+        Dictionary indexed by gids containing calcium concentration
+        for cell sections.
     times : array-like, shape (n_times,)
         Array of time points for samples in continuous data.
         This includes vsoma and isoma.
@@ -110,6 +114,7 @@ class CellResponse(object):
         self._spike_types = spike_types
         self._vsec = list()
         self._isec = list()
+        self._ca = list()
         if times is not None:
             if not isinstance(times, (list, np.ndarray)):
                 raise TypeError("'times' is an np.ndarray of simulation times")
@@ -134,7 +139,8 @@ class CellResponse(object):
                 self._spike_gids == other._spike_gids and
                 self._spike_types == other._spike_types and
                 self.vsec == other.vsec and
-                self.isec == other.isec)
+                self.isec == other.isec and
+                self.ca == other.ca)
 
     def __getitem__(self, gid_item):
         """Returns a CellResponse object with a copied subset filtered by gid.
@@ -223,6 +229,10 @@ class CellResponse(object):
     @property
     def isec(self):
         return self._isec
+    
+    @property
+    def ca(self):
+        return self._ca
 
     @property
     def times(self):
@@ -423,6 +433,12 @@ class CellResponse(object):
             # Turn `int` gid keys into string values for hdf5 format
             trial = dict((str(key), val) for key, val in trial.items())
             cell_response_data['isec'].append(trial)
+        ca_data = self.ca
+        cell_response_data['ca'] = list()
+        for trial in ca_data:
+            # Turn `int` gid keys into string values for hdf5 format
+            trial = dict((str(key), val) for key, val in trial.items())
+            cell_response_data['ca'].append(trial)
         cell_response_data['times'] = self.times
         return cell_response_data
 
