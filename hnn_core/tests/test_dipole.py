@@ -227,28 +227,32 @@ def test_cell_response_backends(run_hnn_core_fixture):
     assert len(joblib_net.cell_response.ca) == n_trials
     assert len(joblib_net.cell_response.vsec[trial_idx][gid]) == 8  # num sec
     assert len(joblib_net.cell_response.isec[trial_idx][gid]) == 1
-    assert len(joblib_net.cell_response.ca[trial_idx][gid]) == 1
     assert len(joblib_net.cell_response.vsec[
         trial_idx][gid]['apical_1']) == n_times
     assert len(joblib_net.cell_response.isec[
                trial_idx][gid]['soma']['soma_gabaa']) == n_times
-    assert len(joblib_net.cell_response.ca[
-               trial_idx][gid]['soma']) == n_times
-
     assert len(mpi_net.cell_response.vsec) == n_trials
     assert len(mpi_net.cell_response.isec) == n_trials
     assert len(mpi_net.cell_response.vsec[trial_idx][gid]) == 8  # num sec
-    assert len(mpi_net.cell_response.isec[trial_idx][gid]) == 1
-    assert len(mpi_net.cell_response.ca[trial_idx][gid]) == 1
+    assert len(mpi_net.cell_response.isec[trial_idx][gid]) == 1  
     assert len(mpi_net.cell_response.vsec[
         trial_idx][gid]['apical_1']) == n_times
     assert len(mpi_net.cell_response.isec[
                trial_idx][gid]['soma']['soma_gabaa']) == n_times
-    assert len(mpi_net.cell_response.ca[
-        trial_idx][gid]['apical_1']) == n_times
     assert mpi_net.cell_response.vsec == joblib_net.cell_response.vsec
     assert mpi_net.cell_response.isec == joblib_net.cell_response.isec
     assert mpi_net.cell_response.ca == joblib_net.cell_response.ca
+
+    # test if calcium concentration is stored correctly (only L5 pyramidal)
+    gid = joblib_net.gid_ranges['L5_pyramidal'][0]
+    assert len(joblib_net.cell_response.ca[trial_idx][gid]) == 1
+    assert len(joblib_net.cell_response.ca[
+               trial_idx][gid]['soma']) == n_times
+    gid = mpi_net.gid_ranges['L5_pyramidal'][0]
+    assert len(mpi_net.cell_response.ca[trial_idx][gid]) == 1
+    assert len(mpi_net.cell_response.ca[
+        trial_idx][gid]['soma']) == n_times
+
     # Test if spike time falls within depolarization window above v_thresh
     v_thresh = 0.0
     times = np.array(joblib_net.cell_response.times)
