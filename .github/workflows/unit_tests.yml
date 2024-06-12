@@ -34,7 +34,7 @@ jobs:
         shell: bash -el {0}
         run: |
           if [ "${{ matrix.os }}" == "macos-latest" ]; then
-              brew install open-mpi@4.1.2
+              brew install open-mpi
           fi;
       - name: Install dependencies
         shell: bash -el {0}
@@ -53,7 +53,8 @@ jobs:
         shell: bash -el {0}
         run: |
           if [ "${{ matrix.os }}" == "macos-latest" ]; then
-            echo "MPI_LIB_NRN_PATH=/opt/homebrew/lib" >> $GITHUB_ENV
+            echo "List /opt/homebrew/lib"
+            ls /opt/homebrew/lib
           fi;
       - name: Run MPI application
         shell: bash -el {0}
