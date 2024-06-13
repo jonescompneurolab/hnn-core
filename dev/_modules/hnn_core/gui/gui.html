@@ -551,7 +551,7 @@
 
         <span class="k">def</span> <span class="nf">_on_upload_connectivity</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">on_upload_params_change</span><span class="p">(</span>
-                <span class="n">change</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span>
+                <span class="n">change</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_boxes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;drive_textbox&#39;</span><span class="p">],</span>
@@ -559,7 +559,7 @@
 
         <span class="k">def</span> <span class="nf">_on_upload_drives</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">on_upload_params_change</span><span class="p">(</span>
-                <span class="n">change</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span>
+                <span class="n">change</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_boxes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;drive_textbox&#39;</span><span class="p">],</span>
@@ -1364,11 +1364,12 @@
     <span class="k">return</span> <span class="n">net</span>
 
 
-<span class="k">def</span> <span class="nf">add_drive_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">add_drive_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
                   <span class="n">layout</span><span class="p">):</span>
     <span class="n">net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
     <span class="n">drive_specs</span> <span class="o">=</span> <span class="n">_extract_drive_specs_from_hnn_params</span><span class="p">(</span>
-        <span class="n">params</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">legacy_mode</span><span class="o">=</span><span class="n">net</span><span class="o">.</span><span class="n">_legacy_mode</span><span class="p">)</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">legacy_mode</span><span class="o">=</span><span class="n">net</span><span class="o">.</span><span class="n">_legacy_mode</span><span class="p">)</span>
 
     <span class="c1"># clear before adding drives</span>
     <span class="n">drives_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
@@ -1377,6 +1378,7 @@
         <span class="n">drive_boxes</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
 
     <span class="n">drive_names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">drive_specs</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
     <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">drive_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">drive_names</span><span class="p">):</span>  <span class="c1"># order matters</span>
         <span class="n">specs</span> <span class="o">=</span> <span class="n">drive_specs</span><span class="p">[</span><span class="n">drive_name</span><span class="p">]</span>
         <span class="n">should_render</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">==</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">drive_names</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
@@ -1408,18 +1410,16 @@
                                 <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
                                 <span class="n">connectivity_textfields</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">layout</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add drive and connectivity ipywidgets from params.&quot;&quot;&quot;</span>
-    <span class="n">log_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
     <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
         <span class="c1"># Add connectivity</span>
         <span class="n">add_connectivity_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">)</span>
         <span class="c1"># Add drives</span>
-        <span class="n">add_drive_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
+        <span class="n">add_drive_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
                       <span class="n">layout</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">on_upload_data_change</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">viz_manager</span><span class="p">,</span> <span class="n">log_out</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;owner&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Empty change&quot;</span><span class="p">)</span>
         <span class="k">return</span>
 
     <span class="n">data_dict</span> <span class="o">=</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -1452,38 +1452,32 @@
         <span class="n">change</span><span class="p">[</span><span class="s1">&#39;owner&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">[]</span>
 
 
-<span class="k">def</span> <span class="nf">on_upload_params_change</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">on_upload_params_change</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span>
                             <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
                             <span class="n">connectivity_textfields</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">load_type</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;owner&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Empty change&quot;</span><span class="p">)</span>
         <span class="k">return</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading connectivity...&quot;</span><span class="p">)</span>
     <span class="n">param_dict</span> <span class="o">=</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">params_fname</span> <span class="o">=</span> <span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
-    <span class="n">param_data</span> <span class="o">=</span> <span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">]</span>
+    <span class="n">file_contents</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">],</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
 
-    <span class="n">param_data</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">param_data</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-
-    <span class="n">ext</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span><span class="o">.</span><span class="n">suffix</span>
-    <span class="n">read_func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;.json&#39;</span><span class="p">:</span> <span class="n">_read_json</span><span class="p">,</span> <span class="s1">&#39;.param&#39;</span><span class="p">:</span> <span class="n">_read_legacy_params</span><span class="p">}</span>
-    <span class="n">params_network</span> <span class="o">=</span> <span class="n">read_func</span><span class="p">[</span><span class="n">ext</span><span class="p">](</span><span class="n">param_data</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span> <span class="n">file_contents</span><span class="p">)</span>
 
     <span class="c1"># update simulation settings and params</span>
-    <span class="n">log_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
     <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s1">&#39;tstop&#39;</span> <span class="ow">in</span> <span class="n">params_network</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">tstop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">params_network</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="s1">&#39;dt&#39;</span> <span class="ow">in</span> <span class="n">params_network</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">dt</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">params_network</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;tstop&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">tstop</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;tstop&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;dt&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">dt</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;dt&#39;</span><span class="p">]</span>
 
-        <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params_network</span><span class="p">)</span>
     <span class="c1"># init network, add drives &amp; connectivity</span>
     <span class="k">if</span> <span class="n">load_type</span> <span class="o">==</span> <span class="s1">&#39;connectivity&#39;</span><span class="p">:</span>
         <span class="n">add_connectivity_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">load_type</span> <span class="o">==</span> <span class="s1">&#39;drives&#39;</span><span class="p">:</span>
-        <span class="n">add_drive_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
-                      <span class="n">layout</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
+            <span class="n">add_drive_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
+                          <span class="n">layout</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span>
     <span class="c1"># Resets file counter to 0</span>
@@ -1609,7 +1603,6 @@
                        <span class="n">simulation_status_contents</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">,</span>
                        <span class="n">viz_manager</span><span class="p">,</span> <span class="n">simulations_list_widget</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the simulation and plot outputs.&quot;&quot;&quot;</span>
-    <span class="n">log_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
     <span class="n">simulation_data</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[</span><span class="s2">&quot;simulation_data&quot;</span><span class="p">]</span>
     <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
         <span class="c1"># clear empty trash simulations</span>

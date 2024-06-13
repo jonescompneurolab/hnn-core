@@ -206,13 +206,16 @@
     <span class="k">return</span> <span class="n">params_input</span>
 
 
-<div class="viewcode-block" id="read_params"><a class="viewcode-back" href="../../generated/hnn_core.read_params.html#hnn_core.read_params">[docs]</a><span class="k">def</span> <span class="nf">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">):</span>
+<div class="viewcode-block" id="read_params"><a class="viewcode-back" href="../../generated/hnn_core.read_params.html#hnn_core.read_params">[docs]</a><span class="k">def</span> <span class="nf">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span> <span class="n">file_contents</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Read param values from a file (.json or .param).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    params_fname : str</span>
 <span class="sd">        Full path to the file (.param)</span>
+<span class="sd">    file_contents : str | None</span>
+<span class="sd">        If file_contents are provided as a string,</span>
+<span class="sd">        it is parsed into a dictionary.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -227,10 +230,12 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unrecognized extension, expected one of&#39;</span> <span class="o">+</span>
                          <span class="s1">&#39; .json, .param. Got </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">ext</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="n">file_contents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+            <span class="n">file_contents</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
     <span class="n">read_func</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;.json&#39;</span><span class="p">:</span> <span class="n">_read_json</span><span class="p">,</span> <span class="s1">&#39;.param&#39;</span><span class="p">:</span> <span class="n">_read_legacy_params</span><span class="p">}</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
-        <span class="n">param_data</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-        <span class="n">params_dict</span> <span class="o">=</span> <span class="n">read_func</span><span class="p">[</span><span class="n">ext</span><span class="p">](</span><span class="n">param_data</span><span class="p">)</span>
+    <span class="n">params_dict</span> <span class="o">=</span> <span class="n">read_func</span><span class="p">[</span><span class="n">ext</span><span class="p">](</span><span class="n">file_contents</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params_dict</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Failed to read parameters from file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
