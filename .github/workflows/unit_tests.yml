@@ -35,7 +35,6 @@ jobs:
         shell: bash -el {0}
         run: |
               brew install open-mpi
-              echo "List /opt/homebrew/lib"
               echo "MPI_LIB_NRN_PATH=/opt/homebrew/lib/libmpi.dylib" >> $GITHUB_ENV
 
       - name: Install dependencies
@@ -43,46 +42,22 @@ jobs:
         run: |
            '${{ steps.cp310.outputs.python-path }}' -m pip install --upgrade pip
            '${{ steps.cp310.outputs.python-path }}' -m pip install mpi4py openmpi
-      - name: Check MPI version
-        shell: bash -el {0}
-        run: |
-          mpiexec --version
-      - name: Check Python version
-        shell: bash -el {0}
-        run: |
-            '${{ steps.cp310.outputs.python-path }}' --version
       - name: Install HNN-core
         shell: bash -el {0}
         run: |
           '${{ steps.cp310.outputs.python-path }}' -m pip install --verbose '.[opt, parallel, test, gui]'
 
-      # - name: Set Env Variables
-      #   if: contains(matrix.os, 'macos')
-      #   shell: bash -el {0}
-      #   run: |
-      #       echo "List /opt/homebrew/lib"
-      #       echo "MPI_LIB_NRN_PATH=/opt/homebrew/lib/libmpi.dylib" >> $GITHUB_ENV
-      # - name: Run MPI application
-      #   shell: bash -el {0}
-      #   run: |
-      #       mpiexec -np 2 '${{ steps.cp310.outputs.python-path }}' ./hnn_core/mpi_test.py
-      - name: Verify NEURON installation
+      - name: Lint with flake8
         shell: bash -el {0}
         run: |
-          nrniv -python -nobanner -mpi '${{ steps.cp310.outputs.python-path }}' "from neuron import h; print(h)"
-      # - name: Run MPI application with NEURON
-      #   shell: bash -el {0}
-      #   run: |
-      #     mpiexec -np 2 -verbose nrniv -python -mpi -nobanner '${{ steps.cp310.outputs.python-path }}' ./hnn_core/mpi_test.py
-      # - name: Lint with flake8
-      #   shell: bash -el {0}
-      #   run: |
-      #     flake8 --count hnn_core
+          flake8 --count hnn_core
+
       - name: Test with pytest
         shell: bash -el {0}
         run: |
           '${{ steps.cp310.outputs.python-path }}' -m pytest ./hnn_core/tests/  --cov=hnn_core --cov-report=xml
-      # - name:  Upload coverage to Codecov
-      #   shell: bash -el {0}
-      #   run: |
-      #     bash <(curl -s https://codecov.io/bash) -f ./coverage.xml
+
+      - name:  Upload coverage to Codecov
+        shell: bash -el {0}
+        run: |
+          bash <(curl -s https://codecov.io/bash) -f ./coverage.xml
