@@ -1336,8 +1336,7 @@ def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
 
     # init network, add drives & connectivity
     if load_type == 'connectivity':
-        params.update(params_network)
-        add_connectivity_tab(params, connectivity_out, connectivity_textfields)
+        add_connectivity_tab(params_network, connectivity_out, connectivity_textfields)
     elif load_type == 'drives':
         with log_out:
             add_drive_tab(params_network, log_out, drives_out, drive_widgets, drive_boxes, tstop,
