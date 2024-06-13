@@ -414,7 +414,7 @@ class HNNGUI:
 
         def _on_upload_connectivity(change):
             return on_upload_params_change(
-                change, self.params, self.widget_tstop, self.widget_dt,
+                change, self.widget_tstop, self.widget_dt,
                 self._log_out, self.drive_boxes, self.drive_widgets,
                 self._drives_out, self._connectivity_out,
                 self.connectivity_widgets, self.layout['drive_textbox'],
