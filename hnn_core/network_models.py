@@ -12,7 +12,7 @@ from .externals.mne import _validate_type
 
 
 def jones_2009_model(params=None, add_drives_from_params=False,
-                     legacy_mode=False, mesh_shape=(10, 10)):
+                     legacy_mode=False, mesh_shape=(10, 10), allow_autapses=True):
     """Instantiate the network model described in
     Jones et al. J. of Neurophys. 2009 [1]_
 
@@ -31,6 +31,8 @@ def jones_2009_model(params=None, add_drives_from_params=False,
         are added suitably. Will be deprecated in a future release.
     mesh_shape : tuple of int (default: (10, 10))
         Defines the (n_x, n_y) shape of the grid of pyramidal cells.
+    allow_autapses : Set to True by default (as in the original paper).
+        Allows cells to connect to themselves. Set to False for L5_Basket.
 
     Returns
     -------
@@ -89,7 +91,8 @@ def jones_2009_model(params=None, add_drives_from_params=False,
         key = f'gbar_L2Basket_L2Pyr_{receptor}'
         weight = net._params[key]
         net.add_connection(
-            src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+            src_cell, target_cell, loc, receptor, weight, delay, lamtha,
+            allow_autapses=allow_autapses)
 
     # layer5 Basket -> layer5 Pyr
     src_cell = 'L5_basket'
@@ -100,7 +103,8 @@ def jones_2009_model(params=None, add_drives_from_params=False,
         key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
         weight = net._params[key]
         net.add_connection(
-            src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+            src_cell, target_cell, loc, receptor, weight, delay, lamtha,
+            allow_autapses=allow_autapses)
 
     # layer2 Pyr -> layer5 Pyr
     src_cell = 'L2_pyramidal'
@@ -110,7 +114,8 @@ def jones_2009_model(params=None, add_drives_from_params=False,
         key = f'gbar_L2Pyr_{_short_name(target_cell)}'
         weight = net._params[key]
         net.add_connection(
-            src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+            src_cell, target_cell, loc, receptor, weight, delay, lamtha,
+            allow_autapses=allow_autapses)
 
     # layer2 Basket -> layer5 Pyr
     src_cell = 'L2_basket'
@@ -120,7 +125,8 @@ def jones_2009_model(params=None, add_drives_from_params=False,
     loc = 'distal'
     receptor = 'gabaa'
     net.add_connection(
-        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha,
+        allow_autapses=allow_autapses)
 
     # xx -> layer2 Basket
     src_cell = 'L2_pyramidal'
@@ -131,7 +137,8 @@ def jones_2009_model(params=None, add_drives_from_params=False,
     loc = 'soma'
     receptor = 'ampa'
     net.add_connection(
-        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha,
+        allow_autapses=allow_autapses)
 
     src_cell = 'L2_basket'
     lamtha = 20.
@@ -140,7 +147,8 @@ def jones_2009_model(params=None, add_drives_from_params=False,
     loc = 'soma'
     receptor = 'gabaa'
     net.add_connection(
-        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha,
+        allow_autapses=allow_autapses)
 
     # xx -> layer5 Basket
     src_cell = 'L5_basket'
@@ -161,7 +169,8 @@ def jones_2009_model(params=None, add_drives_from_params=False,
     loc = 'soma'
     receptor = 'ampa'
     net.add_connection(
-        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha,
+        allow_autapses=allow_autapses)
 
     src_cell = 'L2_pyramidal'
     lamtha = 3.
@@ -170,7 +179,8 @@ def jones_2009_model(params=None, add_drives_from_params=False,
     loc = 'soma'
     receptor = 'ampa'
     net.add_connection(
-        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha,
+        allow_autapses=allow_autapses)
 
     return net
 
@@ -298,7 +308,7 @@ def calcium_model(params=None, add_drives_from_params=False,
         params = read_params(params_fname)
 
     net = jones_2009_model(params, add_drives_from_params, legacy_mode,
-                           mesh_shape=mesh_shape)
+                           mesh_shape=mesh_shape, allow_autapses=False)
 
     # Replace L5 pyramidal cell template with updated calcium
     cell_name = 'L5_pyramidal'
