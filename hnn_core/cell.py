@@ -809,7 +809,7 @@ class Cell:
                 if 'ca' in self.sections[sec_name].mechs:
                     self.ca[sec_name] = h.Vector()
                     self.ca[sec_name].record(
-                        self._nrn_sections[sec_name](0.5)._ref_cai) # there may be an issue here with referencing mod file
+                        self._nrn_sections[sec_name](0.5)._ref_cai)
                     
 
         # calcium concentration

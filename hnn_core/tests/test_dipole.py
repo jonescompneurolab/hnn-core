@@ -239,7 +239,7 @@ def test_cell_response_backends(run_hnn_core_fixture):
     assert len(mpi_net.cell_response.vsec) == n_trials
     assert len(mpi_net.cell_response.isec) == n_trials
     assert len(mpi_net.cell_response.vsec[trial_idx][gid]) == 8  # num sec
-    assert len(mpi_net.cell_response.isec[trial_idx][gid]) == 1  
+    assert len(mpi_net.cell_response.isec[trial_idx][gid]) == 1
     assert len(mpi_net.cell_response.vsec[
         trial_idx][gid]['apical_1']) == n_times
     assert len(mpi_net.cell_response.isec[
