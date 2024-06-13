@@ -1331,16 +1331,12 @@ def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
     if len(change['owner'].value) == 0:
         logger.info("Empty change")
         return
-    logger.info("Loading connectivity...")
     param_dict = change['new'][0]
     params_fname = param_dict['name']
-    param_data = param_dict['content']
+    file_contents = codecs.decode(param_dict['content'], encoding="utf-8")
 
-    param_data = codecs.decode(param_data, encoding="utf-8")
-
-    ext = Path(params_fname).suffix
-    read_func = {'.json': _read_json, '.param': _read_legacy_params}
-    params_network = Params(read_func[ext](param_data))
+    with log_out:
+        params_network = read_params(params_fname, file_contents)
 
     # update simulation settings and params
     with log_out:

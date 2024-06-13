@@ -69,7 +69,7 @@ def _read_legacy_params(param_data):
     return params_input
 
 
-def read_params(params_fname):
+def read_params(params_fname, file_contents=None):
     """Read param values from a file (.json or .param).
 
     Parameters
@@ -90,10 +90,12 @@ def read_params(params_fname):
         raise ValueError('Unrecognized extension, expected one of' +
                          ' .json, .param. Got %s' % ext)
 
+    if file_contents is None:
+        with open(params_fname, 'r') as fp:
+            file_contents = fp.read()
+
     read_func = {'.json': _read_json, '.param': _read_legacy_params}
-    with open(params_fname, 'r') as fp:
-        param_data = fp.read()
-        params_dict = read_func[ext](param_data)
+    params_dict = read_func[ext](file_contents)
 
     if len(params_dict) == 0:
         raise ValueError("Failed to read parameters from file: %s" %
