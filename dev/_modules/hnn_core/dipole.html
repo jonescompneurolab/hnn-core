@@ -611,10 +611,6 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        tmin : float or None</span>
-<span class="sd">            Start time of plot (in ms). If None, plot entire simulation.</span>
-<span class="sd">        tmax : float or None</span>
-<span class="sd">            End time of plot (in ms). If None, plot entire simulation.</span>
 <span class="sd">        layer : str</span>
 <span class="sd">            The layer to plot. Can be one of &#39;agg&#39;, &#39;L2&#39;, and &#39;L5&#39;</span>
 <span class="sd">        decimate : int</span>
@@ -631,6 +627,7 @@
 <span class="sd">        fig : instance of plt.fig</span>
 <span class="sd">            The matplotlib figure handle.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">return</span> <span class="n">plot_dipole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="n">tmax</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="n">layer</span><span class="p">,</span>
                            <span class="n">decim</span><span class="o">=</span><span class="n">decim</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
 
