@@ -75,6 +75,9 @@ Bug
 - Fix GUI plotting bug due to deprecation of matplotlib color cycling method,
   by `George Dang`_ in :gh:`695`.
 
+- Fix loading of drives in the GUI: drives are now overwritten instead of updated,
+  by `Mainak Jas`_ in :gh:`795`.
+
 API
 ~~~
 - :func:`~hnn_core.CellResponse.write` and :func:`~hnn_core.Cell_response.read_spikes`
