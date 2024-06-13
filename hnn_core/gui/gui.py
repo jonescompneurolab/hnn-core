@@ -1227,11 +1227,15 @@ def add_connectivity_tab(params, connectivity_out,
     return net
 
 
-def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
+def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes, tstop,
                   layout):
     net = jones_2009_model(params)
+
+    log_out.clear_output()
+    with log_out:
+        print(net.external_drives)
     drive_specs = _extract_drive_specs_from_hnn_params(
-        params, list(net.cell_types.keys()), legacy_mode=net._legacy_mode)
+        net._params, list(net.cell_types.keys()), legacy_mode=net._legacy_mode)
 
     # clear before adding drives
     drives_out.clear_output()
@@ -1240,6 +1244,10 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
         drive_boxes.pop()
 
     drive_names = sorted(drive_specs.keys())
+
+    with log_out:
+        print(drive_names)
+
     for idx, drive_name in enumerate(drive_names):  # order matters
         specs = drive_specs[drive_name]
         should_render = idx == (len(drive_names) - 1)
@@ -1276,7 +1284,7 @@ def load_drive_and_connectivity(params, log_out, drives_out,
         # Add connectivity
         add_connectivity_tab(params, connectivity_out, connectivity_textfields)
         # Add drives
-        add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
+        add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes, tstop,
                       layout)
 
 
@@ -1333,20 +1341,21 @@ def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
     params_network = read_func[ext](param_data)
 
     # update simulation settings and params
-    log_out.clear_output()
+    log_out.clear_output(wait=True)
     with log_out:
         if 'tstop' in params_network.keys():
             tstop.value = params_network['tstop']
         if 'dt' in params_network.keys():
             dt.value = params_network['dt']
 
-        params.update(params_network)
     # init network, add drives & connectivity
     if load_type == 'connectivity':
         add_connectivity_tab(params, connectivity_out, connectivity_textfields)
     elif load_type == 'drives':
-        add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
-                      layout)
+        params = params_network
+        with log_out:
+            add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes, tstop,
+                          layout)
     else:
         raise ValueError
     # Resets file counter to 0
