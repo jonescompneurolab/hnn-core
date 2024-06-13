@@ -25,7 +25,7 @@ from hnn_core.gui._logging import logger
 from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
 from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
-                             _read_legacy_params)
+                             _read_legacy_params, Params)
 from hnn_core.dipole import _read_dipole_txt
 
 import base64
@@ -1237,6 +1237,8 @@ def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes, tstop
     print(net.external_drives.keys())
     print(net._legacy_mode)
 
+    net = jones_2009_model(params)
+
     drive_specs = _extract_drive_specs_from_hnn_params(
         net._params, list(net.cell_types.keys()), legacy_mode=net._legacy_mode)
 
@@ -1338,7 +1340,7 @@ def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
 
     ext = Path(params_fname).suffix
     read_func = {'.json': _read_json, '.param': _read_legacy_params}
-    params_network = read_func[ext](param_data)
+    params_network = Params(read_func[ext](param_data))
 
     # update simulation settings and params
     with log_out:
