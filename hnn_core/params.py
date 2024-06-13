@@ -76,6 +76,9 @@ def read_params(params_fname, file_contents=None):
     ----------
     params_fname : str
         Full path to the file (.param)
+    file_contents : str | None
+        If file_contents are provided as a string,
+        it is parsed into a dictionary.
 
     Returns
     -------

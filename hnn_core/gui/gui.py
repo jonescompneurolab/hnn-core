@@ -25,7 +25,7 @@ from hnn_core.gui._logging import logger
 from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
 from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
-                             _read_legacy_params, Params)
+                             _read_legacy_params)
 from hnn_core.dipole import _read_dipole_txt
 
 import base64
@@ -1229,14 +1229,6 @@ def add_connectivity_tab(params, connectivity_out,
 
 def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes, tstop,
                   layout):
-    print('Creating net')
-    print(params)
-    net = jones_2009_model(params, add_drives_from_params=True)
-
-    print('External drives')
-    print(net.external_drives.keys())
-    print(net._legacy_mode)
-
     net = jones_2009_model(params)
 
     drive_specs = _extract_drive_specs_from_hnn_params(
@@ -1249,7 +1241,6 @@ def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes, tstop
         drive_boxes.pop()
 
     drive_names = sorted(drive_specs.keys())
-    print(drive_names)
 
     for idx, drive_name in enumerate(drive_names):  # order matters
         specs = drive_specs[drive_name]
@@ -1292,7 +1283,6 @@ def load_drive_and_connectivity(params, log_out, drives_out,
 
 def on_upload_data_change(change, data, viz_manager, log_out):
     if len(change['owner'].value) == 0:
-        logger.info("Empty change")
         return
 
     data_dict = change['new'][0]
@@ -1329,7 +1319,6 @@ def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
                             drive_widgets, drives_out, connectivity_out,
                             connectivity_textfields, layout, load_type):
     if len(change['owner'].value) == 0:
-        logger.info("Empty change")
         return
     param_dict = change['new'][0]
     params_fname = param_dict['name']
