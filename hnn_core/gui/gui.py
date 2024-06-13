@@ -422,7 +422,7 @@ class HNNGUI:
 
         def _on_upload_drives(change):
             return on_upload_params_change(
-                change, self.params, self.widget_tstop, self.widget_dt,
+                change, self.widget_tstop, self.widget_dt,
                 self._log_out, self.drive_boxes, self.drive_widgets,
                 self._drives_out, self._connectivity_out,
                 self.connectivity_widgets, self.layout['drive_textbox'],
@@ -1315,7 +1315,7 @@ def on_upload_data_change(change, data, viz_manager, log_out):
         change['owner'].value = []
 
 
-def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
+def on_upload_params_change(change, tstop, dt, log_out, drive_boxes,
                             drive_widgets, drives_out, connectivity_out,
                             connectivity_textfields, layout, load_type):
     if len(change['owner'].value) == 0:
@@ -1325,21 +1325,21 @@ def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
     file_contents = codecs.decode(param_dict['content'], encoding="utf-8")
 
     with log_out:
-        params_network = read_params(params_fname, file_contents)
+        params = read_params(params_fname, file_contents)
 
     # update simulation settings and params
     with log_out:
-        if 'tstop' in params_network.keys():
-            tstop.value = params_network['tstop']
-        if 'dt' in params_network.keys():
-            dt.value = params_network['dt']
+        if 'tstop' in params.keys():
+            tstop.value = params['tstop']
+        if 'dt' in params.keys():
+            dt.value = params['dt']
 
     # init network, add drives & connectivity
     if load_type == 'connectivity':
-        add_connectivity_tab(params_network, connectivity_out, connectivity_textfields)
+        add_connectivity_tab(params, connectivity_out, connectivity_textfields)
     elif load_type == 'drives':
         with log_out:
-            add_drive_tab(params_network, log_out, drives_out, drive_widgets, drive_boxes, tstop,
+            add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes, tstop,
                           layout)
     else:
         raise ValueError
