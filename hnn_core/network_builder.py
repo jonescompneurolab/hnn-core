@@ -100,6 +100,10 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
             isec_py[gid][sec_name] = {
                 key: isec.to_python() for key, isec in isec.items()}
 
+    dcell_py = dict()
+    for gid, dcell in neuron_net._dcell.items():
+        dcell_py[gid] = dcell.to_python()
+
     dpl_data = np.c_[
         neuron_net._nrn_dipoles['L2_pyramidal'].as_numpy() +
         neuron_net._nrn_dipoles['L5_pyramidal'].as_numpy(),
@@ -119,6 +123,7 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
             'gid_ranges': net.gid_ranges,
             'vsec': vsec_py,
             'isec': isec_py,
+            'dcell': dcell_py,
             'rec_data': rec_arr_py,
             'rec_times': rec_times_py,
             'times': times.to_python()}
@@ -291,6 +296,7 @@ class NetworkBuilder(object):
 
         self._vsec = dict()
         self._isec = dict()
+        self._dcell = dict()
         self._nrn_rec_arrays = dict()
         self._nrn_rec_callbacks = list()
 
@@ -562,6 +568,9 @@ class NetworkBuilder(object):
                 nrn_dpl = self._nrn_dipoles[_long_name(cell.name)]
                 nrn_dpl.add(cell.dipole)
 
+                if self.net._params['record_dcell']:
+                    self._dcell[cell.gid] = cell.dipole
+
             self._vsec[cell.gid] = cell.vsec
             self._isec[cell.gid] = cell.isec
 
@@ -574,6 +583,7 @@ class NetworkBuilder(object):
         # aggregate the currents and voltages independently on each proc
         vsec_list = _PC.py_gather(self._vsec, 0)
         isec_list = _PC.py_gather(self._isec, 0)
+        dcell_list = _PC.py_gather(self._dcell, 0)
 
         # combine spiking data from each proc
         spike_times_list = _PC.py_gather(self._spike_times, 0)
@@ -589,6 +599,8 @@ class NetworkBuilder(object):
                 self._vsec.update(vsec)
             for isec in isec_list:
                 self._isec.update(isec)
+            for dcell in dcell_list:
+                self._dcell.update(dcell)
 
         _PC.barrier()  # get all nodes to this place before continuing
 

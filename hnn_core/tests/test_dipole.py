@@ -186,6 +186,8 @@ def test_dipole_simulation():
     with pytest.raises(ValueError, match="Invalid value for the"):
         simulate_dipole(net, tstop=25., n_trials=1, record_vsec=False,
                         record_isec='abc')
+    with pytest.raises(ValueError, match="Invalid value for the"):
+        simulate_dipole(net, tstop=25., n_trials=1, record_dcell='abc')
 
     # test Network.copy() returns 'bare' network after simulating
     dpl = simulate_dipole(net, tstop=25., n_trials=1)[0]
@@ -212,32 +214,38 @@ def test_cell_response_backends(run_hnn_core_fixture):
 
     # reduced simulation has n_trials=2
     trial_idx, n_trials, gid = 0, 2, 7
-    _, joblib_net = run_hnn_core_fixture(backend='joblib', n_jobs=1,
-                                         reduced=True, record_vsec='all',
-                                         record_isec='soma')
-    _, mpi_net = run_hnn_core_fixture(backend='mpi', n_procs=2, reduced=True,
-                                      record_vsec='all', record_isec='soma')
+    joblib_dpl, joblib_net = run_hnn_core_fixture(
+        backend='joblib', n_jobs=1, reduced=True, record_vsec='all',
+        record_isec='soma', record_dcell=True)
+    mpi_dpl, mpi_net = run_hnn_core_fixture(
+        backend='mpi', n_procs=2, reduced=True, record_vsec='all',
+        record_isec='soma', record_dcell=True)
     n_times = len(joblib_net.cell_response.times)
 
     assert len(joblib_net.cell_response.vsec) == n_trials
     assert len(joblib_net.cell_response.isec) == n_trials
+    assert len(joblib_net.cell_response.dcell) == n_trials
     assert len(joblib_net.cell_response.vsec[trial_idx][gid]) == 8  # num sec
     assert len(joblib_net.cell_response.isec[trial_idx][gid]) == 1
     assert len(joblib_net.cell_response.vsec[
         trial_idx][gid]['apical_1']) == n_times
     assert len(joblib_net.cell_response.isec[
                trial_idx][gid]['soma']['soma_gabaa']) == n_times
+    assert len(joblib_net.cell_response.dcell[trial_idx][gid]) == n_times
 
     assert len(mpi_net.cell_response.vsec) == n_trials
     assert len(mpi_net.cell_response.isec) == n_trials
+    assert len(mpi_net.cell_response.dcell) == n_trials
     assert len(mpi_net.cell_response.vsec[trial_idx][gid]) == 8  # num sec
     assert len(mpi_net.cell_response.isec[trial_idx][gid]) == 1
     assert len(mpi_net.cell_response.vsec[
         trial_idx][gid]['apical_1']) == n_times
     assert len(mpi_net.cell_response.isec[
                trial_idx][gid]['soma']['soma_gabaa']) == n_times
+    assert len(mpi_net.cell_response.dcell[trial_idx][gid]) == n_times
     assert mpi_net.cell_response.vsec == joblib_net.cell_response.vsec
     assert mpi_net.cell_response.isec == joblib_net.cell_response.isec
+    assert mpi_net.cell_response.dcell == joblib_net.cell_response.dcell
 
     # Test if spike time falls within depolarization window above v_thresh
     v_thresh = 0.0
@@ -257,6 +265,29 @@ def test_cell_response_backends(run_hnn_core_fixture):
             net_ets = [spike_times[i] for i, g in enumerate(spike_gids) if
                        g == gid_ran[idx_drive]]
             assert_allclose(np.array(event_times), np.array(net_ets))
+
+    # test that individual cell dipoles match aggregate dipole
+    L5_dipole = np.array([joblib_net.cell_response.dcell[0][gid] for
+                          gid in list(joblib_net.gid_ranges['L5_pyramidal'])])
+    L2_dipole = np.array([joblib_net.cell_response.dcell[0][gid] for
+                          gid in list(joblib_net.gid_ranges['L2_pyramidal'])])
+    agg_dipole = np.concatenate([L2_dipole, L5_dipole], axis=0)
+
+    L5_dipole_sum = np.sum(L5_dipole, axis=0)
+    L2_dipole_sum = np.sum(L2_dipole, axis=0)
+    agg_dipole_sum = np.sum(agg_dipole, axis=0)
+
+    dipole_data = np.stack(
+        [agg_dipole_sum, L2_dipole_sum, L5_dipole_sum], axis=1)
+
+    test_dpl = Dipole(joblib_dpl[0].times, dipole_data)
+    N_pyr_x = joblib_net._params['N_pyr_x']
+    N_pyr_y = joblib_net._params['N_pyr_y']
+    test_dpl._baseline_renormalize(N_pyr_x, N_pyr_y)
+    test_dpl._convert_fAm_to_nAm()
+
+    assert np.all(test_dpl.data['agg'] == joblib_dpl[0].data['agg'])
+    assert np.all(test_dpl.data['agg'] == mpi_dpl[0].data['agg'])
 
 
 def test_rmse():
