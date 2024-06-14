@@ -17,14 +17,14 @@ class CellResponse(object):
 
     Parameters
     ----------
-    spike_times : list (n_trials,) of list (n_spikes,) of float, shape | None
+    spike_times : list (n_trials,) of list (n_spikes,) of float | None
         Each element of the outer list is a trial.
         The inner list contains the time stamps of spikes.
-    spike_gids : list (n_trials,) of list (n_spikes,) of float, shape | None
+    spike_gids : list (n_trials,) of list (n_spikes,) of float | None
         Each element of the outer list is a trial.
         The inner list contains the cell IDs of neurons that
         spiked.
-    spike_types : list (n_trials,) of list (n_spikes,) of float, shape | None
+    spike_types : list (n_trials,) of list (n_spikes,) of float | None
         Each element of the outer list is a trial.
         The inner list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occurred at the corresponding time stamp.
@@ -35,30 +35,30 @@ class CellResponse(object):
     cell_type_names : list
         List of unique cell type names that are explicitly modeled in the
         network
-    vsec : list (n_trials,) of dict, shape
+    vsec : list (n_trials,) of dict
         Each element of the outer list is a trial.
         Dictionary indexed by gids containing voltages for cell sections.
-    isec : list (n_trials,) of dict, shape
+    isec : list (n_trials,) of dict
         Each element of the outer list is a trial.
 
     Attributes
     ----------
-    spike_times : list (n_trials,) of list (n_spikes,) of float, shape
+    spike_times : list (n_trials,) of list (n_spikes,) of float
         Each element of the outer list is a trial.
         The inner list contains the time stamps of spikes.
-    spike_gids : list (n_trials,) of list (n_spikes,) of float, shape
+    spike_gids : list (n_trials,) of list (n_spikes,) of float
         Each element of the outer list is a trial.
         The inner list contains the cell IDs of neurons that
         spiked.
-    spike_types : list (n_trials,) of list (n_spikes,) of float, shape
+    spike_types : list (n_trials,) of list (n_spikes,) of float
         Each element of the outer list is a trial.
         The inner list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occurred at the corresponding time stamp.
         Each gid corresponds to a type via Network::gid_ranges.
-    vsec : list (n_trials,) of dict, shape
+    vsec : list (n_trials,) of dict
         Each element of the outer list is a trial.
         Dictionary indexed by gids containing voltages for cell sections.
-    isec : list (n_trials,) of dict, shape
+    isec : list (n_trials,) of dict
         Each element of the outer list is a trial.
         Dictionary indexed by gids containing currents for cell sections.
     ca : list (n_trials,) of dict, shape
