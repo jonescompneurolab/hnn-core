@@ -1226,7 +1226,8 @@ def add_connectivity_tab(params, connectivity_out,
     return net
 
 
-def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes, tstop,
+def add_drive_tab(params, log_out, drives_out, drive_widgets,
+                  drive_boxes, tstop,
                   layout):
     net = jones_2009_model(params)
 
@@ -1275,9 +1276,10 @@ def load_drive_and_connectivity(params, log_out, drives_out,
     with log_out:
         # Add connectivity
         add_connectivity_tab(params, connectivity_out,
-        connectivity_textfields)
+                             connectivity_textfields)
         # Add drives
-        add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes, tstop,
+        add_drive_tab(params, log_out, drives_out, drive_widgets,
+                      drive_boxes, tstop,
                       layout)
 
 
@@ -1339,7 +1341,8 @@ def on_upload_params_change(change, tstop, dt, log_out, drive_boxes,
         add_connectivity_tab(params, connectivity_out, connectivity_textfields)
     elif load_type == 'drives':
         with log_out:
-            add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes, tstop,
+            add_drive_tab(params, log_out, drives_out,
+                          drive_widgets, drive_boxes, tstop,
                           layout)
     else:
         raise ValueError
