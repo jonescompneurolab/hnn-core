@@ -24,8 +24,7 @@ from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
 from hnn_core.gui._logging import logger
 from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
-from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
-                             _read_legacy_params)
+from hnn_core.params import (_extract_drive_specs_from_hnn_params)
 from hnn_core.dipole import _read_dipole_txt
 
 import base64
@@ -1275,7 +1274,8 @@ def load_drive_and_connectivity(params, log_out, drives_out,
     """Add drive and connectivity ipywidgets from params."""
     with log_out:
         # Add connectivity
-        add_connectivity_tab(params, connectivity_out, connectivity_textfields)
+        add_connectivity_tab(params, connectivity_out,
+        connectivity_textfields)
         # Add drives
         add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes, tstop,
                       layout)
