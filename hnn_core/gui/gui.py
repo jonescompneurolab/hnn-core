@@ -1275,7 +1275,7 @@ def load_drive_and_connectivity(params, log_out, drives_out,
     with log_out:
         # Add connectivity
         add_connectivity_tab(params, connectivity_out,
-        connectivity_textfields)
+                             connectivity_textfields)
         # Add drives
         add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
                       tstop, layout)
