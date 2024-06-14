@@ -68,6 +68,9 @@ Changelog
   and :func:`~plot_spikes_raster` now plotted from 0 to tstop. Inputs tmin and tmax are deprecated,
   by `Katharina Duecker`_ in :gh:`769`
 
+- Cleaned up internal logic in :class:`~hnn_core.CellResponse`,
+  by `Nick Tolley`_ in :gh:`647`.
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by

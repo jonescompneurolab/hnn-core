@@ -17,14 +17,14 @@ class CellResponse(object):
 
     Parameters
     ----------
-    spike_times : list (n_trials,) of list (n_spikes,) of float, shape | None
+    spike_times : list (n_trials,) of list (n_spikes,) of float | None
         Each element of the outer list is a trial.
         The inner list contains the time stamps of spikes.
-    spike_gids : list (n_trials,) of list (n_spikes,) of float, shape | None
+    spike_gids : list (n_trials,) of list (n_spikes,) of float | None
         Each element of the outer list is a trial.
         The inner list contains the cell IDs of neurons that
         spiked.
-    spike_types : list (n_trials,) of list (n_spikes,) of float, shape | None
+    spike_types : list (n_trials,) of list (n_spikes,) of float | None
         Each element of the outer list is a trial.
         The inner list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occurred at the corresponding time stamp.
@@ -35,25 +35,30 @@ class CellResponse(object):
     cell_type_names : list
         List of unique cell type names that are explicitly modeled in the
         network
+    vsec : list (n_trials,) of dict
+        Each element of the outer list is a trial.
+        Dictionary indexed by gids containing voltages for cell sections.
+    isec : list (n_trials,) of dict
+        Each element of the outer list is a trial.
 
     Attributes
     ----------
-    spike_times : list (n_trials,) of list (n_spikes,) of float, shape
+    spike_times : list (n_trials,) of list (n_spikes,) of float
         Each element of the outer list is a trial.
         The inner list contains the time stamps of spikes.
-    spike_gids : list (n_trials,) of list (n_spikes,) of float, shape
+    spike_gids : list (n_trials,) of list (n_spikes,) of float
         Each element of the outer list is a trial.
         The inner list contains the cell IDs of neurons that
         spiked.
-    spike_types : list (n_trials,) of list (n_spikes,) of float, shape
+    spike_types : list (n_trials,) of list (n_spikes,) of float
         Each element of the outer list is a trial.
         The inner list contains the type of spike (e.g., evprox1
         or L2_pyramidal) that occurred at the corresponding time stamp.
         Each gid corresponds to a type via Network::gid_ranges.
-    vsec : list (n_trials,) of dict, shape
+    vsec : list (n_trials,) of dict
         Each element of the outer list is a trial.
         Dictionary indexed by gids containing voltages for cell sections.
-    isec : list (n_trials,) of dict, shape
+    isec : list (n_trials,) of dict
         Each element of the outer list is a trial.
         Dictionary indexed by gids containing currents for cell sections.
     times : array-like, shape (n_times,)
@@ -77,7 +82,7 @@ class CellResponse(object):
     """
 
     def __init__(self, spike_times=None, spike_gids=None, spike_types=None,
-                 times=None, cell_type_names=None):
+                 times=None, cell_type_names=None, vsec=None, isec=None):
         if spike_times is None:
             spike_times = list()
         if spike_gids is None:
@@ -86,6 +91,10 @@ class CellResponse(object):
             spike_types = list()
         if times is None:
             times = list()
+        if vsec is None:
+            vsec = list()
+        if isec is None:
+            isec = list()
 
         if cell_type_names is None:
             cell_type_names = ['L2_basket', 'L2_pyramidal',
@@ -113,8 +122,8 @@ class CellResponse(object):
         self._spike_times = spike_times
         self._spike_gids = spike_gids
         self._spike_types = spike_types
-        self._vsec = list()
-        self._isec = list()
+        self._vsec = vsec
+        self._isec = isec
         if times is not None:
             if not isinstance(times, (list, np.ndarray)):
                 raise TypeError("'times' is an np.ndarray of simulation times")
@@ -137,76 +146,8 @@ class CellResponse(object):
         return (times_self == times_other and
                 self._spike_gids == other._spike_gids and
                 self._spike_types == other._spike_types and
-                self.vsec == other.vsec and
-                self.isec == other.isec)
-
-    def __getitem__(self, gid_item):
-        """Returns a CellResponse object with a copied subset filtered by gid.
-
-        Parameters
-        ----------
-        gid_item : int | slice
-            Subset of gids .
-
-        Returns
-        -------
-        cell_response : instance of CellResponse
-            See below for use cases.
-        """
-
-        if isinstance(gid_item, slice):
-            gid_item = np.arange(gid_item.stop)[gid_item]
-        elif isinstance(gid_item, list):
-            gid_item = np.array(gid_item)
-        elif isinstance(gid_item, np.ndarray):
-            if gid_item.ndim > 1:
-                raise ValueError("ndarray cannot exceed 1 dimension")
-            else:
-                pass
-        elif isinstance(gid_item, int):
-            gid_item = np.array([gid_item])
-        else:
-            raise TypeError("indices must be int, slice, or array-like, "
-                            f"not {type(gid_item).__name__}")
-
-        if not np.issubdtype(gid_item.dtype, np.integer):
-            raise TypeError("gids must be of dtype int, "
-                            f"not {gid_item.dtype.name}")
-
-        n_trials = len(self._spike_times)
-        times_slice = list()
-        gids_slice = list()
-        types_slice = list()
-        vsoma_slice = list()
-        isoma_slice = list()
-        for trial_idx in range(n_trials):
-            gid_mask = np.in1d(self._spike_gids[trial_idx], gid_item)
-            times_trial = np.array(
-                self._spike_times[trial_idx])[gid_mask].tolist()
-            gids_trial = np.array(
-                self._spike_gids[trial_idx])[gid_mask].tolist()
-            types_trial = np.array(
-                self._spike_types[trial_idx])[gid_mask].tolist()
-
-            vsoma_trial = {gid: self._vsoma[trial_idx][gid] for gid in gid_item
-                           if gid in self._vsoma[trial_idx].keys()}
-
-            isoma_trial = {gid: self._isoma[trial_idx][gid] for gid in gid_item
-                           if gid in self._isoma[trial_idx].keys()}
-
-            times_slice.append(times_trial)
-            gids_slice.append(gids_trial)
-            types_slice.append(types_trial)
-            vsoma_slice.append(vsoma_trial)
-            isoma_slice.append(isoma_trial)
-
-        cell_response_slice = CellResponse(spike_times=times_slice,
-                                           spike_gids=gids_slice,
-                                           spike_types=types_slice)
-        cell_response_slice._vsoma = vsoma_slice
-        cell_response_slice._isoma = isoma_slice
-
-        return cell_response_slice
+                self._vsec == other._vsec and
+                self._isec == other._isec)
 
     @property
     def spike_times(self):
