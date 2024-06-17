@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-20.04]
         python-version: ['3.9.10']
 
     steps:
@@ -20,7 +20,7 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:    
-          python-version: ${{ matrix.python-version }}
+          python-version: '>=3.9.10 <3.9.12'
       - name: Install ubuntu dependencies
         shell: bash -el {0}
         run: |
