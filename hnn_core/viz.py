@@ -412,7 +412,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         spike_types_data = np.array([])
 
     unique_types = np.unique(spike_types_data)
-    spike_types_mask = {s_type: np.in1d(spike_types_data, s_type)
+    spike_types_mask = {s_type: np.isin(spike_types_data, s_type)
                         for s_type in unique_types}
     cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
     input_types = np.setdiff1d(unique_types, cell_types)
@@ -1018,7 +1018,7 @@ def plot_connectivity_matrix(net, conn_idx, ax=None, show_weight=True,
 
     for src_gid, target_src_pair in conn['gid_pairs'].items():
         src_idx = np.where(src_range == src_gid)[0][0]
-        target_indeces = np.where(np.in1d(target_range, target_src_pair))[0]
+        target_indeces = np.where(np.isin(target_range, target_src_pair))[0]
         for target_idx in target_indeces:
             src_pos = src_type_pos[src_idx]
             target_pos = target_type_pos[target_idx]
@@ -1068,7 +1068,7 @@ def _update_target_plot(ax, conn, src_gid, src_type_pos, target_type_pos,
     # Extract indices to get position in network
     # Index in gid range aligns with net.pos_dict
     target_src_pair = conn['gid_pairs'][src_gid]
-    target_indeces = np.where(np.in1d(target_range, target_src_pair))[0]
+    target_indeces = np.where(np.isin(target_range, target_src_pair))[0]
 
     src_idx = np.where(src_range == src_gid)[0][0]
     src_pos = src_type_pos[src_idx]
@@ -1155,7 +1155,7 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
     src_range = np.array(net.gid_ranges[conn['src_type']])
 
     valid_src_gids = list(net.connectivity[conn_idx]['gid_pairs'].keys())
-    src_pos_valid = src_type_pos[np.in1d(src_range, valid_src_gids)]
+    src_pos_valid = src_type_pos[np.isin(src_range, valid_src_gids)]
 
     if src_gid is None:
         src_gid = valid_src_gids[0]

@@ -180,7 +180,7 @@ class CellResponse(object):
         vsoma_slice = list()
         isoma_slice = list()
         for trial_idx in range(n_trials):
-            gid_mask = np.in1d(self._spike_gids[trial_idx], gid_item)
+            gid_mask = np.isin(self._spike_gids[trial_idx], gid_item)
             times_trial = np.array(
                 self._spike_times[trial_idx])[gid_mask].tolist()
             gids_trial = np.array(
@@ -258,7 +258,7 @@ class CellResponse(object):
             spike_types_trial = np.empty_like(self._spike_times[trial_idx],
                                               dtype='<U36')
             for gidtype, gids in gid_ranges.items():
-                spike_gids_mask = np.in1d(self._spike_gids[trial_idx], gids)
+                spike_gids_mask = np.isin(self._spike_gids[trial_idx], gids)
                 spike_types_trial[spike_gids_mask] = gidtype
             spike_types += [list(spike_types_trial)]
         self._spike_types = spike_types
@@ -309,11 +309,11 @@ class CellResponse(object):
 
             trial_data = zip(self._spike_types, self._spike_gids)
             for trial_idx, (spike_types, spike_gids) in enumerate(trial_data):
-                trial_type_mask = np.in1d(spike_types, cell_type)
+                trial_type_mask = np.isin(spike_types, cell_type)
                 gids, gid_counts = np.unique(np.array(
                     spike_gids)[trial_type_mask], return_counts=True)
 
-                gid_spike_rate[trial_idx, np.in1d(cell_type_gids, gids)] = (
+                gid_spike_rate[trial_idx, np.isin(cell_type_gids, gids)] = (
                     gid_counts / (tstop - tstart)) * 1000
 
             if mean_type == 'all':
