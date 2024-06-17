@@ -1299,7 +1299,7 @@ class Network:
         gid_pairs = dict()
         for src_gid, target_src_pair in zip(src_gids, target_gids):
             if not allow_autapses:
-                mask = np.in1d(target_src_pair, src_gid, invert=True)
+                mask = np.isin(target_src_pair, src_gid, invert=True)
                 target_src_pair = np.array(target_src_pair)[mask].tolist()
             gid_pairs[src_gid] = target_src_pair
 
