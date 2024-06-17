@@ -62,11 +62,15 @@ jobs:
       #   shell: bash -el {0}
       #   run: |
       #     flake8 --count hnn_core
+      - name: Freeze package versions
+        shell: bash -el {0}
+        run: |
+          python -m pip freeze
 
       - name: Test with pytest
         shell: bash -el {0}
         run: |
-          python -m pytest ./hnn_core/tests/test_parallel_backends.py  --cov=hnn_core --cov-report=xml -s
+          python -m pytest ./hnn_core/tests/test_viz.py  --cov=hnn_core --cov-report=xml -s
 
       # - name:  Upload coverage to Codecov
       #   shell: bash -el {0}
