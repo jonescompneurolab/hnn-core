@@ -20,7 +20,7 @@ jobs:
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:    
-          python-version: '>=3.9.10 <3.9.12'
+          python-version: '3.9.10'
       - name: Install ubuntu dependencies
         shell: bash -el {0}
         run: |
