@@ -24,8 +24,7 @@ from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
 from hnn_core.gui._logging import logger
 from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
-from hnn_core.params import (_extract_drive_specs_from_hnn_params, _read_json,
-                             _read_legacy_params)
+from hnn_core.params import _extract_drive_specs_from_hnn_params
 from hnn_core.dipole import _read_dipole_txt
 
 import base64
@@ -1227,8 +1226,8 @@ def add_connectivity_tab(params, connectivity_out,
     return net
 
 
-def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes, tstop,
-                  layout):
+def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
+                  tstop, layout):
     net = jones_2009_model(params)
 
     drive_specs = _extract_drive_specs_from_hnn_params(
@@ -1277,8 +1276,8 @@ def load_drive_and_connectivity(params, log_out, drives_out,
         # Add connectivity
         add_connectivity_tab(params, connectivity_out, connectivity_textfields)
         # Add drives
-        add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes, tstop,
-                      layout)
+        add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
+                      tstop, layout)
 
 
 def on_upload_data_change(change, data, viz_manager, log_out):
@@ -1339,8 +1338,8 @@ def on_upload_params_change(change, tstop, dt, log_out, drive_boxes,
         add_connectivity_tab(params, connectivity_out, connectivity_textfields)
     elif load_type == 'drives':
         with log_out:
-            add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes, tstop,
-                          layout)
+            add_drive_tab(params, log_out, drives_out, drive_widgets,
+                          drive_boxes, tstop, layout)
     else:
         raise ValueError
     # Resets file counter to 0
