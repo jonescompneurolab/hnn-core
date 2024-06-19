@@ -414,7 +414,7 @@ class HNNGUI:
 
         def _on_upload_connectivity(change):
             return on_upload_params_change(
-                change, self.params, self.widget_tstop, self.widget_dt,
+                change, self.widget_tstop, self.widget_dt,
                 self._log_out, self.drive_boxes, self.drive_widgets,
                 self._drives_out, self._connectivity_out,
                 self.connectivity_widgets, self.layout['drive_textbox'],
@@ -422,7 +422,7 @@ class HNNGUI:
 
         def _on_upload_drives(change):
             return on_upload_params_change(
-                change, self.params, self.widget_tstop, self.widget_dt,
+                change, self.widget_tstop, self.widget_dt,
                 self._log_out, self.drive_boxes, self.drive_widgets,
                 self._drives_out, self._connectivity_out,
                 self.connectivity_widgets, self.layout['drive_textbox'],
@@ -1227,11 +1227,12 @@ def add_connectivity_tab(params, connectivity_out,
     return net
 
 
-def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
+def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes, tstop,
                   layout):
     net = jones_2009_model(params)
+
     drive_specs = _extract_drive_specs_from_hnn_params(
-        params, list(net.cell_types.keys()), legacy_mode=net._legacy_mode)
+        net._params, list(net.cell_types.keys()), legacy_mode=net._legacy_mode)
 
     # clear before adding drives
     drives_out.clear_output()
@@ -1240,6 +1241,7 @@ def add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
         drive_boxes.pop()
 
     drive_names = sorted(drive_specs.keys())
+
     for idx, drive_name in enumerate(drive_names):  # order matters
         specs = drive_specs[drive_name]
         should_render = idx == (len(drive_names) - 1)
@@ -1271,18 +1273,16 @@ def load_drive_and_connectivity(params, log_out, drives_out,
                                 drive_widgets, drive_boxes, connectivity_out,
                                 connectivity_textfields, tstop, layout):
     """Add drive and connectivity ipywidgets from params."""
-    log_out.clear_output()
     with log_out:
         # Add connectivity
         add_connectivity_tab(params, connectivity_out, connectivity_textfields)
         # Add drives
-        add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
+        add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes, tstop,
                       layout)
 
 
 def on_upload_data_change(change, data, viz_manager, log_out):
     if len(change['owner'].value) == 0:
-        logger.info("Empty change")
         return
 
     data_dict = change['new'][0]
@@ -1315,38 +1315,32 @@ def on_upload_data_change(change, data, viz_manager, log_out):
         change['owner'].value = []
 
 
-def on_upload_params_change(change, params, tstop, dt, log_out, drive_boxes,
+def on_upload_params_change(change, tstop, dt, log_out, drive_boxes,
                             drive_widgets, drives_out, connectivity_out,
                             connectivity_textfields, layout, load_type):
     if len(change['owner'].value) == 0:
-        logger.info("Empty change")
         return
-    logger.info("Loading connectivity...")
     param_dict = change['new'][0]
     params_fname = param_dict['name']
-    param_data = param_dict['content']
+    file_contents = codecs.decode(param_dict['content'], encoding="utf-8")
 
-    param_data = codecs.decode(param_data, encoding="utf-8")
-
-    ext = Path(params_fname).suffix
-    read_func = {'.json': _read_json, '.param': _read_legacy_params}
-    params_network = read_func[ext](param_data)
+    with log_out:
+        params = read_params(params_fname, file_contents)
 
     # update simulation settings and params
-    log_out.clear_output()
     with log_out:
-        if 'tstop' in params_network.keys():
-            tstop.value = params_network['tstop']
-        if 'dt' in params_network.keys():
-            dt.value = params_network['dt']
+        if 'tstop' in params.keys():
+            tstop.value = params['tstop']
+        if 'dt' in params.keys():
+            dt.value = params['dt']
 
-        params.update(params_network)
     # init network, add drives & connectivity
     if load_type == 'connectivity':
         add_connectivity_tab(params, connectivity_out, connectivity_textfields)
     elif load_type == 'drives':
-        add_drive_tab(params, drives_out, drive_widgets, drive_boxes, tstop,
-                      layout)
+        with log_out:
+            add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes, tstop,
+                          layout)
     else:
         raise ValueError
     # Resets file counter to 0
@@ -1472,7 +1466,6 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
                        simulation_status_contents, connectivity_textfields,
                        viz_manager, simulations_list_widget):
     """Run the simulation and plot outputs."""
-    log_out.clear_output()
     simulation_data = all_data["simulation_data"]
     with log_out:
         # clear empty trash simulations

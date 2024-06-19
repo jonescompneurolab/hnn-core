@@ -174,6 +174,11 @@ Interested in Contributing?
 
 Read our `contributing guide`_.
 
+Governance Structure
+====================
+
+Read our `governance structure`_.
+
 Roadmap
 =======
 
