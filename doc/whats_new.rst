@@ -69,7 +69,7 @@ Changelog
   by `Katharina Duecker`_ in :gh:`769`
 
 - Use `np.isin()` in place of `np.in1d()` to address numpy deprecation,
-  by `Nick Tolley`_ in :gh:`799
+  by `Nick Tolley`_ in :gh:`799.
 
 Bug
 ~~~
