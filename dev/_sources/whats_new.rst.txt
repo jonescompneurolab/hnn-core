@@ -82,6 +82,9 @@ Bug
 - Fix loading of drives in the GUI: drives are now overwritten instead of updated,
   by `Mainak Jas`_ in :gh:`795`.
 
+- Use `np.isin()` in place of `np.in1d()` to address numpy deprecation,
+  by `Nick Tolley`_ in :gh:`799.
+
 API
 ~~~
 - :func:`~hnn_core.CellResponse.write` and :func:`~hnn_core.Cell_response.read_spikes`

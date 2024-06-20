@@ -161,8 +161,7 @@
 <span class="kn">from</span> <span class="nn">hnn_core.gui._logging</span> <span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">from</span> <span class="nn">hnn_core.gui._viz_manager</span> <span class="kn">import</span> <span class="n">_VizManager</span><span class="p">,</span> <span class="n">_idx2figname</span>
 <span class="kn">from</span> <span class="nn">hnn_core.network</span> <span class="kn">import</span> <span class="n">pick_connection</span>
-<span class="kn">from</span> <span class="nn">hnn_core.params</span> <span class="kn">import</span> <span class="p">(</span><span class="n">_extract_drive_specs_from_hnn_params</span><span class="p">,</span> <span class="n">_read_json</span><span class="p">,</span>
-                             <span class="n">_read_legacy_params</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">hnn_core.params</span> <span class="kn">import</span> <span class="n">_extract_drive_specs_from_hnn_params</span>
 <span class="kn">from</span> <span class="nn">hnn_core.dipole</span> <span class="kn">import</span> <span class="n">_read_dipole_txt</span>
 
 <span class="kn">import</span> <span class="nn">base64</span>
@@ -1364,8 +1363,8 @@
     <span class="k">return</span> <span class="n">net</span>
 
 
-<span class="k">def</span> <span class="nf">add_drive_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
-                  <span class="n">layout</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">add_drive_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span>
+                  <span class="n">tstop</span><span class="p">,</span> <span class="n">layout</span><span class="p">):</span>
     <span class="n">net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
     <span class="n">drive_specs</span> <span class="o">=</span> <span class="n">_extract_drive_specs_from_hnn_params</span><span class="p">(</span>
@@ -1414,8 +1413,8 @@
         <span class="c1"># Add connectivity</span>
         <span class="n">add_connectivity_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">)</span>
         <span class="c1"># Add drives</span>
-        <span class="n">add_drive_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
-                      <span class="n">layout</span><span class="p">)</span>
+        <span class="n">add_drive_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span>
+                      <span class="n">tstop</span><span class="p">,</span> <span class="n">layout</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">on_upload_data_change</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">viz_manager</span><span class="p">,</span> <span class="n">log_out</span><span class="p">):</span>
@@ -1476,8 +1475,8 @@
         <span class="n">add_connectivity_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">load_type</span> <span class="o">==</span> <span class="s1">&#39;drives&#39;</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
-            <span class="n">add_drive_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
-                          <span class="n">layout</span><span class="p">)</span>
+            <span class="n">add_drive_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span>
+                          <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">layout</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span>
     <span class="c1"># Resets file counter to 0</span>
