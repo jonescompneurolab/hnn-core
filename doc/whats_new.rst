@@ -68,9 +68,6 @@ Changelog
   and :func:`~plot_spikes_raster` now plotted from 0 to tstop. Inputs tmin and tmax are deprecated,
   by `Katharina Duecker`_ in :gh:`769`
 
-- Use `np.isin()` in place of `np.in1d()` to address numpy deprecation,
-  by `Nick Tolley`_ in :gh:`799.
-
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
@@ -84,6 +81,9 @@ Bug
 
 - Fix loading of drives in the GUI: drives are now overwritten instead of updated,
   by `Mainak Jas`_ in :gh:`795`.
+
+- Use `np.isin()` in place of `np.in1d()` to address numpy deprecation,
+  by `Nick Tolley`_ in :gh:`799.
 
 API
 ~~~
