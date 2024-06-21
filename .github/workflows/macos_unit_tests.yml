@@ -16,7 +16,7 @@
           python-version: [3.8]
 
       steps:
-        - uses: actions/checkout@4
+        - uses: actions/checkout@v4
 
         - name: Install Ubuntu System dependencies
           if: matrix.os == 'ubuntu-latest'
