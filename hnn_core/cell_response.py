@@ -6,7 +6,6 @@
 
 from glob import glob
 from warnings import warn
-
 import numpy as np
 
 from .viz import plot_spikes_hist, plot_spikes_raster
@@ -76,8 +75,8 @@ class CellResponse(object):
         Write spiking activity to a collection of spike trial files.
     """
 
-    def __init__(self, spike_times=None, spike_gids=None, spike_types=None,
-                 times=None, cell_type_names=None):
+    def __init__(self, cell_type_names, spike_times=None,
+                 spike_gids=None, spike_types=None, times=None):
         if spike_times is None:
             spike_times = list()
         if spike_gids is None:
@@ -86,10 +85,6 @@ class CellResponse(object):
             spike_types = list()
         if times is None:
             times = list()
-
-        if cell_type_names is None:
-            cell_type_names = ['L2_basket', 'L2_pyramidal',
-                               'L5_basket', 'L5_pyramidal']
 
         # Validate arguments
         arg_names = ['spike_times', 'spike_gids', 'spike_types']
@@ -120,7 +115,8 @@ class CellResponse(object):
                 raise TypeError("'times' is an np.ndarray of simulation times")
         self._times = np.array(times)
         self._cell_type_names = cell_type_names
-
+        self._gid_ranges = dict()
+        
     def __repr__(self):
         class_name = self.__class__.__name__
         n_trials = len(self._spike_times)
@@ -525,7 +521,12 @@ def read_spikes(fname, gid_ranges=None):
             spike_gids += [list()]
             spike_types += [list()]
 
-    cell_response = CellResponse(spike_times=spike_times,
+    network_cell_names = ['L2_basket', 'L2_pyramidal',
+                          'L5_basket', 'L5_pyramidal']
+    cell_type_names = list(cell_name for cell_name in
+                           network_cell_names if cell_name in spike_types)
+    cell_response = CellResponse(cell_type_names=cell_type_names,
+                                 spike_times=spike_times,
                                  spike_gids=spike_gids,
                                  spike_types=spike_types)
     if gid_ranges is not None:

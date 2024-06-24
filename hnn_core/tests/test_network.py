@@ -379,7 +379,9 @@ def test_network_drives():
     # to CellResponse-constructor for storage (Network is agnostic of time)
     with pytest.raises(TypeError,
                        match="'times' is an np.ndarray of simulation times"):
-        _ = CellResponse(times='blah')
+        _ = CellResponse(cell_type_names=['L2_basket', 'L2_pyramidal',
+                                          'L5_basket', 'L5_pyramidal'],
+                         times='blah')
 
     # Check that all external drives are initialized with the expected amount
     # of artificial cells assuming legacy_mode=False (i.e., dependent on
@@ -553,7 +555,9 @@ def test_network_drives_legacy():
     # to CellResponse-constructor for storage (Network is agnostic of time)
     with pytest.raises(TypeError,
                        match="'times' is an np.ndarray of simulation times"):
-        _ = CellResponse(times='blah')
+        _ = CellResponse(cell_type_names=['L2_basket', 'L2_pyramidal',
+                                          'L5_basket', 'L5_pyramidal'],
+                         times='blah')
 
     # Assert that all external drives are initialized
     # Assumes legacy mode where cell-specific drives create artificial cells
@@ -725,6 +729,7 @@ def test_add_cell_type():
 
     new_cell = net.cell_types['L2_basket'].copy()
     net._add_cell_type('new_type', pos=pos, cell_template=new_cell)
+    assert 'new_type' in net.cell_types.keys()
     net.cell_types['new_type'].synapses['gabaa']['tau1'] = tau1
 
     n_new_type = len(net.gid_ranges['new_type'])
@@ -1077,3 +1082,36 @@ class TestPickConnection:
                                   target_gids=target_gids
                                   )
         assert len(indices) == expected
+
+
+def test_rename_cell():
+    """Tests renaming cell function"""
+    params = read_params(params_fname)
+    net = hnn_core.jones_2009_model(params)
+    # adding a list of new_names
+    new_names = ['L2_basket_test', 'L2_pyramidal_test',
+                 'L5_basket_test', 'L5_pyrmidal_test']
+    # avoid iteration through net.cell_type.keys() by creating tuples of old and new names
+    rename_pairs = list(zip(net.cell_types.keys(), new_names))
+    for original_name, new_name in rename_pairs:
+        net.rename_cell(original_name, new_name)
+    for new_name in new_names:
+        assert new_name in net.cell_types.keys()
+        assert new_name in net.pos_dict.keys()
+    assert not net.connectivity
+    # Tests for non-existent original_name
+    original_name = 'original_name'
+    with pytest.raises(ValueError,
+                       match=f"'{original_name}' is not in cell_types!"):
+        net.rename_cell('original_name', 'L2_basket_2')
+
+    # Test for already existing new_name
+    new_name = 'L2_basket_test'
+    with pytest.raises(ValueError,
+                       match=f"'{new_name}' is already in cell_types!"):
+        net.rename_cell('L2_basket_test', new_name)
+
+    # Tests for non-string new_name
+    new_name = 5
+    with pytest.raises(TypeError, match=f"'{new_name}' must be a string"):
+        net.rename_cell('L2_basket_test', 5)
