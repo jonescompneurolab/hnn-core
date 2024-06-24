@@ -194,7 +194,7 @@ If you use HNN-core in your work, please cite our
    circuit-level interpretation of human MEG/EEG. *Journal of Open Source
    Software*, 8(92), 5848, https://doi.org/10.21105/joss.05848
 
-.. _precompiled installers: https://www.neuron.yale.edu/neuron/download
+.. _precompiled installers: https://nrn.readthedocs.io/en/latest/
 .. _NEURON forum: https://www.neuron.yale.edu/phpbb/
 .. _contributing guide: https://jonescompneurolab.github.io/hnn-core/dev/contributing.html
 .. _parallel backend guide: https://jonescompneurolab.github.io/hnn-core/dev/parallel.html
