@@ -199,7 +199,7 @@ If you use HNN-core in your work, please cite our
 .. _contributing guide: https://jonescompneurolab.github.io/hnn-core/dev/contributing.html
 .. _parallel backend guide: https://jonescompneurolab.github.io/hnn-core/dev/parallel.html
 
-.. |tests| image:: https://github.com/jonescompneurolab/hnn-core/actions/workflows/unit_tests.yml/badge.svg?branch=master
+.. |tests| image:: https://github.com/jonescompneurolab/hnn-core/actions/workflows/unix_unit_tests.yml/badge.svg?branch=master
    :target: https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:master+event:push
 
 .. |CircleCI| image:: https://circleci.com/gh/jonescompneurolab/hnn-core.svg?style=svg
