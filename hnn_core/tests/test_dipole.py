@@ -157,7 +157,8 @@ def test_dipole(tmp_path, run_hnn_core_fixture):
                       match='The postproc-argument is deprecated'):
         dpls, _ = run_hnn_core_fixture(backend='joblib', n_jobs=1,
                                        reduced=True, record_isec='soma',
-                                       record_vsec='soma', record_ca='soma', postproc=True)
+                                       record_vsec='soma', record_ca='soma',
+                                       postproc=True)
     with pytest.raises(AssertionError):
         assert_allclose(dpls[0].data['agg'], dpls_raw[0].data['agg'])
 
@@ -219,7 +220,8 @@ def test_cell_response_backends(run_hnn_core_fixture):
                                          reduced=True, record_vsec='all',
                                          record_isec='soma', record_ca='soma')
     _, mpi_net = run_hnn_core_fixture(backend='mpi', n_procs=2, reduced=True,
-                                      record_vsec='all', record_isec='soma', record_ca='soma')
+                                      record_vsec='all', record_isec='soma',
+                                      record_ca='soma')
     n_times = len(joblib_net.cell_response.times)
 
     assert len(joblib_net.cell_response.vsec) == n_trials
