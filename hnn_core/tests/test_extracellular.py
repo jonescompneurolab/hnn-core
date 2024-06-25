@@ -41,9 +41,11 @@ def test_extracellular_api():
     # all remaining input arguments checked by ExtracellularArray
 
     rec_arr = ExtracellularArray(electrode_pos)
-    with pytest.raises(AttributeError, match="has no setter|can't set attribute"):
+    with pytest.raises(AttributeError,
+                       match="has no setter|can't set attribute"):
         rec_arr.times = [1, 2, 3]
-    with pytest.raises(AttributeError, match="has no setter|can't set attribute"):
+    with pytest.raises(AttributeError,
+                       match="has no setter|can't set attribute"):
         rec_arr.voltages = [1, 2, 3]
     with pytest.raises(TypeError, match="trial index must be int"):
         _ = rec_arr['0']
