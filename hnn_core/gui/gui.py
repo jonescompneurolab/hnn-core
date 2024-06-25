@@ -156,18 +156,18 @@ class HNNGUI:
             "btn_full_w": Layout(height=f"{button_height}px", width='100%'),
             "del_fig_btn": Layout(height=f"{button_height}px", width='auto'),
             "log_out": Layout(border='1px solid gray',
-                              height=f"{log_window_height-10}px",
+                              height=f"{log_window_height - 10}px",
                               overflow='auto'),
             "viz_config": Layout(width='99%'),
-            "simulations_list": Layout(width=f'{left_sidebar_width-50}px'),
+            "simulations_list": Layout(width=f'{left_sidebar_width - 50}px'),
             "visualization_window": Layout(
-                width=f"{viz_win_width-10}px",
-                height=f"{main_content_height-10}px",
+                width=f"{viz_win_width - 10}px",
+                height=f"{main_content_height - 10}px",
                 border='1px solid gray',
                 overflow='scroll'),
             "visualization_output": Layout(
-                width=f"{viz_win_width-50}px",
-                height=f"{main_content_height-100}px",
+                width=f"{viz_win_width - 50}px",
+                height=f"{main_content_height - 100}px",
                 border='1px solid gray',
                 overflow='scroll'),
             "left_sidebar": Layout(width=f"{left_sidebar_width}px",
@@ -179,7 +179,7 @@ class HNNGUI:
                                     flex_wrap="wrap",
                                     ),
             "config_box": Layout(width=f"{left_sidebar_width}px",
-                                 height=f"{config_box_height-100}px"),
+                                 height=f"{config_box_height - 100}px"),
             "drive_widget": Layout(width="auto"),
             "drive_textbox": Layout(width='270px', height='auto'),
             # simulation status related
@@ -1566,7 +1566,7 @@ def _create_zip(csv_data_list, simulation_name):
     with io.BytesIO() as zip_buffer:
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
             for index, csv_data in enumerate(csv_data_list):
-                zf.writestr(f'{simulation_name}_{index+1}.csv', csv_data)
+                zf.writestr(f'{simulation_name}_{index + 1}.csv', csv_data)
         zip_buffer.seek(0)
         return zip_buffer.read()
 
