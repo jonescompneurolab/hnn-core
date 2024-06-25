@@ -41,6 +41,9 @@ def test_extracellular_api():
     # all remaining input arguments checked by ExtracellularArray
 
     rec_arr = ExtracellularArray(electrode_pos)
+
+    # Added second string in the match pattern due to changes in python >=3.11 
+    # AttributeError message changed to "property X of object Y has no setter"
     with pytest.raises(AttributeError,
                        match="has no setter|can't set attribute"):
         rec_arr.times = [1, 2, 3]
