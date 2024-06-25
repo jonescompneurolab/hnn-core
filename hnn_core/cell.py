@@ -349,10 +349,8 @@ class Cell:
         Must be enabled by running simulate_dipole(net, record_isec=True)
         or simulate_dipole(net, record_isoma=True)
     ca : dict
-        Contains recording of section speicifc calcium concentration. 
-        Must be enabled by running simulate_dipole(net, record_ca) with record_ca
-        set to 'all' to record form all sections, or 'soma' to record from
-        the soma only.
+        Contains recording of section speicifc calcium concentration.
+        Must be enabled by running simulate_dipole(net, record_ca=True).
     tonic_biases : list of h.IClamp
         The current clamps inserted at each section of the cell
         for tonic biasing inputs.
