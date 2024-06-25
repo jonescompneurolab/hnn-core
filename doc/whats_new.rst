@@ -200,7 +200,7 @@ API
   :meth:`~hnn_core.extracellular.ExtracellularArray.plot_lfp`, by
   `Steven Brandt`_ and `Ryan Thorpe`_ in :gh:`517`.
 
-- Recorded voltages/currents from the soma, as well all sections, are enabled by
+- Recorded voltages/currents from the soma, as well as all sections, are enabled by
   setting either `record_vsec` or `record_isec` to `'all'` or `'soma'` 
   in :func:`~hnn_core.simulate_dipole`. Recordings are now accessed through
   :class:`~hnn_core.CellResponse.vsec` and :class:`~hnn_core.CellResponse.isec`,
@@ -209,6 +209,11 @@ API
 - legacy_mode is now set to False by default in all for all
   :class:`~hnn_core.Network` objects, 
   by `Nick Tolley`_ and `Ryan Thorpe`_ in :gh:`619`.
+
+- Recorded calcium conncetration from the soma, as well as all sections, are enabled
+  by setting `record_ca` to `soma` or `all` in :func:`~hnn_core.simulate_dipole`.
+  Recordings are accessed through :class:`~hnn_core.CellResponse.ca`, 
+  by `Katharina Duecker`_ in :gh:`792`
 
 People who contributed to this release (in alphabetical order):
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
