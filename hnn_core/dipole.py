@@ -35,7 +35,7 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
         Option to record voltages from all sections ('all'), or just
         the soma ('soma'). Default: False.
     record_isec : 'all' | 'soma' | False
-        Option to record voltages from all sections ('all'), or just
+        Option to record synaptic currents from all sections ('all'), or just
         the soma ('soma'). Default: False.
     record_ca : 'all' | 'soma' | False
         Option to record calcium concentration from all sections ('all'), 
