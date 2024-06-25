@@ -99,13 +99,13 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
         for sec_name, isec in isec_dict.items():
             isec_py[gid][sec_name] = {
                 key: isec.to_python() for key, isec in isec.items()}
-    
+
     ca_py = dict()
     for gid, ca_dict in neuron_net._ca.items():
         ca_py[gid] = dict()
         for sec_name, ca in ca_dict.items():
             if ca is not None:
-                ca_py[gid][sec_name] = ca.to_python()           
+                ca_py[gid][sec_name] = ca.to_python()
 
     dpl_data = np.c_[
         neuron_net._nrn_dipoles['L2_pyramidal'].as_numpy() +
