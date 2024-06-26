@@ -434,3 +434,35 @@ def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
                      gid=gid)
 
     return cell
+
+
+def pyramidal_PFC(cell_name, pos, override_params=None, gid=None):
+
+    # implement the insert_almog function from Kohl pyr file for k, na, ca
+    """Calcium dynamics."""
+
+    if override_params is None:
+        override_params = dict()
+
+    override_params['L5Pyr_soma_gkbar_hh2'] = 0.01*2
+    override_params['L5Pyr_soma_gnabar_hh2'] = 0.16
+    #override_params['L5Pyr_soma_gbar_ca'] = 60.
+    
+    #gbar_ca = partial(
+    #   _linear_g_at_dist, override_params['L5Pyr_soma_gbar_ca'], 
+    #   gdend=60., xkink=1501)
+    gbar_na = partial(
+        _linear_g_at_dist, gsoma=override_params['L5Pyr_soma_gnabar_hh2'],
+        gdend=0.14, xkink=962)
+    gbar_k = partial(
+        _exp_g_at_dist, zero_val=override_params['L5Pyr_soma_gkbar_hh2'],
+        exp_term=-0.006, offset=.01)
+
+    #override_params['L5Pyr_dend_gbar_ca'] = override_params['L5Pyr_soma_gbar_ca']
+    override_params['L5Pyr_dend_gnabar_hh2'] = gbar_na
+    override_params['L5Pyr_dend_gkbar_hh2'] = gbar_k   
+
+    cell = pyramidal(cell_name, pos, override_params=override_params,
+                     gid=gid)
+
+    return cell
