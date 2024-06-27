@@ -664,7 +664,7 @@ def compare_dictionaries(d1, d2):
 
 def convert_to_json(params_fname,
                     out_fname,
-                    network_connectivity='jones_2009_model',
+                    model_template='jones_2009_model',
                     include_drives=True,
                     overwrite=True):
     """Converts legacy json or param format to hierarchical json format
@@ -675,7 +675,7 @@ def convert_to_json(params_fname,
         Path to file
     out_fname: str
         Path to output
-    network_connectivity: str or None, default:' jones_2009_model'
+    model_template: str or None, default:' jones_2009_model'
          Options: ['jones_2009_model', 'law_2021_model', 'calcium_model', None]
          Neocortical network model to use. Models are defined in
          network_models. If None, the base Network object with no defined
@@ -696,12 +696,12 @@ def convert_to_json(params_fname,
                        'law_2021_model': law_2021_model,
                        'calcium_model': calcium_model
                        }
-    if network_connectivity:
+    if model_template:
         try:
-            network_model = model_functions[network_connectivity]
+            network_model = model_functions[model_template]
         except KeyError:
             raise KeyError(f'Invalid network connectivity: '
-                           f'"{network_connectivity}"; '
+                           f'"{model_template}"; '
                            f'Valid options: {list(model_functions.keys())}')
     else:
         network_model = Network
