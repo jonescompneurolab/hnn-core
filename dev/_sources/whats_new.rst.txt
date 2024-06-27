@@ -29,9 +29,6 @@ Changelog
 
 - Add ability to specify number of cells in :class:`~hnn_core.Network`,
   by `Nick Tolley`_ in :gh:`705`
-
-- Add feature to convert param and json files to HDF5 format, by `George Dang`_
-  in :gh:`723`
   
 - Fixed figure annotation overlap in multiple sub-plots, 
   by `Camilo Diaz`_ in :gh:`741`
@@ -61,12 +58,15 @@ Changelog
 - Added :class:`~hnn_core/viz/NetworkPlotter` to visualize and animate network simulations,
   by `Nick Tolley`_ in :gh:`649`.
 
-- Added GUI feature to include Tonic input drives in simulations, 
+- Added GUI feature to include Tonic input drives in simulations,
   by `Camilo Diaz` :gh:`773`
 
-- :func:`~plot_laminar_lfp`, :func:`~plot_dipole`, :func:`~plot_spikes_hist`, 
+- :func:`~plot_laminar_lfp`, :func:`~plot_dipole`, :func:`~plot_spikes_hist`,
   and :func:`~plot_spikes_raster` now plotted from 0 to tstop. Inputs tmin and tmax are deprecated,
   by `Katharina Duecker`_ in :gh:`769`
+
+- Add function :func:`~hnn_core/params/convert_to_json` to convert legacy param
+  and json files to new json format, by `George Dang`_ in :gh:`772`
 
 Bug
 ~~~
