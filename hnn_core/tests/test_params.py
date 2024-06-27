@@ -126,7 +126,7 @@ class TestConvertToJson:
         outpath = Path(tmp_path, 'default.json')
         convert_to_json(self.path_default,
                         outpath,
-                        network_connectivity='law_2021_model')
+                        model_template='law_2021_model')
         net_json = read_network_configuration(outpath)
         assert net_json == net_params
 
@@ -141,7 +141,7 @@ class TestConvertToJson:
         outpath = Path(tmp_path, 'default.json')
         convert_to_json(self.path_default,
                         outpath,
-                        network_connectivity='calcium_model')
+                        model_template='calcium_model')
         net_json = read_network_configuration(outpath)
         assert net_json == net_params
 
@@ -156,7 +156,7 @@ class TestConvertToJson:
         outpath = Path(tmp_path, 'default.json')
         convert_to_json(self.path_default,
                         outpath,
-                        network_connectivity=None)
+                        model_template=None)
         net_json = read_network_configuration(outpath)
         assert net_json == net_params
 
@@ -186,7 +186,7 @@ class TestConvertToJson:
         good_path = hnn_core_root
         path_str = str(good_path)
         bad_path = 5
-        bad_network_conn = 'bad_model'
+        bad_model = 'bad_model'
 
         # Valid path and string, but not actual files
         with pytest.raises(
@@ -209,10 +209,10 @@ class TestConvertToJson:
         ):
             convert_to_json(good_path, bad_path)
 
-        # Bad network_connectivity
+        # Bad model_template
         with pytest.raises(
                 KeyError,
                 match="Invalid network connectivity:"
         ):
             convert_to_json(good_path, good_path,
-                            network_connectivity=bad_network_conn)
+                            model_template=bad_model)
