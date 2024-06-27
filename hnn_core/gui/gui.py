@@ -7,6 +7,7 @@ import io
 import logging
 import multiprocessing
 import sys
+import json
 import urllib.parse
 import urllib.request
 from collections import defaultdict
@@ -385,8 +386,12 @@ class HNNGUI:
         if not params_fname:
             # by default load default.json
             hnn_core_root = Path(hnn_core.__file__).parent
-            params_fname = hnn_core_root / 'param/default.json'
-        return read_params(params_fname)
+            params_fname = hnn_core_root / 'param/default_hierarchical.json'
+
+        with open(params_fname, 'r') as file:
+            parameters = json.load(file)
+
+        return parameters
 
     def _link_callbacks(self):
         """Link callbacks to UI components."""
