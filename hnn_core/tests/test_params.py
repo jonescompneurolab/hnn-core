@@ -159,6 +159,8 @@ class TestConvertToJson:
                         model_template=None)
         net_json = read_network_configuration(outpath)
         assert net_json == net_params
+        # Should only have external drive connections defined, n=22
+        assert len(net_json.connectivity) == len(net_params.connectivity) == 22
 
     def test_convert_to_json_legacy(self, tmp_path):
         """Tests conversion of a param legacy file to json"""
