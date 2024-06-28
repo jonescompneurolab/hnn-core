@@ -760,7 +760,11 @@ class Cell:
             Option to record voltages from all sections ('all'), or just
             the soma ('soma'). Default: False.
         record_ca : 'all' | 'soma' | False
+<<<<<<< HEAD
             Option to record calcium concentration from all sections ('all'),
+=======
+            Option to record calcium concentration from all sections ('all'), 
+>>>>>>> d3105f90 (record calcium concentration in L5pyr)
             or just the soma ('soma'). Default: False.
         """
 
@@ -793,6 +797,20 @@ class Cell:
                     self.isec[sec_name][syn_name] = h.Vector()
                     self.isec[sec_name][syn_name].record(
                         self._nrn_synapses[syn_name]._ref_i)
+        
+        # calcium concentration
+        if record_ca == 'soma':
+            self.ca = dict.fromkeys(['soma'])
+        elif record_ca == 'all':
+            self.ca = dict.fromkeys(section_names)
+
+        if record_ca:     
+            for sec_name in self.ca:
+                if 'ca' in self.sections[sec_name].mechs:
+                    self.ca[sec_name] = h.Vector()
+                    self.ca[sec_name].record(
+                        self._nrn_sections[sec_name](0.5)._ref_cai) # there may be an issue here with referencing mod file
+                    
 
         # calcium concentration
         if record_ca == 'soma':
