@@ -77,6 +77,7 @@ def run_hnn_core_fixture():
                               reduced=False, record_vsec=False,
                               record_isec=False, record_ca=False,
                               postproc=False, electrode_array=None):
+
         hnn_core_root = op.dirname(hnn_core.__file__)
 
         # default params
