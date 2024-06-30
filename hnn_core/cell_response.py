@@ -458,10 +458,11 @@ class CellResponse(object):
         try:
             fname % 0
         except TypeError:
-            fname.format(0)
-            old_style = False
-        except TypeError:
-            fname.replace('.txt', '_%d.txt')
+            try:
+                fname.format(0)
+                old_style = False
+            except TypeError:
+                fname.replace('.txt', '_%d.txt')
 
         for trial_idx in range(len(self._spike_times)):
             if old_style:

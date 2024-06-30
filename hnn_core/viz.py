@@ -16,7 +16,8 @@ def _lighten_color(color, amount=0.5):
     import matplotlib.colors as mc
     try:
         c = mc.cnames[color]
-    except:
+    except KeyError:
+        # If the color is not found in cnames, assume it's a valid color
         c = color
     c = colorsys.rgb_to_hls(*mc.to_rgb(c))
     return colorsys.hls_to_rgb(c[0], 1 - amount * (1 - c[1]), c[2])
@@ -1425,7 +1426,7 @@ class NetworkPlotter:
     def _init_network_plot(self):
         for cell_type in self.net.cell_types:
             gid_range = self.net.gid_ranges[cell_type]
-            for gid_idx, gid in enumerate(gid_range):
+            for gid_idx, _gid in enumerate(gid_range):
 
                 cell = self.net.cell_types[cell_type]
 

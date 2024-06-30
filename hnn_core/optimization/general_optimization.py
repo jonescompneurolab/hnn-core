@@ -230,9 +230,9 @@ def _assemble_constraints_cobyla(constraints):
     # assemble constraints in solver-specific format
     cons_cobyla = list()
     for idx, cons_key in enumerate(constraints):
-        cons_cobyla.append(lambda x, idx=idx:
+        cons_cobyla.append(lambda x, idx=idx, cons_key=cons_key:
                            float(constraints[cons_key][1]) - x[idx])
-        cons_cobyla.append(lambda x, idx=idx:
+        cons_cobyla.append(lambda x, idx=idx, cons_key=cons_key:
                            x[idx] - float(constraints[cons_key][0]))
 
     return cons_cobyla
