@@ -237,13 +237,6 @@ class CellResponse(object):
     @property
     def ca(self):
         return self._ca
-<<<<<<< HEAD
-
-    @property
-    def ca(self):
-        return self._ca
-=======
->>>>>>> d87a97cd (record calcium concentration in L5pyr)
 
     @property
     def times(self):
