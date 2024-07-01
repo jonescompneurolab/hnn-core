@@ -106,6 +106,7 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
         for sec_name, ca in ca_dict.items():
             if ca is not None:
                 ca_py[gid][sec_name] = ca.to_python()           
+<<<<<<< HEAD
 
     ca_py = dict()
     for gid, ca_dict in neuron_net._ca.items():
@@ -113,6 +114,8 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
         for sec_name, ca in ca_dict.items():
             if ca is not None:
                 ca_py[gid][sec_name] = ca.to_python()
+=======
+>>>>>>> d87a97cd (record calcium concentration in L5pyr)
 
     dpl_data = np.c_[
         neuron_net._nrn_dipoles['L2_pyramidal'].as_numpy() +
