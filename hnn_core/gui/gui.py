@@ -28,6 +28,7 @@ from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
 from hnn_core.dipole import _read_dipole_txt
 from hnn_core.hnn_io import _dict_to_network
+from hnn_core.params import _read_json
 import base64
 import zipfile
 import numpy as np
@@ -1369,11 +1370,10 @@ def on_upload_params_change(change, tstop, dt, log_out, drive_boxes,
     if len(change['owner'].value) == 0:
         return
     param_dict = change['new'][0]
-    params_fname = param_dict['name']
     file_contents = codecs.decode(param_dict['content'], encoding="utf-8")
 
     with log_out:
-        params = read_params(params_fname, file_contents)
+        params = _read_json(file_contents)
 
     # update simulation settings and params
     with log_out:
