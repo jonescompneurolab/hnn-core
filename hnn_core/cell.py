@@ -805,7 +805,7 @@ class Cell:
                 if hasattr(self._nrn_sections[sec_name](0.5), '_ref_cai'):
                     self.ca[sec_name] = h.Vector()
                     self.ca[sec_name].record(
-                        self._nrn_sections[sec_name](0.5)._ref_cai)     
+                        self._nrn_sections[sec_name](0.5)._ref_cai)
 
         # calcium concentration
         if record_ca == 'soma':

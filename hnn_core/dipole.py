@@ -38,15 +38,7 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
         Option to record synaptic currents from all sections ('all'), or just
         the soma ('soma'). Default: False.
     record_ca : 'all' | 'soma' | False
-<<<<<<< HEAD
-<<<<<<< HEAD
         Option to record calcium concentration from all sections ('all'),
-=======
-        Option to record calcium concentration from all sections ('all'), 
->>>>>>> d87a97cd (record calcium concentration in L5pyr)
-=======
-        Option to record calcium concentration from all sections ('all'),
->>>>>>> 8682db4f (flake8 fix)
         or just the soma ('soma'). Default: False.
     postproc : bool
         If True, smoothing (``dipole_smooth_win``) and scaling
