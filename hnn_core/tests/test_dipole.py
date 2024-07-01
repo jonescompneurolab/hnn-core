@@ -222,7 +222,10 @@ def test_cell_response_backends(run_hnn_core_fixture):
     _, mpi_net = run_hnn_core_fixture(backend='mpi', n_procs=2, reduced=True,
                                       record_vsec='all', record_isec='soma',
                                       record_ca='soma')
+<<<<<<< HEAD
     
+=======
+>>>>>>> 8682db4f (flake8 fix)
     n_times = len(joblib_net.cell_response.times)
 
     assert len(joblib_net.cell_response.vsec) == n_trials
