@@ -26,7 +26,6 @@ from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
 from hnn_core.gui._logging import logger
 from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
-from hnn_core.params import _extract_drive_specs_from_hnn_params
 from hnn_core.dipole import _read_dipole_txt
 from hnn_core.hnn_io import _dict_to_network
 import base64
@@ -1258,10 +1257,8 @@ def add_connectivity_tab(params, connectivity_out,
 
 def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
                   tstop, layout):
-    net = jones_2009_model(params)
-
-    drive_specs = _extract_drive_specs_from_hnn_params(
-        net._params, list(net.cell_types.keys()), legacy_mode=net._legacy_mode)
+    net = _dict_to_network(params)
+    drive_specs = net.external_drives
 
     # clear before adding drives
     drives_out.clear_output()
@@ -1275,8 +1272,10 @@ def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
         specs = drive_specs[drive_name]
         should_render = idx == (len(drive_names) - 1)
 
-        is_sync_evinput = (True if not specs['cell_specific'] and
-                           specs['dynamics']['n_drive_cells'] == 1 else False)
+        # Check for synchronous input
+        is_sync_evinput = (True if (not specs['cell_specific']) and
+                                   (specs['n_drive_cells'] == 1)
+                           else False)
 
         add_drive_widget(
             specs['type'].capitalize(),
