@@ -21,8 +21,7 @@ from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         Checkbox)
 from ipywidgets.embed import embed_minimal_html
 import hnn_core
-from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
-                      simulate_dipole)
+from hnn_core import JoblibBackend, MPIBackend, simulate_dipole
 from hnn_core.gui._logging import logger
 from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
@@ -1400,10 +1399,9 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
     print("init network")
     params['dt'] = dt.value
     params['tstop'] = tstop.value
-    single_simulation_data['net'] = jones_2009_model(
-        params,
-        add_drives_from_params=False,
-    )
+    single_simulation_data['net'] = _dict_to_network(params,
+                                                     read_drives=False)
+
     # adjust connectivity according to the connectivity_tab
     for connectivity_slider in connectivity_textfields:
         for vbox in connectivity_slider:
