@@ -177,6 +177,7 @@ def _read_external_drive(net, drive_data, read_output):
                              sigma=drive_data['dynamics']['sigma'],
                              numspikes=drive_data['dynamics']['numspikes'],
                              location=drive_data['location'],
+                             n_drive_cells=_set_from_cell_specific(drive_data),
                              cell_specific=drive_data['cell_specific'],
                              weights_ampa=drive_data['weights_ampa'],
                              weights_nmda=drive_data['weights_nmda'],
