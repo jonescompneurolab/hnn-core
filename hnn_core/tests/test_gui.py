@@ -58,28 +58,28 @@ def test_gui_upload_params():
     gui.delete_drive_button.click()
     assert len(gui.drive_widgets) == 0
 
-    original_tstop = gui.widget_tstop.value
-    gui.widget_tstop.value = 1
-    original_tstep = gui.widget_dt.value
-    gui.widget_dt.value = 1
+    original_connectivity_count = len(gui.connectivity_widgets)
+    assert original_connectivity_count > 0
+    gui.connectivity_widgets = []
+    assert len(gui.connectivity_widgets) == 0
+
     # simulate upload default.json
-    file1_url = assets_path / 'jones2009_3x3_drives.json'
-    file2_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/gamma_L5weak_L2weak.json" # noqa
+    file1_url = Path(hnn_core_root, 'param', 'default_hierarchical.json')
+    # file1_url = Path(assets_path, 'jones2009_3x3_drives.json')
+    file2_url = Path(hnn_core_root, 'param',
+                     'gamma_L5weak_L2weak_hierarchical.json')
     gui._simulate_upload_connectivity(file1_url)
     gui._simulate_upload_drives(file1_url)
 
     # check if parameter is reloaded.
-    assert gui.widget_tstop.value == original_tstop
-    assert gui.widget_dt.value == original_tstep
     assert len(gui.drive_widgets) == original_drive_count
+    assert len(gui.connectivity_widgets) == original_connectivity_count
 
     # check parameters with different files.
     # file1: connectivity file2: drives
     gui._simulate_upload_connectivity(file1_url)
-    assert gui.widget_tstop.value == 170.
     assert gui.connectivity_widgets[0][0].children[1].value == 0.02
     gui._simulate_upload_drives(file2_url)
-    assert gui.widget_tstop.value == 250.
     # uploading new drives does not influence the existing connectivity.
     assert gui.connectivity_widgets[0][0].children[1].value == 0.02
 
@@ -87,7 +87,6 @@ def test_gui_upload_params():
     gui._simulate_upload_connectivity(file2_url)
     # now connectivity is refreshed.
     assert gui.connectivity_widgets[0][0].children[1].value == 0.01
-    assert gui.drive_widgets[-1]['tstop'].value == 250.
     gui._simulate_upload_drives(file1_url)
     assert gui.connectivity_widgets[0][0].children[1].value == 0.01
     plt.close('all')
