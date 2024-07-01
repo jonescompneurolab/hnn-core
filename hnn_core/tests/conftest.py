@@ -76,6 +76,7 @@ def run_hnn_core_fixture():
     def _run_hnn_core_fixture(backend=None, n_procs=None, n_jobs=1,
                               reduced=False, record_vsec=False,
 <<<<<<< HEAD
+<<<<<<< HEAD
                               record_isec=False, record_ca=False,
                               postproc=False, electrode_array=None):
 
@@ -83,6 +84,10 @@ def run_hnn_core_fixture():
                               record_isec=False, record_ca=False, postproc=False,
                               electrode_array=None):
 >>>>>>> d87a97cd (record calcium concentration in L5pyr)
+=======
+                              record_isec=False, record_ca=False, 
+                              postproc=False, electrode_array=None):
+>>>>>>> 8682db4f (flake8 fix)
         hnn_core_root = op.dirname(hnn_core.__file__)
 
         # default params
