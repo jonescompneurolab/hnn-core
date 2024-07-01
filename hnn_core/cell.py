@@ -349,8 +349,15 @@ class Cell:
         Must be enabled by running simulate_dipole(net, record_isec=True)
         or simulate_dipole(net, record_isoma=True)
     ca : dict
+<<<<<<< HEAD
         Contains recording of section speicifc calcium concentration.
         Must be enabled by running simulate_dipole(net, record_ca=True).
+=======
+        Contains recording of section speicifc calcium concentration. 
+        Must be enabled by running simulate_dipole(...) with record_ca
+        set to 'all' to record form all sections, or 'soma' to record from
+        the soma only.
+>>>>>>> d87a97cd (record calcium concentration in L5pyr)
     tonic_biases : list of h.IClamp
         The current clamps inserted at each section of the cell
         for tonic biasing inputs.
@@ -761,10 +768,14 @@ class Cell:
             the soma ('soma'). Default: False.
         record_ca : 'all' | 'soma' | False
 <<<<<<< HEAD
+<<<<<<< HEAD
             Option to record calcium concentration from all sections ('all'),
 =======
             Option to record calcium concentration from all sections ('all'), 
 >>>>>>> d3105f90 (record calcium concentration in L5pyr)
+=======
+            Option to record calcium concentration from all sections ('all'), 
+>>>>>>> d87a97cd (record calcium concentration in L5pyr)
             or just the soma ('soma'). Default: False.
         """
 
@@ -809,6 +820,7 @@ class Cell:
                 if 'ca' in self.sections[sec_name].mechs:
                     self.ca[sec_name] = h.Vector()
                     self.ca[sec_name].record(
+<<<<<<< HEAD
                         self._nrn_sections[sec_name](0.5)._ref_cai)
                     
 
@@ -824,6 +836,10 @@ class Cell:
                     self.ca[sec_name] = h.Vector()
                     self.ca[sec_name].record(
                         self._nrn_sections[sec_name](0.5)._ref_cai)
+=======
+                        self._nrn_sections[sec_name](0.5)._ref_cai) # there may be an issue here with referencing mod file
+                    
+>>>>>>> d87a97cd (record calcium concentration in L5pyr)
 
     def syn_create(self, secloc, e, tau1, tau2):
         """Create an h.Exp2Syn synapse.
