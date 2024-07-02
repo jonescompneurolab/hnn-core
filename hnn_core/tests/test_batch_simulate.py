@@ -36,7 +36,7 @@ def batch_simulate_instance():
 
 @pytest.fixture
 def param_grid():
-    """Returns a dictionary representing a parameter grid for 
+    """Returns a dictionary representing a parameter grid for
     batch simulation."""
     return {
         'weight_basket': np.logspace(-4 - 1, 2),

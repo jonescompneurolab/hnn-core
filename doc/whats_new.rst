@@ -68,6 +68,9 @@ Changelog
 - Add function :func:`~hnn_core/params/convert_to_json` to convert legacy param
   and json files to new json format, by `George Dang`_ in :gh:`772`
 
+- Add :class:`~hnn_core.BatchSimulate` for batch simulation capability,
+  by `Abdul Samad Siddiqui`_ in :gh:`782`.
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by

@@ -13,7 +13,8 @@ from hnn_core.network_models import (jones_2009_model,
 
 class BatchSimulate:
     def __init__(self, set_params, net_name='jones', tstop=170,
-                 dt=0.025, n_trials=1):
+                 dt=0.025, n_trials=1, record_vsec=False,
+                 record_isec=False, postproc=False):
         """
         Initialize the BatchSimulate class.
 
@@ -30,12 +31,32 @@ class BatchSimulate:
             The time step for the simulation. Default is 0.025 ms.
         n_trials : int, optional
             The number of trials for the simulation. Default is 1.
+        record_vsec : 'all' | 'soma' | False
+            Option to record voltages from all sections ('all'), or just
+            the soma ('soma'). Default: False.
+        record_isec : 'all' | 'soma' | False
+            Option to record voltages from all sections ('all'), or just
+            the soma ('soma'). Default: False.
+        postproc : bool
+            If True, smoothing (``dipole_smooth_win``) and scaling
+            (``dipole_scalefctr``) values are read from the parameter file, and
+            applied to the dipole objects before returning.
+            Note that this setting
+            only affects the dipole waveforms, and not somatic voltages,
+            possible extracellular recordings etc.
+            The preferred way is to use the
+            :meth:`~hnn_core.dipole.Dipole.smooth` and
+            :meth:`~hnn_core.dipole.Dipole.scale` methods instead.
+            Default: False.
         """
         self.set_params = set_params
         self.net_name = net_name
         self.tstop = tstop
         self.dt = dt
         self.n_trials = n_trials
+        self.record_vsec = record_vsec
+        self.record_isec = record_isec
+        self.postproc = postproc
 
     def run(self, param_grid, return_output=True, combinations=True, n_jobs=1):
         """
@@ -122,8 +143,13 @@ class BatchSimulate:
             net = calcium_model()
         print(param_values)
         self.set_params(param_values, net)
-        dpl = simulate_dipole(net, tstop=self.tstop, dt=self.dt,
-                              n_trials=self.n_trials)
+        dpl = simulate_dipole(net,
+                              tstop=self.tstop,
+                              dt=self.dt,
+                              n_trials=self.n_trials,
+                              record_vsec=self.record_vsec,
+                              record_isec=self.record_isec,
+                              postproc=self.postproc)
 
         return {'net': net, 'dpl': dpl, 'param_values': param_values}
 
