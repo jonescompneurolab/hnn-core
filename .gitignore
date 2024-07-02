@@ -16,7 +16,8 @@ env/
 venv/
 ENV/
 VENV/
-
+hnn_core/mod/*
+test.*
 # Sphinx documentation
 doc/_build/**
 pip-log.txt
