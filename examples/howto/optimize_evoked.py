@@ -188,10 +188,10 @@ from hnn_core.optimization import Optimizer
 
 net = jones_2009_model()
 optim = Optimizer(net, tstop=tstop, constraints=constraints,
-                  set_params=set_params, scale_factor=scale_factor,
-                  smooth_window_len=smooth_window_len, max_iter=40)
+                  set_params=set_params)
 with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
-    optim.fit(exp_dpl)
+    optim.fit(target=exp_dpl, scale_factor=scale_factor,
+              smooth_window_len=smooth_window_len)
 
 ###############################################################################
 # Finally, we can plot the experimental data alongside the post-optimization
