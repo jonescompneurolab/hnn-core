@@ -167,10 +167,8 @@ def _set_from_cell_specific(drive_data):
     return drive_data['n_drive_cells']
 
 
-def _read_external_drive(net, drive_data, read_drives, read_output):
+def _read_external_drive(net, drive_data, read_output):
     """Adds drives encoded in json data to a Network"""
-    if not read_drives:
-        return None
 
     if (drive_data['type'] == 'evoked') or (drive_data['type'] == 'gaussian'):
         # Skipped n_drive_cells here
@@ -439,7 +437,7 @@ def read_network_configuration(fname, read_drives=True):
                                         net_data['external_drives'])
     for key in external_drive_data.keys():
         _read_external_drive(net, external_drive_data[key],
-                             read_output=False, read_drives=read_drives)
+                             read_output=False)
     # Set external biases
     net.external_biases = net_data['external_biases']
     # Set connectivity
@@ -450,5 +448,8 @@ def read_network_configuration(fname, read_drives=True):
     net.threshold = net_data['threshold']
     # Set delay
     net.delay = net_data['delay']
+
+    if not read_drives:
+        net.clear_drives()
 
     return net
