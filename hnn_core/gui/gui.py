@@ -32,6 +32,81 @@ import zipfile
 import numpy as np
 from copy import deepcopy
 
+cell_parameters_dic = {
+
+    "Geometry":
+    [
+        ('Soma lenght', 'micron'),
+        ('Soma diameter', 'micron'),
+        ('Soma capacitive density', 'F/cm2'),
+        ('Soma resistivity', 'ohm-cm'),
+        ('Dendrite capacitive density', 'F/cm2'),
+        ('Dendrite resistivity', 'ohm-cm'),
+        ('Apical Dendrite Trunk lenght', 'micron'),
+        ('Apical Dendrite 1 lenght', 'micron'),
+        ('Apical Dendrite 1 diameter', 'micron'),
+        ('Apical Dendrite Tuft lenght', 'micron'),
+        ('Apical Dendrite Tuft diameter', 'micron'),
+        ('Oblique Apical Dendrite lenght', 'micron'),
+        ('Oblique Apical Dendrite diameter', 'micron'),
+        ('Basal Dendrite 1 lenght', 'micron'),
+        ('Basal Dendrite 1 diameter', 'micron'),
+        ('Basal Dendrite 2 lenght', 'micron'),
+        ('Basal Dendrite 2 diameter', 'micron'),
+        ('Basal Dendrite 3 lenght', 'micron'),
+        ('Basal Dendrite 3 diameter', 'micron')
+    ],
+    "Synapses":
+    [
+        ('AMPA reversal', 'mV'),
+        ('AMPA rise time', 'ms'),
+        ('AMPA decay time', 'ms'),
+        ('NMDA reversal', 'mV'),
+        ('NMDA rise time', 'ms'),
+        ('NMDA decay time', 'ms'),
+        ('GABAA reversal', 'mV'),
+        ('GABAA rise time', 'ms'),
+        ('GABAA decay time', 'ms'),
+        ('GABAB reversal', 'mV'),
+        ('GABAB rise time', 'ms'),
+        ('GABAB decay time', 'ms')
+    ],
+    "Biophysics L2":
+    [
+        ('Soma Kv channel density', 'S/cm2'),
+        ('Soma Na channel density', 'S/cm2'),
+        ('Soma leak reversal', 'mV'),
+        ('Soma leak channel density', 'S/cm2'),
+        ('Soma Km channel density', 'pS/micron2'),
+        ('Dendrite Kv channel density', 'S/cm2'),
+        ('Dendrite Na channel density', 'S/cm2'),
+        ('Dendrite leak reversal', 'mV'),
+        ('Dendrite leak channel density', 'S/cm2'),
+        ('Dendrite Km channel density', 'pS/micron2')
+    ],
+    "Biophysics L5":
+    [
+        ('Soma Kv channel density', 'S/cm2'),
+        ('Soma Na channel density', 'S/cm2'),
+        ('Soma leak reversal', 'mV'),
+        ('Soma leak channel density', 'S/cm2'),
+        ('Soma Ca channel density', 'pS/micron2'),
+        ('Soma Ca decay time', 'ms'),
+        ('Soma Kca channel density', 'pS/micron2'),
+        ('Soma Km channel density', 'pS/micron2'),
+        ('Soma CaT channel density', 'S/cm2'),
+        ('Soma HCN channel density', 'S/cm2'),
+        ('Dendrite Kv channel density', 'S/cm2'),
+        ('Dendrite Na channel density', 'S/cm2'),
+        ('Dendrite leak reversal', 'mV'),
+        ('Dendrite leak channel density', 'S/cm2'),
+        ('Dendrite KCa channel density', 'pS/micron2'),
+        ('Dendrite Km channel density', 'pS/micron2'),
+        ('Dendrite CaT channel density', 'S/cm2'),
+        ('Dendrite HCN channel density', 'S/cm2')
+    ]
+}
+
 
 class _OutputWidgetHandler(logging.Handler):
     def __init__(self, output_widget, *args, **kwargs):
@@ -284,6 +359,13 @@ class HNNGUI:
             'Delete drives', 'success', layout=self.layout['btn'],
             button_color=self.layout['theme_color'])
 
+        self.cell_type_radio_button = RadioButtons(
+            options=['L2', 'L5'],
+            description='Cell type:')
+        self.cell_layer_radio_button = RadioButtons(
+            options=['Geometry', 'Synapses', 'Biophysics'],
+            description='Layer:')
+
         # Plotting window
 
         # Visualization figure related dicts
@@ -297,6 +379,9 @@ class HNNGUI:
 
         # Connectivity list
         self.connectivity_widgets = list()
+
+        # Cell parameter list
+        self.cell_pameters = dict()
 
         self._init_ui_components()
         self.add_logging_window_logger()
@@ -337,6 +422,7 @@ class HNNGUI:
         # dynamic larger components
         self._drives_out = Output()  # tab to add new drives
         self._connectivity_out = Output()  # tab to tune connectivity.
+        self._cell_params_out = Output()
 
         self._log_out = Output()
 
@@ -464,6 +550,16 @@ class HNNGUI:
             self.widget_location_selection.disabled = (
                 True if value.new == "Tonic" else False)
 
+        def _cell_type_radio_change(value):
+            _update_cell_params_vbox(self._cell_params_out, self.cell_pameters,
+                                     value.new,
+                                     self.cell_layer_radio_button.value)
+
+        def _cell_layer_radio_change(value):
+            _update_cell_params_vbox(self._cell_params_out, self.cell_pameters,
+                                     self.cell_type_radio_button.value,
+                                     value.new)
+
         self.widget_backend_selection.observe(_handle_backend_change, 'value')
         self.add_drive_button.on_click(_add_drive_button_clicked)
         self.delete_drive_button.on_click(_delete_drives_clicked)
@@ -474,6 +570,9 @@ class HNNGUI:
         self.load_data_button.observe(_on_upload_data, names='value')
         self.simulation_list_widget.observe(_simulation_list_change, 'value')
         self.widget_drive_type_selection.observe(_driver_type_change, 'value')
+
+        self.cell_type_radio_button.observe(_cell_type_radio_change, 'value')
+        self.cell_layer_radio_button.observe(_cell_layer_radio_change, 'value')
 
     def compose(self, return_layout=True):
         """Compose widgets.
@@ -491,19 +590,31 @@ class HNNGUI:
                 self._backend_config_out]),
         ], layout=self.layout['config_box'])
 
+        connectivity_configuration = Tab()
+
         connectivity_box = VBox([
             HBox([self.load_connectivity_button, ]),
             self._connectivity_out,
         ])
 
+        cell_parameters = VBox([
+            HBox([self.cell_type_radio_button, self.cell_layer_radio_button]),
+            self._cell_params_out
+        ])
+
+        connectivity_configuration.children = [connectivity_box,
+                                               cell_parameters]
+        connectivity_configuration.titles = ['Network connectivity',
+                                             'Cell Parameters']
+
         # accordions to group local-connectivity by cell type
-        connectivity_boxes = [
-            VBox(slider) for slider in self.connectivity_widgets]
-        connectivity_names = (
-            'Layer 2/3 Pyramidal', 'Layer 5 Pyramidal', 'Layer 2 Basket',
-            'Layer 5 Basket')
-        cell_connectivity = Accordion(children=connectivity_boxes)
-        cell_connectivity.titles = [s for s in connectivity_names]
+        # connectivity_boxes = [
+        #     VBox(slider) for slider in self.connectivity_widgets]
+        # connectivity_names = (
+        #     'Layer 2/3 Pyramidal', 'Layer 5 Pyramidal', 'Layer 2 Basket',
+        #     'Layer 5 Basket')
+        # cell_connectivity = Accordion(children=connectivity_boxes)
+        # cell_connectivity.titles = [s for s in connectivity_names]
 
         drive_selections = VBox([
             self.add_drive_button, self.widget_drive_type_selection,
@@ -523,10 +634,10 @@ class HNNGUI:
         # Tabs for left pane
         left_tab = Tab()
         left_tab.children = [
-            simulation_box, connectivity_box, drives_options,
+            simulation_box, connectivity_configuration, drives_options,
             config_panel,
         ]
-        titles = ('Simulation', 'Network connectivity', 'External drives',
+        titles = ('Simulation', 'Connectivity', 'External drives',
                   'Visualization')
         for idx, title in enumerate(titles):
             left_tab.set_title(idx, title)
@@ -558,6 +669,10 @@ class HNNGUI:
                                     self._drives_out, self.drive_widgets,
                                     self.drive_boxes, self._connectivity_out,
                                     self.connectivity_widgets,
+                                    self._cell_params_out,
+                                    self.cell_pameters,
+                                    self.cell_layer_radio_button,
+                                    self.cell_type_radio_button,
                                     self.widget_tstop, self.layout)
 
         if not return_layout:
@@ -1167,11 +1282,25 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
             display(accordion)
 
 
-def add_connectivity_tab(params, connectivity_out,
-                         connectivity_textfields):
+def add_connectivity_tab(params, connectivity_out, connectivity_textfields,
+                         cell_params_out, cell_pameters_vboxes,
+                         cell_layer_radio_button, cell_type_radio_button):
     """Add all possible connectivity boxes to connectivity tab."""
     net = jones_2009_model(params)
-    cell_types = [ct for ct in net.cell_types.keys()]
+
+    # build network connectivity tab
+    add_network_connectivity_tab(net, connectivity_out,
+                                 connectivity_textfields)
+
+    # build cell parameters tab
+    add_cell_parameters_tab(net, cell_params_out, cell_pameters_vboxes,
+                            cell_layer_radio_button, cell_type_radio_button)
+    return net
+
+
+def add_network_connectivity_tab(network, connectivity_out,
+                                 connectivity_textfields):
+    cell_types = [ct for ct in network.cell_types.keys()]
     receptors = ('ampa', 'nmda', 'gabaa', 'gabab')
     locations = ('proximal', 'distal', 'soma')
 
@@ -1187,7 +1316,7 @@ def add_connectivity_tab(params, connectivity_out,
                 # the connectivity list should be built on this level
                 receptor_related_conn = {}
                 for receptor in receptors:
-                    conn_indices = pick_connection(net=net,
+                    conn_indices = pick_connection(net=network,
                                                    src_gids=src_gids,
                                                    target_gids=target_gids,
                                                    loc=location,
@@ -1195,9 +1324,9 @@ def add_connectivity_tab(params, connectivity_out,
                     if len(conn_indices) > 0:
                         assert len(conn_indices) == 1
                         conn_idx = conn_indices[0]
-                        current_w = net.connectivity[
+                        current_w = network.connectivity[
                             conn_idx]['nc_dict']['A_weight']
-                        current_p = net.connectivity[
+                        current_p = network.connectivity[
                             conn_idx]['probability']
                         # valid connection
                         receptor_related_conn[receptor] = {
@@ -1223,7 +1352,57 @@ def add_connectivity_tab(params, connectivity_out,
     with connectivity_out:
         display(cell_connectivity)
 
-    return net
+    return network
+
+
+def add_cell_parameters_tab(network, cell_params_out, cell_pameters_vboxes,
+                            cell_layer_radio_button, cell_type_radio_button):
+
+    cell_types = ["L2", "L5"]
+    # get_cell_params_dic_values(network.cell_types)
+    for cell_type in cell_types:
+        layer_parameters = list()
+        for layer in cell_parameters_dic.keys():
+            if layer == 'Biophysics' and cell_type not in layer:
+                continue
+
+            for parameter in cell_parameters_dic[layer]:
+                param_name = parameter[0]
+                param_units = parameter[1]
+                descrption = f"{param_name} ({param_units})"
+                text_field = BoundedFloatText(value=0.0,
+                                              min=0,
+                                              max=10.0,
+                                              step=0.1,
+                                              description=descrption,
+                                              disabled=False)
+                layer_parameters.append(text_field)
+            cell_pameters_key = cell_type + "_" + layer
+            cell_pameters_vboxes[cell_pameters_key] = VBox(layer_parameters)
+            layer_parameters.clear()
+
+    # clear existing connectivity
+    cell_params_out.clear_output()
+    # while len(cell_params_out) > 0:
+    #     cell_params_out.pop()
+    #     cell_params_out.pop()
+
+    # Add cell parameters
+    display(_update_cell_params_vbox(cell_params_out,
+                                     cell_pameters_vboxes,
+                                     cell_type_radio_button.value,
+                                     cell_layer_radio_button.value))
+
+
+def get_cell_params_dic_values(network_cell_types):
+    # cell_types = [ct for ct in network_cell_types.keys()
+    #               if "pyramidal" in ct]
+    ...
+    # for type in cell_types:
+    #     cell_type = network_cell_types[type]
+    #     # get geometry params
+
+    #     cell_types.sections['soma']
 
 
 def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
@@ -1270,12 +1449,16 @@ def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
 
 def load_drive_and_connectivity(params, log_out, drives_out,
                                 drive_widgets, drive_boxes, connectivity_out,
-                                connectivity_textfields, tstop, layout):
+                                connectivity_textfields, cell_params_out,
+                                cell_pameters_vboxes, cell_layer_radio_button,
+                                cell_type_radio_button, tstop, layout):
     """Add drive and connectivity ipywidgets from params."""
     with log_out:
         # Add connectivity
-        add_connectivity_tab(params, connectivity_out,
-                             connectivity_textfields)
+        add_connectivity_tab(params, connectivity_out, connectivity_textfields,
+                             cell_params_out, cell_pameters_vboxes,
+                             cell_layer_radio_button, cell_type_radio_button)
+
         # Add drives
         add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
                       tstop, layout)
@@ -1516,6 +1699,18 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
                                           plot_type, {}, "plot")
 
 
+def _update_cell_params_vbox(cell_type_out, cell_parameters_list,
+                             cell_type, cell_layer):
+    cell_parameters_key = f"{cell_type}_{cell_layer}"
+    if "Biophysics" in cell_layer:
+        cell_parameters_key += f" {cell_type}"
+
+    if cell_parameters_key in cell_parameters_key:
+        cell_type_out.clear_output()
+        with cell_type_out:
+            display(cell_parameters_list[cell_parameters_key])
+
+
 def _serialize_simulation(log_out, sim_data, simulation_list_widget):
     # Only download if there is there is at least one simulation
     sim_name = simulation_list_widget.value
@@ -1594,5 +1789,9 @@ def launch():
     You can pass voila commandline parameters as usual.
     """
     from voila.app import main
+    import debugpy
+    debugpy.listen(5678)
+    print("Waiting for debugger attach")
+    debugpy.wait_for_client()
     notebook_path = Path(__file__).parent / 'hnn_widget.ipynb'
     main([str(notebook_path.resolve()), *sys.argv[1:]])
