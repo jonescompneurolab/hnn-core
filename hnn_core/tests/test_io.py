@@ -323,6 +323,19 @@ def test_read_configuration_json(jones_2009_network):
                                      )
     assert net == jones_2009_network
 
+    # Read without drives
+    net_no_drives = read_network_configuration(
+        Path(assets_path, 'jones2009_3x3_drives.json'),
+        read_drives=False
+    )
+    # Check there are no external drives
+    assert len(net_no_drives.external_drives) == 0
+    # Check there are no external drive connections
+    connection_src_types = [connection['src_type']
+                            for connection in net_no_drives.connectivity]
+    assert not any([src_type in net.external_drives.keys()
+                    for src_type in connection_src_types])
+
 
 def test_read_incorrect_format(tmp_path):
     """Test that error raise when the json do not have a Network label."""
