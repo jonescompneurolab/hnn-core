@@ -33,6 +33,8 @@ import zipfile
 import numpy as np
 from copy import deepcopy
 
+hnn_core_root = Path(hnn_core.__file__).parent
+default_network_configuration = hnn_core_root / 'param/default_hierarchical.json'
 
 class _OutputWidgetHandler(logging.Handler):
     def __init__(self, output_widget, *args, **kwargs):
@@ -138,6 +140,7 @@ class HNNGUI:
                  log_window_height=150,
                  status_height=30,
                  dpi=96,
+                 network_configuration=default_network_configuration
                  ):
         # set up styling.
         self.total_height = total_height
@@ -207,7 +210,7 @@ class HNNGUI:
         }
 
         # load default parameters
-        self.params = self.load_parameters()
+        self.params = self.load_parameters(network_configuration)
 
         # In-memory storage of all simulation and visualization related data
         self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
@@ -383,11 +386,6 @@ class HNNGUI:
     @staticmethod
     def load_parameters(params_fname=None):
         """Read parameters from file."""
-        if not params_fname:
-            # by default load default.json
-            hnn_core_root = Path(hnn_core.__file__).parent
-            params_fname = hnn_core_root / 'param/default_hierarchical.json'
-
         with open(params_fname, 'r') as file:
             parameters = json.load(file)
 
