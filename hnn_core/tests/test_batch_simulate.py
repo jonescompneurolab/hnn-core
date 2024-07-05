@@ -6,7 +6,7 @@
 import pytest
 import numpy as np
 
-from hnn_core import BatchSimulate
+from hnn_core.batch_simulate import BatchSimulate
 
 
 @pytest.fixture

@@ -1,4 +1,4 @@
-"""Batch simulation."""
+"""Batch Simulation."""
 
 # Authors: Abdul Samad Siddiqui <abdulsamadsid1@gmail.com>
 #          Nick Tolley <nicholas_tolley@brown.edu>
@@ -6,23 +6,26 @@
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
 from joblib import Parallel, delayed
-from hnn_core import simulate_dipole
-from hnn_core.network_models import (jones_2009_model,
-                                     calcium_model, law_2021_model)
+from .dipole import simulate_dipole
+from .network_models import (jones_2009_model,
+                             calcium_model, law_2021_model)
 
 
 class BatchSimulate:
     def __init__(self, set_params, net_name='jones', tstop=170,
                  dt=0.025, n_trials=1, record_vsec=False,
                  record_isec=False, postproc=False):
-        """
-        Initialize the BatchSimulate class.
+        """Initialize the BatchSimulate class.
 
         Parameters
         ----------
         set_params : func
             User-defined function that sets parameters in network drives.
-            `set_params(net, params) -> None`
+
+                ``set_params(net, params) -> None``
+
+            where ``net`` is a Network object and ``params`` is a dictionary
+            of the parameters that will be set inside the function.
         net_name : str
             The name of the network model to use. Default is `jones`.
         tstop : float, optional
@@ -59,8 +62,7 @@ class BatchSimulate:
         self.postproc = postproc
 
     def run(self, param_grid, return_output=True, combinations=True, n_jobs=1):
-        """
-        Run batch simulations.
+        """Run batch simulations.
 
         Parameters
         ----------
@@ -88,8 +90,7 @@ class BatchSimulate:
             return results
 
     def simulate_batch(self, param_combinations, n_jobs=1):
-        """
-        Simulate a batch of parameter sets in parallel.
+        """Simulate a batch of parameter sets in parallel.
 
         Parameters
         ----------
@@ -113,8 +114,7 @@ class BatchSimulate:
         return res
 
     def _run_single_sim(self, param_values):
-        """
-        Run a single simulation.
+        """Run a single simulation.
 
         Parameters
         ----------
@@ -154,8 +154,7 @@ class BatchSimulate:
         return {'net': net, 'dpl': dpl, 'param_values': param_values}
 
     def _generate_param_combinations(self, param_grid, combinations=True):
-        """
-        Generate combinations of parameters from the grid.
+        """Generate combinations of parameters from the grid.
 
         Parameters
         ----------
