@@ -1,6 +1,6 @@
 """
 ====================
-06. Batch Simulation
+07. Batch Simulation
 ====================
 
 This example shows how to do batch simulations in HNN-core, allowing users to
@@ -13,17 +13,17 @@ for comprehensive analysis.
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
-#############################################################################
+###############################################################################
 # Let us import ``hnn_core``.
 
 import hnn_core
 import numpy as np
-from hnn_core import BatchSimulate
-from hnn_core.network_models import jones_2009_model
+from hnn_core.batch_simulate import BatchSimulate
+from hnn_core import jones_2009_model
 
 # The number of cores may need modifying depending on your current machine.
 n_jobs = 10
-###########################################################################
+###############################################################################
 
 
 def set_params(param_values, net=None):
@@ -57,7 +57,8 @@ def set_params(param_values, net=None):
                          weights_ampa=weights_ampa,
                          synaptic_delays=synaptic_delays)
 
-###########################################################################
+###############################################################################
+# Define a parameter grid for the batch simulation.
 
 
 param_grid = {
@@ -66,6 +67,9 @@ param_grid = {
     'mu': np.linspace(20, 80, 5),
     'sigma': np.linspace(1, 20, 5)
 }
+
+###############################################################################
+# Run the batch simulation and collect the results.
 
 batch_simulation = BatchSimulate(set_params=set_params)
 simulation_results = batch_simulation.run(param_grid,
