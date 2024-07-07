@@ -503,7 +503,7 @@ class HNNGUI:
                 self._log_out, self.drive_boxes, self.drive_widgets,
                 self._drives_out, self._connectivity_out,
                 self.connectivity_widgets, self._cell_params_out,
-                self.cell_pameters_vboxes, self.cell_layer_radio_button,
+                self.cell_pameters, self.cell_layer_radio_button,
                 self.cell_type_radio_button, self.layout['drive_textbox'],
                 "connectivity")
 
