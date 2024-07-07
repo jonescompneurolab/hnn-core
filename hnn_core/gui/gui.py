@@ -502,7 +502,9 @@ class HNNGUI:
                 change, self.widget_tstop, self.widget_dt,
                 self._log_out, self.drive_boxes, self.drive_widgets,
                 self._drives_out, self._connectivity_out,
-                self.connectivity_widgets, self.layout['drive_textbox'],
+                self.connectivity_widgets, self._cell_params_out,
+                self.cell_pameters_vboxes, self.cell_layer_radio_button,
+                self.cell_type_radio_button, self.layout['drive_textbox'],
                 "connectivity")
 
         def _on_upload_drives(change):
@@ -510,7 +512,9 @@ class HNNGUI:
                 change, self.widget_tstop, self.widget_dt,
                 self._log_out, self.drive_boxes, self.drive_widgets,
                 self._drives_out, self._connectivity_out,
-                self.connectivity_widgets, self.layout['drive_textbox'],
+                self.connectivity_widgets, self._cell_params_out,
+                self.cell_pameters_vboxes, self.cell_layer_radio_button,
+                self.cell_type_radio_button, self.layout['drive_textbox'],
                 "drives")
 
         def _on_upload_data(change):
@@ -1369,12 +1373,12 @@ def add_cell_parameters_tab(network, cell_params_out, cell_pameters_vboxes,
             for parameter in cell_parameters_dic[layer]:
                 param_name = parameter[0]
                 param_units = parameter[1]
-                descrption = f"{param_name} ({param_units})"
+                description = f"{param_name} ({param_units})"
                 text_field = BoundedFloatText(value=0.0,
                                               min=0,
                                               max=10.0,
                                               step=0.1,
-                                              description=descrption,
+                                              description=description,
                                               disabled=False)
                 layer_parameters.append(text_field)
             cell_pameters_key = cell_type + "_" + layer
@@ -1500,7 +1504,9 @@ def on_upload_data_change(change, data, viz_manager, log_out):
 
 def on_upload_params_change(change, tstop, dt, log_out, drive_boxes,
                             drive_widgets, drives_out, connectivity_out,
-                            connectivity_textfields, layout, load_type):
+                            connectivity_textfields, cell_params_out,
+                            cell_pameters_vboxes, cell_layer_radio_button,
+                            cell_type_radio_button, layout, load_type):
     if len(change['owner'].value) == 0:
         return
     param_dict = change['new'][0]
@@ -1519,7 +1525,10 @@ def on_upload_params_change(change, tstop, dt, log_out, drive_boxes,
 
     # init network, add drives & connectivity
     if load_type == 'connectivity':
-        add_connectivity_tab(params, connectivity_out, connectivity_textfields)
+        add_connectivity_tab(params, connectivity_out,
+                             connectivity_textfields, cell_params_out,
+                             cell_pameters_vboxes, cell_layer_radio_button,
+                             cell_type_radio_button)
     elif load_type == 'drives':
         with log_out:
             add_drive_tab(params, log_out, drives_out, drive_widgets,
