@@ -193,6 +193,10 @@ def test_gui_add_drives():
             assert gui.drive_widgets[0]['type'] == val_drive_type
             assert gui.drive_widgets[0]['location'] == val_location
             assert val_drive_type in gui.drive_widgets[0]['name']
+            if 'tstop' in gui.drive_widgets[0]:
+                assert (gui.drive_widgets[0]['tstop'].value ==
+                        gui.widget_tstop.value)
+
     plt.close('all')
 
 
