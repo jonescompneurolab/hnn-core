@@ -213,7 +213,7 @@ API
 - Recorded calcium conncetration from the soma, as well as all sections, are enabled
   by setting `record_ca` to `soma` or `all` in :func:`~hnn_core.simulate_dipole`.
   Recordings are accessed through :class:`~hnn_core.CellResponse.ca`, 
-  by `Katharina Duecker`_ in :gh:`792`
+  by `Katharina Duecker`_ in :gh:`804`
 
 People who contributed to this release (in alphabetical order):
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
