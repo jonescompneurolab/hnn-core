@@ -18,7 +18,6 @@ from hnn_core.gui._viz_manager import (_idx2figname,
 from hnn_core.gui.gui import _init_network_from_widgets, _update_nested_dict
 from hnn_core.gui.gui import serialize_simulation
 from hnn_core.network import pick_connection
-from hnn_core.network_models import jones_2009_model
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 from hnn_core.hnn_io import _dict_to_network
 from IPython.display import IFrame
@@ -643,7 +642,9 @@ def test_gui_add_tonic_input(setup_gui):
     """Test if gui add different type of drives."""
     gui = setup_gui
     _single_simulation = {}
-    _single_simulation['net'] = jones_2009_model(gui.params)
+    _single_simulation['net'] = _dict_to_network(gui.params,
+                                                 read_drives=False,
+                                                 read_external_biases=False)
 
     # Add tonic input widget
     gui.widget_drive_type_selection.value = "Tonic"
