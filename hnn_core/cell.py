@@ -807,19 +807,6 @@ class Cell:
                     self.ca[sec_name].record(
                         self._nrn_sections[sec_name](0.5)._ref_cai)
 
-        # calcium concentration
-        if record_ca == 'soma':
-            self.ca = dict.fromkeys(['soma'])
-        elif record_ca == 'all':
-            self.ca = dict.fromkeys(section_names)
-
-        if record_ca:
-            for sec_name in self.ca:
-                if hasattr(self._nrn_sections[sec_name](0.5), '_ref_cai'):
-                    self.ca[sec_name] = h.Vector()
-                    self.ca[sec_name].record(
-                        self._nrn_sections[sec_name](0.5)._ref_cai)
-
     def syn_create(self, secloc, e, tau1, tau2):
         """Create an h.Exp2Syn synapse.
 
