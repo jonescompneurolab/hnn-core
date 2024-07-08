@@ -31,10 +31,9 @@ assets_path = Path(hnn_core_root, 'tests', 'assets')
 
 @pytest.fixture
 def setup_gui():
-    gui = HNNGUI()
+    gui = HNNGUI(network_configuration=assets_path /
+                 'jones2009_3x3_drives.json')
     gui.compose()
-    gui.params['N_pyr_x'] = 3
-    gui.params['N_pyr_y'] = 3
     gui.widget_dt.value = 0.5  # speed up tests
     gui.widget_tstop.value = 70  # speed up tests
     return gui
@@ -204,7 +203,7 @@ def test_gui_init_network():
     _ = gui.compose()
     # now the default parameter has been loaded.
     _single_simulation = {}
-    _single_simulation['net'] = jones_2009_model(gui.params)
+    _single_simulation['net'] = _dict_to_network(gui.params)
     _init_network_from_widgets(gui.params, gui.widget_dt, gui.widget_tstop,
                                _single_simulation, gui.drive_widgets,
                                gui.connectivity_widgets)
