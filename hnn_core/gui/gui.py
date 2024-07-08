@@ -1373,7 +1373,7 @@ def add_cell_parameters_tab(network, cell_params_out, cell_pameters_vboxes,
     for cell_type in cell_types:
         layer_parameters = list()
         for layer in cell_parameters_dic.keys():
-            if  f'Biophysic' in layer and cell_type not in layer:
+            if 'Biophysic' in layer and cell_type not in layer:
                 continue
 
             for parameter in cell_parameters_dic[layer]:
