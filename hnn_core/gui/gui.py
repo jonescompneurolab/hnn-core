@@ -1288,7 +1288,8 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
 
 def add_connectivity_tab(params, connectivity_out, connectivity_textfields,
                          cell_params_out, cell_pameters_vboxes,
-                         cell_layer_radio_button, cell_type_radio_button):
+                         cell_layer_radio_button, cell_type_radio_button,
+                         layout):
     """Add all possible connectivity boxes to connectivity tab."""
     net = jones_2009_model(params)
 
@@ -1298,7 +1299,8 @@ def add_connectivity_tab(params, connectivity_out, connectivity_textfields,
 
     # build cell parameters tab
     add_cell_parameters_tab(net, cell_params_out, cell_pameters_vboxes,
-                            cell_layer_radio_button, cell_type_radio_button)
+                            cell_layer_radio_button, cell_type_radio_button,
+                            layout)
     return net
 
 
@@ -1360,14 +1362,18 @@ def add_network_connectivity_tab(network, connectivity_out,
 
 
 def add_cell_parameters_tab(network, cell_params_out, cell_pameters_vboxes,
-                            cell_layer_radio_button, cell_type_radio_button):
+                            cell_layer_radio_button, cell_type_radio_button,
+                            layout):
 
     cell_types = ["L2", "L5"]
+    style = {'description_width': '235px'}
+    kwargs = dict(layout=layout, style=style)
+
     # get_cell_params_dic_values(network.cell_types)
     for cell_type in cell_types:
         layer_parameters = list()
         for layer in cell_parameters_dic.keys():
-            if layer == 'Biophysics' and cell_type not in layer:
+            if  f'Biophysic' in layer and cell_type not in layer:
                 continue
 
             for parameter in cell_parameters_dic[layer]:
@@ -1379,7 +1385,8 @@ def add_cell_parameters_tab(network, cell_params_out, cell_pameters_vboxes,
                                               max=10.0,
                                               step=0.1,
                                               description=description,
-                                              disabled=False)
+                                              disabled=False,
+                                              **kwargs)
                 layer_parameters.append(text_field)
             cell_pameters_key = cell_type + "_" + layer
             cell_pameters_vboxes[cell_pameters_key] = VBox(layer_parameters)
@@ -1461,7 +1468,8 @@ def load_drive_and_connectivity(params, log_out, drives_out,
         # Add connectivity
         add_connectivity_tab(params, connectivity_out, connectivity_textfields,
                              cell_params_out, cell_pameters_vboxes,
-                             cell_layer_radio_button, cell_type_radio_button)
+                             cell_layer_radio_button, cell_type_radio_button,
+                             layout)
 
         # Add drives
         add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
@@ -1528,7 +1536,7 @@ def on_upload_params_change(change, tstop, dt, log_out, drive_boxes,
         add_connectivity_tab(params, connectivity_out,
                              connectivity_textfields, cell_params_out,
                              cell_pameters_vboxes, cell_layer_radio_button,
-                             cell_type_radio_button)
+                             cell_type_radio_button, layout)
     elif load_type == 'drives':
         with log_out:
             add_drive_tab(params, log_out, drives_out, drive_widgets,
