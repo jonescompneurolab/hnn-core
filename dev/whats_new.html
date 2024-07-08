@@ -329,7 +329,7 @@ layers, by <a class="reference external" href="https://github.com/chenghuzi">Huz
 plotting local field potential (LFP) is now found at
 <a class="reference internal" href="generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray.plot_lfp" title="hnn_core.extracellular.ExtracellularArray.plot_lfp"><code class="xref py py-meth docutils literal notranslate"><span class="pre">plot_lfp()</span></code></a>, by
 <a class="reference external" href="https://github.com/spbrandt">Steven Brandt</a> and <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/517">#517</a>.</p></li>
-<li><p>Recorded voltages/currents from the soma, as well all sections, are enabled by
+<li><p>Recorded voltages/currents from the soma, as well as all sections, are enabled by
 setting either <em class="xref py py-obj">record_vsec</em> or <em class="xref py py-obj">record_isec</em> to <em class="xref py py-obj">‘all’</em> or <em class="xref py py-obj">‘soma’</em>
 in <a class="reference internal" href="generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole"><code class="xref py py-func docutils literal notranslate"><span class="pre">simulate_dipole()</span></code></a>. Recordings are now accessed through
 <code class="xref py py-class docutils literal notranslate"><span class="pre">vsec</span></code> and <code class="xref py py-class docutils literal notranslate"><span class="pre">isec</span></code>,
@@ -337,6 +337,10 @@ by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</
 <li><p>legacy_mode is now set to False by default in all for all
 <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> objects,
 by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> and <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/619">#619</a>.</p></li>
+<li><p>Recorded calcium conncetration from the soma, as well as all sections, are enabled
+by setting <em class="xref py py-obj">record_ca</em> to <em class="xref py py-obj">soma</em> or <em class="xref py py-obj">all</em> in <a class="reference internal" href="generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole"><code class="xref py py-func docutils literal notranslate"><span class="pre">simulate_dipole()</span></code></a>.
+Recordings are accessed through <code class="xref py py-class docutils literal notranslate"><span class="pre">ca</span></code>,
+by <a class="reference external" href="https://github.com/katduecker">Katharina Duecker</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/804">#804</a></p></li>
 </ul>
 </section>
 <section id="people-who-contributed-to-this-release-in-alphabetical-order">

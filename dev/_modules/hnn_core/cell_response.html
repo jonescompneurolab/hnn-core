@@ -193,6 +193,10 @@
 <span class="sd">    isec : list (n_trials,) of dict, shape</span>
 <span class="sd">        Each element of the outer list is a trial.</span>
 <span class="sd">        Dictionary indexed by gids containing currents for cell sections.</span>
+<span class="sd">    ca : list (n_trials,) of dict, shape</span>
+<span class="sd">        Each element of the outer list is a trial.</span>
+<span class="sd">        Dictionary indexed by gids containing calcium concentration</span>
+<span class="sd">        for cell sections.</span>
 <span class="sd">    times : array-like, shape (n_times,)</span>
 <span class="sd">        Array of time points for samples in continuous data.</span>
 <span class="sd">        This includes vsoma and isoma.</span>
@@ -252,6 +256,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_spike_types</span> <span class="o">=</span> <span class="n">spike_types</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vsec</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_isec</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ca</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">times</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;times&#39; is an np.ndarray of simulation times&quot;</span><span class="p">)</span>
@@ -275,7 +280,8 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_spike_gids</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_spike_gids</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_spike_types</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_spike_types</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">vsec</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">vsec</span> <span class="ow">and</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">isec</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">isec</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">isec</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">isec</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ca</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">ca</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CellResponse.__getitem__"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid_item</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a CellResponse object with a copied subset filtered by gid.</span>
@@ -364,6 +370,10 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">isec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isec</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ca</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ca</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -564,6 +574,12 @@
             <span class="c1"># Turn `int` gid keys into string values for hdf5 format</span>
             <span class="n">trial</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">trial</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
             <span class="n">cell_response_data</span><span class="p">[</span><span class="s1">&#39;isec&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trial</span><span class="p">)</span>
+        <span class="n">ca_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ca</span>
+        <span class="n">cell_response_data</span><span class="p">[</span><span class="s1">&#39;ca&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="n">ca_data</span><span class="p">:</span>
+            <span class="c1"># Turn `int` gid keys into string values for hdf5 format</span>
+            <span class="n">trial</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">trial</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+            <span class="n">cell_response_data</span><span class="p">[</span><span class="s1">&#39;ca&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trial</span><span class="p">)</span>
         <span class="n">cell_response_data</span><span class="p">[</span><span class="s1">&#39;times&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">times</span>
         <span class="k">return</span> <span class="n">cell_response_data</span></div>
 

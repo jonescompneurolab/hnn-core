@@ -156,10 +156,10 @@ Run the batch simulation and collect the results.
  .. code-block:: none
 
     [Parallel(n_jobs=10)]: Using backend LokyBackend with 10 concurrent workers.
-    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:  1.3min
-    [Parallel(n_jobs=10)]: Done   2 out of   5 | elapsed:  1.3min remaining:  2.0min
-    [Parallel(n_jobs=10)]: Done   3 out of   5 | elapsed:  1.3min remaining:   52.4s
-    [Parallel(n_jobs=10)]: Done   5 out of   5 | elapsed:  1.3min finished
+    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:  1.7min
+    [Parallel(n_jobs=10)]: Done   2 out of   5 | elapsed:  1.7min remaining:  2.5min
+    [Parallel(n_jobs=10)]: Done   3 out of   5 | elapsed:  1.7min remaining:  1.1min
+    [Parallel(n_jobs=10)]: Done   5 out of   5 | elapsed:  1.7min finished
 
 
 
@@ -167,7 +167,7 @@ Run the batch simulation and collect the results.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 18.969 seconds)
+   **Total running time of the script:** (1 minutes 40.064 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_batch_simulate.py:

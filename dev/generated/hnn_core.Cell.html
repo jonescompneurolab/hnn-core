@@ -229,6 +229,9 @@ by synapse type (keys can be soma_gabaa, soma_gabab etc.).
 Must be enabled by running simulate_dipole(net, record_isec=True)
 or simulate_dipole(net, record_isoma=True)</p>
 </dd>
+<dt><strong>ca</strong><span class="classifier">dict</span></dt><dd><p>Contains recording of section speicifc calcium concentration.
+Must be enabled by running simulate_dipole(net, record_ca=True).</p>
+</dd>
 <dt><strong>tonic_biases</strong><span class="classifier">list of h.IClamp</span></dt><dd><p>The current clamps inserted at each section of the cell
 for tonic biasing inputs.</p>
 </dd>
@@ -274,7 +277,7 @@ list of nodes (children nodes) connected to the parent node.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.plot_morphology" title="hnn_core.Cell.plot_morphology"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_morphology</span></code></a>([ax, color, pos, xlim, ...])</p></td>
 <td><p>Plot the cell morphology.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.record" title="hnn_core.Cell.record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record</span></code></a>([record_vsec, record_isec])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.record" title="hnn_core.Cell.record"><code class="xref py py-obj docutils literal notranslate"><span class="pre">record</span></code></a>([record_vsec, record_isec, record_ca])</p></td>
 <td><p>Record current and voltage from all sections</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.setup_source_netcon" title="hnn_core.Cell.setup_source_netcon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup_source_netcon</span></code></a>(threshold)</p></td>
@@ -470,7 +473,7 @@ defined in the <em class="xref py py-obj">Cell.sections</em> attribute.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Cell.record">
-<span class="sig-name descname"><span class="pre">record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_vsec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_isec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.record" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record_vsec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_isec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_ca</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.record" title="Permalink to this definition">¶</a></dt>
 <dd><p>Record current and voltage from all sections</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -480,6 +483,9 @@ the soma (‘soma’). Default: False.</p>
 </dd>
 <dt><strong>record_isec</strong><span class="classifier">‘all’ | ‘soma’ | False</span></dt><dd><p>Option to record voltages from all sections (‘all’), or just
 the soma (‘soma’). Default: False.</p>
+</dd>
+<dt><strong>record_ca</strong><span class="classifier">‘all’ | ‘soma’ | False</span></dt><dd><p>Option to record calcium concentration from all sections (‘all’),
+or just the soma (‘soma’). Default: False.</p>
 </dd>
 </dl>
 </dd>
