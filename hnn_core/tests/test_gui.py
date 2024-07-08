@@ -156,7 +156,9 @@ def test_gui_change_connectivity():
                 vbox.children[1].value = w_val
 
                 # Original Value
-                original_value = _single_simulation['net'].connectivity[conn_idx]['nc_dict']['A_weight']
+                original_value = (_single_simulation['net']
+                                  .connectivity[conn_idx]
+                                  ['nc_dict']['A_weight'])
 
                 # re-initialize network
                 _init_network_from_widgets(gui.params, gui.widget_dt,
@@ -236,7 +238,6 @@ def test_gui_run_simulation_mpi(setup_gui):
 def test_gui_run_simulations(setup_gui):
     """Test if run button triggers multiple simulations correctly."""
     gui = setup_gui
-
     tstop_trials_tstep = [(10, 1, 0.25),
                           (10, 2, 0.5),
                           (12, 1, 0.5)]

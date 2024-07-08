@@ -34,7 +34,9 @@ import numpy as np
 from copy import deepcopy
 
 hnn_core_root = Path(hnn_core.__file__).parent
-default_network_configuration = hnn_core_root / 'param/default_hierarchical.json'
+default_network_configuration = (hnn_core_root /
+                                 'param/default_hierarchical.json')
+
 
 class _OutputWidgetHandler(logging.Handler):
     def __init__(self, output_widget, *args, **kwargs):
@@ -761,10 +763,9 @@ def _update_nested_dict(original, update):
     """
     original = original.copy()
     for key, value in update.items():
-        if (isinstance(value, dict)
-                and key in original
-                and isinstance(original[key], dict)
-        ):
+        if (isinstance(value, dict) and
+                key in original and
+                isinstance(original[key], dict)):
             original[key] = _update_nested_dict(original[key], value)
         else:
             original[key] = value
@@ -1388,7 +1389,9 @@ def on_upload_params_change(change, tstop, dt, log_out, drive_boxes,
 
         # init network, add drives & connectivity
         if load_type == 'connectivity':
-            add_connectivity_tab(params, connectivity_out, connectivity_textfields)
+            add_connectivity_tab(params,
+                                 connectivity_out,
+                                 connectivity_textfields)
         elif load_type == 'drives':
             add_drive_tab(params, log_out, drives_out, drive_widgets,
                           drive_boxes, tstop, layout)
