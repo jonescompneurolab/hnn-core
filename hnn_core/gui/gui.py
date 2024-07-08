@@ -878,7 +878,11 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
         'seedcore': 14,
     }
     if isinstance(data, dict):
+        # If stop time is not defined, set it to the end of simulation
+        if 'tstop' in data and not data['tstop']:
+            data['tstop'] = tstop_widget.value
         default_data.update(data)
+
     kwargs = dict(layout=layout, style=style)
     tstart = BoundedFloatText(
         value=default_data['tstart'], description='Start time (ms)',
@@ -954,7 +958,11 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
         }
     }
     if isinstance(data, dict):
+        # If stop time is not defined, set it to the end of simulation
+        if 'tstop' in data and not data['tstop']:
+            data['tstop'] = tstop_widget.value
         default_data = _update_nested_dict(default_data, data)
+
     tstart = BoundedFloatText(
         value=default_data['tstart'], description='Start time (ms)',
         min=0, max=1e6, layout=layout, style=style)
