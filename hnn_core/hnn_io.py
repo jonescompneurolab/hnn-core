@@ -381,7 +381,7 @@ def _order_drives(gid_ranges, external_drives):
     return ordered_drives
 
 
-def _dict_to_network(net_data, read_drives=True):
+def _dict_to_network(net_data, read_drives=True, read_external_biases=True):
     """ Convert dict of configurations to Network """
 
     # Importing Network.
@@ -421,7 +421,8 @@ def _dict_to_network(net_data, read_drives=True):
         _read_external_drive(net, external_drive_data[key],
                              read_output=False)
     # Set external biases
-    net.external_biases = net_data['external_biases']
+    if read_external_biases:
+        net.external_biases = net_data['external_biases']
     # Set connectivity
     _read_connectivity(net, net_data['connectivity'])
     # Set rec_arrays
@@ -438,7 +439,9 @@ def _dict_to_network(net_data, read_drives=True):
 
 
 @fill_doc
-def read_network_configuration(fname, read_drives=True):
+def read_network_configuration(fname,
+                               read_drives=True,
+                               read_external_biases=True):
     """Read network from a json configuration file.
 
     Parameters
@@ -459,6 +462,6 @@ def read_network_configuration(fname, read_drives=True):
                          'The file contains object of '
                          'type %s' % (net_data.get('object_type')))
 
-    net = _dict_to_network(net_data, read_drives)
+    net = _dict_to_network(net_data, read_drives, read_external_biases)
 
     return net
