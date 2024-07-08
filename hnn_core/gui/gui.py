@@ -871,7 +871,7 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
     default_data = {
         'tstart': 0.,
         'tstart_std': 0.,
-        'tstop': 0.,
+        'tstop': tstop_widget.value,
         'burst_rate': 7.5,
         'burst_std': 0,
         'repeats': 1,
@@ -944,7 +944,7 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
                         default_delays=None, sync_evinput=False):
     default_data = {
         'tstart': 0.0,
-        'tstop': 0.0,
+        'tstop': tstop_widget.value,
         'seedcore': 14,
         'rate_constant': {
             'L5_pyramidal': 40,
