@@ -141,7 +141,8 @@ def test_gui_change_connectivity():
         for vbox in connectivity_field:
             for w_val in (0.2, 0.9):
                 _single_simulation = {}
-                _single_simulation['net'] = _dict_to_network(gui.params)
+                _single_simulation['net'] = _dict_to_network(gui.params,
+                                                             read_drives=False)
                 # specify connection
                 conn_indices = pick_connection(
                     net=_single_simulation['net'],
