@@ -71,6 +71,9 @@ Changelog
 - Add :class:`~hnn_core.BatchSimulate` for batch simulation capability,
   by `Abdul Samad Siddiqui`_ in :gh:`782`.
 
+- Updated `plot_spikes_raster` logic to include all neurons in network model.
+  Removed GUI exclusion from build, by `Abdul Samad Siddiqui`_  in :gh:`754`.
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
