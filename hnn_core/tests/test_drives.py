@@ -5,6 +5,7 @@ import pytest
 import os.path as op
 
 import numpy as np
+import pytest
 
 import hnn_core
 from hnn_core import Network, read_params
@@ -15,6 +16,14 @@ from hnn_core.network_models import jones_2009_model
 from hnn_core import simulate_dipole
 hnn_core_root = op.dirname(hnn_core.__file__)
 
+@pytest.fixture
+def setup_net():
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+    net = jones_2009_model(params, mesh_shape=(3, 3))
+
+    return net
 
 def test_external_drive_times():
     """Test the different external drives."""
@@ -83,6 +92,27 @@ def test_external_drive_times():
                              events_per_cycle=events_per_cycle,
                              cycle_events_isi=cycle_events_isi,
                              prng=prng, prng2=prng2)
+
+
+def test_drive_seeds(setup_net):
+    """Test that unique spike times are generated across trials"""
+    net = setup_net
+    weights_ampa = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
+                    'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
+    synaptic_delays = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                       'L5_basket': 1., 'L5_pyramidal': 1.}
+    net.add_evoked_drive(
+        'prox', mu=40, sigma=8.33, numspikes=1,
+        weights_ampa=weights_ampa, location='proximal',
+        synaptic_delays=synaptic_delays, event_seed=1)
+
+    _ = simulate_dipole(net, tstop=100, dt=0.5, n_trials=2)
+    trial1_spikes = np.array(sorted(
+        net.external_drives['prox']['events'][0])).squeeze()
+    trial2_spikes = np.array(sorted(
+        net.external_drives['prox']['events'][1])).squeeze()
+    # No two spikes should be perfectly identical across seeds
+    assert ~np.any(trial1_spikes == trial2_spikes)
 
 
 def test_add_drives():

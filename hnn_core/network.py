@@ -1097,6 +1097,7 @@ class Network:
                 for drive_cell_gid in self.gid_ranges[drive['name']]:
                     drive_cell_gid_offset = (drive_cell_gid -
                                              self.gid_ranges[drive['name']][0])
+                    trial_seed_offset = self._n_gids
                     if drive['cell_specific']:
                         # loop over drives (one for each target cell
                         # population) and create event times
@@ -1113,7 +1114,8 @@ class Network:
                                 trial_idx=trial_idx,
                                 drive_cell_gid=drive_cell_gid_offset,
                                 event_seed=drive['event_seed'],
-                                tstop=tstop)
+                                tstop=tstop,
+                                trial_seed_offset=trial_seed_offset)
                             )
                     else:
                         src_event_times = _drive_cell_event_times(
@@ -1123,7 +1125,8 @@ class Network:
                             target_type='any',
                             trial_idx=trial_idx,
                             drive_cell_gid=drive_cell_gid_offset,
-                            event_seed=drive['event_seed'])
+                            event_seed=drive['event_seed'],
+                            trial_seed_offset=trial_seed_offset)
                         event_times.append(src_event_times)
                 # 'events': nested list (n_trials x n_drive_cells x n_events)
                 self.external_drives[
