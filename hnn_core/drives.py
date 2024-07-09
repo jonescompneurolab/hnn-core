@@ -231,7 +231,8 @@ def _get_prng(seed, gid):
 
 
 def _drive_cell_event_times(drive_type, dynamics, tstop, target_type='any',
-                            trial_idx=0, drive_cell_gid=0, event_seed=0):
+                            trial_idx=0, drive_cell_gid=0, event_seed=0,
+                            trial_seed_offset=0):
     """Generate event times for one artificial drive cell based on dynamics.
 
     Parameters
@@ -256,13 +257,15 @@ def _drive_cell_event_times(drive_type, dynamics, tstop, target_type='any',
         Optional gid of current artificial cell (used for seeding)
     event_seed : int
         Optional initial seed for random number generator.
+    trial_seed_offset : int
+        Seed is incremented by this amount for each trial.
 
     Returns
     -------
     event_times : list
         The event times at which spikes occur.
     """
-    prng, prng2 = _get_prng(seed=event_seed + trial_idx,
+    prng, prng2 = _get_prng(seed=event_seed + trial_idx * trial_seed_offset,
                             gid=drive_cell_gid)
 
     # check drive name validity, allowing substring matches
