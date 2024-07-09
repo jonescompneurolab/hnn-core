@@ -109,9 +109,9 @@ def test_drive_seeds(setup_net):
 
     _ = simulate_dipole(net, tstop=100, dt=0.5, n_trials=2)
     trial1_spikes = np.array(sorted(
-        net.external_drives['prox']['events'][0])).squeeze()
+        net.external_drives['prox']['events'][0]))
     trial2_spikes = np.array(sorted(
-        net.external_drives['prox']['events'][1])).squeeze()
+        net.external_drives['prox']['events'][1]))
     # No two spikes should be perfectly identical across seeds
     assert ~np.any(trial1_spikes == trial2_spikes)
 
