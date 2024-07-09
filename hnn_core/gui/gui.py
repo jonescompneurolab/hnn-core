@@ -26,6 +26,8 @@ from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
 from hnn_core.params import _extract_drive_specs_from_hnn_params
 from hnn_core.dipole import _read_dipole_txt
+from hnn_core.params_default import (get_L2Pyr_params_default,
+                                     get_L5Pyr_params_default)
 
 import base64
 import zipfile
@@ -1366,8 +1368,9 @@ def add_network_connectivity_tab(network, connectivity_out,
 def add_cell_parameters_tab(network, cell_params_out, cell_pameters_vboxes,
                             cell_layer_radio_button, cell_type_radio_button,
                             layout):
-
-    cell_types = ["L2", "L5"]
+    L2_defautl_values = get_L2Pyr_params_default()
+    L5_default_values = get_L5Pyr_params_default()
+    cell_types = [("L2", L2_defautl_values), ("L5", L5_default_values)]
     style = {'description_width': '235px'}
     kwargs = dict(layout=layout, style=style)
 
@@ -1375,22 +1378,26 @@ def add_cell_parameters_tab(network, cell_params_out, cell_pameters_vboxes,
     for cell_type in cell_types:
         layer_parameters = list()
         for layer in cell_parameters_dict.keys():
-            if 'Biophysic' in layer and cell_type not in layer:
+            if 'Biophysic' in layer and cell_type[0] not in layer:
                 continue
 
             for parameter in cell_parameters_dict[layer]:
-                param_name = parameter[0]
-                param_units = parameter[1]
+                param_name, param_units, params_key = (parameter[0],
+                                                       parameter[1],
+                                                       parameter[2])
+                default_value = get_cell_param_default_value(
+                    f'{cell_type[0]}Pyr_{params_key}', cell_type[1])
                 description = f"{param_name} ({param_units})"
-                text_field = BoundedFloatText(value=0.0,
-                                              min=0,
-                                              max=10.0,
+                min_value = -1000.0 if param_units not in 'ms' else 0
+                text_field = BoundedFloatText(value=default_value,
+                                              min=min_value,
+                                              max=1000.0,
                                               step=0.1,
                                               description=description,
                                               disabled=False,
                                               **kwargs)
                 layer_parameters.append(text_field)
-            cell_pameters_key = cell_type + "_" + layer
+            cell_pameters_key = f'{cell_type[0]}_{layer}'
             cell_pameters_vboxes[cell_pameters_key] = VBox(layer_parameters)
             layer_parameters.clear()
 
@@ -1405,6 +1412,10 @@ def add_cell_parameters_tab(network, cell_params_out, cell_pameters_vboxes,
                                      cell_pameters_vboxes,
                                      cell_type_radio_button.value,
                                      cell_layer_radio_button.value))
+
+
+def get_cell_param_default_value(cell_type_key, param_dict):
+    return param_dict[cell_type_key]
 
 
 def get_cell_params_dic_values(network_cell_types):
