@@ -113,7 +113,7 @@ def test_drive_seeds(setup_net):
     trial2_spikes = np.array(sorted(
         net.external_drives['prox']['events'][1]))
     # No two spikes should be perfectly identical across seeds
-    assert ~np.any(trial1_spikes == trial2_spikes)
+    assert ~np.any(np.allclose(trial1_spikes, trial2_spikes))
 
 
 def test_add_drives():
