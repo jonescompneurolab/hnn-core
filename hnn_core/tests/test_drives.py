@@ -5,7 +5,6 @@ import pytest
 import os.path as op
 
 import numpy as np
-import pytest
 
 import hnn_core
 from hnn_core import Network, read_params
@@ -16,6 +15,7 @@ from hnn_core.network_models import jones_2009_model
 from hnn_core import simulate_dipole
 hnn_core_root = op.dirname(hnn_core.__file__)
 
+
 @pytest.fixture
 def setup_net():
     hnn_core_root = op.dirname(hnn_core.__file__)
@@ -24,6 +24,7 @@ def setup_net():
     net = jones_2009_model(params, mesh_shape=(3, 3))
 
     return net
+
 
 def test_external_drive_times():
     """Test the different external drives."""
