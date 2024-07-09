@@ -32,78 +32,80 @@ import zipfile
 import numpy as np
 from copy import deepcopy
 
-cell_parameters_dic = {
+cell_parameters_dict = {
 
     "Geometry":
     [
-        ('Soma lenght', 'micron'),
-        ('Soma diameter', 'micron'),
-        ('Soma capacitive density', 'F/cm2'),
-        ('Soma resistivity', 'ohm-cm'),
-        ('Dendrite capacitive density', 'F/cm2'),
-        ('Dendrite resistivity', 'ohm-cm'),
-        ('Apical Dendrite Trunk lenght', 'micron'),
-        ('Apical Dendrite 1 lenght', 'micron'),
-        ('Apical Dendrite 1 diameter', 'micron'),
-        ('Apical Dendrite Tuft lenght', 'micron'),
-        ('Apical Dendrite Tuft diameter', 'micron'),
-        ('Oblique Apical Dendrite lenght', 'micron'),
-        ('Oblique Apical Dendrite diameter', 'micron'),
-        ('Basal Dendrite 1 lenght', 'micron'),
-        ('Basal Dendrite 1 diameter', 'micron'),
-        ('Basal Dendrite 2 lenght', 'micron'),
-        ('Basal Dendrite 2 diameter', 'micron'),
-        ('Basal Dendrite 3 lenght', 'micron'),
-        ('Basal Dendrite 3 diameter', 'micron')
+        ('Soma length', 'micron', 'soma_L'),
+        ('Soma diameter', 'micron', 'soma_diam'),
+        ('Soma capacitive density', 'F/cm2', 'soma_cm'),
+        ('Soma resistivity', 'ohm-cm', 'soma_Ra'),
+        ('Dendrite capacitive density', 'F/cm2', 'dend_cm'),
+        ('Dendrite resistivity', 'ohm-cm', 'dend_Ra'),
+        ('Apical Dendrite Trunk length', 'micron', 'apicaltrunk_L'),
+        ('Apical Dendrite 1 length', 'micron', 'apicaltrunk_diam'),
+        ('Apical Dendrite 1 diameter', 'micron', 'apical1_L'),
+        ('Apical Dendrite Tuft length', 'micron', 'apicaltuft_L'),
+        ('Apical Dendrite Tuft diameter', 'micron', 'apicaltuft_diam'),
+        ('Oblique Apical Dendrite length', 'micron', 'apicaloblique_L'),
+        ('Oblique Apical Dendrite diameter', 'micron', 'apicaloblique_diam'),
+        ('Basal Dendrite 1 length', 'micron', 'basal1_L'),
+        ('Basal Dendrite 1 diameter', 'micron', 'basal1_diam'),
+        ('Basal Dendrite 2 length', 'micron', 'basal2_L'),
+        ('Basal Dendrite 2 diameter', 'micron', 'basal2_diam'),
+        ('Basal Dendrite 3 length', 'micron', 'basal3_L'),
+        ('Basal Dendrite 3 diameter', 'micron', 'basal3_diam')
     ],
     "Synapses":
     [
-        ('AMPA reversal', 'mV'),
-        ('AMPA rise time', 'ms'),
-        ('AMPA decay time', 'ms'),
-        ('NMDA reversal', 'mV'),
-        ('NMDA rise time', 'ms'),
-        ('NMDA decay time', 'ms'),
-        ('GABAA reversal', 'mV'),
-        ('GABAA rise time', 'ms'),
-        ('GABAA decay time', 'ms'),
-        ('GABAB reversal', 'mV'),
-        ('GABAB rise time', 'ms'),
-        ('GABAB decay time', 'ms')
+        ('AMPA reversal', 'mV', 'ampa_e'),
+        ('AMPA rise time', 'ms', 'ampa_tau1'),
+        ('AMPA decay time', 'ms', 'ampa_tau2'),
+        ('NMDA reversal', 'mV', 'nmda_e'),
+        ('NMDA rise time', 'ms', 'nmda_tau1'),
+        ('NMDA decay time', 'ms', 'nmda_tau2'),
+        ('GABAA reversal', 'mV', 'gabaa_e'),
+        ('GABAA rise time', 'ms', 'gabaa_tau1'),
+        ('GABAA decay time', 'ms', 'gabaa_tau2'),
+        ('GABAB reversal', 'mV', 'gabab_e'),
+        ('GABAB rise time', 'ms', 'gabab_tau1'),
+        ('GABAB decay time', 'ms', 'gabab_tau2')
     ],
     "Biophysics L2":
     [
-        ('Soma Kv channel density', 'S/cm2'),
-        ('Soma Na channel density', 'S/cm2'),
-        ('Soma leak reversal', 'mV'),
-        ('Soma leak channel density', 'S/cm2'),
-        ('Soma Km channel density', 'pS/micron2'),
-        ('Dendrite Kv channel density', 'S/cm2'),
-        ('Dendrite Na channel density', 'S/cm2'),
-        ('Dendrite leak reversal', 'mV'),
-        ('Dendrite leak channel density', 'S/cm2'),
-        ('Dendrite Km channel density', 'pS/micron2')
+        ('Soma Kv channel density', 'S/cm2', 'soma_gkbar_hh2'),
+        ('Soma Na channel density', 'S/cm2', 'soma_gnabar_hh2'),
+        ('Soma leak reversal', 'mV', 'soma_el_hh2'),
+        ('Soma leak channel density', 'S/cm2', 'soma_gl_hh2'),
+        ('Soma Km channel density', 'pS/micron2', 'soma_gbar_km'),
+        ('Dendrite Kv channel density', 'S/cm2', 'dend_gkbar_hh2'),
+        ('Dendrite Na channel density', 'S/cm2', 'dend_gnabar_hh2'),
+        ('Dendrite leak reversal', 'mV', 'dend_el_hh2'),
+        ('Dendrite leak channel density', 'S/cm2', 'dend_gl_hh2'),
+        ('Dendrite Km channel density', 'pS/micron2', 'dend_gbar_km')
     ],
     "Biophysics L5":
     [
-        ('Soma Kv channel density', 'S/cm2'),
-        ('Soma Na channel density', 'S/cm2'),
-        ('Soma leak reversal', 'mV'),
-        ('Soma leak channel density', 'S/cm2'),
-        ('Soma Ca channel density', 'pS/micron2'),
-        ('Soma Ca decay time', 'ms'),
-        ('Soma Kca channel density', 'pS/micron2'),
-        ('Soma Km channel density', 'pS/micron2'),
-        ('Soma CaT channel density', 'S/cm2'),
-        ('Soma HCN channel density', 'S/cm2'),
-        ('Dendrite Kv channel density', 'S/cm2'),
-        ('Dendrite Na channel density', 'S/cm2'),
-        ('Dendrite leak reversal', 'mV'),
-        ('Dendrite leak channel density', 'S/cm2'),
-        ('Dendrite KCa channel density', 'pS/micron2'),
-        ('Dendrite Km channel density', 'pS/micron2'),
-        ('Dendrite CaT channel density', 'S/cm2'),
-        ('Dendrite HCN channel density', 'S/cm2')
+        ('Soma Kv channel density', 'S/cm2', 'soma_gkbar_hh2'),
+        ('Soma Na channel density', 'S/cm2', 'soma_gnabar_hh2'),
+        ('Soma leak reversal', 'mV', 'soma_el_hh2'),
+        ('Soma leak channel density', 'S/cm2', 'soma_gl_hh2'),
+        ('Soma Ca channel density', 'pS/micron2', 'soma_gbar_ca'),
+        ('Soma Ca decay time', 'ms', 'soma_taur_cad'),
+        ('Soma Kca channel density', 'pS/micron2', 'soma_gbar_kca'),
+        ('Soma Km channel density', 'pS/micron2', 'soma_gbar_km'),
+        ('Soma CaT channel density', 'S/cm2', 'soma_gbar_cat'),
+        ('Soma HCN channel density', 'S/cm2', 'soma_gbar_ar'),
+        ('Dendrite Kv channel density', 'S/cm2', 'dend_gkbar_hh2'),
+        ('Dendrite Na channel density', 'S/cm2', 'dend_gnabar_hh2'),
+        ('Dendrite leak reversal', 'mV', 'dend_el_hh2'),
+        ('Dendrite leak channel density', 'S/cm2', 'dend_gl_hh2'),
+        ('Dendrite Ca channel density', 'pS/micron2', 'dend_gbar_ca'),
+        ('Dendrite Ca decay time', 'ms', 'dend_taur_cad'),
+        ('Dendrite KCa channel density', 'pS/micron2', 'dend_gbar_kca'),
+        ('Dendrite Km channel density', 'pS/micron2', 'dend_gbar_km'),
+        ('Dendrite CaT channel density', 'S/cm2', 'dend_gbar_cat'),
+        ('Dendrite HCN channel density', 'S/cm2', 'dend_gbar_ar')
     ]
 }
 
@@ -1372,11 +1374,11 @@ def add_cell_parameters_tab(network, cell_params_out, cell_pameters_vboxes,
     # get_cell_params_dic_values(network.cell_types)
     for cell_type in cell_types:
         layer_parameters = list()
-        for layer in cell_parameters_dic.keys():
+        for layer in cell_parameters_dict.keys():
             if 'Biophysic' in layer and cell_type not in layer:
                 continue
 
-            for parameter in cell_parameters_dic[layer]:
+            for parameter in cell_parameters_dict[layer]:
                 param_name = parameter[0]
                 param_units = parameter[1]
                 description = f"{param_name} ({param_units})"
