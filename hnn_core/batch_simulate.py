@@ -5,6 +5,8 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
+import numpy as np
+import os
 from joblib import Parallel, delayed
 from .dipole import simulate_dipole
 from .network_models import (jones_2009_model,
@@ -14,7 +16,8 @@ from .network_models import (jones_2009_model,
 class BatchSimulate:
     def __init__(self, set_params, net_name='jones', tstop=170,
                  dt=0.025, n_trials=1, record_vsec=False,
-                 record_isec=False, postproc=False):
+                 record_isec=False, postproc=False, save_outputs=False,
+                 file_path='./sim_results', num_files=100, overwrite=True):
         """Initialize the BatchSimulate class.
 
         Parameters
@@ -51,6 +54,16 @@ class BatchSimulate:
             :meth:`~hnn_core.dipole.Dipole.smooth` and
             :meth:`~hnn_core.dipole.Dipole.scale` methods instead.
             Default: False.
+        save_outputs : bool, optional
+            Whether to save the simulation outputs to files. Default is False.
+        file_path : str, optional
+            The path to save the simulation outputs.
+            Default is './sim_results'.
+        num_files : int, optional
+            The number of files to split the simulation outputs into.
+            Default is 100.
+        overwrite : bool, optional
+            Whether to overwrite existing files. Default is True.
         """
         self.set_params = set_params
         self.net_name = net_name
@@ -60,6 +73,10 @@ class BatchSimulate:
         self.record_vsec = record_vsec
         self.record_isec = record_isec
         self.postproc = postproc
+        self.save_outputs = save_outputs
+        self.file_path = file_path
+        self.num_files = num_files
+        self.overwrite = overwrite
 
     def run(self, param_grid, return_output=True, combinations=True, n_jobs=1):
         """Run batch simulations.
@@ -85,6 +102,9 @@ class BatchSimulate:
         param_combinations = self._generate_param_combinations(
             param_grid, combinations)
         results = self.simulate_batch(param_combinations, n_jobs=n_jobs)
+
+        if self.save_outputs:
+            self.save(results)
 
         if return_output:
             return results
@@ -180,3 +200,33 @@ class BatchSimulate:
             param_combinations = [dict(zip(keys, combination))
                                   for combination in zip(*values)]
         return param_combinations
+
+    def save(self, sim_results):
+        """Save simulation results to files.
+
+        Parameters
+        ----------
+        sim_results : list
+            List of simulation results.
+        """
+        if not os.path.exists(self.file_path):
+            os.makedirs(self.file_path)
+
+        sim_data = np.stack([dpl['dpl'][0].data['agg'] for dpl in sim_results])
+
+        total_sims = len(sim_data)
+        num_sims_per_file = max(total_sims // self.num_files, 1)
+
+        for i in range(self.num_files):
+            start_idx = i * num_sims_per_file
+            end_idx = start_idx + num_sims_per_file
+            if i == self.num_files - 1:
+                end_idx = len(sim_data)
+
+            file_name = os.path.join(self.file_path, f'sim_run_{i}.npy')
+            if os.path.exists(file_name) and not self.overwrite:
+                raise FileExistsError(
+                    f"File {file_name} already exists and"
+                    "overwrite is set to False.")
+
+            np.save(file_name, sim_data[start_idx:end_idx])
