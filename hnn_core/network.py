@@ -1133,7 +1133,8 @@ class Network:
                 self.external_drives[
                     drive['name']]['events'].append(event_times)
 
-    def add_tonic_bias(self, *, cell_type=None, amplitude, t0=0, tstop=None):
+    def add_tonic_bias(self, *, cell_type=None, sect_name='soma', bias_name='tonic',
+                       amplitude, t0=0, tstop=None):
         """Attaches parameters of tonic bias input for given cell types
 
         Parameters
@@ -1169,6 +1170,7 @@ class Network:
             _validate_type(amplitude, (float, int), 'amplitude')
 
             _add_cell_type_bias(network=self, cell_type=cell_type,
+                                sect_name=sect_name, bias_name=bias_name,
                                 amplitude=float(amplitude),
                                 t_0=t0, t_stop=tstop)
         else:
@@ -1180,6 +1182,7 @@ class Network:
 
             for _cell_type, _amplitude in amplitude.items():
                 _add_cell_type_bias(network=self, cell_type=_cell_type,
+                                    sect_name=sect_name,bias_name=bias_name,
                                     amplitude=_amplitude,
                                     t_0=t0, t_stop=tstop)
 
@@ -1648,7 +1651,7 @@ class _NetworkDrive(dict):
 
 
 def _add_cell_type_bias(network: Network, amplitude: Union[float, dict],
-                        cell_type=None,
+                        cell_type=None, sect_name='soma', bias_name='tonic',
                         t_0=0, t_stop=None):
 
     if network is None:
@@ -1665,15 +1668,16 @@ def _add_cell_type_bias(network: Network, amplitude: Union[float, dict],
                              f'{list(network.cell_types.keys())}. '
                              f'Got {cell_type}')
 
-        if 'tonic' not in network.external_biases:
-            network.external_biases['tonic'] = dict()
+        if bias_name not in network.external_biases:
+            network.external_biases[bias_name] = dict()
 
-        if cell_type in network.external_biases['tonic']:
-            raise ValueError(f'Tonic bias already defined for {cell_type}')
+        if cell_type in network.external_biases[bias_name]:
+            raise ValueError(f'Bias named {bias_name} already defined for {cell_type}')
 
         cell_type_bias = {
             'amplitude': amplitude,
             't0': t_0,
-            'tstop': t_stop
+            'tstop': t_stop,
+            'sect_name': sect_name
         }
-        network.external_biases['tonic'][cell_type] = cell_type_bias
+        network.external_biases[bias_name][cell_type] = cell_type_bias
