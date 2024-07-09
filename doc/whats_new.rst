@@ -91,6 +91,9 @@ Bug
 - Use `np.isin()` in place of `np.in1d()` to address numpy deprecation,
   by `Nick Tolley`_ in :gh:`799.
 
+- Fix drive seeding so that event times are unique across multiple trials,
+  by `Nick Tolley`_ in :gh:`810`.
+
 API
 ~~~
 - :func:`~hnn_core.CellResponse.write` and :func:`~hnn_core.Cell_response.read_spikes`
