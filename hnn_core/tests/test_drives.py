@@ -98,8 +98,8 @@ def test_external_drive_times():
 def test_drive_seeds(setup_net):
     """Test that unique spike times are generated across trials"""
     net = setup_net
-    weights_ampa = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
-                    'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
+    weights_ampa = {'L2_basket': 0.3, 'L2_pyramidal': 0.3,
+                    'L5_basket': 0.3, 'L5_pyramidal': 0.3}
     synaptic_delays = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
                        'L5_basket': 1., 'L5_pyramidal': 1.}
     net.add_evoked_drive(
@@ -114,6 +114,30 @@ def test_drive_seeds(setup_net):
         net.external_drives['prox']['events'][1]))
     # No two spikes should be perfectly identical across seeds
     assert ~np.any(np.allclose(trial1_spikes, trial2_spikes))
+
+
+def test_clear_drives(setup_net):
+    """Test clearing drives updates Network"""
+    net = setup_net
+    weights_ampa = {'L5_pyramidal': 0.3}
+    synaptic_delays = {'L5_pyramidal': 1.}
+
+    n_gids = net._n_gids
+    net.add_evoked_drive(
+        'prox', mu=40, sigma=8.33, numspikes=1,
+        weights_ampa=weights_ampa, location='proximal',
+        synaptic_delays=synaptic_delays, cell_specific=True)
+
+    assert len(net.external_drives) > 0
+    assert 'prox' in net.external_drives
+    assert 'prox' in net.gid_ranges
+    assert net._n_gids == n_gids + len(net.gid_ranges['L5_pyramidal'])
+
+    net.clear_drives()
+    assert len(net.external_drives) == 0
+    assert 'prox' not in net.external_drives
+    assert 'prox' not in net.gid_ranges
+    assert net._n_gids == n_gids
 
 
 def test_add_drives():
