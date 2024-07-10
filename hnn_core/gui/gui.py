@@ -628,15 +628,6 @@ class HNNGUI:
         connectivity_configuration.titles = ['Network connectivity',
                                              'Cell Parameters']
 
-        # accordions to group local-connectivity by cell type
-        # connectivity_boxes = [
-        #     VBox(slider) for slider in self.connectivity_widgets]
-        # connectivity_names = (
-        #     'Layer 2/3 Pyramidal', 'Layer 5 Pyramidal', 'Layer 2 Basket',
-        #     'Layer 5 Basket')
-        # cell_connectivity = Accordion(children=connectivity_boxes)
-        # cell_connectivity.titles = [s for s in connectivity_names]
-
         drive_selections = VBox([
             self.add_drive_button, self.widget_drive_type_selection,
             self.widget_location_selection],
@@ -1315,7 +1306,7 @@ def add_connectivity_tab(params, connectivity_out, connectivity_textfields,
                                  connectivity_textfields)
 
     # build cell parameters tab
-    add_cell_parameters_tab(net, cell_params_out, cell_pameters_vboxes,
+    add_cell_parameters_tab(cell_params_out, cell_pameters_vboxes,
                             cell_layer_radio_button, cell_type_radio_button,
                             layout)
     return net
@@ -1378,7 +1369,7 @@ def add_network_connectivity_tab(network, connectivity_out,
     return network
 
 
-def add_cell_parameters_tab(network, cell_params_out, cell_pameters_vboxes,
+def add_cell_parameters_tab(cell_params_out, cell_pameters_vboxes,
                             cell_layer_radio_button, cell_type_radio_button,
                             layout):
     L2_defautl_values = get_L2Pyr_params_default()
@@ -1387,7 +1378,6 @@ def add_cell_parameters_tab(network, cell_params_out, cell_pameters_vboxes,
     style = {'description_width': '235px'}
     kwargs = dict(layout=layout, style=style)
 
-    # get_cell_params_dic_values(network.cell_types)
     for cell_type in cell_types:
         layer_parameters = list()
         for layer in cell_parameters_dict.keys():
@@ -1991,9 +1981,5 @@ def launch():
     You can pass voila commandline parameters as usual.
     """
     from voila.app import main
-    import debugpy
-    debugpy.listen(5678)
-    print("Waiting for debugger attach")
-    debugpy.wait_for_client()
     notebook_path = Path(__file__).parent / 'hnn_widget.ipynb'
     main([str(notebook_path.resolve()), *sys.argv[1:]])
