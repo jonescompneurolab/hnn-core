@@ -1375,7 +1375,7 @@ def add_cell_parameters_tab(cell_params_out, cell_pameters_vboxes,
     L2_defautl_values = get_L2Pyr_params_default()
     L5_default_values = get_L5Pyr_params_default()
     cell_types = [("L2", L2_defautl_values), ("L5", L5_default_values)]
-    style = {'description_width': '235px'}
+    style = {'description_width': '255px'}
     kwargs = dict(layout=layout, style=style)
 
     for cell_type in cell_types:
