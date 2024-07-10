@@ -1,5 +1,5 @@
 """
-Handler classes to calculate extracellular electric potentials, such as the
+Handler classes to calculate calclate extracellular electric potentials, such as the
 Local Field Potential (LFP), at ideal (point-like) electrodes based on net
 transmembrane currents of all neurons in the network.
 
