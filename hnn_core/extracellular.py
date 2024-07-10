@@ -511,7 +511,8 @@ class ExtracellularArray:
                 show=show)
         return fig
 
-    def plot_csd(self, colorbar=True, ax=None, vmin=None, vmax=None, interpolation='spline', show=True):
+    def plot_csd(self, colorbar=True, ax=None, vmin=None, vmax=None,
+                 interpolation='spline', show=True):
         """Plot laminar current source density (CSD) estimation
 
         Parameters
@@ -537,7 +538,7 @@ class ExtracellularArray:
 
         fig = plot_laminar_csd(self.times, csd_data,
                                contact_labels=contact_labels, ax=ax,
-                               colorbar=colorbar, vmin=vmin, vmax=vmax, 
+                               colorbar=colorbar, vmin=vmin, vmax=vmax,
                                interpolation=interpolation, show=show)
 
         return fig
