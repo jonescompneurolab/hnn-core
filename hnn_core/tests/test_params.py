@@ -97,14 +97,17 @@ def test_remove_nulled_drives(tmp_path):
 
     # External drives were removed
     drives_removed = ['bursty1', 'bursty2', 'extgauss', 'extpois']
-    assert all([drive not in net_removed.external_drives.keys() for drive in drives_removed])
+    assert all([drive not in net_removed.external_drives.keys()
+                for drive in drives_removed])
 
     # Connections were removed
-    conn_src_types = set([conn['src_type'] for conn in net_removed.connectivity])
+    conn_src_types = set([conn['src_type']
+                          for conn in net_removed.connectivity])
     assert all([drive not in conn_src_types for drive in drives_removed])
 
     # gid ranges were updated
-    assert all([drive not in net_removed.gid_ranges.keys() for drive in drives_removed])
+    assert all([drive not in net_removed.gid_ranges.keys()
+                for drive in drives_removed])
 
 
 class TestConvertToJson:

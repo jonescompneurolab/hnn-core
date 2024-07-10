@@ -683,8 +683,8 @@ def remove_nulled_drives(net):
     """Removes drives from network if they have been given null parameters.
 
     Legacy param files contained parameter placeholders for non-functional
-    drives. These drives were nulled by assigning values outside typical ranges.
-    This function removes drives on the following conditions:
+    drives. These drives were nulled by assigning values outside typical
+    ranges. This function removes drives on the following conditions:
         1. Start time is larger than stop time
         2. All weights are non-positive
 
@@ -803,6 +803,7 @@ def convert_to_json(params_fname,
                             overwrite=overwrite,
                             )
     return
+
 
 # debug test function
 if __name__ == '__main__':
