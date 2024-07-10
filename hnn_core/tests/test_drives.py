@@ -465,3 +465,20 @@ def test_drive_random_state():
     net._instantiate_drives(tstop=170.)
     assert (net.external_drives['evprox1']['events'] ==
             net.external_drives['evprox2']['events'])
+
+
+def test_non_cellspecific_pois_rate(setup_net):
+    """Testing rate constant when adding non-cell-specific poisson drive"""
+
+    net = setup_net
+    rate_constant = 2.0
+
+    weights_ampa_noise = {'L2_basket': 0.01, 'L2_pyramidal': 0.002,
+                        'L5_pyramidal': 0.02}
+    
+    net.add_poisson_drive('noise_global', rate_constant=rate_constant,
+                        location='distal', weights_ampa=weights_ampa_noise,space_constant=100, n_drive_cells=1,
+                        cell_specific=False)
+
+    assert rate_constant == net.external_drives['noise_global']['dynamics']['rate_constant']
+    
