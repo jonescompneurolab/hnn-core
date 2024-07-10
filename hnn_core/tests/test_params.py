@@ -8,11 +8,9 @@ from urllib.request import urlretrieve
 
 import pytest
 
-from hnn_core import (read_params, Params, convert_to_json,
-                      Network)
+from hnn_core import read_params, Params, convert_to_json
 from hnn_core.hnn_io import read_network_configuration
-from hnn_core.network_models import (jones_2009_model, law_2021_model,
-                                     calcium_model)
+from hnn_core.network_models import jones_2009_model
 from hnn_core.params import remove_nulled_drives
 
 
@@ -176,7 +174,6 @@ class TestConvertToJson:
         good_path = hnn_core_root
         path_str = str(good_path)
         bad_path = 5
-        bad_model = 'bad_model'
 
         # Valid path and string, but not actual files
         with pytest.raises(
