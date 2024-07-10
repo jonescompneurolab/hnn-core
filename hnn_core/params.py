@@ -662,6 +662,78 @@ def compare_dictionaries(d1, d2):
     return d1
 
 
+def _any_positive_weights(drive):
+    """ Checks a drive for any positive weights. """
+    weights = (list(drive['weights_ampa'].values()) +
+               list(drive['weights_nmda'].values()))
+    if any([val > 0 for val in weights]):
+        return True
+    else:
+        return False
+
+
+def _get_n_cells(net):
+    """ Get number of neocortical cells  """
+    cell_names = net.cell_types.keys()
+    n_cells = max([net.gid_ranges[cell_name].stop for cell_name in cell_names])
+    return n_cells
+
+
+def remove_nulled_drives(net):
+    """Removes drives from network if they have been given null parameters.
+
+    Legacy param files contained parameter placeholders for non-functional
+    drives. These drives were nulled by assigning values outside typical ranges.
+    This function removes drives on the following conditions:
+        1. Start time is larger than stop time
+        2. All weights are non-positive
+
+    Parameters
+    ----------
+    net : Network object
+
+    Returns
+    -------
+
+    """
+    from .network import pick_connection
+
+    net = deepcopy(net)
+    drives_copy = net.external_drives.copy()
+    n_cells = _get_n_cells(net)
+
+    extras = dict()
+    for drive_name, drive in net.external_drives.items():
+        conn_indices = pick_connection(net, src_gids=drive_name)
+
+        space_constant = net.connectivity[conn_indices[0]]['nc_dict']['lamtha']
+        probability = net.connectivity[conn_indices[0]]['probability']
+
+        extras[drive_name] = {'space_constant': space_constant,
+                              'probability': probability}
+
+    net.clear_drives()
+    for drive_name, drive in drives_copy.items():
+        # Do not add drive if tstart is > tstop
+        if drive['dynamics'].get('tstart'):
+            if drive['dynamics']['tstart'] > drive['dynamics']['tstop']:
+                continue
+        # Do not add if all 0 weights
+        elif not _any_positive_weights(drive):
+            continue
+        else:
+            # Set n_drive_cells to 'n_cells' if equal to max number of cells
+            if drive['n_drive_cells'] == n_cells:
+                drive['n_drive_cells'] = 'n_cells'
+            net._attach_drive(drive['name'], drive, drive['weights_ampa'],
+                              drive['weights_nmda'], drive['location'],
+                              extras[drive_name]['space_constant'],
+                              drive['synaptic_delays'],
+                              drive['n_drive_cells'], drive['cell_specific'],
+                              extras[drive_name]['probability'])
+    return net
+
+
 def convert_to_json(params_fname,
                     out_fname,
                     model_template='jones_2009_model',
@@ -724,11 +796,13 @@ def convert_to_json(params_fname,
                                      else False),
                         )
 
+    # Remove drives that have null attributes
+    net = remove_nulled_drives(net)
+
     net.write_configuration(fname=out_fname,
                             overwrite=overwrite,
                             )
     return
-
 
 # debug test function
 if __name__ == '__main__':
