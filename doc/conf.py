@@ -244,7 +244,8 @@ sphinx_gallery_conf = {
                'repo': 'hnn-core',
                'branch': 'gh-pages',
                'binderhub_url': 'https://mybinder.org',
-               'notebooks_dir': f'{filepath_prefix}/notebooks',
+               'filepath_prefix': filepath_prefix,
+               'notebooks_dir': 'notebooks',
                'dependencies': 'Dockerfile'
                }
 }
