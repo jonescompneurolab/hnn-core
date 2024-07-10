@@ -663,3 +663,37 @@ def test_gui_add_tonic_input(setup_gui):
                                gui.cell_pameters_widgets)
 
     assert _single_simulation['net'].external_biases['tonic'] is not None
+
+
+def test_gui_cell_params_widgets(setup_gui):
+    """Test if gui add different type of drives."""
+    gui = setup_gui
+    _single_simulation = {}
+    _single_simulation['net'] = jones_2009_model(gui.params)
+    _single_simulation['net'].cell_types
+    pyramid_cell_types = [cell_type for cell_type
+                          in _single_simulation['net'].cell_types
+                          if "pyramidal" in cell_type]
+    assert (len(pyramid_cell_types) == 2)
+
+    # Check cell types map directly to the gui widgets
+    layers = gui.cell_layer_radio_buttons.options
+    assert (len(layers) == 3)
+
+    keys = gui.cell_pameters_widgets.keys()
+    num_cell_params = 0
+    for pyramid_cell_type in pyramid_cell_types:
+        cell_type = pyramid_cell_type.split('_')[0]
+        for cell_layer in layers:
+            key = f'{cell_type}_{cell_layer}'
+            assert (any(key in k for k in keys))
+            num_cell_params = num_cell_params + 1
+
+    assert (len(keys) == num_cell_params)
+
+    # Check the if the cell params dictionary has been updated
+    cell_params = gui.get_cell_parameters_dict()
+    assert (len(cell_params['Geometry']) == 20)
+    assert (len(cell_params['Synapses']) == 12)
+    assert (len(cell_params['Biophysics L2']) == 10)
+    assert (len(cell_params['Biophysics L5']) == 20)
