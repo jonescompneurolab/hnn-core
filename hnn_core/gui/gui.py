@@ -365,7 +365,7 @@ class HNNGUI:
             button_color=self.layout['theme_color'])
 
         self.cell_type_radio_buttons = RadioButtons(
-            options=['L2', 'L5'],
+            options=['L2 Pyramidal', 'L5 Pyramidal'],
             description='Cell type:')
 
         self.cell_layer_radio_buttons = RadioButtons(
@@ -567,15 +567,17 @@ class HNNGUI:
                 True if value.new == "Tonic" else False)
 
         def _cell_type_radio_change(value):
+            cell_type = value.new.split(' ')[0]
             _update_cell_params_vbox(self._cell_params_out,
                                      self.cell_pameters_widgets,
-                                     value.new,
+                                     cell_type,
                                      self.cell_layer_radio_buttons.value)
 
         def _cell_layer_radio_change(value):
+            cell_type = self.cell_type_radio_buttons.value.split(' ')[0]
             _update_cell_params_vbox(self._cell_params_out,
                                      self.cell_pameters_widgets,
-                                     self.cell_type_radio_buttons.value,
+                                     cell_type,
                                      value.new)
 
         self.widget_backend_selection.observe(_handle_backend_change, 'value')
@@ -625,8 +627,8 @@ class HNNGUI:
 
         connectivity_configuration.children = [connectivity_box,
                                                cell_parameters]
-        connectivity_configuration.titles = ['Network connectivity',
-                                             'Cell Parameters']
+        connectivity_configuration.titles = ['Connectivity',
+                                             'Cell parameters']
 
         drive_selections = VBox([
             self.add_drive_button, self.widget_drive_type_selection,
@@ -649,7 +651,7 @@ class HNNGUI:
             simulation_box, connectivity_configuration, drives_options,
             config_panel,
         ]
-        titles = ('Simulation', 'Connectivity', 'External drives',
+        titles = ('Simulation', 'Network', 'External drives',
                   'Visualization')
         for idx, title in enumerate(titles):
             left_tab.set_title(idx, title)
@@ -1409,9 +1411,10 @@ def add_cell_parameters_tab(cell_params_out, cell_pameters_vboxes,
     cell_params_out.clear_output()
 
     # Add cell parameters
+    cell_type = cell_type_radio_button.value.split(' ')[0]
     display(_update_cell_params_vbox(cell_params_out,
                                      cell_pameters_vboxes,
-                                     cell_type_radio_button.value,
+                                     cell_type,
                                      cell_layer_radio_button.value))
 
 
@@ -1971,5 +1974,9 @@ def launch():
     You can pass voila commandline parameters as usual.
     """
     from voila.app import main
+    import debugpy
+    debugpy.listen(5678)
+    print("Waiting for debugger attach")
+    debugpy.wait_for_client()
     notebook_path = Path(__file__).parent / 'hnn_widget.ipynb'
     main([str(notebook_path.resolve()), *sys.argv[1:]])
