@@ -122,6 +122,7 @@ def test_clear_drives(setup_net):
     weights_ampa = {'L5_pyramidal': 0.3}
     synaptic_delays = {'L5_pyramidal': 1.}
 
+    # Test attributes after adding 2 drives
     n_gids = net._n_gids
     net.add_evoked_drive(
         'prox', mu=40, sigma=8.33, numspikes=1,
@@ -140,6 +141,7 @@ def test_clear_drives(setup_net):
         assert drive_name in net.pos_dict
         assert net._n_gids == n_gids + len(net.gid_ranges['L5_pyramidal']) * 2
 
+    # Test attributes after clearing drives
     net.clear_drives()
     for drive_name in ['prox', 'dist']:
         assert len(net.external_drives) == 0
@@ -148,6 +150,7 @@ def test_clear_drives(setup_net):
         assert drive_name not in net.pos_dict
         assert net._n_gids == n_gids
 
+    # Test attributes after adding 1 drive
     net.add_evoked_drive(
         'prox', mu=40, sigma=8.33, numspikes=1,
         weights_ampa=weights_ampa, location='proximal',
