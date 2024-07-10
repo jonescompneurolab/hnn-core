@@ -166,8 +166,8 @@ Bug reports
 ===========
 
 Use the `github issue tracker <https://github.com/jonescompneurolab/hnn-core/issues>`_ to
-report bugs. For user questions and scientific discussions, please join the
-`HNN Google group <https://groups.google.com/g/hnnsolver>`_.
+report bugs. For user questions and scientific discussions, please see our
+`GitHub Discussions page <https://github.com/jonescompneurolab/hnn-core/discussions>`_.
 
 Interested in Contributing?
 ===========================
@@ -178,11 +178,6 @@ Governance Structure
 ====================
 
 Read our `governance structure`_.
-
-Roadmap
-=======
-
-Read our `roadmap`_.
 
 Citing
 ======
