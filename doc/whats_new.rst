@@ -69,7 +69,7 @@ Changelog
 - Added GUI feature to include Tonic input drives in simulations,
   by `Camilo Diaz` :gh:`773`
 
-- :func:`~plot_laminar_lfp`, :func:`~plot_dipole`, :func:`~plot_spikes_hist`,
+- :func:`~plot_lfp`, :func:`~plot_dipole`, :func:`~plot_spikes_hist`,
   and :func:`~plot_spikes_raster` now plotted from 0 to tstop. Inputs tmin and tmax are deprecated,
   by `Katharina Duecker`_ in :gh:`769`
 
@@ -85,6 +85,9 @@ Changelog
 - Added GUI feature to read and modify cell parameters,
   by `Camilo Diaz`_  in :gh:`806`.
 
+- Added features to :func:`~plot_csd`: to set color of sinks and sources, range of the colormap,
+  and interpolation method to smoothen CSD plot,
+  by `Katharina Duecker`_ in :gh:``
 
 Bug
 ~~~
