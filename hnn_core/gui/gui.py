@@ -45,8 +45,9 @@ cell_parameters_dict = {
         ('Dendrite capacitive density', 'F/cm2', 'dend_cm'),
         ('Dendrite resistivity', 'ohm-cm', 'dend_Ra'),
         ('Apical Dendrite Trunk length', 'micron', 'apicaltrunk_L'),
-        ('Apical Dendrite 1 length', 'micron', 'apicaltrunk_diam'),
-        ('Apical Dendrite 1 diameter', 'micron', 'apical1_L'),
+        ('Apical Dendrite Trunk diameter', 'micron', 'apicaltrunk_diam'),
+        ('Apical Dendrite 1 length', 'micron', 'apical1_L'),
+        ('Apical Dendrite 1 diameter', 'micron', 'apical1_diam'),
         ('Apical Dendrite Tuft length', 'micron', 'apicaltuft_L'),
         ('Apical Dendrite Tuft diameter', 'micron', 'apicaltuft_diam'),
         ('Oblique Apical Dendrite length', 'micron', 'apicaloblique_L'),
@@ -385,7 +386,7 @@ class HNNGUI:
         self.connectivity_widgets = list()
 
         # Cell parameter list
-        self.cell_pameters = dict()
+        self.cell_pameters_widgets = dict()
 
         self._init_ui_components()
         self.add_logging_window_logger()
@@ -507,7 +508,7 @@ class HNNGUI:
                 self._log_out, self.drive_boxes, self.drive_widgets,
                 self._drives_out, self._connectivity_out,
                 self.connectivity_widgets, self._cell_params_out,
-                self.cell_pameters, self.cell_layer_radio_button,
+                self.cell_pameters_widgets, self.cell_layer_radio_button,
                 self.cell_type_radio_button, self.layout['drive_textbox'],
                 "connectivity")
 
@@ -517,7 +518,7 @@ class HNNGUI:
                 self._log_out, self.drive_boxes, self.drive_widgets,
                 self._drives_out, self._connectivity_out,
                 self.connectivity_widgets, self._cell_params_out,
-                self.cell_pameters, self.cell_layer_radio_button,
+                self.cell_pameters_widgets, self.cell_layer_radio_button,
                 self.cell_type_radio_button, self.layout['drive_textbox'],
                 "drives")
 
@@ -533,7 +534,7 @@ class HNNGUI:
                 self.widget_mpi_cmd, self.widget_n_jobs, self.params,
                 self._simulation_status_bar, self._simulation_status_contents,
                 self.connectivity_widgets, self.viz_manager,
-                self.simulation_list_widget)
+                self.simulation_list_widget, self.cell_pameters_widgets)
 
         def _simulation_list_change(value):
             _simulation_data, file_extension = (
@@ -559,12 +560,14 @@ class HNNGUI:
                 True if value.new == "Tonic" else False)
 
         def _cell_type_radio_change(value):
-            _update_cell_params_vbox(self._cell_params_out, self.cell_pameters,
+            _update_cell_params_vbox(self._cell_params_out,
+                                     self.cell_pameters_widgets,
                                      value.new,
                                      self.cell_layer_radio_button.value)
 
         def _cell_layer_radio_change(value):
-            _update_cell_params_vbox(self._cell_params_out, self.cell_pameters,
+            _update_cell_params_vbox(self._cell_params_out,
+                                     self.cell_pameters_widgets,
                                      self.cell_type_radio_button.value,
                                      value.new)
 
@@ -678,7 +681,7 @@ class HNNGUI:
                                     self.drive_boxes, self._connectivity_out,
                                     self.connectivity_widgets,
                                     self._cell_params_out,
-                                    self.cell_pameters,
+                                    self.cell_pameters_widgets,
                                     self.cell_layer_radio_button,
                                     self.cell_type_radio_button,
                                     self.widget_tstop, self.layout)
@@ -1403,9 +1406,6 @@ def add_cell_parameters_tab(network, cell_params_out, cell_pameters_vboxes,
 
     # clear existing connectivity
     cell_params_out.clear_output()
-    # while len(cell_params_out) > 0:
-    #     cell_params_out.pop()
-    #     cell_params_out.pop()
 
     # Add cell parameters
     display(_update_cell_params_vbox(cell_params_out,
@@ -1562,6 +1562,7 @@ def on_upload_params_change(change, tstop, dt, log_out, drive_boxes,
 
 def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                                drive_widgets, connectivity_textfields,
+                               cell_params_vboxes,
                                add_drive=True):
     """Construct network and add drives."""
     print("init network")
@@ -1573,21 +1574,38 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
     )
     # adjust connectivity according to the connectivity_tab
     for connectivity_slider in connectivity_textfields:
-        for vbox in connectivity_slider:
+        for vbox_key in connectivity_slider:
             conn_indices = pick_connection(
                 net=single_simulation_data['net'],
-                src_gids=vbox._belongsto['src_gids'],
-                target_gids=vbox._belongsto['target_gids'],
-                loc=vbox._belongsto['location'],
-                receptor=vbox._belongsto['receptor'])
+                src_gids=vbox_key._belongsto['src_gids'],
+                target_gids=vbox_key._belongsto['target_gids'],
+                loc=vbox_key._belongsto['location'],
+                receptor=vbox_key._belongsto['receptor'])
 
             if len(conn_indices) > 0:
                 assert len(conn_indices) == 1
                 conn_idx = conn_indices[0]
                 single_simulation_data['net'].connectivity[conn_idx][
-                    'nc_dict']['A_weight'] = vbox.children[1].value
+                    'nc_dict']['A_weight'] = vbox_key.children[1].value
                 single_simulation_data['net'].connectivity[conn_idx][
-                    'probability'] = vbox.children[2].value
+                    'probability'] = vbox_key.children[2].value
+
+    # Update cell params
+
+    update_functions = {
+        'Geometry': update_geometry_cell_params,
+        'Synapses': update_synapse_cell_params,
+        'L2_Biophysics': update_L2_biophysics_cell_params,
+        'L5_Biophysics': update_L5_biophysics_cell_params
+    }
+
+    # Update cell params
+    for vbox_key, cell_param_list in cell_params_vboxes.items():
+        for key, update_function in update_functions.items():
+            if key in vbox_key:
+                update_function(single_simulation_data['net'], vbox_key,
+                                cell_param_list.children)
+                break
 
     if add_drive is False:
         return
@@ -1677,7 +1695,8 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
                        all_data, dt, tstop, ntrials, backend_selection,
                        mpi_cmd, n_jobs, params, simulation_status_bar,
                        simulation_status_contents, connectivity_textfields,
-                       viz_manager, simulations_list_widget):
+                       viz_manager, simulations_list_widget,
+                       cell_pameters_widgets):
     """Run the simulation and plot outputs."""
     simulation_data = all_data["simulation_data"]
     with log_out:
@@ -1695,7 +1714,8 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
 
         _init_network_from_widgets(params, dt, tstop,
                                    simulation_data[_sim_name], drive_widgets,
-                                   connectivity_textfields)
+                                   connectivity_textfields,
+                                   cell_pameters_widgets)
 
         print("start simulation")
         if backend_selection.value == "MPI":
@@ -1739,6 +1759,148 @@ def _update_cell_params_vbox(cell_type_out, cell_parameters_list,
         cell_type_out.clear_output()
         with cell_type_out:
             display(cell_parameters_list[cell_parameters_key])
+
+
+def update_geometry_cell_params(net, cell_param_key, param_list):
+    cell_params = param_list
+    cell_type = f'{cell_param_key.split("_")[0]}_pyramidal'
+
+    sections = net.cell_types[cell_type].sections
+    # Soma
+    sections['soma']._L = cell_params[0].value
+    sections['soma']._diam = cell_params[1].value
+    sections['soma']._cm = cell_params[2].value
+    sections['soma']._Ra = cell_params[3].value
+
+    # Dendrite common parameters
+    dendrite_cm = cell_params[4].value
+    dendrite_Ra = cell_params[5].value
+
+    dendrite_sections = [
+        'apical_trunk', 'apical_1', 'apical_tuft', 'apical_oblique',
+        'basal_1', 'basal_2', 'basal_3'
+    ]
+
+    param_indices = [
+        (6, 7), (8, 9), (10, 11), (12, 13), (14, 15), (16, 17), (18, 19)]
+
+    # Dentrite
+    for section, indices in zip(dendrite_sections, param_indices):
+        sections[section]._L = cell_params[indices[0]].value
+        sections[section]._diam = cell_params[indices[1]].value
+        sections[section]._cm = dendrite_cm
+        sections[section]._Ra = dendrite_Ra
+
+
+def update_synapse_cell_params(net, cell_param_key, param_list):
+    cell_params = param_list
+    cell_type = f'{cell_param_key.split("_")[0]}_pyramidal'
+    network_synapses = net.cell_types[cell_type].synapses
+    synapse_sections = ['ampa', 'nmda', 'gabaa', 'gabab']
+
+    param_indices = [
+        (0, 1, 2), (3, 4, 5), (6, 7, 8), (9, 10, 11)]
+
+    # Update Dentrite
+    for section, indices in zip(synapse_sections, param_indices):
+        network_synapses[section]['e'] = cell_params[indices[0]].value
+        network_synapses[section]['tau1'] = cell_params[indices[1]].value
+        network_synapses[section]['tau2'] = cell_params[indices[2]].value
+
+
+def update_L2_biophysics_cell_params(net, cell_param_key, param_list):
+
+    cell_type = f'{cell_param_key.split("_")[0]}_pyramidal'
+    sections = net.cell_types[cell_type].sections
+    # Soma
+    mechs_params = {
+        'hh2': {
+            'gkbar_hh2': param_list[0].value,
+            'gnabar_hh2': param_list[1].value,
+            'el_hh2': param_list[2].value,
+            'gl_hh2': param_list[3].value},
+        'km': {
+            'gbar_km': param_list[4].value}
+    }
+
+    sections['soma'].mechs.update(mechs_params)
+
+    # dendrites
+    mechs_params['hh2'] = {
+        'gkbar_hh2': param_list[5].value,
+        'gnabar_hh2': param_list[6].value,
+        'el_hh2': param_list[7].value,
+        'gl_hh2': param_list[8].value}
+    mechs_params['km'] = {
+        'gbar_km': param_list[9].value}
+
+    update_common_dendrite_sections(sections, mechs_params)
+
+
+def update_L5_biophysics_cell_params(net, cell_param_key, param_list):
+    cell_type = f'{cell_param_key.split("_")[0]}_pyramidal'
+    sections = net.cell_types[cell_type].sections
+    # Soma
+    mechs_params = {
+        'hh2':
+        {
+            'gkbar_hh2': param_list[0].value,
+            'gnabar_hh2': param_list[1].value,
+            'el_hh2': param_list[2].value,
+            'gl_hh2': param_list[3].value
+        },
+        'ca':
+        {
+            'gbar_ca': param_list[4].value
+        },
+        'cad':
+        {
+            'taur_cad': param_list[5].value
+        },
+        'kca':
+        {
+            'gbar_kca': param_list[6].value
+        },
+        'km':
+        {
+            'gbar_km': param_list[7].value
+        },
+        'cat':
+        {
+            'gbar_cat': param_list[8].value
+        },
+        'ar':
+        {
+            'gbar_ar': param_list[9].value
+        }
+    }
+
+    sections['soma'].mechs.update(mechs_params)
+
+    # dendrites
+    mechs_params['hh2'] = {
+        'gkbar_hh2': param_list[9].value,
+        'gnabar_hh2': param_list[10].value,
+        'el_hh2': param_list[11].value,
+        'gl_hh2': param_list[12].value}
+
+    mechs_params['ca'] = {'gbar_ca': param_list[13].value}
+    mechs_params['cad'] = {'taur_cad': param_list[14].value}
+    mechs_params['kca'] = {'gbar_kca': param_list[15].value}
+    mechs_params['km'] = {'gbar_km': param_list[16].value}
+    mechs_params['cat'] = {'gbar_cat': param_list[17].value}
+    mechs_params['ar'] = {'gbar_ar': param_list[18].value}
+
+    update_common_dendrite_sections(sections, mechs_params)
+
+
+def update_common_dendrite_sections(sections, mechs_params):
+    dendrite_sections = [
+        'apical_trunk', 'apical_1', 'apical_tuft', 'apical_oblique',
+        'basal_1', 'basal_2', 'basal_3'
+    ]
+    for section in dendrite_sections:
+        sections[section].mechs.update(mechs_params)
 
 
 def _serialize_simulation(log_out, sim_data, simulation_list_widget):
