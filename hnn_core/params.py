@@ -700,7 +700,6 @@ def remove_nulled_drives(net):
 
     net = deepcopy(net)
     drives_copy = net.external_drives.copy()
-    n_cells = _get_n_cells(net)
 
     extras = dict()
     for drive_name, drive in net.external_drives.items():
@@ -723,7 +722,7 @@ def remove_nulled_drives(net):
             continue
         else:
             # Set n_drive_cells to 'n_cells' if equal to max number of cells
-            if drive['n_drive_cells'] == n_cells:
+            if drive['cell_specific']:
                 drive['n_drive_cells'] = 'n_cells'
             net._attach_drive(drive['name'], drive, drive['weights_ampa'],
                               drive['weights_nmda'], drive['location'],
