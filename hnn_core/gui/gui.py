@@ -1418,17 +1418,6 @@ def get_cell_param_default_value(cell_type_key, param_dict):
     return param_dict[cell_type_key]
 
 
-def get_cell_params_dic_values(network_cell_types):
-    # cell_types = [ct for ct in network_cell_types.keys()
-    #               if "pyramidal" in ct]
-    ...
-    # for type in cell_types:
-    #     cell_type = network_cell_types[type]
-    #     # get geometry params
-
-    #     cell_types.sections['soma']
-
-
 def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
                   tstop, layout):
     net = jones_2009_model(params)
