@@ -1399,6 +1399,7 @@ def add_cell_parameters_tab(cell_params_out, cell_pameters_vboxes,
                                               description=description,
                                               disabled=False,
                                               **kwargs)
+                text_field.layout.width = "350px"
                 layer_parameters.append(text_field)
             cell_pameters_key = f'{cell_type[0]}_{layer}'
             cell_pameters_vboxes[cell_pameters_key] = VBox(layer_parameters)
