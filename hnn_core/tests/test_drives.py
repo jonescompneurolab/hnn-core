@@ -128,18 +128,36 @@ def test_clear_drives(setup_net):
         weights_ampa=weights_ampa, location='proximal',
         synaptic_delays=synaptic_delays, cell_specific=True)
 
-    assert len(net.external_drives) > 0
+    net.add_evoked_drive(
+        'dist', mu=40, sigma=8.33, numspikes=1,
+        weights_ampa=weights_ampa, location='distal',
+        synaptic_delays=synaptic_delays, cell_specific=True)
+
+    for drive_name in ['prox', 'dist']:
+        assert len(net.external_drives) == 2
+        assert drive_name in net.external_drives
+        assert drive_name in net.gid_ranges
+        assert drive_name in net.pos_dict
+        assert net._n_gids == n_gids + len(net.gid_ranges['L5_pyramidal']) * 2
+
+    net.clear_drives()
+    for drive_name in ['prox', 'dist']:
+        assert len(net.external_drives) == 0
+        assert drive_name not in net.external_drives
+        assert drive_name not in net.gid_ranges
+        assert drive_name not in net.pos_dict
+        assert net._n_gids == n_gids
+
+    net.add_evoked_drive(
+        'prox', mu=40, sigma=8.33, numspikes=1,
+        weights_ampa=weights_ampa, location='proximal',
+        synaptic_delays=synaptic_delays, cell_specific=True)
+
+    assert len(net.external_drives) == 1
     assert 'prox' in net.external_drives
     assert 'prox' in net.gid_ranges
     assert 'prox' in net.pos_dict
     assert net._n_gids == n_gids + len(net.gid_ranges['L5_pyramidal'])
-
-    net.clear_drives()
-    assert len(net.external_drives) == 0
-    assert 'prox' not in net.external_drives
-    assert 'prox' not in net.gid_ranges
-    assert 'prox' not in net.pos_dict
-    assert net._n_gids == n_gids
 
 
 def test_add_drives():
