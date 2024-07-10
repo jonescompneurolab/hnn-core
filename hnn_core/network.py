@@ -748,7 +748,7 @@ class Network:
         elif isinstance(rate_constant, float):
             if cell_specific:
                 rate_constant = {cell_type: rate_constant for cell_type in
-                                target_populations}
+                                 target_populations}
 
         drive = _NetworkDrive()
         drive['type'] = 'poisson'

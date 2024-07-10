@@ -470,19 +470,17 @@ def test_drive_random_state():
 @pytest.mark.parametrize("rate_constant,cell_specific,n_drive_cells",
                          [(2, False, 1), (2.0, False, 1),
                           ])
-def test_add_poisson_drive(setup_net, rate_constant,
-                                    cell_specific, n_drive_cells):
+def test_add_poisson_drive(setup_net, rate_constant, cell_specific,
+                           n_drive_cells):
     """Testing rate constant when adding non-cell-specific poisson drive"""
-
     net = setup_net
 
     weights_ampa_noise = {'L2_basket': 0.01, 'L2_pyramidal': 0.002,
-                        'L5_pyramidal': 0.02}
-    
+                          'L5_pyramidal': 0.02}
+
     net.add_poisson_drive('noise_global', rate_constant=rate_constant,
-                        location='distal', weights_ampa=weights_ampa_noise,
-                        space_constant=100, n_drive_cells=n_drive_cells,
-                        cell_specific=cell_specific)
+                          location='distal', weights_ampa=weights_ampa_noise,
+                          space_constant=100, n_drive_cells=n_drive_cells,
+                          cell_specific=cell_specific)
 
     simulate_dipole(net, tstop=5)
-    
