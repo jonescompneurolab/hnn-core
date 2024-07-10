@@ -1879,17 +1879,17 @@ def update_L5_biophysics_cell_params(net, cell_param_key, param_list):
 
     # dendrites
     mechs_params['hh2'] = {
-        'gkbar_hh2': param_list[9].value,
-        'gnabar_hh2': param_list[10].value,
-        'el_hh2': param_list[11].value,
-        'gl_hh2': param_list[12].value}
+        'gkbar_hh2': param_list[10].value,
+        'gnabar_hh2': param_list[11].value,
+        'el_hh2': param_list[12].value,
+        'gl_hh2': param_list[13].value}
 
-    mechs_params['ca'] = {'gbar_ca': param_list[13].value}
-    mechs_params['cad'] = {'taur_cad': param_list[14].value}
-    mechs_params['kca'] = {'gbar_kca': param_list[15].value}
-    mechs_params['km'] = {'gbar_km': param_list[16].value}
-    mechs_params['cat'] = {'gbar_cat': param_list[17].value}
-    mechs_params['ar'] = {'gbar_ar': param_list[18].value}
+    mechs_params['ca'] = {'gbar_ca': param_list[14].value}
+    mechs_params['cad'] = {'taur_cad': param_list[15].value}
+    mechs_params['kca'] = {'gbar_kca': param_list[16].value}
+    mechs_params['km'] = {'gbar_km': param_list[17].value}
+    mechs_params['cat'] = {'gbar_cat': param_list[18].value}
+    mechs_params['ar'] = {'gbar_ar': param_list[19].value}
 
     update_common_dendrite_sections(sections, mechs_params)
 
