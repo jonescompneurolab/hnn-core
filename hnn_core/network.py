@@ -1376,7 +1376,7 @@ class Network:
     def clear_drives(self):
         """Remove all drives defined in Network.connectivity"""
         self.connectivity = [conn for conn in self.connectivity if
-                             conn['src_type'] if conn['src_type'] not
+                             conn['src_type'] not
                              in self.external_drives.keys()]
 
         for cell_type in list(self.gid_ranges.keys()):
