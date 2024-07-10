@@ -17,8 +17,6 @@
     <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=fd10adb8"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@^1.0.1/dist/embed-amd.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 
@@ -1233,6 +1231,7 @@
                 <span class="k">for</span> <span class="n">drive_cell_gid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]]:</span>
                     <span class="n">drive_cell_gid_offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">drive_cell_gid</span> <span class="o">-</span>
                                              <span class="bp">self</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]][</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">trial_seed_offset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_gids</span>
                     <span class="k">if</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;cell_specific&#39;</span><span class="p">]:</span>
                         <span class="c1"># loop over drives (one for each target cell</span>
                         <span class="c1"># population) and create event times</span>
@@ -1249,7 +1248,8 @@
                                 <span class="n">trial_idx</span><span class="o">=</span><span class="n">trial_idx</span><span class="p">,</span>
                                 <span class="n">drive_cell_gid</span><span class="o">=</span><span class="n">drive_cell_gid_offset</span><span class="p">,</span>
                                 <span class="n">event_seed</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;event_seed&#39;</span><span class="p">],</span>
-                                <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">)</span>
+                                <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
+                                <span class="n">trial_seed_offset</span><span class="o">=</span><span class="n">trial_seed_offset</span><span class="p">)</span>
                             <span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">src_event_times</span> <span class="o">=</span> <span class="n">_drive_cell_event_times</span><span class="p">(</span>
@@ -1259,7 +1259,8 @@
                             <span class="n">target_type</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">,</span>
                             <span class="n">trial_idx</span><span class="o">=</span><span class="n">trial_idx</span><span class="p">,</span>
                             <span class="n">drive_cell_gid</span><span class="o">=</span><span class="n">drive_cell_gid_offset</span><span class="p">,</span>
-                            <span class="n">event_seed</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;event_seed&#39;</span><span class="p">])</span>
+                            <span class="n">event_seed</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;event_seed&#39;</span><span class="p">],</span>
+                            <span class="n">trial_seed_offset</span><span class="o">=</span><span class="n">trial_seed_offset</span><span class="p">)</span>
                         <span class="n">event_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">src_event_times</span><span class="p">)</span>
                 <span class="c1"># &#39;events&#39;: nested list (n_trials x n_drive_cells x n_events)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">external_drives</span><span class="p">[</span>
