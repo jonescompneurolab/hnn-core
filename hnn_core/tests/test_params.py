@@ -13,6 +13,7 @@ from hnn_core import (read_params, Params, convert_to_json,
 from hnn_core.hnn_io import read_network_configuration
 from hnn_core.network_models import (jones_2009_model, law_2021_model,
                                      calcium_model)
+from hnn_core.params import remove_nulled_drives
 
 
 hnn_core_root = Path(__file__).parents[1]
@@ -77,6 +78,33 @@ def test_base_params():
     params_base['spec_cmap'] = 'viridis'
     params = Params(params_base)
     assert params == params_base
+
+
+def test_remove_nulled_drives(tmp_path):
+    param_url = ("https://raw.githubusercontent.com/jonescompneurolab/hnn/"
+                 "master/param/ERPYes100Trials.param")
+    params_fname = Path(hnn_core_root, 'param', 'ERPYes100Trials.param')
+    if not op.exists(params_fname):
+        urlretrieve(param_url, params_fname)
+
+    net = jones_2009_model(params=read_params(params_fname),
+                           add_drives_from_params=True,
+                           legacy_mode=True,
+                           )
+    net_removed = remove_nulled_drives(net)
+
+    assert net_removed != net
+
+    # External drives were removed
+    drives_removed = ['bursty1', 'bursty2', 'extgauss', 'extpois']
+    assert all([drive not in net_removed.external_drives.keys() for drive in drives_removed])
+
+    # Connections were removed
+    conn_src_types = set([conn['src_type'] for conn in net_removed.connectivity])
+    assert all([drive not in conn_src_types for drive in drives_removed])
+
+    # gid ranges were updated
+    assert all([drive not in net_removed.gid_ranges.keys() for drive in drives_removed])
 
 
 class TestConvertToJson:
