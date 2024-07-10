@@ -98,6 +98,9 @@ Bug
 - Fix drive seeding so that event times are unique across multiple trials,
   by `Nick Tolley`_ in :gh:`810`.
 
+- Fix bug in :func:`~hnn_core/network/clear_drives` where gid_ranges are not
+  accurately updated, by `Nick Tolley`_ in :gh:`812`.
+
 API
 ~~~
 - :func:`~hnn_core.CellResponse.write` and :func:`~hnn_core.Cell_response.read_spikes`
