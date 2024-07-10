@@ -370,7 +370,7 @@ class HNNGUI:
 
         self.cell_layer_radio_buttons = RadioButtons(
             options=['Geometry', 'Synapses', 'Biophysics'],
-            description='Layer:')
+            description='Cell Properties:')
 
         # Plotting window
 
@@ -1314,9 +1314,9 @@ def add_connectivity_tab(params, connectivity_out, connectivity_textfields,
     return net
 
 
-def add_network_connectivity_tab(network, connectivity_out,
+def add_network_connectivity_tab(net, connectivity_out,
                                  connectivity_textfields):
-    cell_types = [ct for ct in network.cell_types.keys()]
+    cell_types = [ct for ct in net.cell_types.keys()]
     receptors = ('ampa', 'nmda', 'gabaa', 'gabab')
     locations = ('proximal', 'distal', 'soma')
 
@@ -1332,7 +1332,7 @@ def add_network_connectivity_tab(network, connectivity_out,
                 # the connectivity list should be built on this level
                 receptor_related_conn = {}
                 for receptor in receptors:
-                    conn_indices = pick_connection(net=network,
+                    conn_indices = pick_connection(net=net,
                                                    src_gids=src_gids,
                                                    target_gids=target_gids,
                                                    loc=location,
@@ -1340,9 +1340,9 @@ def add_network_connectivity_tab(network, connectivity_out,
                     if len(conn_indices) > 0:
                         assert len(conn_indices) == 1
                         conn_idx = conn_indices[0]
-                        current_w = network.connectivity[
+                        current_w = net.connectivity[
                             conn_idx]['nc_dict']['A_weight']
-                        current_p = network.connectivity[
+                        current_p = net.connectivity[
                             conn_idx]['probability']
                         # valid connection
                         receptor_related_conn[receptor] = {
@@ -1368,7 +1368,7 @@ def add_network_connectivity_tab(network, connectivity_out,
     with connectivity_out:
         display(cell_connectivity)
 
-    return network
+    return net
 
 
 def add_cell_parameters_tab(cell_params_out, cell_pameters_vboxes,
@@ -1586,10 +1586,10 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
     # Update cell params
 
     update_functions = {
-        'Geometry': update_geometry_cell_params,
-        'Synapses': update_synapse_cell_params,
-        'L2_Biophysics': update_L2_biophysics_cell_params,
-        'L5_Biophysics': update_L5_biophysics_cell_params
+        'Geometry': _update_geometry_cell_params,
+        'Synapses': _update_synapse_cell_params,
+        'L2_Biophysics': _update_L2_biophysics_cell_params,
+        'L5_Biophysics': _update_L5_biophysics_cell_params
     }
 
     # Update cell params
@@ -1754,7 +1754,7 @@ def _update_cell_params_vbox(cell_type_out, cell_parameters_list,
             display(cell_parameters_list[cell_parameters_key])
 
 
-def update_geometry_cell_params(net, cell_param_key, param_list):
+def _update_geometry_cell_params(net, cell_param_key, param_list):
     cell_params = param_list
     cell_type = f'{cell_param_key.split("_")[0]}_pyramidal'
 
@@ -1785,7 +1785,7 @@ def update_geometry_cell_params(net, cell_param_key, param_list):
         sections[section]._Ra = dendrite_Ra
 
 
-def update_synapse_cell_params(net, cell_param_key, param_list):
+def _update_synapse_cell_params(net, cell_param_key, param_list):
     cell_params = param_list
     cell_type = f'{cell_param_key.split("_")[0]}_pyramidal'
     network_synapses = net.cell_types[cell_type].synapses
@@ -1801,7 +1801,7 @@ def update_synapse_cell_params(net, cell_param_key, param_list):
         network_synapses[section]['tau2'] = cell_params[indices[2]].value
 
 
-def update_L2_biophysics_cell_params(net, cell_param_key, param_list):
+def _update_L2_biophysics_cell_params(net, cell_param_key, param_list):
 
     cell_type = f'{cell_param_key.split("_")[0]}_pyramidal'
     sections = net.cell_types[cell_type].sections
@@ -1830,7 +1830,7 @@ def update_L2_biophysics_cell_params(net, cell_param_key, param_list):
     update_common_dendrite_sections(sections, mechs_params)
 
 
-def update_L5_biophysics_cell_params(net, cell_param_key, param_list):
+def _update_L5_biophysics_cell_params(net, cell_param_key, param_list):
     cell_type = f'{cell_param_key.split("_")[0]}_pyramidal'
     sections = net.cell_types[cell_type].sections
     # Soma
