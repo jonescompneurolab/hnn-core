@@ -1374,9 +1374,9 @@ def add_network_connectivity_tab(network, connectivity_out,
 def add_cell_parameters_tab(cell_params_out, cell_pameters_vboxes,
                             cell_layer_radio_button, cell_type_radio_button,
                             layout):
-    L2_defautl_values = get_L2Pyr_params_default()
+    L2_default_values = get_L2Pyr_params_default()
     L5_default_values = get_L5Pyr_params_default()
-    cell_types = [("L2", L2_defautl_values), ("L5", L5_default_values)]
+    cell_types = [("L2", L2_default_values), ("L5", L5_default_values)]
     style = {'description_width': '255px'}
     kwargs = dict(layout=layout, style=style)
 
