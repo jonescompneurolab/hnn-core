@@ -131,12 +131,14 @@ def test_clear_drives(setup_net):
     assert len(net.external_drives) > 0
     assert 'prox' in net.external_drives
     assert 'prox' in net.gid_ranges
+    assert 'prox' in net.pos_dict
     assert net._n_gids == n_gids + len(net.gid_ranges['L5_pyramidal'])
 
     net.clear_drives()
     assert len(net.external_drives) == 0
     assert 'prox' not in net.external_drives
     assert 'prox' not in net.gid_ranges
+    assert 'prox' not in net.pos_dict
     assert net._n_gids == n_gids
 
 
