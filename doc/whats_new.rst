@@ -37,11 +37,11 @@ Changelog
 - Fixed figure annotation overlap in multiple sub-plots, 
   by `Camilo Diaz`_ in :gh:`741`
 
-- Fix bug in :func:`~hnn_core/network/pick_connection` where connections are
+- Fix bug in :func:`~hnn_core.network.pick_connection` where connections are
   returned for cases when there should be no valid matches, by `George Dang`_
   in :gh:`739`
 
-- Added check for invalid Axes object in :func:`~hnn_core/viz/plot_cells` 
+- Added check for invalid Axes object in :func:`~hnn_core.viz.plot_cells` 
   function, by `Abdul Samad Siddiqui`_ in :gh:`744`.
 
 - Added kwargs options to `plot_spikes_hist` for adjusting the histogram plots 
@@ -59,7 +59,7 @@ Changelog
 - Added feature to read/write :class:`~hnn_core.Network` configurations to
   json, by `George Dang`_ and `Rajat Partani`_ in :gh:`757`
 
-- Added :class:`~hnn_core/viz/NetworkPlotter` to visualize and animate network simulations,
+- Added :class:`~hnn_core.viz.NetworkPlotter` to visualize and animate network simulations,
   by `Nick Tolley`_ in :gh:`649`.
 
 - Added GUI feature to include Tonic input drives in simulations,
@@ -69,7 +69,7 @@ Changelog
   and :func:`~plot_spikes_raster` now plotted from 0 to tstop. Inputs tmin and tmax are deprecated,
   by `Katharina Duecker`_ in :gh:`769`
 
-- Add function :func:`~hnn_core/params/convert_to_json` to convert legacy param
+- Add function :func:`~hnn_core.params.convert_to_json` to convert legacy param
   and json files to new json format, by `George Dang`_ in :gh:`772`
 
 - Add :class:`~hnn_core.BatchSimulate` for batch simulation capability,
@@ -83,7 +83,7 @@ Bug
 - Fix inconsistent connection mapping from drive gids to cell gids, by
   `Ryan Thorpe`_ in :gh:`642`.
 
-- Objective function called by :func:`~hnn_core/optimization/optimize_evoked`
+- Objective function called by :func:`~hnn_core.optimization.optimize_evoked`
   now returns a scalar instead of tuple, by `Ryan Thorpe`_ in :gh:`670`.
 
 - Fix GUI plotting bug due to deprecation of matplotlib color cycling method,
@@ -98,7 +98,7 @@ Bug
 - Fix drive seeding so that event times are unique across multiple trials,
   by `Nick Tolley`_ in :gh:`810`.
 
-- Fix bug in :func:`~hnn_core/network/clear_drives` where network object are not
+- Fix bug in :func:`~hnn_core.network.clear_drives` where network object are not
   accurately updated, by `Nick Tolley`_ in :gh:`812`.
 
 API
