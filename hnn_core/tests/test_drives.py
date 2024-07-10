@@ -471,7 +471,7 @@ def test_drive_random_state():
                          [(2, False, 1), (2.0, False, 1),
                           (2, True, 'n_cells'), (2.0, True, 'n_cells'),
                           ])
-def test_non_cellspecific_pois_rate(setup_net, rate_constant,
+def test_add_poisson_drive(setup_net, rate_constant,
                                     cell_specific, n_drive_cells):
     """Testing rate constant when adding non-cell-specific poisson drive"""
 
