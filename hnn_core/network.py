@@ -1378,8 +1378,18 @@ class Network:
         for conn in self.connectivity:
             if conn['src_type'] not in self.external_drives.keys():
                 connectivity.append(conn)
+
+        new_n_gids = 0
+        new_gid_ranges = dict()
+        for cell_type in self.gid_ranges.keys():
+            if cell_type not in self.external_drives.keys():
+                new_gid_ranges[cell_type] = self.gid_ranges[cell_type]
+                new_n_gids += len(self.gid_ranges[cell_type])
+
         self.external_drives = dict()
         self.connectivity = connectivity
+        self.gid_ranges = new_gid_ranges
+        self._n_gids = new_n_gids
 
     def add_electrode_array(self, name, electrode_pos, *, conductivity=0.3,
                             method='psa', min_distance=0.5):
