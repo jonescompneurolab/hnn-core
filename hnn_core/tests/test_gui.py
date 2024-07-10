@@ -165,6 +165,7 @@ def test_gui_change_connectivity():
                                            _single_simulation,
                                            gui.drive_widgets,
                                            gui.connectivity_widgets,
+                                           gui.cell_pameters_widgets,
                                            add_drive=False)
 
                 # test if the new value is reflected in the network
@@ -203,7 +204,8 @@ def test_gui_init_network():
     _single_simulation['net'] = jones_2009_model(gui.params)
     _init_network_from_widgets(gui.params, gui.widget_dt, gui.widget_tstop,
                                _single_simulation, gui.drive_widgets,
-                               gui.connectivity_widgets)
+                               gui.connectivity_widgets,
+                               gui.cell_pameters_widgets)
     plt.close('all')
 
     # copied from test_network.py
@@ -657,6 +659,7 @@ def test_gui_add_tonic_input(setup_gui):
     # Add tonic bias to the simulation
     _init_network_from_widgets(gui.params, gui.widget_dt, gui.widget_tstop,
                                _single_simulation, gui.drive_widgets,
-                               gui.connectivity_widgets)
+                               gui.connectivity_widgets,
+                               gui.cell_pameters_widgets)
 
     assert _single_simulation['net'].external_biases['tonic'] is not None
