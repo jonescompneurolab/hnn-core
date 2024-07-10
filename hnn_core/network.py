@@ -1379,11 +1379,11 @@ class Network:
                              conn['src_type'] not
                              in self.external_drives.keys()]
 
-        for cell_type in list(self.gid_ranges.keys()):
-            if cell_type in self.external_drives:
-                self._n_gids -= len(self.gid_ranges[cell_type])
-                del self.gid_ranges[cell_type]
-                del self.pos_dict[cell_type]
+        for cell_name in list(self.gid_ranges.keys()):
+            if cell_name in self.external_drives:
+                self._n_gids -= len(self.gid_ranges[cell_name])
+                del self.gid_ranges[cell_name]
+                del self.pos_dict[cell_name]
 
         self.external_drives = dict()
 
