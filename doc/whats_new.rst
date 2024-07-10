@@ -13,6 +13,10 @@ Current
 Changelog
 ~~~~~~~~~
 - Fix bug in :func:`~hnn_core.Network.add_poisson_drive` where an error is
+  thrown when passing an int for rate_constant when ``cell_specific=True``,
+  by `Dylan Daniels`_ in :gh:`818`
+
+- Fix bug in :func:`~hnn_core.Network.add_poisson_drive` where an error is
   thrown when passing a float for rate_constant when ``cell_specific=False``,
   by `Dylan Daniels`_ in :gh:`814`
   
