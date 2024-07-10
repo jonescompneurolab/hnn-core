@@ -160,11 +160,15 @@ class TestConvertToJson:
                                       legacy_mode=True
                                       )
 
-        # Write json and check if constructed network is equal
+        # Write json and check if constructed network is correct
         outpath = Path(tmp_path, 'default.json')
         convert_to_json(params_base_fname, outpath)
         net_json = read_network_configuration(outpath)
-        assert net_json == net_params
+        # Nulled drives are removed, so they should not be equal
+        assert net_json != net_params
+        assert len(net_json.external_drives) == 3
+        assert len(net_json.connectivity) == 39
+        assert len(net_json.gid_ranges) == 7
 
     def test_convert_to_json_bad_type(self):
         """Tests type validation in convert_to_json function"""
