@@ -56,7 +56,6 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'numpydoc',
-    'nbsphinx',
     'sphinx_copybutton',
     'gh_substitutions'  # custom extension, see ./sphinxext/gh_substitutions.py
 ]
@@ -245,28 +244,3 @@ sphinx_gallery_conf = {
                }
 }
 
-suppress_warnings = [
-    'nbsphinx',
-]
-
-nbsphinx_execute = 'always'
-
-nbsphinx_prolog = """
-.. raw:: html
-
-    <style>
-        .body {
-            max-width: 100% !important;
-        }
-        .nbinput.container {
-            padding-top: 5px;
-            display: none !important;
-        }
-        div.nboutput.container div.prompt {
-            display: none !important;
-        }
-        div.nboutput.container div.output_area.stderr {
-            display: none !important;
-        }
-    </style>
-"""

@@ -81,7 +81,7 @@ if __name__ == "__main__":
         'parallel': ['joblib', 'psutil'],
         'test': ['flake8', 'pytest', 'pytest-cov', ],
         'docs': ['mne', 'nibabel', 'pooch', 'tdqm',
-                 'sphinx', 'nbsphinx', 'sphinx-gallery',
+                 'sphinx', 'sphinx-gallery',
                  'sphinx_bootstrap_theme', 'sphinx-copybutton',
                  'pillow', 'numpydoc',
                  ],
