@@ -364,10 +364,11 @@ class HNNGUI:
             'Delete drives', 'success', layout=self.layout['btn'],
             button_color=self.layout['theme_color'])
 
-        self.cell_type_radio_button = RadioButtons(
+        self.cell_type_radio_buttons = RadioButtons(
             options=['L2', 'L5'],
             description='Cell type:')
-        self.cell_layer_radio_button = RadioButtons(
+
+        self.cell_layer_radio_buttons = RadioButtons(
             options=['Geometry', 'Synapses', 'Biophysics'],
             description='Layer:')
 
@@ -390,6 +391,12 @@ class HNNGUI:
 
         self._init_ui_components()
         self.add_logging_window_logger()
+
+    def get_cell_parameters_dict(self):
+        """Returns the number of elements in the
+            cell_parameters_dict dictionary.
+            This is for testing purposes """
+        return cell_parameters_dict
 
     def _init_html_download_button(self):
         b64 = base64.b64encode("".encode())
@@ -508,8 +515,8 @@ class HNNGUI:
                 self._log_out, self.drive_boxes, self.drive_widgets,
                 self._drives_out, self._connectivity_out,
                 self.connectivity_widgets, self._cell_params_out,
-                self.cell_pameters_widgets, self.cell_layer_radio_button,
-                self.cell_type_radio_button, self.layout['drive_textbox'],
+                self.cell_pameters_widgets, self.cell_layer_radio_buttons,
+                self.cell_type_radio_buttons, self.layout['drive_textbox'],
                 "connectivity")
 
         def _on_upload_drives(change):
@@ -518,8 +525,8 @@ class HNNGUI:
                 self._log_out, self.drive_boxes, self.drive_widgets,
                 self._drives_out, self._connectivity_out,
                 self.connectivity_widgets, self._cell_params_out,
-                self.cell_pameters_widgets, self.cell_layer_radio_button,
-                self.cell_type_radio_button, self.layout['drive_textbox'],
+                self.cell_pameters_widgets, self.cell_layer_radio_buttons,
+                self.cell_type_radio_buttons, self.layout['drive_textbox'],
                 "drives")
 
         def _on_upload_data(change):
@@ -563,12 +570,12 @@ class HNNGUI:
             _update_cell_params_vbox(self._cell_params_out,
                                      self.cell_pameters_widgets,
                                      value.new,
-                                     self.cell_layer_radio_button.value)
+                                     self.cell_layer_radio_buttons.value)
 
         def _cell_layer_radio_change(value):
             _update_cell_params_vbox(self._cell_params_out,
                                      self.cell_pameters_widgets,
-                                     self.cell_type_radio_button.value,
+                                     self.cell_type_radio_buttons.value,
                                      value.new)
 
         self.widget_backend_selection.observe(_handle_backend_change, 'value')
@@ -582,8 +589,10 @@ class HNNGUI:
         self.simulation_list_widget.observe(_simulation_list_change, 'value')
         self.widget_drive_type_selection.observe(_driver_type_change, 'value')
 
-        self.cell_type_radio_button.observe(_cell_type_radio_change, 'value')
-        self.cell_layer_radio_button.observe(_cell_layer_radio_change, 'value')
+        self.cell_type_radio_buttons.observe(_cell_type_radio_change,
+                                             'value')
+        self.cell_layer_radio_buttons.observe(_cell_layer_radio_change,
+                                              'value')
 
     def compose(self, return_layout=True):
         """Compose widgets.
@@ -609,7 +618,8 @@ class HNNGUI:
         ])
 
         cell_parameters = VBox([
-            HBox([self.cell_type_radio_button, self.cell_layer_radio_button]),
+            HBox([self.cell_type_radio_buttons,
+                  self.cell_layer_radio_buttons]),
             self._cell_params_out
         ])
 
@@ -682,8 +692,8 @@ class HNNGUI:
                                     self.connectivity_widgets,
                                     self._cell_params_out,
                                     self.cell_pameters_widgets,
-                                    self.cell_layer_radio_button,
-                                    self.cell_type_radio_button,
+                                    self.cell_layer_radio_buttons,
+                                    self.cell_type_radio_buttons,
                                     self.widget_tstop, self.layout)
 
         if not return_layout:
