@@ -37,7 +37,7 @@ clean:
 	rm -rf modules/*
 
 html-noplot:
-	$(SPHINXBUILD) -D plot_gallery=0 -D nbsphinx_execute=never -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	$(SPHINXBUILD) -D plot_gallery=0 -D -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
