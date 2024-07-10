@@ -1229,7 +1229,8 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
 
 
 def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
-                     vmin=None, vmax=None, sink='b', interpolation = 'spline', show=True):
+                     vmin=None, vmax=None, sink='b', interpolation='spline',
+                     show=True):
     """Plot laminar current source density (CSD) estimation from LFP array.
 
     Parameters
@@ -1251,7 +1252,7 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
         If set to 'blue' or 'b', plots sinks in blue and sources in red,
         if set to 'red' or 'r', sinks plotted in red and sources blue.
     interpolation : string.
-        If 'spline', will smoothen the CSD using spline method, 
+        If 'spline', will smoothen the CSD using spline method,
         if None, no smoothing will be applied.
 
     show : bool
@@ -1269,17 +1270,18 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
     if sink[0] == 'b':
-        cmap="jet"
+        cmap = "jet"
     elif sink[0] == 'r':
-        cmap="jet_r"
+        cmap = "jet_r"
 
     if interpolation == 'spline':
         # create interpolation function
         interp_data = RectBivariateSpline(times, contact_labels, data.T)
         # increase number of contacts
-        new_depths = np.linspace(contact_labels[0],contact_labels[-1],contact_labels[-1]-contact_labels[0])
+        new_depths = np.linspace(contact_labels[0], contact_labels[-1],
+                                 contact_labels[-1] - contact_labels[0])
         # interpolate
-        data = interp_data(times,new_depths).T
+        data = interp_data(times, new_depths).T
     elif not interpolation:
         data = data
         new_depths = contact_labels
@@ -1290,7 +1292,7 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
         vmax = np.max(np.abs(data))
 
     im = ax.pcolormesh(times, new_depths, data,
-                       cmap=cmap, shading='auto',vmin=vmin,vmax=vmax)
+                       cmap=cmap, shading='auto', vmin=vmin, vmax=vmax)
 
     if colorbar:
         color_axis = ax.inset_axes([1.05, 0, 0.02, 1], transform=ax.transAxes)
