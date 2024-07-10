@@ -60,5 +60,9 @@ RUN git init . && \
     git fetch origin gh-pages && \
     git checkout gh-pages
 
+ENV PYVISTA_TRAME_SERVER_PROXY_PREFIX='/proxy/'
+
+ENV JUPYTERHUB_SERVICE_PREFIX='/proxy/'
+
 # Add an x-server to the entrypoint. This is needed by Mayavi
 ENTRYPOINT ["tini", "-g", "--", "xvfb-run"]

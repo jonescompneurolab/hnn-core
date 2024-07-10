@@ -224,6 +224,11 @@ else:
     filepath_prefix = 'v{}'.format(version)
 
 sphinx_gallery_conf = {
+    'first_notebook_cell': ("import pyvista as pv\n"
+                            "from mne.viz import set_3d_backend\n"
+                            "set_3d_backend('notebook')\n"
+                            "pv.set_jupyter_backend('client')"
+                            ),
     'doc_module': 'hnn_core',
     # path to your examples scripts
     'examples_dirs': '../examples',
