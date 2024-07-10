@@ -8,7 +8,6 @@ import numpy as np
 from itertools import cycle
 import colorsys
 import warnings
-
 from .externals.mne import _validate_type
 
 
@@ -1230,7 +1229,7 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
 
 
 def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
-                     show=True):
+                     vmin=None, vmax=None, sink='b', interpolation = 'spline', show=True):
     """Plot laminar current source density (CSD) estimation from LFP array.
 
     Parameters
@@ -1246,6 +1245,15 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
     contact_labels : list
         Labels associated with the contacts to plot. Passed as-is to
         :func:`~matplotlib.axes.Axes.set_yticklabels`.
+    vmin, vmax : float, optional
+        data range the colormap covers
+    sink : string color of the sink.
+        If set to 'blue' or 'b', plots sinks in blue and sources in red,
+        if set to 'red' or 'r', sinks plotted in red and sources blue.
+    interpolation : string.
+        If 'spline', will smoothen the CSD using spline method, 
+        if None, no smoothing will be applied.
+
     show : bool
         If True, show the plot.
 
@@ -1255,19 +1263,39 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
         The matplotlib figure handle.
     """
     import matplotlib.pyplot as plt
+    from scipy.interpolate import RectBivariateSpline
+
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
-    im = ax.pcolormesh(times, contact_labels, np.array(data),
-                       cmap="jet_r", shading='auto')
-    ax.set_title("CSD")
+    if sink[0] == 'b':
+        cmap="jet"
+    elif sink[0] == 'r':
+        cmap="jet_r"
+
+    if interpolation == 'spline':
+        # create interpolation function
+        interp_data = RectBivariateSpline(times, contact_labels, data.T)
+        # increase number of contacts
+        new_depths = np.linspace(contact_labels[0],contact_labels[-1],contact_labels[-1]-contact_labels[0])
+        # interpolate
+        data = interp_data(times,new_depths).T
+    elif not interpolation:
+        data = data
+        new_depths = contact_labels
+
+    # if vmin and vmax are both None, set colormap such that green = zero
+    if vmin is None and vmax is None:
+        vmin = -np.max(np.abs(data))
+        vmax = np.max(np.abs(data))
+
+    im = ax.pcolormesh(times, new_depths, data,
+                       cmap=cmap, shading='auto',vmin=vmin,vmax=vmax)
 
     if colorbar:
         color_axis = ax.inset_axes([1.05, 0, 0.02, 1], transform=ax.transAxes)
         plt.colorbar(im, ax=ax, cax=color_axis).set_label(r'$CSD (uV/um^{2})$')
 
-    ax.set_xlabel('Time (ms)')
-    ax.set_ylabel('Electrode depth')
     plt.tight_layout()
     plt_show(show)
 
