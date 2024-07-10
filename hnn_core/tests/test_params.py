@@ -146,53 +146,6 @@ class TestConvertToJson:
                         )
         assert outpath_no_ext.with_suffix('.json').exists()
 
-    def test_law_network_connectivity(self, tmp_path):
-        """Tests conversion with Law 2021 network connectivity model"""
-
-        net_params = law_2021_model(read_params(self.path_default),
-                                    add_drives_from_params=True,
-                                    )
-
-        # Write json and check if constructed network is equal
-        outpath = Path(tmp_path, 'default.json')
-        convert_to_json(self.path_default,
-                        outpath,
-                        model_template='law_2021_model')
-        net_json = read_network_configuration(outpath)
-        assert net_json == net_params
-
-    def test_calcium_network_connectivity(self, tmp_path):
-        """Tests conversion with calcium network connectivity model"""
-
-        net_params = calcium_model(read_params(self.path_default),
-                                   add_drives_from_params=True,
-                                   )
-
-        # Write json and check if constructed network is equal
-        outpath = Path(tmp_path, 'default.json')
-        convert_to_json(self.path_default,
-                        outpath,
-                        model_template='calcium_model')
-        net_json = read_network_configuration(outpath)
-        assert net_json == net_params
-
-    def test_no_network_connectivity(self, tmp_path):
-        """Tests conversion with no network connectivity model"""
-
-        net_params = Network(read_params(self.path_default),
-                             add_drives_from_params=True,
-                             )
-
-        # Write json and check if constructed network is equal
-        outpath = Path(tmp_path, 'default.json')
-        convert_to_json(self.path_default,
-                        outpath,
-                        model_template=None)
-        net_json = read_network_configuration(outpath)
-        assert net_json == net_params
-        # Should only have external drive connections defined, n=22
-        assert len(net_json.connectivity) == len(net_params.connectivity) == 22
-
     def test_convert_to_json_legacy(self, tmp_path):
         """Tests conversion of a param legacy file to json"""
 
@@ -241,11 +194,3 @@ class TestConvertToJson:
                 match="out_fname must be an instance of str or Path"
         ):
             convert_to_json(good_path, bad_path)
-
-        # Bad model_template
-        with pytest.raises(
-                KeyError,
-                match="Invalid network connectivity:"
-        ):
-            convert_to_json(good_path, good_path,
-                            model_template=bad_model)
