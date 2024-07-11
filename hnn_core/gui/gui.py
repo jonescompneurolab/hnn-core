@@ -567,17 +567,15 @@ class HNNGUI:
                 True if value.new == "Tonic" else False)
 
         def _cell_type_radio_change(value):
-            cell_type = value.new.split(' ')[0]
             _update_cell_params_vbox(self._cell_params_out,
                                      self.cell_pameters_widgets,
-                                     cell_type,
+                                     value.new,
                                      self.cell_layer_radio_buttons.value)
 
         def _cell_layer_radio_change(value):
-            cell_type = self.cell_type_radio_buttons.value.split(' ')[0]
             _update_cell_params_vbox(self._cell_params_out,
                                      self.cell_pameters_widgets,
-                                     cell_type,
+                                     self.cell_type_radio_buttons.value,
                                      value.new)
 
         self.widget_backend_selection.observe(_handle_backend_change, 'value')
@@ -1403,7 +1401,7 @@ def add_cell_parameters_tab(cell_params_out, cell_pameters_vboxes,
                                               **kwargs)
                 text_field.layout.width = "350px"
                 layer_parameters.append(text_field)
-            cell_pameters_key = f'{cell_type[0]}_{layer}'
+            cell_pameters_key = f'{cell_type[0]} Pyramidal_{layer}'
             cell_pameters_vboxes[cell_pameters_key] = VBox(layer_parameters)
             layer_parameters.clear()
 
@@ -1411,10 +1409,9 @@ def add_cell_parameters_tab(cell_params_out, cell_pameters_vboxes,
     cell_params_out.clear_output()
 
     # Add cell parameters
-    cell_type = cell_type_radio_button.value.split(' ')[0]
     display(_update_cell_params_vbox(cell_params_out,
                                      cell_pameters_vboxes,
-                                     cell_type,
+                                     cell_type_radio_button.value,
                                      cell_layer_radio_button.value))
 
 
@@ -1588,15 +1585,17 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
     update_functions = {
         'Geometry': _update_geometry_cell_params,
         'Synapses': _update_synapse_cell_params,
-        'L2_Biophysics': _update_L2_biophysics_cell_params,
-        'L5_Biophysics': _update_L5_biophysics_cell_params
+        'L2 Pyramidal_Biophysics': _update_L2_biophysics_cell_params,
+        'L5 Pyramidal_Biophysics': _update_L5_biophysics_cell_params
     }
 
     # Update cell params
     for vbox_key, cell_param_list in cell_params_vboxes.items():
         for key, update_function in update_functions.items():
             if key in vbox_key:
-                update_function(single_simulation_data['net'], vbox_key,
+                # Remove 'Pyramidal' keyword
+                cell_type = vbox_key.split()[0]
+                update_function(single_simulation_data['net'], cell_type,
                                 cell_param_list.children)
                 break
 
@@ -1746,9 +1745,9 @@ def _update_cell_params_vbox(cell_type_out, cell_parameters_list,
                              cell_type, cell_layer):
     cell_parameters_key = f"{cell_type}_{cell_layer}"
     if "Biophysics" in cell_layer:
-        cell_parameters_key += f" {cell_type}"
+        cell_parameters_key += f" {cell_type.split(' ')[0]}"
 
-    if cell_parameters_key in cell_parameters_key:
+    if cell_parameters_key in cell_parameters_list:
         cell_type_out.clear_output()
         with cell_type_out:
             display(cell_parameters_list[cell_parameters_key])
