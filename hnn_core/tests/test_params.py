@@ -107,6 +107,10 @@ def test_remove_nulled_drives(tmp_path):
     assert all([drive not in net_removed.gid_ranges.keys()
                 for drive in drives_removed])
 
+    # position dictionary was updated
+    assert all([drive not in net_removed.pos_dict.keys()
+                for drive in drives_removed])
+
 
 class TestConvertToJson:
     """Tests convert_to_json function"""
