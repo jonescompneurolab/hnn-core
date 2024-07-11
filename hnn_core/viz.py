@@ -1246,12 +1246,16 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
     contact_labels : list
         Labels associated with the contacts to plot. Passed as-is to
         :func:`~matplotlib.axes.Axes.set_yticklabels`.
-    vmin, vmax : float, optional
-        data range the colormap covers
-    sink : string color of the sink.
+    vmin: float, optional
+        lower bound of the color axis.
+        Will be set automatically of None.
+    vmax: float, optional
+        upper bound of the color axis.
+        Will be set automatically of None.
+    sink : str
         If set to 'blue' or 'b', plots sinks in blue and sources in red,
         if set to 'red' or 'r', sinks plotted in red and sources blue.
-    interpolation : string.
+    interpolation : str | None
         If 'spline', will smoothen the CSD using spline method,
         if None, no smoothing will be applied.
 
@@ -1269,10 +1273,13 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
-    if sink[0] == 'b':
+    if sink[0].lower() == 'b':
         cmap = "jet"
-    elif sink[0] == 'r':
+    elif sink[0].lower() == 'r':
         cmap = "jet_r"
+    elif sink[0].lower() != 'b' or sink[0].lower() != 'r':
+        raise RuntimeError('Please use sink = '"'b'"' or sink = '"'r'"'.'
+                           ' Only colormap "jet" is supported for CSD.')
 
     if interpolation == 'spline':
         # create interpolation function
@@ -1282,7 +1289,7 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
                                  contact_labels[-1] - contact_labels[0])
         # interpolate
         data = interp_data(times, new_depths).T
-    elif not interpolation:
+    elif interpolation is None:
         data = data
         new_depths = contact_labels
 

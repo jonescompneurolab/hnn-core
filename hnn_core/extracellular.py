@@ -511,12 +511,24 @@ class ExtracellularArray:
                 show=show)
         return fig
 
-    def plot_csd(self, colorbar=True, ax=None, vmin=None, vmax=None,
-                 interpolation='spline', show=True):
+    def plot_csd(self, vmin=None, vmax=None, interpolation='spline',
+                 sink='b', colorbar=True, ax=None, show=True):
         """Plot laminar current source density (CSD) estimation
 
         Parameters
         ----------
+        vmin: float, optional
+            lower bound of the color axis.
+            Will be set automatically of None.
+        vmax: float, optional
+            upper bound of the color axis.
+            Will be set automatically of None.
+        sink : str
+            If set to 'blue' or 'b', plots sinks in blue and sources in red,
+            if set to 'red' or 'r', sinks plotted in red and sources blue.
+        interpolation : str | None
+            If 'spline', will smoothen the CSD using spline method,
+            if None, no smoothing will be applied.
         colorbar : bool
             If the colorbar is presented.
         ax : instance of matplotlib figure | None
@@ -539,7 +551,8 @@ class ExtracellularArray:
         fig = plot_laminar_csd(self.times, csd_data,
                                contact_labels=contact_labels, ax=ax,
                                colorbar=colorbar, vmin=vmin, vmax=vmax,
-                               interpolation=interpolation, show=show)
+                               interpolation=interpolation, sink=sink,
+                               show=show)
 
         return fig
 
