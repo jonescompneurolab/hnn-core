@@ -7,7 +7,7 @@ import pytest
 import numpy as np
 import os
 
-from hnn_core.batch_simulate import BatchSimulate
+from hnn_core import BatchSimulate
 
 
 @pytest.fixture
@@ -33,9 +33,9 @@ def batch_simulate_instance(tmp_path):
                              synaptic_delays=synaptic_delays)
 
     return BatchSimulate(set_params=set_params,
-                         tstop=10.,
+                         tstop=1.,
                          file_path=tmp_path,
-                         num_files=3)
+                         batch_size=3)
 
 
 @pytest.fixture
@@ -82,7 +82,8 @@ def test_simulate_batch(batch_simulate_instance, param_grid):
     param_combinations = batch_simulate_instance._generate_param_combinations(
         param_grid)[:3]
     results = batch_simulate_instance.simulate_batch(param_combinations,
-                                                     n_jobs=2)
+                                                     n_jobs=1,
+                                                     backend='threading')
     assert len(results) == len(param_combinations)
     for result in results:
         assert 'net' in result
@@ -92,74 +93,65 @@ def test_simulate_batch(batch_simulate_instance, param_grid):
 
 def test_run(batch_simulate_instance, param_grid):
     """Test the run method of the batch_simulate_instance."""
-    results = batch_simulate_instance.run(param_grid, n_jobs=2,
-                                          return_output=True,
-                                          combinations=False)
+    results_without_cache = batch_simulate_instance.run(param_grid,
+                                                        n_jobs=2,
+                                                        return_output=True,
+                                                        combinations=False,
+                                                        backend='loky',
+                                                        clear_cache=False)
 
-    assert results is not None
-    assert isinstance(results, list)
-    assert len(results) == len(
+    total_combinations = len(
         batch_simulate_instance._generate_param_combinations(
             param_grid, combinations=False))
 
+    assert results_without_cache is not None
+    assert isinstance(results_without_cache, list)
+    assert len(results_without_cache) == total_combinations
 
-def test_save_and_load(batch_simulate_instance, param_grid, tmp_path):
-    """Test the save method of BatchSimulate class."""
+    results_with_cache = batch_simulate_instance.run(param_grid,
+                                                     n_jobs=2,
+                                                     return_output=True,
+                                                     combinations=False,
+                                                     backend='loky',
+                                                     clear_cache=True)
+
+    assert results_with_cache is not None
+    assert isinstance(results_with_cache, list)
+    assert len(results_with_cache) == 0
+
+
+def test_save_load_and_overwrite(batch_simulate_instance,
+                                 param_grid, tmp_path):
+    """Test the save method and its overwrite functionality."""
     param_combinations = batch_simulate_instance._generate_param_combinations(
-        param_grid)[:5]
-    results = batch_simulate_instance.simulate_batch(
-        param_combinations,
-        n_jobs=3)
-
-    batch_simulate_instance.save(results)
-    num_files_created = len([name for name in os.listdir(tmp_path)
-                             if name.startswith('sim_run_') and
-                             name.endswith('.npy')])
-    expected_num_files = min(batch_simulate_instance.num_files, len(results))
-    assert num_files_created == expected_num_files
-
-    loaded_results = []
-    for i in range(expected_num_files):
-        file_path = tmp_path / f'sim_run_{i}.npy'
-        assert file_path.exists()
-
-        sim_data = np.load(file_path, allow_pickle=True)
-        loaded_results.extend(sim_data)
-
-    original_data = np.stack([dpl['dpl'][0].data['agg'] for dpl in results])
-    loaded_data = np.stack(loaded_results)
-
-    assert (original_data == loaded_data).all()
-
-
-def test_save_overwrite(batch_simulate_instance, param_grid, tmp_path):
-    """Test the save method's overwrite functionality."""
-    param_combinations = batch_simulate_instance._generate_param_combinations(
-        param_grid)[:5]
+        param_grid)[:3]
     results = batch_simulate_instance.simulate_batch(
         param_combinations,
         n_jobs=2)
 
-    batch_simulate_instance.save(results)
+    start_idx = 0
+    end_idx = len(results)
 
+    batch_simulate_instance.save(results, start_idx, end_idx)
+
+    file_name = os.path.join(tmp_path, f'sim_run_{start_idx}-{end_idx}.npy')
+    assert os.path.exists(file_name)
+
+    loaded_results = np.load(file_name, allow_pickle=True)
+    original_data = np.stack([dpl['dpl'][0].data['agg'] for dpl in results])
+    assert (original_data == loaded_results).all()
+
+    # Overwrite Test
     batch_simulate_instance.overwrite = False
     results[0]['dpl'][0].data['agg'][0] += 1
 
     with pytest.raises(FileExistsError):
-        batch_simulate_instance.save(results)
+        batch_simulate_instance.save(results, start_idx, end_idx)
 
     batch_simulate_instance.overwrite = True
-    batch_simulate_instance.save(results)
+    batch_simulate_instance.save(results, start_idx, end_idx)
 
-    expected_num_files = min(batch_simulate_instance.num_files, len(results))
-
-    loaded_results = []
-    for i in range(expected_num_files):
-        file_path = tmp_path / f'sim_run_{i}.npy'
-        sim_data = np.load(file_path, allow_pickle=True)
-        loaded_results.extend(sim_data)
+    loaded_results = np.load(file_name, allow_pickle=True)
 
     original_data = np.stack([dpl['dpl'][0].data['agg'] for dpl in results])
-    loaded_data = np.stack(loaded_results)
-
-    assert (original_data == loaded_data).all()
+    assert (original_data == loaded_results).all()

@@ -7,17 +7,18 @@
 
 import numpy as np
 import os
-from joblib import Parallel, delayed
+from joblib import Parallel, delayed, parallel_config
 from .dipole import simulate_dipole
 from .network_models import (jones_2009_model,
                              calcium_model, law_2021_model)
 
 
-class BatchSimulate:
+class BatchSimulate(object):
     def __init__(self, set_params, net_name='jones', tstop=170,
                  dt=0.025, n_trials=1, record_vsec=False,
                  record_isec=False, postproc=False, save_outputs=False,
-                 file_path='./sim_results', num_files=100, overwrite=True):
+                 file_path='./sim_results', batch_size=100,
+                 overwrite=True, summary_func=None):
         """Initialize the BatchSimulate class.
 
         Parameters
@@ -59,11 +60,24 @@ class BatchSimulate:
         file_path : str, optional
             The path to save the simulation outputs.
             Default is './sim_results'.
-        num_files : int, optional
-            The number of files to split the simulation outputs into.
+        batch_size : int, optional
+            The maximum number of simulations saved in a single file.
             Default is 100.
         overwrite : bool, optional
-            Whether to overwrite existing files. Default is True.
+            Whether to overwrite existing files and create file paths
+            if they do not exist. Default is True.
+        summary_func : callable, optional
+            A function to calculate summary statistics from the simulation
+            results. Default is None.
+        Notes
+        -----
+        When `save_output=True`, the saved files will appear as
+        `sim_run_{start_idx}-{end_idx}.npy` in the specified `file_path`
+        directory. The `start_idx` and `end_idx` indicate the range of
+        simulation indices contained in each file. Each file will contain
+        a maximum of `batch_size` simulations, split evenly among the
+        available files. If `overwrite=True`, existing files with the same name
+        will be overwritten.
         """
         self.set_params = set_params
         self.net_name = net_name
@@ -75,10 +89,13 @@ class BatchSimulate:
         self.postproc = postproc
         self.save_outputs = save_outputs
         self.file_path = file_path
-        self.num_files = num_files
+        self.batch_size = batch_size
         self.overwrite = overwrite
+        self.summary_func = summary_func
 
-    def run(self, param_grid, return_output=True, combinations=True, n_jobs=1):
+    def run(self, param_grid, return_output=True,
+            combinations=True, n_jobs=1, backend='loky',
+            verbose=50, clear_cache=False):
         """Run batch simulations.
 
         Parameters
@@ -93,6 +110,14 @@ class BatchSimulate:
             Default is True.
         n_jobs : int, optional
             Number of parallel jobs. Default is 1.
+        backend : str or joblib.parallel.ParallelBackendBase instance, optional
+            The parallel backend to use. Can be one of `loky`, `threading`,
+            `multiprocessing`, or `dask`. Default is `loky`
+        verbose : int, optional
+            The verbosity level for parallel execution. Default is 50.
+        clear_cache : bool, optional
+            Whether to clear the results cache after saving each batch.
+            Default is False
 
         Returns
         -------
@@ -101,15 +126,41 @@ class BatchSimulate:
         """
         param_combinations = self._generate_param_combinations(
             param_grid, combinations)
-        results = self.simulate_batch(param_combinations, n_jobs=n_jobs)
+        total_sims = len(param_combinations)
+        num_sims_per_batch = max(total_sims // self.batch_size, 1)
+        batch_size = min(self.batch_size, total_sims)
 
-        if self.save_outputs:
-            self.save(results)
+        results = []
+        for i in range(batch_size):
+            start_idx = i * num_sims_per_batch
+            end_idx = start_idx + num_sims_per_batch
+            if i == batch_size - 1:
+                end_idx = len(param_combinations)
+            batch_results = self.simulate_batch(
+                param_combinations[start_idx:end_idx],
+                n_jobs=n_jobs,
+                backend=backend,
+                verbose=verbose)
+
+            if self.save_outputs:
+                self.save(batch_results, start_idx, end_idx)
+
+            if self.summary_func is not None:
+                summary_statistics = self.summary_func(batch_results)
+                if return_output and not clear_cache:
+                    results.append(summary_statistics)
+
+            elif return_output and not clear_cache:
+                results.append(batch_results)
+
+            if clear_cache:
+                del batch_results
 
         if return_output:
             return results
 
-    def simulate_batch(self, param_combinations, n_jobs=1):
+    def simulate_batch(self, param_combinations, n_jobs=1,
+                       backend='loky', verbose=50):
         """Simulate a batch of parameter sets in parallel.
 
         Parameters
@@ -118,6 +169,11 @@ class BatchSimulate:
             List of parameter combinations.
         n_jobs : int, optional
             Number of parallel jobs. Default is 1.
+        backend : str or joblib.parallel.ParallelBackendBase instance, optional
+            The parallel backend to use. Can be one of `loky`, `threading`,
+            `multiprocessing`, or `dask`. Default is `loky`
+        verbose : int, optional
+            The verbosity level for parallel execution. Default is 50.
 
         Returns
         -------
@@ -128,9 +184,10 @@ class BatchSimulate:
             - `dpl`: The simulated dipole.
             - `param_values`: The parameter values used for the simulation.
         """
-        res = Parallel(n_jobs=n_jobs, verbose=50)(
-            delayed(self._run_single_sim)(
-                params) for params in param_combinations)
+        with parallel_config(backend=backend):
+            res = Parallel(n_jobs=n_jobs, verbose=verbose)(
+                delayed(self._run_single_sim)(
+                    params) for params in param_combinations)
         return res
 
     def _run_single_sim(self, param_values):
@@ -161,7 +218,7 @@ class BatchSimulate:
             net = law_2021_model()
         elif self.net_name == 'calcium':
             net = calcium_model()
-        print(param_values)
+
         self.set_params(param_values, net)
         dpl = simulate_dipole(net,
                               tstop=self.tstop,
@@ -201,32 +258,26 @@ class BatchSimulate:
                                   for combination in zip(*values)]
         return param_combinations
 
-    def save(self, sim_results):
+    def save(self, results, start_idx, end_idx):
         """Save simulation results to files.
 
         Parameters
         ----------
-        sim_results : list
-            List of simulation results.
+        results : list
+            The results to save.
+        batch_index : int
+            The index of the current batch.
         """
         if not os.path.exists(self.file_path):
             os.makedirs(self.file_path)
 
-        sim_data = np.stack([dpl['dpl'][0].data['agg'] for dpl in sim_results])
+        sim_data = np.stack([dpl['dpl'][0].data['agg'] for dpl in results])
 
-        total_sims = len(sim_data)
-        num_sims_per_file = max(total_sims // self.num_files, 1)
+        file_name = os.path.join(self.file_path,
+                                 f'sim_run_{start_idx}-{end_idx}.npy')
+        if os.path.exists(file_name) and not self.overwrite:
+            raise FileExistsError(
+                f"File {file_name} already exists and "
+                "overwrite is set to False.")
 
-        for i in range(self.num_files):
-            start_idx = i * num_sims_per_file
-            end_idx = start_idx + num_sims_per_file
-            if i == self.num_files - 1:
-                end_idx = len(sim_data)
-
-            file_name = os.path.join(self.file_path, f'sim_run_{i}.npy')
-            if os.path.exists(file_name) and not self.overwrite:
-                raise FileExistsError(
-                    f"File {file_name} already exists and"
-                    "overwrite is set to False.")
-
-            np.save(file_name, sim_data[start_idx:end_idx])
+        np.save(file_name, sim_data)
