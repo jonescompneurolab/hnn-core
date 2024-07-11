@@ -707,10 +707,14 @@ def remove_nulled_drives(net):
 
     net.clear_drives()
     for drive_name, drive in drives_copy.items():
-        # Do not add drive if tstart is > tstop
-        if drive['dynamics'].get('tstart'):
-            if drive['dynamics']['tstart'] > drive['dynamics']['tstop']:
-                continue
+        # Do not add drive if tstart is > tstop, or negative
+        t_start = drive['dynamics'].get('tstart')
+        t_stop = drive['dynamics'].get('tstop')
+        if (t_start is not None and t_stop is not None and
+                ((t_start > t_stop) or
+                 (t_start < 0) or
+                 (t_stop < 0))):
+            continue
         # Do not add if all 0 weights
         elif not _any_positive_weights(drive):
             continue
