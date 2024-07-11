@@ -685,7 +685,7 @@ def test_gui_cell_params_widgets(setup_gui):
     for pyramid_cell_type in pyramid_cell_types:
         cell_type = pyramid_cell_type.split('_')[0]
         for cell_layer in layers:
-            key = f'{cell_type}_{cell_layer}'
+            key = f'{cell_type} Pyramidal_{cell_layer}'
             assert (any(key in k for k in keys))
             num_cell_params = num_cell_params + 1
 
