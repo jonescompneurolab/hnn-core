@@ -672,13 +672,6 @@ def _any_positive_weights(drive):
         return False
 
 
-def _get_n_cells(net):
-    """ Get number of neocortical cells  """
-    cell_names = net.cell_types.keys()
-    n_cells = max([net.gid_ranges[cell_name].stop for cell_name in cell_names])
-    return n_cells
-
-
 def remove_nulled_drives(net):
     """Removes drives from network if they have been given null parameters.
 
