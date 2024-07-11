@@ -694,6 +694,7 @@ def remove_nulled_drives(net):
 
     Returns
     -------
+    net : Network object
 
     """
     from .network import pick_connection
