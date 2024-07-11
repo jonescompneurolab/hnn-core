@@ -1768,10 +1768,9 @@ def _update_geometry_cell_params(net, cell_param_key, param_list):
     dendrite_cm = cell_params[4].value
     dendrite_Ra = cell_params[5].value
 
-    dendrite_sections = [
-        'apical_trunk', 'apical_1', 'apical_tuft', 'apical_oblique',
-        'basal_1', 'basal_2', 'basal_3'
-    ]
+    dendrite_sections = [name for name in sections.keys()
+                         if name != 'soma'
+                         ]
 
     param_indices = [
         (6, 7), (8, 9), (10, 11), (12, 13), (14, 15), (16, 17), (18, 19)]
@@ -1888,8 +1887,7 @@ def _update_L5_biophysics_cell_params(net, cell_param_key, param_list):
 
 def update_common_dendrite_sections(sections, mechs_params):
     dendrite_sections = [
-        'apical_trunk', 'apical_1', 'apical_tuft', 'apical_oblique',
-        'basal_1', 'basal_2', 'basal_3'
+        name for name in sections.keys() if name != 'soma'
     ]
     for section in dendrite_sections:
         sections[section].mechs.update(mechs_params)
