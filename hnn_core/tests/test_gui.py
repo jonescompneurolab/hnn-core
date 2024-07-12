@@ -676,7 +676,11 @@ def test_gui_cell_params_widgets(setup_gui):
                           if "pyramidal" in cell_type]
     assert (len(pyramid_cell_types) == 2)
 
-    # Check cell types map directly to the gui widgets
+    # Check the if the cell params dictionary has been updated
+    # Security check for if parameters have been added or removed from the cell
+    # params dict. Any additions will need mappings added to the
+    # update_{*}_cell_params functions
+
     layers = gui.cell_layer_radio_buttons.options
     assert (len(layers) == 3)
 
@@ -687,7 +691,7 @@ def test_gui_cell_params_widgets(setup_gui):
         for cell_layer in layers:
             key = f'{cell_type} Pyramidal_{cell_layer}'
             assert (any(key in k for k in keys))
-            num_cell_params = num_cell_params + 1
+            num_cell_params += 1
 
     assert (len(keys) == num_cell_params)
 
