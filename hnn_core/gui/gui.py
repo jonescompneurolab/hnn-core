@@ -1593,7 +1593,6 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
     for vbox_key, cell_param_list in cell_params_vboxes.items():
         for key, update_function in update_functions.items():
             if key in vbox_key:
-                # Remove 'Pyramidal' keyword
                 cell_type = vbox_key.split()[0]
                 update_function(single_simulation_data['net'], cell_type,
                                 cell_param_list.children)
