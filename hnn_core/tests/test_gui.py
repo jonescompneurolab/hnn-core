@@ -676,7 +676,6 @@ def test_gui_cell_params_widgets(setup_gui):
                           if "pyramidal" in cell_type]
     assert (len(pyramid_cell_types) == 2)
 
-    # Check the if the cell params dictionary has been updated
     # Security check for if parameters have been added or removed from the cell
     # params dict. Any additions will need mappings added to the
     # update_{*}_cell_params functions
