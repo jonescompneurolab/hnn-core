@@ -82,6 +82,10 @@ Changelog
 - Updated `plot_spikes_raster` logic to include all neurons in network model.
   Removed GUI exclusion from build, by `Abdul Samad Siddiqui`_  in :gh:`754`.
 
+- Added GUI feature to read and modify cell parameters,
+  by `Camilo Diaz`_  in :gh:`806`.
+
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
