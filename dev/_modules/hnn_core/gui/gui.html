@@ -160,11 +160,91 @@
 <span class="kn">from</span> <span class="nn">hnn_core.network</span> <span class="kn">import</span> <span class="n">pick_connection</span>
 <span class="kn">from</span> <span class="nn">hnn_core.params</span> <span class="kn">import</span> <span class="n">_extract_drive_specs_from_hnn_params</span>
 <span class="kn">from</span> <span class="nn">hnn_core.dipole</span> <span class="kn">import</span> <span class="n">_read_dipole_txt</span>
+<span class="kn">from</span> <span class="nn">hnn_core.params_default</span> <span class="kn">import</span> <span class="p">(</span><span class="n">get_L2Pyr_params_default</span><span class="p">,</span>
+                                     <span class="n">get_L5Pyr_params_default</span><span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">base64</span>
 <span class="kn">import</span> <span class="nn">zipfile</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+
+<span class="n">cell_parameters_dict</span> <span class="o">=</span> <span class="p">{</span>
+
+    <span class="s2">&quot;Geometry&quot;</span><span class="p">:</span>
+    <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;Soma length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_L&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_diam&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma capacitive density&#39;</span><span class="p">,</span> <span class="s1">&#39;F/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_cm&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma resistivity&#39;</span><span class="p">,</span> <span class="s1">&#39;ohm-cm&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_Ra&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite capacitive density&#39;</span><span class="p">,</span> <span class="s1">&#39;F/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_cm&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite resistivity&#39;</span><span class="p">,</span> <span class="s1">&#39;ohm-cm&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_Ra&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Apical Dendrite Trunk length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apicaltrunk_L&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Apical Dendrite Trunk diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apicaltrunk_diam&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Apical Dendrite 1 length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apical1_L&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Apical Dendrite 1 diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apical1_diam&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Apical Dendrite Tuft length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apicaltuft_L&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Apical Dendrite Tuft diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apicaltuft_diam&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Oblique Apical Dendrite length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apicaloblique_L&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Oblique Apical Dendrite diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apicaloblique_diam&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Basal Dendrite 1 length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;basal1_L&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Basal Dendrite 1 diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;basal1_diam&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Basal Dendrite 2 length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;basal2_L&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Basal Dendrite 2 diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;basal2_diam&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Basal Dendrite 3 length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;basal3_L&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Basal Dendrite 3 diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;basal3_diam&#39;</span><span class="p">)</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;Synapses&quot;</span><span class="p">:</span>
+    <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;AMPA reversal&#39;</span><span class="p">,</span> <span class="s1">&#39;mV&#39;</span><span class="p">,</span> <span class="s1">&#39;ampa_e&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;AMPA rise time&#39;</span><span class="p">,</span> <span class="s1">&#39;ms&#39;</span><span class="p">,</span> <span class="s1">&#39;ampa_tau1&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;AMPA decay time&#39;</span><span class="p">,</span> <span class="s1">&#39;ms&#39;</span><span class="p">,</span> <span class="s1">&#39;ampa_tau2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;NMDA reversal&#39;</span><span class="p">,</span> <span class="s1">&#39;mV&#39;</span><span class="p">,</span> <span class="s1">&#39;nmda_e&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;NMDA rise time&#39;</span><span class="p">,</span> <span class="s1">&#39;ms&#39;</span><span class="p">,</span> <span class="s1">&#39;nmda_tau1&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;NMDA decay time&#39;</span><span class="p">,</span> <span class="s1">&#39;ms&#39;</span><span class="p">,</span> <span class="s1">&#39;nmda_tau2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;GABAA reversal&#39;</span><span class="p">,</span> <span class="s1">&#39;mV&#39;</span><span class="p">,</span> <span class="s1">&#39;gabaa_e&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;GABAA rise time&#39;</span><span class="p">,</span> <span class="s1">&#39;ms&#39;</span><span class="p">,</span> <span class="s1">&#39;gabaa_tau1&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;GABAA decay time&#39;</span><span class="p">,</span> <span class="s1">&#39;ms&#39;</span><span class="p">,</span> <span class="s1">&#39;gabaa_tau2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;GABAB reversal&#39;</span><span class="p">,</span> <span class="s1">&#39;mV&#39;</span><span class="p">,</span> <span class="s1">&#39;gabab_e&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;GABAB rise time&#39;</span><span class="p">,</span> <span class="s1">&#39;ms&#39;</span><span class="p">,</span> <span class="s1">&#39;gabab_tau1&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;GABAB decay time&#39;</span><span class="p">,</span> <span class="s1">&#39;ms&#39;</span><span class="p">,</span> <span class="s1">&#39;gabab_tau2&#39;</span><span class="p">)</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;Biophysics L2&quot;</span><span class="p">:</span>
+    <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;Soma Kv channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;S/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_gkbar_hh2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma Na channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;S/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_gnabar_hh2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma leak reversal&#39;</span><span class="p">,</span> <span class="s1">&#39;mV&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_el_hh2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma leak channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;S/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_gl_hh2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma Km channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;pS/micron2&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_gbar_km&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite Kv channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;S/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_gkbar_hh2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite Na channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;S/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_gnabar_hh2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite leak reversal&#39;</span><span class="p">,</span> <span class="s1">&#39;mV&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_el_hh2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite leak channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;S/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_gl_hh2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite Km channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;pS/micron2&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_gbar_km&#39;</span><span class="p">)</span>
+    <span class="p">],</span>
+    <span class="s2">&quot;Biophysics L5&quot;</span><span class="p">:</span>
+    <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;Soma Kv channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;S/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_gkbar_hh2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma Na channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;S/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_gnabar_hh2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma leak reversal&#39;</span><span class="p">,</span> <span class="s1">&#39;mV&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_el_hh2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma leak channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;S/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_gl_hh2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma Ca channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;pS/micron2&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_gbar_ca&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma Ca decay time&#39;</span><span class="p">,</span> <span class="s1">&#39;ms&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_taur_cad&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma Kca channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;pS/micron2&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_gbar_kca&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma Km channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;pS/micron2&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_gbar_km&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma CaT channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;S/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_gbar_cat&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma HCN channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;S/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_gbar_ar&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite Kv channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;S/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_gkbar_hh2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite Na channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;S/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_gnabar_hh2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite leak reversal&#39;</span><span class="p">,</span> <span class="s1">&#39;mV&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_el_hh2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite leak channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;S/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_gl_hh2&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite Ca channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;pS/micron2&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_gbar_ca&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite Ca decay time&#39;</span><span class="p">,</span> <span class="s1">&#39;ms&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_taur_cad&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite KCa channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;pS/micron2&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_gbar_kca&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite Km channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;pS/micron2&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_gbar_km&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite CaT channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;S/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_gbar_cat&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite HCN channel density&#39;</span><span class="p">,</span> <span class="s1">&#39;S/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_gbar_ar&#39;</span><span class="p">)</span>
+    <span class="p">]</span>
+<span class="p">}</span>
 
 
 <span class="k">class</span> <span class="nc">_OutputWidgetHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Handler</span><span class="p">):</span>
@@ -418,6 +498,14 @@
             <span class="s1">&#39;Delete drives&#39;</span><span class="p">,</span> <span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;btn&#39;</span><span class="p">],</span>
             <span class="n">button_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">])</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">cell_type_radio_buttons</span> <span class="o">=</span> <span class="n">RadioButtons</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;L2 Pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;L5 Pyramidal&#39;</span><span class="p">],</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Cell type:&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cell_layer_radio_buttons</span> <span class="o">=</span> <span class="n">RadioButtons</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Geometry&#39;</span><span class="p">,</span> <span class="s1">&#39;Synapses&#39;</span><span class="p">,</span> <span class="s1">&#39;Biophysics&#39;</span><span class="p">],</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Cell Properties:&#39;</span><span class="p">)</span>
+
         <span class="c1"># Plotting window</span>
 
         <span class="c1"># Visualization figure related dicts</span>
@@ -432,8 +520,17 @@
         <span class="c1"># Connectivity list</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
+        <span class="c1"># Cell parameter list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_ui_components</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_logging_window_logger</span><span class="p">()</span>
+
+<div class="viewcode-block" id="HNNGUI.get_cell_parameters_dict"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.get_cell_parameters_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_cell_parameters_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of elements in the</span>
+<span class="sd">            cell_parameters_dict dictionary.</span>
+<span class="sd">            This is for testing purposes &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">cell_parameters_dict</span></div>
 
     <span class="k">def</span> <span class="nf">_init_html_download_button</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">b64</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
@@ -471,6 +568,7 @@
         <span class="c1"># dynamic larger components</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>  <span class="c1"># tab to add new drives</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>  <span class="c1"># tab to tune connectivity.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cell_params_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>
 
@@ -550,7 +648,9 @@
                 <span class="n">change</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_boxes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;drive_textbox&#39;</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cell_params_out</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_layer_radio_buttons</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cell_type_radio_buttons</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;drive_textbox&#39;</span><span class="p">],</span>
                 <span class="s2">&quot;connectivity&quot;</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">_on_upload_drives</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
@@ -558,7 +658,9 @@
                 <span class="n">change</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_boxes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;drive_textbox&#39;</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cell_params_out</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_layer_radio_buttons</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cell_type_radio_buttons</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;drive_textbox&#39;</span><span class="p">],</span>
                 <span class="s2">&quot;drives&quot;</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">_on_upload_data</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
@@ -573,7 +675,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_mpi_cmd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_n_jobs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_bar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_contents</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz_manager</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">_simulation_list_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="n">_simulation_data</span><span class="p">,</span> <span class="n">file_extension</span> <span class="o">=</span> <span class="p">(</span>
@@ -598,6 +700,18 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">widget_location_selection</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="kc">True</span> <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">new</span> <span class="o">==</span> <span class="s2">&quot;Tonic&quot;</span> <span class="k">else</span> <span class="kc">False</span><span class="p">)</span>
 
+        <span class="k">def</span> <span class="nf">_cell_type_radio_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="n">_update_cell_params_vbox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cell_params_out</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span><span class="p">,</span>
+                                     <span class="n">value</span><span class="o">.</span><span class="n">new</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">cell_layer_radio_buttons</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">_cell_layer_radio_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="n">_update_cell_params_vbox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cell_params_out</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">cell_type_radio_buttons</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                     <span class="n">value</span><span class="o">.</span><span class="n">new</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_handle_backend_change</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_drive_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_add_drive_button_clicked</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">delete_drive_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">_delete_drives_clicked</span><span class="p">)</span>
@@ -608,6 +722,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">load_data_button</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_on_upload_data</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_simulation_list_change</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_drive_type_selection</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_driver_type_change</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cell_type_radio_buttons</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_cell_type_radio_change</span><span class="p">,</span>
+                                             <span class="s1">&#39;value&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cell_layer_radio_buttons</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_cell_layer_radio_change</span><span class="p">,</span>
+                                              <span class="s1">&#39;value&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="HNNGUI.compose"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.compose">[docs]</a>    <span class="k">def</span> <span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose widgets.</span>
@@ -625,19 +744,23 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_backend_config_out</span><span class="p">]),</span>
         <span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;config_box&#39;</span><span class="p">])</span>
 
+        <span class="n">connectivity_configuration</span> <span class="o">=</span> <span class="n">Tab</span><span class="p">()</span>
+
         <span class="n">connectivity_box</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span>
             <span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">load_connectivity_button</span><span class="p">,</span> <span class="p">]),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span><span class="p">,</span>
         <span class="p">])</span>
 
-        <span class="c1"># accordions to group local-connectivity by cell type</span>
-        <span class="n">connectivity_boxes</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">VBox</span><span class="p">(</span><span class="n">slider</span><span class="p">)</span> <span class="k">for</span> <span class="n">slider</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">]</span>
-        <span class="n">connectivity_names</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s1">&#39;Layer 2/3 Pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;Layer 5 Pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;Layer 2 Basket&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;Layer 5 Basket&#39;</span><span class="p">)</span>
-        <span class="n">cell_connectivity</span> <span class="o">=</span> <span class="n">Accordion</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="n">connectivity_boxes</span><span class="p">)</span>
-        <span class="n">cell_connectivity</span><span class="o">.</span><span class="n">titles</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">connectivity_names</span><span class="p">]</span>
+        <span class="n">cell_parameters</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span>
+            <span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">cell_type_radio_buttons</span><span class="p">,</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">cell_layer_radio_buttons</span><span class="p">]),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cell_params_out</span>
+        <span class="p">])</span>
+
+        <span class="n">connectivity_configuration</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="n">connectivity_box</span><span class="p">,</span>
+                                               <span class="n">cell_parameters</span><span class="p">]</span>
+        <span class="n">connectivity_configuration</span><span class="o">.</span><span class="n">titles</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Connectivity&#39;</span><span class="p">,</span>
+                                             <span class="s1">&#39;Cell parameters&#39;</span><span class="p">]</span>
 
         <span class="n">drive_selections</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_drive_button</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_drive_type_selection</span><span class="p">,</span>
@@ -657,10 +780,10 @@
         <span class="c1"># Tabs for left pane</span>
         <span class="n">left_tab</span> <span class="o">=</span> <span class="n">Tab</span><span class="p">()</span>
         <span class="n">left_tab</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">simulation_box</span><span class="p">,</span> <span class="n">connectivity_box</span><span class="p">,</span> <span class="n">drives_options</span><span class="p">,</span>
+            <span class="n">simulation_box</span><span class="p">,</span> <span class="n">connectivity_configuration</span><span class="p">,</span> <span class="n">drives_options</span><span class="p">,</span>
             <span class="n">config_panel</span><span class="p">,</span>
         <span class="p">]</span>
-        <span class="n">titles</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Simulation&#39;</span><span class="p">,</span> <span class="s1">&#39;Network connectivity&#39;</span><span class="p">,</span> <span class="s1">&#39;External drives&#39;</span><span class="p">,</span>
+        <span class="n">titles</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Simulation&#39;</span><span class="p">,</span> <span class="s1">&#39;Network&#39;</span><span class="p">,</span> <span class="s1">&#39;External drives&#39;</span><span class="p">,</span>
                   <span class="s1">&#39;Visualization&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">title</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">titles</span><span class="p">):</span>
             <span class="n">left_tab</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
@@ -692,6 +815,10 @@
                                     <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">drive_boxes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span><span class="p">,</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">_cell_params_out</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">cell_layer_radio_buttons</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">cell_type_radio_buttons</span><span class="p">,</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">return_layout</span><span class="p">:</span>
@@ -1301,10 +1428,26 @@
             <span class="n">display</span><span class="p">(</span><span class="n">accordion</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">add_connectivity_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
-                         <span class="n">connectivity_textfields</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">add_connectivity_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">,</span>
+                         <span class="n">cell_params_out</span><span class="p">,</span> <span class="n">cell_pameters_vboxes</span><span class="p">,</span>
+                         <span class="n">cell_layer_radio_button</span><span class="p">,</span> <span class="n">cell_type_radio_button</span><span class="p">,</span>
+                         <span class="n">layout</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add all possible connectivity boxes to connectivity tab.&quot;&quot;&quot;</span>
     <span class="n">net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="c1"># build network connectivity tab</span>
+    <span class="n">add_network_connectivity_tab</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
+                                 <span class="n">connectivity_textfields</span><span class="p">)</span>
+
+    <span class="c1"># build cell parameters tab</span>
+    <span class="n">add_cell_parameters_tab</span><span class="p">(</span><span class="n">cell_params_out</span><span class="p">,</span> <span class="n">cell_pameters_vboxes</span><span class="p">,</span>
+                            <span class="n">cell_layer_radio_button</span><span class="p">,</span> <span class="n">cell_type_radio_button</span><span class="p">,</span>
+                            <span class="n">layout</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">net</span>
+
+
+<span class="k">def</span> <span class="nf">add_network_connectivity_tab</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
+                                 <span class="n">connectivity_textfields</span><span class="p">):</span>
     <span class="n">cell_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">ct</span> <span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
     <span class="n">receptors</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;ampa&#39;</span><span class="p">,</span> <span class="s1">&#39;nmda&#39;</span><span class="p">,</span> <span class="s1">&#39;gabaa&#39;</span><span class="p">,</span> <span class="s1">&#39;gabab&#39;</span><span class="p">)</span>
     <span class="n">locations</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;proximal&#39;</span><span class="p">,</span> <span class="s1">&#39;distal&#39;</span><span class="p">,</span> <span class="s1">&#39;soma&#39;</span><span class="p">)</span>
@@ -1360,6 +1503,56 @@
     <span class="k">return</span> <span class="n">net</span>
 
 
+<span class="k">def</span> <span class="nf">add_cell_parameters_tab</span><span class="p">(</span><span class="n">cell_params_out</span><span class="p">,</span> <span class="n">cell_pameters_vboxes</span><span class="p">,</span>
+                            <span class="n">cell_layer_radio_button</span><span class="p">,</span> <span class="n">cell_type_radio_button</span><span class="p">,</span>
+                            <span class="n">layout</span><span class="p">):</span>
+    <span class="n">L2_default_values</span> <span class="o">=</span> <span class="n">get_L2Pyr_params_default</span><span class="p">()</span>
+    <span class="n">L5_default_values</span> <span class="o">=</span> <span class="n">get_L5Pyr_params_default</span><span class="p">()</span>
+    <span class="n">cell_types</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;L2&quot;</span><span class="p">,</span> <span class="n">L2_default_values</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;L5&quot;</span><span class="p">,</span> <span class="n">L5_default_values</span><span class="p">)]</span>
+    <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description_width&#39;</span><span class="p">:</span> <span class="s1">&#39;255px&#39;</span><span class="p">}</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">cell_types</span><span class="p">:</span>
+        <span class="n">layer_parameters</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">cell_parameters_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="s1">&#39;Biophysic&#39;</span> <span class="ow">in</span> <span class="n">layer</span> <span class="ow">and</span> <span class="n">cell_type</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">layer</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="n">cell_parameters_dict</span><span class="p">[</span><span class="n">layer</span><span class="p">]:</span>
+                <span class="n">param_name</span><span class="p">,</span> <span class="n">param_units</span><span class="p">,</span> <span class="n">params_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">parameter</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                       <span class="n">parameter</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                                       <span class="n">parameter</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="n">default_value</span> <span class="o">=</span> <span class="n">get_cell_param_default_value</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_type</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">Pyr_</span><span class="si">{</span><span class="n">params_key</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">cell_type</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">param_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">param_units</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="n">min_value</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1000.0</span> <span class="k">if</span> <span class="n">param_units</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s1">&#39;ms&#39;</span> <span class="k">else</span> <span class="mi">0</span>
+                <span class="n">text_field</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">default_value</span><span class="p">,</span>
+                                              <span class="nb">min</span><span class="o">=</span><span class="n">min_value</span><span class="p">,</span>
+                                              <span class="nb">max</span><span class="o">=</span><span class="mf">1000.0</span><span class="p">,</span>
+                                              <span class="n">step</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                                              <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+                                              <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                              <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">text_field</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="s2">&quot;350px&quot;</span>
+                <span class="n">layer_parameters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text_field</span><span class="p">)</span>
+            <span class="n">cell_pameters_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_type</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> Pyramidal_</span><span class="si">{</span><span class="n">layer</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">cell_pameters_vboxes</span><span class="p">[</span><span class="n">cell_pameters_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">layer_parameters</span><span class="p">)</span>
+            <span class="n">layer_parameters</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+    <span class="c1"># clear existing connectivity</span>
+    <span class="n">cell_params_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+
+    <span class="c1"># Add cell parameters</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">_update_cell_params_vbox</span><span class="p">(</span><span class="n">cell_params_out</span><span class="p">,</span>
+                                     <span class="n">cell_pameters_vboxes</span><span class="p">,</span>
+                                     <span class="n">cell_type_radio_button</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                     <span class="n">cell_layer_radio_button</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">get_cell_param_default_value</span><span class="p">(</span><span class="n">cell_type_key</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">param_dict</span><span class="p">[</span><span class="n">cell_type_key</span><span class="p">]</span>
+
+
 <span class="k">def</span> <span class="nf">add_drive_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span>
                   <span class="n">tstop</span><span class="p">,</span> <span class="n">layout</span><span class="p">):</span>
     <span class="n">net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
@@ -1404,12 +1597,17 @@
 
 <span class="k">def</span> <span class="nf">load_drive_and_connectivity</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span>
                                 <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
-                                <span class="n">connectivity_textfields</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">layout</span><span class="p">):</span>
+                                <span class="n">connectivity_textfields</span><span class="p">,</span> <span class="n">cell_params_out</span><span class="p">,</span>
+                                <span class="n">cell_pameters_vboxes</span><span class="p">,</span> <span class="n">cell_layer_radio_button</span><span class="p">,</span>
+                                <span class="n">cell_type_radio_button</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">layout</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add drive and connectivity ipywidgets from params.&quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
         <span class="c1"># Add connectivity</span>
-        <span class="n">add_connectivity_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
-                             <span class="n">connectivity_textfields</span><span class="p">)</span>
+        <span class="n">add_connectivity_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">,</span>
+                             <span class="n">cell_params_out</span><span class="p">,</span> <span class="n">cell_pameters_vboxes</span><span class="p">,</span>
+                             <span class="n">cell_layer_radio_button</span><span class="p">,</span> <span class="n">cell_type_radio_button</span><span class="p">,</span>
+                             <span class="n">layout</span><span class="p">)</span>
+
         <span class="c1"># Add drives</span>
         <span class="n">add_drive_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span>
                       <span class="n">tstop</span><span class="p">,</span> <span class="n">layout</span><span class="p">)</span>
@@ -1451,7 +1649,9 @@
 
 <span class="k">def</span> <span class="nf">on_upload_params_change</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drive_boxes</span><span class="p">,</span>
                             <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
-                            <span class="n">connectivity_textfields</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">load_type</span><span class="p">):</span>
+                            <span class="n">connectivity_textfields</span><span class="p">,</span> <span class="n">cell_params_out</span><span class="p">,</span>
+                            <span class="n">cell_pameters_vboxes</span><span class="p">,</span> <span class="n">cell_layer_radio_button</span><span class="p">,</span>
+                            <span class="n">cell_type_radio_button</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">load_type</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;owner&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span>
     <span class="n">param_dict</span> <span class="o">=</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -1470,7 +1670,10 @@
 
     <span class="c1"># init network, add drives &amp; connectivity</span>
     <span class="k">if</span> <span class="n">load_type</span> <span class="o">==</span> <span class="s1">&#39;connectivity&#39;</span><span class="p">:</span>
-        <span class="n">add_connectivity_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">)</span>
+        <span class="n">add_connectivity_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
+                             <span class="n">connectivity_textfields</span><span class="p">,</span> <span class="n">cell_params_out</span><span class="p">,</span>
+                             <span class="n">cell_pameters_vboxes</span><span class="p">,</span> <span class="n">cell_layer_radio_button</span><span class="p">,</span>
+                             <span class="n">cell_type_radio_button</span><span class="p">,</span> <span class="n">layout</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">load_type</span> <span class="o">==</span> <span class="s1">&#39;drives&#39;</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
             <span class="n">add_drive_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drives_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span>
@@ -1483,6 +1686,7 @@
 
 <span class="k">def</span> <span class="nf">_init_network_from_widgets</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">single_simulation_data</span><span class="p">,</span>
                                <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">,</span>
+                               <span class="n">cell_params_vboxes</span><span class="p">,</span>
                                <span class="n">add_drive</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct network and add drives.&quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;init network&quot;</span><span class="p">)</span>
@@ -1494,21 +1698,39 @@
     <span class="p">)</span>
     <span class="c1"># adjust connectivity according to the connectivity_tab</span>
     <span class="k">for</span> <span class="n">connectivity_slider</span> <span class="ow">in</span> <span class="n">connectivity_textfields</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">vbox</span> <span class="ow">in</span> <span class="n">connectivity_slider</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">vbox_key</span> <span class="ow">in</span> <span class="n">connectivity_slider</span><span class="p">:</span>
             <span class="n">conn_indices</span> <span class="o">=</span> <span class="n">pick_connection</span><span class="p">(</span>
                 <span class="n">net</span><span class="o">=</span><span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">],</span>
-                <span class="n">src_gids</span><span class="o">=</span><span class="n">vbox</span><span class="o">.</span><span class="n">_belongsto</span><span class="p">[</span><span class="s1">&#39;src_gids&#39;</span><span class="p">],</span>
-                <span class="n">target_gids</span><span class="o">=</span><span class="n">vbox</span><span class="o">.</span><span class="n">_belongsto</span><span class="p">[</span><span class="s1">&#39;target_gids&#39;</span><span class="p">],</span>
-                <span class="n">loc</span><span class="o">=</span><span class="n">vbox</span><span class="o">.</span><span class="n">_belongsto</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">],</span>
-                <span class="n">receptor</span><span class="o">=</span><span class="n">vbox</span><span class="o">.</span><span class="n">_belongsto</span><span class="p">[</span><span class="s1">&#39;receptor&#39;</span><span class="p">])</span>
+                <span class="n">src_gids</span><span class="o">=</span><span class="n">vbox_key</span><span class="o">.</span><span class="n">_belongsto</span><span class="p">[</span><span class="s1">&#39;src_gids&#39;</span><span class="p">],</span>
+                <span class="n">target_gids</span><span class="o">=</span><span class="n">vbox_key</span><span class="o">.</span><span class="n">_belongsto</span><span class="p">[</span><span class="s1">&#39;target_gids&#39;</span><span class="p">],</span>
+                <span class="n">loc</span><span class="o">=</span><span class="n">vbox_key</span><span class="o">.</span><span class="n">_belongsto</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">],</span>
+                <span class="n">receptor</span><span class="o">=</span><span class="n">vbox_key</span><span class="o">.</span><span class="n">_belongsto</span><span class="p">[</span><span class="s1">&#39;receptor&#39;</span><span class="p">])</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">conn_indices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">conn_indices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
                 <span class="n">conn_idx</span> <span class="o">=</span> <span class="n">conn_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_idx</span><span class="p">][</span>
-                    <span class="s1">&#39;nc_dict&#39;</span><span class="p">][</span><span class="s1">&#39;A_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vbox</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                    <span class="s1">&#39;nc_dict&#39;</span><span class="p">][</span><span class="s1">&#39;A_weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vbox_key</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
                 <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_idx</span><span class="p">][</span>
-                    <span class="s1">&#39;probability&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vbox</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                    <span class="s1">&#39;probability&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vbox_key</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="c1"># Update cell params</span>
+
+    <span class="n">update_functions</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;Geometry&#39;</span><span class="p">:</span> <span class="n">_update_geometry_cell_params</span><span class="p">,</span>
+        <span class="s1">&#39;Synapses&#39;</span><span class="p">:</span> <span class="n">_update_synapse_cell_params</span><span class="p">,</span>
+        <span class="s1">&#39;L2 Pyramidal_Biophysics&#39;</span><span class="p">:</span> <span class="n">_update_L2_biophysics_cell_params</span><span class="p">,</span>
+        <span class="s1">&#39;L5 Pyramidal_Biophysics&#39;</span><span class="p">:</span> <span class="n">_update_L5_biophysics_cell_params</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Update cell params</span>
+    <span class="k">for</span> <span class="n">vbox_key</span><span class="p">,</span> <span class="n">cell_param_list</span> <span class="ow">in</span> <span class="n">cell_params_vboxes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">update_function</span> <span class="ow">in</span> <span class="n">update_functions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">vbox_key</span><span class="p">:</span>
+                <span class="n">cell_type</span> <span class="o">=</span> <span class="n">vbox_key</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">update_function</span><span class="p">(</span><span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">],</span> <span class="n">cell_type</span><span class="p">,</span>
+                                <span class="n">cell_param_list</span><span class="o">.</span><span class="n">children</span><span class="p">)</span>
+                <span class="k">break</span>
 
     <span class="k">if</span> <span class="n">add_drive</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
         <span class="k">return</span>
@@ -1598,7 +1820,8 @@
                        <span class="n">all_data</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">ntrials</span><span class="p">,</span> <span class="n">backend_selection</span><span class="p">,</span>
                        <span class="n">mpi_cmd</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">simulation_status_bar</span><span class="p">,</span>
                        <span class="n">simulation_status_contents</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">,</span>
-                       <span class="n">viz_manager</span><span class="p">,</span> <span class="n">simulations_list_widget</span><span class="p">):</span>
+                       <span class="n">viz_manager</span><span class="p">,</span> <span class="n">simulations_list_widget</span><span class="p">,</span>
+                       <span class="n">cell_pameters_widgets</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the simulation and plot outputs.&quot;&quot;&quot;</span>
     <span class="n">simulation_data</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[</span><span class="s2">&quot;simulation_data&quot;</span><span class="p">]</span>
     <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
@@ -1616,7 +1839,8 @@
 
         <span class="n">_init_network_from_widgets</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
                                    <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">],</span> <span class="n">drive_widgets</span><span class="p">,</span>
-                                   <span class="n">connectivity_textfields</span><span class="p">)</span>
+                                   <span class="n">connectivity_textfields</span><span class="p">,</span>
+                                   <span class="n">cell_pameters_widgets</span><span class="p">)</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;start simulation&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">backend_selection</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;MPI&quot;</span><span class="p">:</span>
@@ -1648,6 +1872,158 @@
     <span class="k">for</span> <span class="n">ax_name</span><span class="p">,</span> <span class="n">plot_type</span> <span class="ow">in</span> <span class="n">ax_plots</span><span class="p">:</span>
         <span class="n">viz_manager</span><span class="o">.</span><span class="n">_simulate_edit_figure</span><span class="p">(</span><span class="n">fig_name</span><span class="p">,</span> <span class="n">ax_name</span><span class="p">,</span> <span class="n">_sim_name</span><span class="p">,</span>
                                           <span class="n">plot_type</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;plot&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_update_cell_params_vbox</span><span class="p">(</span><span class="n">cell_type_out</span><span class="p">,</span> <span class="n">cell_parameters_list</span><span class="p">,</span>
+                             <span class="n">cell_type</span><span class="p">,</span> <span class="n">cell_layer</span><span class="p">):</span>
+    <span class="n">cell_parameters_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">cell_layer</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;Biophysics&quot;</span> <span class="ow">in</span> <span class="n">cell_layer</span><span class="p">:</span>
+        <span class="n">cell_parameters_key</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">cell_type</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">if</span> <span class="n">cell_parameters_key</span> <span class="ow">in</span> <span class="n">cell_parameters_list</span><span class="p">:</span>
+        <span class="n">cell_type_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">cell_type_out</span><span class="p">:</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">cell_parameters_list</span><span class="p">[</span><span class="n">cell_parameters_key</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">_update_geometry_cell_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">cell_param_key</span><span class="p">,</span> <span class="n">param_list</span><span class="p">):</span>
+    <span class="n">cell_params</span> <span class="o">=</span> <span class="n">param_list</span>
+    <span class="n">cell_type</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_param_key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">_pyramidal&#39;</span>
+
+    <span class="n">sections</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span><span class="o">.</span><span class="n">sections</span>
+    <span class="c1"># Soma</span>
+    <span class="n">sections</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">sections</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_diam</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">sections</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_cm</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">sections</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_Ra</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="c1"># Dendrite common parameters</span>
+    <span class="n">dendrite_cm</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">dendrite_Ra</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="n">dendrite_sections</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">sections</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                         <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;soma&#39;</span>
+                         <span class="p">]</span>
+
+    <span class="n">param_indices</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">),</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">),</span> <span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span> <span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">),</span> <span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">19</span><span class="p">)]</span>
+
+    <span class="c1"># Dentrite</span>
+    <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">indices</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dendrite_sections</span><span class="p">,</span> <span class="n">param_indices</span><span class="p">):</span>
+        <span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">_diam</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">_cm</span> <span class="o">=</span> <span class="n">dendrite_cm</span>
+        <span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">_Ra</span> <span class="o">=</span> <span class="n">dendrite_Ra</span>
+
+
+<span class="k">def</span> <span class="nf">_update_synapse_cell_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">cell_param_key</span><span class="p">,</span> <span class="n">param_list</span><span class="p">):</span>
+    <span class="n">cell_params</span> <span class="o">=</span> <span class="n">param_list</span>
+    <span class="n">cell_type</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_param_key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">_pyramidal&#39;</span>
+    <span class="n">network_synapses</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span><span class="o">.</span><span class="n">synapses</span>
+    <span class="n">synapse_sections</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ampa&#39;</span><span class="p">,</span> <span class="s1">&#39;nmda&#39;</span><span class="p">,</span> <span class="s1">&#39;gabaa&#39;</span><span class="p">,</span> <span class="s1">&#39;gabab&#39;</span><span class="p">]</span>
+
+    <span class="n">param_indices</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">)]</span>
+
+    <span class="c1"># Update Dentrite</span>
+    <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">indices</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">synapse_sections</span><span class="p">,</span> <span class="n">param_indices</span><span class="p">):</span>
+        <span class="n">network_synapses</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="s1">&#39;e&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">network_synapses</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="s1">&#39;tau1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">network_synapses</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="s1">&#39;tau2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">_update_L2_biophysics_cell_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">cell_param_key</span><span class="p">,</span> <span class="n">param_list</span><span class="p">):</span>
+
+    <span class="n">cell_type</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_param_key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">_pyramidal&#39;</span>
+    <span class="n">sections</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span><span class="o">.</span><span class="n">sections</span>
+    <span class="c1"># Soma</span>
+    <span class="n">mechs_params</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;hh2&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;gkbar_hh2&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s1">&#39;gnabar_hh2&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s1">&#39;el_hh2&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s1">&#39;gl_hh2&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">},</span>
+        <span class="s1">&#39;km&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;gbar_km&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="n">sections</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mechs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">mechs_params</span><span class="p">)</span>
+
+    <span class="c1"># dendrites</span>
+    <span class="n">mechs_params</span><span class="p">[</span><span class="s1">&#39;hh2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;gkbar_hh2&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="s1">&#39;gnabar_hh2&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="s1">&#39;el_hh2&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="s1">&#39;gl_hh2&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+    <span class="n">mechs_params</span><span class="p">[</span><span class="s1">&#39;km&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;gbar_km&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+
+    <span class="n">update_common_dendrite_sections</span><span class="p">(</span><span class="n">sections</span><span class="p">,</span> <span class="n">mechs_params</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_update_L5_biophysics_cell_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">cell_param_key</span><span class="p">,</span> <span class="n">param_list</span><span class="p">):</span>
+    <span class="n">cell_type</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_param_key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">_pyramidal&#39;</span>
+    <span class="n">sections</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span><span class="o">.</span><span class="n">sections</span>
+    <span class="c1"># Soma</span>
+    <span class="n">mechs_params</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;hh2&#39;</span><span class="p">:</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;gkbar_hh2&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s1">&#39;gnabar_hh2&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s1">&#39;el_hh2&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s1">&#39;gl_hh2&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;ca&#39;</span><span class="p">:</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;gbar_ca&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;cad&#39;</span><span class="p">:</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;taur_cad&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;kca&#39;</span><span class="p">:</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;gbar_kca&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;km&#39;</span><span class="p">:</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;gbar_km&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;cat&#39;</span><span class="p">:</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;gbar_cat&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;ar&#39;</span><span class="p">:</span>
+        <span class="p">{</span>
+            <span class="s1">&#39;gbar_ar&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="n">sections</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mechs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">mechs_params</span><span class="p">)</span>
+
+    <span class="c1"># dendrites</span>
+    <span class="n">mechs_params</span><span class="p">[</span><span class="s1">&#39;hh2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;gkbar_hh2&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="s1">&#39;gnabar_hh2&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">11</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="s1">&#39;el_hh2&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">12</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="s1">&#39;gl_hh2&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">13</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+
+    <span class="n">mechs_params</span><span class="p">[</span><span class="s1">&#39;ca&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;gbar_ca&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">14</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+    <span class="n">mechs_params</span><span class="p">[</span><span class="s1">&#39;cad&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;taur_cad&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">15</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+    <span class="n">mechs_params</span><span class="p">[</span><span class="s1">&#39;kca&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;gbar_kca&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">16</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+    <span class="n">mechs_params</span><span class="p">[</span><span class="s1">&#39;km&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;gbar_km&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">17</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+    <span class="n">mechs_params</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;gbar_cat&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">18</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+    <span class="n">mechs_params</span><span class="p">[</span><span class="s1">&#39;ar&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;gbar_ar&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">19</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+
+    <span class="n">update_common_dendrite_sections</span><span class="p">(</span><span class="n">sections</span><span class="p">,</span> <span class="n">mechs_params</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">update_common_dendrite_sections</span><span class="p">(</span><span class="n">sections</span><span class="p">,</span> <span class="n">mechs_params</span><span class="p">):</span>
+    <span class="n">dendrite_sections</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">sections</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;soma&#39;</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">dendrite_sections</span><span class="p">:</span>
+        <span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">mechs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">mechs_params</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_serialize_simulation</span><span class="p">(</span><span class="n">log_out</span><span class="p">,</span> <span class="n">sim_data</span><span class="p">,</span> <span class="n">simulation_list_widget</span><span class="p">):</span>
