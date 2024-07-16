@@ -8,6 +8,7 @@
 import numpy as np
 import os
 from joblib import Parallel, delayed, parallel_config
+from .externals.mne import _validate_type, _check_option
 from .dipole import simulate_dipole
 from .network_models import (jones_2009_model,
                              calcium_model, law_2021_model)
@@ -79,6 +80,23 @@ class BatchSimulate(object):
         available files. If `overwrite=True`, existing files with the same name
         will be overwritten.
         """
+
+        _validate_type(net_name, types='str', item_name='net_name')
+        _check_option('net_name', net_name, ['jones', 'law', 'calcium'])
+        _validate_type(tstop, types='numeric', item_name='tstop')
+        _validate_type(dt, types='numeric', item_name='dt')
+        _validate_type(n_trials, types='int', item_name='n_trials')
+        _check_option('record_vsec', record_vsec, ['all', 'soma', False])
+        _check_option('record_isec', record_isec, ['all', 'soma', False])
+        _validate_type(file_path, types='path-like', item_name='file_path')
+        _validate_type(batch_size, types='int', item_name='batch_size')
+
+        if set_params is not None and not callable(set_params):
+            raise TypeError("set_params must be a callable function")
+
+        if summary_func is not None and not callable(summary_func):
+            raise TypeError("summary_func must be a callable function")
+
         self.set_params = set_params
         self.net_name = net_name
         self.tstop = tstop
@@ -124,6 +142,12 @@ class BatchSimulate(object):
         results : list
             List of simulation results if return_output is True.
         """
+        _validate_type(param_grid, types=(dict,), item_name='param_grid')
+        _validate_type(n_jobs, types='int', item_name='n_jobs')
+        _check_option('backend', backend, ['loky', 'threading',
+                                           'multiprocessing', 'dask'])
+        _validate_type(verbose, types='int', item_name='verbose')
+
         param_combinations = self._generate_param_combinations(
             param_grid, combinations)
         total_sims = len(param_combinations)
@@ -143,7 +167,7 @@ class BatchSimulate(object):
                 verbose=verbose)
 
             if self.save_outputs:
-                self.save(batch_results, start_idx, end_idx)
+                self._save(batch_results, start_idx, end_idx)
 
             if self.summary_func is not None:
                 summary_statistics = self.summary_func(batch_results)
@@ -184,6 +208,13 @@ class BatchSimulate(object):
             - `dpl`: The simulated dipole.
             - `param_values`: The parameter values used for the simulation.
         """
+        _validate_type(param_combinations, types=(list,),
+                       item_name='param_combinations')
+        _validate_type(n_jobs, types='int', item_name='n_jobs')
+        _check_option('backend', backend, ['loky', 'threading',
+                                           'multiprocessing', 'dask'])
+        _validate_type(verbose, types='int', item_name='verbose')
+
         with parallel_config(backend=backend):
             res = Parallel(n_jobs=n_jobs, verbose=verbose)(
                 delayed(self._run_single_sim)(
@@ -258,7 +289,7 @@ class BatchSimulate(object):
                                   for combination in zip(*values)]
         return param_combinations
 
-    def save(self, results, start_idx, end_idx):
+    def _save(self, results, start_idx, end_idx):
         """Save simulation results to files.
 
         Parameters
@@ -268,6 +299,10 @@ class BatchSimulate(object):
         batch_index : int
             The index of the current batch.
         """
+        _validate_type(results, types=(list,), item_name='results')
+        _validate_type(start_idx, types='int', item_name='start_idx')
+        _validate_type(end_idx, types='int', item_name='end_idx')
+
         if not os.path.exists(self.file_path):
             os.makedirs(self.file_path)
 
