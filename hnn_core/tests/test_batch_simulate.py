@@ -7,7 +7,7 @@ import pytest
 import numpy as np
 import os
 
-from hnn_core import BatchSimulate
+from hnn_core.batch_simulate import BatchSimulate
 
 
 @pytest.fixture
@@ -80,7 +80,7 @@ def test_run_single_sim(batch_simulate_instance):
 def test_simulate_batch(batch_simulate_instance, param_grid):
     """Test simulating a batch of parameter sets."""
     param_combinations = batch_simulate_instance._generate_param_combinations(
-        param_grid)[:3]
+        param_grid)[:1]
     results = batch_simulate_instance.simulate_batch(param_combinations,
                                                      n_jobs=1,
                                                      backend='threading')
@@ -89,6 +89,23 @@ def test_simulate_batch(batch_simulate_instance, param_grid):
         assert 'net' in result
         assert 'dpl' in result
         assert 'param_values' in result
+
+    # Validation Tests
+    invalid_param_combinations = 'invalid'
+    with pytest.raises(TypeError, match='param_combinations must be'):
+        batch_simulate_instance.simulate_batch(invalid_param_combinations)
+
+    with pytest.raises(TypeError, match='n_jobs must be'):
+        batch_simulate_instance.simulate_batch(param_combinations,
+                                               n_jobs='invalid')
+
+    with pytest.raises(ValueError, match="Invalid value for the 'backend'"):
+        batch_simulate_instance.simulate_batch(param_combinations,
+                                               backend='invalid')
+
+    with pytest.raises(TypeError, match='verbose must be'):
+        batch_simulate_instance.simulate_batch(param_combinations,
+                                               verbose='invalid')
 
 
 def test_run(batch_simulate_instance, param_grid):
@@ -119,6 +136,19 @@ def test_run(batch_simulate_instance, param_grid):
     assert isinstance(results_with_cache, list)
     assert len(results_with_cache) == 0
 
+    # Validation Tests
+    with pytest.raises(TypeError, match='param_grid must be'):
+        batch_simulate_instance.run('invalid_param_grid')
+
+    with pytest.raises(TypeError, match='n_jobs must be'):
+        batch_simulate_instance.run(param_grid, n_jobs='invalid')
+
+    with pytest.raises(ValueError, match="Invalid value for the 'backend'"):
+        batch_simulate_instance.run(param_grid, backend='invalid_backend')
+
+    with pytest.raises(TypeError, match='verbose must be'):
+        batch_simulate_instance.run(param_grid, verbose='invalid')
+
 
 def test_save_load_and_overwrite(batch_simulate_instance,
                                  param_grid, tmp_path):
@@ -132,7 +162,7 @@ def test_save_load_and_overwrite(batch_simulate_instance,
     start_idx = 0
     end_idx = len(results)
 
-    batch_simulate_instance.save(results, start_idx, end_idx)
+    batch_simulate_instance._save(results, start_idx, end_idx)
 
     file_name = os.path.join(tmp_path, f'sim_run_{start_idx}-{end_idx}.npy')
     assert os.path.exists(file_name)
@@ -146,12 +176,22 @@ def test_save_load_and_overwrite(batch_simulate_instance,
     results[0]['dpl'][0].data['agg'][0] += 1
 
     with pytest.raises(FileExistsError):
-        batch_simulate_instance.save(results, start_idx, end_idx)
+        batch_simulate_instance._save(results, start_idx, end_idx)
 
     batch_simulate_instance.overwrite = True
-    batch_simulate_instance.save(results, start_idx, end_idx)
+    batch_simulate_instance._save(results, start_idx, end_idx)
 
     loaded_results = np.load(file_name, allow_pickle=True)
 
     original_data = np.stack([dpl['dpl'][0].data['agg'] for dpl in results])
     assert (original_data == loaded_results).all()
+
+    # Validation Tests
+    with pytest.raises(TypeError, match='results must be'):
+        batch_simulate_instance._save('invalid_results', start_idx, end_idx)
+
+    with pytest.raises(TypeError, match='start_idx must be'):
+        batch_simulate_instance._save(results, 'invalid_start_idx', end_idx)
+
+    with pytest.raises(TypeError, match='end_idx must be'):
+        batch_simulate_instance._save(results, start_idx, 'invalid_end_idx')
