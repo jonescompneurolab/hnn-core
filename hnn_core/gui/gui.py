@@ -1727,7 +1727,7 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
                 'finished']
 
             sim_names = [sim_name for sim_name in simulation_data
-                               if simulation_data[sim_name]['net'] is not None]
+                         if simulation_data[sim_name]['net'] is not None]
 
             simulations_list_widget.options = sim_names
             simulations_list_widget.value = sim_names[0]
