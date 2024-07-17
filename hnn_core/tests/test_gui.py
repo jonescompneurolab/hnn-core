@@ -599,6 +599,13 @@ def test_gui_download_simulation(setup_gui):
     # result is a single csv file
     assert file_extension == ".csv"
 
+    # Check no loaded data is listed in the sims dropdown list to download
+    file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt"  # noqa
+    gui._simulate_upload_data(file1_url)
+    download_simulation_list = gui.simulation_list_widget.options
+    assert (len([sim_name for sim_name in download_simulation_list
+                if sim_name == "S1_SupraT"]) == 0)
+
 
 def test_gui_upload_csv_simulation(setup_gui):
     """Test if gui handles uploaded csv data"""
