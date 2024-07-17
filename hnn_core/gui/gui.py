@@ -1726,11 +1726,11 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
             simulation_status_bar.value = simulation_status_contents[
                 'finished']
 
-            run_simulations = [sim_name for sim_name in simulation_data
+            sim_names = [sim_name for sim_name in simulation_data
                                if simulation_data[sim_name]['net'] is not None]
 
-            simulations_list_widget.options = run_simulations
-            simulations_list_widget.value = run_simulations[0]
+            simulations_list_widget.options = sim_names
+            simulations_list_widget.value = sim_names[0]
 
     viz_manager.reset_fig_config_tabs()
     viz_manager.add_figure()
