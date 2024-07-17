@@ -94,21 +94,18 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance, cell_types):
     xxrange = np.arange(n_pyr_x) * inplane_distance
     yyrange = np.arange(n_pyr_y) * inplane_distance
 
-
     cell_name_pos_mapping = {
         'L5Pyr': _calc_pyramidal_coord(xxrange, yyrange, zdiff=0),
         'L2Pyr': _calc_pyramidal_coord(xxrange, yyrange, zdiff=zdiff),
         'L5Basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
-                                       inplane_distance, weight=0.2
-                                       ),
+                                       inplane_distance, weight=0.2),
         'L2Basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
-                                       inplane_distance, weight=0.8
-                                       )
+                                       inplane_distance, weight=0.8)
     }
 
     pos_dict = dict()
-    for cell_net_name, cell_value in cell_types.items():
-        cell_name = cell_value.name
+    for cell_net_name, cell_template in cell_types.items():
+        cell_name = cell_template.name
         pos_dict[cell_net_name] = cell_name_pos_mapping[cell_name]
 
     pos_dict['origin'] = _calc_origin(xxrange, yyrange, zdiff),
@@ -422,7 +419,6 @@ class Network:
         # cell counts, real and artificial
         self._n_cells = 0  # used in tests and MPIBackend checks
         self.pos_dict = dict()
-        self.cell_types = dict()
 
         # set the mesh shape
         _validate_type(mesh_shape, tuple, 'mesh_shape')
