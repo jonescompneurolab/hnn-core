@@ -34,7 +34,7 @@ def batch_simulate_instance(tmp_path):
 
     return BatchSimulate(set_params=set_params,
                          tstop=1.,
-                         file_path=tmp_path,
+                         save_folder=tmp_path,
                          batch_size=3)
 
 
@@ -45,8 +45,8 @@ def param_grid():
     return {
         'weight_basket': np.logspace(-4 - 1, 2),
         'weight_pyr': np.logspace(-4, -1, 2),
-        'mu': np.linspace(20, 80, 2),
-        'sigma': np.linspace(1, 20, 2)
+        'mu': [40],
+        'sigma': [5]
     }
 
 
@@ -148,6 +148,21 @@ def test_run(batch_simulate_instance, param_grid):
 
     with pytest.raises(TypeError, match='verbose must be'):
         batch_simulate_instance.run(param_grid, verbose='invalid')
+
+    with pytest.raises(TypeError, match='clear_cache must be'):
+        batch_simulate_instance.run(param_grid, clear_cache='invalid')
+
+    # Callables Test
+    batch_simulate_instance.summary_func = lambda x: x
+    assert callable(batch_simulate_instance.summary_func)
+    assert callable(batch_simulate_instance.set_params)
+
+    with pytest.raises(TypeError, match='summary_func must be'):
+        BatchSimulate(set_params=batch_simulate_instance.set_params,
+                      summary_func='invalid')
+
+    with pytest.raises(TypeError, match='set_params must be'):
+        BatchSimulate(set_params='invalid')
 
 
 def test_save_load_and_overwrite(batch_simulate_instance,

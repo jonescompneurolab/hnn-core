@@ -50,8 +50,8 @@ def set_params(param_values, net=None):
 
     # Add an evoked drive to the network.
     net.add_evoked_drive('evprox',
-                         mu=param_values['mu'],
-                         sigma=param_values['sigma'],
+                         mu=40,
+                         sigma=5,
                          numspikes=1,
                          location='proximal',
                          weights_ampa=weights_ampa,
@@ -63,9 +63,7 @@ def set_params(param_values, net=None):
 
 param_grid = {
     'weight_basket': np.logspace(-4 - 1, 5),
-    'weight_pyr': np.logspace(-4, -1, 5),
-    'mu': np.linspace(20, 80, 5),
-    'sigma': np.linspace(1, 20, 5)
+    'weight_pyr': np.logspace(-4, -1, 5)
 }
 
 ###############################################################################
