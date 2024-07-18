@@ -18,7 +18,7 @@ class BatchSimulate(object):
     def __init__(self, set_params, net_name='jones', tstop=170,
                  dt=0.025, n_trials=1, record_vsec=False,
                  record_isec=False, postproc=False, save_outputs=False,
-                 file_path='./sim_results', batch_size=100,
+                 save_folder='./sim_results', batch_size=100,
                  overwrite=True, summary_func=None):
         """Initialize the BatchSimulate class.
 
@@ -58,7 +58,7 @@ class BatchSimulate(object):
             Default: False.
         save_outputs : bool, optional
             Whether to save the simulation outputs to files. Default is False.
-        file_path : str, optional
+        save_folder : str, optional
             The path to save the simulation outputs.
             Default is './sim_results'.
         batch_size : int, optional
@@ -73,7 +73,7 @@ class BatchSimulate(object):
         Notes
         -----
         When `save_output=True`, the saved files will appear as
-        `sim_run_{start_idx}-{end_idx}.npy` in the specified `file_path`
+        `sim_run_{start_idx}-{end_idx}.npy` in the specified `save_folder`
         directory. The `start_idx` and `end_idx` indicate the range of
         simulation indices contained in each file. Each file will contain
         a maximum of `batch_size` simulations, split evenly among the
@@ -88,7 +88,7 @@ class BatchSimulate(object):
         _validate_type(n_trials, types='int', item_name='n_trials')
         _check_option('record_vsec', record_vsec, ['all', 'soma', False])
         _check_option('record_isec', record_isec, ['all', 'soma', False])
-        _validate_type(file_path, types='path-like', item_name='file_path')
+        _validate_type(save_folder, types='path-like', item_name='save_folder')
         _validate_type(batch_size, types='int', item_name='batch_size')
 
         if set_params is not None and not callable(set_params):
@@ -106,7 +106,7 @@ class BatchSimulate(object):
         self.record_isec = record_isec
         self.postproc = postproc
         self.save_outputs = save_outputs
-        self.file_path = file_path
+        self.save_folder = save_folder
         self.batch_size = batch_size
         self.overwrite = overwrite
         self.summary_func = summary_func
@@ -147,6 +147,7 @@ class BatchSimulate(object):
         _check_option('backend', backend, ['loky', 'threading',
                                            'multiprocessing', 'dask'])
         _validate_type(verbose, types='int', item_name='verbose')
+        _validate_type(clear_cache, types=(bool,), item_name='clear_cache')
 
         param_combinations = self._generate_param_combinations(
             param_grid, combinations)
@@ -303,12 +304,12 @@ class BatchSimulate(object):
         _validate_type(start_idx, types='int', item_name='start_idx')
         _validate_type(end_idx, types='int', item_name='end_idx')
 
-        if not os.path.exists(self.file_path):
-            os.makedirs(self.file_path)
+        if not os.path.exists(self.save_folder):
+            os.makedirs(self.save_folder)
 
         sim_data = np.stack([dpl['dpl'][0].data['agg'] for dpl in results])
 
-        file_name = os.path.join(self.file_path,
+        file_name = os.path.join(self.save_folder,
                                  f'sim_run_{start_idx}-{end_idx}.npy')
         if os.path.exists(file_name) and not self.overwrite:
             raise FileExistsError(
