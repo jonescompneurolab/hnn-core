@@ -590,7 +590,8 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
                                         data)
 
     def _on_plot_type_change(new_plot_type):
-        return plot_type_coupled_change(new_plot_type.new, target_data_selection)
+        return plot_type_coupled_change(new_plot_type.new,
+                                        target_data_selection)
 
     simulation_selection.observe(_on_sim_data_change, 'value')
     target_data_selection.observe(_on_target_comparison_change, 'value')
