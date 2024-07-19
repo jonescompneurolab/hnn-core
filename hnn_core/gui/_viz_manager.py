@@ -590,7 +590,7 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
                                         data)
 
     def _on_plot_type_change(new_plot_type):
-        return plot_type_coupled_change(new_plot_type, target_data_selection)
+        return plot_type_coupled_change(new_plot_type.new, target_data_selection)
 
     simulation_selection.observe(_on_sim_data_change, 'value')
     target_data_selection.observe(_on_target_comparison_change, 'value')
@@ -836,12 +836,6 @@ class _VizManager:
 
     def reset_fig_config_tabs(self, template_name=None):
         """Reset the figure config tabs with most recent simulation data."""
-        simulation_names = tuple(self.data['simulations'].keys())
-        for tab in self.axes_config_tabs.children:
-            controls = tab.children[1]
-            for ax_control in controls.children:
-                simulation_selection = ax_control.children[0]
-                simulation_selection.options = simulation_names
         # recover the default layout
         if template_name is None:
             template_name = list(fig_templates.keys())[0]
