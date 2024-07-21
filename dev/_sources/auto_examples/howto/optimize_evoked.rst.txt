@@ -307,6 +307,10 @@ simulation dipole as well as the convergence plot.
 
       :download:`Download Python source code: optimize_evoked.py <optimize_evoked.py>`
 
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: optimize_evoked.zip <optimize_evoked.zip>`
+
 
 .. only:: html
 

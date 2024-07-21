@@ -35,7 +35,7 @@ tasks.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The main output of HNN simulations is the &#x27;dipole&#x27; waveform, i.e., the net intracellular curren...">
+    <div class="sphx-glr-thumbcontainer" tooltip="The main output of HNN simulations is the &#x27;dipole&#x27; waveform, i.e., the net intracellular current flowing in pyramidal cell apical dendrites. At the large distances between cells and M/EEG sensors, this &#x27;primary&#x27; current is the main contributor to the measured fields. Close to the cells, the local field potential (LFP) is the result of intracellular current leaking into the extracellular medium through active and passive membrane channels. Under some simplifying assumptions, we may approximate the LFP at virtual electrodes placed in and around the HNN network model.">
 
 .. only:: html
 
@@ -86,7 +86,7 @@ tasks.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to optimize the parameters of the model simulation to match an ex...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to optimize the parameters of the model simulation to match an experimental dipole waveform.">
 
 .. only:: html
 
@@ -120,7 +120,7 @@ tasks.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to do batch simulations in HNN-core, allowing users to efficiently run m...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to do batch simulations in HNN-core, allowing users to efficiently run multiple simulations with different parameters for comprehensive analysis.">
 
 .. only:: html
 
