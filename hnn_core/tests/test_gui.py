@@ -15,8 +15,9 @@ from hnn_core.gui._viz_manager import (_idx2figname,
                                        _plot_types,
                                        _no_overlay_plot_types,
                                        unlink_relink)
-from hnn_core.gui.gui import _init_network_from_widgets
-from hnn_core.gui.gui import serialize_simulation
+from hnn_core.gui.gui import (_init_network_from_widgets,
+                              _prepare_upload_file,
+                              serialize_simulation)
 from hnn_core.network import pick_connection
 from hnn_core.network_models import jones_2009_model
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
@@ -48,6 +49,26 @@ def test_gui_load_params():
     print(gui.params)
     print(gui.params['L2Pyr*'])
     plt.close('all')
+
+
+def test_prepare_upload_file():
+    """Tests that input files from local or url sources import correctly"""
+    url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json"  # noqa
+    file = Path(hnn_core_root, 'param', 'default.json')
+
+    content_from_url = _prepare_upload_file(url)[0]
+    content_from_local = _prepare_upload_file(file)[0]
+
+    assert (content_from_url['name'] ==
+            content_from_local['name'] ==
+            'default.json')
+    assert (content_from_url['type'] ==
+            content_from_local['type'] ==
+            'application/json')
+    assert (content_from_url['size'] ==
+            content_from_local['size'] ==
+            6941)
+    assert content_from_url['content'] == content_from_local['content']
 
 
 def test_gui_upload_params():
