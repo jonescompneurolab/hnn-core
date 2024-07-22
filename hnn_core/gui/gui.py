@@ -854,19 +854,21 @@ def _prepare_upload_file_from_local(path):
 
 
 def _prepare_upload_file_from_url(file_url):
-    params_name = file_url.split("/")[-1]
+    file_name = file_url.split("/")[-1]
     data = urllib.request.urlopen(file_url)
-    content = b""
+    content = bytearray()
     for line in data:
-        content += line
+        content.extend(line)
 
-    return [{
-        'name': params_name,
-        'type': 'application/json',
+    upload_structure = [{
+        'name': file_name,
+        'type': mimetypes.guess_type(file_url)[0],
         'size': len(content),
-        'content': content,
+        'content': memoryview(content),
         'last_modified': datetime.now()
     }]
+
+    return upload_structure
 
 
 def create_expanded_button(description, button_style, layout, disabled=False,
