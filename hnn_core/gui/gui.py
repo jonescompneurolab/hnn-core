@@ -5,6 +5,7 @@
 import codecs
 import io
 import logging
+import mimetypes
 import multiprocessing
 import sys
 import urllib.parse
@@ -834,6 +835,22 @@ class HNNGUI:
         self._simulate_left_tab_click("Visualization")
         action = getattr(self.viz_manager, f"_simulate_{action_name}")
         action(*args, **kwargs)
+
+
+def _prepare_upload_file_from_local(path):
+    with open(path, 'rb') as file:
+        content = memoryview(file.read())
+    last_modified = datetime.fromtimestamp(path.stat().st_mtime)
+
+    upload_structure = [{
+        'name': path.name,
+        'type': mimetypes.guess_type(path)[0],
+        'size': path.stat().st_size,
+        'content': content,
+        'last_modified': last_modified
+    }]
+
+    return upload_structure
 
 
 def _prepare_upload_file_from_url(file_url):
