@@ -871,6 +871,22 @@ def _prepare_upload_file_from_url(file_url):
     return upload_structure
 
 
+def _prepare_upload_file(path):
+    """ Simulates output of the FileUpload widget for testing.
+
+    Unit tests for the GUI simulate user upload of files. File source can
+    either be locally or from a URL. This function returns the data structure
+    of the ipywidget FileUpload widget, a list of dictionaries with file
+    attributes.
+    """
+    try:
+        uploaded_value = _prepare_upload_file_from_local(path)
+    except FileNotFoundError:
+        uploaded_value = _prepare_upload_file_from_url(path)
+
+    return uploaded_value
+
+
 def create_expanded_button(description, button_style, layout, disabled=False,
                            button_color="#8A2BE2"):
     return Button(description=description, button_style=button_style,
