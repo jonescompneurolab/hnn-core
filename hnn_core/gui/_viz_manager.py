@@ -837,6 +837,18 @@ class _VizManager:
 
     def reset_fig_config_tabs(self, template_name=None):
         """Reset the figure config tabs with most recent simulation data."""
+        simulation_names = tuple(self.data['simulations'].keys())
+        for tab in self.axes_config_tabs.children:
+            controls = tab.children[1]
+            for ax_control in controls.children:
+                # Update the options for the simulation data selection dropdown
+                simulation_data_selection = ax_control.children[1]
+                simulation_data_selection.options = simulation_names
+
+                # Update the options for the simulation to compare dropdown
+                simulation_to_compare = ax_control.children[4]
+                simulation_to_compare.options = simulation_names
+
         # recover the default layout
         if template_name is None:
             template_name = list(fig_templates.keys())[0]
