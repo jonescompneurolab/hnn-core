@@ -203,8 +203,8 @@ def test_gui_change_connectivity():
                                            add_drive=False)
 
                 # test if the new value is reflected in the network
-                assert _single_simulation['net'].connectivity[conn_idx][
-                           'nc_dict']['A_weight'] == w_val
+                assert (_single_simulation['net'].connectivity[conn_idx]
+                        ['nc_dict']['A_weight'] == w_val)
     plt.close('all')
 
 
