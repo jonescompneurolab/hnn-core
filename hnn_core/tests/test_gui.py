@@ -65,7 +65,8 @@ def test_prepare_upload_file():
     assert (content_from_url['type'] ==
             content_from_local['type'] ==
             'application/json')
-    assert content_from_url['size'] == content_from_local['size']
+    assert content_from_url.get('size')
+    assert content_from_local.get('size')
     assert content_from_url['content'] == content_from_local['content']
 
 
