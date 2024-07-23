@@ -20,6 +20,7 @@ from hnn_core.gui._viz_manager import (_idx2figname,
                                        unlink_relink)
 from hnn_core.gui.gui import (_init_network_from_widgets,
                               _prepare_upload_file,
+                              _update_nested_dict,
                               serialize_simulation)
 from hnn_core.network import pick_connection
 from hnn_core.network_models import jones_2009_model
@@ -779,3 +780,50 @@ def test_fig_tabs_dropdown_lists(setup_gui):
             # non "input histograms" plot type
             if ax_control.children[0].value != "input histogram":
                 assert not ax_control.children[4].disabled
+
+
+def test_update_nested_dict():
+    """Tests nested dictionary updates changes values appropriately."""
+    original = {'a': 0,
+                'b': {'a2': 0, 'b2': 0},
+                }
+
+    # Changes at each level
+    changes = {'a': 1,
+               'b': {'a2': 1, 'b2': 0},
+               }
+    updated = _update_nested_dict(original, changes)
+    expected = changes
+    assert updated == expected
+
+    # Omitted items should not be changed from in the original
+    omission = {'a': 1,
+                'b': {'a2': 0},
+                }
+    expected = {'a': 1,
+                'b': {'a2': 0, 'b2': 0},
+                }
+    updated = _update_nested_dict(original, omission)
+    assert updated == expected
+
+    # Additional items should be added
+    addition = {'a': 1,
+                'b': {'a2': 0, 'b2': 0, 'c2': 1},
+                'c': 1,
+                }
+    expected = addition
+    updated = _update_nested_dict(original, addition)
+    assert updated == expected
+
+    # Test passing of None values
+    has_none = {'a': 0,
+                'b': {'a2': None, 'b2': 0},
+                }
+    # Default behavior will not pass in None values to the update
+    expected = original  # No change expected
+    updated = _update_nested_dict(original, has_none)
+    assert updated == expected
+    # Skip_none set of False will pass in None values to the update
+    updated = _update_nested_dict(original, has_none, skip_none=False)
+    expected = has_none
+    assert updated == expected
