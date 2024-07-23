@@ -983,9 +983,7 @@ def _get_cell_specific_widgets(layout, style, location, data=None):
         },
     }
     if isinstance(data, dict):
-        for k in default_data.keys():
-            if k in data and data[k] is not None:
-                default_data[k].update(data[k])
+        default_data = _update_nested_dict(default_data, data)
 
     kwargs = dict(layout=layout, style=style)
     cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket', 'L2_basket']
@@ -1108,7 +1106,8 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
         }
     }
     if isinstance(data, dict):
-        default_data.update(data)
+        default_data = _update_nested_dict(default_data, data)
+
     tstart = BoundedFloatText(
         value=default_data['tstart'], description='Start time (ms)',
         min=0, max=1e6, layout=layout, style=style)
