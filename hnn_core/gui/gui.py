@@ -888,6 +888,43 @@ def _prepare_upload_file(path):
     return uploaded_value
 
 
+def _update_nested_dict(original, new, skip_none=True):
+    """ Updates dictionary values from another dictionary
+
+    Will update nested dictionaries in the structure. New items from the
+    update dictionary are added and omitted items are retained from the
+    original dictionary. By default, will not pass None values from the update
+    dictionary.
+
+    Parameters
+    ----------
+    original : dict
+        Dictionary to update
+    new : dict
+        Dictionary with new values for updating
+    skip_none : bool, default True
+        None values in the new dictionary are not passed to the updated
+        dictionary by when True. If False None values will be passed to the
+        updated dictionary.
+
+    Returns
+    -------
+
+    """
+    updated = original.copy()
+    for key, value in new.items():
+        if (isinstance(value, dict) and
+                key in updated and
+                isinstance(updated[key], dict)):
+            updated[key] = _update_nested_dict(updated[key], value, skip_none)
+        elif value or not skip_none:
+            updated[key] = value
+        else:
+            pass
+
+    return updated
+
+
 def create_expanded_button(description, button_style, layout, disabled=False,
                            button_color="#8A2BE2"):
     return Button(description=description, button_style=button_style,
