@@ -838,6 +838,7 @@ class HNNGUI:
 
 
 def _prepare_upload_file_from_local(path):
+    path = Path(path)
     with open(path, 'rb') as file:
         content = memoryview(file.read())
     last_modified = datetime.fromtimestamp(path.stat().st_mtime)
