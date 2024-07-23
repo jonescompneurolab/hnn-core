@@ -783,7 +783,7 @@ def test_fig_tabs_dropdown_lists(setup_gui):
 
 
 def test_update_nested_dict():
-    """Tests nested dictionary updates changes values appropriately."""
+    """Tests nested dictionary updates values appropriately."""
     original = {'a': 0,
                 'b': {'a2': 0, 'b2': 0},
                 }
