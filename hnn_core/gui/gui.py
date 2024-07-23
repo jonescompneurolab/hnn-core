@@ -881,7 +881,7 @@ def _prepare_upload_file(path):
     """
     try:
         uploaded_value = _prepare_upload_file_from_local(path)
-    except FileNotFoundError:
+    except (FileNotFoundError, OSError):
         uploaded_value = _prepare_upload_file_from_url(path)
 
     return uploaded_value
