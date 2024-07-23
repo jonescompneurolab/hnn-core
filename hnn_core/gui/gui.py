@@ -876,7 +876,7 @@ def _prepare_upload_file(path):
     """ Simulates output of the FileUpload widget for testing.
 
     Unit tests for the GUI simulate user upload of files. File source can
-    either be locally or from a URL. This function returns the data structure
+    either be local or from a URL. This function returns the data structure
     of the ipywidget FileUpload widget, a list of dictionaries with file
     attributes.
     """
