@@ -203,15 +203,15 @@ Run the batch simulation and collect the results.
  .. code-block:: none
 
     [Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:   27.6s
+    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:   27.0s
     [Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:   27.7s
+    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:   26.9s
     [Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:   27.9s
+    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:   26.9s
     [Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:   27.4s
+    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:   27.5s
     [Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:   27.4s
+    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:   26.9s
     Simulation results: [[{'min_peak': -0.001242556683917088, 'max_peak': 0.004900589999999999}], [{'min_peak': -0.001242556683917088, 'max_peak': 0.004900589999999999}], [{'min_peak': -0.03665290820701789, 'max_peak': 0.02352069470140582}], [{'min_peak': -0.038695414756536456, 'max_peak': 0.022995093327209466}], [{'min_peak': -0.03373821891133495, 'max_peak': 0.03047248131934011}]]
 
 
@@ -260,7 +260,7 @@ Extract and Plot Results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (2 minutes 18.468 seconds)
+   **Total running time of the script:** (2 minutes 15.657 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_batch_simulate.py:

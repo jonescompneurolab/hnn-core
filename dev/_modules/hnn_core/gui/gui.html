@@ -139,6 +139,7 @@
 <span class="kn">import</span> <span class="nn">codecs</span>
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">mimetypes</span>
 <span class="kn">import</span> <span class="nn">multiprocessing</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">urllib.parse</span>
@@ -927,15 +928,15 @@
 
     <span class="c1"># below are a series of methods that are used to manipulate the GUI</span>
     <span class="k">def</span> <span class="nf">_simulate_upload_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_url</span><span class="p">):</span>
-        <span class="n">uploaded_value</span> <span class="o">=</span> <span class="n">_prepare_upload_file_from_url</span><span class="p">(</span><span class="n">file_url</span><span class="p">)</span>
+        <span class="n">uploaded_value</span> <span class="o">=</span> <span class="n">_prepare_upload_file</span><span class="p">(</span><span class="n">file_url</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_data_button</span><span class="o">.</span><span class="n">set_trait</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">uploaded_value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_simulate_upload_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_url</span><span class="p">):</span>
-        <span class="n">uploaded_value</span> <span class="o">=</span> <span class="n">_prepare_upload_file_from_url</span><span class="p">(</span><span class="n">file_url</span><span class="p">)</span>
+        <span class="n">uploaded_value</span> <span class="o">=</span> <span class="n">_prepare_upload_file</span><span class="p">(</span><span class="n">file_url</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_connectivity_button</span><span class="o">.</span><span class="n">set_trait</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">uploaded_value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_simulate_upload_drives</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_url</span><span class="p">):</span>
-        <span class="n">uploaded_value</span> <span class="o">=</span> <span class="n">_prepare_upload_file_from_url</span><span class="p">(</span><span class="n">file_url</span><span class="p">)</span>
+        <span class="n">uploaded_value</span> <span class="o">=</span> <span class="n">_prepare_upload_file</span><span class="p">(</span><span class="n">file_url</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_drives_button</span><span class="o">.</span><span class="n">set_trait</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">uploaded_value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_simulate_left_tab_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_title</span><span class="p">):</span>
@@ -970,20 +971,55 @@
         <span class="n">action</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_prepare_upload_file_from_url</span><span class="p">(</span><span class="n">file_url</span><span class="p">):</span>
-    <span class="n">params_name</span> <span class="o">=</span> <span class="n">file_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">file_url</span><span class="p">)</span>
-    <span class="n">content</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-        <span class="n">content</span> <span class="o">+=</span> <span class="n">line</span>
+<span class="k">def</span> <span class="nf">_prepare_upload_file_from_local</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="nb">memoryview</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+    <span class="n">last_modified</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="p">[{</span>
-        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">params_name</span><span class="p">,</span>
-        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="p">),</span>
+    <span class="n">upload_structure</span> <span class="o">=</span> <span class="p">[{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">mimetypes</span><span class="o">.</span><span class="n">guess_type</span><span class="p">(</span><span class="n">path</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="n">path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span><span class="p">,</span>
         <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">content</span><span class="p">,</span>
+        <span class="s1">&#39;last_modified&#39;</span><span class="p">:</span> <span class="n">last_modified</span>
+    <span class="p">}]</span>
+
+    <span class="k">return</span> <span class="n">upload_structure</span>
+
+
+<span class="k">def</span> <span class="nf">_prepare_upload_file_from_url</span><span class="p">(</span><span class="n">file_url</span><span class="p">):</span>
+    <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">file_url</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">content</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+    <span class="n">upload_structure</span> <span class="o">=</span> <span class="p">[{</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">file_name</span><span class="p">,</span>
+        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">mimetypes</span><span class="o">.</span><span class="n">guess_type</span><span class="p">(</span><span class="n">file_url</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="p">),</span>
+        <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="nb">memoryview</span><span class="p">(</span><span class="n">content</span><span class="p">),</span>
         <span class="s1">&#39;last_modified&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
     <span class="p">}]</span>
+
+    <span class="k">return</span> <span class="n">upload_structure</span>
+
+
+<span class="k">def</span> <span class="nf">_prepare_upload_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Simulates output of the FileUpload widget for testing.</span>
+
+<span class="sd">    Unit tests for the GUI simulate user upload of files. File source can</span>
+<span class="sd">    either be local or from a URL. This function returns the data structure</span>
+<span class="sd">    of the ipywidget FileUpload widget, a list of dictionaries with file</span>
+<span class="sd">    attributes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">uploaded_value</span> <span class="o">=</span> <span class="n">_prepare_upload_file_from_local</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>
+        <span class="n">uploaded_value</span> <span class="o">=</span> <span class="n">_prepare_upload_file_from_url</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">uploaded_value</span>
 
 
 <span class="k">def</span> <span class="nf">create_expanded_button</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">button_style</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
