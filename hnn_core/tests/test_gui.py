@@ -75,8 +75,8 @@ def test_prepare_upload_file():
             'application/json')
     # Check that the size attribute is present. Cannot do an equivalency check
     # because file systems may add additional when saving to disk.
-    assert content_from_url.get('size')
-    assert content_from_local.get('size')
+    assert 'size' in content_from_url
+    assert 'size' in content_from_local
 
     # Check that the content is the same when imported as dict
     dict_from_url = _import_json(content_from_url.get('content'))
