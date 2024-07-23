@@ -1,6 +1,9 @@
 # Authors: Huzi Cheng <hzcheng15@icloud.com>
 #          Camilo Diaz <camilo_diaz@brown.edu>
 #          George Dang <george_dang@brown.edu>
+import codecs
+import io
+import json
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -53,6 +56,11 @@ def test_gui_load_params():
 
 def test_prepare_upload_file():
     """Tests that input files from local or url sources import correctly"""
+    def _import_json(content):
+        decode = codecs.decode(content, encoding="utf-8")
+        json_content = json.load(io.StringIO(decode))
+        return json_content
+
     url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json"  # noqa
     file = Path(hnn_core_root, 'param', 'default.json')
 
@@ -65,9 +73,15 @@ def test_prepare_upload_file():
     assert (content_from_url['type'] ==
             content_from_local['type'] ==
             'application/json')
+    # Check that the size attribute is present. Cannot do an equivalency check
+    # because file systems may add additional when saving to disk.
     assert content_from_url.get('size')
     assert content_from_local.get('size')
-    assert content_from_url['content'] == content_from_local['content']
+
+    # Check that the content is the same when imported as dict
+    dict_from_url = _import_json(content_from_url.get('content'))
+    dict_from_local = _import_json(content_from_local.get('content'))
+    assert dict_from_url == dict_from_local
 
 
 def test_gui_upload_params():
@@ -86,8 +100,8 @@ def test_gui_upload_params():
     original_tstep = gui.widget_dt.value
     gui.widget_dt.value = 1
     # simulate upload default.json
-    file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json" # noqa
-    file2_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/gamma_L5weak_L2weak.json" # noqa
+    file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json"  # noqa
+    file2_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/gamma_L5weak_L2weak.json"  # noqa
     gui._simulate_upload_connectivity(file1_url)
     gui._simulate_upload_drives(file1_url)
 
@@ -190,7 +204,7 @@ def test_gui_change_connectivity():
 
                 # test if the new value is reflected in the network
                 assert _single_simulation['net'].connectivity[conn_idx][
-                    'nc_dict']['A_weight'] == w_val
+                           'nc_dict']['A_weight'] == w_val
     plt.close('all')
 
 
@@ -298,13 +312,13 @@ def test_non_unique_name_error(setup_gui):
     assert isinstance(gui.simulation_data[sim_name]["net"], Network)
     assert isinstance(dpls, list)
     assert gui._simulation_status_bar.value == \
-        gui._simulation_status_contents['finished']
+           gui._simulation_status_contents['finished']
 
     gui.widget_simulation_name.value = sim_name
     gui.run_button.click()
     assert len(gui.simulation_data) == 1
     assert gui._simulation_status_bar.value == \
-        gui._simulation_status_contents['failed']
+           gui._simulation_status_contents['failed']
     plt.close('all')
 
 
@@ -624,7 +638,7 @@ def test_gui_download_simulation(setup_gui):
     gui._simulate_upload_data(file1_url)
     download_simulation_list = gui.simulation_list_widget.options
     assert (len([sim_name for sim_name in download_simulation_list
-                if sim_name == "S1_SupraT"]) == 0)
+                 if sim_name == "S1_SupraT"]) == 0)
 
 
 def test_gui_upload_csv_simulation(setup_gui):
