@@ -381,7 +381,7 @@ def _order_drives(gid_ranges, external_drives):
     return ordered_drives
 
 
-def _dict_to_network(net_data,
+def dict_to_network(net_data,
                      read_drives=True,
                      read_external_biases=True):
     """ Convert dict of configurations to Network """
@@ -464,6 +464,6 @@ def read_network_configuration(fname,
                          'The file contains object of '
                          'type %s' % (net_data.get('object_type')))
 
-    net = _dict_to_network(net_data, read_drives, read_external_biases)
+    net = dict_to_network(net_data, read_drives, read_external_biases)
 
     return net
