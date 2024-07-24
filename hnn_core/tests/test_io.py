@@ -336,6 +336,14 @@ def test_read_configuration_json(jones_2009_network):
     assert not any([src_type in net.external_drives.keys()
                     for src_type in connection_src_types])
 
+    # Read without external bias
+    net_no_bias = read_network_configuration(
+        Path(assets_path, 'jones2009_3x3_drives.json'),
+        read_external_biases=False
+    )
+    assert len(net_no_bias.external_biases) == 0
+    assert len(net_no_bias.external_drives) > 0
+
 
 def test_read_incorrect_format(tmp_path):
     """Test that error raise when the json do not have a Network label."""
