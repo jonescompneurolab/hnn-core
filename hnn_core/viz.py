@@ -1278,7 +1278,7 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
     elif sink[0].lower() == 'r':
         cmap = "jet_r"
     elif sink[0].lower() != 'b' or sink[0].lower() != 'r':
-        raise RuntimeError('Please use sink = '"'b'"' or sink = '"'r'"'.'
+        raise RuntimeError('Please use sink = "b" or sink = "r".'
                            ' Only colormap "jet" is supported for CSD.')
 
     if interpolation == 'spline':
@@ -1300,7 +1300,8 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
 
     im = ax.pcolormesh(times, new_depths, data,
                        cmap=cmap, shading='auto', vmin=vmin, vmax=vmax)
-
+    ax.set_xlabel('time (s)')
+    ax.set_ylabel('electrode depth')
     if colorbar:
         color_axis = ax.inset_axes([1.05, 0, 0.02, 1], transform=ax.transAxes)
         plt.colorbar(im, ax=ax, cax=color_axis).set_label(r'$CSD (uV/um^{2})$')
