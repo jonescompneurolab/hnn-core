@@ -282,7 +282,7 @@ def test_extracellular_viz():
 
     with pytest.deprecated_call():
         net.rec_arrays['arr1'].plot_lfp(show=False, tmin=10, tmax=100)
-    with pytest.raises(RuntimeError, match='Please use sink = '"'b'"' or '
-                       'sink = '"'r'"'. Only colormap "jet" is supported '
+    with pytest.raises(RuntimeError, match='Please use sink = "b" or '
+                       'sink = "r". Only colormap "jet" is supported '
                        'for CSD.'):
         net.rec_arrays['arr1'].plot_csd(show=False, sink='g')
