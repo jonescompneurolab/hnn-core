@@ -741,3 +741,38 @@ def test_gui_cell_params_widgets(setup_gui):
     assert (len(cell_params['Synapses']) == 12)
     assert (len(cell_params['Biophysics L2']) == 10)
     assert (len(cell_params['Biophysics L5']) == 20)
+
+
+def test_fig_tabs_dropdown_lists(setup_gui):
+    """Test the GUI download simulation pipeline."""
+
+    gui = setup_gui
+
+    gui.widget_ntrials.value = 1
+
+    # Initiate 1rs simulation
+    sim_name = "sim1"
+    gui.widget_simulation_name.value = sim_name
+
+    # Run simulation
+    gui.run_button.click()
+
+    # Initiate 2nd simulation
+    sim_name2 = "sim2"
+    gui.widget_simulation_name.value = sim_name2
+
+    # Run simulation
+    gui.run_button.click()
+
+    viz_tabs = gui.viz_manager.axes_config_tabs.children
+    for tab in viz_tabs:
+        controls = tab.children[1]
+        for ax_control in controls.children:
+            assert ax_control.children[1].description == "Simulation Data:"
+            sim_names = ax_control.children[1].options
+            assert all(sim in sim_names for sim in [sim_name, sim_name2])
+
+            assert ax_control.children[4].description == "Data to Compare:"
+
+            if ax_control.children[0].value != "input histogram":
+                assert not ax_control.children[4].disabled
