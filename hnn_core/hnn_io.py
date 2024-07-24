@@ -382,8 +382,8 @@ def _order_drives(gid_ranges, external_drives):
 
 
 def dict_to_network(net_data,
-                     read_drives=True,
-                     read_external_biases=True):
+                    read_drives=True,
+                    read_external_biases=True):
     """ Converts a dict of network configurations to a Network
 
     Parameters
