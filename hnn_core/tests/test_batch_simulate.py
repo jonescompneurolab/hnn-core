@@ -1,8 +1,3 @@
-# Authors: Abdul Samad Siddiqui <abdulsamadsid1@gmail.com>
-#          Nick Tolley <nicholas_tolley@brown.edu>
-#          Ryan Thorpe <ryan_thorpe@brown.edu>
-#          Mainak Jas <mjas@mgh.harvard.edu>
-
 import pytest
 import numpy as np
 import os
@@ -43,7 +38,7 @@ def param_grid():
     """Returns a dictionary representing a parameter grid for
     batch simulation."""
     return {
-        'weight_basket': np.logspace(-4 - 1, 2),
+        'weight_basket': np.logspace(-4, -1, 2),
         'weight_pyr': np.logspace(-4, -1, 2),
         'mu': [40],
         'sigma': [5]
@@ -179,12 +174,19 @@ def test_save_load_and_overwrite(batch_simulate_instance,
 
     batch_simulate_instance._save(results, start_idx, end_idx)
 
-    file_name = os.path.join(tmp_path, f'sim_run_{start_idx}-{end_idx}.npy')
+    file_name = os.path.join(tmp_path, f'sim_run_{start_idx}-{end_idx}.npz')
     assert os.path.exists(file_name)
 
-    loaded_results = np.load(file_name, allow_pickle=True)
-    original_data = np.stack([dpl['dpl'][0].data['agg'] for dpl in results])
-    assert (original_data == loaded_results).all()
+    loaded_data = np.load(file_name, allow_pickle=True)
+    loaded_results = {key: loaded_data[key].tolist()
+                      for key in loaded_data.files}
+
+    original_data = np.stack([result['dpl'][0].data['agg']
+                              for result in results])
+    loaded_data = np.stack([dpl[0].data['agg']
+                            for dpl in loaded_results['dpl']])
+
+    assert (original_data == loaded_data).all()
 
     # Overwrite Test
     batch_simulate_instance.overwrite = False
@@ -196,10 +198,16 @@ def test_save_load_and_overwrite(batch_simulate_instance,
     batch_simulate_instance.overwrite = True
     batch_simulate_instance._save(results, start_idx, end_idx)
 
-    loaded_results = np.load(file_name, allow_pickle=True)
+    loaded_data = np.load(file_name, allow_pickle=True)
+    loaded_results = {key: loaded_data[key].tolist()
+                      for key in loaded_data.files}
 
-    original_data = np.stack([dpl['dpl'][0].data['agg'] for dpl in results])
-    assert (original_data == loaded_results).all()
+    original_data = np.stack([result['dpl'][0].data['agg']
+                              for result in results])
+    loaded_data = np.stack([dpl[0].data['agg']
+                            for dpl in loaded_results['dpl']])
+
+    assert (original_data == loaded_data).all()
 
     # Validation Tests
     with pytest.raises(TypeError, match='results must be'):
@@ -210,3 +218,79 @@ def test_save_load_and_overwrite(batch_simulate_instance,
 
     with pytest.raises(TypeError, match='end_idx must be'):
         batch_simulate_instance._save(results, start_idx, 'invalid_end_idx')
+
+
+def test_load_results(batch_simulate_instance, param_grid, tmp_path):
+    """Test loading results from a single file."""
+    param_combinations = batch_simulate_instance._generate_param_combinations(
+        param_grid)[:3]
+    results = batch_simulate_instance.simulate_batch(
+        param_combinations,
+        n_jobs=2)
+
+    start_idx = 0
+    end_idx = len(results)
+    batch_simulate_instance._save(results, start_idx, end_idx)
+
+    file_name = os.path.join(tmp_path, f'sim_run_{start_idx}-{end_idx}.npz')
+    assert os.path.exists(file_name)
+
+    # single result file
+    loaded_results = batch_simulate_instance.load_results(file_name)
+    assert 'param_values' in loaded_results
+    assert 'dpl' in loaded_results
+    assert len(loaded_results['dpl']) == len(results)
+
+    original_data = np.stack([result['dpl'][0].data['agg']
+                              for result in results])
+    loaded_data = np.stack([dpl[0].data['agg']
+                            for dpl in loaded_results['dpl']])
+    assert np.array_equal(original_data, loaded_data)
+
+    for key in ['spiking', 'LFP', 'voltages', 'currents', 'calcium']:
+        assert key not in loaded_results
+
+    # all result files
+    all_loaded_results = batch_simulate_instance.load_all_results()
+    assert len(all_loaded_results) == 1
+
+    all_loaded_data = np.stack([dpl[0].data['agg']
+                               for dpl in all_loaded_results[0]['dpl']])
+    assert np.array_equal(original_data, all_loaded_data)
+
+    # Validation Tests
+    with pytest.raises(TypeError, match='results must be'):
+        batch_simulate_instance._save("invalid_results", start_idx, end_idx)
+
+
+def test_load_parameters(batch_simulate_instance, param_grid, tmp_path):
+    """Test loading parameters from a single file and all files."""
+    param_combinations = batch_simulate_instance._generate_param_combinations(
+        param_grid)[:3]
+
+    start_idx = 0
+    end_idx = len(param_combinations)
+    batch_simulate_instance._save_parameters(
+        param_combinations,
+        start_idx,
+        end_idx)
+
+    params_file_name = os.path.join(tmp_path,
+                                    f'parameters_{start_idx}-{end_idx}.npz')
+    assert os.path.exists(params_file_name)
+
+    # single parameter file
+    loaded_parameters = batch_simulate_instance.load_parameters(
+        params_file_name)
+    assert 'param_values' in loaded_parameters
+    assert loaded_parameters['param_values'] == param_combinations
+
+    # all parameter files
+    all_loaded_parameters = batch_simulate_instance.load_all_parameters()
+    assert len(all_loaded_parameters) == 1
+    assert all_loaded_parameters[0]['param_values'] == param_combinations
+
+    # Validation Tests
+    with pytest.raises(TypeError, match='param_combinations must be'):
+        batch_simulate_instance._save_parameters("invalid_params",
+                                                 start_idx, end_idx)

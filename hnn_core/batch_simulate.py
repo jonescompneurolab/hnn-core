@@ -19,7 +19,10 @@ class BatchSimulate(object):
                  dt=0.025, n_trials=1, record_vsec=False,
                  record_isec=False, postproc=False, save_outputs=False,
                  save_folder='./sim_results', batch_size=100,
-                 overwrite=True, summary_func=None):
+                 overwrite=True, summary_func=None,
+                 save_dpl=True, save_spiking=False,
+                 save_lfp=False, save_voltages=False,
+                 save_currents=False, save_calcium=False):
         """Initialize the BatchSimulate class.
 
         Parameters
@@ -70,10 +73,22 @@ class BatchSimulate(object):
         summary_func : callable, optional
             A function to calculate summary statistics from the simulation
             results. Default is None.
+        save_dpl : bool
+            If True, save dipole results. Default: True.
+        save_spiking : bool
+            If True, save spiking results. Default: False.
+        save_lfp : bool
+            If True, save local field potential (lfp) results. Default: False.
+        save_voltages : bool
+            If True, save voltages results. Default: False.
+        save_currents : bool
+            If True, save currents results. Default: False.
+        save_calcium : bool
+            If True, save calcium concentrations. Default: False.
         Notes
         -----
         When `save_output=True`, the saved files will appear as
-        `sim_run_{start_idx}-{end_idx}.npy` in the specified `save_folder`
+        `sim_run_{start_idx}-{end_idx}.npz` in the specified `save_folder`
         directory. The `start_idx` and `end_idx` indicate the range of
         simulation indices contained in each file. Each file will contain
         a maximum of `batch_size` simulations, split evenly among the
@@ -110,6 +125,12 @@ class BatchSimulate(object):
         self.batch_size = batch_size
         self.overwrite = overwrite
         self.summary_func = summary_func
+        self.save_dpl = save_dpl
+        self.save_spiking = save_spiking
+        self.save_lfp = save_lfp
+        self.save_voltages = save_voltages
+        self.save_currents = save_currents
+        self.save_calcium = save_calcium
 
     def run(self, param_grid, return_output=True,
             combinations=True, n_jobs=1, backend='loky',
@@ -169,6 +190,8 @@ class BatchSimulate(object):
 
             if self.save_outputs:
                 self._save(batch_results, start_idx, end_idx)
+                self._save_parameters(param_combinations[start_idx:end_idx],
+                                      start_idx, end_idx)
 
             if self.summary_func is not None:
                 summary_statistics = self.summary_func(batch_results)
@@ -252,15 +275,39 @@ class BatchSimulate(object):
             net = calcium_model()
 
         self.set_params(param_values, net)
-        dpl = simulate_dipole(net,
-                              tstop=self.tstop,
-                              dt=self.dt,
-                              n_trials=self.n_trials,
-                              record_vsec=self.record_vsec,
-                              record_isec=self.record_isec,
-                              postproc=self.postproc)
 
-        return {'net': net, 'dpl': dpl, 'param_values': param_values}
+        results = {'net': net, 'param_values': param_values}
+
+        if self.save_dpl:
+            dpl = simulate_dipole(net,
+                                  tstop=self.tstop,
+                                  dt=self.dt,
+                                  n_trials=self.n_trials,
+                                  record_vsec=self.record_vsec,
+                                  record_isec=self.record_isec,
+                                  postproc=self.postproc)
+            results['dpl'] = dpl
+
+        if self.save_spiking:
+            results['spiking'] = {
+                'spike_times': net.cell_response.spike_times,
+                'spike_types': net.cell_response.spike_types,
+                'spike_gids': net.cell_response.spike_gids
+            }
+
+        if self.save_lfp:
+            results['lfp'] = net.rec_arrays
+
+        if self.save_voltages:
+            results['voltages'] = net.cell_response.vsec
+
+        if self.save_currents:
+            results['currents'] = net.cell_response.isec
+
+        if self.save_calcium:
+            results['calcium'] = net.cell_response.ca
+
+        return results
 
     def _generate_param_combinations(self, param_grid, combinations=True):
         """Generate combinations of parameters from the grid.
@@ -297,8 +344,10 @@ class BatchSimulate(object):
         ----------
         results : list
             The results to save.
-        batch_index : int
-            The index of the current batch.
+        start_idx : int
+            The index of the first simulation in this batch.
+        end_idx : int
+            The index of the last simulation in this batch.
         """
         _validate_type(results, types=(list,), item_name='results')
         _validate_type(start_idx, types='int', item_name='start_idx')
@@ -307,13 +356,135 @@ class BatchSimulate(object):
         if not os.path.exists(self.save_folder):
             os.makedirs(self.save_folder)
 
-        sim_data = np.stack([dpl['dpl'][0].data['agg'] for dpl in results])
+        save_data = {
+            'param_values': [result['param_values'] for result in results]
+        }
+
+        attributes_to_save = ['dpl', 'spiking', 'lfp',
+                              'voltages', 'currents', 'calcium']
+        for attr in attributes_to_save:
+            if getattr(self, f'save_{attr}') and attr in results[0]:
+                save_data[attr] = [result[attr] for result in results]
 
         file_name = os.path.join(self.save_folder,
-                                 f'sim_run_{start_idx}-{end_idx}.npy')
+                                 f'sim_run_{start_idx}-{end_idx}.npz')
         if os.path.exists(file_name) and not self.overwrite:
             raise FileExistsError(
                 f"File {file_name} already exists and "
                 "overwrite is set to False.")
 
-        np.save(file_name, sim_data)
+        np.savez(file_name, **save_data)
+
+    def _save_parameters(self, param_combinations, start_idx, end_idx):
+        """Save simulation parameters to a separate file.
+
+        Parameters
+        ----------
+        param_combinations : list
+            The list of parameter combinations used in the simulations.
+        start_idx : int
+            The index of the first simulation in this batch.
+        end_idx : int
+            The index of the last simulation in this batch.
+        """
+        _validate_type(param_combinations, types=(list,),
+                       item_name='param_combinations')
+        _validate_type(start_idx, types='int', item_name='start_idx')
+        _validate_type(end_idx, types='int', item_name='end_idx')
+
+        params_data = {'param_values': param_combinations}
+        params_file_name = os.path.join(self.save_folder,
+                                        (f'parameters_{start_idx}-'
+                                         f'{end_idx}.npz'))
+        if os.path.exists(params_file_name) and not self.overwrite:
+            raise FileExistsError(
+                f"File {params_file_name} already exists and "
+                "overwrite is set to False.")
+
+        np.savez(params_file_name, **params_data)
+
+    def load_parameters(self, file_path):
+        """Load simulation parameters from a file.
+
+        Parameters
+        ----------
+        file_path : str
+            The path to the file containing the simulation parameters.
+
+        Returns
+        -------
+        parameters : dict
+            Dictionary containing the loaded parameter values.
+        """
+        data = np.load(file_path, allow_pickle=True)
+        parameters = {key: data[key].tolist() for key in data.files}
+        return parameters
+
+    def load_all_parameters(self):
+        """Load all simulation parameters from the save folder.
+
+        Returns
+        -------
+        all_parameters : list
+            List of dictionaries containing all loaded parameter values.
+        """
+        all_parameters = []
+        for file_name in os.listdir(self.save_folder):
+            if file_name.startswith('parameters_') and \
+                    file_name.endswith('.npz'):
+                file_path = os.path.join(self.save_folder, file_name)
+                parameters = self.load_parameters(file_path)
+                all_parameters.append(parameters)
+        return all_parameters
+
+    def load_results(self, file_path, return_data=None):
+        """Load simulation results from a file.
+
+        Parameters
+        ----------
+        file_path : str
+            The path to the file containing the simulation results.
+        return_data : list of str, optional
+            List of data types to return. If None,
+            defaults to the types specified during initialization.
+
+        Returns
+        -------
+        results : dict
+            Dictionary containing the loaded results and parameter values.
+        """
+        if return_data is None:
+            return_data = []
+            if self.save_dpl:
+                return_data.append('dpl')
+            if self.save_spiking:
+                return_data.append('spiking')
+            if self.save_lfp:
+                return_data.append('lfp')
+            if self.save_voltages:
+                return_data.append('voltages')
+            if self.save_currents:
+                return_data.append('currents')
+            if self.save_calcium:
+                return_data.append('calcium')
+
+        data = np.load(file_path, allow_pickle=True)
+        results = {key: data[key].tolist() for key in data.files
+                   if key in return_data or key == 'param_values'}
+        return results
+
+    def load_all_results(self):
+        """Load all simulation results from the save folder.
+
+        Returns
+        -------
+        all_results : list
+            List of dictionaries containing all loaded simulation results.
+        """
+        all_results = []
+        for file_name in os.listdir(self.save_folder):
+            if file_name.startswith('sim_run_') and file_name.endswith('.npz'):
+                file_path = os.path.join(self.save_folder, file_name)
+                results = self.load_results(file_path)
+                all_results.append(results)
+        return all_results
