@@ -845,7 +845,7 @@ class _VizManager:
                 simulation_data_selection = ax_control.children[1]
                 simulation_data_selection.options = simulation_names
 
-                # Update the options for the simulation to compare dropdown
+                # Update the options for the data to compare dropdown
                 simulation_to_compare = ax_control.children[4]
                 simulation_to_compare.options = simulation_names
 
