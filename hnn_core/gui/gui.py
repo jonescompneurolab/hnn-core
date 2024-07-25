@@ -907,7 +907,7 @@ def _update_nested_dict(original, new, skip_none=True):
         dictionary by when True. If False None values will be passed to the
         updated dictionary.
 
-    Returns
+    Returns dict
     -------
 
     """
