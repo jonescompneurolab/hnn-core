@@ -91,6 +91,36 @@ def test_prepare_upload_file():
     assert dict_from_url == dict_from_local
 
 
+def test_gui_upload_connectivity():
+    """Test if gui handles uploaded connectivity parameters correctly"""
+    gui = HNNGUI()
+    _ = gui.compose()
+    # clear the drive and connectivity widgets
+    original_connectivity_count = len(gui.connectivity_widgets)
+    assert original_connectivity_count > 0
+    gui.connectivity_widgets = []
+    assert len(gui.connectivity_widgets) == 0
+
+    # simulate upload default.json
+    file1_path = Path(hnn_core_root, 'param', 'jones2009_base.json')
+    file2_path = Path(hnn_core_root, 'param',
+                      'gamma_L5weak_L2weak_hierarchical.json')
+    gui._simulate_upload_connectivity(file1_path)
+
+    # check if parameter is reloaded.
+    assert len(gui.connectivity_widgets) == original_connectivity_count
+
+    # check parameters with different files
+    gui._simulate_upload_connectivity(file1_path)
+    assert gui.connectivity_widgets[0][0].children[1].value == 0.02
+    # value should change when loading connectivity from file 2
+    gui._simulate_upload_connectivity(file2_path)
+    assert gui.connectivity_widgets[0][0].children[1].value == 0.01
+
+    # TODO Add check that loading drives does not change connectivity
+
+    plt.close('all')
+
 def test_gui_upload_params():
     """Test if gui handles uploaded parameters correctly"""
     gui = HNNGUI()
