@@ -1632,12 +1632,10 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                                add_drive=True):
     """Construct network and add drives."""
     print("init network")
-    params['dt'] = dt.value
-    params['tstop'] = tstop.value
-    single_simulation_data['net'] = jones_2009_model(
-        params,
-        add_drives_from_params=False,
-    )
+    single_simulation_data['net'] = dict_to_network(params,
+                                                    read_drives=False,
+                                                    read_external_biases=False
+                                                    )
     # adjust connectivity according to the connectivity_tab
     for connectivity_slider in connectivity_textfields:
         for vbox_key in connectivity_slider:
