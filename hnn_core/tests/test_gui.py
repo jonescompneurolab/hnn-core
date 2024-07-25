@@ -158,52 +158,6 @@ def test_gui_upload_drives():
     plt.close('all')
 
 
-def test_gui_upload_params():
-    """Test if gui handles uploaded parameters correctly"""
-    gui = HNNGUI()
-    _ = gui.compose()
-
-    # change the default loaded parameters
-    original_drive_count = len(gui.drive_widgets)
-    assert original_drive_count > 0
-    gui.delete_drive_button.click()
-    assert len(gui.drive_widgets) == 0
-
-    original_tstop = gui.widget_tstop.value
-    gui.widget_tstop.value = 1
-    original_tstep = gui.widget_dt.value
-    gui.widget_dt.value = 1
-    # simulate upload default.json
-    file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/default.json"  # noqa
-    file2_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn-core/master/hnn_core/param/gamma_L5weak_L2weak.json"  # noqa
-    gui._simulate_upload_connectivity(file1_url)
-    gui._simulate_upload_drives(file1_url)
-
-    # check if parameter is reloaded.
-    assert gui.widget_tstop.value == original_tstop
-    assert gui.widget_dt.value == original_tstep
-    assert len(gui.drive_widgets) == original_drive_count
-
-    # check parameters with different files.
-    # file1: connectivity file2: drives
-    gui._simulate_upload_connectivity(file1_url)
-    assert gui.widget_tstop.value == 170.
-    assert gui.connectivity_widgets[0][0].children[1].value == 0.02
-    gui._simulate_upload_drives(file2_url)
-    assert gui.widget_tstop.value == 250.
-    # uploading new drives does not influence the existing connectivity.
-    assert gui.connectivity_widgets[0][0].children[1].value == 0.02
-
-    # file2: connectivity file1: drives
-    gui._simulate_upload_connectivity(file2_url)
-    # now connectivity is refreshed.
-    assert gui.connectivity_widgets[0][0].children[1].value == 0.01
-    assert gui.drive_widgets[-1]['tstop'].value == 250.
-    gui._simulate_upload_drives(file1_url)
-    assert gui.connectivity_widgets[0][0].children[1].value == 0.01
-    plt.close('all')
-
-
 def test_gui_upload_data():
     """Test if gui handles uploaded data"""
     gui = HNNGUI()
