@@ -8,6 +8,7 @@ import logging
 import mimetypes
 import multiprocessing
 import sys
+import json
 import urllib.parse
 import urllib.request
 from collections import defaultdict
@@ -34,6 +35,10 @@ import base64
 import zipfile
 import numpy as np
 from copy import deepcopy
+
+hnn_core_root = Path(hnn_core.__file__).parent
+default_network_configuration = (hnn_core_root / 'param' /
+                                 'jones2009_base.json')
 
 cell_parameters_dict = {
 
@@ -218,6 +223,7 @@ class HNNGUI:
                  log_window_height=150,
                  status_height=30,
                  dpi=96,
+                 network_configuration=default_network_configuration,
                  ):
         # set up styling.
         self.total_height = total_height
@@ -287,7 +293,7 @@ class HNNGUI:
         }
 
         # load default parameters
-        self.params = self.load_parameters()
+        self.params = self.load_parameters(network_configuration)
 
         # In-memory storage of all simulation and visualization related data
         self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
@@ -481,11 +487,10 @@ class HNNGUI:
     @staticmethod
     def load_parameters(params_fname=None):
         """Read parameters from file."""
-        if not params_fname:
-            # by default load default.json
-            hnn_core_root = Path(hnn_core.__file__).parent
-            params_fname = hnn_core_root / 'param/default.json'
-        return read_params(params_fname)
+        with open(params_fname, 'r') as file:
+            parameters = json.load(file)
+
+        return parameters
 
     def _link_callbacks(self):
         """Link callbacks to UI components."""
