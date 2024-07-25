@@ -917,7 +917,7 @@ def _update_nested_dict(original, new, skip_none=True):
                 key in updated and
                 isinstance(updated[key], dict)):
             updated[key] = _update_nested_dict(updated[key], value, skip_none)
-        elif value or not skip_none:
+        elif (value is not None) or (not skip_none):
             updated[key] = value
         else:
             pass
