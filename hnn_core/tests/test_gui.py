@@ -35,10 +35,10 @@ assets_path = Path(hnn_core_root, 'tests', 'assets')
 
 @pytest.fixture
 def setup_gui():
-    gui = HNNGUI()
+    gui = HNNGUI(
+        network_configuration=assets_path / 'jones2009_3x3_drives.json'
+    )
     gui.compose()
-    gui.params['N_pyr_x'] = 3
-    gui.params['N_pyr_y'] = 3
     gui.widget_dt.value = 0.5  # speed up tests
     gui.widget_tstop.value = 70  # speed up tests
     return gui
