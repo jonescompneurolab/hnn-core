@@ -1599,11 +1599,10 @@ def on_upload_params_change(change, tstop, dt, log_out, drive_boxes,
     if len(change['owner'].value) == 0:
         return
     param_dict = change['new'][0]
-    params_fname = param_dict['name']
     file_contents = codecs.decode(param_dict['content'], encoding="utf-8")
 
     with log_out:
-        params = read_params(params_fname, file_contents)
+        params = json.loads(file_contents)
 
     # update simulation settings and params
     with log_out:
