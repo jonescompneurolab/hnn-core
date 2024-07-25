@@ -12,7 +12,7 @@ import traitlets
 import os
 
 from pathlib import Path
-from hnn_core import Dipole, Network, Params
+from hnn_core import Dipole, Network
 from hnn_core.gui import HNNGUI
 from hnn_core.gui._viz_manager import (_idx2figname,
                                        _plot_types,
@@ -48,10 +48,8 @@ def test_gui_load_params():
     """Test if gui loads default parameters properly"""
     gui = HNNGUI()
 
-    assert isinstance(gui.params, Params)
-
-    print(gui.params)
-    print(gui.params['L2Pyr*'])
+    assert isinstance(gui.params, dict)
+    assert gui.params['object_type'] == 'Network'
     plt.close('all')
 
 
