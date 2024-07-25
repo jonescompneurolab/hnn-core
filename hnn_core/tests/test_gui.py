@@ -123,6 +123,41 @@ def test_gui_upload_connectivity():
 
     plt.close('all')
 
+
+def test_gui_upload_drives():
+    """Test if gui handles uploaded drive parameters correctly"""
+    gui = HNNGUI()
+    _ = gui.compose()
+
+    # clear the drive and connectivity widgets
+    original_drive_count = len(gui.drive_widgets)
+    assert original_drive_count > 0
+    gui.delete_drive_button.click()
+    assert len(gui.drive_widgets) == 0
+
+    # simulate upload default.json
+    file1_url = Path(hnn_core_root, 'param', 'jones2009_base.json')
+    file2_url = Path(hnn_core_root, 'param',
+                     'gamma_L5weak_L2weak_hierarchical.json')
+
+    # check if parameter reloads
+    gui._simulate_upload_drives(file1_url)
+    assert len(gui.drive_widgets) == original_drive_count
+    drive_types = [widget['type'] for widget in gui.drive_widgets]
+    assert drive_types == ['Evoked', 'Evoked', 'Evoked']
+
+    # check parameters with different files.
+    gui._simulate_upload_drives(file2_url)
+    assert len(gui.drive_widgets) == 1
+    assert gui.drive_widgets[0]['type'] == 'Poisson'
+
+    # Load connectitivty and make sure drives did not change
+    gui._simulate_upload_connectivity(file1_url)
+    assert len(gui.drive_widgets) == 1
+
+    plt.close('all')
+
+
 def test_gui_upload_params():
     """Test if gui handles uploaded parameters correctly"""
     gui = HNNGUI()
