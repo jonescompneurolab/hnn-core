@@ -1604,25 +1604,24 @@ def on_upload_params_change(change, tstop, dt, log_out, drive_boxes,
     with log_out:
         params = json.loads(file_contents)
 
-    # update simulation settings and params
-    with log_out:
+        # update simulation settings and params
         if 'tstop' in params.keys():
             tstop.value = params['tstop']
         if 'dt' in params.keys():
             dt.value = params['dt']
 
-    # init network, add drives & connectivity
-    if load_type == 'connectivity':
-        add_connectivity_tab(params, connectivity_out,
-                             connectivity_textfields, cell_params_out,
-                             cell_pameters_vboxes, cell_layer_radio_button,
-                             cell_type_radio_button, layout)
-    elif load_type == 'drives':
-        with log_out:
-            add_drive_tab(params, log_out, drives_out, drive_widgets,
-                          drive_boxes, tstop, layout)
-    else:
-        raise ValueError
+        # init network, add drives & connectivity
+        if load_type == 'connectivity':
+            add_connectivity_tab(params, connectivity_out,
+                                 connectivity_textfields, cell_params_out,
+                                 cell_pameters_vboxes, cell_layer_radio_button,
+                                 cell_type_radio_button, layout)
+        elif load_type == 'drives':
+            with log_out:
+                add_drive_tab(params, log_out, drives_out, drive_widgets,
+                              drive_boxes, tstop, layout)
+        else:
+            raise ValueError
     # Resets file counter to 0
     change['owner'].set_trait('value', ([]))
 
