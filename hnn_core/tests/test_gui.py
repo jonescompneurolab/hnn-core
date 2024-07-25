@@ -23,8 +23,8 @@ from hnn_core.gui.gui import (_init_network_from_widgets,
                               _update_nested_dict,
                               serialize_simulation)
 from hnn_core.network import pick_connection
-from hnn_core.network_models import jones_2009_model
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
+from hnn_core.hnn_io import dict_to_network
 from IPython.display import IFrame
 from ipywidgets import Tab, Text, link
 
@@ -206,7 +206,7 @@ def test_gui_change_connectivity():
         for vbox in connectivity_field:
             for w_val in (0.2, 0.9):
                 _single_simulation = {}
-                _single_simulation['net'] = jones_2009_model(gui.params)
+                _single_simulation['net'] = dict_to_network(gui.params)
                 # specify connection
                 conn_indices = pick_connection(
                     net=_single_simulation['net'],
@@ -263,7 +263,7 @@ def test_gui_init_network():
     _ = gui.compose()
     # now the default parameter has been loaded.
     _single_simulation = {}
-    _single_simulation['net'] = jones_2009_model(gui.params)
+    _single_simulation['net'] = dict_to_network(gui.params)
     _init_network_from_widgets(gui.params, gui.widget_dt, gui.widget_tstop,
                                _single_simulation, gui.drive_widgets,
                                gui.connectivity_widgets,
@@ -711,7 +711,7 @@ def test_gui_add_tonic_input(setup_gui):
     """Test if gui add different type of drives."""
     gui = setup_gui
     _single_simulation = {}
-    _single_simulation['net'] = jones_2009_model(gui.params)
+    _single_simulation['net'] = dict_to_network(gui.params)
 
     # Add tonic input widget
     gui.widget_drive_type_selection.value = "Tonic"
@@ -738,7 +738,7 @@ def test_gui_cell_params_widgets(setup_gui):
     """Test if gui add different type of drives."""
     gui = setup_gui
     _single_simulation = {}
-    _single_simulation['net'] = jones_2009_model(gui.params)
+    _single_simulation['net'] = dict_to_network(gui.params)
     _single_simulation['net'].cell_types
     pyramid_cell_types = [cell_type for cell_type
                           in _single_simulation['net'].cell_types
