@@ -30,6 +30,7 @@ from hnn_core.params import _extract_drive_specs_from_hnn_params
 from hnn_core.dipole import _read_dipole_txt
 from hnn_core.params_default import (get_L2Pyr_params_default,
                                      get_L5Pyr_params_default)
+from hnn_core.hnn_io import dict_to_network
 
 import base64
 import zipfile
@@ -1376,7 +1377,7 @@ def add_connectivity_tab(params, connectivity_out, connectivity_textfields,
                          cell_layer_radio_button, cell_type_radio_button,
                          layout):
     """Add all possible connectivity boxes to connectivity tab."""
-    net = jones_2009_model(params)
+    net = dict_to_network(params)
 
     # build network connectivity tab
     add_network_connectivity_tab(net, connectivity_out,
@@ -1498,10 +1499,8 @@ def get_cell_param_default_value(cell_type_key, param_dict):
 
 def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
                   tstop, layout):
-    net = jones_2009_model(params)
-
-    drive_specs = _extract_drive_specs_from_hnn_params(
-        net._params, list(net.cell_types.keys()), legacy_mode=net._legacy_mode)
+    net = dict_to_network(params)
+    drive_specs = net.external_drives
 
     # clear before adding drives
     drives_out.clear_output()
@@ -1515,8 +1514,10 @@ def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
         specs = drive_specs[drive_name]
         should_render = idx == (len(drive_names) - 1)
 
-        is_sync_evinput = (True if not specs['cell_specific'] and
-                           specs['dynamics']['n_drive_cells'] == 1 else False)
+        # Check for synchronous input
+        is_sync_evinput = (True if (not specs['cell_specific']) and
+                                   (specs['n_drive_cells'] == 1)
+                           else False)
 
         add_drive_widget(
             specs['type'].capitalize(),
