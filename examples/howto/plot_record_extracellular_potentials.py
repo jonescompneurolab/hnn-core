@@ -98,8 +98,7 @@ axs[1].set_xlabel('')
 # Add spike raster to subplot
 net.cell_response.plot_spikes_raster(ax=axs[2], show=False)
 
-# Finally, add the CSD to the bottom subplot, with the colormap ranging from -0.02 to 0.02 µV,
-# and spline interpolation for smoothing
+# Finally, add the CSD to the bottom subplot
 net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot_csd(ax=axs[3], show=False)
 plt.tight_layout()
 plt.show()
