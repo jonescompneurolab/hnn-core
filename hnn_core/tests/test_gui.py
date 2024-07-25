@@ -53,6 +53,14 @@ def test_gui_load_params():
     plt.close('all')
 
 
+def test_gui_compose():
+    gui = HNNGUI()
+    gui.compose()
+    assert len(gui.connectivity_widgets) == 12
+    assert len(gui.drive_widgets) == 3
+    plt.close('all')
+
+
 def test_prepare_upload_file():
     """Tests that input files from local or url sources import correctly"""
     def _import_json(content):
