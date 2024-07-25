@@ -784,40 +784,54 @@ def test_fig_tabs_dropdown_lists(setup_gui):
 
 def test_update_nested_dict():
     """Tests nested dictionary updates values appropriately."""
-    original = {'a': 0,
-                'b': {'a2': 0, 'b2': 0},
+    original = {'a': 1,
+                'b': {'a2': 0,
+                      'b2': {'a3': 0
+                             }
+                      },
                 }
 
     # Changes at each level
-    changes = {'a': 1,
-               'b': {'a2': 1, 'b2': 0},
+    changes = {'a': 2,
+               'b': {'a2': 1,
+                     'b2': {'a3': 1
+                            }
+                     },
                }
     updated = _update_nested_dict(original, changes)
     expected = changes
     assert updated == expected
 
     # Omitted items should not be changed from in the original
-    omission = {'a': 1,
+    omission = {'a': 2,
                 'b': {'a2': 0},
                 }
-    expected = {'a': 1,
-                'b': {'a2': 0, 'b2': 0},
+    expected = {'a': 2,
+                'b': {'a2': 0,
+                      'b2': {'a3': 0
+                             }
+                      },
                 }
     updated = _update_nested_dict(original, omission)
     assert updated == expected
 
     # Additional items should be added
-    addition = {'a': 1,
-                'b': {'a2': 0, 'b2': 0, 'c2': 1},
-                'c': 1,
+    addition = {'a': 2,
+                'b': {'a2': 0,
+                      'b2': {'a3': 0,
+                             'b3': 0,
+                             },
+                      'c2': 1
+                      },
+                'c': 1
                 }
     expected = addition
     updated = _update_nested_dict(original, addition)
     assert updated == expected
 
     # Test passing of None values
-    has_none = {'a': 0,
-                'b': {'a2': None, 'b2': 0},
+    has_none = {'a': 1,
+                'b': {'a2': None},
                 }
     # Default behavior will not pass in None values to the update
     expected = original  # No change expected
@@ -825,5 +839,24 @@ def test_update_nested_dict():
     assert updated == expected
     # Skip_none set of False will pass in None values to the update
     updated = _update_nested_dict(original, has_none, skip_none=False)
-    expected = has_none
+    expected = {'a': 1,
+                'b': {'a2': None,
+                      'b2': {'a3': 0
+                             }
+                      },
+                }
+    assert updated == expected
+
+    # Values that evaluate to False that but are not None type should be passed
+    # to the updated dict by default.
+    has_nulls = {'a': 0,
+                 'b': {'a2': np.nan,
+                       'b2': {'a3': False,
+                              'b3': ''
+                              }
+                       },
+                 }
+    # Skip_none set of False will pass in None values to the update
+    updated = _update_nested_dict(original, has_nulls)
+    expected = has_nulls
     assert updated == expected
