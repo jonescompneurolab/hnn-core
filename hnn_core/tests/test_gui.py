@@ -117,7 +117,9 @@ def test_gui_upload_connectivity():
     gui._simulate_upload_connectivity(file2_path)
     assert gui.connectivity_widgets[0][0].children[1].value == 0.01
 
-    # TODO Add check that loading drives does not change connectivity
+    # Load drives and make sure connectivity does not change
+    gui._simulate_upload_drives(file1_path)
+    assert gui.connectivity_widgets[0][0].children[1].value == 0.01
 
     plt.close('all')
 
