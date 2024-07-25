@@ -750,7 +750,7 @@ def test_fig_tabs_dropdown_lists(setup_gui):
 
     gui.widget_ntrials.value = 1
 
-    # Initiate 1rs simulation
+    # Initiate 1st simulation
     sim_name = "sim1"
     gui.widget_simulation_name.value = sim_name
 
@@ -770,9 +770,12 @@ def test_fig_tabs_dropdown_lists(setup_gui):
         for ax_control in controls.children:
             assert ax_control.children[1].description == "Simulation Data:"
             sim_names = ax_control.children[1].options
+            # Check that dropdown has been updated with all simulation names
             assert all(sim in sim_names for sim in [sim_name, sim_name2])
 
             assert ax_control.children[4].description == "Data to Compare:"
 
+            # Check the data to compare dropdown is enable for
+            # non "input histograms" plot type
             if ax_control.children[0].value != "input histogram":
                 assert not ax_control.children[4].disabled
