@@ -21,12 +21,10 @@ from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         Checkbox)
 from ipywidgets.embed import embed_minimal_html
 import hnn_core
-from hnn_core import (JoblibBackend, MPIBackend, jones_2009_model, read_params,
-                      simulate_dipole)
+from hnn_core import JoblibBackend, MPIBackend, simulate_dipole
 from hnn_core.gui._logging import logger
 from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
-from hnn_core.params import _extract_drive_specs_from_hnn_params
 from hnn_core.dipole import _read_dipole_txt
 from hnn_core.params_default import (get_L2Pyr_params_default,
                                      get_L5Pyr_params_default)
