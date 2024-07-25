@@ -1029,14 +1029,15 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
     default_data = {
         'tstart': 0.,
         'tstart_std': 0.,
-        'tstop': 0.,
+        'tstop': tstop_widget.value,
         'burst_rate': 7.5,
         'burst_std': 0,
         'repeats': 1,
         'seedcore': 14,
     }
     if isinstance(data, dict):
-        default_data.update(data)
+        default_data = _update_nested_dict(default_data, data)
+
     kwargs = dict(layout=layout, style=style)
     tstart = BoundedFloatText(
         value=default_data['tstart'], description='Start time (ms)',
