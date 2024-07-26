@@ -161,7 +161,7 @@ without the need to install and configure MPI.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 
 <span class="kn">import</span> <span class="nn">hnn_core</span>
-<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <span class="n">simulate_dipole</span><span class="p">,</span> <span class="n">jones_2009_model</span>
+<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">,</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a>
 </pre></div>
 </div>
 <p>Following <span class="xref std std-ref">the alpha example</span>, we add a
@@ -170,13 +170,13 @@ simulation. Each burst consists of a pair (2) of spikes, spaced 10 ms apart.
 The occurrence of each burst is jittered by a random, normally distributed
 amount (20 ms standard deviation). We repeat the burst train 10 times, each
 time with unique randomization.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">()</span>
 
-<span class="n">weights_ampa</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">5.4e-5</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">5.4e-5</span><span class="p">}</span>
-<span class="n">net</span><span class="o">.</span><span class="n">add_bursty_drive</span><span class="p">(</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_ampa</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">5.4e-5</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">5.4e-5</span><span class="p">}</span>
+<a href="../../generated/hnn_core.Network.html#hnn_core.Network.add_bursty_drive" title="hnn_core.Network.add_bursty_drive" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">add_bursty_drive</span></a><span class="p">(</span>
     <span class="s1">&#39;bursty&#39;</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="mf">50.</span><span class="p">,</span> <span class="n">burst_rate</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">burst_std</span><span class="o">=</span><span class="mf">20.</span><span class="p">,</span> <span class="n">numspikes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="n">spike_isi</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_drive_cells</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="s1">&#39;distal&#39;</span><span class="p">,</span>
-    <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa</span><span class="p">,</span> <span class="n">event_seed</span><span class="o">=</span><span class="mi">278</span><span class="p">)</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_ampa</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights_ampa</span></a><span class="p">,</span> <span class="n">event_seed</span><span class="o">=</span><span class="mi">278</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Finally, to simulate we use the
@@ -187,10 +187,10 @@ start the simulation across the number of processors (cores) specified by
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <span class="n">MPIBackend</span>
 
 <span class="k">with</span> <span class="n">MPIBackend</span><span class="p">(</span><span class="n">n_procs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">mpi_cmd</span><span class="o">=</span><span class="s1">&#39;mpiexec&#39;</span><span class="p">):</span>
-    <span class="n">dpls</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="mf">310.</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpls</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">(</span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="mf">310.</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="n">trial_idx</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">dpls</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trial_idx</span></a> <span class="o">=</span> <span class="mi">0</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpls</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trial_idx</span></a><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
 <img src="../../_images/sphx_glr_plot_simulate_mpi_backend_001.png" srcset="../../_images/sphx_glr_plot_simulate_mpi_backend_001.png" alt="Aggregate (L2 + L5)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>MPI will run 1 trial(s) sequentially by distributing network neurons over 2 processes.
@@ -234,7 +234,7 @@ Trial 1: 300.0 ms...
 &lt;Figure size 640x480 with 1 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 22.032 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 21.527 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-simulate-mpi-backend-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_simulate_mpi_backend.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" width="150px" /></a>
@@ -244,6 +244,9 @@ Trial 1: 300.0 ms...
 </div>
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/91a795d18e509bc245aa62129f56638a/plot_simulate_mpi_backend.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_simulate_mpi_backend.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/2614b7213bd2fa80a84b0cf766148cc7/plot_simulate_mpi_backend.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">plot_simulate_mpi_backend.zip</span></code></a></p>
 </div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>

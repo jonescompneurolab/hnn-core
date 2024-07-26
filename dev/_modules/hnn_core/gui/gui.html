@@ -1022,6 +1022,43 @@
     <span class="k">return</span> <span class="n">uploaded_value</span>
 
 
+<span class="k">def</span> <span class="nf">_update_nested_dict</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="n">new</span><span class="p">,</span> <span class="n">skip_none</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Updates dictionary values from another dictionary</span>
+
+<span class="sd">    Will update nested dictionaries in the structure. New items from the</span>
+<span class="sd">    update dictionary are added and omitted items are retained from the</span>
+<span class="sd">    original dictionary. By default, will not pass None values from the update</span>
+<span class="sd">    dictionary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    original : dict</span>
+<span class="sd">        Dictionary to update</span>
+<span class="sd">    new : dict</span>
+<span class="sd">        Dictionary with new values for updating</span>
+<span class="sd">    skip_none : bool, default True</span>
+<span class="sd">        None values in the new dictionary are not passed to the updated</span>
+<span class="sd">        dictionary by when True. If False None values will be passed to the</span>
+<span class="sd">        updated dictionary.</span>
+
+<span class="sd">    Returns dict</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">updated</span> <span class="o">=</span> <span class="n">original</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">new</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="n">key</span> <span class="ow">in</span> <span class="n">updated</span> <span class="ow">and</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">updated</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)):</span>
+            <span class="n">updated</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_update_nested_dict</span><span class="p">(</span><span class="n">updated</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">value</span><span class="p">,</span> <span class="n">skip_none</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">skip_none</span><span class="p">):</span>
+            <span class="n">updated</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="k">return</span> <span class="n">updated</span>
+
+
 <span class="k">def</span> <span class="nf">create_expanded_button</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">button_style</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                            <span class="n">button_color</span><span class="o">=</span><span class="s2">&quot;#8A2BE2&quot;</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">button_style</span><span class="o">=</span><span class="n">button_style</span><span class="p">,</span>
@@ -1080,9 +1117,7 @@
         <span class="p">},</span>
     <span class="p">}</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">default_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">default_data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="n">default_data</span> <span class="o">=</span> <span class="n">_update_nested_dict</span><span class="p">(</span><span class="n">default_data</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
     <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">)</span>
     <span class="n">cell_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;L5_basket&#39;</span><span class="p">,</span> <span class="s1">&#39;L2_basket&#39;</span><span class="p">]</span>
@@ -1198,14 +1233,15 @@
         <span class="s1">&#39;tstop&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="s1">&#39;seedcore&#39;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span>
         <span class="s1">&#39;rate_constant&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">8.5</span><span class="p">,</span>
-            <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">8.5</span><span class="p">,</span>
-            <span class="s1">&#39;L5_basket&#39;</span><span class="p">:</span> <span class="mf">8.5</span><span class="p">,</span>
-            <span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">8.5</span><span class="p">,</span>
+            <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">40.</span><span class="p">,</span>
+            <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">40.</span><span class="p">,</span>
+            <span class="s1">&#39;L5_basket&#39;</span><span class="p">:</span> <span class="mf">40.</span><span class="p">,</span>
+            <span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">40.</span><span class="p">,</span>
         <span class="p">}</span>
     <span class="p">}</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="n">default_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">default_data</span> <span class="o">=</span> <span class="n">_update_nested_dict</span><span class="p">(</span><span class="n">default_data</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
     <span class="n">tstart</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
         <span class="n">value</span><span class="o">=</span><span class="n">default_data</span><span class="p">[</span><span class="s1">&#39;tstart&#39;</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Start time (ms)&#39;</span><span class="p">,</span>
         <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">)</span>

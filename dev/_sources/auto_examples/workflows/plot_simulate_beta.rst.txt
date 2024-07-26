@@ -623,7 +623,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (3 minutes 7.561 seconds)
+   **Total running time of the script:** (2 minutes 57.394 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_beta.py:
@@ -646,6 +646,10 @@ References
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_simulate_beta.py <plot_simulate_beta.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_simulate_beta.zip <plot_simulate_beta.zip>`
 
 
 .. only:: html

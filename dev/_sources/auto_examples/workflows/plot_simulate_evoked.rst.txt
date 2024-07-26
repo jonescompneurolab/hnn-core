@@ -453,7 +453,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 59.784 seconds)
+   **Total running time of the script:** (0 minutes 59.235 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_evoked.py:
@@ -476,6 +476,10 @@ References
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_simulate_evoked.py <plot_simulate_evoked.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_simulate_evoked.zip <plot_simulate_evoked.zip>`
 
 
 .. only:: html
