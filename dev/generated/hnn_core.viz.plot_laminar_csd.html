@@ -146,7 +146,7 @@
 <h1>hnn_core.viz.plot_laminar_csd<a class="headerlink" href="#hnn-core-viz-plot-laminar-csd" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="hnn_core.viz.plot_laminar_csd">
-<span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">plot_laminar_csd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#plot_laminar_csd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.plot_laminar_csd" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">plot_laminar_csd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">times</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contact_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'b'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spline'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#plot_laminar_csd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.plot_laminar_csd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot laminar current source density (CSD) estimation from LFP array.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -161,6 +161,18 @@
 </dd>
 <dt><strong>contact_labels</strong><span class="classifier">list</span></dt><dd><p>Labels associated with the contacts to plot. Passed as-is to
 <code class="xref py py-func docutils literal notranslate"><span class="pre">set_yticklabels()</span></code>.</p>
+</dd>
+<dt><strong>vmin: float, optional</strong></dt><dd><p>lower bound of the color axis.
+Will be set automatically of None.</p>
+</dd>
+<dt><strong>vmax: float, optional</strong></dt><dd><p>upper bound of the color axis.
+Will be set automatically of None.</p>
+</dd>
+<dt><strong>sink</strong><span class="classifier">str</span></dt><dd><p>If set to ‘blue’ or ‘b’, plots sinks in blue and sources in red,
+if set to ‘red’ or ‘r’, sinks plotted in red and sources blue.</p>
+</dd>
+<dt><strong>interpolation</strong><span class="classifier">str | None</span></dt><dd><p>If ‘spline’, will smoothen the CSD using spline method,
+if None, no smoothing will be applied.</p>
 </dd>
 <dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the plot.</p>
 </dd>

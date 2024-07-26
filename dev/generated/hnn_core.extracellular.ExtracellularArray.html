@@ -215,7 +215,7 @@ measured values of conductivity in rat cortex (note units there are mS/cm)</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.copy" title="hnn_core.extracellular.ExtracellularArray.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
 <td><p>Return a copy of the ExtracellularArray instance</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.plot_csd" title="hnn_core.extracellular.ExtracellularArray.plot_csd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_csd</span></code></a>([colorbar, ax, show])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.plot_csd" title="hnn_core.extracellular.ExtracellularArray.plot_csd"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_csd</span></code></a>([vmin, vmax, interpolation, sink, ...])</p></td>
 <td><p>Plot laminar current source density (CSD) estimation</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.extracellular.ExtracellularArray.plot_lfp" title="hnn_core.extracellular.ExtracellularArray.plot_lfp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_lfp</span></code></a>(*[, trial_no, contact_no, tmin, ...])</p></td>
@@ -251,11 +251,23 @@ measured values of conductivity in rat cortex (note units there are mS/cm)</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.extracellular.ExtracellularArray.plot_csd">
-<span class="sig-name descname"><span class="pre">plot_csd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/extracellular.html#ExtracellularArray.plot_csd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.extracellular.ExtracellularArray.plot_csd" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">plot_csd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spline'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'b'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/extracellular.html#ExtracellularArray.plot_csd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.extracellular.ExtracellularArray.plot_csd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot laminar current source density (CSD) estimation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
+<dt><strong>vmin: float, optional</strong></dt><dd><p>lower bound of the color axis.
+Will be set automatically of None.</p>
+</dd>
+<dt><strong>vmax: float, optional</strong></dt><dd><p>upper bound of the color axis.
+Will be set automatically of None.</p>
+</dd>
+<dt><strong>sink</strong><span class="classifier">str</span></dt><dd><p>If set to ‘blue’ or ‘b’, plots sinks in blue and sources in red,
+if set to ‘red’ or ‘r’, sinks plotted in red and sources blue.</p>
+</dd>
+<dt><strong>interpolation</strong><span class="classifier">str | None</span></dt><dd><p>If ‘spline’, will smoothen the CSD using spline method,
+if None, no smoothing will be applied.</p>
+</dd>
 <dt><strong>colorbar</strong><span class="classifier">bool</span></dt><dd><p>If the colorbar is presented.</p>
 </dd>
 <dt><strong>ax</strong><span class="classifier">instance of matplotlib figure | None</span></dt><dd><p>The matplotlib axis.</p>

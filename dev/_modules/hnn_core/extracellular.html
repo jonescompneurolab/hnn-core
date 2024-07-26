@@ -645,11 +645,24 @@
                 <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">fig</span></div>
 
-<div class="viewcode-block" id="ExtracellularArray.plot_csd"><a class="viewcode-back" href="../../generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray.plot_csd">[docs]</a>    <span class="k">def</span> <span class="nf">plot_csd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="ExtracellularArray.plot_csd"><a class="viewcode-back" href="../../generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray.plot_csd">[docs]</a>    <span class="k">def</span> <span class="nf">plot_csd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;spline&#39;</span><span class="p">,</span>
+                 <span class="n">sink</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot laminar current source density (CSD) estimation</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
+<span class="sd">        vmin: float, optional</span>
+<span class="sd">            lower bound of the color axis.</span>
+<span class="sd">            Will be set automatically of None.</span>
+<span class="sd">        vmax: float, optional</span>
+<span class="sd">            upper bound of the color axis.</span>
+<span class="sd">            Will be set automatically of None.</span>
+<span class="sd">        sink : str</span>
+<span class="sd">            If set to &#39;blue&#39; or &#39;b&#39;, plots sinks in blue and sources in red,</span>
+<span class="sd">            if set to &#39;red&#39; or &#39;r&#39;, sinks plotted in red and sources blue.</span>
+<span class="sd">        interpolation : str | None</span>
+<span class="sd">            If &#39;spline&#39;, will smoothen the CSD using spline method,</span>
+<span class="sd">            if None, no smoothing will be applied.</span>
 <span class="sd">        colorbar : bool</span>
 <span class="sd">            If the colorbar is presented.</span>
 <span class="sd">        ax : instance of matplotlib figure | None</span>
@@ -671,7 +684,9 @@
 
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_laminar_csd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="n">csd_data</span><span class="p">,</span>
                                <span class="n">contact_labels</span><span class="o">=</span><span class="n">contact_labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
-                               <span class="n">colorbar</span><span class="o">=</span><span class="n">colorbar</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span>
+                               <span class="n">colorbar</span><span class="o">=</span><span class="n">colorbar</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span>
+                               <span class="n">interpolation</span><span class="o">=</span><span class="n">interpolation</span><span class="p">,</span> <span class="n">sink</span><span class="o">=</span><span class="n">sink</span><span class="p">,</span>
+                               <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">fig</span></div>
 

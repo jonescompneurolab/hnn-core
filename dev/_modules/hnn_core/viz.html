@@ -142,7 +142,6 @@
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">cycle</span>
 <span class="kn">import</span> <span class="nn">colorsys</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-
 <span class="kn">from</span> <span class="nn">.externals.mne</span> <span class="kn">import</span> <span class="n">_validate_type</span>
 
 
@@ -1364,6 +1363,7 @@
 
 
 <div class="viewcode-block" id="plot_laminar_csd"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_laminar_csd.html#hnn_core.viz.plot_laminar_csd">[docs]</a><span class="k">def</span> <span class="nf">plot_laminar_csd</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">contact_labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                     <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sink</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;spline&#39;</span><span class="p">,</span>
                      <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot laminar current source density (CSD) estimation from LFP array.</span>
 
@@ -1380,6 +1380,19 @@
 <span class="sd">    contact_labels : list</span>
 <span class="sd">        Labels associated with the contacts to plot. Passed as-is to</span>
 <span class="sd">        :func:`~matplotlib.axes.Axes.set_yticklabels`.</span>
+<span class="sd">    vmin: float, optional</span>
+<span class="sd">        lower bound of the color axis.</span>
+<span class="sd">        Will be set automatically of None.</span>
+<span class="sd">    vmax: float, optional</span>
+<span class="sd">        upper bound of the color axis.</span>
+<span class="sd">        Will be set automatically of None.</span>
+<span class="sd">    sink : str</span>
+<span class="sd">        If set to &#39;blue&#39; or &#39;b&#39;, plots sinks in blue and sources in red,</span>
+<span class="sd">        if set to &#39;red&#39; or &#39;r&#39;, sinks plotted in red and sources blue.</span>
+<span class="sd">    interpolation : str | None</span>
+<span class="sd">        If &#39;spline&#39;, will smoothen the CSD using spline method,</span>
+<span class="sd">        if None, no smoothing will be applied.</span>
+
 <span class="sd">    show : bool</span>
 <span class="sd">        If True, show the plot.</span>
 
@@ -1389,19 +1402,44 @@
 <span class="sd">        The matplotlib figure handle.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">RectBivariateSpline</span>
+
     <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">contact_labels</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
-                       <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;jet_r&quot;</span><span class="p">,</span> <span class="n">shading</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;CSD&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">sink</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span>
+        <span class="n">cmap</span> <span class="o">=</span> <span class="s2">&quot;jet&quot;</span>
+    <span class="k">elif</span> <span class="n">sink</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;r&#39;</span><span class="p">:</span>
+        <span class="n">cmap</span> <span class="o">=</span> <span class="s2">&quot;jet_r&quot;</span>
+    <span class="k">elif</span> <span class="n">sink</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;b&#39;</span> <span class="ow">or</span> <span class="n">sink</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;r&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Please use sink = &quot;b&quot; or sink = &quot;r&quot;.&#39;</span>
+                           <span class="s1">&#39; Only colormap &quot;jet&quot; is supported for CSD.&#39;</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="n">interpolation</span> <span class="o">==</span> <span class="s1">&#39;spline&#39;</span><span class="p">:</span>
+        <span class="c1"># create interpolation function</span>
+        <span class="n">interp_data</span> <span class="o">=</span> <span class="n">RectBivariateSpline</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">contact_labels</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="c1"># increase number of contacts</span>
+        <span class="n">new_depths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">contact_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">contact_labels</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                 <span class="n">contact_labels</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">contact_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="c1"># interpolate</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">interp_data</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">new_depths</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">elif</span> <span class="n">interpolation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="n">new_depths</span> <span class="o">=</span> <span class="n">contact_labels</span>
+
+    <span class="c1"># if vmin and vmax are both None, set colormap such that green = zero</span>
+    <span class="k">if</span> <span class="n">vmin</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">vmax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">vmin</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="n">vmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+
+    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">new_depths</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
+                       <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">shading</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;time (s)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;electrode depth&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">colorbar</span><span class="p">:</span>
         <span class="n">color_axis</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">inset_axes</span><span class="p">([</span><span class="mf">1.05</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">color_axis</span><span class="p">)</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$CSD (uV/um^</span><span class="si">{2}</span><span class="s1">)$&#39;</span><span class="p">)</span>
 
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Electrode depth&#39;</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
     <span class="n">plt_show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
 

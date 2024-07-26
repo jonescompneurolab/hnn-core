@@ -175,6 +175,7 @@ speed up computation considerably.
 
     {'shank1': <ExtracellularArray | 25 electrodes, conductivity=0.3, method=psa (no data recorded yet)>}
     Joblib will run 1 trial(s) in parallel by distributing trials over 1 jobs.
+    Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.8/site-packages/hnn_core/mod/x86_64/libnrnmech.so
     Building the NEURON model
     [Done]
     Trial 1: 0.03 ms...
@@ -205,7 +206,7 @@ smoothing window, after which both data can be decimated by a factor of 20
 from 40 to 2 kHz sampling rates (note that decimation is applied in two
 steps). Decimation speeds up plotting significantly.
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-107
+.. GENERATED FROM PYTHON SOURCE LINES 82-106
 
 .. code-block:: Python
 
@@ -229,8 +230,7 @@ steps). Decimation speeds up plotting significantly.
     net.cell_response.plot_spikes_raster(ax=axs[2], show=False)
 
     # Finally, add the CSD to the bottom subplot
-    net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot_csd(
-        ax=axs[3], show=False)
+    net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot_csd(ax=axs[3], show=False)
     plt.tight_layout()
     plt.show()
 
@@ -238,7 +238,7 @@ steps). Decimation speeds up plotting significantly.
 
 
 .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_record_extracellular_potentials_003.png
-   :alt: Aggregate (L2 + L5), CSD
+   :alt: Aggregate (L2 + L5)
    :srcset: /auto_examples/howto/images/sphx_glr_plot_record_extracellular_potentials_003.png
    :class: sphx-glr-single-img
 
@@ -247,13 +247,13 @@ steps). Decimation speeds up plotting significantly.
 
  .. code-block:: none
 
-    /home/circleci/project/examples/howto/plot_record_extracellular_potentials.py:104: UserWarning: The figure layout has changed to tight
+    /home/circleci/project/examples/howto/plot_record_extracellular_potentials.py:103: UserWarning: The figure layout has changed to tight
       plt.tight_layout()
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-115
+.. GENERATED FROM PYTHON SOURCE LINES 107-114
 
 References
 ----------
@@ -266,7 +266,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 35.711 seconds)
+   **Total running time of the script:** (0 minutes 56.592 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_record_extracellular_potentials.py:
@@ -289,6 +289,10 @@ References
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_record_extracellular_potentials.py <plot_record_extracellular_potentials.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_record_extracellular_potentials.zip <plot_record_extracellular_potentials.zip>`
 
 
 .. only:: html
