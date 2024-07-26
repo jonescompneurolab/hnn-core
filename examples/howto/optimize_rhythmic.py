@@ -1,6 +1,6 @@
 """
 =========================================
-05. Optimize simulated rhythmic responses
+08. Optimize simulated rhythmic responses
 =========================================
 
 This example demonstrates how to optimize the power spectral density (PSD)

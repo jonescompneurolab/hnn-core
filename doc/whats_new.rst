@@ -84,6 +84,9 @@ Changelog
 
 - Added GUI feature to read and modify cell parameters,
   by `Camilo Diaz`_  in :gh:`806`.
+  
+- Add ability to optimize parameters associated with rhythmic drives,
+  by `Carolina Fernandez Pujol`_ in :gh:`673`.
 
 
 Bug
