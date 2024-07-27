@@ -384,7 +384,7 @@ def _order_drives(gid_ranges, external_drives):
 def dict_to_network(net_data,
                     read_drives=True,
                     read_external_biases=True):
-    """ Converts a dict of network configurations to a Network
+    """Converts a dict of network configurations to a Network
 
     Parameters
     ----------
@@ -456,7 +456,7 @@ def dict_to_network(net_data,
 def read_network_configuration(fname,
                                read_drives=True,
                                read_external_biases=True):
-    """ Read network from a json configuration file.
+    """Read network from a json configuration file.
 
     Parameters
     ----------
