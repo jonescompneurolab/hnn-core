@@ -447,12 +447,15 @@ class Network:
 
     def __repr__(self):
         class_name = self.__class__.__name__
-        s = ("%d x %d Pyramidal cells (L2, L5)"
-             % (self._N_pyr_x, self._N_pyr_y))
-        s += ("\n%d L2 basket cells\n%d L5 basket cells"
-              % (len(self.pos_dict['L2_basket']),
-                 len(self.pos_dict['L5_basket'])))
-        return '<%s | %s>' % (class_name, s)
+        # Dynamically create the description based on the current cell types
+        descriptions = []
+        for cell_name in self.cell_types:
+            count = len(self.pos_dict.get(cell_name, []))
+            descriptions.append(f"{count} {cell_name} cells")
+
+    # Combine all descriptions into a single string
+        description_str = "\n".join(descriptions)
+        return f'<{class_name} | {description_str}>'
 
     def __eq__(self, other):
         if not isinstance(other, Network):
@@ -460,7 +463,7 @@ class Network:
 
         # Check connectivity
         if ((len(self.connectivity) != len(other.connectivity)) or
-                not (_compare_lists(self.connectivity, other.connectivity))):
+                not (_compare_lists(self.onnectivity, other.connectivity))):
             return False
 
         # Check all other attributes
