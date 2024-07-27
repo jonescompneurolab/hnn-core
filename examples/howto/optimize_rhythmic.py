@@ -26,10 +26,6 @@ n_procs = 10
 # object with no attached drives, and a dictionary of the parameters we wish to
 # optimize.
 
-# define set_params function and constraints
-net = jones_2009_model()
-
-
 def set_params(net, params):
 
     # Proximal (alpha)
