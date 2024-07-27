@@ -74,7 +74,6 @@ def set_params(net, params):
 # The following synaptic weight parameter ranges (units of micro-siemens)
 # were chosen so as to keep the model in physiologically realistic regimes.
 
-
 constraints = dict()
 constraints.update({'alpha_prox_weight': (4.4e-5, 6.4e-5),
                     'alpha_prox_tstart': (45, 55),
