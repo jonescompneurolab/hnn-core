@@ -138,7 +138,7 @@ data_templates = {
 
 def check_sim_plot_types(
         new_sim_name, plot_type_selection, target_selection, data):
-    if data["simulations"][new_sim_name.new]['net'] is None:
+    if data["simulations"][new_sim_name]['net'] is None:
         plot_type_selection.options = [
             pt for pt in _plot_types if pt not in _ext_data_disabled_plot_types
         ]
@@ -146,7 +146,7 @@ def check_sim_plot_types(
         plot_type_selection.options = _plot_types
     # deal with target data
     all_possible_targets = list(data["simulations"].keys())
-    all_possible_targets.remove(new_sim_name.new)
+    all_possible_targets.remove(new_sim_name)
     target_selection.options = all_possible_targets + ['None']
     target_selection.value = 'None'
 
@@ -531,6 +531,12 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         style=analysis_style,
     )
 
+    # This will check the sim plot types dropdown available options
+    # for the specific sim name in the simulation_selection dropdown options
+    check_sim_plot_types(
+        simulation_names[sim_index],
+        plot_type_selection, target_data_selection, data)
+
     spectrogram_colormap_selection = Dropdown(
         description='Spectrogram Colormap:',
         options=[(cm, cm) for cm in _spectrogram_color_maps],
@@ -580,7 +586,7 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
 
     def _on_sim_data_change(new_sim_name):
         return check_sim_plot_types(
-            new_sim_name, plot_type_selection, target_data_selection, data)
+            new_sim_name.new, plot_type_selection, target_data_selection, data)
 
     def _on_target_comparison_change(new_target_name):
         return target_comparison_change(new_target_name, simulation_selection,
