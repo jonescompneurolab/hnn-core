@@ -489,32 +489,29 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
     analysis_style = {'description_width': '200px'}
     layout = Layout(width="98%")
     simulation_names = tuple(data['simulations'].keys())
-    sim_name_default = simulation_names[-1]
-
-    if len(simulation_names) == 0:
-        simulation_names = [
-            "None",
-        ]
+    sim_index = 0
+    if not simulation_names:
+        simulation_names = ("None",)
+    else:
+        # Find the last simulation with a non-None 'net'
+        sim_index = next(
+            (idx for idx, sim_name in enumerate(simulation_names)
+             if data['simulations'][sim_name]['net'] is not None),
+            0  # Default value if no such simulation is found
+        )
 
     simulation_selection = Dropdown(
         options=simulation_names,
-        value=simulation_names[0],
+        value=simulation_names[sim_index],
         description='Simulation Data:',
         disabled=False,
         layout=layout,
         style=analysis_style,
     )
 
-    if data['simulations'][sim_name_default]['net'] is None:
-        valid_plot_types = [
-            pt for pt in _plot_types if pt not in _ext_data_disabled_plot_types
-        ]
-    else:
-        valid_plot_types = _plot_types
-
     plot_type_selection = Dropdown(
-        options=valid_plot_types,
-        value=valid_plot_types[0],
+        options=_plot_types,
+        value=_plot_types[0],
         description='Type:',
         disabled=False,
         layout=layout,
