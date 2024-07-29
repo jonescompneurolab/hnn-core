@@ -22,7 +22,8 @@ class BatchSimulate(object):
                  overwrite=True, summary_func=None,
                  save_dpl=True, save_spiking=False,
                  save_lfp=False, save_voltages=False,
-                 save_currents=False, save_calcium=False):
+                 save_currents=False, save_calcium=False,
+                 clear_cache=False):
         """Initialize the BatchSimulate class.
 
         Parameters
@@ -74,17 +75,28 @@ class BatchSimulate(object):
             A function to calculate summary statistics from the simulation
             results. Default is None.
         save_dpl : bool
-            If True, save dipole results. Default: True.
+            If True, save dipole results. Note, `save_outputs` must be True.
+            Default: True.
         save_spiking : bool
-            If True, save spiking results. Default: False.
+            If True, save spiking results. Note, `save_outputs` must be True.
+            Default: False.
         save_lfp : bool
-            If True, save local field potential (lfp) results. Default: False.
+            If True, save local field potential (lfp) results.
+            Note, `save_outputs` must be True.
+            Default: False.
         save_voltages : bool
-            If True, save voltages results. Default: False.
+            If True, save voltages results. Note, `save_outputs` must be True.
+            Default: False.
         save_currents : bool
-            If True, save currents results. Default: False.
+            If True, save currents results. Note, `save_outputs` must be True.
+            Default: False.
         save_calcium : bool
-            If True, save calcium concentrations. Default: False.
+            If True, save calcium concentrations.
+            Note, `save_outputs` must be True.
+            Default: False.
+        clear_cache : bool, optional
+            Whether to clear the results cache after saving each batch.
+            Default is False.
         Notes
         -----
         When `save_output=True`, the saved files will appear as
@@ -105,6 +117,14 @@ class BatchSimulate(object):
         _check_option('record_isec', record_isec, ['all', 'soma', False])
         _validate_type(save_folder, types='path-like', item_name='save_folder')
         _validate_type(batch_size, types='int', item_name='batch_size')
+        _validate_type(save_outputs, types=(bool,), item_name='save_outputs')
+        _validate_type(save_dpl, types=(bool,), item_name='save_dpl')
+        _validate_type(save_spiking, types=(bool,), item_name='save_spiking')
+        _validate_type(save_lfp, types=(bool,), item_name='save_lfp')
+        _validate_type(save_voltages, types=(bool,), item_name='save_voltages')
+        _validate_type(save_currents, types=(bool,), item_name='save_currents')
+        _validate_type(save_calcium, types=(bool,), item_name='save_calcium')
+        _validate_type(clear_cache, types=(bool,), item_name='clear_cache')
 
         if set_params is not None and not callable(set_params):
             raise TypeError("set_params must be a callable function")
@@ -131,10 +151,11 @@ class BatchSimulate(object):
         self.save_voltages = save_voltages
         self.save_currents = save_currents
         self.save_calcium = save_calcium
+        self.clear_cache = clear_cache
 
     def run(self, param_grid, return_output=True,
             combinations=True, n_jobs=1, backend='loky',
-            verbose=50, clear_cache=False):
+            verbose=50):
         """Run batch simulations.
 
         Parameters
@@ -154,21 +175,20 @@ class BatchSimulate(object):
             `multiprocessing`, or `dask`. Default is `loky`
         verbose : int, optional
             The verbosity level for parallel execution. Default is 50.
-        clear_cache : bool, optional
-            Whether to clear the results cache after saving each batch.
-            Default is False
 
         Returns
         -------
-        results : list
-            List of simulation results if return_output is True.
+        results : dict
+            Dictionary containing summary statistics and simulation data
+            if return_output is True and clear_cache is False. Otherwise,
+            a dictionary containing only summary statistics.
+
         """
         _validate_type(param_grid, types=(dict,), item_name='param_grid')
         _validate_type(n_jobs, types='int', item_name='n_jobs')
         _check_option('backend', backend, ['loky', 'threading',
                                            'multiprocessing', 'dask'])
         _validate_type(verbose, types='int', item_name='verbose')
-        _validate_type(clear_cache, types=(bool,), item_name='clear_cache')
 
         param_combinations = self._generate_param_combinations(
             param_grid, combinations)
@@ -177,6 +197,7 @@ class BatchSimulate(object):
         batch_size = min(self.batch_size, total_sims)
 
         results = []
+        simulated_data = []
         for i in range(batch_size):
             start_idx = i * num_sims_per_batch
             end_idx = start_idx + num_sims_per_batch
@@ -190,22 +211,25 @@ class BatchSimulate(object):
 
             if self.save_outputs:
                 self._save(batch_results, start_idx, end_idx)
-                self._save_parameters(param_combinations[start_idx:end_idx],
-                                      start_idx, end_idx)
 
             if self.summary_func is not None:
                 summary_statistics = self.summary_func(batch_results)
-                if return_output and not clear_cache:
-                    results.append(summary_statistics)
+                results.append(summary_statistics)
+                if not self.clear_cache:
+                    simulated_data.append(batch_results)
 
-            elif return_output and not clear_cache:
-                results.append(batch_results)
+            elif return_output and not self.clear_cache:
+                simulated_data.append(batch_results)
 
-            if clear_cache:
+            if self.clear_cache:
                 del batch_results
 
         if return_output:
-            return results
+            if self.clear_cache:
+                return {"summary_statistics": results}
+            else:
+                return {"summary_statistics": results,
+                        "simulated_data": simulated_data}
 
     def simulate_batch(self, param_combinations, n_jobs=1,
                        backend='loky', verbose=50):
@@ -374,68 +398,6 @@ class BatchSimulate(object):
                 "overwrite is set to False.")
 
         np.savez(file_name, **save_data)
-
-    def _save_parameters(self, param_combinations, start_idx, end_idx):
-        """Save simulation parameters to a separate file.
-
-        Parameters
-        ----------
-        param_combinations : list
-            The list of parameter combinations used in the simulations.
-        start_idx : int
-            The index of the first simulation in this batch.
-        end_idx : int
-            The index of the last simulation in this batch.
-        """
-        _validate_type(param_combinations, types=(list,),
-                       item_name='param_combinations')
-        _validate_type(start_idx, types='int', item_name='start_idx')
-        _validate_type(end_idx, types='int', item_name='end_idx')
-
-        params_data = {'param_values': param_combinations}
-        params_file_name = os.path.join(self.save_folder,
-                                        (f'parameters_{start_idx}-'
-                                         f'{end_idx}.npz'))
-        if os.path.exists(params_file_name) and not self.overwrite:
-            raise FileExistsError(
-                f"File {params_file_name} already exists and "
-                "overwrite is set to False.")
-
-        np.savez(params_file_name, **params_data)
-
-    def load_parameters(self, file_path):
-        """Load simulation parameters from a file.
-
-        Parameters
-        ----------
-        file_path : str
-            The path to the file containing the simulation parameters.
-
-        Returns
-        -------
-        parameters : dict
-            Dictionary containing the loaded parameter values.
-        """
-        data = np.load(file_path, allow_pickle=True)
-        parameters = {key: data[key].tolist() for key in data.files}
-        return parameters
-
-    def load_all_parameters(self):
-        """Load all simulation parameters from the save folder.
-
-        Returns
-        -------
-        all_parameters : list
-            List of dictionaries containing all loaded parameter values.
-        """
-        all_parameters = []
-        for file_name in os.listdir(self.save_folder):
-            if file_name.startswith('parameters_') and \
-                    file_name.endswith('.npz'):
-                file_path = os.path.join(self.save_folder, file_name)
-                parameters = self.load_parameters(file_path)
-                all_parameters.append(parameters)
-        return all_parameters
 
     def load_results(self, file_path, return_data=None):
         """Load simulation results from a file.
