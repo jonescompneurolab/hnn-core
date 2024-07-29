@@ -103,8 +103,7 @@ def test_gui_upload_connectivity():
 
     # simulate upload default.json
     file1_path = Path(hnn_core_root, 'param', 'jones2009_base.json')
-    file2_path = Path(hnn_core_root, 'param',
-                      'gamma_L5weak_L2weak_hierarchical.json')
+    file2_path = Path(assets_path, 'gamma_L5weak_L2weak_hierarchical.json')
     gui._simulate_upload_connectivity(file1_path)
 
     # check if parameter is reloaded.
@@ -137,8 +136,7 @@ def test_gui_upload_drives():
 
     # simulate upload default.json
     file1_url = Path(hnn_core_root, 'param', 'jones2009_base.json')
-    file2_url = Path(hnn_core_root, 'param',
-                     'gamma_L5weak_L2weak_hierarchical.json')
+    file2_url = Path(assets_path, 'gamma_L5weak_L2weak_hierarchical.json')
 
     # check if parameter reloads
     gui._simulate_upload_drives(file1_url)
