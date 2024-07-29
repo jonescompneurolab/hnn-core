@@ -95,7 +95,7 @@ def test_gui_upload_connectivity():
     """Test if gui handles uploaded connectivity parameters correctly"""
     gui = HNNGUI()
     _ = gui.compose()
-    # clear the drive and connectivity widgets
+    # clear the connectivity widgets
     original_connectivity_count = len(gui.connectivity_widgets)
     assert original_connectivity_count > 0
     gui.connectivity_widgets = []
@@ -110,7 +110,6 @@ def test_gui_upload_connectivity():
     assert len(gui.connectivity_widgets) == original_connectivity_count
 
     # check parameters with different files
-    gui._simulate_upload_connectivity(file1_path)
     assert gui.connectivity_widgets[0][0].children[1].value == 0.02
     # value should change when loading connectivity from file 2
     gui._simulate_upload_connectivity(file2_path)
@@ -128,7 +127,7 @@ def test_gui_upload_drives():
     gui = HNNGUI()
     _ = gui.compose()
 
-    # clear the drive and connectivity widgets
+    # clear the drive widgets
     original_drive_count = len(gui.drive_widgets)
     assert original_drive_count > 0
     gui.delete_drive_button.click()
@@ -149,7 +148,7 @@ def test_gui_upload_drives():
     assert len(gui.drive_widgets) == 1
     assert gui.drive_widgets[0]['type'] == 'Poisson'
 
-    # Load connectitivty and make sure drives did not change
+    # Load connectivity and make sure drives did not change
     gui._simulate_upload_connectivity(file1_url)
     assert len(gui.drive_widgets) == 1
 
