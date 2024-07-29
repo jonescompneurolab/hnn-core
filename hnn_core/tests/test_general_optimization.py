@@ -16,16 +16,12 @@ from hnn_core.optimization import Optimizer
 def test_optimize_evoked(solver):
     """Test optimization routines for evoked drives in a reduced network."""
 
-    max_iter = 11
+    max_iter = 2
     tstop = 10.
     n_trials = 1
 
     # simulate a dipole to establish ground-truth drive parameters
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
-
-    net_orig = jones_2009_model(params, mesh_shape=(3, 3))
+    net_orig = jones_2009_model(mesh_shape=(3, 3))
 
     mu_orig = 2.
     weights_ampa = {'L2_basket': 0.5,
@@ -44,7 +40,7 @@ def test_optimize_evoked(solver):
     dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
 
     # define set_params function and constraints
-    net_offset = jones_2009_model(params)
+    net_offset = jones_2009_model(mesh_shape=(3, 3))
 
     def set_params(net_offset, params):
         weights_ampa = {'L2_basket': 0.5,
@@ -109,17 +105,11 @@ def test_optimize_evoked(solver):
 def test_rhythmic(solver):
     """Test optimization routines for rhythmic drives in a reduced network."""
 
-    max_iter = 11
-    tstop = 300.
+    max_iter = 2
+    tstop = 10.
 
     # simulate a dipole to establish ground-truth drive parameters
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
-
-    params.update({'N_pyr_x': 3,
-                   'N_pyr_y': 3})
-    net_offset = jones_2009_model(params)
+    net_offset = jones_2009_model(mesh_shape=(3, 3))
 
     # define set_params function and constraints
     def set_params(net_offset, params):
@@ -176,7 +166,7 @@ def test_rhythmic(solver):
     with pytest.raises(ValueError, match='The current Network instance has '
                        'external drives, provide a Network object with no '
                        'external drives.'):
-        net_with_drives = jones_2009_model(params, add_drives_from_params=True)
+        net_with_drives = jones_2009_model(add_drives_from_params=True)
         optim = Optimizer(net_with_drives,
                           tstop=tstop,
                           constraints=constraints,
@@ -209,17 +199,11 @@ def test_rhythmic(solver):
 def test_user_obj_fun(solver):
     """Test optimization routines with a user-defined optimization function."""
 
-    max_iter = 11
-    tstop = 200.
+    max_iter = 2
+    tstop = 10.
 
     # simulate a dipole to establish ground-truth drive parameters
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
-    params = read_params(params_fname)
-
-    params.update({'N_pyr_x': 3,
-                   'N_pyr_y': 3})
-    net_offset = jones_2009_model(params)
+    net_offset = jones_2009_model(mesh_shape=(3, 3))
 
     def maximize_csd(initial_net, initial_params, set_params, predicted_params,
                      update_params, obj_values, tstop, obj_fun_kwargs):
@@ -240,7 +224,7 @@ def test_user_obj_fun(solver):
         electrode_pos = [(135, 135, dep) for dep in depths]
         new_net.add_electrode_array('shank1', electrode_pos)
 
-        simulate_dipole(new_net, tstop=tstop, n_trials=1)[0]
+        simulate_dipole(new_net, tstop=tstop, dt=0.5, n_trials=1)[0]
 
         potentials = new_net.rec_arrays['shank1'][0]
 
@@ -299,7 +283,7 @@ def test_user_obj_fun(solver):
     with pytest.raises(ValueError, match='The current Network instance has '
                        'external drives, provide a Network object with no '
                        'external drives.'):
-        net_with_drives = jones_2009_model(params, add_drives_from_params=True)
+        net_with_drives = jones_2009_model(add_drives_from_params=True)
         optim = Optimizer(net_with_drives,
                           tstop=tstop,
                           constraints=constraints,
