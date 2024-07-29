@@ -356,7 +356,8 @@ class HNNGUI:
             button_style='success')
 
         # Create save simulation widget wrapper
-        self.save_simuation_button = self._init_html_download_button()
+        self.save_simuation_button = self._init_html_download_button(
+            title='Save Simulation')
 
         self.simulation_list_widget = Dropdown(options=[],
                                                value=None,
@@ -431,7 +432,7 @@ class HNNGUI:
             This is for testing purposes """
         return cell_parameters_dict
 
-    def _init_html_download_button(self):
+    def _init_html_download_button(self, title):
         b64 = base64.b64encode("".encode())
         payload = b64.decode()
         # Initialliting HTML code for download button
@@ -440,7 +441,7 @@ class HNNGUI:
           download>
         <button style="background:{color_theme}; height:{btn_height}"
         class=" jupyter-button
-           mod-warning" {is_disabled} >Save Simulation</button>
+           mod-warning" {is_disabled} >{title}</button>
         </a>
         '''
         # Create widget wrapper
@@ -450,7 +451,8 @@ class HNNGUI:
                         filename={""},
                         is_disabled="disabled",
                         btn_height=self.layout['run_btn'].height,
-                        color_theme=self.layout['theme_color'])))
+                        color_theme=self.layout['theme_color'],
+                        title=title)))
 
     def add_logging_window_logger(self):
         handler = _OutputWidgetHandler(self._log_out)
@@ -593,7 +595,8 @@ class HNNGUI:
                 self.html_download_button.format(
                     payload=payload, filename=result_file,
                     is_disabled="", btn_height=self.layout['run_btn'].height,
-                    color_theme=self.layout['theme_color']))
+                    color_theme=self.layout['theme_color'],
+                    title='Save Simulation'))
 
         def _driver_type_change(value):
             self.widget_location_selection.disabled = (
