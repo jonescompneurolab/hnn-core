@@ -1,3 +1,8 @@
+# Authors: Abdul Samad Siddiqui <abdulsamadsid1@gmail.com>
+#          Nick Tolley <nicholas_tolley@brown.edu>
+#          Ryan Thorpe <ryan_thorpe@brown.edu>
+#          Mainak Jas <mjas@mgh.harvard.edu>
+
 import pytest
 import numpy as np
 import os
@@ -43,6 +48,27 @@ def param_grid():
         'mu': [40],
         'sigma': [5]
     }
+
+
+def test_parameter_validation():
+    boolean_params = [
+        'save_outputs',
+        'save_dpl',
+        'save_spiking',
+        'save_lfp',
+        'save_voltages',
+        'save_currents',
+        'save_calcium',
+        'clear_cache',
+        'summary_func'
+    ]
+
+    for param in boolean_params:
+        with pytest.raises(TypeError, match=f'{param} must be'):
+            BatchSimulate(set_params=lambda x: x, **{param: 'invalid'})
+
+    with pytest.raises(TypeError, match='set_params must be'):
+        BatchSimulate(set_params='invalid')
 
 
 def test_generate_param_combinations(batch_simulate_instance, param_grid):
@@ -109,27 +135,29 @@ def test_run(batch_simulate_instance, param_grid):
                                                         n_jobs=2,
                                                         return_output=True,
                                                         combinations=False,
-                                                        backend='loky',
-                                                        clear_cache=False)
+                                                        backend='loky')
 
     total_combinations = len(
         batch_simulate_instance._generate_param_combinations(
             param_grid, combinations=False))
 
     assert results_without_cache is not None
-    assert isinstance(results_without_cache, list)
-    assert len(results_without_cache) == total_combinations
+    assert isinstance(results_without_cache, dict)
+    assert 'simulated_data' in results_without_cache
+    assert len(results_without_cache['simulated_data']
+               ) == total_combinations
 
+    batch_simulate_instance.clear_cache = True
     results_with_cache = batch_simulate_instance.run(param_grid,
                                                      n_jobs=2,
                                                      return_output=True,
                                                      combinations=False,
                                                      backend='loky',
-                                                     clear_cache=True)
+                                                     verbose=50)
 
     assert results_with_cache is not None
-    assert isinstance(results_with_cache, list)
-    assert len(results_with_cache) == 0
+    assert isinstance(results_with_cache, dict)
+    assert 'summary_statistics' in results_with_cache
 
     # Validation Tests
     with pytest.raises(TypeError, match='param_grid must be'):
@@ -143,21 +171,6 @@ def test_run(batch_simulate_instance, param_grid):
 
     with pytest.raises(TypeError, match='verbose must be'):
         batch_simulate_instance.run(param_grid, verbose='invalid')
-
-    with pytest.raises(TypeError, match='clear_cache must be'):
-        batch_simulate_instance.run(param_grid, clear_cache='invalid')
-
-    # Callables Test
-    batch_simulate_instance.summary_func = lambda x: x
-    assert callable(batch_simulate_instance.summary_func)
-    assert callable(batch_simulate_instance.set_params)
-
-    with pytest.raises(TypeError, match='summary_func must be'):
-        BatchSimulate(set_params=batch_simulate_instance.set_params,
-                      summary_func='invalid')
-
-    with pytest.raises(TypeError, match='set_params must be'):
-        BatchSimulate(set_params='invalid')
 
 
 def test_save_load_and_overwrite(batch_simulate_instance,
@@ -247,7 +260,7 @@ def test_load_results(batch_simulate_instance, param_grid, tmp_path):
                             for dpl in loaded_results['dpl']])
     assert np.array_equal(original_data, loaded_data)
 
-    for key in ['spiking', 'LFP', 'voltages', 'currents', 'calcium']:
+    for key in ['spiking', 'lfp', 'voltages', 'currents', 'calcium']:
         assert key not in loaded_results
 
     # all result files
@@ -261,36 +274,3 @@ def test_load_results(batch_simulate_instance, param_grid, tmp_path):
     # Validation Tests
     with pytest.raises(TypeError, match='results must be'):
         batch_simulate_instance._save("invalid_results", start_idx, end_idx)
-
-
-def test_load_parameters(batch_simulate_instance, param_grid, tmp_path):
-    """Test loading parameters from a single file and all files."""
-    param_combinations = batch_simulate_instance._generate_param_combinations(
-        param_grid)[:3]
-
-    start_idx = 0
-    end_idx = len(param_combinations)
-    batch_simulate_instance._save_parameters(
-        param_combinations,
-        start_idx,
-        end_idx)
-
-    params_file_name = os.path.join(tmp_path,
-                                    f'parameters_{start_idx}-{end_idx}.npz')
-    assert os.path.exists(params_file_name)
-
-    # single parameter file
-    loaded_parameters = batch_simulate_instance.load_parameters(
-        params_file_name)
-    assert 'param_values' in loaded_parameters
-    assert loaded_parameters['param_values'] == param_combinations
-
-    # all parameter files
-    all_loaded_parameters = batch_simulate_instance.load_all_parameters()
-    assert len(all_loaded_parameters) == 1
-    assert all_loaded_parameters[0]['param_values'] == param_combinations
-
-    # Validation Tests
-    with pytest.raises(TypeError, match='param_combinations must be'):
-        batch_simulate_instance._save_parameters("invalid_params",
-                                                 start_idx, end_idx)
