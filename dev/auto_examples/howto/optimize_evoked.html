@@ -317,10 +317,10 @@ were chosen so as to keep the model in physiologically realistic regimes.</p>
 
 <span class="n">net</span> <span class="o">=</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">()</span>
 <span class="n">optim</span> <span class="o">=</span> <a href="../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer" title="hnn_core.optimization.Optimizer" class="sphx-glr-backref-module-hnn_core-optimization sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Optimizer</span></a><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>
-                  <span class="n">set_params</span><span class="o">=</span><span class="n">set_params</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">,</span>
-                  <span class="n">smooth_window_len</span><span class="o">=</span><span class="n">smooth_window_len</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">40</span><span class="p">)</span>
+                  <span class="n">set_params</span><span class="o">=</span><span class="n">set_params</span><span class="p">)</span>
 <span class="k">with</span> <span class="n">MPIBackend</span><span class="p">(</span><span class="n">n_procs</span><span class="o">=</span><span class="n">n_procs</span><span class="p">,</span> <span class="n">mpi_cmd</span><span class="o">=</span><span class="s1">&#39;mpiexec&#39;</span><span class="p">):</span>
-    <span class="n">optim</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">exp_dpl</span><span class="p">)</span>
+    <span class="n">optim</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">exp_dpl</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="n">scale_factor</span><span class="p">,</span>
+              <span class="n">smooth_window_len</span><span class="o">=</span><span class="n">smooth_window_len</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Finally, we can plot the experimental data alongside the post-optimization

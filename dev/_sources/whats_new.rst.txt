@@ -84,6 +84,9 @@ Changelog
 
 - Added GUI feature to read and modify cell parameters,
   by `Camilo Diaz`_  in :gh:`806`.
+  
+- Add ability to optimize parameters associated with rhythmic drives,
+  by `Carolina Fernandez Pujol`_ in :gh:`673`.
 
 - Added features to :func:`~plot_csd`: to set color of sinks and sources, range of the colormap,
   and interpolation method to smoothen CSD plot,

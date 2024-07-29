@@ -141,13 +141,12 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">.objective_functions</span> <span class="kn">import</span> <span class="n">_rmse_evoked</span>
+<span class="kn">from</span> <span class="nn">.objective_functions</span> <span class="kn">import</span> <span class="n">_rmse_evoked</span><span class="p">,</span> <span class="n">_maximize_psd</span>
 
 
 <div class="viewcode-block" id="Optimizer"><a class="viewcode-back" href="../../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer">[docs]</a><span class="k">class</span> <span class="nc">Optimizer</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">set_params</span><span class="p">,</span>
-                 <span class="n">solver</span><span class="o">=</span><span class="s1">&#39;cobyla&#39;</span><span class="p">,</span> <span class="n">obj_fun</span><span class="o">=</span><span class="s1">&#39;dipole_rmse&#39;</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span>
-                 <span class="n">smooth_window_len</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">200</span><span class="p">):</span>
+                 <span class="n">solver</span><span class="o">=</span><span class="s1">&#39;bayesian&#39;</span><span class="p">,</span> <span class="n">obj_fun</span><span class="o">=</span><span class="s1">&#39;dipole_rmse&#39;</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">200</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parameter optimization.</span>
 
 <span class="sd">        Parameters</span>
@@ -167,12 +166,10 @@
 <span class="sd">            of the parameters that will be set inside the function.</span>
 <span class="sd">        solver : str</span>
 <span class="sd">            The optimizer, &#39;bayesian&#39; or &#39;cobyla&#39;.</span>
-<span class="sd">        obj_fun : str</span>
-<span class="sd">            The objective function to be minimized.</span>
-<span class="sd">        scale_factor : float, optional</span>
-<span class="sd">            The dipole scale factor. The default is 1.</span>
-<span class="sd">        smooth_window_len : float, optional</span>
-<span class="sd">            The smooth window length. The default is None.</span>
+<span class="sd">        obj_fun : str | func</span>
+<span class="sd">            The objective function to be minimized. Can be &#39;dipole_rmse&#39;,</span>
+<span class="sd">            &#39;maximize_psd&#39;, or a user-defined function. The default is</span>
+<span class="sd">            &#39;dipole_rmse&#39;.</span>
 <span class="sd">        max_iter : int, optional</span>
 <span class="sd">            The max number of calls to the objective function. The default is</span>
 <span class="sd">            200.</span>
@@ -187,10 +184,8 @@
 <span class="sd">            The optimization function.</span>
 <span class="sd">        obj_fun : func</span>
 <span class="sd">            The objective function to be minimized.</span>
-<span class="sd">        scale_factor : float</span>
-<span class="sd">            The dipole scale factor.</span>
-<span class="sd">        smooth_window_len : float</span>
-<span class="sd">            The smooth window length.</span>
+<span class="sd">        obj_fun_name : str</span>
+<span class="sd">            The name of the template objective function.</span>
 <span class="sd">        tstop : float</span>
 <span class="sd">            The simulated dipole&#39;s duration.</span>
 <span class="sd">        net_ : instance of Network</span>
@@ -223,10 +218,13 @@
         <span class="c1"># Response to be optimized</span>
         <span class="k">if</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s1">&#39;dipole_rmse&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">_rmse_evoked</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s1">&#39;dipole_rmse&#39;</span>
+        <span class="k">elif</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s1">&#39;maximize_psd&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">_maximize_psd</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s1">&#39;maximize_psd&#39;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;obj_fun must be &#39;dipole_rmse&#39;&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">scale_factor</span> <span class="o">=</span> <span class="n">scale_factor</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">smooth_window_len</span> <span class="o">=</span> <span class="n">smooth_window_len</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">obj_fun</span>  <span class="c1"># user-defined function</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tstop</span> <span class="o">=</span> <span class="n">tstop</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">net_</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obj_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -240,14 +238,29 @@
         <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s2">solver=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">solver</span><span class="si">}</span><span class="se">\n</span><span class="s2">fit=</span><span class="si">{</span><span class="n">is_fit</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div>
 
-<div class="viewcode-block" id="Optimizer.fit"><a class="viewcode-back" href="../../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+<div class="viewcode-block" id="Optimizer.fit"><a class="viewcode-back" href="../../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">obj_fun_kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs optimization routine.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        target : instance of Dipole</span>
+<span class="sd">        target : instance of Dipole (if obj_fun=&#39;dipole_rmse&#39;)</span>
 <span class="sd">            A dipole object with experimental data.</span>
+<span class="sd">        f_bands : list of tuples (if obj_fun=&#39;maximize_psd&#39;)</span>
+<span class="sd">            Lower and higher limit for each frequency band.</span>
+<span class="sd">        relative_bandpower : tuple (if obj_fun=&#39;maximize_psd&#39;)</span>
+<span class="sd">            Weight for each frequency band.</span>
+<span class="sd">        scale_factor : float, optional</span>
+<span class="sd">            The dipole scale factor.</span>
+<span class="sd">        smooth_window_len : float, optional</span>
+<span class="sd">            The smooth window length.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s1">&#39;dipole_rmse&#39;</span> <span class="ow">and</span>
+                <span class="s1">&#39;target&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;target must be specified&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s1">&#39;maximize_psd&#39;</span> <span class="ow">and</span>
+              <span class="p">(</span><span class="s1">&#39;f_bands&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span> <span class="ow">or</span>
+               <span class="s1">&#39;relative_bandpower&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;f_bands and relative_bandpower must be specified&#39;</span><span class="p">)</span>
 
         <span class="n">constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_constraints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
         <span class="n">initial_params</span> <span class="o">=</span> <span class="n">_get_initial_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
@@ -259,9 +272,7 @@
                                               <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span><span class="p">,</span>
                                               <span class="n">initial_params</span><span class="p">,</span>
                                               <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">,</span>
-                                              <span class="n">target</span><span class="p">,</span>
-                                              <span class="bp">self</span><span class="o">.</span><span class="n">scale_factor</span><span class="p">,</span>
-                                              <span class="bp">self</span><span class="o">.</span><span class="n">smooth_window_len</span><span class="p">)</span>
+                                              <span class="n">obj_fun_kwargs</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">net_</span> <span class="o">=</span> <span class="n">net_</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obj_</span> <span class="o">=</span> <span class="n">obj</span>
@@ -396,8 +407,7 @@
 
 
 <span class="k">def</span> <span class="nf">_run_opt_bayesian</span><span class="p">(</span><span class="n">initial_net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">set_params</span><span class="p">,</span> <span class="n">obj_fun</span><span class="p">,</span>
-                      <span class="n">initial_params</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span>
-                      <span class="n">smooth_window_len</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                      <span class="n">initial_params</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">,</span> <span class="n">obj_fun_kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs optimization routine with gp_minimize optimizer.</span>
 
 <span class="sd">    Parameters</span>
@@ -416,12 +426,6 @@
 <span class="sd">        Keys are parameter names, values are initial parameters.</span>
 <span class="sd">    max_iter : int</span>
 <span class="sd">        Number of calls the optimizer makes.</span>
-<span class="sd">    target : instance of Dipole</span>
-<span class="sd">        A dipole object with experimental data.</span>
-<span class="sd">    scale_factor : float</span>
-<span class="sd">        The dipole scale factor.</span>
-<span class="sd">    smooth_window_len : float</span>
-<span class="sd">        The smooth window length.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -438,16 +442,14 @@
     <span class="n">obj_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_obj_func</span><span class="p">(</span><span class="n">predicted_params</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">obj_fun</span><span class="p">(</span><span class="n">initial_net</span><span class="p">,</span>
-                       <span class="n">initial_params</span><span class="p">,</span>
-                       <span class="n">set_params</span><span class="p">,</span>
-                       <span class="n">predicted_params</span><span class="p">,</span>
-                       <span class="n">_update_params</span><span class="p">,</span>
-                       <span class="n">obj_values</span><span class="p">,</span>
-                       <span class="n">scale_factor</span><span class="p">,</span>
-                       <span class="n">smooth_window_len</span><span class="p">,</span>
-                       <span class="n">target</span><span class="p">,</span>
-                       <span class="n">tstop</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj_fun</span><span class="p">(</span><span class="n">initial_net</span><span class="o">=</span><span class="n">initial_net</span><span class="p">,</span>
+                       <span class="n">initial_params</span><span class="o">=</span><span class="n">initial_params</span><span class="p">,</span>
+                       <span class="n">set_params</span><span class="o">=</span><span class="n">set_params</span><span class="p">,</span>
+                       <span class="n">predicted_params</span><span class="o">=</span><span class="n">predicted_params</span><span class="p">,</span>
+                       <span class="n">update_params</span><span class="o">=</span><span class="n">_update_params</span><span class="p">,</span>
+                       <span class="n">obj_values</span><span class="o">=</span><span class="n">obj_values</span><span class="p">,</span>
+                       <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
+                       <span class="n">obj_fun_kwargs</span><span class="o">=</span><span class="n">obj_fun_kwargs</span><span class="p">)</span>
 
     <span class="n">opt_results</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">bayes_opt</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">_obj_func</span><span class="p">,</span>
                                <span class="n">x0</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">initial_params</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
@@ -470,8 +472,7 @@
 
 
 <span class="k">def</span> <span class="nf">_run_opt_cobyla</span><span class="p">(</span><span class="n">initial_net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">set_params</span><span class="p">,</span> <span class="n">obj_fun</span><span class="p">,</span>
-                    <span class="n">initial_params</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">scale_factor</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span>
-                    <span class="n">smooth_window_len</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                    <span class="n">initial_params</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">,</span> <span class="n">obj_fun_kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs optimization routine with fmin_cobyla optimizer.</span>
 
 <span class="sd">    Parameters</span>
@@ -490,12 +491,6 @@
 <span class="sd">        Keys are parameter names, values are initial parameters.</span>
 <span class="sd">    max_iter : int</span>
 <span class="sd">        Number of calls the optimizer makes.</span>
-<span class="sd">    target : instance of Dipole</span>
-<span class="sd">        A dipole object with experimental data.</span>
-<span class="sd">    scale_factor : float</span>
-<span class="sd">        The dipole scale factor.</span>
-<span class="sd">    smooth_window_len : float</span>
-<span class="sd">        The smooth window length.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -512,16 +507,14 @@
     <span class="n">obj_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_obj_func</span><span class="p">(</span><span class="n">predicted_params</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">obj_fun</span><span class="p">(</span><span class="n">initial_net</span><span class="p">,</span>
-                       <span class="n">initial_params</span><span class="p">,</span>
-                       <span class="n">set_params</span><span class="p">,</span>
-                       <span class="n">predicted_params</span><span class="p">,</span>
-                       <span class="n">_update_params</span><span class="p">,</span>
-                       <span class="n">obj_values</span><span class="p">,</span>
-                       <span class="n">scale_factor</span><span class="p">,</span>
-                       <span class="n">smooth_window_len</span><span class="p">,</span>
-                       <span class="n">target</span><span class="p">,</span>
-                       <span class="n">tstop</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj_fun</span><span class="p">(</span><span class="n">initial_net</span><span class="o">=</span><span class="n">initial_net</span><span class="p">,</span>
+                       <span class="n">initial_params</span><span class="o">=</span><span class="n">initial_params</span><span class="p">,</span>
+                       <span class="n">set_params</span><span class="o">=</span><span class="n">set_params</span><span class="p">,</span>
+                       <span class="n">predicted_params</span><span class="o">=</span><span class="n">predicted_params</span><span class="p">,</span>
+                       <span class="n">update_params</span><span class="o">=</span><span class="n">_update_params</span><span class="p">,</span>
+                       <span class="n">obj_values</span><span class="o">=</span><span class="n">obj_values</span><span class="p">,</span>
+                       <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
+                       <span class="n">obj_fun_kwargs</span><span class="o">=</span><span class="n">obj_fun_kwargs</span><span class="p">)</span>
 
     <span class="n">opt_results</span> <span class="o">=</span> <span class="n">fmin_cobyla</span><span class="p">(</span><span class="n">_obj_func</span><span class="p">,</span>
                               <span class="n">cons</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>

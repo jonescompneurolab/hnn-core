@@ -135,6 +135,23 @@ tasks.
     </div>
 
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to optimize the power spectral density (PSD) of a current dipole signal with significant alpha and beta spectral components.">
+
+.. only:: html
+
+  .. image:: /auto_examples/howto/images/thumb/sphx_glr_optimize_rhythmic_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_howto_optimize_rhythmic.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">08. Optimize simulated rhythmic responses</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
@@ -152,4 +169,5 @@ tasks.
    /auto_examples/howto/optimize_evoked
    /auto_examples/howto/plot_hnn_animation
    /auto_examples/howto/plot_batch_simulate
+   /auto_examples/howto/optimize_rhythmic
 
