@@ -138,7 +138,7 @@ data_templates = {
 
 def check_sim_plot_types(
         new_sim_name, plot_type_selection, target_selection, data):
-    if data["simulations"][new_sim_name]['net'] is None:
+    if not _is_simulation(data["simulations"][new_sim_name]):
         plot_type_selection.options = [
             pt for pt in _plot_types if pt not in _ext_data_disabled_plot_types
         ]
