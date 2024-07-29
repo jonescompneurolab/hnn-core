@@ -115,10 +115,10 @@ print("Simulation results:", simulation_results)
 
 # Extract min and max peaks for plotting
 min_peaks, max_peaks = [], []
-for res in simulation_results:
-    summary_stats = res[0]
-    min_peaks.append(summary_stats['min_peak'])
-    max_peaks.append(summary_stats['max_peak'])
+for summary_list in simulation_results['summary_statistics']:
+    for summary in summary_list:
+        min_peaks.append(summary['min_peak'])
+        max_peaks.append(summary['max_peak'])
 
 # Plotting
 plt.figure(figsize=(10, 6))
