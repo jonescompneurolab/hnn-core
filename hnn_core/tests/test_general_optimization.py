@@ -3,11 +3,8 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
-import os.path as op
-
 import pytest
 
-import hnn_core
 from hnn_core import jones_2009_model, simulate_dipole
 from hnn_core.optimization import Optimizer
 
