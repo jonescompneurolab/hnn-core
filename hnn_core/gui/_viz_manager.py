@@ -495,8 +495,9 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
     else:
         # Find the last simulation with a non-None 'net'
         sim_index = next(
-            (idx for idx, sim_name in enumerate(simulation_names)
-             if data['simulations'][sim_name]['net'] is not None),
+            (idx for idx, sim_name in
+             reversed(list(enumerate(simulation_names)))
+             if _is_simulation(data["simulations"][sim_name])),
             0  # Default value if no such simulation is found
         )
 
@@ -1029,3 +1030,10 @@ class _VizManager:
             buttons.children[0].click()
         elif operation == "clear":
             buttons.children[1].click()
+
+
+def _is_simulation(data):
+    """Determines if saved data is a simulation."""
+    if data['net'] is not None:
+        return True
+    return False
