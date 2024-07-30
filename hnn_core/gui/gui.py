@@ -484,7 +484,7 @@ class HNNGUI:
         return {"simulation_data": self.simulation_data}
 
     @staticmethod
-    def load_parameters(params_fname=None):
+    def load_parameters(params_fname):
         """Read parameters from file."""
         with open(params_fname, 'r') as file:
             parameters = json.load(file)
