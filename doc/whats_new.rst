@@ -95,6 +95,11 @@ Changelog
 - Cleaned up internal logic in :class:`~hnn_core.CellResponse`,
   by `Nick Tolley`_ in :gh:`647`.
 
+- Changed the configuration/parameter file format support of the GUI. Loading
+  of connectivity and drives use a new multi-level json structure that mirrors
+  the structure of the Network object. Flat parameter and json configuration
+  files are no longer supported by the GUI, by `George Dang`_ in :gh:`837`
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
