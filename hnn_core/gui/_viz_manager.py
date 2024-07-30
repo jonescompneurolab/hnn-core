@@ -1034,6 +1034,4 @@ class _VizManager:
 
 def _is_simulation(data):
     """Determines if saved data is a simulation."""
-    if data['net'] is not None:
-        return True
-    return False
+    return data['net'] is not None
