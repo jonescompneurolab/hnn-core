@@ -62,8 +62,8 @@ def set_params(param_values, net=None):
 
 
 param_grid = {
-    'weight_basket': np.logspace(-4 - 1, 5),
-    'weight_pyr': np.logspace(-4, -1, 5)
+    'weight_basket': np.logspace(-4 - 1, 10),
+    'weight_pyr': np.logspace(-4, -1, 10)
 }
 
 ###############################################################################
@@ -113,18 +113,37 @@ print("Simulation results:", simulation_results)
 # Extract and Plot Results
 ###############################################################################
 
+# Extract and overlay dipole waveforms
+dpl_waveforms = []
+for data_list in simulation_results['simulated_data']:
+    for data in data_list:
+        dpl_waveforms.append(data['dpl'][0].data['agg'])
+
+plt.figure(figsize=(10, 6))
+for waveform in dpl_waveforms:
+    plt.plot(waveform, alpha=0.5)
+plt.title('Overlay of Dipole Waveforms')
+plt.xlabel('Time (ms)')
+plt.ylabel('Dipole Amplitude (nAm)')
+plt.grid(True)
+plt.tight_layout()
+plt.savefig("image.png")
+plt.show()
+
 # Extract min and max peaks for plotting
-min_peaks, max_peaks = [], []
-for summary_list in simulation_results['summary_statistics']:
-    for summary in summary_list:
+min_peaks, max_peaks, param_values = [], [], []
+for summary_list, data_list in zip(simulation_results['summary_statistics'],
+                                   simulation_results['simulated_data']):
+    for summary, data in zip(summary_list, data_list):
         min_peaks.append(summary['min_peak'])
         max_peaks.append(summary['max_peak'])
+        param_values.append(data['param_values']['weight_basket'])
 
 # Plotting
 plt.figure(figsize=(10, 6))
-plt.plot(min_peaks, label='Min Dipole Peak')
-plt.plot(max_peaks, label='Max Dipole Peak')
-plt.xlabel('Simulation Index')
+plt.plot(param_values, min_peaks, label='Min Dipole Peak')
+plt.plot(param_values, max_peaks, label='Max Dipole Peak')
+plt.xlabel('Synaptic Strength (nS)')
 plt.ylabel('Dipole Peak Magnitude')
 plt.title('Min and Max Dipole Peaks across Simulations')
 plt.legend()
