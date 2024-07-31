@@ -1649,8 +1649,6 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                 conn_idx = conn_indices[0]
                 single_simulation_data['net'].connectivity[conn_idx][
                     'nc_dict']['A_weight'] = vbox_key.children[1].value
-                single_simulation_data['net'].connectivity[conn_idx][
-                    'probability'] = vbox_key.children[2].value
 
     # Update cell params
 
