@@ -939,15 +939,21 @@ def _get_connectivity_widgets(conn_data):
     style = {}
     conn_widgets = list()
     for receptor_name in conn_data.keys():
-        w_text_input = BoundedFloatText(
+        weight_text_input = BoundedFloatText(
             value=conn_data[receptor_name]['weight'], disabled=False,
             continuous_update=False, min=0, max=1e6, step=0.01,
             description="weight", style=style)
+        probability_text_input = BoundedFloatText(
+            value=conn_data[receptor_name]['probability'], disabled=False,
+            continuous_update=False, min=0, max=1.0, step=0.01,
+            description="probability", style=style)
 
         conn_widget = VBox([
-            HTML(value=f"""<p>
-            Receptor: {conn_data[receptor_name]['receptor']}</p>"""),
-            w_text_input, HTML(value="<hr style='margin-bottom:5px'/>")
+            HTML(value=f"""<p>Receptor: {conn_data[receptor_name]['receptor']}
+                           </p>"""),
+            weight_text_input,
+            probability_text_input,
+            HTML(value="<hr style='margin-bottom:5px'/>")
         ])
 
         conn_widget._belongsto = {
