@@ -1622,6 +1622,8 @@ def on_upload_params_change(change, tstop, dt, log_out, drive_boxes,
                               drive_boxes, tstop, layout)
         else:
             raise ValueError
+
+        print(f"Loaded {load_type} from {param_dict['name']}")
     # Resets file counter to 0
     change['owner'].set_trait('value', ([]))
     return params
