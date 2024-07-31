@@ -148,6 +148,13 @@ def test_gui_upload_drives():
     assert len(gui.drive_widgets) == 1
     assert gui.drive_widgets[0]['type'] == 'Poisson'
 
+    # tstop is currently set to the tstop widget because the Network configs
+    # do not currently save a universal tstop attribute. In this case
+    # the drive tstop gets set to the widget value if the drive stop is larger
+    # than the widget tstop. This may change in the future if tstop is saved to
+    # the network configs.
+    assert gui.drive_widgets[0]['tstop'].value == 170.
+
     # Load connectivity and make sure drives did not change
     gui._simulate_upload_connectivity(file1_url)
     assert len(gui.drive_widgets) == 1
