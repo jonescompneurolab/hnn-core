@@ -2131,7 +2131,7 @@ def update_common_dendrite_sections(sections, mechs_params):
 
 
 def _serialize_simulation(log_out, sim_data, simulation_list_widget):
-    # Only download if there is there is at least one simulation
+    # Only download if there is at least one simulation
     sim_name = simulation_list_widget.value
 
     with log_out:
@@ -2148,7 +2148,7 @@ def serialize_simulation(simulations_data, simulation_name):
     """
     simulation_data = simulations_data["simulation_data"]
     csv_trials_output = []
-    # CSV file hearders
+    # CSV file headers
     headers = 'times,agg,L2,L5'
     fmt = '%f, %f, %f, %f'
 
