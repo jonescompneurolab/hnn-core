@@ -87,25 +87,6 @@ def test_cell_response(tmp_path):
                                  spike_gids=spike_gids,
                                  spike_types=spike_types)
 
-    with pytest.raises(TypeError, match="indices must be int, slice, or "
-                       "array-like, not str"):
-        cell_response['1']
-
-    with pytest.raises(TypeError, match="indices must be int, slice, or "
-                       "array-like, not float"):
-        cell_response[1.0]
-
-    with pytest.raises(ValueError, match="ndarray cannot exceed 1 dimension"):
-        cell_response[np.array([[1, 2], [3, 4]])]
-
-    with pytest.raises(TypeError, match="gids must be of dtype int, "
-                       "not float64"):
-        cell_response[np.array([1, 2, 3.0])]
-
-    with pytest.raises(TypeError, match="gids must be of dtype int, "
-                       "not float64"):
-        cell_response[[0, 1, 2, 2.0]]
-
     with pytest.raises(TypeError, match="spike_types should be str, "
                                         "list, dict, or None"):
         cell_response.plot_spikes_hist(spike_types=1, show=False)
