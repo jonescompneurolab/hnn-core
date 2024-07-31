@@ -356,7 +356,9 @@ class HNNGUI:
 
         # Create save simulation widget wrapper
         self.save_simuation_button = self._init_html_download_button(
-            title='Save Simulation')
+            title='Save Simulation', mimetype='text/csv')
+        self.save_config_button = self._init_html_download_button(
+            title='Save Configurations', mimetype='application/json')
 
         self.simulation_list_widget = Dropdown(options=[],
                                                value=None,
@@ -486,6 +488,7 @@ class HNNGUI:
         self._log_window = HBox([self._log_out], layout=self.layout['log_out'])
         self._operation_buttons = HBox(
             [self.run_button, self.load_data_button,
+             self.save_config_button,
              self.save_simuation_button,
              self.simulation_list_widget],
             layout=self.layout['operation_box'])
