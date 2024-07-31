@@ -582,6 +582,7 @@ class HNNGUI:
                 self.simulation_list_widget, self.cell_pameters_widgets)
 
         def _simulation_list_change(value):
+            # Simulation Data
             _simulation_data, file_extension = (
                 _serialize_simulation(self._log_out,
                                       self.data,
@@ -599,7 +600,21 @@ class HNNGUI:
                     payload=payload, filename=result_file,
                     is_disabled="", btn_height=self.layout['run_btn'].height,
                     color_theme=self.layout['theme_color'],
-                    title='Save Simulation'))
+                    title='Save Simulation', mimetype='text/csv'))
+
+            # Network Configuration
+            network_config = _serialize_config(self._log_out,
+                                               self.data,
+                                               self.simulation_list_widget)
+            b64_net = base64.b64encode(network_config.encode())
+            self.save_config_button.value = (
+                self.html_download_button.format(
+                    payload=b64_net.decode(),
+                    filename=f"{value.new}.json",
+                    is_disabled="",
+                    btn_height=self.layout['run_btn'].height,
+                    color_theme=self.layout['theme_color'],
+                    title='Save Configurations', mimetype='application/json'))
 
         def _driver_type_change(value):
             self.widget_location_selection.disabled = (
