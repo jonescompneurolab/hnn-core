@@ -31,7 +31,7 @@ from hnn_core.network import pick_connection
 from hnn_core.dipole import _read_dipole_txt
 from hnn_core.params_default import (get_L2Pyr_params_default,
                                      get_L5Pyr_params_default)
-from hnn_core.hnn_io import dict_to_network
+from hnn_core.hnn_io import dict_to_network, write_network_configuration
 from hnn_core.cells_default import _exp_g_at_dist
 
 import base64
@@ -2155,6 +2155,27 @@ def serialize_simulation(simulations_data, simulation_name):
     else:
         # Create zip file
         return _create_zip(csv_trials_output, simulation_name), ".zip"
+
+
+def _serialize_config(log_out, sim_data, simulation_list_widget):
+    # Only download if there is at least one simulation
+    sim_name = simulation_list_widget.value
+
+    with log_out:
+        logger.info(f"Saving Network configuration {sim_name}.json")
+        return serialize_config(sim_data, sim_name)
+
+
+def serialize_config(simulations_data, simulation_name):
+    """Serializes Network configuration data to json."""
+
+    # Get network from data dictionary
+    net = simulations_data["simulation_data"][simulation_name]['net']
+
+    # Write to buffer
+    with io.StringIO() as output:
+        write_network_configuration(net, output)
+        return output.getvalue()
 
 
 def _create_zip(csv_data_list, simulation_name):
