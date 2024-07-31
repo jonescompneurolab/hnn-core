@@ -515,7 +515,7 @@ class HNNGUI:
                 self.drive_boxes.pop()
 
         def _on_upload_connectivity(change):
-            return on_upload_params_change(
+            new_params = on_upload_params_change(
                 change, self.widget_tstop, self.widget_dt,
                 self._log_out, self.drive_boxes, self.drive_widgets,
                 self._drives_out, self._connectivity_out,
@@ -523,9 +523,10 @@ class HNNGUI:
                 self.cell_pameters_widgets, self.cell_layer_radio_buttons,
                 self.cell_type_radio_buttons, self.layout['drive_textbox'],
                 "connectivity")
+            self.params = new_params
 
         def _on_upload_drives(change):
-            return on_upload_params_change(
+            _ = on_upload_params_change(
                 change, self.widget_tstop, self.widget_dt,
                 self._log_out, self.drive_boxes, self.drive_widgets,
                 self._drives_out, self._connectivity_out,
@@ -1623,6 +1624,7 @@ def on_upload_params_change(change, tstop, dt, log_out, drive_boxes,
             raise ValueError
     # Resets file counter to 0
     change['owner'].set_trait('value', ([]))
+    return params
 
 
 def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
