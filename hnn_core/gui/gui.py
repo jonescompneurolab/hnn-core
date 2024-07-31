@@ -431,12 +431,12 @@ class HNNGUI:
             This is for testing purposes """
         return cell_parameters_dict
 
-    def _init_html_download_button(self, title):
+    def _init_html_download_button(self, title, mimetype):
         b64 = base64.b64encode("".encode())
         payload = b64.decode()
         # Initialliting HTML code for download button
         self.html_download_button = '''
-        <a download="{filename}" href="data:text/csv;base64,{payload}"
+        <a download="{filename}" href="data:{mimetype};base64,{payload}"
           download>
         <button style="background:{color_theme}; height:{btn_height}"
         class=" jupyter-button
@@ -451,7 +451,8 @@ class HNNGUI:
                         is_disabled="disabled",
                         btn_height=self.layout['run_btn'].height,
                         color_theme=self.layout['theme_color'],
-                        title=title)))
+                        title=title,
+                        mimetype=mimetype)))
 
     def add_logging_window_logger(self):
         handler = _OutputWidgetHandler(self._log_out)
