@@ -21,8 +21,9 @@ from hnn_core.gui._viz_manager import (_idx2figname,
 from hnn_core.gui.gui import (_init_network_from_widgets,
                               _prepare_upload_file,
                               _update_nested_dict,
-                              serialize_simulation)
-from hnn_core.network import pick_connection
+                              serialize_simulation,
+                              serialize_config)
+from hnn_core.network import pick_connection, _compare_lists
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 from hnn_core.hnn_io import dict_to_network, read_network_configuration
 from IPython.display import IFrame
@@ -42,6 +43,71 @@ def setup_gui():
     gui.widget_dt.value = 0.5  # speed up tests
     gui.widget_tstop.value = 70  # speed up tests
     return gui
+
+
+def check_equal_networks(net1, net2):
+    """Checks for equivalency networks
+
+    GUI and API generated networks should be equal except for certain
+    attributes that differ. The Network.__eq__ method will not work for
+    comparing GUI-derived networks to API-derived networks. This function
+    adapts the __eq__
+    """
+    def check_equality(item1, item2, message=None):
+        assert item1 == item2, message
+
+    # Poisson and Bursty drives will have different tstop. This function
+    # passes comparing tstop.
+    def check_items(dict1, dict2, ignore_keys=[], message=''):
+        for d_key, d_value in dict1.items():
+            if d_key not in ignore_keys:
+                check_equality(d_value, dict2[d_key],
+                               f'{message}{d_key} not equal')
+
+    def check_drive(drive1, drive2, keys):
+        name = drive1['name']
+        for key in keys:
+            value1 = drive1[key]
+            value2 = drive2[key]
+            if key != 'dynamics':
+                check_equality(value1, value2,
+                               f'>{name}>{key} not equal')
+            else:
+                check_items(value1, value2, ignore_keys=['tstop'],
+                            message=f'>{name}>{key}>')
+
+    # Check connectivity
+    assert len(net1.connectivity) == len(net2.connectivity)
+    assert _compare_lists(net1.connectivity, net2.connectivity)
+
+    # Check drives
+    for drive1, drive2 in zip(net1.external_drives.values(),
+                              net2.external_drives.values()):
+        check_drive(drive1, drive2, keys=drive1.keys())
+
+    # Check external biases
+    for bias_name, bias_dict in net1.external_biases.items():
+        for cell_type, bias_params in bias_dict.items():
+            check_items(bias_params,
+                        net2.external_biases[bias_name][cell_type],
+                        ignore_keys=['tstop'],
+                        message=f'{bias_name}>{cell_type}>')
+
+    # Check all other attributes
+    all_attrs = dir(net1)
+    attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
+    attrs_to_ignore.extend(['add_bursty_drive', 'add_connection',
+                            'add_electrode_array', 'add_evoked_drive',
+                            'add_poisson_drive', 'add_tonic_bias',
+                            'clear_connectivity', 'clear_drives',
+                            'connectivity', 'copy', 'gid_to_type',
+                            'plot_cells', 'set_cell_positions',
+                            'to_dict', 'write_configuration',
+                            'external_drives', 'external_biases'])
+    attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
+    for attr in attrs_to_check:
+        check_equality(getattr(net1, attr), getattr(net2, attr),
+                       f'{attr} not equal')
 
 
 def test_gui_load_params():
@@ -818,6 +884,34 @@ def test_gui_upload_csv_simulation(setup_gui):
                 ['dpls'][0].data['L2']) == data_lengh)
     assert (len(gui.data['simulation_data']['test_default']
                 ['dpls'][0].data['L5']) == data_lengh)
+
+
+def test_gui_download_configuration(setup_gui):
+    """Test the GUI download simulation pipeline."""
+
+    gui = setup_gui
+
+    # Initiate 1st simulation
+    sim_name = "sim1"
+    gui.widget_simulation_name.value = sim_name
+
+    # Run simulation
+    gui.run_button.click()
+
+    # serialize configurations of the simulation
+    configs = serialize_config(gui.data, sim_name)
+    net_from_buffer = json.loads(configs)
+
+    # Load configuration from file
+    source_network_config = assets_path / 'jones2009_3x3_drives.json'
+    with open(source_network_config, 'r') as file:
+        net_source_config = json.load(file)
+
+    # Create  networks
+    net1 = dict_to_network(net_from_buffer)
+    net2 = dict_to_network(net_source_config)
+
+    check_equal_networks(net1, net2)
 
 
 def test_gui_add_tonic_input():
