@@ -95,6 +95,8 @@ def test_gui_upload_connectivity():
     """Test if gui handles uploaded connectivity parameters correctly"""
     gui = HNNGUI()
     _ = gui.compose()
+    default_params = gui.params.copy()
+
     # clear the connectivity widgets
     original_connectivity_count = len(gui.connectivity_widgets)
     assert original_connectivity_count > 0
@@ -114,6 +116,9 @@ def test_gui_upload_connectivity():
     # value should change when loading connectivity from file 2
     gui._simulate_upload_connectivity(file2_path)
     assert gui.connectivity_widgets[0][0].children[1].value == 0.01
+
+    # check that the gui param attribute was updated
+    assert gui.params != default_params
 
     # Load drives and make sure connectivity does not change
     gui._simulate_upload_drives(file1_path)
