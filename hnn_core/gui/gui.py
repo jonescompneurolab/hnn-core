@@ -1481,10 +1481,10 @@ def add_cell_parameters_tab(cell_params_out, cell_pameters_vboxes,
     cell_params_out.clear_output()
 
     # Add cell parameters
-    display(_update_cell_params_vbox(cell_params_out,
-                                     cell_pameters_vboxes,
-                                     cell_type_radio_button.value,
-                                     cell_layer_radio_button.value))
+    _update_cell_params_vbox(cell_params_out,
+                             cell_pameters_vboxes,
+                             cell_type_radio_button.value,
+                             cell_layer_radio_button.value)
 
 
 def get_cell_param_default_value(cell_type_key, param_dict):
