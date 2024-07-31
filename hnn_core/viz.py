@@ -601,7 +601,7 @@ def plot_spikes_raster(cell_response, trial_idx=None, color=None,
         else:
             events.append(
                 ax.eventplot([-1], lineoffsets=[-1],
-                             color=cell_type_colors[cell_type],
+                             color=new_cell_type_colors[cell_type],
                              label=cell_type, linelengths=5))
 
     ax.legend(handles=[e[0] for e in events], loc=1)
