@@ -151,14 +151,14 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    spike_times : list (n_trials,) of list (n_spikes,) of float, shape | None</span>
+<span class="sd">    spike_times : list (n_trials,) of list (n_spikes,) of float | None</span>
 <span class="sd">        Each element of the outer list is a trial.</span>
 <span class="sd">        The inner list contains the time stamps of spikes.</span>
-<span class="sd">    spike_gids : list (n_trials,) of list (n_spikes,) of float, shape | None</span>
+<span class="sd">    spike_gids : list (n_trials,) of list (n_spikes,) of float | None</span>
 <span class="sd">        Each element of the outer list is a trial.</span>
 <span class="sd">        The inner list contains the cell IDs of neurons that</span>
 <span class="sd">        spiked.</span>
-<span class="sd">    spike_types : list (n_trials,) of list (n_spikes,) of float, shape | None</span>
+<span class="sd">    spike_types : list (n_trials,) of list (n_spikes,) of float | None</span>
 <span class="sd">        Each element of the outer list is a trial.</span>
 <span class="sd">        The inner list contains the type of spike (e.g., evprox1</span>
 <span class="sd">        or L2_pyramidal) that occurred at the corresponding time stamp.</span>
@@ -172,22 +172,22 @@
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    spike_times : list (n_trials,) of list (n_spikes,) of float, shape</span>
+<span class="sd">    spike_times : list (n_trials,) of list (n_spikes,) of float</span>
 <span class="sd">        Each element of the outer list is a trial.</span>
 <span class="sd">        The inner list contains the time stamps of spikes.</span>
-<span class="sd">    spike_gids : list (n_trials,) of list (n_spikes,) of float, shape</span>
+<span class="sd">    spike_gids : list (n_trials,) of list (n_spikes,) of float</span>
 <span class="sd">        Each element of the outer list is a trial.</span>
 <span class="sd">        The inner list contains the cell IDs of neurons that</span>
 <span class="sd">        spiked.</span>
-<span class="sd">    spike_types : list (n_trials,) of list (n_spikes,) of float, shape</span>
+<span class="sd">    spike_types : list (n_trials,) of list (n_spikes,) of float</span>
 <span class="sd">        Each element of the outer list is a trial.</span>
 <span class="sd">        The inner list contains the type of spike (e.g., evprox1</span>
 <span class="sd">        or L2_pyramidal) that occurred at the corresponding time stamp.</span>
 <span class="sd">        Each gid corresponds to a type via Network::gid_ranges.</span>
-<span class="sd">    vsec : list (n_trials,) of dict, shape</span>
+<span class="sd">    vsec : list (n_trials,) of dict</span>
 <span class="sd">        Each element of the outer list is a trial.</span>
 <span class="sd">        Dictionary indexed by gids containing voltages for cell sections.</span>
-<span class="sd">    isec : list (n_trials,) of dict, shape</span>
+<span class="sd">    isec : list (n_trials,) of dict</span>
 <span class="sd">        Each element of the outer list is a trial.</span>
 <span class="sd">        Dictionary indexed by gids containing currents for cell sections.</span>
 <span class="sd">    ca : list (n_trials,) of dict, shape</span>
@@ -276,77 +276,12 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">times_self</span> <span class="o">==</span> <span class="n">times_other</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_spike_gids</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_spike_gids</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_spike_types</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_spike_types</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_vsec</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_vsec</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_isec</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_isec</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_ca</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_ca</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">vsec</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">vsec</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">isec</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">isec</span> <span class="ow">and</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">ca</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">ca</span><span class="p">)</span>
-
-<div class="viewcode-block" id="CellResponse.__getitem__"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid_item</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a CellResponse object with a copied subset filtered by gid.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        gid_item : int | slice</span>
-<span class="sd">            Subset of gids .</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        cell_response : instance of CellResponse</span>
-<span class="sd">            See below for use cases.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gid_item</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
-            <span class="n">gid_item</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">gid_item</span><span class="o">.</span><span class="n">stop</span><span class="p">)[</span><span class="n">gid_item</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gid_item</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">gid_item</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gid_item</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gid_item</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">gid_item</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ndarray cannot exceed 1 dimension&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">pass</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gid_item</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="n">gid_item</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">gid_item</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;indices must be int, slice, or array-like, &quot;</span>
-                            <span class="sa">f</span><span class="s2">&quot;not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">gid_item</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">gid_item</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;gids must be of dtype int, &quot;</span>
-                            <span class="sa">f</span><span class="s2">&quot;not </span><span class="si">{</span><span class="n">gid_item</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="n">n_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">)</span>
-        <span class="n">times_slice</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="n">gids_slice</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="n">types_slice</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="n">vsoma_slice</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="n">isoma_slice</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">trial_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">):</span>
-            <span class="n">gid_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spike_gids</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">],</span> <span class="n">gid_item</span><span class="p">)</span>
-            <span class="n">times_trial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">])[</span><span class="n">gid_mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-            <span class="n">gids_trial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_spike_gids</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">])[</span><span class="n">gid_mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-            <span class="n">types_trial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_spike_types</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">])[</span><span class="n">gid_mask</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-
-            <span class="n">vsoma_trial</span> <span class="o">=</span> <span class="p">{</span><span class="n">gid</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vsoma</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">][</span><span class="n">gid</span><span class="p">]</span> <span class="k">for</span> <span class="n">gid</span> <span class="ow">in</span> <span class="n">gid_item</span>
-                           <span class="k">if</span> <span class="n">gid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vsoma</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
-
-            <span class="n">isoma_trial</span> <span class="o">=</span> <span class="p">{</span><span class="n">gid</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isoma</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">][</span><span class="n">gid</span><span class="p">]</span> <span class="k">for</span> <span class="n">gid</span> <span class="ow">in</span> <span class="n">gid_item</span>
-                           <span class="k">if</span> <span class="n">gid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_isoma</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
-
-            <span class="n">times_slice</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">times_trial</span><span class="p">)</span>
-            <span class="n">gids_slice</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gids_trial</span><span class="p">)</span>
-            <span class="n">types_slice</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">types_trial</span><span class="p">)</span>
-            <span class="n">vsoma_slice</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vsoma_trial</span><span class="p">)</span>
-            <span class="n">isoma_slice</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">isoma_trial</span><span class="p">)</span>
-
-        <span class="n">cell_response_slice</span> <span class="o">=</span> <span class="n">CellResponse</span><span class="p">(</span><span class="n">spike_times</span><span class="o">=</span><span class="n">times_slice</span><span class="p">,</span>
-                                           <span class="n">spike_gids</span><span class="o">=</span><span class="n">gids_slice</span><span class="p">,</span>
-                                           <span class="n">spike_types</span><span class="o">=</span><span class="n">types_slice</span><span class="p">)</span>
-        <span class="n">cell_response_slice</span><span class="o">.</span><span class="n">_vsoma</span> <span class="o">=</span> <span class="n">vsoma_slice</span>
-        <span class="n">cell_response_slice</span><span class="o">.</span><span class="n">_isoma</span> <span class="o">=</span> <span class="n">isoma_slice</span>
-
-        <span class="k">return</span> <span class="n">cell_response_slice</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">spike_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

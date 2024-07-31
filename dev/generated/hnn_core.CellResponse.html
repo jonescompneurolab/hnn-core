@@ -89,7 +89,6 @@
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#">hnn_core.CellResponse</a><ul>
 <li><a class="reference internal" href="#hnn_core.CellResponse"><code class="docutils literal notranslate"><span class="pre">CellResponse</span></code></a><ul>
-<li><a class="reference internal" href="#hnn_core.CellResponse.__getitem__"><code class="docutils literal notranslate"><span class="pre">CellResponse.__getitem__()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.CellResponse.__repr__"><code class="docutils literal notranslate"><span class="pre">CellResponse.__repr__()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.CellResponse.mean_rates"><code class="docutils literal notranslate"><span class="pre">CellResponse.mean_rates()</span></code></a></li>
 <li><a class="reference internal" href="#hnn_core.CellResponse.plot_spikes_hist"><code class="docutils literal notranslate"><span class="pre">CellResponse.plot_spikes_hist()</span></code></a></li>
@@ -161,14 +160,14 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>spike_times</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape | None</span></dt><dd><p>Each element of the outer list is a trial.
+<dt><strong>spike_times</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float | None</span></dt><dd><p>Each element of the outer list is a trial.
 The inner list contains the time stamps of spikes.</p>
 </dd>
-<dt><strong>spike_gids</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape | None</span></dt><dd><p>Each element of the outer list is a trial.
+<dt><strong>spike_gids</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float | None</span></dt><dd><p>Each element of the outer list is a trial.
 The inner list contains the cell IDs of neurons that
 spiked.</p>
 </dd>
-<dt><strong>spike_types</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape | None</span></dt><dd><p>Each element of the outer list is a trial.
+<dt><strong>spike_types</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float | None</span></dt><dd><p>Each element of the outer list is a trial.
 The inner list contains the type of spike (e.g., evprox1
 or L2_pyramidal) that occurred at the corresponding time stamp.
 Each gid corresponds to a type via Network().gid_ranges.</p>
@@ -183,22 +182,22 @@ network</p>
 </dd>
 <dt class="field-even">Attributes<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt><strong>spike_times</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape</span></dt><dd><p>Each element of the outer list is a trial.
+<dt><strong>spike_times</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float</span></dt><dd><p>Each element of the outer list is a trial.
 The inner list contains the time stamps of spikes.</p>
 </dd>
-<dt><strong>spike_gids</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape</span></dt><dd><p>Each element of the outer list is a trial.
+<dt><strong>spike_gids</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float</span></dt><dd><p>Each element of the outer list is a trial.
 The inner list contains the cell IDs of neurons that
 spiked.</p>
 </dd>
-<dt><strong>spike_types</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float, shape</span></dt><dd><p>Each element of the outer list is a trial.
+<dt><strong>spike_types</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float</span></dt><dd><p>Each element of the outer list is a trial.
 The inner list contains the type of spike (e.g., evprox1
 or L2_pyramidal) that occurred at the corresponding time stamp.
 Each gid corresponds to a type via Network::gid_ranges.</p>
 </dd>
-<dt><strong>vsec</strong><span class="classifier">list (n_trials,) of dict, shape</span></dt><dd><p>Each element of the outer list is a trial.
+<dt><strong>vsec</strong><span class="classifier">list (n_trials,) of dict</span></dt><dd><p>Each element of the outer list is a trial.
 Dictionary indexed by gids containing voltages for cell sections.</p>
 </dd>
-<dt><strong>isec</strong><span class="classifier">list (n_trials,) of dict, shape</span></dt><dd><p>Each element of the outer list is a trial.
+<dt><strong>isec</strong><span class="classifier">list (n_trials,) of dict</span></dt><dd><p>Each element of the outer list is a trial.
 Dictionary indexed by gids containing currents for cell sections.</p>
 </dd>
 <dt><strong>ca</strong><span class="classifier">list (n_trials,) of dict, shape</span></dt><dd><p>Each element of the outer list is a trial.
@@ -231,26 +230,6 @@ This includes vsoma and isoma.</p>
 </tr>
 </tbody>
 </table>
-<dl class="py method">
-<dt class="sig sig-object py" id="hnn_core.CellResponse.__getitem__">
-<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gid_item</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse.__getitem__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a CellResponse object with a copied subset filtered by gid.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>gid_item</strong><span class="classifier">int | slice</span></dt><dd><p>Subset of gids .</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>cell_response</strong><span class="classifier">instance of CellResponse</span></dt><dd><p>See below for use cases.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.CellResponse.__repr__">
 <span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse.__repr__" title="Permalink to this definition">¶</a></dt>
