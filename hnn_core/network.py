@@ -28,7 +28,7 @@ from .externals.mne import copy_doc
 from typing import Union
 
 
-def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance, cell_types, cell_types):
+def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
     """Creates coordinate grid and place cells in it.
 
     Parameters
