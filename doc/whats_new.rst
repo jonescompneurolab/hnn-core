@@ -92,6 +92,9 @@ Changelog
   and interpolation method to smoothen CSD plot,
   by `Katharina Duecker`_ in :gh:`815`
 
+- Cleaned up internal logic in :class:`~hnn_core.CellResponse`,
+  by `Nick Tolley`_ in :gh:`647`.
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
