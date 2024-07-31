@@ -35,11 +35,6 @@ class CellResponse(object):
     cell_type_names : list
         List of unique cell type names that are explicitly modeled in the
         network
-    vsec : list (n_trials,) of dict
-        Each element of the outer list is a trial.
-        Dictionary indexed by gids containing voltages for cell sections.
-    isec : list (n_trials,) of dict
-        Each element of the outer list is a trial.
 
     Attributes
     ----------
@@ -86,7 +81,7 @@ class CellResponse(object):
     """
 
     def __init__(self, spike_times=None, spike_gids=None, spike_types=None,
-                 times=None, cell_type_names=None, vsec=None, isec=None):
+                 times=None, cell_type_names=None):
         if spike_times is None:
             spike_times = list()
         if spike_gids is None:
@@ -95,10 +90,6 @@ class CellResponse(object):
             spike_types = list()
         if times is None:
             times = list()
-        if vsec is None:
-            vsec = list()
-        if isec is None:
-            isec = list()
 
         if cell_type_names is None:
             cell_type_names = ['L2_basket', 'L2_pyramidal',
