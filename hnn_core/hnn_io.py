@@ -9,6 +9,7 @@ import json
 import numpy as np
 
 from collections import OrderedDict
+from pathlib import Path
 
 from .cell import Cell, Section
 from .cell_response import CellResponse
@@ -319,7 +320,7 @@ def network_to_dict(net, write_output=False):
 
 
 @fill_doc
-def write_network_configuration(net, fname, overwrite=True):
+def write_network_configuration(net, output, overwrite=True):
     """Writes network configuration to a json file.
 
     Writes network configurations as a hierarchical json similar to the Network
@@ -328,25 +329,33 @@ def write_network_configuration(net, fname, overwrite=True):
 
     Parameters
     ----------
-    %(net)s
-    %(fname)s
-    %(overwrite)s
+    net : Network
+        hnn-core Network object
+    output : str, Path, or StringIO
+        Path or buffer to write outputs
+    overwrite : bool
+        Overwrite file if it exists. Default: True
 
-    Yields
-    ------
-    A json file containing the Network configurations.
+    Returns
+    -------
+    None
     """
-
-    if overwrite is False and os.path.exists(fname):
-        raise FileExistsError('File already exists at path %s. Rename '
-                              'the file or set overwrite=True.' % (fname,))
 
     net_data = net.to_dict(write_output=False)
     net_data_converted = _convert_np_array_to_list(net_data)
 
-    # Saving file
-    with open(fname, 'w', encoding='utf-8') as f:
-        json.dump(net_data_converted, f, ensure_ascii=False, indent=4)
+    if isinstance(output, (str, Path)):
+        if overwrite is False and os.path.exists(output):
+            raise FileExistsError('File already exists at path %s. Rename '
+                                  'the file or set overwrite=True.' % (output,)
+                                  )
+        # Saving file
+        with open(output, 'w', encoding='utf-8') as f:
+            json.dump(net_data_converted, f, ensure_ascii=False, indent=4)
+    else:
+        # Write to StringIO buffer
+        json.dump(net_data_converted, output, ensure_ascii=False, indent=4)
+        output.seek(0)  # Reset buffer position to the start
 
 
 def _order_drives(gid_ranges, external_drives):
