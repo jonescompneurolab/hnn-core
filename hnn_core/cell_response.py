@@ -144,6 +144,7 @@ class CellResponse(object):
                 self._spike_types == other._spike_types and
                 self._vsec == other._vsec and
                 self._isec == other._isec and
+                self._ca == other._ca and
                 self.vsec == other.vsec and
                 self.isec == other.isec and
                 self.ca == other.ca)
