@@ -459,7 +459,7 @@ class Network:
 
         # Check connectivity
         if ((len(self.connectivity) != len(other.connectivity)) or
-                not (_compare_lists(self.onnectivity, other.connectivity))):
+                not (_compare_lists(self.connectivity, other.connectivity))):
             return False
 
         # Check all other attributes
