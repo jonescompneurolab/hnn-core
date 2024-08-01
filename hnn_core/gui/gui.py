@@ -14,6 +14,7 @@ import urllib.request
 from collections import defaultdict
 from pathlib import Path
 from datetime import datetime
+from functools import partial
 from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload, VBox,
@@ -29,6 +30,7 @@ from hnn_core.dipole import _read_dipole_txt
 from hnn_core.params_default import (get_L2Pyr_params_default,
                                      get_L5Pyr_params_default)
 from hnn_core.hnn_io import dict_to_network
+from hnn_core.cells_default import _exp_g_at_dist
 
 import base64
 import zipfile
@@ -41,7 +43,7 @@ default_network_configuration = (hnn_core_root / 'param' /
 
 cell_parameters_dict = {
 
-    "Geometry":
+    "Geometry L2":
     [
         ('Soma length', 'micron', 'soma_L'),
         ('Soma diameter', 'micron', 'soma_diam'),
@@ -53,6 +55,34 @@ cell_parameters_dict = {
         ('Apical Dendrite Trunk diameter', 'micron', 'apicaltrunk_diam'),
         ('Apical Dendrite 1 length', 'micron', 'apical1_L'),
         ('Apical Dendrite 1 diameter', 'micron', 'apical1_diam'),
+        # ('Apical Dendrite 2 length', 'micron', 'apical2_L'),
+        # ('Apical Dendrite 2 diameter', 'micron', 'apical2_diam'),
+        ('Apical Dendrite Tuft length', 'micron', 'apicaltuft_L'),
+        ('Apical Dendrite Tuft diameter', 'micron', 'apicaltuft_diam'),
+        ('Oblique Apical Dendrite length', 'micron', 'apicaloblique_L'),
+        ('Oblique Apical Dendrite diameter', 'micron', 'apicaloblique_diam'),
+        ('Basal Dendrite 1 length', 'micron', 'basal1_L'),
+        ('Basal Dendrite 1 diameter', 'micron', 'basal1_diam'),
+        ('Basal Dendrite 2 length', 'micron', 'basal2_L'),
+        ('Basal Dendrite 2 diameter', 'micron', 'basal2_diam'),
+        ('Basal Dendrite 3 length', 'micron', 'basal3_L'),
+        ('Basal Dendrite 3 diameter', 'micron', 'basal3_diam')
+    ],
+
+    "Geometry L5":
+    [
+        ('Soma length', 'micron', 'soma_L'),
+        ('Soma diameter', 'micron', 'soma_diam'),
+        ('Soma capacitive density', 'F/cm2', 'soma_cm'),
+        ('Soma resistivity', 'ohm-cm', 'soma_Ra'),
+        ('Dendrite capacitive density', 'F/cm2', 'dend_cm'),
+        ('Dendrite resistivity', 'ohm-cm', 'dend_Ra'),
+        ('Apical Dendrite Trunk length', 'micron', 'apicaltrunk_L'),
+        ('Apical Dendrite Trunk diameter', 'micron', 'apicaltrunk_diam'),
+        ('Apical Dendrite 1 length', 'micron', 'apical1_L'),
+        ('Apical Dendrite 1 diameter', 'micron', 'apical1_diam'),
+        ('Apical Dendrite 2 length', 'micron', 'apical2_L'),
+        ('Apical Dendrite 2 diameter', 'micron', 'apical2_diam'),
         ('Apical Dendrite Tuft length', 'micron', 'apicaltuft_L'),
         ('Apical Dendrite Tuft diameter', 'micron', 'apicaltuft_diam'),
         ('Oblique Apical Dendrite length', 'micron', 'apicaloblique_L'),
@@ -1656,7 +1686,8 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
     # Update cell params
 
     update_functions = {
-        'Geometry': _update_geometry_cell_params,
+        'L2 Geometry': _update_L2_geometry_cell_params,
+        'L5 Geometry': _update_L5_geometry_cell_params,
         'Synapses': _update_synapse_cell_params,
         'L2 Pyramidal_Biophysics': _update_L2_biophysics_cell_params,
         'L5 Pyramidal_Biophysics': _update_L5_biophysics_cell_params
@@ -1669,7 +1700,11 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                 cell_type = vbox_key.split()[0]
                 update_function(single_simulation_data['net'], cell_type,
                                 cell_param_list.children)
-                break
+                break  # why is this here?
+
+    for cell_type in single_simulation_data['net'].cell_types.keys():
+        single_simulation_data['net'].cell_types[cell_type]._update_end_pts()
+        single_simulation_data['net'].cell_types[cell_type]._compute_section_mechs()
 
     if add_drive is False:
         return
@@ -1817,7 +1852,7 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
 def _update_cell_params_vbox(cell_type_out, cell_parameters_list,
                              cell_type, cell_layer):
     cell_parameters_key = f"{cell_type}_{cell_layer}"
-    if "Biophysics" in cell_layer:
+    if "Biophysics" or 'Geometry' in cell_layer:
         cell_parameters_key += f" {cell_type.split(' ')[0]}"
 
     if cell_parameters_key in cell_parameters_list:
@@ -1826,7 +1861,7 @@ def _update_cell_params_vbox(cell_type_out, cell_parameters_list,
             display(cell_parameters_list[cell_parameters_key])
 
 
-def _update_geometry_cell_params(net, cell_param_key, param_list):
+def _update_L2_geometry_cell_params(net, cell_param_key, param_list):
     cell_params = param_list
     cell_type = f'{cell_param_key.split("_")[0]}_pyramidal'
 
@@ -1847,6 +1882,37 @@ def _update_geometry_cell_params(net, cell_param_key, param_list):
 
     param_indices = [
         (6, 7), (8, 9), (10, 11), (12, 13), (14, 15), (16, 17), (18, 19)]
+
+    # Dendrite
+    for section, indices in zip(dendrite_sections, param_indices):
+        sections[section]._L = cell_params[indices[0]].value
+        sections[section]._diam = cell_params[indices[1]].value
+        sections[section]._cm = dendrite_cm
+        sections[section]._Ra = dendrite_Ra
+
+
+def _update_L5_geometry_cell_params(net, cell_param_key, param_list):
+    cell_params = param_list
+    cell_type = f'{cell_param_key.split("_")[0]}_pyramidal'
+
+    sections = net.cell_types[cell_type].sections
+    # Soma
+    sections['soma']._L = cell_params[0].value
+    sections['soma']._diam = cell_params[1].value
+    sections['soma']._cm = cell_params[2].value
+    sections['soma']._Ra = cell_params[3].value
+
+    # Dendrite common parameters
+    dendrite_cm = cell_params[4].value
+    dendrite_Ra = cell_params[5].value
+
+    dendrite_sections = [name for name in sections.keys()
+                         if name != 'soma'
+                         ]
+
+    param_indices = [
+        (6, 7), (8, 9), (10, 11), (12, 13), (14, 15),
+        (16, 17), (18, 19), (20, 21)]
 
     # Dentrite
     for section, indices in zip(dendrite_sections, param_indices):
@@ -1953,7 +2019,8 @@ def _update_L5_biophysics_cell_params(net, cell_param_key, param_list):
     mechs_params['kca'] = {'gbar_kca': param_list[16].value}
     mechs_params['km'] = {'gbar_km': param_list[17].value}
     mechs_params['cat'] = {'gbar_cat': param_list[18].value}
-    mechs_params['ar'] = {'gbar_ar': param_list[19].value}
+    mechs_params['ar'] = {'gbar_ar': partial(_exp_g_at_dist, zero_val=param_list[19].value,
+                                             exp_term=3e-3, offset=0.0)}
 
     update_common_dendrite_sections(sections, mechs_params)
 
