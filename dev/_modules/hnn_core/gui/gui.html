@@ -1756,6 +1756,8 @@
                               <span class="n">drive_boxes</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">layout</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="n">load_type</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">param_dict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="c1"># Resets file counter to 0</span>
     <span class="n">change</span><span class="p">[</span><span class="s1">&#39;owner&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_trait</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="p">([]))</span>
     <span class="k">return</span> <span class="n">params</span>
