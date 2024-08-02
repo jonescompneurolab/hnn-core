@@ -117,7 +117,7 @@ print("Simulation results:", simulation_results)
 dpl_waveforms = []
 for data_list in simulation_results['simulated_data']:
     for data in data_list:
-        dpl_waveforms.append(data['dpl'][0].data['agg'])
+        dpl_waveforms.append(data['dpl'][0].data['agg'].copy().smooth(30))
 
 plt.figure(figsize=(10, 6))
 for waveform in dpl_waveforms:
