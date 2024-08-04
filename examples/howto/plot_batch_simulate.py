@@ -110,27 +110,32 @@ simulation_results = batch_simulation.run(param_grid,
 # backend='dask' if installed
 print("Simulation results:", simulation_results)
 ###############################################################################
-# Extract and Plot Results
-###############################################################################
+# This plot shows an overlay of all smoothed dipole waveforms from the
+# batch simulation. Each line represents a different set of parameters,
+# allowing us to visualize the range of responses across the parameter space.
 
-# Extract and overlay dipole waveforms
+
 dpl_waveforms = []
 for data_list in simulation_results['simulated_data']:
     for data in data_list:
-        dpl_waveforms.append(data['dpl'][0].data['agg'].copy().smooth(30))
+        window_len = 30
+        dpl_smooth = data['dpl'][0].copy().smooth(window_len)
+        dpl_waveforms.append(dpl_smooth.data['agg'])
 
 plt.figure(figsize=(10, 6))
 for waveform in dpl_waveforms:
-    plt.plot(waveform, alpha=0.5)
+    plt.plot(waveform, alpha=0.5, linewidth=3)
 plt.title('Overlay of Dipole Waveforms')
 plt.xlabel('Time (ms)')
 plt.ylabel('Dipole Amplitude (nAm)')
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("image.png")
 plt.show()
+###############################################################################
+# This plot displays the minimum and maximum dipole peaks across
+# different synaptic strengths. This allows us to see how the range of
+# dipole activity changes as we vary the synaptic strength parameter.
 
-# Extract min and max peaks for plotting
 min_peaks, max_peaks, param_values = [], [], []
 for summary_list, data_list in zip(simulation_results['summary_statistics'],
                                    simulation_results['simulated_data']):
