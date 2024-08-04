@@ -1236,50 +1236,7 @@ class Network:
                     # Insert the value as it is
                     self.gid_ranges[name] = gid_range
         self.clear_connectivity()
-
-    def rename_cell(self, original_name, new_name):
-        """Renames cells in the network and clears connectivity so user can
-        set new connections.
-
-        Parameters
-        ----------
-            original_name: str
-            The original cell name in the network to be changed
-            new_name: str
-            The desired new cell name in the network
-        """
-        if original_name not in self.cell_types.keys():
-            # Raises error if the original name is not in cell_types
-            raise ValueError(
-                f" '{original_name}' is not in cell_types!")
-        elif new_name in self.cell_types.keys():
-            # Raises error if the new name is already in cell_types
-            raise ValueError(f"'{new_name}' is already in cell_types!")
-        elif original_name is None or new_name is None:
-            # Raises error if either arguments are not present.
-            raise TypeError
-        elif not isinstance(original_name, str):
-            # Raises error when original_name is not a string
-            raise TypeError(f"'{original_name}' must be a string")
-        elif not isinstance(new_name, str):
-            # Raises error when new_name is not a string
-            raise TypeError(f"'{new_name}' must be a string")
-        elif original_name in self.cell_types.keys():
-            # Update cell name in places where order doesn't matter
-            self.cell_types[new_name] = self.cell_types.pop(original_name)
-            self.pos_dict[new_name] = self.pos_dict.pop(original_name)
-
-            # Update cell name in gid_ranges: order matters for consistency!
-            for _ in range(len(self.gid_ranges)):
-                name, gid_range = self.gid_ranges.popitem(last=False)
-                if name == original_name:
-                    # Insert the new name with the value of the original name
-                    self.gid_ranges[new_name] = gid_range
-                else:
-                    # Insert the value as it is
-                    self.gid_ranges[name] = gid_range
-        self.clear_connectivity()
-
+    
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
         return _gid_to_type(gid, self.gid_ranges)
