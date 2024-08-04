@@ -179,9 +179,15 @@ class BatchSimulate(object):
         Returns
         -------
         results : dict
-            Dictionary containing summary statistics and simulation data
-            if return_output is True and clear_cache is False. Otherwise,
-            a dictionary containing only summary statistics.
+            Dictionary containing 'summary_statistics' and optionally
+            'simulated_data'.
+            'simulated_data' may include keys: 'dpl', 'lfp', 'spikes',
+            'voltages', 'param_values', 'net', 'times'.
+
+        Notes
+        -----
+        Return content depends on summary_func, return_output, and
+        clear_cache settings.
 
         """
         _validate_type(param_grid, types=(dict,), item_name='param_grid')
