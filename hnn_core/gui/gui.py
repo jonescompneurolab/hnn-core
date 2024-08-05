@@ -55,8 +55,6 @@ cell_parameters_dict = {
         ('Apical Dendrite Trunk diameter', 'micron', 'apicaltrunk_diam'),
         ('Apical Dendrite 1 length', 'micron', 'apical1_L'),
         ('Apical Dendrite 1 diameter', 'micron', 'apical1_diam'),
-        # ('Apical Dendrite 2 length', 'micron', 'apical2_L'),
-        # ('Apical Dendrite 2 diameter', 'micron', 'apical2_diam'),
         ('Apical Dendrite Tuft length', 'micron', 'apicaltuft_L'),
         ('Apical Dendrite Tuft diameter', 'micron', 'apicaltuft_diam'),
         ('Oblique Apical Dendrite length', 'micron', 'apicaloblique_L'),
