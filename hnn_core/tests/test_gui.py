@@ -283,10 +283,13 @@ def test_gui_init_network():
     assert np.isclose(_single_simulation['net']._inplane_distance, 1.)
     assert np.isclose(_single_simulation['net']._layer_separation, 1307.4)
 
-    default_network_configuration = read_params(hnn_core_root / 'param' / 'default.json')
-    net = jones_2009_model(params=default_network_configuration, add_drives_from_params=True)
+    default_network_configuration = read_params(
+        hnn_core_root / 'param' / 'default.json')
+    net = jones_2009_model(
+        params=default_network_configuration, add_drives_from_params=True)
 
     assert _single_simulation['net'] == net
+
 
 @requires_mpi4py
 @requires_psutil
@@ -778,7 +781,8 @@ def test_gui_cell_params_widgets(setup_gui):
 
     # Check the if the cell params dictionary has been updated
     cell_params = gui.get_cell_parameters_dict()
-    assert (len(cell_params['Geometry']) == 20)
+    assert (len(cell_params['Geometry L2']) == 20)
+    assert (len(cell_params['Geometry L5']) == 22)
     assert (len(cell_params['Synapses']) == 12)
     assert (len(cell_params['Biophysics L2']) == 10)
     assert (len(cell_params['Biophysics L5']) == 20)
