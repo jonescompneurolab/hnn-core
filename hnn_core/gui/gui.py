@@ -1749,10 +1749,7 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
     # add drives to network
     for drive in drive_widgets:
         if drive['type'] in ('Tonic'):
-            weights_amplitudes = {
-                k: v.value
-                for k, v in drive["amplitude"].items()
-            }
+            weights_amplitudes = _drive_widget_to_dict(drive, 'amplitude')
             single_simulation_data['net'].add_tonic_bias(
                 amplitude=weights_amplitudes,
                 t0=drive["t0"].value,
@@ -1763,15 +1760,9 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                 synch_inputs_kwargs['n_drive_cells'] = 1
                 synch_inputs_kwargs['cell_specific'] = False
 
-            weights_ampa = {
-                k: v.value
-                for k, v in drive['weights_ampa'].items()
-            }
-            weights_nmda = {
-                k: v.value
-                for k, v in drive['weights_nmda'].items()
-            }
-            synaptic_delays = {k: v.value for k, v in drive['delays'].items()}
+            weights_ampa = _drive_widget_to_dict(drive, 'weights_ampa')
+            weights_nmda = _drive_widget_to_dict(drive, 'weights_nmda')
+            synaptic_delays = _drive_widget_to_dict(drive, 'delays')
             print(
                 f"drive type is {drive['type']}, location={drive['location']}")
             if drive['type'] == 'Poisson':
@@ -1787,6 +1778,7 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                     k: v
                     for k, v in weights_nmda.items() if k in rate_constant
                 }
+                rate_constant = _drive_widget_to_dict(drive, 'rate_constant')
                 single_simulation_data['net'].add_poisson_drive(
                     name=drive['name'],
                     tstart=drive['tstart'].value,
