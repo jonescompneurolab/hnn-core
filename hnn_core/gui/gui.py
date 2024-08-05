@@ -1672,6 +1672,28 @@ def on_upload_params_change(change, tstop, dt, log_out, drive_boxes,
     return params
 
 
+def _drive_widget_to_dict(drive, name):
+    """Creates a dict of input widget values
+
+    Input widgets for drive parameters are structured in a nested
+    dictionary. This function recreates the nested dictionary replacing
+    the input widget with its stored value.
+    Parameters
+    ----------
+    drive : dict
+        The drive dictionary containing nested dictionaries for parameters with
+        multiple input widgets.
+    name : str
+        key of the nested dictionary
+
+    Returns : dict
+    -------
+
+    """
+    return {
+        k: v.value
+        for k, v in drive[name].items()
+    }
 def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                                drive_widgets, connectivity_textfields,
                                cell_params_vboxes,
