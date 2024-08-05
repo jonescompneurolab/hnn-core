@@ -1489,7 +1489,8 @@ def add_cell_parameters_tab(cell_params_out, cell_pameters_vboxes,
     for cell_type in cell_types:
         layer_parameters = list()
         for layer in cell_parameters_dict.keys():
-            if 'Biophysic' in layer and cell_type[0] not in layer:
+            if ('Biophysic' in layer or 'Geometry' in layer) and \
+                    cell_type[0] not in layer:
                 continue
 
             for parameter in cell_parameters_dict[layer]:
@@ -1700,11 +1701,12 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                 cell_type = vbox_key.split()[0]
                 update_function(single_simulation_data['net'], cell_type,
                                 cell_param_list.children)
-                break  # why is this here?
+                # break  # why is this here?
 
     for cell_type in single_simulation_data['net'].cell_types.keys():
         single_simulation_data['net'].cell_types[cell_type]._update_end_pts()
-        single_simulation_data['net'].cell_types[cell_type]._compute_section_mechs()
+        single_simulation_data['net'].cell_types[
+            cell_type]._compute_section_mechs()
 
     if add_drive is False:
         return
@@ -1931,7 +1933,7 @@ def _update_synapse_cell_params(net, cell_param_key, param_list):
     param_indices = [
         (0, 1, 2), (3, 4, 5), (6, 7, 8), (9, 10, 11)]
 
-    # Update Dentrite
+    # Update Dendrite
     for section, indices in zip(synapse_sections, param_indices):
         network_synapses[section]['e'] = cell_params[indices[0]].value
         network_synapses[section]['tau1'] = cell_params[indices[1]].value
@@ -2019,8 +2021,9 @@ def _update_L5_biophysics_cell_params(net, cell_param_key, param_list):
     mechs_params['kca'] = {'gbar_kca': param_list[16].value}
     mechs_params['km'] = {'gbar_km': param_list[17].value}
     mechs_params['cat'] = {'gbar_cat': param_list[18].value}
-    mechs_params['ar'] = {'gbar_ar': partial(_exp_g_at_dist, zero_val=param_list[19].value,
-                                             exp_term=3e-3, offset=0.0)}
+    mechs_params['ar'] = {'gbar_ar': partial(
+        _exp_g_at_dist, zero_val=param_list[19].value,
+        exp_term=3e-3, offset=0.0)}
 
     update_common_dendrite_sections(sections, mechs_params)
 
@@ -2030,7 +2033,7 @@ def update_common_dendrite_sections(sections, mechs_params):
         name for name in sections.keys() if name != 'soma'
     ]
     for section in dendrite_sections:
-        sections[section].mechs.update(mechs_params)
+        sections[section].mechs.update(deepcopy(mechs_params))
 
 
 def _serialize_simulation(log_out, sim_data, simulation_list_widget):

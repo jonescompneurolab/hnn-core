@@ -284,12 +284,9 @@ def test_gui_init_network():
     assert np.isclose(_single_simulation['net']._layer_separation, 1307.4)
 
     default_network_configuration = read_params(hnn_core_root / 'param' / 'default.json')
-    net = jones_2009_model(params=default_network_configuration)
-    for section in _single_simulation['net'].cell_types['L5_pyramidal'].sections:
-        print(section)
-        # assert _single_simulation['net'].cell_types['L5_pyramidal'].sections[section].mechs == net.cell_types['L5_pyramidal'].sections[section].mechs
-        assert _single_simulation['net'].cell_types['L5_pyramidal'].sections[section].L == net.cell_types['L5_pyramidal'].sections[section].L
+    net = jones_2009_model(params=default_network_configuration, add_drives_from_params=True)
 
+    assert _single_simulation['net'] == net
 
 @requires_mpi4py
 @requires_psutil
