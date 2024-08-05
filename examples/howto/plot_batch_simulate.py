@@ -86,7 +86,8 @@ def summary_func(results):
     """
     summary_stats = []
     for result in results:
-        dpl_data = result['dpl'][0].data['agg']
+        dpl_smooth = result['dpl'][0].copy().smooth(window_len=30)
+        dpl_data = dpl_smooth.data['agg']
         min_peak = np.min(dpl_data)
         max_peak = np.max(dpl_data)
         summary_stats.append({'min_peak': min_peak, 'max_peak': max_peak})
@@ -152,5 +153,6 @@ plt.ylabel('Dipole Peak Magnitude')
 plt.title('Min and Max Dipole Peaks across Simulations')
 plt.legend()
 plt.grid(True)
+plt.xscale('log')
 plt.tight_layout()
 plt.show()
