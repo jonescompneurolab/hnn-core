@@ -148,6 +148,7 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">IFrame</span><span class="p">,</span> <span class="n">display</span>
 <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="p">(</span><span class="n">HTML</span><span class="p">,</span> <span class="n">Accordion</span><span class="p">,</span> <span class="n">AppLayout</span><span class="p">,</span> <span class="n">BoundedFloatText</span><span class="p">,</span>
                         <span class="n">BoundedIntText</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">Dropdown</span><span class="p">,</span> <span class="n">FileUpload</span><span class="p">,</span> <span class="n">VBox</span><span class="p">,</span>
@@ -163,6 +164,7 @@
 <span class="kn">from</span> <span class="nn">hnn_core.params_default</span> <span class="kn">import</span> <span class="p">(</span><span class="n">get_L2Pyr_params_default</span><span class="p">,</span>
                                      <span class="n">get_L5Pyr_params_default</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">hnn_core.hnn_io</span> <span class="kn">import</span> <span class="n">dict_to_network</span>
+<span class="kn">from</span> <span class="nn">hnn_core.cells_default</span> <span class="kn">import</span> <span class="n">_exp_g_at_dist</span>
 
 <span class="kn">import</span> <span class="nn">base64</span>
 <span class="kn">import</span> <span class="nn">zipfile</span>
@@ -175,7 +177,7 @@
 
 <span class="n">cell_parameters_dict</span> <span class="o">=</span> <span class="p">{</span>
 
-    <span class="s2">&quot;Geometry&quot;</span><span class="p">:</span>
+    <span class="s2">&quot;Geometry L2&quot;</span><span class="p">:</span>
     <span class="p">[</span>
         <span class="p">(</span><span class="s1">&#39;Soma length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_L&#39;</span><span class="p">),</span>
         <span class="p">(</span><span class="s1">&#39;Soma diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_diam&#39;</span><span class="p">),</span>
@@ -187,6 +189,32 @@
         <span class="p">(</span><span class="s1">&#39;Apical Dendrite Trunk diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apicaltrunk_diam&#39;</span><span class="p">),</span>
         <span class="p">(</span><span class="s1">&#39;Apical Dendrite 1 length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apical1_L&#39;</span><span class="p">),</span>
         <span class="p">(</span><span class="s1">&#39;Apical Dendrite 1 diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apical1_diam&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Apical Dendrite Tuft length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apicaltuft_L&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Apical Dendrite Tuft diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apicaltuft_diam&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Oblique Apical Dendrite length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apicaloblique_L&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Oblique Apical Dendrite diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apicaloblique_diam&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Basal Dendrite 1 length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;basal1_L&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Basal Dendrite 1 diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;basal1_diam&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Basal Dendrite 2 length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;basal2_L&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Basal Dendrite 2 diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;basal2_diam&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Basal Dendrite 3 length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;basal3_L&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Basal Dendrite 3 diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;basal3_diam&#39;</span><span class="p">)</span>
+    <span class="p">],</span>
+
+    <span class="s2">&quot;Geometry L5&quot;</span><span class="p">:</span>
+    <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;Soma length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_L&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_diam&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma capacitive density&#39;</span><span class="p">,</span> <span class="s1">&#39;F/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_cm&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Soma resistivity&#39;</span><span class="p">,</span> <span class="s1">&#39;ohm-cm&#39;</span><span class="p">,</span> <span class="s1">&#39;soma_Ra&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite capacitive density&#39;</span><span class="p">,</span> <span class="s1">&#39;F/cm2&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_cm&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Dendrite resistivity&#39;</span><span class="p">,</span> <span class="s1">&#39;ohm-cm&#39;</span><span class="p">,</span> <span class="s1">&#39;dend_Ra&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Apical Dendrite Trunk length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apicaltrunk_L&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Apical Dendrite Trunk diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apicaltrunk_diam&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Apical Dendrite 1 length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apical1_L&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Apical Dendrite 1 diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apical1_diam&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Apical Dendrite 2 length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apical2_L&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">&#39;Apical Dendrite 2 diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apical2_diam&#39;</span><span class="p">),</span>
         <span class="p">(</span><span class="s1">&#39;Apical Dendrite Tuft length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apicaltuft_L&#39;</span><span class="p">),</span>
         <span class="p">(</span><span class="s1">&#39;Apical Dendrite Tuft diameter&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apicaltuft_diam&#39;</span><span class="p">),</span>
         <span class="p">(</span><span class="s1">&#39;Oblique Apical Dendrite length&#39;</span><span class="p">,</span> <span class="s1">&#39;micron&#39;</span><span class="p">,</span> <span class="s1">&#39;apicaloblique_L&#39;</span><span class="p">),</span>
@@ -1593,7 +1621,8 @@
     <span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">cell_types</span><span class="p">:</span>
         <span class="n">layer_parameters</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">cell_parameters_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="k">if</span> <span class="s1">&#39;Biophysic&#39;</span> <span class="ow">in</span> <span class="n">layer</span> <span class="ow">and</span> <span class="n">cell_type</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">layer</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;Biophysic&#39;</span> <span class="ow">in</span> <span class="n">layer</span> <span class="ow">or</span> <span class="s1">&#39;Geometry&#39;</span> <span class="ow">in</span> <span class="n">layer</span><span class="p">)</span> <span class="ow">and</span> \
+                    <span class="n">cell_type</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">layer</span><span class="p">:</span>
                 <span class="k">continue</span>
 
             <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="n">cell_parameters_dict</span><span class="p">[</span><span class="n">layer</span><span class="p">]:</span>
@@ -1792,7 +1821,8 @@
     <span class="c1"># Update cell params</span>
 
     <span class="n">update_functions</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;Geometry&#39;</span><span class="p">:</span> <span class="n">_update_geometry_cell_params</span><span class="p">,</span>
+        <span class="s1">&#39;L2 Geometry&#39;</span><span class="p">:</span> <span class="n">_update_L2_geometry_cell_params</span><span class="p">,</span>
+        <span class="s1">&#39;L5 Geometry&#39;</span><span class="p">:</span> <span class="n">_update_L5_geometry_cell_params</span><span class="p">,</span>
         <span class="s1">&#39;Synapses&#39;</span><span class="p">:</span> <span class="n">_update_synapse_cell_params</span><span class="p">,</span>
         <span class="s1">&#39;L2 Pyramidal_Biophysics&#39;</span><span class="p">:</span> <span class="n">_update_L2_biophysics_cell_params</span><span class="p">,</span>
         <span class="s1">&#39;L5 Pyramidal_Biophysics&#39;</span><span class="p">:</span> <span class="n">_update_L5_biophysics_cell_params</span>
@@ -1805,7 +1835,12 @@
                 <span class="n">cell_type</span> <span class="o">=</span> <span class="n">vbox_key</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">update_function</span><span class="p">(</span><span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">],</span> <span class="n">cell_type</span><span class="p">,</span>
                                 <span class="n">cell_param_list</span><span class="o">.</span><span class="n">children</span><span class="p">)</span>
-                <span class="k">break</span>
+                <span class="k">break</span>  <span class="c1"># update needed only once per vbox_key</span>
+
+    <span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span><span class="o">.</span><span class="n">_update_end_pts</span><span class="p">()</span>
+        <span class="n">single_simulation_data</span><span class="p">[</span><span class="s1">&#39;net&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span>
+            <span class="n">cell_type</span><span class="p">]</span><span class="o">.</span><span class="n">_compute_section_mechs</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">add_drive</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
         <span class="k">return</span>
@@ -1953,7 +1988,7 @@
 <span class="k">def</span> <span class="nf">_update_cell_params_vbox</span><span class="p">(</span><span class="n">cell_type_out</span><span class="p">,</span> <span class="n">cell_parameters_list</span><span class="p">,</span>
                              <span class="n">cell_type</span><span class="p">,</span> <span class="n">cell_layer</span><span class="p">):</span>
     <span class="n">cell_parameters_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">cell_layer</span><span class="si">}</span><span class="s2">&quot;</span>
-    <span class="k">if</span> <span class="s2">&quot;Biophysics&quot;</span> <span class="ow">in</span> <span class="n">cell_layer</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">&quot;Biophysics&quot;</span> <span class="ow">or</span> <span class="s1">&#39;Geometry&#39;</span> <span class="ow">in</span> <span class="n">cell_layer</span><span class="p">:</span>
         <span class="n">cell_parameters_key</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">cell_type</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
 
     <span class="k">if</span> <span class="n">cell_parameters_key</span> <span class="ow">in</span> <span class="n">cell_parameters_list</span><span class="p">:</span>
@@ -1962,7 +1997,7 @@
             <span class="n">display</span><span class="p">(</span><span class="n">cell_parameters_list</span><span class="p">[</span><span class="n">cell_parameters_key</span><span class="p">])</span>
 
 
-<span class="k">def</span> <span class="nf">_update_geometry_cell_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">cell_param_key</span><span class="p">,</span> <span class="n">param_list</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_update_L2_geometry_cell_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">cell_param_key</span><span class="p">,</span> <span class="n">param_list</span><span class="p">):</span>
     <span class="n">cell_params</span> <span class="o">=</span> <span class="n">param_list</span>
     <span class="n">cell_type</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_param_key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">_pyramidal&#39;</span>
 
@@ -1984,6 +2019,37 @@
     <span class="n">param_indices</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">),</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">),</span> <span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span> <span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">),</span> <span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">19</span><span class="p">)]</span>
 
+    <span class="c1"># Dendrite</span>
+    <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">indices</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dendrite_sections</span><span class="p">,</span> <span class="n">param_indices</span><span class="p">):</span>
+        <span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">_diam</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">_cm</span> <span class="o">=</span> <span class="n">dendrite_cm</span>
+        <span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">_Ra</span> <span class="o">=</span> <span class="n">dendrite_Ra</span>
+
+
+<span class="k">def</span> <span class="nf">_update_L5_geometry_cell_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">cell_param_key</span><span class="p">,</span> <span class="n">param_list</span><span class="p">):</span>
+    <span class="n">cell_params</span> <span class="o">=</span> <span class="n">param_list</span>
+    <span class="n">cell_type</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_param_key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">_pyramidal&#39;</span>
+
+    <span class="n">sections</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span><span class="o">.</span><span class="n">sections</span>
+    <span class="c1"># Soma</span>
+    <span class="n">sections</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">sections</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_diam</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">sections</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_cm</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">sections</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_Ra</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="c1"># Dendrite common parameters</span>
+    <span class="n">dendrite_cm</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">dendrite_Ra</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="n">dendrite_sections</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">sections</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                         <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;soma&#39;</span>
+                         <span class="p">]</span>
+
+    <span class="n">param_indices</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">),</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">),</span> <span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">17</span><span class="p">),</span> <span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">19</span><span class="p">),</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">21</span><span class="p">)]</span>
+
     <span class="c1"># Dentrite</span>
     <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">indices</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dendrite_sections</span><span class="p">,</span> <span class="n">param_indices</span><span class="p">):</span>
         <span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span>
@@ -2001,7 +2067,7 @@
     <span class="n">param_indices</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">)]</span>
 
-    <span class="c1"># Update Dentrite</span>
+    <span class="c1"># Update Dendrite</span>
     <span class="k">for</span> <span class="n">section</span><span class="p">,</span> <span class="n">indices</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">synapse_sections</span><span class="p">,</span> <span class="n">param_indices</span><span class="p">):</span>
         <span class="n">network_synapses</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="s1">&#39;e&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span>
         <span class="n">network_synapses</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="s1">&#39;tau1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span>
@@ -2089,7 +2155,9 @@
     <span class="n">mechs_params</span><span class="p">[</span><span class="s1">&#39;kca&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;gbar_kca&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">16</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
     <span class="n">mechs_params</span><span class="p">[</span><span class="s1">&#39;km&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;gbar_km&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">17</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
     <span class="n">mechs_params</span><span class="p">[</span><span class="s1">&#39;cat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;gbar_cat&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">18</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
-    <span class="n">mechs_params</span><span class="p">[</span><span class="s1">&#39;ar&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;gbar_ar&#39;</span><span class="p">:</span> <span class="n">param_list</span><span class="p">[</span><span class="mi">19</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+    <span class="n">mechs_params</span><span class="p">[</span><span class="s1">&#39;ar&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;gbar_ar&#39;</span><span class="p">:</span> <span class="n">partial</span><span class="p">(</span>
+        <span class="n">_exp_g_at_dist</span><span class="p">,</span> <span class="n">zero_val</span><span class="o">=</span><span class="n">param_list</span><span class="p">[</span><span class="mi">19</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="n">exp_term</span><span class="o">=</span><span class="mf">3e-3</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)}</span>
 
     <span class="n">update_common_dendrite_sections</span><span class="p">(</span><span class="n">sections</span><span class="p">,</span> <span class="n">mechs_params</span><span class="p">)</span>
 
@@ -2099,7 +2167,7 @@
         <span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">sections</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;soma&#39;</span>
     <span class="p">]</span>
     <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">dendrite_sections</span><span class="p">:</span>
-        <span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">mechs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">mechs_params</span><span class="p">)</span>
+        <span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">mechs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">mechs_params</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">_serialize_simulation</span><span class="p">(</span><span class="n">log_out</span><span class="p">,</span> <span class="n">sim_data</span><span class="p">,</span> <span class="n">simulation_list_widget</span><span class="p">):</span>
