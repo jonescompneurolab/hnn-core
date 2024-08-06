@@ -8,6 +8,7 @@ import numpy as np
 import os
 
 from hnn_core.batch_simulate import BatchSimulate
+from hnn_core import jones_2009_model
 
 
 @pytest.fixture
@@ -32,7 +33,8 @@ def batch_simulate_instance(tmp_path):
                              weights_ampa=weights_ampa,
                              synaptic_delays=synaptic_delays)
 
-    return BatchSimulate(set_params=set_params,
+    net = jones_2009_model()
+    return BatchSimulate(net=net, set_params=set_params,
                          tstop=1.,
                          save_folder=tmp_path,
                          batch_size=3)
@@ -70,6 +72,9 @@ def test_parameter_validation():
     with pytest.raises(TypeError, match='set_params must be'):
         BatchSimulate(set_params='invalid')
 
+    with pytest.raises(TypeError, match="net must be"):
+        BatchSimulate(net="invalid_network", set_params=lambda x: x)
+
 
 def test_generate_param_combinations(batch_simulate_instance, param_grid):
     """Test generating parameter combinations."""
@@ -96,6 +101,7 @@ def test_run_single_sim(batch_simulate_instance):
     assert 'dpl' in result
     assert 'param_values' in result
     assert result['param_values'] == param_values
+    assert isinstance(result['net'], type(batch_simulate_instance.net))
 
 
 def test_simulate_batch(batch_simulate_instance, param_grid):
