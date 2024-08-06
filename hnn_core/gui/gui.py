@@ -1699,7 +1699,7 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                 cell_type = vbox_key.split()[0]
                 update_function(single_simulation_data['net'], cell_type,
                                 cell_param_list.children)
-                # break  # why is this here?
+                break  # update needed only once per vbox_key
 
     for cell_type in single_simulation_data['net'].cell_types.keys():
         single_simulation_data['net'].cell_types[cell_type]._update_end_pts()
