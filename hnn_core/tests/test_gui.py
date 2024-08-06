@@ -141,6 +141,7 @@ def test_gui_upload_drives():
     # simulate upload default.json
     file1_url = Path(hnn_core_root, 'param', 'jones2009_base.json')
     file2_url = Path(assets_path, 'gamma_L5weak_L2weak_hierarchical.json')
+    file3_url = Path(assets_path, 'jones2009_3x3_drives.json')
 
     # check if parameter reloads
     gui._simulate_upload_drives(file1_url)
@@ -163,6 +164,13 @@ def test_gui_upload_drives():
     # Load connectivity and make sure drives did not change
     gui._simulate_upload_connectivity(file1_url)
     assert len(gui.drive_widgets) == 1
+
+    # Load file with more drives and make sure it's in the right order
+    gui.delete_drive_button.click()
+    gui._simulate_upload_drives(file3_url)
+    drive_names = [widget['name'] for widget in gui.drive_widgets]
+    assert drive_names == ['evdist1', 'evprox1', 'evprox2',
+                           'alpha_prox', 'poisson']
 
     plt.close('all')
 
