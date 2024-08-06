@@ -37,9 +37,6 @@ def set_params(param_values, net=None):
     net : instance of Network, optional
         If None, a new network is created using the specified model type.
     """
-    if net is None:
-        net = jones_2009_model()
-
     weights_ampa = {'L2_basket': param_values['weight_basket'],
                     'L2_pyramidal': param_values['weight_pyr'],
                     'L5_basket': param_values['weight_basket'],
@@ -102,7 +99,8 @@ def summary_func(results):
 
 
 # Run the batch simulation and collect the results.
-batch_simulation = BatchSimulate(set_params=set_params,
+batch_simulation = BatchSimulate(net=jones_2009_model(mesh_shape=(3, 3)),
+                                 set_params=set_params,
                                  summary_func=summary_func)
 simulation_results = batch_simulation.run(param_grid,
                                           n_jobs=n_jobs,

@@ -8,14 +8,15 @@
 import numpy as np
 import os
 from joblib import Parallel, delayed, parallel_config
+
+from .network import Network
 from .externals.mne import _validate_type, _check_option
 from .dipole import simulate_dipole
-from .network_models import (jones_2009_model,
-                             calcium_model, law_2021_model)
+from .network_models import jones_2009_model
 
 
 class BatchSimulate(object):
-    def __init__(self, set_params, net_name='jones', tstop=170,
+    def __init__(self, set_params, net=jones_2009_model(), tstop=170,
                  dt=0.025, n_trials=1, record_vsec=False,
                  record_isec=False, postproc=False, save_outputs=False,
                  save_folder='./sim_results', batch_size=100,
@@ -35,8 +36,10 @@ class BatchSimulate(object):
 
             where ``net`` is a Network object and ``params`` is a dictionary
             of the parameters that will be set inside the function.
-        net_name : str
-            The name of the network model to use. Default is `jones`.
+        net : Network object, optional
+            The network model to use for simulations. Must be an instance of
+            jones_2009_model, law_2021_model, or calcium_model.
+            Default is jones_2009_model().
         tstop : float, optional
             The stop time for the simulation. Default is 170 ms.
         dt : float, optional
@@ -108,8 +111,7 @@ class BatchSimulate(object):
         will be overwritten.
         """
 
-        _validate_type(net_name, types='str', item_name='net_name')
-        _check_option('net_name', net_name, ['jones', 'law', 'calcium'])
+        _validate_type(net, Network, 'net', 'Network')
         _validate_type(tstop, types='numeric', item_name='tstop')
         _validate_type(dt, types='numeric', item_name='dt')
         _validate_type(n_trials, types='int', item_name='n_trials')
@@ -132,8 +134,8 @@ class BatchSimulate(object):
         if summary_func is not None and not callable(summary_func):
             raise TypeError("summary_func must be a callable function")
 
+        self.net = net
         self.set_params = set_params
-        self.net_name = net_name
         self.tstop = tstop
         self.dt = dt
         self.n_trials = n_trials
@@ -292,18 +294,8 @@ class BatchSimulate(object):
             - `dpl`: The simulated dipole.
             - `param_values`: The parameter values used for the simulation.
         """
-        if self.net_name not in ['jones', 'law', 'calcium']:
-            raise ValueError(
-                f"Unknown network model: {self.net_name}. "
-                "Valid options are 'jones', 'law', and 'calcium'."
-            )
-        elif self.net_name == 'jones':
-            net = jones_2009_model()
-        elif self.net_name == 'law':
-            net = law_2021_model()
-        elif self.net_name == 'calcium':
-            net = calcium_model()
 
+        net = self.net.copy()
         self.set_params(param_values, net)
 
         results = {'net': net, 'param_values': param_values}
