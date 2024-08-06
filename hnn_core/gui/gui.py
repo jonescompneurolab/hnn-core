@@ -1508,7 +1508,7 @@ def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
         drive_widgets.pop()
         drive_boxes.pop()
 
-    drive_names = sorted(drive_specs.keys())
+    drive_names = drive_specs.keys()
 
     for idx, drive_name in enumerate(drive_names):  # order matters
         specs = drive_specs[drive_name]
