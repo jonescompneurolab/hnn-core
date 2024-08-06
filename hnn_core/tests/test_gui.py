@@ -170,7 +170,13 @@ def test_gui_upload_drives():
     gui._simulate_upload_drives(file3_url)
     drive_names = [widget['name'] for widget in gui.drive_widgets]
     assert drive_names == ['evdist1', 'evprox1', 'evprox2',
-                           'alpha_prox', 'poisson']
+                           'alpha_prox', 'poisson', 'tonic']
+
+    # Check for correct tonic bias loading
+    assert gui.drive_widgets[5]['type'] == 'Tonic'
+    assert gui.drive_widgets[5]['amplitude']['L2_pyramidal'].value == 1.0
+    assert gui.drive_widgets[5]['amplitude']['L5_basket'].value == 0.0
+    assert gui.drive_widgets[5]['tstop'].value == 170.0
 
     plt.close('all')
 
