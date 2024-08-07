@@ -741,7 +741,8 @@ def test_gui_add_tonic_input():
     """Test if gui add different type of drives."""
     gui = HNNGUI()
     _ = gui.compose()
-    assert 'tonic' not in [drive['type'].lower() for drive in gui.drive_widgets]
+    assert 'tonic' not in [drive['type'].lower()
+                           for drive in gui.drive_widgets]
 
     _single_simulation = {}
     _single_simulation['net'] = dict_to_network(gui.params)
