@@ -7,11 +7,13 @@ import io
 import logging
 import mimetypes
 import multiprocessing
+import numpy as np
 import sys
 import json
 import urllib.parse
 import urllib.request
 from collections import defaultdict
+from copy import deepcopy
 from pathlib import Path
 from datetime import datetime
 from functools import partial
@@ -34,15 +36,12 @@ from hnn_core.cells_default import _exp_g_at_dist
 
 import base64
 import zipfile
-import numpy as np
-from copy import deepcopy
 
 hnn_core_root = Path(hnn_core.__file__).parent
 default_network_configuration = (hnn_core_root / 'param' /
                                  'jones2009_base.json')
 
 cell_parameters_dict = {
-
     "Geometry L2":
     [
         ('Soma length', 'micron', 'soma_L'),
