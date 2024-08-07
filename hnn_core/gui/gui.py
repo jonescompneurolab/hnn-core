@@ -1375,9 +1375,9 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                 sync_evinput=sync_evinput
             )
         elif drive_type == 'Tonic':
-            name = drive_type
             drive, drive_box = _get_tonic_widget(
                 name,
+                tstop_widget,
                 layout,
                 style,
                 data=prespecified_drive_data
@@ -1398,7 +1398,7 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
 
             for idx, drive in enumerate(drive_widgets):
                 tab_name = drive['name']
-                if "Tonic" not in tab_name:
+                if "tonic" not in tab_name.lower():
                     tab_name += f" ({drive['location']})"
                 accordion.set_title(idx, tab_name)
 
