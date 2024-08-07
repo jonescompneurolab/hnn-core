@@ -1254,33 +1254,38 @@ def _get_evoked_widget(name, layout, style, location, data=None,
     return drive, drive_box
 
 
-def _get_tonic_widget(name, layout, style, data=None):
-
-    default_data = {
+def _get_tonic_widget(name, tstop_widget, layout, style, data=None):
+    cell_types = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
+    default_values = {
         'amplitude': 0,
         't0': 0,
-        'tstop': 0
+        'tstop': tstop_widget.value
     }
+    t0 = default_values['t0']
+    tstop = default_values['tstop']
+    default_data = {cell_type: default_values for cell_type in cell_types}
 
-    cell_types = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
-
-    if isinstance(data, dict):
-        default_data.update(data)
     kwargs = dict(layout=layout, style=style)
+    if isinstance(data, dict):
+        default_data = _update_nested_dict(default_data, data)
 
     amplitudes = dict()
     for cell_type in cell_types:
-        if cell_type in data:
-            default_data.update(data[cell_type])
+        amplitude = default_data[cell_type]['amplitude']
         amplitudes[cell_type] = BoundedFloatText(
-            value=deepcopy(default_data['amplitude']),
-            description=cell_type, min=0, max=1e6, step=0.01, **kwargs)
+            value=amplitude, description=cell_type,
+            min=0, max=1e6, step=0.01, **kwargs)
+        # Reset the global t0 and stop with values from the 'data' keyword.
+        # It should be same across all the cell-types.
+        if amplitude > 0:
+            t0 = default_data[cell_type]['t0']
+            tstop = default_data[cell_type]['tstop']
 
     start_times = BoundedFloatText(
-        value=deepcopy(default_data['t0']), description="Start time",
+        value=t0, description="Start time",
         min=0, max=1e6, step=1.0, **kwargs)
     stop_times = BoundedFloatText(
-        value=deepcopy(default_data['tstop']), description="Stop time",
+        value=tstop, description="Stop time",
         min=-1, max=1e6, step=1.0, **kwargs)
 
     widgets_dict = {
