@@ -737,9 +737,12 @@ def test_gui_upload_csv_simulation(setup_gui):
                 ['dpls'][0].data['L5']) == data_lengh)
 
 
-def test_gui_add_tonic_input(setup_gui):
+def test_gui_add_tonic_input():
     """Test if gui add different type of drives."""
-    gui = setup_gui
+    gui = HNNGUI()
+    _ = gui.compose()
+    assert 'tonic' not in [drive['type'].lower() for drive in gui.drive_widgets]
+
     _single_simulation = {}
     _single_simulation['net'] = dict_to_network(gui.params)
 
@@ -748,20 +751,33 @@ def test_gui_add_tonic_input(setup_gui):
     gui.add_drive_button.click()
 
     # Check last drive (Tonic)
-    last_drive_pos = len(gui.drive_widgets) - 1
-    assert gui.drive_widgets[last_drive_pos]['type'] == "Tonic"
+    last_drive = gui.drive_widgets[-1]
+    assert last_drive['type'] == "Tonic"
+    assert last_drive['t0'].value == 0.0
+    assert last_drive['tstop'].value == 170.0
+    assert last_drive['amplitude']['L5_pyramidal'].value == 0
 
-    gui.drive_widgets[last_drive_pos]['amplitude']["L5_pyramidal"].value = 10
-    gui.drive_widgets[last_drive_pos]['t0'].value = 0
-    gui.drive_widgets[last_drive_pos]['tstop'].value = 15
+    # Set new widget values
+    last_drive['t0'].value = 0
+    last_drive['tstop'].value = 15
+    last_drive['amplitude']['L5_pyramidal'].value = 10
 
-    # Add tonic bias to the simulation
+    # Check that you can't add more than one tonic
+    gui.add_drive_button.click()
+    assert ([drive['type'].lower() for drive in gui.drive_widgets] ==
+            ['evoked', 'evoked', 'evoked', 'tonic'])
+
+    # Add tonic bias to the network
     _init_network_from_widgets(gui.params, gui.widget_dt, gui.widget_tstop,
                                _single_simulation, gui.drive_widgets,
                                gui.connectivity_widgets,
                                gui.cell_pameters_widgets)
 
-    assert _single_simulation['net'].external_biases['tonic'] is not None
+    net = _single_simulation['net']
+    assert net.external_biases['tonic'] is not None
+    assert net.external_biases['tonic']['L5_pyramidal']['t0'] == 0.0
+    assert net.external_biases['tonic']['L5_pyramidal']['tstop'] == 15.0
+    assert net.external_biases['tonic']['L5_pyramidal']['amplitude'] == 10.0
 
 
 def test_gui_cell_params_widgets(setup_gui):
