@@ -564,7 +564,7 @@ class Cell:
                 for attr, val in p_mech.items():
                     if isinstance(val, list):
                         seg_xs, seg_vals = val[0], val[1]
-                        for seg, seg_x, seg_val in zip(sec, seg_xs, seg_vals):
+                        for seg, _seg_x, seg_val in zip(sec, seg_xs, seg_vals):
                             setattr(seg, attr, seg_val)
                     else:
                         setattr(sec, attr, val)
@@ -572,9 +572,9 @@ class Cell:
     def _compute_section_mechs(self):
         sections = self.sections
         for sec_name, section in sections.items():
-            for mech_name, p_mech in section.mechs.items():
+            for _mech_name, p_mech in section.mechs.items():
                 for attr, val in p_mech.items():
-                    if hasattr(val, '__call__'):
+                    if callable(val):
                         seg_xs, seg_vals = list(), list()
                         section_distance = self.distance_section(sec_name,
                                                                  ('soma', 0))

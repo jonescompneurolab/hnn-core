@@ -126,8 +126,10 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     threads_started = False
 
     try:
-        proc = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE, *args,
-                     **kwargs)
+        kwargs.setdefault('stdin', PIPE)
+        kwargs.setdefault('stdout', PIPE)
+        kwargs.setdefault('stderr', PIPE)
+        proc = Popen(command, *args, **kwargs)
 
         # now that the process has started, add it to the queue
         # used by MPIBackend.terminate()
@@ -352,7 +354,7 @@ def requires_mpi4py(function):
         import mpi4py
         assert hasattr(mpi4py, '__version__')
         skip = False
-    except (ImportError, ModuleNotFoundError) as err:
+    except ImportError as err:
         if "TRAVIS_OS_NAME" not in os.environ:
             skip = True
         else:
@@ -369,7 +371,7 @@ def requires_psutil(function):
         import psutil
         assert hasattr(psutil, '__version__')
         skip = False
-    except (ImportError, ModuleNotFoundError) as err:
+    except ImportError as err:
         if "TRAVIS_OS_NAME" not in os.environ:
             skip = True
         else:
