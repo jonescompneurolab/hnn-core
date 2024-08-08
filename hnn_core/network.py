@@ -443,6 +443,9 @@ class Network:
         if add_drives_from_params:
             _add_drives_from_params(self)
 
+        self._tstop = None
+        self._dt = None
+
     def __repr__(self):
         class_name = self.__class__.__name__
         s = ("%d x %d Pyramidal cells (L2, L5)"
