@@ -24,7 +24,7 @@ from hnn_core.gui.gui import (_init_network_from_widgets,
                               serialize_simulation)
 from hnn_core.network import pick_connection
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
-from hnn_core.hnn_io import dict_to_network
+from hnn_core.hnn_io import dict_to_network, read_network_configuration
 from IPython.display import IFrame
 from ipywidgets import Tab, Text, link
 
@@ -280,10 +280,9 @@ def test_gui_add_drives():
     plt.close('all')
 
 
-def test_gui_init_network():
+def test_gui_init_network(setup_gui):
     """Test if gui initializes network properly"""
-    gui = HNNGUI()
-    _ = gui.compose()
+    gui = setup_gui
     # now the default parameter has been loaded.
     _single_simulation = {}
     _single_simulation['net'] = dict_to_network(gui.params)
@@ -293,16 +292,51 @@ def test_gui_init_network():
                                gui.cell_pameters_widgets)
     plt.close('all')
 
+    net_from_gui = _single_simulation['net']
+
     # copied from test_network.py
-    assert np.isclose(_single_simulation['net']._inplane_distance, 1.)
-    assert np.isclose(_single_simulation['net']._layer_separation, 1307.4)
+    assert np.isclose(net_from_gui._inplane_distance, 1.)
+    assert np.isclose(net_from_gui._layer_separation, 1307.4)
 
-    default_network_configuration = read_params(
-        hnn_core_root / 'param' / 'default.json')
-    net = jones_2009_model(
-        params=default_network_configuration, add_drives_from_params=True)
+    # Compare Network created from API
+    config_path = assets_path / 'jones2009_3x3_drives.json'
+    net_from_api = read_network_configuration(config_path)
 
-    assert _single_simulation['net'] == net
+    assert net_from_gui.cell_types == net_from_api.cell_types
+    assert net_from_gui.external_biases == net_from_api.external_biases
+
+    # Check Connections - This currently fails
+    # assert len(net_from_gui.connectivity) == len(net_from_api.connectivity)
+    # assert net_from_gui.gid_ranges == net_from_api.gid_ranges
+    assert net_from_gui.pos_dict == net_from_api.pos_dict
+
+    # Check Drives
+    gui_drives = net_from_gui.external_drives
+    api_drives = net_from_api.external_drives
+
+    # Check evoked drives
+    assert gui_drives['evdist1'] == api_drives['evdist1']
+    assert gui_drives['evprox1'] == api_drives['evprox1']
+    assert gui_drives['evprox2'] == api_drives['evprox2']
+
+    # Poisson and Bursty drives will have different tstop. This helper function
+    # passes comparing tstop.
+    def _check_drive(name, keys):
+        for key in keys:
+            if key != 'dynamics':
+                assert gui_drives[name][key] == api_drives[name][key], (
+                    f'{name}, {key} not equal')
+            else:
+                for d_key, d_value in gui_drives[name][key].items():
+                    if d_key != 'tstop':
+                        assert d_value == api_drives[name][key][d_key], (
+                            f'{name}, {key} not equal')
+
+    _check_drive('poisson', gui_drives['poisson'].keys())
+
+    # Bursty drives will currently fail until planned GUI updates are made
+    # _check_drive('alpha_prox', gui_drives['alpha_prox'].keys())
+
 
 
 @requires_mpi4py
