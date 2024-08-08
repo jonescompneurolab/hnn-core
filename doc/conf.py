@@ -211,7 +211,11 @@ linkcheck_ignore = [
    'https://groups.google.com/g/hnnsolver'
 ]
 linkcheck_request_headers = {
-    r'http://biorxiv.org/': {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'}
+    "https://www.biorxiv.org/":
+        {"User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+         "Referer": "https://www.biorxiv.org/",
+         "Accept-Language": "en-US,en;q=0.5"}
 }
 
 # Resolve binder filepath_prefix. From the docs:
