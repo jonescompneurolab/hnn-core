@@ -1397,7 +1397,7 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
 
             for idx, drive in enumerate(drive_widgets):
                 tab_name = drive['name']
-                if "tonic" not in tab_name.lower():
+                if drive['type'] != 'Tonic':
                     tab_name += f" ({drive['location']})"
                 accordion.set_title(idx, tab_name)
 
@@ -2117,7 +2117,7 @@ def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
 
 def _is_valid_add_tonic_input(drive_widgets):
     for drive in drive_widgets:
-        if "Tonic" in drive['name']:
+        if drive['type'] == 'Tonic':
             return False
     return True
 
