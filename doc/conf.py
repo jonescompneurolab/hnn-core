@@ -204,19 +204,13 @@ intersphinx_mapping = {
 intersphinx_timeout = 5
 
 linkcheck_ignore = [
-   'https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#',
-   'https://neuron.yale.edu/neuron',
-   'https://doi.org/10.1152/jn.00535.2009',
-   'https://doi.org/10.1152/jn.00122.2010',
-   'https://groups.google.com/g/hnnsolver'
+    'https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#',
+    'https://neuron.yale.edu/neuron',
+    'https://doi.org/10.1152/jn.00535.2009',
+    'https://doi.org/10.1152/jn.00122.2010',
+    'https://doi.org/10.1101/2021.04.16.440210',
+    'https://groups.google.com/g/hnnsolver'
 ]
-linkcheck_request_headers = {
-    "https://www.biorxiv.org/":
-        {"User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-         "Referer": "https://www.biorxiv.org/",
-         "Accept-Language": "en-US,en;q=0.5"}
-}
 
 # Resolve binder filepath_prefix. From the docs:
 # "A prefix to append to the filepath in the Binder links. You should use this
