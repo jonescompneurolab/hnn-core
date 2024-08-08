@@ -12,7 +12,7 @@ import traitlets
 import os
 
 from pathlib import Path
-from hnn_core import Dipole, Network, read_params, jones_2009_model
+from hnn_core import Dipole, Network
 from hnn_core.gui import HNNGUI
 from hnn_core.gui._viz_manager import (_idx2figname,
                                        _plot_types,
@@ -336,7 +336,6 @@ def test_gui_init_network(setup_gui):
 
     # Bursty drives will currently fail until planned GUI updates are made
     # _check_drive('alpha_prox', gui_drives['alpha_prox'].keys())
-
 
 
 @requires_mpi4py
