@@ -47,13 +47,17 @@ def jones_2009_network(params):
     # Add drives
     location = 'proximal'
     burst_std = 20
-    weights_ampa_p = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
-    syn_delays_p = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
+    weights_ampa_p = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5,
+                      'L2_basket': 0.0, 'L5_basket': 0.0}
+    weights_nmda_p = {'L2_pyramidal': 0.0, 'L5_pyramidal': 0.0,
+                      'L2_basket': 0.0, 'L5_basket': 0.0}
+    syn_delays_p = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.,
+                    'L2_basket': 0.0, 'L5_basket': 0.0}
     net.add_bursty_drive(
         'alpha_prox', tstart=1., burst_rate=10, burst_std=burst_std,
         numspikes=2, spike_isi=10, n_drive_cells=10, location=location,
-        weights_ampa=weights_ampa_p, synaptic_delays=syn_delays_p,
-        event_seed=284)
+        weights_ampa=weights_ampa_p, weights_nmda=weights_nmda_p,
+        synaptic_delays=syn_delays_p, event_seed=284)
 
     weights_ampa = {'L2_pyramidal': 0.0008, 'L5_pyramidal': 0.0075}
     synaptic_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0}
