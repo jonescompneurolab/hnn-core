@@ -66,7 +66,7 @@ Let us import ``hnn_core``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-60
+.. GENERATED FROM PYTHON SOURCE LINES 27-57
 
 .. code-block:: Python
 
@@ -83,9 +83,6 @@ Let us import ``hnn_core``.
         net : instance of Network, optional
             If None, a new network is created using the specified model type.
         """
-        if net is None:
-            net = jones_2009_model()
-
         weights_ampa = {'L2_basket': param_values['weight_basket'],
                         'L2_pyramidal': param_values['weight_pyr'],
                         'L5_basket': param_values['weight_basket'],
@@ -110,19 +107,19 @@ Let us import ``hnn_core``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-62
+.. GENERATED FROM PYTHON SOURCE LINES 58-59
 
 Define a parameter grid for the batch simulation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-69
+.. GENERATED FROM PYTHON SOURCE LINES 59-66
 
 .. code-block:: Python
 
 
 
     param_grid = {
-        'weight_basket': np.logspace(-4 - 1, 5),
-        'weight_pyr': np.logspace(-4, -1, 5)
+        'weight_basket': np.logspace(-4 - 1, 10),
+        'weight_pyr': np.logspace(-4, -1, 10)
     }
 
 
@@ -132,11 +129,11 @@ Define a parameter grid for the batch simulation.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-71
+.. GENERATED FROM PYTHON SOURCE LINES 67-68
 
 Define a function to calculate summary statistics
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-95
+.. GENERATED FROM PYTHON SOURCE LINES 68-93
 
 .. code-block:: Python
 
@@ -158,7 +155,8 @@ Define a function to calculate summary statistics
         """
         summary_stats = []
         for result in results:
-            dpl_data = result['dpl'][0].data['agg']
+            dpl_smooth = result['dpl'][0].copy().smooth(window_len=30)
+            dpl_data = dpl_smooth.data['agg']
             min_peak = np.min(dpl_data)
             max_peak = np.max(dpl_data)
             summary_stats.append({'min_peak': min_peak, 'max_peak': max_peak})
@@ -171,11 +169,11 @@ Define a function to calculate summary statistics
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-97
+.. GENERATED FROM PYTHON SOURCE LINES 94-95
 
 Run the batch simulation and collect the results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-112
+.. GENERATED FROM PYTHON SOURCE LINES 95-112
 
 .. code-block:: Python
 
@@ -186,7 +184,9 @@ Run the batch simulation and collect the results.
 
 
     # Run the batch simulation and collect the results.
-    batch_simulation = BatchSimulate(set_params=set_params,
+    net = jones_2009_model(mesh_shape=(3, 3))
+    batch_simulation = BatchSimulate(net=net,
+                                     set_params=set_params,
                                      summary_func=summary_func)
     simulation_results = batch_simulation.run(param_grid,
                                               n_jobs=n_jobs,
@@ -203,45 +203,73 @@ Run the batch simulation and collect the results.
  .. code-block:: none
 
     [Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:   30.1s
+    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.6s
     [Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:   29.2s
+    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.6s
     [Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:   30.9s
+    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.6s
     [Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:   29.5s
+    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.6s
     [Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:   29.6s
-    Simulation results: [[{'min_peak': -0.001242556683917088, 'max_peak': 0.004900589999999999}], [{'min_peak': -0.001242556683917088, 'max_peak': 0.004900589999999999}], [{'min_peak': -0.03665290820701789, 'max_peak': 0.02352069470140582}], [{'min_peak': -0.038695414756536456, 'max_peak': 0.022995093327209466}], [{'min_peak': -0.03373821891133495, 'max_peak': 0.03047248131934011}]]
+    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.6s
+    [Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
+    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.6s
+    [Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
+    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.6s
+    [Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
+    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.6s
+    [Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
+    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.6s
+    [Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
+    [Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.6s
+    Simulation results: {'summary_statistics': [[{'min_peak': -1.9487233699162363e-05, 'max_peak': 2.438299811172486e-05}], [{'min_peak': -1.9487233699162363e-05, 'max_peak': 5.406961258004377e-05}], [{'min_peak': -1.9487233699162363e-05, 'max_peak': 0.00011922352353898099}], [{'min_peak': -0.0006636604554164317, 'max_peak': 0.0011404645089040637}], [{'min_peak': -1.9487233699162363e-05, 'max_peak': 0.0009097461915339956}], [{'min_peak': -1.9487233699162363e-05, 'max_peak': 0.0011362095936085991}], [{'min_peak': -1.9487233699162363e-05, 'max_peak': 0.001168458230350182}], [{'min_peak': -1.9487233699162363e-05, 'max_peak': 0.0012737618628301784}], [{'min_peak': -1.9487233699162363e-05, 'max_peak': 0.0014391544369764205}], [{'min_peak': -1.9487233699162363e-05, 'max_peak': 0.001616939552849071}]], 'simulated_data': [[{'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L2 basket cells
+    3 L5 basket cells>, 'param_values': {'weight_basket': 9.999999999999999e-06, 'weight_pyr': 9.999999999999999e-05}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f1c2a98ac40>]}], [{'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L2 basket cells
+    3 L5 basket cells>, 'param_values': {'weight_basket': 2.0235896477251556e-05, 'weight_pyr': 0.00021544346900318845}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f1c2a9bd820>]}], [{'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L2 basket cells
+    3 L5 basket cells>, 'param_values': {'weight_basket': 4.094915062380427e-05, 'weight_pyr': 0.00046415888336127773}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f1c2a96c4c0>]}], [{'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L2 basket cells
+    3 L5 basket cells>, 'param_values': {'weight_basket': 8.286427728546842e-05, 'weight_pyr': 0.001}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f1c2a91e0a0>]}], [{'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L2 basket cells
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.00016768329368110083, 'weight_pyr': 0.002154434690031882}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f1c2a8c7c40>]}], [{'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L2 basket cells
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.00033932217718953293, 'weight_pyr': 0.004641588833612777}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f1c2a8f4760>]}], [{'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L2 basket cells
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0006866488450042998, 'weight_pyr': 0.01}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f1c2a8a2340>]}], [{'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L2 basket cells
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0013894954943731376, 'weight_pyr': 0.021544346900318822}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f1c2a84cfd0>]}], [{'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L2 basket cells
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.002811768697974231, 'weight_pyr': 0.046415888336127774}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f1c2a87cbb0>]}], [{'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L2 basket cells
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.005689866029018299, 'weight_pyr': 0.09999999999999999}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f1c2a82e790>]}]]}
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-115
+.. GENERATED FROM PYTHON SOURCE LINES 113-116
 
-Extract and Plot Results
-##############################################################################
+This plot shows an overlay of all smoothed dipole waveforms from the
+batch simulation. Each line represents a different set of parameters,
+allowing us to visualize the range of responses across the parameter space.
 
-.. GENERATED FROM PYTHON SOURCE LINES 115-134
+.. GENERATED FROM PYTHON SOURCE LINES 116-132
 
 .. code-block:: Python
 
 
-    # Extract min and max peaks for plotting
-    min_peaks, max_peaks = [], []
-    for res in simulation_results:
-        summary_stats = res[0]
-        min_peaks.append(summary_stats['min_peak'])
-        max_peaks.append(summary_stats['max_peak'])
+    dpl_waveforms = []
+    for data_list in simulation_results['simulated_data']:
+        for data in data_list:
+            dpl_smooth = data['dpl'][0].copy().smooth(window_len=30)
+            dpl_waveforms.append(dpl_smooth.data['agg'])
 
-    # Plotting
     plt.figure(figsize=(10, 6))
-    plt.plot(min_peaks, label='Min Dipole Peak')
-    plt.plot(max_peaks, label='Max Dipole Peak')
-    plt.xlabel('Simulation Index')
-    plt.ylabel('Dipole Peak Magnitude')
-    plt.title('Min and Max Dipole Peaks across Simulations')
-    plt.legend()
+    for waveform in dpl_waveforms:
+        plt.plot(waveform, alpha=0.5, linewidth=3)
+    plt.title('Overlay of Dipole Waveforms')
+    plt.xlabel('Time (ms)')
+    plt.ylabel('Dipole Amplitude (nAm)')
     plt.grid(True)
     plt.tight_layout()
     plt.show()
@@ -249,8 +277,51 @@ Extract and Plot Results
 
 
 .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_batch_simulate_001.png
-   :alt: Min and Max Dipole Peaks across Simulations
+   :alt: Overlay of Dipole Waveforms
    :srcset: /auto_examples/howto/images/sphx_glr_plot_batch_simulate_001.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 133-136
+
+This plot displays the minimum and maximum dipole peaks across
+different synaptic strengths. This allows us to see how the range of
+dipole activity changes as we vary the synaptic strength parameter.
+
+.. GENERATED FROM PYTHON SOURCE LINES 136-157
+
+.. code-block:: Python
+
+
+    min_peaks, max_peaks, param_values = [], [], []
+    for summary_list, data_list in zip(simulation_results['summary_statistics'],
+                                       simulation_results['simulated_data']):
+        for summary, data in zip(summary_list, data_list):
+            min_peaks.append(summary['min_peak'])
+            max_peaks.append(summary['max_peak'])
+            param_values.append(data['param_values']['weight_basket'])
+
+    # Plotting
+    plt.figure(figsize=(10, 6))
+    plt.plot(param_values, min_peaks, label='Min Dipole Peak')
+    plt.plot(param_values, max_peaks, label='Max Dipole Peak')
+    plt.xlabel('Synaptic Strength (nS)')
+    plt.ylabel('Dipole Peak Magnitude')
+    plt.title('Min and Max Dipole Peaks across Simulations')
+    plt.legend()
+    plt.grid(True)
+    plt.xscale('log')
+    plt.tight_layout()
+    plt.show()
+
+
+
+.. image-sg:: /auto_examples/howto/images/sphx_glr_plot_batch_simulate_002.png
+   :alt: Min and Max Dipole Peaks across Simulations
+   :srcset: /auto_examples/howto/images/sphx_glr_plot_batch_simulate_002.png
    :class: sphx-glr-single-img
 
 
@@ -260,7 +331,7 @@ Extract and Plot Results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (2 minutes 29.612 seconds)
+   **Total running time of the script:** (0 minutes 16.851 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_batch_simulate.py:
