@@ -7,11 +7,13 @@ import io
 import logging
 import mimetypes
 import multiprocessing
+import numpy as np
 import sys
 import json
 import urllib.parse
 import urllib.request
 from collections import defaultdict
+from copy import deepcopy
 from pathlib import Path
 from datetime import datetime
 from functools import partial
@@ -34,15 +36,12 @@ from hnn_core.cells_default import _exp_g_at_dist
 
 import base64
 import zipfile
-import numpy as np
-from copy import deepcopy
 
 hnn_core_root = Path(hnn_core.__file__).parent
 default_network_configuration = (hnn_core_root / 'param' /
                                  'jones2009_base.json')
 
 cell_parameters_dict = {
-
     "Geometry L2":
     [
         ('Soma length', 'micron', 'soma_L'),
@@ -1254,33 +1253,38 @@ def _get_evoked_widget(name, layout, style, location, data=None,
     return drive, drive_box
 
 
-def _get_tonic_widget(name, layout, style, data=None):
-
-    default_data = {
+def _get_tonic_widget(name, tstop_widget, layout, style, data=None):
+    cell_types = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
+    default_values = {
         'amplitude': 0,
         't0': 0,
-        'tstop': 0
+        'tstop': tstop_widget.value
     }
+    t0 = default_values['t0']
+    tstop = default_values['tstop']
+    default_data = {cell_type: default_values for cell_type in cell_types}
 
-    cell_types = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
-
-    if isinstance(data, dict):
-        default_data.update(data)
     kwargs = dict(layout=layout, style=style)
+    if isinstance(data, dict):
+        default_data = _update_nested_dict(default_data, data)
 
     amplitudes = dict()
     for cell_type in cell_types:
-        if cell_type in data:
-            default_data.update(data[cell_type])
+        amplitude = default_data[cell_type]['amplitude']
         amplitudes[cell_type] = BoundedFloatText(
-            value=deepcopy(default_data['amplitude']),
-            description=cell_type, min=0, max=1e6, step=0.01, **kwargs)
+            value=amplitude, description=cell_type,
+            min=0, max=1e6, step=0.01, **kwargs)
+        # Reset the global t0 and stop with values from the 'data' keyword.
+        # It should be same across all the cell-types.
+        if amplitude > 0:
+            t0 = default_data[cell_type]['t0']
+            tstop = default_data[cell_type]['tstop']
 
     start_times = BoundedFloatText(
-        value=deepcopy(default_data['t0']), description="Start time",
+        value=t0, description="Start time",
         min=0, max=1e6, step=1.0, **kwargs)
     stop_times = BoundedFloatText(
-        value=deepcopy(default_data['tstop']), description="Stop time",
+        value=tstop, description="Stop time",
         min=-1, max=1e6, step=1.0, **kwargs)
 
     widgets_dict = {
@@ -1370,9 +1374,9 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                 sync_evinput=sync_evinput
             )
         elif drive_type == 'Tonic':
-            name = drive_type
             drive, drive_box = _get_tonic_widget(
                 name,
+                tstop_widget,
                 layout,
                 style,
                 data=prespecified_drive_data
@@ -1393,7 +1397,7 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
 
             for idx, drive in enumerate(drive_widgets):
                 tab_name = drive['name']
-                if "Tonic" not in tab_name:
+                if drive['type'] != 'Tonic':
                     tab_name += f" ({drive['location']})"
                 accordion.set_title(idx, tab_name)
 
@@ -1530,6 +1534,7 @@ def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
                   tstop, layout):
     net = dict_to_network(params)
     drive_specs = net.external_drives
+    tonic_specs = net.external_biases
 
     # clear before adding drives
     drives_out.clear_output()
@@ -1537,16 +1542,30 @@ def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
         drive_widgets.pop()
         drive_boxes.pop()
 
-    drive_names = drive_specs.keys()
+    drive_names = list(drive_specs.keys())
+    # Add tonic biases
+    if tonic_specs:
+        drive_names.extend(list(tonic_specs.keys()))
 
     for idx, drive_name in enumerate(drive_names):  # order matters
-        specs = drive_specs[drive_name]
-        should_render = idx == (len(drive_names) - 1)
+        if 'tonic' in drive_name:
+            specs = dict(type='tonic', location=None)
+            kwargs = dict(prespecified_drive_data=tonic_specs[drive_name])
+        else:
+            specs = drive_specs[drive_name]
+            # Check for synchronous input
+            is_sync_evinput = (True if (not specs['cell_specific']) and
+                                       (specs['n_drive_cells'] == 1)
+                               else False)
+            kwargs = dict(prespecified_drive_data=specs['dynamics'],
+                          prespecified_weights_ampa=specs['weights_ampa'],
+                          prespecified_weights_nmda=specs['weights_nmda'],
+                          prespecified_delays=specs['synaptic_delays'],
+                          event_seed=specs['event_seed'],
+                          sync_evinput=is_sync_evinput
+                          )
 
-        # Check for synchronous input
-        is_sync_evinput = (True if (not specs['cell_specific']) and
-                                   (specs['n_drive_cells'] == 1)
-                           else False)
+        should_render = idx == (len(drive_names) - 1)
 
         add_drive_widget(
             specs['type'].capitalize(),
@@ -1557,14 +1576,9 @@ def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
             specs['location'],
             layout=layout,
             prespecified_drive_name=drive_name,
-            prespecified_drive_data=specs['dynamics'],
-            prespecified_weights_ampa=specs['weights_ampa'],
-            prespecified_weights_nmda=specs['weights_nmda'],
-            prespecified_delays=specs['synaptic_delays'],
             render=should_render,
             expand_last_drive=False,
-            event_seed=specs['event_seed'],
-            sync_evinput=is_sync_evinput
+            **kwargs
         )
 
 
@@ -2103,7 +2117,7 @@ def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
 
 def _is_valid_add_tonic_input(drive_widgets):
     for drive in drive_widgets:
-        if "Tonic" in drive['name']:
+        if drive['type'] == 'Tonic':
             return False
     return True
 
