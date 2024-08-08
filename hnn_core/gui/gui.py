@@ -1802,28 +1802,23 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
             print(
                 f"drive type is {drive['type']}, location={drive['location']}")
             if drive['type'] == 'Poisson':
-                rate_constant = {
-                    k: v.value
-                    for k, v in drive['rate_constant'].items() if v.value > 0
-                }
-                weights_ampa = {
-                    k: v
-                    for k, v in weights_ampa.items() if k in rate_constant
-                }
-                weights_nmda = {
-                    k: v
-                    for k, v in weights_nmda.items() if k in rate_constant
-                }
                 rate_constant = _drive_widget_to_dict(drive, 'rate_constant')
+                poisson_params = _filter_poisson_inputs(
+                    weights_ampa,
+                    weights_nmda,
+                    rate_constant,
+                    synaptic_delays
+                )
+
                 single_simulation_data['net'].add_poisson_drive(
                     name=drive['name'],
                     tstart=drive['tstart'].value,
                     tstop=drive['tstop'].value,
-                    rate_constant=rate_constant,
+                    rate_constant=poisson_params['rate_constant'],
                     location=drive['location'],
-                    weights_ampa=weights_ampa,
-                    weights_nmda=weights_nmda,
-                    synaptic_delays=synaptic_delays,
+                    weights_ampa=poisson_params['weights_ampa'],
+                    weights_nmda=poisson_params['weights_nmda'],
+                    synaptic_delays=poisson_params['synaptic_delays'],
                     space_constant=100.0,
                     event_seed=drive['seedcore'].value,
                     **synch_inputs_kwargs)
