@@ -1129,13 +1129,13 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
                         default_delays=None, sync_evinput=False):
     default_data = {
         'tstart': 0.0,
-        'tstop': 0.0,
+        'tstop': tstop_widget.value,
         'seedcore': 14,
         'rate_constant': {
-            'L5_pyramidal': 40.,
             'L2_pyramidal': 40.,
-            'L5_basket': 40.,
+            'L5_pyramidal': 40.,
             'L2_basket': 40.,
+            'L5_basket': 40.,
         }
     }
     if isinstance(data, dict):
