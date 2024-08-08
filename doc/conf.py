@@ -210,6 +210,9 @@ linkcheck_ignore = [
    'https://doi.org/10.1152/jn.00122.2010',
    'https://groups.google.com/g/hnnsolver'
 ]
+linkcheck_request_headers = {
+    r'https://doi.org/': {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64) Gecko/20100101 Firefox/128.0'}
+}
 
 # Resolve binder filepath_prefix. From the docs:
 # "A prefix to append to the filepath in the Binder links. You should use this
