@@ -239,7 +239,7 @@ class HNNGUI:
         in the network.
     """
 
-    def __init__(self, theme_color="#8A2BE2",
+    def __init__(self, theme_color="#802989",
                  total_height=800,
                  total_width=1300,
                  header_height=50,

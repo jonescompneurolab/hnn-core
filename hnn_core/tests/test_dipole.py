@@ -193,6 +193,8 @@ def test_dipole_simulation():
 
     # test Network.copy() returns 'bare' network after simulating
     dpl = simulate_dipole(net, tstop=25., n_trials=1)[0]
+    assert net._dt == 0.025
+    assert net._tstop == 25.0
     net_copy = net.copy()
     assert len(net_copy.external_drives['evprox1']['events']) == 0
 

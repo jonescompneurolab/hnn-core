@@ -103,6 +103,10 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
 
     net._params['record_ca'] = record_ca
 
+    net._tstop = tstop
+
+    net._dt = dt
+
     if postproc:
         warnings.warn('The postproc-argument is deprecated and will be removed'
                       ' in a future release of hnn-core. Please define '
