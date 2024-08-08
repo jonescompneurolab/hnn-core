@@ -113,7 +113,6 @@ print("Simulation results:", simulation_results)
 # batch simulation. Each line represents a different set of parameters,
 # allowing us to visualize the range of responses across the parameter space.
 
-
 dpl_waveforms = []
 for data_list in simulation_results['simulated_data']:
     for data in data_list:
