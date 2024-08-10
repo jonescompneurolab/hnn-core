@@ -5,6 +5,7 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
+import json
 import numpy as np
 import os
 from joblib import Parallel, delayed, parallel_config
@@ -13,6 +14,7 @@ from .network import Network
 from .externals.mne import _validate_type, _check_option
 from .dipole import simulate_dipole
 from .network_models import jones_2009_model
+from .hnn_io import dict_to_network
 
 
 class BatchSimulate(object):
@@ -24,7 +26,7 @@ class BatchSimulate(object):
                  save_dpl=True, save_spiking=False,
                  save_lfp=False, save_voltages=False,
                  save_currents=False, save_calcium=False,
-                 clear_cache=False):
+                 clear_cache=False, net_json=None):
         """Initialize the BatchSimulate class.
 
         Parameters
@@ -100,6 +102,9 @@ class BatchSimulate(object):
         clear_cache : bool, optional
             Whether to clear the results cache after saving each batch.
             Default is False.
+        net_json : str, optional
+            The path to a JSON file to create the network model. If provided,
+            this will override the `net` parameter. Default is None.
         Notes
         -----
         When `save_output=True`, the saved files will appear as
@@ -127,6 +132,8 @@ class BatchSimulate(object):
         _validate_type(save_currents, types=(bool,), item_name='save_currents')
         _validate_type(save_calcium, types=(bool,), item_name='save_calcium')
         _validate_type(clear_cache, types=(bool,), item_name='clear_cache')
+        _validate_type(net_json, types=('path-like', None),
+                       item_name='net_json')
 
         if set_params is not None and not callable(set_params):
             raise TypeError("set_params must be a callable function")
@@ -154,6 +161,7 @@ class BatchSimulate(object):
         self.save_currents = save_currents
         self.save_calcium = save_calcium
         self.clear_cache = clear_cache
+        self.net_json = net_json
 
     def run(self, param_grid, return_output=True,
             combinations=True, n_jobs=1, backend='loky',
@@ -295,7 +303,14 @@ class BatchSimulate(object):
             - `param_values`: The parameter values used for the simulation.
         """
 
-        net = self.net.copy()
+        if isinstance(self.net_json, str):
+            with open(self.net_json, 'r') as file:
+                net_data = json.load(file)
+            net = dict_to_network(net_data)
+        else:
+            net = self.net
+        net = net.copy()
+
         self.set_params(param_values, net)
 
         results = {'net': net, 'param_values': param_values}
