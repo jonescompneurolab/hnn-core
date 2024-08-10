@@ -3,12 +3,16 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
+from pathlib import Path
 import pytest
 import numpy as np
 import os
 
 from hnn_core.batch_simulate import BatchSimulate
 from hnn_core import jones_2009_model
+
+hnn_core_root = Path(__file__).parents[1]
+assets_path = Path(hnn_core_root, 'tests', 'assets')
 
 
 @pytest.fixture
@@ -33,9 +37,9 @@ def batch_simulate_instance(tmp_path):
                              weights_ampa=weights_ampa,
                              synaptic_delays=synaptic_delays)
 
-    net = jones_2009_model()
+    net = jones_2009_model(mesh_shape=(3, 3))
     return BatchSimulate(net=net, set_params=set_params,
-                         tstop=1.,
+                         tstop=10,
                          save_folder=tmp_path,
                          batch_size=3)
 
@@ -75,6 +79,9 @@ def test_parameter_validation():
     with pytest.raises(TypeError, match="net must be"):
         BatchSimulate(net="invalid_network", set_params=lambda x: x)
 
+    with pytest.raises(TypeError, match="net_json must be"):
+        BatchSimulate(net_json=123, set_params=lambda x: x)
+
 
 def test_generate_param_combinations(batch_simulate_instance, param_grid):
     """Test generating parameter combinations."""
@@ -102,6 +109,21 @@ def test_run_single_sim(batch_simulate_instance):
     assert 'param_values' in result
     assert result['param_values'] == param_values
     assert isinstance(result['net'], type(batch_simulate_instance.net))
+
+
+def test_net_json_loading(param_grid):
+    """Test loading the network from a JSON file."""
+    json_path = assets_path / 'jones2009_3x3_drives.json'
+
+    batch_simulate = BatchSimulate(net_json=str(json_path),
+                                   set_params=lambda x, y: x,
+                                   tstop=70)
+
+    result = batch_simulate._run_single_sim(param_grid)
+    assert isinstance(result, dict)
+    assert 'net' in result
+    assert 'param_values' in result
+    assert 'dpl' in result
 
 
 def test_simulate_batch(batch_simulate_instance, param_grid):
