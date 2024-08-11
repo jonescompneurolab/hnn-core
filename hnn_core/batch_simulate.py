@@ -18,15 +18,14 @@ from .hnn_io import dict_to_network
 
 
 class BatchSimulate(object):
-    def __init__(self, set_params, net=jones_2009_model(), tstop=170,
-                 dt=0.025, n_trials=1, record_vsec=False,
-                 record_isec=False, postproc=False, save_outputs=False,
+    def __init__(self, set_params, net=jones_2009_model(), net_json=None,
+                 tstop=170, dt=0.025, n_trials=1,
                  save_folder='./sim_results', batch_size=100,
-                 overwrite=True, summary_func=None,
-                 save_dpl=True, save_spiking=False,
-                 save_lfp=False, save_voltages=False,
-                 save_currents=False, save_calcium=False,
-                 clear_cache=False, net_json=None):
+                 overwrite=True, save_outputs=False, save_dpl=True,
+                 save_spiking=False, save_lfp=False, save_voltages=False,
+                 save_currents=False, save_calcium=False, record_vsec=False,
+                 record_isec=False, postproc=False, clear_cache=False,
+                 summary_func=None):
         """Initialize the BatchSimulate class.
 
         Parameters
@@ -42,31 +41,15 @@ class BatchSimulate(object):
             The network model to use for simulations. Must be an instance of
             jones_2009_model, law_2021_model, or calcium_model.
             Default is jones_2009_model().
+        net_json : str, optional
+            The path to a JSON file to create the network model. If provided,
+            this will override the `net` parameter. Default is None.
         tstop : float, optional
             The stop time for the simulation. Default is 170 ms.
         dt : float, optional
             The time step for the simulation. Default is 0.025 ms.
         n_trials : int, optional
             The number of trials for the simulation. Default is 1.
-        record_vsec : 'all' | 'soma' | False
-            Option to record voltages from all sections ('all'), or just
-            the soma ('soma'). Default: False.
-        record_isec : 'all' | 'soma' | False
-            Option to record voltages from all sections ('all'), or just
-            the soma ('soma'). Default: False.
-        postproc : bool
-            If True, smoothing (``dipole_smooth_win``) and scaling
-            (``dipole_scalefctr``) values are read from the parameter file, and
-            applied to the dipole objects before returning.
-            Note that this setting
-            only affects the dipole waveforms, and not somatic voltages,
-            possible extracellular recordings etc.
-            The preferred way is to use the
-            :meth:`~hnn_core.dipole.Dipole.smooth` and
-            :meth:`~hnn_core.dipole.Dipole.scale` methods instead.
-            Default: False.
-        save_outputs : bool, optional
-            Whether to save the simulation outputs to files. Default is False.
         save_folder : str, optional
             The path to save the simulation outputs.
             Default is './sim_results'.
@@ -76,9 +59,8 @@ class BatchSimulate(object):
         overwrite : bool, optional
             Whether to overwrite existing files and create file paths
             if they do not exist. Default is True.
-        summary_func : callable, optional
-            A function to calculate summary statistics from the simulation
-            results. Default is None.
+        save_outputs : bool, optional
+            Whether to save the simulation outputs to files. Default is False.
         save_dpl : bool
             If True, save dipole results. Note, `save_outputs` must be True.
             Default: True.
@@ -99,12 +81,23 @@ class BatchSimulate(object):
             If True, save calcium concentrations.
             Note, `save_outputs` must be True.
             Default: False.
+        record_vsec : 'all' | 'soma' | False
+            Option to record voltages from all sections ('all'), or just
+            the soma ('soma'). Default: False.
+        record_isec : 'all' | 'soma' | False
+            Option to record voltages from all sections ('all'), or just
+            the soma ('soma'). Default: False.
+        postproc : bool
+            If True, smoothing (``dipole_smooth_win``) and scaling
+            (``dipole_scalefctr``) values are read from the parameter file, and
+            applied to the dipole objects before returning.
+            Default: False.
         clear_cache : bool, optional
             Whether to clear the results cache after saving each batch.
             Default is False.
-        net_json : str, optional
-            The path to a JSON file to create the network model. If provided,
-            this will override the `net` parameter. Default is None.
+        summary_func : callable, optional
+            A function to calculate summary statistics from the simulation
+            results. Default is None.
         Notes
         -----
         When `save_output=True`, the saved files will appear as
