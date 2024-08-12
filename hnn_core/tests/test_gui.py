@@ -349,7 +349,7 @@ def test_gui_init_network(setup_gui):
         for att_key, attribute in gui_attributes.items():
             if att_key != 'tstop':
                 check_equality(attribute, api_tonic[cell_type][att_key],
-                               f'{'tonic'}>{cell_type}>{att_key} not equal')
+                               f'"tonic">{cell_type}>{att_key} not equal')
 
 
 @requires_mpi4py
