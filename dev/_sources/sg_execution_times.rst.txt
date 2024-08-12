@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:16.194** total execution time for 13 files **from all galleries**:
+**14:32.891** total execution time for 13 files **from all galleries**:
 
 .. container::
 
@@ -32,42 +32,42 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
+   * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_beta.py` (``../examples/workflows/plot_simulate_beta.py``)
+     - 03:26.822
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_gamma.py` (``../examples/workflows/plot_simulate_gamma.py``)
+     - 02:20.773
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_alpha.py` (``../examples/workflows/plot_simulate_alpha.py``)
+     - 01:48.419
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_howto_plot_connectivity.py` (``../examples/howto/plot_connectivity.py``)
+     - 01:40.059
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_evoked.py` (``../examples/workflows/plot_simulate_evoked.py``)
+     - 01:11.968
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_howto_plot_hnn_animation.py` (``../examples/howto/plot_hnn_animation.py``)
+     - 01:06.425
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_somato.py` (``../examples/workflows/plot_simulate_somato.py``)
+     - 00:55.683
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py` (``../examples/howto/plot_record_extracellular_potentials.py``)
+     - 00:47.187
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_howto_plot_firing_pattern.py` (``../examples/howto/plot_firing_pattern.py``)
+     - 00:34.098
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_howto_plot_simulate_mpi_backend.py` (``../examples/howto/plot_simulate_mpi_backend.py``)
+     - 00:23.094
+     - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_plot_batch_simulate.py` (``../examples/howto/plot_batch_simulate.py``)
-     - 00:16.194
+     - 00:18.362
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_optimize_evoked.py` (``../examples/howto/optimize_evoked.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_optimize_rhythmic.py` (``../examples/howto/optimize_rhythmic.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_howto_plot_connectivity.py` (``../examples/howto/plot_connectivity.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_howto_plot_firing_pattern.py` (``../examples/howto/plot_firing_pattern.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_howto_plot_hnn_animation.py` (``../examples/howto/plot_hnn_animation.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py` (``../examples/howto/plot_record_extracellular_potentials.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_howto_plot_simulate_mpi_backend.py` (``../examples/howto/plot_simulate_mpi_backend.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_alpha.py` (``../examples/workflows/plot_simulate_alpha.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_beta.py` (``../examples/workflows/plot_simulate_beta.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_evoked.py` (``../examples/workflows/plot_simulate_evoked.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_gamma.py` (``../examples/workflows/plot_simulate_gamma.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_somato.py` (``../examples/workflows/plot_simulate_somato.py``)
      - 00:00.000
      - 0.0
