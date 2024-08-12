@@ -39,9 +39,8 @@ def jones_2009_network(params):
                            mesh_shape=(3, 3))
 
     # Adding bias
-    tonic_bias = {
-        'L2_pyramidal': 1.0
-    }
+    tonic_bias = {'L2_pyramidal': 1.0, 'L5_pyramidal': 0.0,
+                  'L2_basket': 0.0, 'L5_basket': 0.0}
     net.add_tonic_bias(amplitude=tonic_bias)
 
     # Add drives
