@@ -2086,6 +2086,21 @@
                 "amplitude": 1.0,
                 "t0": 0,
                 "tstop": null
+            },
+            "L5_pyramidal": {
+                "amplitude": 0.0,
+                "t0": 0,
+                "tstop": null
+            },
+            "L2_basket": {
+                "amplitude": 0.0,
+                "t0": 0,
+                "tstop": null
+            },
+            "L5_basket": {
+                "amplitude": 0.0,
+                "t0": 0,
+                "tstop": null
             }
         }
     },
