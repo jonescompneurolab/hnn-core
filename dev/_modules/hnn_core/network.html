@@ -577,6 +577,9 @@
         <span class="k">if</span> <span class="n">add_drives_from_params</span><span class="p">:</span>
             <span class="n">_add_drives_from_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tstop</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dt</span> <span class="o">=</span> <span class="kc">None</span>
+
 <div class="viewcode-block" id="Network.__repr__"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">class_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> x </span><span class="si">%d</span><span class="s2"> Pyramidal cells (L2, L5)&quot;</span>
