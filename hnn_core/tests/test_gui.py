@@ -303,7 +303,6 @@ def test_gui_init_network(setup_gui):
     net_from_api = read_network_configuration(config_path)
 
     assert net_from_gui.cell_types == net_from_api.cell_types
-    assert net_from_gui.external_biases == net_from_api.external_biases
 
     # Check Connections - This currently fails
     # assert len(net_from_gui.connectivity) == len(net_from_api.connectivity)
@@ -341,6 +340,16 @@ def test_gui_init_network(setup_gui):
 
     # Bursty drives will currently fail until planned GUI updates are made
     # _check_drive('alpha_prox', gui_drives['alpha_prox'].keys())
+
+    # Check external bias is created. This will not match the api network
+    # because of the GUI tstop value.
+    gui_tonic = net_from_gui.external_biases['tonic']
+    api_tonic = net_from_api.external_biases['tonic']
+    for cell_type, gui_attributes in gui_tonic.items():
+        for att_key, attribute in gui_attributes.items():
+            if att_key != 'tstop':
+                check_equality(attribute, api_tonic[cell_type][att_key],
+                               f'{'tonic'}>{cell_type}>{att_key} not equal')
 
 
 @requires_mpi4py
