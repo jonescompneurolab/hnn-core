@@ -321,16 +321,21 @@ def test_gui_init_network(setup_gui):
 
     # Poisson and Bursty drives will have different tstop. This helper function
     # passes comparing tstop.
+    def check_equality(item1, item2, message=None):
+        assert item1 == item2, message
+
     def _check_drive(name, keys):
         for key in keys:
+            gui_value = gui_drives[name][key]
+            api_value = api_drives[name][key]
             if key != 'dynamics':
-                assert gui_drives[name][key] == api_drives[name][key], (
-                    f'{name}, {key} not equal')
+                check_equality(gui_value, api_value,
+                               f'{name}>{key} not equal')
             else:
-                for d_key, d_value in gui_drives[name][key].items():
+                for d_key, d_value in gui_value.items():
                     if d_key != 'tstop':
-                        assert d_value == api_drives[name][key][d_key], (
-                            f'{name}, {key} not equal')
+                        check_equality(d_value, api_value[d_key],
+                                       f'{name}>{key}>{d_key} not equal')
 
     _check_drive('poisson', gui_drives['poisson'].keys())
 
