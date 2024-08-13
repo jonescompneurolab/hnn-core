@@ -1056,9 +1056,10 @@ def _cell_spec_change(change, widget):
 
 
 def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
-                         data=None, default_weights_ampa=None,
-                         default_weights_nmda=None, default_delays=None,
-                         sync_evinput=False):
+                         data={}, weights_ampa=None,
+                         weights_nmda=None, delays=None,
+                         n_drive_cells=None, cell_specific=None
+                         ):
     default_data = {
         'tstart': 0.,
         'tstart_std': 0.,
@@ -1066,10 +1067,13 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
         'burst_rate': 7.5,
         'burst_std': 0,
         'numspikes': 1,
+        'n_drive_cells': 1,
+        'cell_specific': False,
         'seedcore': 14,
     }
-    if isinstance(data, dict):
-        default_data = _update_nested_dict(default_data, data)
+    data.update({'n_drive_cells': n_drive_cells,
+                 'cell_specific': cell_specific})
+    default_data = _update_nested_dict(default_data, data)
 
     kwargs = dict(layout=layout, style=style)
     tstart = BoundedFloatText(
@@ -1093,28 +1097,36 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
     numspikes = BoundedIntText(
         value=default_data['numspikes'], description='No. Spikes:', min=0,
         max=int(1e6), **kwargs)
+    n_drive_cells = IntText(value=default_data['n_drive_cells'],
+                            description='No. Drive Cells:',
+                            disabled=default_data['cell_specific'],
+                            **kwargs)
+    cell_specific = Checkbox(value=default_data['cell_specific'],
+                             description='Cell-Specific',
+                             **kwargs)
     seedcore = IntText(value=default_data['seedcore'],
                        description='Seed',
                        **kwargs)
-    sync_inputs = Checkbox(value=sync_evinput,
-                           description='Synchronous Inputs',
-                           **kwargs)
 
     widgets_list, widgets_dict = _get_drive_weight_widgets(
         layout,
         style,
         location,
         data={
-            'weights_ampa': default_weights_ampa,
-            'weights_nmda': default_weights_nmda,
-            'delays': default_delays,
+            'weights_ampa': weights_ampa,
+            'weights_nmda': weights_nmda,
+            'delays': delays,
         },
     )
 
+    # Disable n_drive_cells widget based on cell_specific checkbox
+    cell_specific.observe(partial(_cell_spec_change, widget=n_drive_cells),
+                          names='value')
+
     drive_box = VBox([tstart, tstart_std, tstop,
-                      burst_rate, burst_std, repeats,
-                      seedcore, sync_inputs] +
-                     widgets_list)
+                      burst_rate, burst_std, numspikes,
+                      n_drive_cells, cell_specific,
+                      seedcore] + widgets_list)
 
     drive = dict(type='Rhythmic',
                  name=name,
@@ -1126,7 +1138,9 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
                  seedcore=seedcore,
                  location=location,
                  tstop=tstop,
-                 is_synch_inputs=sync_inputs)
+                 n_drive_cells=n_drive_cells,
+                 is_cell_specific=cell_specific,
+                 )
     drive.update(widgets_dict)
     return drive, drive_box
 
