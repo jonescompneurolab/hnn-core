@@ -1810,10 +1810,11 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                 t0=drive["t0"].value,
                 tstop=drive["tstop"].value)
         else:
-            synch_inputs_kwargs = {}
-            if drive['is_synch_inputs'].value:
-                synch_inputs_kwargs['n_drive_cells'] = 1
-                synch_inputs_kwargs['cell_specific'] = False
+            sync_inputs_kwargs = dict(
+                n_drive_cells=('n_cells' if drive['is_cell_specific'].value
+                               else drive['n_drive_cells'].value),
+                cell_specific=drive['is_cell_specific'].value,
+            )
 
             weights_ampa = _drive_widget_to_dict(drive, 'weights_ampa')
             weights_nmda = _drive_widget_to_dict(drive, 'weights_nmda')
@@ -1834,7 +1835,7 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                     synaptic_delays=synaptic_delays,
                     space_constant=100.0,
                     event_seed=drive['seedcore'].value,
-                    **synch_inputs_kwargs)
+                    **sync_inputs_kwargs)
             elif drive['type'] in ('Evoked', 'Gaussian'):
                 single_simulation_data['net'].add_evoked_drive(
                     name=drive['name'],
@@ -1847,7 +1848,7 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                     synaptic_delays=synaptic_delays,
                     space_constant=3.0,
                     event_seed=drive['seedcore'].value,
-                    **synch_inputs_kwargs)
+                    **sync_inputs_kwargs)
             elif drive['type'] in ('Rhythmic', 'Bursty'):
                 single_simulation_data['net'].add_bursty_drive(
                     name=drive['name'],
@@ -1862,7 +1863,7 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                     weights_nmda=weights_nmda,
                     synaptic_delays=synaptic_delays,
                     event_seed=drive['seedcore'].value,
-                    **synch_inputs_kwargs)
+                    **sync_inputs_kwargs)
 
 
 def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
