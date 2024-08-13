@@ -551,22 +551,32 @@ def test_gui_synchronous_inputs(setup_gui):
     """Test if the GUI creates plot using synchronous_inputs."""
     gui = setup_gui
 
+    # Set cell_specific to False
+    gui.drive_widgets[0]['is_cell_specific'].value = False
+    # Check that the n_drive_cells is not disabled
+    assert not gui.drive_widgets[0]['n_drive_cells'].disabled
+
     # set synch inputs to first driver in simulation
     driver_name = gui.drive_widgets[0]['name']
-    gui.drive_widgets[0]['is_synch_inputs'].value = True
 
-    # Run simulation
-    gui.run_button.click()
+    # Loop by number of drive cells
+    for i, n_drive_cells in enumerate([1, 3]):
+        gui.widget_simulation_name.value = f'sim_{i}'
+        gui.drive_widgets[0]['n_drive_cells'].value = n_drive_cells
 
-    sim = gui.viz_manager.data['simulations']['default']
-    network_connections = sim['net'].connectivity
-    # Filter connections for specific driver_name first
-    driver_connections = [conn for conn in network_connections
-                          if conn['src_type'] == driver_name]
+        # Run simulation
+        gui.run_button.click()
+        sim = (gui.viz_manager.data
+               ['simulations'][gui.widget_simulation_name.value])
 
-    # Check src_gids length
-    for connectivity in driver_connections:
-        assert len(connectivity['src_gids']) == 1
+        # Filter connections for specific driver_name first
+        network_connections = sim['net'].connectivity
+        driver_connections = [conn for conn in network_connections
+                              if conn['src_type'] == driver_name]
+
+        # Check src_gids length
+        for connectivity in driver_connections:
+            assert len(connectivity['src_gids']) == n_drive_cells
 
 
 def test_gui_figure_overlay(setup_gui):
