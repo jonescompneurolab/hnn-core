@@ -1365,9 +1365,12 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                      prespecified_drive_data=None,
                      prespecified_weights_ampa=None,
                      prespecified_weights_nmda=None,
-                     prespecified_delays=None, render=True,
-                     expand_last_drive=True, event_seed=14,
-                     sync_evinput=False):
+                     prespecified_delays=None,
+                     prespecified_n_drive_cells=None,
+                     prespecified_cell_specific=None,
+                     render=True,
+                     expand_last_drive=True,
+                     event_seed=14,):
     """Add a widget for a new drive."""
 
     # Check only adds 1 tonic input widget
@@ -1393,10 +1396,11 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                 style,
                 location,
                 data=prespecified_drive_data,
-                default_weights_ampa=prespecified_weights_ampa,
-                default_weights_nmda=prespecified_weights_nmda,
-                default_delays=prespecified_delays,
-                sync_evinput=sync_evinput
+                weights_ampa=prespecified_weights_ampa,
+                weights_nmda=prespecified_weights_nmda,
+                delays=prespecified_delays,
+                n_drive_cells=prespecified_n_drive_cells,
+                cell_specific=prespecified_cell_specific,
             )
         elif drive_type == 'Poisson':
             drive, drive_box = _get_poisson_widget(
@@ -1406,10 +1410,11 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                 style,
                 location,
                 data=prespecified_drive_data,
-                default_weights_ampa=prespecified_weights_ampa,
-                default_weights_nmda=prespecified_weights_nmda,
-                default_delays=prespecified_delays,
-                sync_evinput=sync_evinput
+                weights_ampa=prespecified_weights_ampa,
+                weights_nmda=prespecified_weights_nmda,
+                delays=prespecified_delays,
+                n_drive_cells=prespecified_n_drive_cells,
+                cell_specific=prespecified_cell_specific,
             )
         elif drive_type in ('Evoked', 'Gaussian'):
             drive, drive_box = _get_evoked_widget(
@@ -1418,10 +1423,11 @@ def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
                 style,
                 location,
                 data=prespecified_drive_data,
-                default_weights_ampa=prespecified_weights_ampa,
-                default_weights_nmda=prespecified_weights_nmda,
-                default_delays=prespecified_delays,
-                sync_evinput=sync_evinput
+                weights_ampa=prespecified_weights_ampa,
+                weights_nmda=prespecified_weights_nmda,
+                delays=prespecified_delays,
+                n_drive_cells=prespecified_n_drive_cells,
+                cell_specific=prespecified_cell_specific,
             )
         elif drive_type == 'Tonic':
             drive, drive_box = _get_tonic_widget(
