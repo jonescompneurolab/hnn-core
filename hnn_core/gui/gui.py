@@ -1352,8 +1352,7 @@ def _get_tonic_widget(name, tstop_widget, layout, style, data=None):
                  name=name,
                  amplitude=amplitudes,
                  t0=start_times,
-                 tstop=stop_times,
-                 is_synch_inputs=False)
+                 tstop=stop_times,)
 
     drive.update(widgets_dict)
     return drive, drive_box
