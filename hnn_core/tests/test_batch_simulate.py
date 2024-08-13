@@ -82,6 +82,12 @@ def test_parameter_validation():
     with pytest.raises(TypeError, match="net_json must be"):
         BatchSimulate(net_json=123, set_params=lambda x: x)
 
+    with pytest.raises(ValueError, match="'record_vsec' parameter"):
+        BatchSimulate(set_params=lambda x: x, record_vsec="invalid")
+
+    with pytest.raises(ValueError, match="'record_isec' parameter"):
+        BatchSimulate(set_params=lambda x: x, record_isec="invalid")
+
 
 def test_generate_param_combinations(batch_simulate_instance, param_grid):
     """Test generating parameter combinations."""
