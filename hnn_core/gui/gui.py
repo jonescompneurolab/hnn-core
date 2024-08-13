@@ -1609,16 +1609,13 @@ def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
             kwargs = dict(prespecified_drive_data=tonic_specs[drive_name])
         else:
             specs = drive_specs[drive_name]
-            # Check for synchronous input
-            is_sync_evinput = (True if (not specs['cell_specific']) and
-                                       (specs['n_drive_cells'] == 1)
-                               else False)
             kwargs = dict(prespecified_drive_data=specs['dynamics'],
                           prespecified_weights_ampa=specs['weights_ampa'],
                           prespecified_weights_nmda=specs['weights_nmda'],
                           prespecified_delays=specs['synaptic_delays'],
+                          prespecified_n_drive_cells=specs['n_drive_cells'],
+                          prespecified_cell_specific=specs['cell_specific'],
                           event_seed=specs['event_seed'],
-                          sync_evinput=is_sync_evinput
                           )
 
         should_render = idx == (len(drive_names) - 1)
