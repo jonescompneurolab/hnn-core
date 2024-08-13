@@ -993,7 +993,7 @@ def _get_connectivity_widgets(conn_data):
     return sliders
 
 
-def _get_cell_specific_widgets(layout, style, location, data=None):
+def _get_drive_weight_widgets(layout, style, location, data=None):
     default_data = {
         'weights_ampa': {
             'L5_pyramidal': 0.,
@@ -1093,7 +1093,7 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
                            description='Synchronous Inputs',
                            **kwargs)
 
-    widgets_list, widgets_dict = _get_cell_specific_widgets(
+    widgets_list, widgets_dict = _get_drive_weight_widgets(
         layout,
         style,
         location,
@@ -1169,7 +1169,7 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
             description=f'{cell_type}:', min=0, max=1e6, step=0.01,
             layout=layout, style=style)
 
-    widgets_list, widgets_dict = _get_cell_specific_widgets(
+    widgets_list, widgets_dict = _get_drive_weight_widgets(
         layout,
         style,
         location,
@@ -1223,11 +1223,7 @@ def _get_evoked_widget(name, layout, style, location, data=None,
                        description='Seed: ',
                        **kwargs)
 
-    sync_inputs = Checkbox(value=sync_evinput,
-                           description='Synchronous Inputs',
-                           **kwargs)
-
-    widgets_list, widgets_dict = _get_cell_specific_widgets(
+    widgets_list, widgets_dict = _get_drive_weight_widgets(
         layout,
         style,
         location,
