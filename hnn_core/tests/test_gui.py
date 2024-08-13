@@ -579,6 +579,32 @@ def test_gui_synchronous_inputs(setup_gui):
             assert len(connectivity['src_gids']) == n_drive_cells
 
 
+def test_gui_all_to_all_drive(setup_gui):
+    """Tests all-to-all connection with cell_specific widget"""
+    gui = setup_gui
+    # Set cell_specific to False
+    gui.drive_widgets[0]['is_cell_specific'].value = True
+    # Assert that the n_drive_cells is disabled
+    assert gui.drive_widgets[0]['n_drive_cells'].disabled
+
+    # set synch inputs to first driver in simulation
+    driver_name = gui.drive_widgets[0]['name']
+
+    # Run simulation
+    gui.run_button.click()
+    sim = gui.viz_manager.data['simulations'][gui.widget_simulation_name.value]
+
+    # Filter connections for specific driver_name first
+    network_connections = sim['net'].connectivity
+    driver_connections = [conn for conn in network_connections
+                          if conn['src_type'] == driver_name]
+
+    # Check src_gids length
+    for connectivity in driver_connections:
+        assert (len(connectivity['src_gids']) ==
+                len(connectivity['target_gids']))
+
+
 def test_gui_figure_overlay(setup_gui):
     """Test if the GUI adds/deletes figs properly."""
     gui = setup_gui
