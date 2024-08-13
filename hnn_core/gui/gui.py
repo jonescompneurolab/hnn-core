@@ -1131,12 +1131,15 @@ def _get_rhythmic_widget(name, tstop_widget, layout, style, location,
     return drive, drive_box
 
 
-def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
-                        default_weights_ampa=None, default_weights_nmda=None,
-                        default_delays=None, sync_evinput=False):
+def _get_poisson_widget(name, tstop_widget, layout, style, location, data={},
+                        weights_ampa=None, weights_nmda=None,
+                        delays=None, n_drive_cells=None,
+                        cell_specific=None):
     default_data = {
         'tstart': 0.0,
         'tstop': tstop_widget.value,
+        'n_drive_cells': 1,
+        'cell_specific': True,
         'seedcore': 14,
         'rate_constant': {
             'L2_pyramidal': 40.,
@@ -1145,8 +1148,9 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
             'L5_basket': 40.,
         }
     }
-    if isinstance(data, dict):
-        default_data = _update_nested_dict(default_data, data)
+    data.update({'n_drive_cells': n_drive_cells,
+                 'cell_specific': cell_specific})
+    default_data = _update_nested_dict(default_data, data)
 
     tstart = BoundedFloatText(
         value=default_data['tstart'], description='Start time (ms)',
@@ -1158,15 +1162,21 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
         layout=layout,
         style=style,
     )
+    n_drive_cells = IntText(value=default_data['n_drive_cells'],
+                            description='No. Drive Cells:',
+                            disabled=default_data['cell_specific'],
+                            layout=layout,
+                            style=style
+                            )
+    cell_specific = Checkbox(value=default_data['cell_specific'],
+                             description='Cell-Specific',
+                             layout=layout,
+                             style=style
+                             )
     seedcore = IntText(value=default_data['seedcore'],
                        description='Seed',
                        layout=layout,
                        style=style)
-
-    sync_inputs = Checkbox(value=sync_evinput,
-                           description='Synchronous Inputs',
-                           layout=layout,
-                           style=style)
 
     cell_types = ['L5_pyramidal', 'L2_pyramidal', 'L5_basket', 'L2_basket']
     rate_constant = dict()
@@ -1181,16 +1191,21 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
         style,
         location,
         data={
-            'weights_ampa': default_weights_ampa,
-            'weights_nmda': default_weights_nmda,
-            'delays': default_delays,
+            'weights_ampa': weights_ampa,
+            'weights_nmda': weights_nmda,
+            'delays': delays,
         },
     )
     widgets_dict.update({'rate_constant': rate_constant})
     widgets_list.extend([HTML(value="<b>Rate constants</b>")] +
                         list(widgets_dict['rate_constant'].values()))
 
-    drive_box = VBox([tstart, tstop, seedcore, sync_inputs] + widgets_list)
+    # Disable n_drive_cells widget based on cell_specific checkbox
+    cell_specific.observe(partial(_cell_spec_change, widget=n_drive_cells),
+                          names='value')
+
+    drive_box = VBox([tstart, tstop, n_drive_cells,
+                      cell_specific, seedcore] + widgets_list)
     drive = dict(
         type='Poisson',
         name=name,
@@ -1199,7 +1214,8 @@ def _get_poisson_widget(name, tstop_widget, layout, style, location, data=None,
         rate_constant=rate_constant,
         seedcore=seedcore,
         location=location,  # notice this is a widget but a str!
-        is_synch_inputs=sync_inputs,
+        n_drive_cells=n_drive_cells,
+        is_cell_specific=cell_specific,
     )
     drive.update(widgets_dict)
     return drive, drive_box
