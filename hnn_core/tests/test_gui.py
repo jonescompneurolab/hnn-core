@@ -811,12 +811,11 @@ def test_gui_cell_params_widgets(setup_gui):
     assert (len(keys) == num_cell_params)
 
     # Check the if the cell params dictionary has been updated
-    cell_params = gui.get_cell_parameters_dict()
-    assert (len(cell_params['Geometry L2']) == 20)
-    assert (len(cell_params['Geometry L5']) == 22)
-    assert (len(cell_params['Synapses']) == 12)
-    assert (len(cell_params['Biophysics L2']) == 10)
-    assert (len(cell_params['Biophysics L5']) == 20)
+    assert (gui.count_cell_parametes('Geometry', 'L2') == 20)
+    assert (gui.count_cell_parametes('Geometry', 'L5') == 22)
+    assert (gui.count_cell_parametes('Synapses', 'L2') == 12)
+    assert (gui.count_cell_parametes('Biophysics', 'L2') == 10)
+    assert (gui.count_cell_parametes('Biophysics', 'L5') == 20)
 
 
 def test_fig_tabs_dropdown_lists(setup_gui):

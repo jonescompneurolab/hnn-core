@@ -41,108 +41,125 @@ hnn_core_root = Path(hnn_core.__file__).parent
 default_network_configuration = (hnn_core_root / 'param' /
                                  'jones2009_base.json')
 
-cell_parameters_dict = {
-    "Geometry L2":
-    [
-        ('Soma length', 'micron', 'soma_L'),
-        ('Soma diameter', 'micron', 'soma_diam'),
-        ('Soma capacitive density', 'F/cm2', 'soma_cm'),
-        ('Soma resistivity', 'ohm-cm', 'soma_Ra'),
-        ('Dendrite capacitive density', 'F/cm2', 'dend_cm'),
-        ('Dendrite resistivity', 'ohm-cm', 'dend_Ra'),
-        ('Apical Dendrite Trunk length', 'micron', 'apicaltrunk_L'),
-        ('Apical Dendrite Trunk diameter', 'micron', 'apicaltrunk_diam'),
-        ('Apical Dendrite 1 length', 'micron', 'apical1_L'),
-        ('Apical Dendrite 1 diameter', 'micron', 'apical1_diam'),
-        ('Apical Dendrite Tuft length', 'micron', 'apicaltuft_L'),
-        ('Apical Dendrite Tuft diameter', 'micron', 'apicaltuft_diam'),
-        ('Oblique Apical Dendrite length', 'micron', 'apicaloblique_L'),
-        ('Oblique Apical Dendrite diameter', 'micron', 'apicaloblique_diam'),
-        ('Basal Dendrite 1 length', 'micron', 'basal1_L'),
-        ('Basal Dendrite 1 diameter', 'micron', 'basal1_diam'),
-        ('Basal Dendrite 2 length', 'micron', 'basal2_L'),
-        ('Basal Dendrite 2 diameter', 'micron', 'basal2_diam'),
-        ('Basal Dendrite 3 length', 'micron', 'basal3_L'),
-        ('Basal Dendrite 3 diameter', 'micron', 'basal3_diam')
-    ],
+# Define the structured array data type
+data_types = np.dtype([
+    ('Label', 'U50'),
+    ('Units', 'U10'),
+    ('Param_Key', 'U20'),
+    ('Layer', 'U15'),
+    ('CELL_TYPE', 'U10')
+])
 
-    "Geometry L5":
-    [
-        ('Soma length', 'micron', 'soma_L'),
-        ('Soma diameter', 'micron', 'soma_diam'),
-        ('Soma capacitive density', 'F/cm2', 'soma_cm'),
-        ('Soma resistivity', 'ohm-cm', 'soma_Ra'),
-        ('Dendrite capacitive density', 'F/cm2', 'dend_cm'),
-        ('Dendrite resistivity', 'ohm-cm', 'dend_Ra'),
-        ('Apical Dendrite Trunk length', 'micron', 'apicaltrunk_L'),
-        ('Apical Dendrite Trunk diameter', 'micron', 'apicaltrunk_diam'),
-        ('Apical Dendrite 1 length', 'micron', 'apical1_L'),
-        ('Apical Dendrite 1 diameter', 'micron', 'apical1_diam'),
-        ('Apical Dendrite 2 length', 'micron', 'apical2_L'),
-        ('Apical Dendrite 2 diameter', 'micron', 'apical2_diam'),
-        ('Apical Dendrite Tuft length', 'micron', 'apicaltuft_L'),
-        ('Apical Dendrite Tuft diameter', 'micron', 'apicaltuft_diam'),
-        ('Oblique Apical Dendrite length', 'micron', 'apicaloblique_L'),
-        ('Oblique Apical Dendrite diameter', 'micron', 'apicaloblique_diam'),
-        ('Basal Dendrite 1 length', 'micron', 'basal1_L'),
-        ('Basal Dendrite 1 diameter', 'micron', 'basal1_diam'),
-        ('Basal Dendrite 2 length', 'micron', 'basal2_L'),
-        ('Basal Dendrite 2 diameter', 'micron', 'basal2_diam'),
-        ('Basal Dendrite 3 length', 'micron', 'basal3_L'),
-        ('Basal Dendrite 3 diameter', 'micron', 'basal3_diam')
-    ],
-    "Synapses":
-    [
-        ('AMPA reversal', 'mV', 'ampa_e'),
-        ('AMPA rise time', 'ms', 'ampa_tau1'),
-        ('AMPA decay time', 'ms', 'ampa_tau2'),
-        ('NMDA reversal', 'mV', 'nmda_e'),
-        ('NMDA rise time', 'ms', 'nmda_tau1'),
-        ('NMDA decay time', 'ms', 'nmda_tau2'),
-        ('GABAA reversal', 'mV', 'gabaa_e'),
-        ('GABAA rise time', 'ms', 'gabaa_tau1'),
-        ('GABAA decay time', 'ms', 'gabaa_tau2'),
-        ('GABAB reversal', 'mV', 'gabab_e'),
-        ('GABAB rise time', 'ms', 'gabab_tau1'),
-        ('GABAB decay time', 'ms', 'gabab_tau2')
-    ],
-    "Biophysics L2":
-    [
-        ('Soma Kv channel density', 'S/cm2', 'soma_gkbar_hh2'),
-        ('Soma Na channel density', 'S/cm2', 'soma_gnabar_hh2'),
-        ('Soma leak reversal', 'mV', 'soma_el_hh2'),
-        ('Soma leak channel density', 'S/cm2', 'soma_gl_hh2'),
-        ('Soma Km channel density', 'pS/micron2', 'soma_gbar_km'),
-        ('Dendrite Kv channel density', 'S/cm2', 'dend_gkbar_hh2'),
-        ('Dendrite Na channel density', 'S/cm2', 'dend_gnabar_hh2'),
-        ('Dendrite leak reversal', 'mV', 'dend_el_hh2'),
-        ('Dendrite leak channel density', 'S/cm2', 'dend_gl_hh2'),
-        ('Dendrite Km channel density', 'pS/micron2', 'dend_gbar_km')
-    ],
-    "Biophysics L5":
-    [
-        ('Soma Kv channel density', 'S/cm2', 'soma_gkbar_hh2'),
-        ('Soma Na channel density', 'S/cm2', 'soma_gnabar_hh2'),
-        ('Soma leak reversal', 'mV', 'soma_el_hh2'),
-        ('Soma leak channel density', 'S/cm2', 'soma_gl_hh2'),
-        ('Soma Ca channel density', 'pS/micron2', 'soma_gbar_ca'),
-        ('Soma Ca decay time', 'ms', 'soma_taur_cad'),
-        ('Soma Kca channel density', 'pS/micron2', 'soma_gbar_kca'),
-        ('Soma Km channel density', 'pS/micron2', 'soma_gbar_km'),
-        ('Soma CaT channel density', 'S/cm2', 'soma_gbar_cat'),
-        ('Soma HCN channel density', 'S/cm2', 'soma_gbar_ar'),
-        ('Dendrite Kv channel density', 'S/cm2', 'dend_gkbar_hh2'),
-        ('Dendrite Na channel density', 'S/cm2', 'dend_gnabar_hh2'),
-        ('Dendrite leak reversal', 'mV', 'dend_el_hh2'),
-        ('Dendrite leak channel density', 'S/cm2', 'dend_gl_hh2'),
-        ('Dendrite Ca channel density', 'pS/micron2', 'dend_gbar_ca'),
-        ('Dendrite Ca decay time', 'ms', 'dend_taur_cad'),
-        ('Dendrite KCa channel density', 'pS/micron2', 'dend_gbar_kca'),
-        ('Dendrite Km channel density', 'pS/micron2', 'dend_gbar_km'),
-        ('Dendrite CaT channel density', 'S/cm2', 'dend_gbar_cat'),
-        ('Dendrite HCN channel density', 'S/cm2', 'dend_gbar_ar')
-    ]
-}
+ui_cell_params_data = np.array([
+    ('Soma length', 'micron', 'soma_L',
+     'Geometry', 'L2 L5'),
+    ('Soma diameter', 'micron', 'soma_diam',
+     'Geometry', 'L2 L5'),
+    ('Soma capacitive density', 'F/cm2', 'soma_cm',
+     'Geometry', 'L2 L5'),
+    ('Soma resistivity', 'ohm-cm', 'soma_Ra',
+     'Geometry', 'L2 L5'),
+    ('Dendrite capacitive density', 'F/cm2', 'dend_cm',
+     'Geometry', 'L2 L5'),
+    ('Dendrite resistivity', 'ohm-cm', 'dend_Ra',
+     'Geometry', 'L2 L5'),
+    ('Apical Dendrite Trunk length', 'micron', 'apicaltrunk_L',
+     'Geometry', 'L2 L5'),
+    ('Apical Dendrite Trunk diameter', 'micron', 'apicaltrunk_diam',
+     'Geometry', 'L2 L5'),
+    ('Apical Dendrite 1 length', 'micron', 'apical1_L',
+     'Geometry', 'L2 L5'),
+    ('Apical Dendrite 1 diameter', 'micron', 'apical1_diam',
+     'Geometry', 'L2 L5'),
+    ('Apical Dendrite 2 length', 'micron', 'apical2_L',
+     'Geometry', 'L5'),
+    ('Apical Dendrite 2 diameter', 'micron', 'apical2_diam',
+     'Geometry', 'L5'),
+    ('Apical Dendrite Tuft length', 'micron', 'apicaltuft_L',
+     'Geometry', 'L2 L5'),
+    ('Apical Dendrite Tuft diameter', 'micron', 'apicaltuft_diam',
+     'Geometry', 'L2 L5'),
+    ('Oblique Apical Dendrite length', 'micron', 'apicaloblique_L',
+     'Geometry', 'L2 L5'),
+    ('Oblique Apical Dendrite diameter', 'micron', 'apicaloblique_diam',
+     'Geometry', 'L2 L5'),
+    ('Basal Dendrite 1 length', 'micron', 'basal1_L',
+     'Geometry', 'L2 L5'),
+    ('Basal Dendrite 1 diameter', 'micron', 'basal1_diam',
+     'Geometry', 'L2 L5'),
+    ('Basal Dendrite 2 length', 'micron', 'basal2_L',
+     'Geometry', 'L2 L5'),
+    ('Basal Dendrite 2 diameter', 'micron', 'basal2_diam',
+     'Geometry', 'L2 L5'),
+    ('Basal Dendrite 3 length', 'micron', 'basal3_L',
+     'Geometry', 'L2 L5'),
+    ('Basal Dendrite 3 diameter', 'micron', 'basal3_diam',
+     'Geometry', 'L2 L5'),
+    ('AMPA reversal', 'mV', 'ampa_e',
+     'Synapses', 'L2 L5'),
+    ('AMPA rise time', 'ms', 'ampa_tau1',
+     'Synapses', 'L2 L5'),
+    ('AMPA decay time', 'ms', 'ampa_tau2',
+     'Synapses', 'L2 L5'),
+    ('NMDA reversal', 'mV', 'nmda_e',
+     'Synapses', 'L2 L5'),
+    ('NMDA rise time', 'ms', 'nmda_tau1',
+     'Synapses', 'L2 L5'),
+    ('NMDA decay time', 'ms', 'nmda_tau2',
+     'Synapses', 'L2 L5'),
+    ('GABAA reversal', 'mV', 'gabaa_e',
+     'Synapses', 'L2 L5'),
+    ('GABAA rise time', 'ms', 'gabaa_tau1',
+     'Synapses', 'L2 L5'),
+    ('GABAA decay time', 'ms', 'gabaa_tau2',
+     'Synapses', 'L2 L5'),
+    ('GABAB reversal', 'mV', 'gabab_e',
+     'Synapses', 'L2 L5'),
+    ('GABAB rise time', 'ms', 'gabab_tau1',
+     'Synapses', 'L2 L5'),
+    ('GABAB decay time', 'ms', 'gabab_tau2',
+     'Synapses', 'L2 L5'),
+    ('Soma Kv channel density', 'S/cm2', 'soma_gkbar_hh2',
+     'Biophysics', 'L2 L5'),
+    ('Soma Na channel density', 'S/cm2', 'soma_gnabar_hh2',
+     'Biophysics', 'L2 L5'),
+    ('Soma leak reversal', 'mV', 'soma_el_hh2',
+     'Biophysics', 'L2 L5'),
+    ('Soma leak channel density', 'S/cm2', 'soma_gl_hh2',
+     'Biophysics', 'L2 L5'),
+    ('Soma Ca channel density', 'pS/micron2', 'soma_gbar_ca',
+     'Biophysics', 'L5'),
+    ('Soma Ca decay time', 'ms', 'soma_taur_cad',
+     'Biophysics', 'L5'),
+    ('Soma Kca channel density', 'pS/micron2', 'soma_gbar_kca',
+     'Biophysics', 'L5'),
+    ('Soma Km channel density', 'pS/micron2', 'soma_gbar_km',
+     'Biophysics', 'L2 L5'),
+    ('Soma CaT channel density', 'S/cm2', 'soma_gbar_cat',
+     'Biophysics', 'L5'),
+    ('Soma HCN channel density', 'S/cm2', 'soma_gbar_ar',
+     'Biophysics', 'L5'),
+    ('Dendrite Kv channel density', 'S/cm2', 'dend_gkbar_hh2',
+     'Biophysics', 'L2 L5'),
+    ('Dendrite Na channel density', 'S/cm2', 'dend_gnabar_hh2',
+     'Biophysics', 'L2 L5'),
+    ('Dendrite leak reversal', 'mV', 'dend_el_hh2',
+     'Biophysics', 'L2 L5'),
+    ('Dendrite leak channel density', 'S/cm2', 'dend_gl_hh2',
+     'Biophysics', 'L2 L5'),
+    ('Dendrite Ca channel density', 'pS/micron2', 'dend_gbar_ca',
+     'Biophysics', 'L5'),
+    ('Dendrite Ca decay time', 'ms', 'dend_taur_cad',
+     'Biophysics', 'L5'),
+    ('Dendrite KCa channel density', 'pS/micron2', 'dend_gbar_kca',
+     'Biophysics', 'L5'),
+    ('Dendrite Km channel density', 'pS/micron2', 'dend_gbar_km',
+     'Biophysics', 'L2 L5'),
+    ('Dendrite CaT channel density', 'S/cm2', 'dend_gbar_cat',
+     'Biophysics', 'L5'),
+    ('Dendrite HCN channel density', 'S/cm2', 'dend_gbar_ar',
+     'Biophysics', 'L5')
+], dtype=data_types)
 
 
 class _OutputWidgetHandler(logging.Handler):
@@ -425,11 +442,13 @@ class HNNGUI:
         self._init_ui_components()
         self.add_logging_window_logger()
 
-    def get_cell_parameters_dict(self):
-        """Returns the number of elements in the
-            cell_parameters_dict dictionary.
+    def count_cell_parametes(self, layer, celltype):
+        """Returns cell_parameters dictionary.
             This is for testing purposes """
-        return cell_parameters_dict
+        selected_elements = ui_cell_params_data[
+            (ui_cell_params_data['Layer'] == layer) &
+            (np.char.find(ui_cell_params_data['CELL_TYPE'], celltype) >= 0)]
+        return len(selected_elements)
 
     def _init_html_download_button(self):
         b64 = base64.b64encode("".encode())
@@ -1479,6 +1498,30 @@ def add_network_connectivity_tab(net, connectivity_out,
     return net
 
 
+def build_cell_params_table(cell_params_data, cell_type,
+                            default_values_function, style):
+    layer_parameters = []
+    for row in cell_params_data:
+        param_name = row['Label']
+        param_units = row['Units']
+        param_key = row['Param_Key']
+        default_value = get_cell_param_default_value(
+            f'{cell_type}Pyr_{param_key}', default_values_function)
+        description = f"{param_name} ({param_units})"
+        min_value = -1000.0 if param_units not in 'ms' else 0
+        text_field = BoundedFloatText(value=default_value,
+                                      min=min_value,
+                                      max=1000.0,
+                                      step=0.1,
+                                      description=description,
+                                      disabled=False,
+                                      **style)
+        text_field.layout.width = "350px"
+        layer_parameters.append(text_field)
+
+    return layer_parameters
+
+
 def add_cell_parameters_tab(cell_params_out, cell_pameters_vboxes,
                             cell_layer_radio_button, cell_type_radio_button,
                             layout):
@@ -1488,33 +1531,23 @@ def add_cell_parameters_tab(cell_params_out, cell_pameters_vboxes,
     style = {'description_width': '255px'}
     kwargs = dict(layout=layout, style=style)
 
-    for cell_type in cell_types:
-        layer_parameters = list()
-        for layer in cell_parameters_dict.keys():
-            if ('Biophysic' in layer or 'Geometry' in layer) and \
-                    cell_type[0] not in layer:
-                continue
+    unique_cell_layers = np.unique(ui_cell_params_data['Layer'])
 
-            for parameter in cell_parameters_dict[layer]:
-                param_name, param_units, params_key = (parameter[0],
-                                                       parameter[1],
-                                                       parameter[2])
-                default_value = get_cell_param_default_value(
-                    f'{cell_type[0]}Pyr_{params_key}', cell_type[1])
-                description = f"{param_name} ({param_units})"
-                min_value = -1000.0 if param_units not in 'ms' else 0
-                text_field = BoundedFloatText(value=default_value,
-                                              min=min_value,
-                                              max=1000.0,
-                                              step=0.1,
-                                              description=description,
-                                              disabled=False,
-                                              **kwargs)
-                text_field.layout.width = "350px"
-                layer_parameters.append(text_field)
-            cell_pameters_key = f'{cell_type[0]} Pyramidal_{layer}'
+    for layer in unique_cell_layers:
+        for cell_type, default_values in cell_types:
+            cell_params_table = (
+                ui_cell_params_data[
+                    (ui_cell_params_data['Layer'] == layer) &
+                    (np.char.find(ui_cell_params_data['CELL_TYPE'],
+                                  cell_type) >= 0)])
+
+            layer_parameters = build_cell_params_table(cell_params_table,
+                                                       cell_type,
+                                                       default_values,
+                                                       kwargs)
+
+            cell_pameters_key = f'{cell_type} Pyramidal_{layer}'
             cell_pameters_vboxes[cell_pameters_key] = VBox(layer_parameters)
-            layer_parameters.clear()
 
     # clear existing connectivity
     cell_params_out.clear_output()
@@ -1868,8 +1901,6 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
 def _update_cell_params_vbox(cell_type_out, cell_parameters_list,
                              cell_type, cell_layer):
     cell_parameters_key = f"{cell_type}_{cell_layer}"
-    if "Biophysics" or 'Geometry' in cell_layer:
-        cell_parameters_key += f" {cell_type.split(' ')[0]}"
 
     if cell_parameters_key in cell_parameters_list:
         cell_type_out.clear_output()
@@ -2128,5 +2159,10 @@ def launch():
     You can pass voila commandline parameters as usual.
     """
     from voila.app import main
+    import debugpy
+    debugpy.listen(5678)
+    print("Waiting for debugger attach")
+    debugpy.wait_for_client()
+
     notebook_path = Path(__file__).parent / 'hnn_widget.ipynb'
     main([str(notebook_path.resolve()), *sys.argv[1:]])
