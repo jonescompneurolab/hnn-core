@@ -1696,40 +1696,6 @@ def _drive_widget_to_dict(drive, name):
     }
 
 
-def _filter_poisson_inputs(ampa, nmda, rates, delays):
-    def _get_positive_weights(weight_dict):
-        return {
-            key: value
-            for key, value in weight_dict.items()
-            if value > 0
-        }
-
-    def _filter_by_keys(dictionary, keys):
-        return {
-            key: value
-            for key, value in dictionary.items()
-            if key in keys
-        }
-
-    # Filter the weights for positive values
-    weights_ampa, weights_nmda = [_get_positive_weights(weights)
-                                  for weights in [ampa, nmda]]
-
-    # Filter the rates and delays that match the weights
-    cell_types = set(list(weights_ampa.keys()) + list(weights_nmda.keys()))
-    rate_constant = _filter_by_keys(rates, cell_types)
-    synaptic_delays = _filter_by_keys(delays, cell_types)
-
-    # Set weights to None if the dict is empty
-    weights_ampa, weights_nmda = [weights if weights else None
-                                  for weights in [weights_ampa, weights_nmda]]
-
-    return dict(weights_ampa=weights_ampa,
-                weights_nmda=weights_nmda,
-                rate_constant=rate_constant,
-                synaptic_delays=synaptic_delays)
-
-
 def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                                drive_widgets, connectivity_textfields,
                                cell_params_vboxes,
@@ -1803,22 +1769,16 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                 f"drive type is {drive['type']}, location={drive['location']}")
             if drive['type'] == 'Poisson':
                 rate_constant = _drive_widget_to_dict(drive, 'rate_constant')
-                poisson_params = _filter_poisson_inputs(
-                    weights_ampa,
-                    weights_nmda,
-                    rate_constant,
-                    synaptic_delays
-                )
 
                 single_simulation_data['net'].add_poisson_drive(
                     name=drive['name'],
                     tstart=drive['tstart'].value,
                     tstop=drive['tstop'].value,
-                    rate_constant=poisson_params['rate_constant'],
+                    rate_constant=rate_constant,
                     location=drive['location'],
-                    weights_ampa=poisson_params['weights_ampa'],
-                    weights_nmda=poisson_params['weights_nmda'],
-                    synaptic_delays=poisson_params['synaptic_delays'],
+                    weights_ampa=weights_ampa,
+                    weights_nmda=weights_nmda,
+                    synaptic_delays=synaptic_delays,
                     space_constant=100.0,
                     event_seed=drive['seedcore'].value,
                     **synch_inputs_kwargs)
