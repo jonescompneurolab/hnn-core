@@ -79,9 +79,6 @@ def test_parameter_validation():
     with pytest.raises(TypeError, match="net must be"):
         BatchSimulate(net="invalid_network", set_params=lambda x: x)
 
-    with pytest.raises(TypeError, match="net_json must be"):
-        BatchSimulate(net_json=123, set_params=lambda x: x)
-
     with pytest.raises(ValueError, match="'record_vsec' parameter"):
         BatchSimulate(set_params=lambda x: x, record_vsec="invalid")
 
@@ -115,21 +112,6 @@ def test_run_single_sim(batch_simulate_instance):
     assert 'param_values' in result
     assert result['param_values'] == param_values
     assert isinstance(result['net'], type(batch_simulate_instance.net))
-
-
-def test_net_json_loading(param_grid):
-    """Test loading the network from a JSON file."""
-    json_path = assets_path / 'jones2009_3x3_drives.json'
-
-    batch_simulate = BatchSimulate(net_json=str(json_path),
-                                   set_params=lambda x, y: x,
-                                   tstop=70)
-
-    result = batch_simulate._run_single_sim(param_grid)
-    assert isinstance(result, dict)
-    assert 'net' in result
-    assert 'param_values' in result
-    assert 'dpl' in result
 
 
 def test_simulate_batch(batch_simulate_instance, param_grid):
