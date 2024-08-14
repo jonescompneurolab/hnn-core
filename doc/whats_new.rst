@@ -12,6 +12,20 @@ Current
 
 Changelog
 ~~~~~~~~~
+
+Bug
+~~~
+
+API
+~~~
+
+.. _0.4:
+
+0.4
+---
+
+Changelog
+~~~~~~~~~
 - Fix bug in :func:`~hnn_core.Network.add_poisson_drive` where an error is
   thrown when passing an int for rate_constant when ``cell_specific=True``,
   by `Dylan Daniels`_ in :gh:`818`
@@ -149,6 +163,25 @@ API
 - :func:`network.add_tonic_bias` cell-specific tonic bias can now be 
   provided using the argument amplitude in network.add_tonic_bias`,
   by `Camilo Diaz`_ in :gh:`766`
+
+People who contributed to this release (in alphabetical order):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- `Huzi Cheng`_
+- `Tianqi Cheng`_
+- `Dylan Daniels`_
+- `George Dang`_
+- `Camilo Diaz`_
+- `Katharina Duecker`_
+- `Carolina Fernandez Pujol`_
+- `Yaroslav Halchenko`_
+- `Mainak Jas`_
+- `Nick Tolley`_
+- `Orsolya Beatrix Kolozsvari`_
+- `Rajat Partani`_
+- `Abdul Samad Siddiqui`_
+- `Ryan Thorpe`_
+- `Stephanie R. Jones`_
 
 .. _0.3:
 
@@ -553,3 +586,5 @@ People who contributed to this release (in alphabetical order):
 .. _Camilo Diaz: https://github.com/kmilo9999
 .. _Abdul Samad Siddiqui: https://github.com/samadpls
 .. _Katharina Duecker: https://github.com/katduecker
+.. _Yaroslav Halchenko:  https://github.com/yarikoptic
+.. _Tianqi Cheng: https://github.com/tianqi-cheng

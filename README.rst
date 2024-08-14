@@ -191,9 +191,9 @@ If you use HNN-core in your work, please cite our
 
 .. _precompiled installers: https://nrn.readthedocs.io/en/latest/
 .. _NEURON forum: https://www.neuron.yale.edu/phpbb/
-.. _contributing guide: https://jonescompneurolab.github.io/hnn-core/dev/contributing.html
-.. _governance structure: https://jonescompneurolab.github.io/hnn-core/dev/governance.html
-.. _parallel backend guide: https://jonescompneurolab.github.io/hnn-core/dev/parallel.html
+.. _contributing guide: https://jonescompneurolab.github.io/hnn-core/stable/contributing.html
+.. _governance structure: https://jonescompneurolab.github.io/hnn-core/stable/governance.html
+.. _parallel backend guide: https://jonescompneurolab.github.io/hnn-core/stable/parallel.html
 
 .. |tests| image:: https://github.com/jonescompneurolab/hnn-core/actions/workflows/unix_unit_tests.yml/badge.svg?branch=master
    :target: https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:master+event:push
