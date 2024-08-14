@@ -1252,7 +1252,7 @@
         },
         "poisson": {
             "start": 103,
-            "stop": 121
+            "stop": 127
         }
     },
     "pos_dict": {
@@ -1882,6 +1882,36 @@
                 1.0,
                 1.0,
                 653.0
+            ],
+            [
+                1.0,
+                1.0,
+                653.0
+            ],
+            [
+                1.0,
+                1.0,
+                653.0
+            ],
+            [
+                1.0,
+                1.0,
+                653.0
+            ],
+            [
+                1.0,
+                1.0,
+                653.0
+            ],
+            [
+                1.0,
+                1.0,
+                653.0
+            ],
+            [
+                1.0,
+                1.0,
+                653.0
             ]
         ]
     },
@@ -2050,7 +2080,7 @@
         "poisson": {
             "type": "poisson",
             "location": "proximal",
-            "n_drive_cells": 18,
+            "n_drive_cells": 24,
             "event_seed": 1349,
             "conn_seed": 3,
             "dynamics": {
@@ -2058,23 +2088,36 @@
                 "tstop": null,
                 "rate_constant": {
                     "L2_pyramidal": 140.0,
-                    "L5_pyramidal": 40.0
+                    "L5_pyramidal": 40.0,
+                    "L2_basket": 40.0,
+                    "L5_basket": 40.0
                 }
             },
             "events": [],
             "weights_ampa": {
                 "L2_pyramidal": 0.0008,
-                "L5_pyramidal": 0.0075
+                "L5_pyramidal": 0.0075,
+                "L2_basket": 0.0,
+                "L5_basket": 0.0
             },
-            "weights_nmda": null,
+            "weights_nmda": {
+                "L2_pyramidal": 0.0,
+                "L5_pyramidal": 0.0,
+                "L2_basket": 0.0,
+                "L5_basket": 0.0
+            },
             "synaptic_delays": {
                 "L2_pyramidal": 0.1,
-                "L5_pyramidal": 1.0
+                "L5_pyramidal": 1.0,
+                "L2_basket": 0.0,
+                "L5_basket": 0.0
             },
             "probability": 1.0,
             "name": "poisson",
             "target_types": [
+                "L2_basket",
                 "L2_pyramidal",
+                "L5_basket",
                 "L5_pyramidal"
             ],
             "cell_specific": true
@@ -5677,6 +5720,80 @@
             "probability": 1.0
         },
         {
+            "target_type": "L2_basket",
+            "target_gids": [
+                0,
+                1,
+                2
+            ],
+            "num_targets": 3,
+            "src_type": "poisson",
+            "src_gids": [
+                104,
+                105,
+                103
+            ],
+            "num_srcs": 3,
+            "gid_pairs": {
+                "103": [
+                    0
+                ],
+                "104": [
+                    1
+                ],
+                "105": [
+                    2
+                ]
+            },
+            "loc": "proximal",
+            "receptor": "ampa",
+            "nc_dict": {
+                "A_delay": 0.0,
+                "A_weight": 0.0,
+                "lamtha": 100.0,
+                "threshold": 0.0
+            },
+            "allow_autapses": 1,
+            "probability": 1.0
+        },
+        {
+            "target_type": "L2_basket",
+            "target_gids": [
+                0,
+                1,
+                2
+            ],
+            "num_targets": 3,
+            "src_type": "poisson",
+            "src_gids": [
+                104,
+                105,
+                103
+            ],
+            "num_srcs": 3,
+            "gid_pairs": {
+                "103": [
+                    0
+                ],
+                "104": [
+                    1
+                ],
+                "105": [
+                    2
+                ]
+            },
+            "loc": "proximal",
+            "receptor": "nmda",
+            "nc_dict": {
+                "A_delay": 0.0,
+                "A_weight": 0.0,
+                "lamtha": 100.0,
+                "threshold": 0.0
+            },
+            "allow_autapses": 1,
+            "probability": 1.0
+        },
+        {
             "target_type": "L2_pyramidal",
             "target_gids": [
                 3,
@@ -5692,43 +5809,43 @@
             "num_targets": 9,
             "src_type": "poisson",
             "src_gids": [
-                103,
-                104,
-                105,
                 106,
                 107,
                 108,
                 109,
                 110,
-                111
+                111,
+                112,
+                113,
+                114
             ],
             "num_srcs": 9,
             "gid_pairs": {
-                "103": [
+                "106": [
                     3
                 ],
-                "104": [
+                "107": [
                     4
                 ],
-                "105": [
+                "108": [
                     5
                 ],
-                "106": [
+                "109": [
                     6
                 ],
-                "107": [
+                "110": [
                     7
                 ],
-                "108": [
+                "111": [
                     8
                 ],
-                "109": [
+                "112": [
                     9
                 ],
-                "110": [
+                "113": [
                     10
                 ],
-                "111": [
+                "114": [
                     11
                 ]
             },
@@ -5737,6 +5854,147 @@
             "nc_dict": {
                 "A_delay": 0.1,
                 "A_weight": 0.0008,
+                "lamtha": 100.0,
+                "threshold": 0.0
+            },
+            "allow_autapses": 1,
+            "probability": 1.0
+        },
+        {
+            "target_type": "L2_pyramidal",
+            "target_gids": [
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11
+            ],
+            "num_targets": 9,
+            "src_type": "poisson",
+            "src_gids": [
+                106,
+                107,
+                108,
+                109,
+                110,
+                111,
+                112,
+                113,
+                114
+            ],
+            "num_srcs": 9,
+            "gid_pairs": {
+                "106": [
+                    3
+                ],
+                "107": [
+                    4
+                ],
+                "108": [
+                    5
+                ],
+                "109": [
+                    6
+                ],
+                "110": [
+                    7
+                ],
+                "111": [
+                    8
+                ],
+                "112": [
+                    9
+                ],
+                "113": [
+                    10
+                ],
+                "114": [
+                    11
+                ]
+            },
+            "loc": "proximal",
+            "receptor": "nmda",
+            "nc_dict": {
+                "A_delay": 0.1,
+                "A_weight": 0.0,
+                "lamtha": 100.0,
+                "threshold": 0.0
+            },
+            "allow_autapses": 1,
+            "probability": 1.0
+        },
+        {
+            "target_type": "L5_basket",
+            "target_gids": [
+                12,
+                13,
+                14
+            ],
+            "num_targets": 3,
+            "src_type": "poisson",
+            "src_gids": [
+                115,
+                116,
+                117
+            ],
+            "num_srcs": 3,
+            "gid_pairs": {
+                "115": [
+                    12
+                ],
+                "116": [
+                    13
+                ],
+                "117": [
+                    14
+                ]
+            },
+            "loc": "proximal",
+            "receptor": "ampa",
+            "nc_dict": {
+                "A_delay": 0.0,
+                "A_weight": 0.0,
+                "lamtha": 100.0,
+                "threshold": 0.0
+            },
+            "allow_autapses": 1,
+            "probability": 1.0
+        },
+        {
+            "target_type": "L5_basket",
+            "target_gids": [
+                12,
+                13,
+                14
+            ],
+            "num_targets": 3,
+            "src_type": "poisson",
+            "src_gids": [
+                115,
+                116,
+                117
+            ],
+            "num_srcs": 3,
+            "gid_pairs": {
+                "115": [
+                    12
+                ],
+                "116": [
+                    13
+                ],
+                "117": [
+                    14
+                ]
+            },
+            "loc": "proximal",
+            "receptor": "nmda",
+            "nc_dict": {
+                "A_delay": 0.0,
+                "A_weight": 0.0,
                 "lamtha": 100.0,
                 "threshold": 0.0
             },
@@ -5759,43 +6017,43 @@
             "num_targets": 9,
             "src_type": "poisson",
             "src_gids": [
-                112,
-                113,
-                114,
-                115,
-                116,
-                117,
                 118,
                 119,
-                120
+                120,
+                121,
+                122,
+                123,
+                124,
+                125,
+                126
             ],
             "num_srcs": 9,
             "gid_pairs": {
-                "112": [
+                "118": [
                     15
                 ],
-                "113": [
+                "119": [
                     16
                 ],
-                "114": [
+                "120": [
                     17
                 ],
-                "115": [
+                "121": [
                     18
                 ],
-                "116": [
+                "122": [
                     19
                 ],
-                "117": [
+                "123": [
                     20
                 ],
-                "118": [
+                "124": [
                     21
                 ],
-                "119": [
+                "125": [
                     22
                 ],
-                "120": [
+                "126": [
                     23
                 ]
             },
@@ -5804,6 +6062,73 @@
             "nc_dict": {
                 "A_delay": 1.0,
                 "A_weight": 0.0075,
+                "lamtha": 100.0,
+                "threshold": 0.0
+            },
+            "allow_autapses": 1,
+            "probability": 1.0
+        },
+        {
+            "target_type": "L5_pyramidal",
+            "target_gids": [
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23
+            ],
+            "num_targets": 9,
+            "src_type": "poisson",
+            "src_gids": [
+                118,
+                119,
+                120,
+                121,
+                122,
+                123,
+                124,
+                125,
+                126
+            ],
+            "num_srcs": 9,
+            "gid_pairs": {
+                "118": [
+                    15
+                ],
+                "119": [
+                    16
+                ],
+                "120": [
+                    17
+                ],
+                "121": [
+                    18
+                ],
+                "122": [
+                    19
+                ],
+                "123": [
+                    20
+                ],
+                "124": [
+                    21
+                ],
+                "125": [
+                    22
+                ],
+                "126": [
+                    23
+                ]
+            },
+            "loc": "proximal",
+            "receptor": "nmda",
+            "nc_dict": {
+                "A_delay": 1.0,
+                "A_weight": 0.0,
                 "lamtha": 100.0,
                 "threshold": 0.0
             },
