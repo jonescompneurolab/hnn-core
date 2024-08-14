@@ -743,18 +743,17 @@ voltages are not saved due to size.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>net</strong><span class="classifier">Instance of Network object</span></dt><dd><p>The Network object.</p>
+<dt><strong>net</strong><span class="classifier">Network</span></dt><dd><p>hnn-core Network object</p>
 </dd>
-<dt><strong>fname</strong><span class="classifier">str | Path object</span></dt><dd><p>Full path to the output file (.hdf5).</p>
+<dt><strong>output</strong><span class="classifier">str, Path, or StringIO</span></dt><dd><p>Path or buffer to write outputs</p>
 </dd>
-<dt><strong>overwrite</strong><span class="classifier">Boolean</span></dt><dd><p>True : Overwrite existing file.
-False : Throw error if file already exists.</p>
+<dt><strong>overwrite</strong><span class="classifier">bool</span></dt><dd><p>Overwrite file if it exists. Default: True</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Yields<span class="colon">:</span></dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>A json file containing the Network configurations.</dt><dd></dd>
+<dt>None</dt><dd></dd>
 </dl>
 </dd>
 </dl>

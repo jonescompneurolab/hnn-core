@@ -136,6 +136,7 @@
 
 <span class="c1"># Authors: Mainak Jas &lt;mjas@mgh.harvard.edu&gt;</span>
 <span class="c1">#          Huzi Cheng &lt;hzcheng15@icloud.com&gt;</span>
+<span class="kn">import</span> <span class="nn">base64</span>
 <span class="kn">import</span> <span class="nn">codecs</span>
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -146,6 +147,7 @@
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">urllib.parse</span>
 <span class="kn">import</span> <span class="nn">urllib.request</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
@@ -165,11 +167,8 @@
 <span class="kn">from</span> <span class="nn">hnn_core.dipole</span> <span class="kn">import</span> <span class="n">_read_dipole_txt</span>
 <span class="kn">from</span> <span class="nn">hnn_core.params_default</span> <span class="kn">import</span> <span class="p">(</span><span class="n">get_L2Pyr_params_default</span><span class="p">,</span>
                                      <span class="n">get_L5Pyr_params_default</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">hnn_core.hnn_io</span> <span class="kn">import</span> <span class="n">dict_to_network</span>
+<span class="kn">from</span> <span class="nn">hnn_core.hnn_io</span> <span class="kn">import</span> <span class="n">dict_to_network</span><span class="p">,</span> <span class="n">write_network_configuration</span>
 <span class="kn">from</span> <span class="nn">hnn_core.cells_default</span> <span class="kn">import</span> <span class="n">_exp_g_at_dist</span>
-
-<span class="kn">import</span> <span class="nn">base64</span>
-<span class="kn">import</span> <span class="nn">zipfile</span>
 
 <span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
 <span class="n">default_network_configuration</span> <span class="o">=</span> <span class="p">(</span><span class="n">hnn_core_root</span> <span class="o">/</span> <span class="s1">&#39;param&#39;</span> <span class="o">/</span>
@@ -490,7 +489,10 @@
             <span class="n">button_style</span><span class="o">=</span><span class="s1">&#39;success&#39;</span><span class="p">)</span>
 
         <span class="c1"># Create save simulation widget wrapper</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">save_simuation_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_html_download_button</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_simuation_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_html_download_button</span><span class="p">(</span>
+            <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Save Simulation&#39;</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s1">&#39;text/csv&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_config_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_html_download_button</span><span class="p">(</span>
+            <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Save Configurations&#39;</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s1">&#39;application/json&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[],</span>
                                                <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -565,16 +567,16 @@
 <span class="sd">            This is for testing purposes &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">cell_parameters_dict</span></div>
 
-    <span class="k">def</span> <span class="nf">_init_html_download_button</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_init_html_download_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">):</span>
         <span class="n">b64</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="n">b64</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
         <span class="c1"># Initialliting HTML code for download button</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">html_download_button</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
-<span class="s1">        &lt;a download=&quot;</span><span class="si">{filename}</span><span class="s1">&quot; href=&quot;data:text/csv;base64,</span><span class="si">{payload}</span><span class="s1">&quot;</span>
+<span class="s1">        &lt;a download=&quot;</span><span class="si">{filename}</span><span class="s1">&quot; href=&quot;data:</span><span class="si">{mimetype}</span><span class="s1">;base64,</span><span class="si">{payload}</span><span class="s1">&quot;</span>
 <span class="s1">          download&gt;</span>
 <span class="s1">        &lt;button style=&quot;background:</span><span class="si">{color_theme}</span><span class="s1">; height:</span><span class="si">{btn_height}</span><span class="s1">&quot;</span>
 <span class="s1">        class=&quot; jupyter-button</span>
-<span class="s1">           mod-warning&quot; </span><span class="si">{is_disabled}</span><span class="s1"> &gt;Save Simulation&lt;/button&gt;</span>
+<span class="s1">           mod-warning&quot; </span><span class="si">{is_disabled}</span><span class="s1"> &gt;</span><span class="si">{title}</span><span class="s1">&lt;/button&gt;</span>
 <span class="s1">        &lt;/a&gt;</span>
 <span class="s1">        &#39;&#39;&#39;</span>
         <span class="c1"># Create widget wrapper</span>
@@ -584,7 +586,9 @@
                         <span class="n">filename</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;&quot;</span><span class="p">},</span>
                         <span class="n">is_disabled</span><span class="o">=</span><span class="s2">&quot;disabled&quot;</span><span class="p">,</span>
                         <span class="n">btn_height</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;run_btn&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
-                        <span class="n">color_theme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">])))</span>
+                        <span class="n">color_theme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">],</span>
+                        <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+                        <span class="n">mimetype</span><span class="o">=</span><span class="n">mimetype</span><span class="p">)))</span>
 
     <span class="k">def</span> <span class="nf">add_logging_window_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">handler</span> <span class="o">=</span> <span class="n">_OutputWidgetHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">)</span>
@@ -618,6 +622,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_log_window</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;log_out&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_operation_buttons</span> <span class="o">=</span> <span class="n">HBox</span><span class="p">(</span>
             <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">run_button</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_data_button</span><span class="p">,</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">save_config_button</span><span class="p">,</span>
              <span class="bp">self</span><span class="o">.</span><span class="n">save_simuation_button</span><span class="p">,</span>
              <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="p">],</span>
             <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;operation_box&#39;</span><span class="p">])</span>
@@ -711,6 +716,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">_simulation_list_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="c1"># Simulation Data</span>
             <span class="n">_simulation_data</span><span class="p">,</span> <span class="n">file_extension</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">_serialize_simulation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span>
                                       <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
@@ -727,7 +733,22 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">html_download_button</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="n">payload</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">result_file</span><span class="p">,</span>
                     <span class="n">is_disabled</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">btn_height</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;run_btn&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
-                    <span class="n">color_theme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">]))</span>
+                    <span class="n">color_theme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">],</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Save Simulation&#39;</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s1">&#39;text/csv&#39;</span><span class="p">))</span>
+
+            <span class="c1"># Network Configuration</span>
+            <span class="n">network_config</span> <span class="o">=</span> <span class="n">_serialize_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                                               <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="p">)</span>
+            <span class="n">b64_net</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">network_config</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save_config_button</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">html_download_button</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">payload</span><span class="o">=</span><span class="n">b64_net</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span>
+                    <span class="n">filename</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="o">.</span><span class="n">new</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">,</span>
+                    <span class="n">is_disabled</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                    <span class="n">btn_height</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;run_btn&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
+                    <span class="n">color_theme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">],</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Save Configurations&#39;</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s1">&#39;application/json&#39;</span><span class="p">))</span>
 
         <span class="k">def</span> <span class="nf">_driver_type_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">widget_location_selection</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="p">(</span>
@@ -2244,7 +2265,7 @@
 
 
 <span class="k">def</span> <span class="nf">_serialize_simulation</span><span class="p">(</span><span class="n">log_out</span><span class="p">,</span> <span class="n">sim_data</span><span class="p">,</span> <span class="n">simulation_list_widget</span><span class="p">):</span>
-    <span class="c1"># Only download if there is there is at least one simulation</span>
+    <span class="c1"># Only download if there is at least one simulation</span>
     <span class="n">sim_name</span> <span class="o">=</span> <span class="n">simulation_list_widget</span><span class="o">.</span><span class="n">value</span>
 
     <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
@@ -2261,7 +2282,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">simulation_data</span> <span class="o">=</span> <span class="n">simulations_data</span><span class="p">[</span><span class="s2">&quot;simulation_data&quot;</span><span class="p">]</span>
     <span class="n">csv_trials_output</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="c1"># CSV file hearders</span>
+    <span class="c1"># CSV file headers</span>
     <span class="n">headers</span> <span class="o">=</span> <span class="s1">&#39;times,agg,L2,L5&#39;</span>
     <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%f</span><span class="s1">, </span><span class="si">%f</span><span class="s1">, </span><span class="si">%f</span><span class="s1">, </span><span class="si">%f</span><span class="s1">&#39;</span>
 
@@ -2286,6 +2307,27 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Create zip file</span>
         <span class="k">return</span> <span class="n">_create_zip</span><span class="p">(</span><span class="n">csv_trials_output</span><span class="p">,</span> <span class="n">simulation_name</span><span class="p">),</span> <span class="s2">&quot;.zip&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">_serialize_config</span><span class="p">(</span><span class="n">log_out</span><span class="p">,</span> <span class="n">sim_data</span><span class="p">,</span> <span class="n">simulation_list_widget</span><span class="p">):</span>
+    <span class="c1"># Only download if there is at least one simulation</span>
+    <span class="n">sim_name</span> <span class="o">=</span> <span class="n">simulation_list_widget</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saving Network configuration </span><span class="si">{</span><span class="n">sim_name</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">serialize_config</span><span class="p">(</span><span class="n">sim_data</span><span class="p">,</span> <span class="n">sim_name</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">serialize_config</span><span class="p">(</span><span class="n">simulations_data</span><span class="p">,</span> <span class="n">simulation_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Serializes Network configuration data to json.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Get network from data dictionary</span>
+    <span class="n">net</span> <span class="o">=</span> <span class="n">simulations_data</span><span class="p">[</span><span class="s2">&quot;simulation_data&quot;</span><span class="p">][</span><span class="n">simulation_name</span><span class="p">][</span><span class="s1">&#39;net&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Write to buffer</span>
+    <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span> <span class="k">as</span> <span class="n">output</span><span class="p">:</span>
+        <span class="n">write_network_configuration</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">_create_zip</span><span class="p">(</span><span class="n">csv_data_list</span><span class="p">,</span> <span class="n">simulation_name</span><span class="p">):</span>
