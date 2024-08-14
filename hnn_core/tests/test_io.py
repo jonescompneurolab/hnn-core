@@ -58,11 +58,15 @@ def jones_2009_network(params):
         weights_ampa=weights_ampa_p, weights_nmda=weights_nmda_p,
         synaptic_delays=syn_delays_p, event_seed=284)
 
-    weights_ampa = {'L2_pyramidal': 0.0008, 'L5_pyramidal': 0.0075}
-    synaptic_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0}
-    rate_constant = {'L2_pyramidal': 140.0, 'L5_pyramidal': 40.0}
+    weights_ampa = {'L2_pyramidal': 0.0008, 'L5_pyramidal': 0.0075,
+                    'L2_basket': 0.0, 'L5_basket': 0.0}
+    synaptic_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0,
+                       'L2_basket': 0.0, 'L5_basket': 0.0}
+    rate_constant = {'L2_pyramidal': 140.0, 'L5_pyramidal': 40.0,
+                     'L2_basket': 40.0, 'L5_basket': 40.0}
     net.add_poisson_drive(
-        'poisson', rate_constant=rate_constant, weights_ampa=weights_ampa,
+        'poisson', rate_constant=rate_constant,
+        weights_ampa=weights_ampa, weights_nmda=weights_nmda_p,
         location='proximal', synaptic_delays=synaptic_delays,
         event_seed=1349)
 
