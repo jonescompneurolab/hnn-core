@@ -100,6 +100,12 @@ Changelog
   the structure of the Network object. Flat parameter and json configuration
   files are no longer supported by the GUI, by `George Dang`_ in :gh:`837`
 
+- Updated the GUI load drive widget to be able to load tonic biases from a
+  network configuration file. `George Dang`_ in :gh:`852`
+
+- Added "No. Drive Cells" input widget to the GUI and changed the "Synchronous
+  Input" checkbox to "Cell-Specific" to align with the API `George Dang`_ in :gh:`861`
+
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
