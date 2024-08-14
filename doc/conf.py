@@ -31,11 +31,11 @@ sys.path.append(os.path.abspath(os.path.join(curdir, 'sphinxext')))
 # -- Project information -----------------------------------------------------
 
 project = 'hnn-core'
-copyright = '2023, HNN Developers'
+copyright = '2024, HNN Developers'
 author = 'HNN Developers'
 
 # The short X.Y version
-version = '0.4.dev0'
+version = '0.4'
 # The full version, including alpha/beta/rc tags
 release = ''
 
@@ -250,4 +250,3 @@ sphinx_gallery_conf = {
                'dependencies': 'Dockerfile'
                }
 }
-
