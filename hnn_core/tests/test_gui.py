@@ -304,10 +304,10 @@ def test_gui_init_network(setup_gui):
 
     assert net_from_gui.cell_types == net_from_api.cell_types
 
-    # Check Connections - This currently fails
-    # assert len(net_from_gui.connectivity) == len(net_from_api.connectivity)
-    # assert net_from_gui.gid_ranges == net_from_api.gid_ranges
-    # assert net_from_gui.pos_dict == net_from_api.pos_dict
+    # Check Connections
+    assert len(net_from_gui.connectivity) == len(net_from_api.connectivity)
+    assert net_from_gui.gid_ranges == net_from_api.gid_ranges
+    assert net_from_gui.pos_dict == net_from_api.pos_dict
 
     # Check Drives
     gui_drives = net_from_gui.external_drives
@@ -318,11 +318,11 @@ def test_gui_init_network(setup_gui):
     assert gui_drives['evprox1'] == api_drives['evprox1']
     assert gui_drives['evprox2'] == api_drives['evprox2']
 
-    # Poisson and Bursty drives will have different tstop. This helper function
-    # passes comparing tstop.
     def check_equality(item1, item2, message=None):
         assert item1 == item2, message
 
+    # Poisson and Bursty drives will have different tstop. This function
+    # passes comparing tstop.
     def _check_drive(name, keys):
         for key in keys:
             gui_value = gui_drives[name][key]
@@ -336,10 +336,10 @@ def test_gui_init_network(setup_gui):
                         check_equality(d_value, api_value[d_key],
                                        f'{name}>{key}>{d_key} not equal')
 
+    # Poisson drives
     _check_drive('poisson', gui_drives['poisson'].keys())
-
-    # Bursty drives will currently fail until planned GUI updates are made
-    # _check_drive('alpha_prox', gui_drives['alpha_prox'].keys())
+    # Rhythmic/Bursty drives
+    _check_drive('alpha_prox', gui_drives['alpha_prox'].keys())
 
     # Check external bias is created. This will not match the api network
     # because of the GUI tstop value.
