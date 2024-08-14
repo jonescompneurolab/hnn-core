@@ -556,8 +556,8 @@ def test_gui_synchronous_inputs(setup_gui):
     # Check that the n_drive_cells is not disabled
     assert not gui.drive_widgets[0]['n_drive_cells'].disabled
 
-    # set synch inputs to first driver in simulation
-    driver_name = gui.drive_widgets[0]['name']
+    # Get name of first drive
+    drive_name = gui.drive_widgets[0]['name']
 
     # Loop by number of drive cells
     for i, n_drive_cells in enumerate([1, 3]):
@@ -572,22 +572,22 @@ def test_gui_synchronous_inputs(setup_gui):
         # Filter connections for specific driver_name first
         network_connections = sim['net'].connectivity
         driver_connections = [conn for conn in network_connections
-                              if conn['src_type'] == driver_name]
+                              if conn['src_type'] == drive_name]
 
         # Check src_gids length
         for connectivity in driver_connections:
             assert len(connectivity['src_gids']) == n_drive_cells
 
 
-def test_gui_all_to_all_drive(setup_gui):
-    """Tests all-to-all connection with cell_specific widget"""
+def test_gui_cell_specific_drive(setup_gui):
+    """Tests 1:1 connection with cell_specific widget"""
     gui = setup_gui
     # Set cell_specific to False
     gui.drive_widgets[0]['is_cell_specific'].value = True
     # Assert that the n_drive_cells is disabled
     assert gui.drive_widgets[0]['n_drive_cells'].disabled
 
-    # set synch inputs to first driver in simulation
+    # Get name of first drive
     driver_name = gui.drive_widgets[0]['name']
 
     # Run simulation
