@@ -2,6 +2,7 @@
 
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Huzi Cheng <hzcheng15@icloud.com>
+import base64
 import codecs
 import io
 import logging
@@ -12,6 +13,7 @@ import sys
 import json
 import urllib.parse
 import urllib.request
+import zipfile
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
@@ -33,9 +35,6 @@ from hnn_core.params_default import (get_L2Pyr_params_default,
                                      get_L5Pyr_params_default)
 from hnn_core.hnn_io import dict_to_network, write_network_configuration
 from hnn_core.cells_default import _exp_g_at_dist
-
-import base64
-import zipfile
 
 hnn_core_root = Path(hnn_core.__file__).parent
 default_network_configuration = (hnn_core_root / 'param' /
