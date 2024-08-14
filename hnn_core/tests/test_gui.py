@@ -368,54 +368,7 @@ def test_gui_init_network(setup_gui):
     config_path = assets_path / 'jones2009_3x3_drives.json'
     net_from_api = read_network_configuration(config_path)
 
-    assert net_from_gui.cell_types == net_from_api.cell_types
-
-    # Check Connections
-    assert len(net_from_gui.connectivity) == len(net_from_api.connectivity)
-    assert net_from_gui.gid_ranges == net_from_api.gid_ranges
-    assert net_from_gui.pos_dict == net_from_api.pos_dict
-
-    # Check Drives
-    gui_drives = net_from_gui.external_drives
-    api_drives = net_from_api.external_drives
-
-    # Check evoked drives
-    assert gui_drives['evdist1'] == api_drives['evdist1']
-    assert gui_drives['evprox1'] == api_drives['evprox1']
-    assert gui_drives['evprox2'] == api_drives['evprox2']
-
-    def check_equality(item1, item2, message=None):
-        assert item1 == item2, message
-
-    # Poisson and Bursty drives will have different tstop. This function
-    # passes comparing tstop.
-    def _check_drive(name, keys):
-        for key in keys:
-            gui_value = gui_drives[name][key]
-            api_value = api_drives[name][key]
-            if key != 'dynamics':
-                check_equality(gui_value, api_value,
-                               f'{name}>{key} not equal')
-            else:
-                for d_key, d_value in gui_value.items():
-                    if d_key != 'tstop':
-                        check_equality(d_value, api_value[d_key],
-                                       f'{name}>{key}>{d_key} not equal')
-
-    # Poisson drives
-    _check_drive('poisson', gui_drives['poisson'].keys())
-    # Rhythmic/Bursty drives
-    _check_drive('alpha_prox', gui_drives['alpha_prox'].keys())
-
-    # Check external bias is created. This will not match the api network
-    # because of the GUI tstop value.
-    gui_tonic = net_from_gui.external_biases['tonic']
-    api_tonic = net_from_api.external_biases['tonic']
-    for cell_type, gui_attributes in gui_tonic.items():
-        for att_key, attribute in gui_attributes.items():
-            if att_key != 'tstop':
-                check_equality(attribute, api_tonic[cell_type][att_key],
-                               f'"tonic">{cell_type}>{att_key} not equal')
+    check_equal_networks(net_from_gui, net_from_api)
 
 
 @requires_mpi4py
