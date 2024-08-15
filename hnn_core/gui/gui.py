@@ -358,7 +358,7 @@ class HNNGUI:
         self.save_simuation_button = self._init_html_download_button(
             title='Save Simulation', mimetype='text/csv')
         self.save_config_button = self._init_html_download_button(
-            title='Save Configurations', mimetype='application/json')
+            title='Save Network', mimetype='application/json')
 
         self.simulation_list_widget = Dropdown(options=[],
                                                value=None,
@@ -614,7 +614,7 @@ class HNNGUI:
                     is_disabled="",
                     btn_height=self.layout['run_btn'].height,
                     color_theme=self.layout['theme_color'],
-                    title='Save Configurations', mimetype='application/json'))
+                    title='Save Network', mimetype='application/json'))
 
         def _driver_type_change(value):
             self.widget_location_selection.disabled = (
