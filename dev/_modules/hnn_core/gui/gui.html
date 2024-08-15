@@ -492,7 +492,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">save_simuation_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_html_download_button</span><span class="p">(</span>
             <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Save Simulation&#39;</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s1">&#39;text/csv&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save_config_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_html_download_button</span><span class="p">(</span>
-            <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Save Configurations&#39;</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s1">&#39;application/json&#39;</span><span class="p">)</span>
+            <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Save Network&#39;</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s1">&#39;application/json&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[],</span>
                                                <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -748,7 +748,7 @@
                     <span class="n">is_disabled</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
                     <span class="n">btn_height</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;run_btn&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">height</span><span class="p">,</span>
                     <span class="n">color_theme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">],</span>
-                    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Save Configurations&#39;</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s1">&#39;application/json&#39;</span><span class="p">))</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Save Network&#39;</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s1">&#39;application/json&#39;</span><span class="p">))</span>
 
         <span class="k">def</span> <span class="nf">_driver_type_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">widget_location_selection</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="p">(</span>
