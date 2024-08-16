@@ -207,7 +207,7 @@ If you use HNN-core in your work, please cite our
 .. |PyPI| image:: https://img.shields.io/pypi/dm/hnn-core.svg?label=PyPI%20downloads
    :target: https://pypi.org/project/hnn-core/
 
-.. |HNN-GUI| image:: https://github.com/jonescompneurolab/hnn-core/blob/acbcc4a598610dc3be5d4b0b7c59f98251ea7690/.github/images/hnn_gui.png
+.. |HNN-GUI| image:: https://raw.githubusercontent.com/jonescompneurolab/hnn-core/acbcc4a598610dc3be5d4b0b7c59f98251ea7690/.github/images/hnn_gui.png
 
 .. |Gitter| image:: https://badges.gitter.im/jonescompneurolab/hnn_core.svg
    :target: https://gitter.im/jonescompneurolab/hnn-core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
