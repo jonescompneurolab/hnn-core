@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>hnn_core.viz.NetworkPlotter &#8212; hnn-core  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css?v=9afac83c" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=fd10adb8"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-199741045-1');
+</script>
+
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html">
+          hnn-core</a>
+        <span class="navbar-text navbar-version pull-left"><b>0.4</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../auto_examples/index.html">Examples</a></li>
+                <li><a href="../api.html">API</a></li>
+                <li><a href="../glossary.html">Glossary</a></li>
+                <li><a href="../whats_new.html">What's new</a></li>
+                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"></ul>
+</li>
+              
+                <li class="dropdown">
+  <a role="button"
+     id="dLabelLocalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="#">Page <b class="caret"></b></a>
+  <ul class="dropdown-menu localtoc"
+      role="menu"
+      aria-labelledby="dLabelLocalToc"><ul>
+<li><a class="reference internal" href="#">hnn_core.viz.NetworkPlotter</a><ul>
+<li><a class="reference internal" href="#hnn_core.viz.NetworkPlotter"><code class="docutils literal notranslate"><span class="pre">NetworkPlotter</span></code></a><ul>
+<li><a class="reference internal" href="#hnn_core.viz.NetworkPlotter.export_movie"><code class="docutils literal notranslate"><span class="pre">NetworkPlotter.export_movie()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#examples-using-hnn-core-viz-networkplotter">Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.viz.NetworkPlotter</span></code></a></li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+              <li class="hidden-sm">
+<div id="sourcelink">
+  <a href="../_sources/generated/hnn_core.viz.NetworkPlotter.rst.txt"
+     rel="nofollow">Source</a>
+</div></li>
+            
+          </ul>
+
+          
+<div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
+  <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
+    v0.4
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/index.html">Development</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.2/index.html">v0.2</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.3/index.html">v0.3</a></li>
+    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.4/index.html">v0.4</a></li>
+  </ul>
+</div>
+
+
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="body col-md-12 content" role="main">
+      
+  <section id="hnn-core-viz-networkplotter">
+<h1>hnn_core.viz.NetworkPlotter<a class="headerlink" href="#hnn-core-viz-networkplotter" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="hnn_core.viz.NetworkPlotter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">NetworkPlotter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bg_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltage_colormap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">azim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-200,</span> <span class="pre">3100)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-200,</span> <span class="pre">3100)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-300,</span> <span class="pre">2200)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trial_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#NetworkPlotter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.NetworkPlotter" title="Link to this definition">¶</a></dt>
+<dd><p>Helper class to visualize full morphology of HNN model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>net</strong><span class="classifier">Instance of Network object</span></dt><dd><p>The Network object</p>
+</dd>
+<dt><strong>ax</strong><span class="classifier">instance of matplotlib Axes3D | None</span></dt><dd><p>An axis object from matplotlib. If None,
+a new figure is created.</p>
+</dd>
+<dt><strong>vmin</strong><span class="classifier">int | float</span></dt><dd><p>Lower limit of colormap for plotting voltage
+Default: -100 mV</p>
+</dd>
+<dt><strong>vmax</strong><span class="classifier">int | float</span></dt><dd><p>Upper limit of colormap for plotting voltage
+Default: 50 mV</p>
+</dd>
+<dt><strong>bg_color</strong><span class="classifier">str</span></dt><dd><p>Background color of ax. Default: ‘black’</p>
+</dd>
+<dt><strong>colorbar</strong><span class="classifier">bool</span></dt><dd><p>If True (default), adjust figure to include colorbar.</p>
+</dd>
+<dt><strong>voltage_colormap</strong><span class="classifier">str</span></dt><dd><p>Colormap used for plotting voltages
+Default: ‘viridis’</p>
+</dd>
+<dt><strong>elev</strong><span class="classifier">int | float</span></dt><dd><p>Elevation 3D plot viewpoint, default: 10</p>
+</dd>
+<dt><strong>azim</strong><span class="classifier">int | float</span></dt><dd><p>Azimuth of 3D plot view point, default: 20</p>
+</dd>
+<dt><strong>xlim</strong><span class="classifier">tuple of int | tuple of float</span></dt><dd><p>x limits of plot window. Default (-200, 3100)</p>
+</dd>
+<dt><strong>ylim</strong><span class="classifier">tuple of int | tuple of float</span></dt><dd><p>y limits of plot window. Default (-200, 3100)</p>
+</dd>
+<dt><strong>zlim</strong><span class="classifier">tuple of int | tuple of float</span></dt><dd><p>z limits of plot window. Default (-300, 2200)</p>
+</dd>
+<dt><strong>trial_idx</strong><span class="classifier">int</span></dt><dd><p>Index of simulation trial plotted. Default: 0</p>
+</dd>
+<dt><strong>time_idx</strong><span class="classifier">int</span></dt><dd><p>Index of time point plotted. Default: 0</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>azim</strong></dt><dd></dd>
+<dt><strong>bg_color</strong></dt><dd></dd>
+<dt><strong>colorbar</strong></dt><dd></dd>
+<dt><strong>elev</strong></dt><dd></dd>
+<dt><strong>time_idx</strong></dt><dd></dd>
+<dt><strong>trial_idx</strong></dt><dd></dd>
+<dt><strong>vmax</strong></dt><dd></dd>
+<dt><strong>vmin</strong></dt><dd></dd>
+<dt><strong>voltage_colormap</strong></dt><dd></dd>
+<dt><strong>xlim</strong></dt><dd></dd>
+<dt><strong>ylim</strong></dt><dd></dd>
+<dt><strong>zlim</strong></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.viz.NetworkPlotter.export_movie" title="hnn_core.viz.NetworkPlotter.export_movie"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_movie</span></code></a>(fname[, fps, dpi, decim, ...])</p></td>
+<td><p>Export movie of network activity</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.viz.NetworkPlotter.export_movie">
+<span class="sig-name descname"><span class="pre">export_movie</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pillow'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#NetworkPlotter.export_movie"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.NetworkPlotter.export_movie" title="Link to this definition">¶</a></dt>
+<dd><p>Export movie of network activity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fname</strong><span class="classifier">str</span></dt><dd><p>Filename of exported movie</p>
+</dd>
+<dt><strong>fps</strong><span class="classifier">int</span></dt><dd><p>Frames per second, default: 30</p>
+</dd>
+<dt><strong>dpi</strong><span class="classifier">int</span></dt><dd><p>Dots per inch, default: 300</p>
+</dd>
+<dt><strong>decim</strong><span class="classifier">int</span></dt><dd><p>Decimation factor for frames, default: 10</p>
+</dd>
+<dt><strong>interval</strong><span class="classifier">int</span></dt><dd><p>Delay between frames, default: 30</p>
+</dd>
+<dt><strong>frame_start</strong><span class="classifier">int</span></dt><dd><p>Index of first frame, default: 0</p>
+</dd>
+<dt><strong>frame_stop</strong><span class="classifier">int | None</span></dt><dd><p>Index of last frame, default: None
+If None, entire simulation is animated</p>
+</dd>
+<dt><strong>writer</strong><span class="classifier">str</span></dt><dd><p>Movie writer, default: ‘pillow’.
+Alternative movie writers can be found at
+<a class="reference external" href="https://matplotlib.org/stable/api/animation_api.html">https://matplotlib.org/stable/api/animation_api.html</a></p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="examples-using-hnn-core-viz-networkplotter">
+<span id="sphx-glr-backreferences-hnn-core-viz-networkplotter"></span><h2>Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.viz.NetworkPlotter</span></code><a class="headerlink" href="#examples-using-hnn-core-viz-networkplotter" title="Link to this heading">¶</a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to animate HNN simulations"><img alt="" src="../_images/sphx_glr_plot_hnn_animation_thumb.png" />
+<p><a class="reference internal" href="../auto_examples/howto/plot_hnn_animation.html#sphx-glr-auto-examples-howto-plot-hnn-animation-py"><span class="std std-ref">06. Animating HNN simulations</span></a></p>
+  <div class="sphx-glr-thumbnail-title">06. Animating HNN simulations</div>
+</div></div></section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+    </p>
+    <p>
+        &copy; Copyright 2024, HNN Developers.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.2.6.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>
