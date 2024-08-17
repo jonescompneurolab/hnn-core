@@ -16,7 +16,7 @@ from .network_models import jones_2009_model
 
 
 class BatchSimulate(object):
-    def __init__(self, set_params, net=jones_2009_model(),
+    def __init__(self, set_params, net=None,
                  tstop=170, dt=0.025, n_trials=1,
                  save_folder='./sim_results', batch_size=100,
                  overwrite=True, save_outputs=False, save_dpl=True,
@@ -36,9 +36,11 @@ class BatchSimulate(object):
             where ``net`` is a Network object and ``params`` is a dictionary
             of the parameters that will be set inside the function.
         net : Network object, optional
-            The network model to use for simulations. Must be an instance of
-            jones_2009_model, law_2021_model, or calcium_model.
-            Default is jones_2009_model().
+            The network model to use for simulations. Examples include:
+            - `jones_2009_model`: A network model based on Jones et al. (2009).
+            - `law_2021_model`: A network model based on Law et al. (2021).
+            - `calcium_model`: A network model incorporating calcium dynamics.
+            Default is `jones_2009_model()`
         tstop : float, optional
             The stop time for the simulation. Default is 170 ms.
         dt : float, optional
@@ -104,7 +106,7 @@ class BatchSimulate(object):
         will be overwritten.
         """
 
-        _validate_type(net, Network, 'net', 'Network')
+        _validate_type(net, (Network, None), 'net', 'Network')
         _validate_type(tstop, types='numeric', item_name='tstop')
         _validate_type(dt, types='numeric', item_name='dt')
         _validate_type(n_trials, types='int', item_name='n_trials')
@@ -127,7 +129,7 @@ class BatchSimulate(object):
         if summary_func is not None and not callable(summary_func):
             raise TypeError("summary_func must be a callable function")
 
-        self.net = net
+        self.net = net if net is not None else jones_2009_model()
         self.set_params = set_params
         self.tstop = tstop
         self.dt = dt

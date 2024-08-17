@@ -26,11 +26,24 @@ from hnn_core import jones_2009_model
 # The number of cores may need modifying depending on your current machine.
 n_jobs = 10
 ###############################################################################
+# The `add_evoked_drive` function simulates external input to the network,
+# mimicking sensory stimulation or other external events.
+#
+# - `evprox` indicates a proximal drive, targeting dendrites near the cell
+#   bodies.
+# - `mu=40` and `sigma=5` define the timing (mean and spread) of the input.
+# - `numspikes=1` means it's a single, brief stimulation.
+# - `weights_ampa` and `synaptic_delays` control the strength and
+#   timing of the input.
+#
+# This evoked drive causes the initial positive deflection in the dipole
+# signal, triggering a cascade of activity through the network and
+# resulting in the complex waveforms observed.
 
 
 def set_params(param_values, net=None):
     """
-    Set parameters in the network drives.
+    Set parameters for the network drives.
 
     Parameters
     ----------
@@ -57,16 +70,16 @@ def set_params(param_values, net=None):
                          synaptic_delays=synaptic_delays)
 
 ###############################################################################
-# Define a parameter grid for the batch simulation.
+# Next, we define a parameter grid for the batch simulation.
 
 
 param_grid = {
-    'weight_basket': np.logspace(-4 - 1, 10),
+    'weight_basket': np.logspace(-4, -1, 10),
     'weight_pyr': np.logspace(-4, -1, 10)
 }
 
 ###############################################################################
-# Define a function to calculate summary statistics
+# We then define a function to calculate summary statistics.
 
 
 def summary_func(results):
@@ -95,12 +108,12 @@ def summary_func(results):
 ###############################################################################
 # Run the batch simulation and collect the results.
 
-# Comment off this code, if dask and distributed Python packages are installed
+# Uncomment this code if dask and distributed Python packages are installed.
 # from dask.distributed import Client
 # client = Client(threads_per_worker=1, n_workers=5, processes=False)
 
 
-# Run the batch simulation and collect the results.
+# Initialize the network model and run the batch simulation.
 net = jones_2009_model(mesh_shape=(3, 3))
 batch_simulation = BatchSimulate(net=net,
                                  set_params=set_params,
@@ -113,18 +126,47 @@ simulation_results = batch_simulation.run(param_grid,
 print("Simulation results:", simulation_results)
 ###############################################################################
 # This plot shows an overlay of all smoothed dipole waveforms from the
-# batch simulation. Each line represents a different set of parameters,
-# allowing us to visualize the range of responses across the parameter space.
+# batch simulation. Each line represents a different set of synaptic strength
+# parameters (`weight_basket`), allowing us to visualize the range of responses
+# across the parameter space.
+# The colormap represents different synaptic strengths, with purple indicating
+# lower strengths and yellow indicating higher strengths.
+#
+# Key observations:
+#
+# - The dipole signal reflects the net current flow in the cortical column.
+# - Initially, we see a positive deflection as excitatory input arrives at
+#   the proximal dendrites, causing current to flow upwards
+#   (away from the soma).
+# - The subsequent negative deflection, despite continued excitatory input,
+#   occurs when action potentials are triggered, causing rapid current flow in
+#   the opposite direction as the cell bodies depolarize.
+# - Inhibitory neurons, when they fire, can also contribute to negative
+#   deflections by causing hyperpolarization in their target neurons.
+# - Later oscillations likely represent ongoing network activity and
+#   subthreshold membrane potential fluctuations.
+#
+# The y-axis represents dipole amplitude in nAm (nanoAmpere-meters), which is
+# the product of current flow and distance in the neural tissue.
+#
+# Stronger synaptic connections (yellow lines) generally show larger
+# amplitude responses and more pronounced features throughout the simulation.
 
-dpl_waveforms = []
+dpl_waveforms, param_values = [], []
 for data_list in simulation_results['simulated_data']:
     for data in data_list:
         dpl_smooth = data['dpl'][0].copy().smooth(window_len=30)
         dpl_waveforms.append(dpl_smooth.data['agg'])
+        param_values.append(data['param_values']['weight_basket'])
 
 plt.figure(figsize=(10, 6))
-for waveform in dpl_waveforms:
-    plt.plot(waveform, alpha=0.5, linewidth=3)
+cmap = plt.get_cmap('viridis')
+param_values = np.array(param_values)
+norm = plt.Normalize(param_values.min(), param_values.max())
+
+for waveform, param in zip(dpl_waveforms, param_values):
+    color = cmap(norm(param))
+    plt.plot(waveform, color=color, alpha=0.7, linewidth=2)
 plt.title('Overlay of Dipole Waveforms')
 plt.xlabel('Time (ms)')
 plt.ylabel('Dipole Amplitude (nAm)')
