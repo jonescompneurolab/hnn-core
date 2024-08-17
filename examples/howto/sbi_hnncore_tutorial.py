@@ -123,12 +123,12 @@ inference = sbi_inference.SNPE(prior=prior)
 density_estimator = inference.append_simulations(thetas, xs).train()
 posterior = inference.build_posterior(density_estimator)
 
+###############################################################################
 # The prior distribution represents our initial guess about the range of
 # possible values for `weight_pyr`. The SBI algorithm will use this prior,
 # along with the simulated data, to build a posterior distribution, which
 # represents our updated belief about `weight_pyr` after seeing the data.
-
-###############################################################################
+#
 # This function allows us to simulate data for a single parameter value.
 
 
@@ -143,6 +143,7 @@ def simulator_batch(param):
 # a parameter value that we pretend we don't know.
 
 
+np.random.seed(42)
 unknown_param = torch.tensor([[np.random.choice(np.linspace(-4, -1, 100))]])
 x_o = simulator_batch(unknown_param.item())
 samples = posterior.sample((1000,), x=x_o)
@@ -165,12 +166,12 @@ plt.legend()
 plt.xlim([-4, -1])
 plt.show()
 
+###############################################################################
 # This plot shows the posterior distribution of the inferred parameter values.
 # If the inferred posterior distribution is centered around the true parameter
 # value, it suggests that the SBI method is accurately capturing the underlying
 # parameter. The red dashed line represents the true parameter value.
-
-###############################################################################
+#
 # Finally, we'll evaluate the performance of our SBI method on multiple
 # unseen parameter values.
 
@@ -189,6 +190,7 @@ plt.xticks(ticks=unseen_params, labels=[f'{param:.2f}'
 plt.xlim(-4.1, -0.9)
 plt.show()
 
+###############################################################################
 # This boxplot visualizes the distribution of inferred parameters for each
 # unseen true parameter value. The true parameters are shown on the x-axis,
 # and the boxes represent the spread of inferred values. If the inferred
