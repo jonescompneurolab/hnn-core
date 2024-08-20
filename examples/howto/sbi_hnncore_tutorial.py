@@ -68,7 +68,7 @@ def set_params(param_values, net=None):
 
 ###############################################################################
 # Here, we generate our parameter grid and run the simulations. We're varying
-# the 'weight_pyr' parameter between 10^-4 and 10^-1.
+# the 'weight_pyr' parameter between 1e-4 and 1e-1.
 
 
 val = np.linspace(-4, -1, n_simulations)
@@ -102,8 +102,8 @@ def extract_dipole_data(sim_results):
 dipole_data = extract_dipole_data(simulation_results)
 
 ###############################################################################
-# Now we prepare our data for the SBI algorithm. 'thetas' are our parameters,
-# and 'xs' are our observed data (the dipole activity). These will be used by
+# Now we prepare our data for the SBI algorithm. `thetas` are our parameters,
+# and `xs` are our observed data (the dipole activity). These will be used by
 # the SBI algorithm to learn the relationship between parameters and
 # the resulting neural activity.
 
