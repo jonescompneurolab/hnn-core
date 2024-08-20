@@ -44,7 +44,6 @@ n_jobs = 20
 # - `evprox` indicates a proximal drive, targeting dendrites near the cell
 #   bodies.
 # - `mu=40` and `sigma=5` define the timing (mean and spread) of the input.
-# - `numspikes=1` means it's a single, brief stimulation.
 # - `weights_ampa` and `synaptic_delays` control the strength and
 #   timing of the input.
 #
