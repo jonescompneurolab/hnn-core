@@ -32,7 +32,6 @@ n_jobs = 10
 # - `evprox` indicates a proximal drive, targeting dendrites near the cell
 #   bodies.
 # - `mu=40` and `sigma=5` define the timing (mean and spread) of the input.
-# - `numspikes=1` means it's a single, brief stimulation.
 # - `weights_ampa` and `synaptic_delays` control the strength and
 #   timing of the input.
 #
@@ -129,22 +128,15 @@ print("Simulation results:", simulation_results)
 # batch simulation. Each line represents a different set of synaptic strength
 # parameters (`weight_basket`), allowing us to visualize the range of responses
 # across the parameter space.
-# The colormap represents different synaptic strengths, with purple indicating
-# lower strengths and yellow indicating higher strengths.
+# The colormap represents synaptic strengths, from weaker (purple)
+# to stronger (yellow).
 #
-# Key observations:
-#
-# - The dipole signal reflects the net current flow in the cortical column.
-# - Initially, we see a positive deflection as excitatory input arrives at
-#   the proximal dendrites, causing current to flow upwards
-#   (away from the soma).
-# - The subsequent negative deflection, despite continued excitatory input,
-#   occurs when action potentials are triggered, causing rapid current flow in
-#   the opposite direction as the cell bodies depolarize.
-# - Inhibitory neurons, when they fire, can also contribute to negative
-#   deflections by causing hyperpolarization in their target neurons.
-# - Later oscillations likely represent ongoing network activity and
-#   subthreshold membrane potential fluctuations.
+# As drive strength increases, dipole responses show progressively larger
+# amplitudes and more distinct features, reflecting heightened network
+# activity. Weak drives (purple lines) produce smaller amplitude signals with
+# simpler waveforms, while stronger drives (yellow lines) generate
+# larger responses with more pronounced oscillatory features, indicating
+# more robust network activity.
 #
 # The y-axis represents dipole amplitude in nAm (nanoAmpere-meters), which is
 # the product of current flow and distance in the neural tissue.
@@ -161,11 +153,11 @@ for data_list in simulation_results['simulated_data']:
 
 plt.figure(figsize=(10, 6))
 cmap = plt.get_cmap('viridis')
-param_values = np.array(param_values)
-norm = plt.Normalize(param_values.min(), param_values.max())
+log_param_values = np.log10(param_values)
+norm = plt.Normalize(log_param_values.min(), log_param_values.max())
 
-for waveform, param in zip(dpl_waveforms, param_values):
-    color = cmap(norm(param))
+for waveform, log_param in zip(dpl_waveforms, log_param_values):
+    color = cmap(norm(log_param))
     plt.plot(waveform, color=color, alpha=0.7, linewidth=2)
 plt.title('Overlay of Dipole Waveforms')
 plt.xlabel('Time (ms)')
