@@ -383,6 +383,7 @@ def test_gui_run_simulation_mpi(setup_gui):
     dpls = gui.simulation_data[default_name]['dpls']
     assert isinstance(gui.simulation_data[default_name]["net"], Network)
     assert isinstance(dpls, list)
+    assert len(dpls) > 0
     assert all([isinstance(dpl, Dipole) for dpl in dpls])
     plt.close('all')
 
