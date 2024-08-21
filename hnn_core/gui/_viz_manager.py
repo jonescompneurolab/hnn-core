@@ -983,8 +983,10 @@ class _VizManager:
                 Type of visualization.
             preprocessing_config : dict
                 A dict of visualization preprocessing parameters. Allowed keys:
-                `dipole_smooth`, `dipole_scaling`, `max_spectral_frequency`,
-                `spectrogram_colormap_selection`. config could be empty: `{}`.
+                `dipole_smooth`, `dipole_scaling`,
+                `data_to_compare`, `data_smooth`, `data_scaling`
+                `max_spectral_frequency`, `spectrogram_colormap_selection`.
+                config could be empty: `{}`.
             operation : str
                 `"plot"` if you want to plot and `"clear"` if you want to
                 remove previously plotted visualizations.
@@ -1016,8 +1018,11 @@ class _VizManager:
         config_name_idx = {
             "dipole_smooth": 2,
             "dipole_scaling": 3,
-            "max_spectral_frequency": 4,
-            "spectrogram_colormap_selection": 5,
+            "data_to_compare": 4,
+            "data_smooth": 5,
+            "data_scaling": 6,
+            "max_spectral_frequency": 7,
+            "spectrogram_colormap_selection": 8,
         }
         for conf_key, conf_val in preprocessing_config.items():
             assert conf_key in config_name_idx.keys()
