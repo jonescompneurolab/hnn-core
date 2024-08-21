@@ -343,6 +343,17 @@ def _dynamic_rerender(fig):
     fig.tight_layout()
 
 
+def _avg_dipole_check(dpls):
+    """Check for averaged dipole, else average the trials"""
+    # Check if there is an averaged dipole already
+    avg_dpls = [d for d in dpls if d.nave > 1]
+    if avg_dpls:
+        dpl = avg_dpls[0]
+    else:
+        dpl = average_dipoles(dpls)
+    return dpl
+
+
 def _plot_on_axes(b, simulations_widget, widgets_plot_type,
                   data_widget,
                   spectrogram_colormap_selection, max_spectral_frequency,
@@ -427,7 +438,7 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
         t0 = 0.0
         tstop = dpls_processed[-1].times[-1]
         if len(dpls_processed) > 1:
-            dpl = average_dipoles(dpls_processed)
+            dpl = _avg_dipole_check(dpls_processed)
         else:
             dpl = dpls_processed
         rmse = _rmse(dpl, target_dpl_processed, t0, tstop)
