@@ -678,7 +678,7 @@ def test_gui_adaptive_spectrogram(setup_gui):
 
 
 def test_gui_visualization(setup_gui):
-    """ Tests updating a figure creates plots with data. """
+    """Tests updating a figure creates plots with data."""
 
     gui = setup_gui
     gui.run_button.click()
