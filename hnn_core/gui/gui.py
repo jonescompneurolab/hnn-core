@@ -7,8 +7,9 @@ import codecs
 import io
 import logging
 import mimetypes
-import multiprocessing
 import numpy as np
+import platform
+import psutil
 import sys
 import json
 import urllib.parse
@@ -344,6 +345,9 @@ class HNNGUI:
         # load default parameters
         self.params = self.load_parameters(network_configuration)
 
+        # Number of available cores
+        self.n_cores = self._available_cores()
+
         # In-memory storage of all simulation and visualization related data
         self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
 
@@ -402,7 +406,7 @@ class HNNGUI:
                                    placeholder='Fill if applies',
                                    description='MPI cmd:', disabled=False)
         self.widget_n_jobs = BoundedIntText(value=1, min=1,
-                                            max=multiprocessing.cpu_count(),
+                                            max=self.n_cores,
                                             description='Cores:',
                                             disabled=False)
         self.load_data_button = FileUpload(
@@ -641,8 +645,9 @@ class HNNGUI:
                 self.fig_default_params, self.widget_default_smoothing,
                 self.widget_min_frequency, self.widget_max_frequency,
                 self.widget_ntrials, self.widget_backend_selection,
-                self.widget_mpi_cmd, self.widget_n_jobs, self.params,
-                self._simulation_status_bar, self._simulation_status_contents,
+                self.widget_mpi_cmd, self.n_cores, self.widget_n_jobs,
+                self.params, self._simulation_status_bar,
+                self._simulation_status_contents,
                 self.connectivity_widgets, self.viz_manager,
                 self.simulation_list_widget, self.cell_pameters_widgets)
 
