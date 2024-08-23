@@ -490,6 +490,15 @@ class HNNGUI:
         self._init_ui_components()
         self.add_logging_window_logger()
 
+    @staticmethod
+    def _available_cores():
+        # For macos
+        if platform.system() == 'Darwin':
+            return psutil.cpu_count()
+        # For Linux and Windows
+        else:
+            return len(psutil.Process().cpu_affinity())
+
     def get_cell_parameters_dict(self):
         """Returns the number of elements in the
             cell_parameters_dict dictionary.
