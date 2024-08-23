@@ -346,6 +346,9 @@ def _dynamic_rerender(fig):
 def _avg_dipole_check(dpls):
     """Check for averaged dipole, else average the trials"""
     # Check if there is an averaged dipole already
+    if not dpls:
+        return None
+
     avg_dpls = [d for d in dpls if d.nave > 1]
     if avg_dpls:
         dpl = avg_dpls[0]
