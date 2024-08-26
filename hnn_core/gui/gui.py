@@ -677,6 +677,10 @@ class HNNGUI:
                 self.widget_ntrials, self.widget_backend_selection,
                 self._backend_config_out]),
         ], layout=self.layout['config_box'])
+        # Displays the default backend options
+        handle_backend_change(self.widget_backend_selection.value,
+                              self._backend_config_out, self.widget_mpi_cmd,
+                              self.widget_n_jobs)
 
         connectivity_configuration = Tab()
 
