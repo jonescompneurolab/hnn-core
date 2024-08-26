@@ -496,6 +496,13 @@ class HNNGUI:
 
     @staticmethod
     def _available_cores():
+        """Return the number of available cores to the process.
+
+        This is important for systems where the number of available cores is
+        partitioned such as on HPC systems. Linux and Windows can return cpu
+        affinity, which is the number of available cores. MacOS can only return
+        total system cores.
+        """
         # For macos
         if platform.system() == 'Darwin':
             return psutil.cpu_count()
