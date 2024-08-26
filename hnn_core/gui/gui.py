@@ -2135,7 +2135,6 @@ def _serialize_simulation(log_out, sim_data, simulation_list_widget):
     sim_name = simulation_list_widget.value
 
     with log_out:
-        logger.info(f"Saving {sim_name}.txt")
         return serialize_simulation(sim_data, sim_name)
 
 
@@ -2180,7 +2179,6 @@ def _serialize_config(log_out, sim_data, simulation_list_widget):
     sim_name = simulation_list_widget.value
 
     with log_out:
-        logger.info(f"Saving Network configuration {sim_name}.json")
         return serialize_config(sim_data, sim_name)
 
 
