@@ -645,7 +645,7 @@ class HNNGUI:
                 self.fig_default_params, self.widget_default_smoothing,
                 self.widget_min_frequency, self.widget_max_frequency,
                 self.widget_ntrials, self.widget_backend_selection,
-                self.widget_mpi_cmd, self.n_cores, self.widget_n_jobs,
+                self.widget_mpi_cmd, self.widget_n_jobs,
                 self.params, self._simulation_status_bar,
                 self._simulation_status_contents,
                 self.connectivity_widgets, self.viz_manager,
@@ -2060,7 +2060,7 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
 
 def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
                        all_data, dt, tstop, ntrials, backend_selection,
-                       mpi_cmd, n_cores, n_jobs, params, simulation_status_bar,
+                       mpi_cmd, n_jobs, params, simulation_status_bar,
                        simulation_status_contents, connectivity_textfields,
                        viz_manager, simulations_list_widget,
                        cell_pameters_widgets):
