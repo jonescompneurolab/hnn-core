@@ -2083,7 +2083,7 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
         print("start simulation")
         if backend_selection.value == "MPI":
             backend = MPIBackend(
-                n_procs=n_cores - 1,
+                n_procs=n_jobs.value,
                 mpi_cmd=mpi_cmd.value)
         else:
             backend = JoblibBackend(n_jobs=n_jobs.value)
@@ -2391,7 +2391,7 @@ def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
     backend_config.clear_output()
     with backend_config:
         if backend_type == "MPI":
-            display(mpi_cmd)
+            display(VBox(children=[n_jobs, mpi_cmd]))
         elif backend_type == "Joblib":
             display(n_jobs)
 
