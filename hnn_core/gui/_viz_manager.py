@@ -343,6 +343,20 @@ def _dynamic_rerender(fig):
     fig.tight_layout()
 
 
+def _avg_dipole_check(dpls):
+    """Check for averaged dipole, else average the trials"""
+    # Check if there is an averaged dipole already
+    if not dpls:
+        return None
+
+    avg_dpls = [d for d in dpls if d.nave > 1]
+    if avg_dpls:
+        dpl = avg_dpls[0]
+    else:
+        dpl = average_dipoles(dpls)
+    return dpl
+
+
 def _plot_on_axes(b, simulations_widget, widgets_plot_type,
                   data_widget,
                   spectrogram_colormap_selection, max_spectral_frequency,
@@ -427,7 +441,7 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
         t0 = 0.0
         tstop = dpls_processed[-1].times[-1]
         if len(dpls_processed) > 1:
-            dpl = average_dipoles(dpls_processed)
+            dpl = _avg_dipole_check(dpls_processed)
         else:
             dpl = dpls_processed
         rmse = _rmse(dpl, target_dpl_processed, t0, tstop)
@@ -983,8 +997,10 @@ class _VizManager:
                 Type of visualization.
             preprocessing_config : dict
                 A dict of visualization preprocessing parameters. Allowed keys:
-                `dipole_smooth`, `dipole_scaling`, `max_spectral_frequency`,
-                `spectrogram_colormap_selection`. config could be empty: `{}`.
+                `dipole_smooth`, `dipole_scaling`,
+                `data_to_compare`, `data_smooth`, `data_scaling`
+                `max_spectral_frequency`, `spectrogram_colormap_selection`.
+                config could be empty: `{}`.
             operation : str
                 `"plot"` if you want to plot and `"clear"` if you want to
                 remove previously plotted visualizations.
@@ -1016,8 +1032,11 @@ class _VizManager:
         config_name_idx = {
             "dipole_smooth": 2,
             "dipole_scaling": 3,
-            "max_spectral_frequency": 4,
-            "spectrogram_colormap_selection": 5,
+            "data_to_compare": 4,
+            "data_smooth": 5,
+            "data_scaling": 6,
+            "max_spectral_frequency": 7,
+            "spectrogram_colormap_selection": 8,
         }
         for conf_key, conf_val in preprocessing_config.items():
             assert conf_key in config_name_idx.keys()

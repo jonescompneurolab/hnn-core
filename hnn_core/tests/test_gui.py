@@ -678,7 +678,7 @@ def test_gui_adaptive_spectrogram(setup_gui):
 
 
 def test_gui_visualization(setup_gui):
-    """ Tests updating a figure creates plots with data. """
+    """Tests updating a figure creates plots with data."""
 
     gui = setup_gui
     gui.run_button.click()
@@ -709,6 +709,44 @@ def test_gui_visualization(setup_gui):
         assert len(gui.viz_manager.figs[figid].axes) == 2
         # Check default figs have data on their axis
         assert gui.viz_manager.figs[figid].axes[1].has_data()
+    plt.close('all')
+
+
+def test_dipole_data_overlay(setup_gui):
+    """Tests dipole plot with a simulation and data overlay."""
+    gui = setup_gui
+
+    # Run simulation with 2 trials
+    gui.widget_ntrials.value = 2
+    gui.run_button.click()
+
+    # Load data
+    file_path = assets_path / 'test_default.csv'
+    gui._simulate_upload_data(file_path)
+
+    # Edit the figure with data overlay
+    figid = 1
+    figname = f'Figure {figid}'
+    axname = 'ax1'
+    gui._simulate_viz_action("edit_figure", figname,
+                             axname, 'default', 'current dipole', {}, 'clear')
+    gui._simulate_viz_action("edit_figure", figname,
+                             axname, 'default', 'current dipole',
+                             {'data_to_compare': 'test_default'},
+                             'plot')
+    ax = gui.viz_manager.figs[figid].axes[1]
+
+    # Check number of lines
+    # 2 trials, 1 average, 2 data (data is over-plotted twice for some reason)
+    # But it only appears in the legend once.
+    assert len(ax.lines) == 5
+    assert len(ax.legend_.texts) == 2
+    assert ax.legend_.texts[0]._text == 'default: average'
+    assert ax.legend_.texts[1]._text == 'test_default'
+
+    # Check RMSE is printed
+    assert 'RMSE(default, test_default):' in ax.texts[0]._text
+
     plt.close('all')
 
 

@@ -15,6 +15,8 @@ Changelog
 
 Bug
 ~~~
+- Fix GUI over-plotting of loaded data where the app stalled and did not plot
+  RMSE, by `George Dang`_ in :gh:`869`
 
 API
 ~~~
