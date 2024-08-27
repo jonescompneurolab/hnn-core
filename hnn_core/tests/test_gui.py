@@ -373,16 +373,22 @@ def test_gui_init_network(setup_gui):
 
 @requires_mpi4py
 @requires_psutil
-def test_gui_run_simulation_mpi(setup_gui):
+def test_gui_run_simulation_mpi():
     """Test if run button triggers simulation with MPIBackend."""
-    gui = setup_gui
+    gui = HNNGUI()
+    _ = gui.compose()
 
+    gui.widget_tstop.value = 70
+    gui.widget_dt.value = 0.5
     gui.widget_backend_selection.value = "MPI"
+    gui.widget_ntrials.value = 2
     gui.run_button.click()
+
     default_name = gui.widget_simulation_name.value
     dpls = gui.simulation_data[default_name]['dpls']
     assert isinstance(gui.simulation_data[default_name]["net"], Network)
     assert isinstance(dpls, list)
+    assert len(dpls) > 0
     assert all([isinstance(dpl, Dipole) for dpl in dpls])
     plt.close('all')
 
