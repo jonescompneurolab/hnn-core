@@ -36,6 +36,7 @@ from hnn_core.params_default import (get_L2Pyr_params_default,
                                      get_L5Pyr_params_default)
 from hnn_core.hnn_io import dict_to_network, write_network_configuration
 from hnn_core.cells_default import _exp_g_at_dist
+from hnn_core.parallel_backends import _has_mpi4py, _has_psutil
 
 hnn_core_root = Path(hnn_core.__file__).parent
 default_network_configuration = (hnn_core_root / 'param' /
@@ -398,10 +399,11 @@ class HNNGUI:
                                            placeholder='ID of your simulation',
                                            description='Name:',
                                            disabled=False)
-        self.widget_backend_selection = Dropdown(options=[('Joblib', 'Joblib'),
-                                                          ('MPI', 'MPI')],
-                                                 value='Joblib',
-                                                 description='Backend:')
+        self.widget_backend_selection = (
+            Dropdown(options=[('Joblib', 'Joblib'),
+                              ('MPI', 'MPI')],
+                     value=self._check_backend(),
+                     description='Backend:'))
         self.widget_mpi_cmd = Text(value='mpiexec',
                                    placeholder='Fill if applies',
                                    description='MPI cmd:', disabled=False)
@@ -509,6 +511,14 @@ class HNNGUI:
         # For Linux and Windows
         else:
             return len(psutil.Process().cpu_affinity())
+
+    @staticmethod
+    def _check_backend():
+        """Checks for MPI and returns the default backend name"""
+        default_backend = 'Joblib'
+        if _has_mpi4py() and _has_psutil():
+            default_backend = 'MPI'
+        return default_backend
 
     def get_cell_parameters_dict(self):
         """Returns the number of elements in the
