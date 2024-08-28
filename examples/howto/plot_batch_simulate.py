@@ -12,6 +12,8 @@ for comprehensive analysis.
 #          Nick Tolley <nicholas_tolley@brown.edu>
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
+#
+# This project was supported by Google Summer of Code (GSoC) 2024.
 
 ###############################################################################
 # Let us import ``hnn_core``.
