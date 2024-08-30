@@ -84,7 +84,8 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
 def _get_mpi_env():
     """Set some MPI environment variables."""
     my_env = os.environ.copy()
-    if 'win' not in sys.platform:
+    # For Linux systems
+    if sys.platform not in ['win32', 'darwin']:
         my_env["OMPI_MCA_btl_base_warn_component_unused"] = '0'
 
     if 'darwin' in sys.platform:
