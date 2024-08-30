@@ -648,11 +648,7 @@ class MPIBackend(object):
                          'mpi_child.py')
 
         # Split the command into shell arguments for passing to Popen
-        if 'win' in sys.platform:
-            use_posix = True
-        else:
-            use_posix = False
-        self.mpi_cmd = shlex.split(self.mpi_cmd, posix=use_posix)
+        self.mpi_cmd = shlex.split(self.mpi_cmd, posix=sys.platform != 'win32')
 
     def __enter__(self):
         global _BACKEND
