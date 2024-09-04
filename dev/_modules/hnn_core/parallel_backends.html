@@ -219,7 +219,8 @@
 <span class="k">def</span> <span class="nf">_get_mpi_env</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Set some MPI environment variables.&quot;&quot;&quot;</span>
     <span class="n">my_env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="k">if</span> <span class="s1">&#39;win&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+    <span class="c1"># For Linux systems</span>
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">!=</span> <span class="s1">&#39;win32&#39;</span><span class="p">:</span>
         <span class="n">my_env</span><span class="p">[</span><span class="s2">&quot;OMPI_MCA_btl_base_warn_component_unused&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
 
     <span class="k">if</span> <span class="s1">&#39;darwin&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
@@ -783,10 +784,7 @@
                          <span class="s1">&#39;mpi_child.py&#39;</span><span class="p">)</span>
 
         <span class="c1"># Split the command into shell arguments for passing to Popen</span>
-        <span class="k">if</span> <span class="s1">&#39;win&#39;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
-            <span class="n">use_posix</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">use_posix</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">use_posix</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">!=</span> <span class="s1">&#39;win32&#39;</span> <span class="k">else</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span><span class="p">,</span> <span class="n">posix</span><span class="o">=</span><span class="n">use_posix</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
