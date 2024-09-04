@@ -85,7 +85,7 @@ def _get_mpi_env():
     """Set some MPI environment variables."""
     my_env = os.environ.copy()
     # For Linux systems
-    if sys.platform not in ['win32', 'darwin']:
+    if sys.platform != 'win32':
         my_env["OMPI_MCA_btl_base_warn_component_unused"] = '0'
 
     if 'darwin' in sys.platform:
