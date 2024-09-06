@@ -4,14 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hnn-core"
-version = "0.1.1"
-dependencies = [
-    "numpy >= 1.14",
-    "matplotlib >= 3.5.3",
-    "scipy",
-    "NEURON >= 7.7; sys_platform != 'win32'",
-    "h5io",
-]
+dynamic = ["version"]
 authors = [
     { name="Stephanie Jones", email="stephanie_jones@brown.edu" },
     { name="Mainak Jas", email="mainakjas@gmail.com" },
@@ -24,7 +17,7 @@ maintainers = [
 
 ]
 description = "Tools for biophysical simulation of a cortical column using Neuron"
-readme = "README.md"
+readme = "README.rst"
 requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -37,6 +30,13 @@ classifiers = [
     "Operating System :: POSIX",
     "Operating System :: Unix",
     "Operating System :: MacOS",
+]
+dependencies = [
+    "numpy >= 1.14",
+    "matplotlib >= 3.5.3",
+    "scipy",
+    "NEURON >= 7.7; sys_platform != 'win32'",
+    "h5io",
 ]
 
 [project.optional-dependencies]
@@ -51,9 +51,21 @@ parallel = ['joblib', 'psutil', 'mpi4py']
 gui = ['ipywidgets>=8.0.0', 'ipykernel', 'ipympl', 'voila']
 dev = ["hnn-core[opt,test,docs,parallel,gui]"]
 
+[project.gui-scripts]
+hnn-gui = "hnn_core.gui.gui:launch"
+
 [project.urls]
 "Homepage" = "https://jonescompneurolab.github.io/hnn-core"
 "Source Code" = "http://github.com/jonescompneurolab/hnn-core"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["hnn_core"]
+
+[tool.setuptools.dynamic]
+version = {attr = "hnn_core.__version__"}
 
 [tool.codespell]
 skip = '.git,*.pdf,*.svg'
