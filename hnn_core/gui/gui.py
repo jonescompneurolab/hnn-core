@@ -1680,55 +1680,6 @@ def get_cell_param_default_value(cell_type_key, param_dict):
     return param_dict[cell_type_key]
 
 
-def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
-                  tstop, layout):
-    net = dict_to_network(params)
-    drive_specs = net.external_drives
-    tonic_specs = net.external_biases
-
-    # clear before adding drives
-    drives_out.clear_output()
-    while len(drive_widgets) > 0:
-        drive_widgets.pop()
-        drive_boxes.pop()
-
-    drive_names = list(drive_specs.keys())
-    # Add tonic biases
-    if tonic_specs:
-        drive_names.extend(list(tonic_specs.keys()))
-
-    for idx, drive_name in enumerate(drive_names):  # order matters
-        if 'tonic' in drive_name:
-            specs = dict(type='tonic', location=None)
-            kwargs = dict(prespecified_drive_data=tonic_specs[drive_name])
-        else:
-            specs = drive_specs[drive_name]
-            kwargs = dict(prespecified_drive_data=specs['dynamics'],
-                          prespecified_weights_ampa=specs['weights_ampa'],
-                          prespecified_weights_nmda=specs['weights_nmda'],
-                          prespecified_delays=specs['synaptic_delays'],
-                          prespecified_n_drive_cells=specs['n_drive_cells'],
-                          prespecified_cell_specific=specs['cell_specific'],
-                          event_seed=specs['event_seed'],
-                          )
-
-        should_render = idx == (len(drive_names) - 1)
-
-        add_drive_widget(
-            specs['type'].capitalize(),
-            drive_boxes,
-            drive_widgets,
-            drives_out,
-            tstop,
-            specs['location'],
-            layout=layout,
-            prespecified_drive_name=drive_name,
-            render=should_render,
-            expand_last_drive=False,
-            **kwargs
-        )
-
-
 def on_upload_data_change(change, data, viz_manager, log_out):
     if len(change['owner'].value) == 0:
         return
