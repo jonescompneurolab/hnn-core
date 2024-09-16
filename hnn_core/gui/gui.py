@@ -891,8 +891,55 @@ class HNNGUI:
                                  self.layout)
 
             # Add drives
-            add_drive_tab(self.params, self._log_out, self._drives_out, self.drive_widgets, self.drive_boxes,
-                          self.widget_tstop, self.layout)
+            self.add_drive_tab(self.params)
+
+    def add_drive_tab(self, params):
+        net = dict_to_network(params)
+        drive_specs = net.external_drives
+        tonic_specs = net.external_biases
+
+        # clear before adding drives
+        self._drives_out.clear_output()
+        while len(self.drive_widgets) > 0:
+            self.drive_widgets.pop()
+            self.drive_boxes.pop()
+
+        drive_names = list(drive_specs.keys())
+        # Add tonic biases
+        if tonic_specs:
+            drive_names.extend(list(tonic_specs.keys()))
+
+        for idx, drive_name in enumerate(drive_names):  # order matters
+            if 'tonic' in drive_name:
+                specs = dict(type='tonic', location=None)
+                kwargs = dict(prespecified_drive_data=tonic_specs[drive_name])
+            else:
+                specs = drive_specs[drive_name]
+                kwargs = dict(prespecified_drive_data=specs['dynamics'],
+                              prespecified_weights_ampa=specs['weights_ampa'],
+                              prespecified_weights_nmda=specs['weights_nmda'],
+                              prespecified_delays=specs['synaptic_delays'],
+                              prespecified_n_drive_cells=specs['n_drive_cells'],
+                              prespecified_cell_specific=specs['cell_specific'],
+                              event_seed=specs['event_seed'],
+                              )
+
+            should_render = idx == (len(drive_names) - 1)
+
+            add_drive_widget(
+                specs['type'].capitalize(),
+                self.drive_boxes,
+                self.drive_widgets,
+                self._drives_out,
+                self.widget_tstop,
+                specs['location'],
+                layout=self.layout['drive_textbox'],
+                prespecified_drive_name=drive_name,
+                render=should_render,
+                expand_last_drive=False,
+                **kwargs
+            )
+
 
 def _prepare_upload_file_from_local(path):
     path = Path(path)
