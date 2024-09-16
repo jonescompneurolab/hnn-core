@@ -547,25 +547,15 @@ class HNNGUI:
                 self.drive_boxes.pop()
 
         def _on_upload_connectivity(change):
-            new_params = on_upload_params_change(
-                change, self.widget_tstop, self.widget_dt,
-                self._log_out, self.drive_boxes, self.drive_widgets,
-                self._drives_out, self._connectivity_out,
-                self.connectivity_widgets, self._cell_params_out,
-                self.cell_pameters_widgets, self.cell_layer_radio_buttons,
-                self.cell_type_radio_buttons, self.layout['drive_textbox'],
-                "connectivity")
+            new_params = self.on_upload_params_change(
+                change, self.layout['drive_textbox'], load_type="connectivity"
+            )
             self.params = new_params
 
         def _on_upload_drives(change):
-            _ = on_upload_params_change(
-                change, self.widget_tstop, self.widget_dt,
-                self._log_out, self.drive_boxes, self.drive_widgets,
-                self._drives_out, self._connectivity_out,
-                self.connectivity_widgets, self._cell_params_out,
-                self.cell_pameters_widgets, self.cell_layer_radio_buttons,
-                self.cell_type_radio_buttons, self.layout['drive_textbox'],
-                "drives")
+            _ = self.on_upload_params_change(
+                change, self.layout['drive_textbox'], load_type="drives"
+            )
 
         def _on_upload_data(change):
             return on_upload_data_change(change, self.data, self.viz_manager,
@@ -939,6 +929,39 @@ class HNNGUI:
                 expand_last_drive=False,
                 **kwargs
             )
+
+    def on_upload_params_change(self, change, layout, load_type):
+
+        if len(change['owner'].value) == 0:
+            return
+        param_dict = change['new'][0]
+        file_contents = codecs.decode(param_dict['content'], encoding="utf-8")
+
+        with self._log_out:
+            params = json.loads(file_contents)
+
+            # update simulation settings and params
+            if 'tstop' in params.keys():
+                self.widget_tstop.value = params['tstop']
+            if 'dt' in params.keys():
+                self.widget_dt.value = params['dt']
+
+            # init network, add drives & connectivity
+            if load_type == 'connectivity':
+                add_connectivity_tab(
+                    params, self._connectivity_out, self.connectivity_widgets,
+                    self._cell_params_out, self.cell_pameters_widgets,
+                    self.cell_layer_radio_buttons,
+                    self.cell_type_radio_buttons, layout)
+            elif load_type == 'drives':
+                self.add_drive_tab(params)
+            else:
+                raise ValueError
+
+            print(f"Loaded {load_type} from {param_dict['name']}")
+        # Resets file counter to 0
+        change['owner'].set_trait('value', ([]))
+        return params
 
 
 def _prepare_upload_file_from_local(path):
@@ -1738,44 +1761,6 @@ def on_upload_data_change(change, data, viz_manager, log_out):
             viz_manager._simulate_edit_figure(
                 fig_name, ax_name, data_fname, plot_type, {}, "plot")
         change['owner'].value = []
-
-
-def on_upload_params_change(change, tstop, dt, log_out, drive_boxes,
-                            drive_widgets, drives_out, connectivity_out,
-                            connectivity_textfields, cell_params_out,
-                            cell_pameters_vboxes, cell_layer_radio_button,
-                            cell_type_radio_button, layout, load_type):
-    if len(change['owner'].value) == 0:
-        return
-    param_dict = change['new'][0]
-    file_contents = codecs.decode(param_dict['content'], encoding="utf-8")
-
-    with log_out:
-        params = json.loads(file_contents)
-
-        # update simulation settings and params
-        if 'tstop' in params.keys():
-            tstop.value = params['tstop']
-        if 'dt' in params.keys():
-            dt.value = params['dt']
-
-        # init network, add drives & connectivity
-        if load_type == 'connectivity':
-            add_connectivity_tab(params, connectivity_out,
-                                 connectivity_textfields, cell_params_out,
-                                 cell_pameters_vboxes, cell_layer_radio_button,
-                                 cell_type_radio_button, layout)
-        elif load_type == 'drives':
-            with log_out:
-                add_drive_tab(params, log_out, drives_out, drive_widgets,
-                              drive_boxes, tstop, layout)
-        else:
-            raise ValueError
-
-        print(f"Loaded {load_type} from {param_dict['name']}")
-    # Resets file counter to 0
-    change['owner'].set_trait('value', ([]))
-    return params
 
 
 def _drive_widget_to_dict(drive, name):
