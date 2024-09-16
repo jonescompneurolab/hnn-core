@@ -731,15 +731,7 @@ class HNNGUI:
         self._link_callbacks()
 
         # initialize drive and connectivity ipywidgets
-        load_drive_and_connectivity(self.params, self._log_out,
-                                    self._drives_out, self.drive_widgets,
-                                    self.drive_boxes, self._connectivity_out,
-                                    self.connectivity_widgets,
-                                    self._cell_params_out,
-                                    self.cell_pameters_widgets,
-                                    self.cell_layer_radio_buttons,
-                                    self.cell_type_radio_buttons,
-                                    self.widget_tstop, self.layout)
+        self.load_drive_and_connectivity()
 
         if not return_layout:
             return
@@ -889,6 +881,18 @@ class HNNGUI:
         action = getattr(self.viz_manager, f"_simulate_{action_name}")
         action(*args, **kwargs)
 
+    def load_drive_and_connectivity(self):
+        """Add drive and connectivity ipywidgets from params."""
+        with self._log_out:
+            # Add connectivity
+            add_connectivity_tab(self.params, self._connectivity_out, self.connectivity_widgets,
+                                 self._cell_params_out, self.cell_pameters_widgets,
+                                 self.cell_layer_radio_buttons, self.cell_type_radio_buttons,
+                                 self.layout)
+
+            # Add drives
+            add_drive_tab(self.params, self._log_out, self._drives_out, self.drive_widgets, self.drive_boxes,
+                          self.widget_tstop, self.layout)
 
 def _prepare_upload_file_from_local(path):
     path = Path(path)
@@ -1653,24 +1657,6 @@ def add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
             expand_last_drive=False,
             **kwargs
         )
-
-
-def load_drive_and_connectivity(params, log_out, drives_out,
-                                drive_widgets, drive_boxes, connectivity_out,
-                                connectivity_textfields, cell_params_out,
-                                cell_pameters_vboxes, cell_layer_radio_button,
-                                cell_type_radio_button, tstop, layout):
-    """Add drive and connectivity ipywidgets from params."""
-    with log_out:
-        # Add connectivity
-        add_connectivity_tab(params, connectivity_out, connectivity_textfields,
-                             cell_params_out, cell_pameters_vboxes,
-                             cell_layer_radio_button, cell_type_radio_button,
-                             layout)
-
-        # Add drives
-        add_drive_tab(params, log_out, drives_out, drive_widgets, drive_boxes,
-                      tstop, layout)
 
 
 def on_upload_data_change(change, data, viz_manager, log_out):
