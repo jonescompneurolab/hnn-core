@@ -272,7 +272,7 @@ class ExtracellularArray:
     measured values of conductivity in rat cortex (note units there are mS/cm)
     """
 
-    def __init__(self, positions, *, conductivity=0.3, method='psa',
+    def __init__(self, positions, *, conductivity=0.3, method='lsa',
                  min_distance=0.5, times=None, voltages=None):
 
         _validate_type(positions, (tuple, list), 'positions')
