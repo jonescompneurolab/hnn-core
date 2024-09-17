@@ -417,6 +417,7 @@ class HNNGUI:
         # Add drive section
         self.drive_widgets = list()
         self.drive_boxes = list()
+        self.drive_accordion = Accordion()
 
         # Connectivity list
         self.connectivity_widgets = list()
@@ -637,6 +638,18 @@ class HNNGUI:
                                              'value')
         self.cell_layer_radio_buttons.observe(_cell_layer_radio_change,
                                               'value')
+
+    def _delete_single_drive(self, b):
+        # Remove selected drive from drive lists
+        self.drive_boxes.pop(self.drive_accordion.selected_index)
+        self.drive_widgets.pop(self.drive_accordion.selected_index)
+
+        # Rebuild the accordion collection
+        self._drives_out.clear_output()
+        with self._drives_out:
+            self.drive_accordion.selected_index = None
+            self.drive_accordion.children = self.drive_boxes
+            display(self.drive_accordion)
 
     def compose(self, return_layout=True):
         """Compose widgets.
@@ -964,6 +977,14 @@ class HNNGUI:
                     style,
                     data=prespecified_drive_data
                 )
+
+            # Add delete button
+            delete_button = create_expanded_button(
+                'Delete', 'success', layout=layout, button_color='red'
+            )
+            # Call-back on drive deletion
+            delete_button.on_click(self._delete_single_drive)
+            drive_box.children += (delete_button,)
 
             if drive_type in [
                 'Evoked', 'Poisson', 'Rhythmic', 'Bursty', 'Gaussian', 'Tonic'
