@@ -1109,3 +1109,12 @@ def test_update_nested_dict():
     updated = _update_nested_dict(original, has_nulls)
     expected = has_nulls
     assert updated == expected
+
+
+def test_delete_single_drive(setup_gui):
+    """Deleting a single drive."""
+    gui = setup_gui
+    assert len(gui.drive_accordion.children) == 6
+
+    gui._simulate_delete_single_drive(0)
+    assert len(gui.drive_accordion.children) == 5
