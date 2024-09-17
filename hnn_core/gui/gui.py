@@ -884,6 +884,10 @@ class HNNGUI:
         action = getattr(self.viz_manager, f"_simulate_{action_name}")
         action(*args, **kwargs)
 
+    def _simulate_delete_single_drive(self, idx=0):
+        self.drive_accordion.selected_index = idx
+        self.drive_boxes[idx].children[-1].click()
+
     def load_drive_and_connectivity(self):
         """Add drive and connectivity ipywidgets from params."""
         with self._log_out:
