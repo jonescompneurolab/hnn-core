@@ -532,11 +532,11 @@ class HNNGUI:
                                          self.widget_n_jobs)
 
         def _add_drive_button_clicked(b):
-            return add_drive_widget(self.widget_drive_type_selection.value,
-                                    self.drive_boxes, self.drive_widgets,
-                                    self._drives_out, self.widget_tstop,
-                                    self.widget_location_selection.value,
-                                    layout=self.layout['drive_textbox'])
+            return self.add_drive_widget(
+                self.widget_drive_type_selection.value,
+                self.widget_location_selection.value,
+                layout=self.layout['drive_textbox']
+            )
 
         def _delete_drives_clicked(b):
             self._drives_out.clear_output()
@@ -883,6 +883,108 @@ class HNNGUI:
             # Add drives
             self.add_drive_tab(self.params)
 
+    def add_drive_widget(self,
+                         drive_type,
+                         location,
+                         layout,
+                         prespecified_drive_name=None,
+                         prespecified_drive_data=None,
+                         prespecified_weights_ampa=None,
+                         prespecified_weights_nmda=None,
+                         prespecified_delays=None,
+                         prespecified_n_drive_cells=None,
+                         prespecified_cell_specific=None,
+                         render=True,
+                         expand_last_drive=True,
+                         event_seed=14, ):
+        """Add a widget for a new drive."""
+
+        # Check only adds 1 tonic input widget
+        if (drive_type == "Tonic" and
+                not _is_valid_add_tonic_input(self.drive_widgets)):
+            return
+
+        style = {'description_width': '125px'}
+        self._drives_out.clear_output()
+        if not prespecified_drive_data:
+            prespecified_drive_data = {}
+        prespecified_drive_data.update({"seedcore": max(event_seed, 2)})
+
+        with self._drives_out:
+            if not prespecified_drive_name:
+                name = drive_type + str(len(self.drive_boxes))
+            else:
+                name = prespecified_drive_name
+            if drive_type in ('Rhythmic', 'Bursty'):
+                drive, drive_box = _get_rhythmic_widget(
+                    name,
+                    self.widget_tstop,
+                    layout,
+                    style,
+                    location,
+                    data=prespecified_drive_data,
+                    weights_ampa=prespecified_weights_ampa,
+                    weights_nmda=prespecified_weights_nmda,
+                    delays=prespecified_delays,
+                    n_drive_cells=prespecified_n_drive_cells,
+                    cell_specific=prespecified_cell_specific,
+                )
+            elif drive_type == 'Poisson':
+                drive, drive_box = _get_poisson_widget(
+                    name,
+                    self.widget_tstop,
+                    layout,
+                    style,
+                    location,
+                    data=prespecified_drive_data,
+                    weights_ampa=prespecified_weights_ampa,
+                    weights_nmda=prespecified_weights_nmda,
+                    delays=prespecified_delays,
+                    n_drive_cells=prespecified_n_drive_cells,
+                    cell_specific=prespecified_cell_specific,
+                )
+            elif drive_type in ('Evoked', 'Gaussian'):
+                drive, drive_box = _get_evoked_widget(
+                    name,
+                    layout,
+                    style,
+                    location,
+                    data=prespecified_drive_data,
+                    weights_ampa=prespecified_weights_ampa,
+                    weights_nmda=prespecified_weights_nmda,
+                    delays=prespecified_delays,
+                    n_drive_cells=prespecified_n_drive_cells,
+                    cell_specific=prespecified_cell_specific,
+                )
+            elif drive_type == 'Tonic':
+                drive, drive_box = _get_tonic_widget(
+                    name,
+                    self.widget_tstop,
+                    layout,
+                    style,
+                    data=prespecified_drive_data
+                )
+
+            if drive_type in [
+                'Evoked', 'Poisson', 'Rhythmic', 'Bursty', 'Gaussian', 'Tonic'
+            ]:
+                self.drive_boxes.append(drive_box)
+                self.drive_widgets.append(drive)
+
+            if render:
+                self.drive_accordion.children = self.drive_boxes
+                self.drive_accordion.selected_index = (
+                    len(self.drive_boxes) - 1 if expand_last_drive else None
+                )
+
+                for idx, drive in enumerate(self.drive_widgets):
+                    tab_name = drive['name']
+                    if drive['type'] != 'Tonic':
+                        tab_name += f" ({drive['location']})"
+                    self.drive_accordion.set_title(idx, tab_name)
+
+                display(self.drive_accordion)
+
     def add_drive_tab(self, params):
         net = dict_to_network(params)
         drive_specs = net.external_drives
@@ -915,20 +1017,13 @@ class HNNGUI:
                               )
 
             should_render = idx == (len(drive_names) - 1)
-
-            add_drive_widget(
-                specs['type'].capitalize(),
-                self.drive_boxes,
-                self.drive_widgets,
-                self._drives_out,
-                self.widget_tstop,
-                specs['location'],
-                layout=self.layout['drive_textbox'],
-                prespecified_drive_name=drive_name,
-                render=should_render,
-                expand_last_drive=False,
-                **kwargs
-            )
+            self.add_drive_widget(drive_type=specs['type'].capitalize(),
+                                  location=specs['location'],
+                                  layout=self.layout['drive_textbox'],
+                                  prespecified_drive_name=drive_name,
+                                  render=should_render,
+                                  expand_last_drive=False,
+                                  **kwargs)
 
     def on_upload_params_change(self, change, layout, load_type):
 
@@ -1451,107 +1546,6 @@ def _get_tonic_widget(name, tstop_widget, layout, style, data=None):
 
     drive.update(widgets_dict)
     return drive, drive_box
-
-
-def add_drive_widget(drive_type, drive_boxes, drive_widgets, drives_out,
-                     tstop_widget, location, layout,
-                     prespecified_drive_name=None,
-                     prespecified_drive_data=None,
-                     prespecified_weights_ampa=None,
-                     prespecified_weights_nmda=None,
-                     prespecified_delays=None,
-                     prespecified_n_drive_cells=None,
-                     prespecified_cell_specific=None,
-                     render=True,
-                     expand_last_drive=True,
-                     event_seed=14,):
-    """Add a widget for a new drive."""
-
-    # Check only adds 1 tonic input widget
-    if drive_type == "Tonic" and not _is_valid_add_tonic_input(drive_widgets):
-        return
-
-    style = {'description_width': '125px'}
-    drives_out.clear_output()
-    if not prespecified_drive_data:
-        prespecified_drive_data = {}
-    prespecified_drive_data.update({"seedcore": max(event_seed, 2)})
-
-    with drives_out:
-        if not prespecified_drive_name:
-            name = drive_type + str(len(drive_boxes))
-        else:
-            name = prespecified_drive_name
-        if drive_type in ('Rhythmic', 'Bursty'):
-            drive, drive_box = _get_rhythmic_widget(
-                name,
-                tstop_widget,
-                layout,
-                style,
-                location,
-                data=prespecified_drive_data,
-                weights_ampa=prespecified_weights_ampa,
-                weights_nmda=prespecified_weights_nmda,
-                delays=prespecified_delays,
-                n_drive_cells=prespecified_n_drive_cells,
-                cell_specific=prespecified_cell_specific,
-            )
-        elif drive_type == 'Poisson':
-            drive, drive_box = _get_poisson_widget(
-                name,
-                tstop_widget,
-                layout,
-                style,
-                location,
-                data=prespecified_drive_data,
-                weights_ampa=prespecified_weights_ampa,
-                weights_nmda=prespecified_weights_nmda,
-                delays=prespecified_delays,
-                n_drive_cells=prespecified_n_drive_cells,
-                cell_specific=prespecified_cell_specific,
-            )
-        elif drive_type in ('Evoked', 'Gaussian'):
-            drive, drive_box = _get_evoked_widget(
-                name,
-                layout,
-                style,
-                location,
-                data=prespecified_drive_data,
-                weights_ampa=prespecified_weights_ampa,
-                weights_nmda=prespecified_weights_nmda,
-                delays=prespecified_delays,
-                n_drive_cells=prespecified_n_drive_cells,
-                cell_specific=prespecified_cell_specific,
-            )
-        elif drive_type == 'Tonic':
-            drive, drive_box = _get_tonic_widget(
-                name,
-                tstop_widget,
-                layout,
-                style,
-                data=prespecified_drive_data
-            )
-
-        if drive_type in [
-                'Evoked', 'Poisson', 'Rhythmic', 'Bursty', 'Gaussian', 'Tonic'
-        ]:
-            drive_boxes.append(drive_box)
-            drive_widgets.append(drive)
-
-        if render:
-            accordion = Accordion(
-                children=drive_boxes,
-                selected_index=len(drive_boxes) -
-                1 if expand_last_drive else None,
-            )
-
-            for idx, drive in enumerate(drive_widgets):
-                tab_name = drive['name']
-                if drive['type'] != 'Tonic':
-                    tab_name += f" ({drive['location']})"
-                accordion.set_title(idx, tab_name)
-
-            display(accordion)
 
 
 def add_connectivity_tab(params, connectivity_out, connectivity_textfields,
