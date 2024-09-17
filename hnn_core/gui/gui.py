@@ -983,12 +983,16 @@ class HNNGUI:
                 )
 
             # Add delete button
-            delete_button = create_expanded_button(
-                'Delete', 'success', layout=layout, button_color='red'
+            delete_button = Button(
+                description='Delete',
+                button_style='danger',
+                icon='close',
+                layout=self.layout['del_fig_btn']
             )
             # Call-back on drive deletion
             delete_button.on_click(self._delete_single_drive)
-            drive_box.children += (delete_button,)
+            drive_box.children += (HTML(value="<p> </p>"),
+                                   delete_button)
 
             if drive_type in [
                 'Evoked', 'Poisson', 'Rhythmic', 'Bursty', 'Gaussian', 'Tonic'
