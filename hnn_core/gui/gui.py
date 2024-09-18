@@ -925,64 +925,22 @@ class HNNGUI:
                 not _is_valid_add_tonic_input(self.drive_widgets)):
             return
 
+        # Build drive widget objects
+        name = (drive_type + str(len(self.drive_boxes))
+                if not prespecified_drive_name
+                else prespecified_drive_name)
         style = {'description_width': '125px'}
-        if not prespecified_drive_data:
-            prespecified_drive_data = {}
+        prespecified_drive_data = ({} if not prespecified_drive_data
+                                   else prespecified_drive_data)
         prespecified_drive_data.update({"seedcore": max(event_seed, 2)})
 
-        if not prespecified_drive_name:
-            name = drive_type + str(len(self.drive_boxes))
-        else:
-            name = prespecified_drive_name
-        if drive_type in ('Rhythmic', 'Bursty'):
-            drive, drive_box = _get_rhythmic_widget(
-                name,
-                self.widget_tstop,
-                layout,
-                style,
-                location,
-                data=prespecified_drive_data,
-                weights_ampa=prespecified_weights_ampa,
-                weights_nmda=prespecified_weights_nmda,
-                delays=prespecified_delays,
-                n_drive_cells=prespecified_n_drive_cells,
-                cell_specific=prespecified_cell_specific,
-            )
-        elif drive_type == 'Poisson':
-            drive, drive_box = _get_poisson_widget(
-                name,
-                self.widget_tstop,
-                layout,
-                style,
-                location,
-                data=prespecified_drive_data,
-                weights_ampa=prespecified_weights_ampa,
-                weights_nmda=prespecified_weights_nmda,
-                delays=prespecified_delays,
-                n_drive_cells=prespecified_n_drive_cells,
-                cell_specific=prespecified_cell_specific,
-            )
-        elif drive_type in ('Evoked', 'Gaussian'):
-            drive, drive_box = _get_evoked_widget(
-                name,
-                layout,
-                style,
-                location,
-                data=prespecified_drive_data,
-                weights_ampa=prespecified_weights_ampa,
-                weights_nmda=prespecified_weights_nmda,
-                delays=prespecified_delays,
-                n_drive_cells=prespecified_n_drive_cells,
-                cell_specific=prespecified_cell_specific,
-            )
-        elif drive_type == 'Tonic':
-            drive, drive_box = _get_tonic_widget(
-                name,
-                self.widget_tstop,
-                layout,
-                style,
-                data=prespecified_drive_data
-            )
+        drive, drive_box = _build_drive_objects(
+            drive_type, name, self.widget_tstop,
+            layout, style, location,
+            prespecified_drive_data, prespecified_weights_ampa,
+            prespecified_weights_nmda, prespecified_delays,
+            prespecified_n_drive_cells, prespecified_cell_specific
+        )
 
         # Add delete button
         delete_button = Button(
@@ -1580,6 +1538,66 @@ def _get_tonic_widget(name, tstop_widget, layout, style, data=None):
                  tstop=stop_times,)
 
     drive.update(widgets_dict)
+    return drive, drive_box
+
+
+def _build_drive_objects(drive_type, name, tstop_widget, layout, style,
+                         location, drive_data, weights_ampa,
+                         weights_nmda, delays, n_drive_cells,
+                         cell_specific):
+
+    if drive_type in ('Rhythmic', 'Bursty'):
+        drive, drive_box = _get_rhythmic_widget(
+            name,
+            tstop_widget,
+            layout,
+            style,
+            location,
+            data=drive_data,
+            weights_ampa=weights_ampa,
+            weights_nmda=weights_nmda,
+            delays=delays,
+            n_drive_cells=n_drive_cells,
+            cell_specific=cell_specific,
+        )
+    elif drive_type == 'Poisson':
+        drive, drive_box = _get_poisson_widget(
+            name,
+            tstop_widget,
+            layout,
+            style,
+            location,
+            data=drive_data,
+            weights_ampa=weights_ampa,
+            weights_nmda=weights_nmda,
+            delays=delays,
+            n_drive_cells=n_drive_cells,
+            cell_specific=cell_specific,
+        )
+    elif drive_type in ('Evoked', 'Gaussian'):
+        drive, drive_box = _get_evoked_widget(
+            name,
+            layout,
+            style,
+            location,
+            data=drive_data,
+            weights_ampa=weights_ampa,
+            weights_nmda=weights_nmda,
+            delays=delays,
+            n_drive_cells=n_drive_cells,
+            cell_specific=cell_specific,
+        )
+    elif drive_type == 'Tonic':
+        drive, drive_box = _get_tonic_widget(
+            name,
+            tstop_widget,
+            layout,
+            style,
+            data=drive_data
+        )
+    else:
+        raise ValueError(f'Unknown drive type {drive_type}')
+
     return drive, drive_box
 
 
