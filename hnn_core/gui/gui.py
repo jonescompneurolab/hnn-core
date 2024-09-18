@@ -949,11 +949,8 @@ class HNNGUI:
         drive_box.children += (HTML(value="<p> </p>"),  # Adds blank space
                                delete_button)
 
-        if drive_type in [
-            'Evoked', 'Poisson', 'Rhythmic', 'Bursty', 'Gaussian', 'Tonic'
-        ]:
-            self.drive_boxes.append(drive_box)
-            self.drive_widgets.append(drive)
+        self.drive_boxes.append(drive_box)
+        self.drive_widgets.append(drive)
 
         if render:
             # Construct accordion object
