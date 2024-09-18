@@ -767,6 +767,28 @@ def _add_figure(b, widgets, data, template_type, scale=0.95, dpi=96):
     data['fig_idx']['idx'] += 1
 
 
+def _postprocess_template(template_name, fig, idx,
+                          use_ipympl=True, widgets=None):
+    """Post-processes and re-renders plot templates with determined styles
+
+    Templates are constructed on panel-by-panel basis. If adjustments need to
+    be made based on information other plots in the figure, it is adjusted with
+    this function. For example, L2 and L5 dipole plots should have the same
+    y-axis range.
+    """
+    if template_name == 'Dipole Layers (3x1)':
+        # Make the L2 and L5 plots the same y-range
+        y_lims_list = [ax.get_ylim() for ax in fig.axes[0:2]]
+        y_lims = (np.min(y_lims_list), np.max(y_lims_list))
+        [ax.set_ylim(y_lims) for ax in fig.axes[0:2]]
+
+    # Re-render
+    if not use_ipympl:
+        _static_rerender(widgets, fig, idx)
+    else:
+        _dynamic_rerender(fig)
+
+
 class _VizManager:
     """GUI visualization panel manager class.
 
@@ -958,6 +980,14 @@ class _VizManager:
                 # paint fig in axis
                 self._simulate_edit_figure(fig_name, ax_name, sim_name,
                                            plot_type, {}, "plot")
+            # template post-processing
+            _postprocess_template(template_name,
+                                  fig=self.figs[len(self.figs)],
+                                  idx=self.data['fig_idx']['idx'] - 1,
+                                  use_ipympl=self.use_ipympl,
+                                  widgets=self.widgets,
+                                  )
+
             logger.info(f"Figure {template_name} for "
                         f"simulation {sim_name} "
                         "has been created"
