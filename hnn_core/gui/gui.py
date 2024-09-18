@@ -1676,23 +1676,29 @@ def load_drive_and_connectivity(params, log_out, drives_out,
 def on_upload_data_change(change, data, viz_manager, log_out):
     if len(change['owner'].value) == 0:
         return
-
+    # Parsing file information from the 'change' object passed in from
+    # the upload file widget.
     data_dict = change['new'][0]
-
     dict_name = data_dict['name'].rsplit('.', 1)
     data_fname = dict_name[0]
     file_extension = f".{dict_name[1]}"
 
+    # If data was already loaded return
     if data_fname in data['simulation_data'].keys():
-        logger.error(f"Found existing data: {data_fname}.")
+        with log_out:
+            logger.error(f"Found existing data: {data_fname}.")
         return
 
+    # Read the file
     ext_content = data_dict['content']
     ext_content = codecs.decode(ext_content, encoding="utf-8")
-    with log_out:
-        data['simulation_data'][data_fname] = {'net': None, 'dpls': [
-            _read_dipole_txt(io.StringIO(ext_content), file_extension)
-        ]}
+    with (log_out):
+        # Write loaded data to data object
+        data['simulation_data'][data_fname] = {
+            'net': None, 'dpls': [_read_dipole_txt(io.StringIO(ext_content),
+                                                   file_extension
+                                                   )
+                                  ]}
         logger.info(f'External data {data_fname} loaded.')
 
         # Create a dipole plot
