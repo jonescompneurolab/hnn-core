@@ -942,16 +942,11 @@ class HNNGUI:
             prespecified_n_drive_cells, prespecified_cell_specific
         )
 
-        # Add delete button
-        delete_button = Button(
-            description='Delete',
-            button_style='danger',
-            icon='close',
-            layout=self.layout['del_fig_btn']
-        )
-        # Call-back on drive deletion
+        # Add delete button and assign its call-back function
+        delete_button = Button(description='Delete', button_style='danger',
+                               icon='close', layout=self.layout['del_fig_btn'])
         delete_button.on_click(self._delete_single_drive)
-        drive_box.children += (HTML(value="<p> </p>"),
+        drive_box.children += (HTML(value="<p> </p>"),  # Adds blank space
                                delete_button)
 
         if drive_type in [
