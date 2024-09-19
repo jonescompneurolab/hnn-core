@@ -1115,6 +1115,17 @@ def test_delete_single_drive(setup_gui):
     """Deleting a single drive."""
     gui = setup_gui
     assert len(gui.drive_accordion.children) == 6
+    assert gui.drive_accordion.titles == ('evdist1 (distal)',
+                                          'evprox1 (proximal)',
+                                          'evprox2 (proximal)',
+                                          'alpha_prox (proximal)',
+                                          'poisson (proximal)',
+                                          'tonic')
 
-    gui._simulate_delete_single_drive(0)
+    gui._simulate_delete_single_drive(2)
     assert len(gui.drive_accordion.children) == 5
+    assert gui.drive_accordion.titles == ('evdist1 (distal)',
+                                          'evprox1 (proximal)',
+                                          'alpha_prox (proximal)',
+                                          'poisson (proximal)',
+                                          'tonic')
