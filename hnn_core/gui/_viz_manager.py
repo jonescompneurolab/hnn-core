@@ -981,9 +981,10 @@ class _VizManager:
                 self._simulate_edit_figure(fig_name, ax_name, sim_name,
                                            plot_type, {}, "plot")
             # template post-processing
+            fig_key = self.data['fig_idx']['idx'] - 1
             _postprocess_template(template_name,
-                                  fig=self.figs[len(self.figs)],
-                                  idx=self.data['fig_idx']['idx'] - 1,
+                                  fig=self.figs[fig_key],
+                                  idx=fig_key,
                                   use_ipympl=self.use_ipympl,
                                   widgets=self.widgets,
                                   )
