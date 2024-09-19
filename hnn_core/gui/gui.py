@@ -536,7 +536,6 @@ class HNNGUI:
             return self.add_drive_widget(
                 self.widget_drive_type_selection.value,
                 self.widget_location_selection.value,
-                layout=self.layout['drive_textbox']
             )
 
         def _delete_drives_clicked(b):
@@ -914,7 +913,6 @@ class HNNGUI:
     def add_drive_widget(self,
                          drive_type,
                          location,
-                         layout,
                          prespecified_drive_name=None,
                          prespecified_drive_data=None,
                          prespecified_weights_ampa=None,
@@ -943,7 +941,7 @@ class HNNGUI:
 
         drive, drive_box = _build_drive_objects(
             drive_type, name, self.widget_tstop,
-            layout, style, location,
+            self.layout['drive_textbox'], style, location,
             prespecified_drive_data, prespecified_weights_ampa,
             prespecified_weights_nmda, prespecified_delays,
             prespecified_n_drive_cells, prespecified_cell_specific
@@ -1011,7 +1009,6 @@ class HNNGUI:
             should_render = idx == (len(drive_names) - 1)
             self.add_drive_widget(drive_type=specs['type'].capitalize(),
                                   location=specs['location'],
-                                  layout=self.layout['drive_textbox'],
                                   prespecified_drive_name=drive_name,
                                   render=should_render,
                                   expand_last_drive=False,
