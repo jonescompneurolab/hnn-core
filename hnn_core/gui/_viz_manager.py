@@ -258,7 +258,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
 
     elif plot_type == 'spectrogram':
         if len(dpls_copied) > 0:
-            min_f = 10.0
+            min_f = plot_config['min_spectral_frequency']
             max_f = plot_config['max_spectral_frequency']
             step_f = 1.0
             freqs = np.arange(min_f, max_f, step_f)
@@ -359,7 +359,8 @@ def _avg_dipole_check(dpls):
 
 def _plot_on_axes(b, simulations_widget, widgets_plot_type,
                   data_widget,
-                  spectrogram_colormap_selection, max_spectral_frequency,
+                  spectrogram_colormap_selection,
+                  min_spectral_frequency, max_spectral_frequency,
                   dipole_smooth, dipole_scaling, data_smooth, data_scaling,
                   widgets, data, fig_idx, fig, ax, existing_plots):
     """Plotting different types of data on the given axes.
@@ -380,6 +381,8 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
         A dropdown widget that contains all the colormaps for spectrogram.
     dipole_smooth : ipywidgets.FloatText
         A textfield widget that specifies the smoothing window size.
+    min_spectral_frequency : ipywidgets.FloatText
+        A textfield that specifies the minimum frequency for spectrogram plot.
     max_spectral_frequency : ipywidgets.FloatText
         A textfield that specifies the max frequency for spectrogram plot.
     dipole_scaling : ipywidgets.FloatText
@@ -411,6 +414,7 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
     simulation_plot_config = {
         "dipole_scaling": dipole_scaling.value,
         "dipole_smooth": dipole_smooth.value,
+        "min_spectral_frequency": min_spectral_frequency.value,
         "max_spectral_frequency": max_spectral_frequency.value,
         "spectrogram_cm": spectrogram_colormap_selection.value
     }
@@ -428,6 +432,7 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
         data_plot_config = {
             "dipole_scaling": data_scaling.value,
             "dipole_smooth": data_smooth.value,
+            "min_spectral_frequency": min_spectral_frequency.value,
             "max_spectral_frequency": max_spectral_frequency.value,
             "spectrogram_cm": spectrogram_colormap_selection.value
         }
@@ -587,6 +592,13 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         layout=layout,
         style=analysis_style)
 
+    min_spectral_frequency = FloatText(
+        value=10,
+        description='Min Spectral Frequency (Hz):',
+        disabled=False,
+        layout=layout,
+        style=analysis_style)
+
     max_spectral_frequency = FloatText(
         value=100,
         description='Max Spectral Frequency (Hz):',
@@ -635,6 +647,7 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
             widgets_plot_type=plot_type_selection,
             data_widget=target_data_selection,
             spectrogram_colormap_selection=spectrogram_colormap_selection,
+            min_spectral_frequency=min_spectral_frequency,
             max_spectral_frequency=max_spectral_frequency,
             dipole_smooth=simulation_dipole_smooth,
             dipole_scaling=simulation_dipole_scaling,
@@ -651,7 +664,7 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
     vbox = VBox([
         plot_type_selection, simulation_selection, simulation_dipole_smooth,
         simulation_dipole_scaling, target_data_selection, data_dipole_smooth,
-        data_dipole_scaling, max_spectral_frequency,
+        data_dipole_scaling, min_spectral_frequency, max_spectral_frequency,
         spectrogram_colormap_selection,
         HBox(
             [plot_button, clear_button],
@@ -999,7 +1012,8 @@ class _VizManager:
                 A dict of visualization preprocessing parameters. Allowed keys:
                 `dipole_smooth`, `dipole_scaling`,
                 `data_to_compare`, `data_smooth`, `data_scaling`
-                `max_spectral_frequency`, `spectrogram_colormap_selection`.
+                `min_spectral_frequency`, `max_spectral_frequency`,
+                `spectrogram_colormap_selection`.
                 config could be empty: `{}`.
             operation : str
                 `"plot"` if you want to plot and `"clear"` if you want to
@@ -1035,8 +1049,9 @@ class _VizManager:
             "data_to_compare": 4,
             "data_smooth": 5,
             "data_scaling": 6,
-            "max_spectral_frequency": 7,
-            "spectrogram_colormap_selection": 8,
+            "min_spectral_frequency": 7,
+            "max_spectral_frequency": 8,
+            "spectrogram_colormap_selection": 9,
         }
         for conf_key, conf_val in preprocessing_config.items():
             assert conf_key in config_name_idx.keys()
