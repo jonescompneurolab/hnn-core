@@ -1023,26 +1023,29 @@ class _VizManager:
         assert plot_type in _plot_types
         assert operation in ("plot", "clear")
 
+        # Select the figure tab
         tab = self.axes_config_tabs
         titles = tab.titles
         assert fig_name in titles, "No such figure"
         tab_idx = titles.index(fig_name)
         self.axes_config_tabs.selected_index = tab_idx
 
+        # Select the figure panel/ax tab
         ax_control_tabs = self.axes_config_tabs.children[tab_idx].children[1]
         ax_titles = ax_control_tabs.titles
         assert ax_name in ax_titles, "No such axis"
         ax_idx = ax_titles.index(ax_name)
         ax_control_tabs.selected_index = ax_idx
 
-        # ax config
-        simulation_ctrl = ax_control_tabs.children[ax_idx].children[1]
-        # return simulation_ctrl
-        simulation_ctrl.value = simulation_name
+        # Select the simulation
+        simulation_selector = ax_control_tabs.children[ax_idx].children[1]
+        simulation_selector.value = simulation_name
 
-        plot_type_ctrl = ax_control_tabs.children[ax_idx].children[0]
-        plot_type_ctrl.value = plot_type
+        # Select the plot type
+        plot_type_selector = ax_control_tabs.children[ax_idx].children[0]
+        plot_type_selector.value = plot_type
 
+        # Set the plot configurations
         config_name_idx = {
             "dipole_smooth": 2,
             "dipole_scaling": 3,
