@@ -776,6 +776,9 @@ def _postprocess_template(template_name, fig, idx,
     this function. For example, L2 and L5 dipole plots should have the same
     y-axis range.
     """
+    if template_name not in ['Dipole Layers (3x1)']:
+        return
+
     if template_name == 'Dipole Layers (3x1)':
         # Make the L2 and L5 plots the same y-range
         y_lims_list = [ax.get_ylim() for ax in fig.axes[0:2]]
