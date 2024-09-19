@@ -640,15 +640,22 @@ class HNNGUI:
                                               'value')
 
     def _delete_single_drive(self, b):
+        index = self.drive_accordion.selected_index
+
         # Remove selected drive from drive lists
-        self.drive_boxes.pop(self.drive_accordion.selected_index)
-        self.drive_widgets.pop(self.drive_accordion.selected_index)
+        self.drive_boxes.pop(index)
+        self.drive_widgets.pop(index)
 
         # Rebuild the accordion collection
+        self.drive_accordion.titles = tuple(
+            t for i, t in enumerate(self.drive_accordion.titles) if i != index
+        )
+        self.drive_accordion.selected_index = None
+        self.drive_accordion.children = self.drive_boxes
+
+        # Render
         self._drives_out.clear_output()
         with self._drives_out:
-            self.drive_accordion.selected_index = None
-            self.drive_accordion.children = self.drive_boxes
             display(self.drive_accordion)
 
     def compose(self, return_layout=True):
