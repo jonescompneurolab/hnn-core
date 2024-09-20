@@ -611,8 +611,8 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
         np.array(cell_response._spike_gids, dtype=object)[trial_idx])
 
     cell_types = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
-    cell_type_colors = {'L5_pyramidal': 'r', 'L5_basket': 'b',
-                        'L2_pyramidal': 'g', 'L2_basket': 'w'}
+    cell_type_colors = {'L5_pyramidal': 'C0', 'L5_basket': 'C1',
+                        'L2_pyramidal': 'C2', 'L2_basket': 'C3'}
 
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
@@ -638,7 +638,6 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
                              label=cell_type, linelengths=5))
 
     ax.legend(handles=[e[0] for e in events], loc=1)
-    ax.set_facecolor('k')
     ax.set_xlabel('Time (ms)')
     ax.get_yaxis().set_visible(False)
 
