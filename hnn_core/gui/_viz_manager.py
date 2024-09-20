@@ -781,6 +781,7 @@ def _add_figure(b, widgets, data, template_type, scale=0.95, dpi=96):
 
     data['figs'][fig_idx] = fig
     widgets['figs_tabs'].selected_index = n_tabs
+    widgets['axes_config_tabs'].selected_index = n_tabs
     data['fig_idx']['idx'] += 1
 
 
