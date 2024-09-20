@@ -333,14 +333,12 @@ def _static_rerender(widgets, fig, fig_idx):
     fig_output = widgets['figs_tabs'].children[fig_tab_idx]
     fig_output.clear_output()
     with fig_output:
-        fig.tight_layout()
         display(fig)
 
 
 def _dynamic_rerender(fig):
     fig.canvas.draw()
     fig.canvas.flush_events()
-    fig.tight_layout()
 
 
 def _avg_dipole_check(dpls):
@@ -762,13 +760,10 @@ def _add_figure(b, widgets, data, template_type, scale=0.95, dpi=96):
                    scale * ((int(viz_output_layout.height[:-2]) - 10) / dpi))
         mosaic = template_type['mosaic']
         kwargs = template_type['kwargs']
-        plt.ioff()
-        fig, axd = plt.subplot_mosaic(mosaic,
-                                      figsize=figsize,
-                                      dpi=dpi,
-                                      **kwargs)
-        plt.ion()
-        fig.tight_layout()
+        with plt.ioff():
+            fig = plt.figure(figsize=figsize, dpi=dpi, layout='constrained')
+            axd = fig.subplot_mosaic(mosaic, **kwargs)
+
         fig.canvas.header_visible = False
         fig.canvas.footer_visible = False
 
