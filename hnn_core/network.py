@@ -1358,6 +1358,8 @@ class Network:
             _validate_type(item, (int, float), arg_name, 'int or float')
             conn['nc_dict'][key] = item
 
+        conn['nc_dict']['gain'] = 1.0
+
         # Probabilistically define connections
         if probability != 1.0:
             _connection_probability(conn, probability, conn_seed)
@@ -1428,6 +1430,55 @@ class Network:
                                      method=method,
                                      min_distance=min_distance)})
 
+    def update_weights(self, e_e=1.0, e_i=1.0, i_e=1.0, i_i=1.0, copy=True):
+        """Update synaptic weights of the network.
+
+        Parameters
+        ----------
+        e_e : float
+            Synaptic gain of excitatory to excitatory connections (default 1.0)
+        e_i : float
+            Synaptic gain of excitatory to inhibitory connections (default 1.0)
+        i_e : float
+            Synaptic gain of inhibitory to excitatory connections (default 1.0)
+        i_i : float
+            Synaptic gain of inhibitory to inhibitory connections (default 1.0)
+        copy : bool
+            If True, create a copy of the network. If False, update the network
+            in place (default True)
+        """
+        _validate_type(copy, bool, 'copy')
+
+        net = self.copy() if copy else self
+
+        e_conns = pick_connection(self, receptor=['ampa', 'nmda'])
+        e_cells = np.concatenate([list(net.connectivity[
+            conn_idx]['src_gids']) for conn_idx in e_conns]).tolist()
+
+        i_conns = pick_connection(self, receptor=['gabaa', 'gabab'])
+        i_cells = np.concatenate([list(net.connectivity[
+            conn_idx]['src_gids']) for conn_idx in i_conns]).tolist()
+        conn_types = {
+            'e_e': (e_e, e_cells, e_cells),
+            'e_i': (e_i, e_cells, i_cells),
+            'i_e': (i_e, i_cells, e_cells),
+            'i_i': (i_i, i_cells, i_cells)
+        }
+
+        for conn_type, (gain, e_vals, i_vals) in conn_types.items():
+            _validate_type(gain, (int, float), conn_type, 'int or float')
+            if gain < 0.0:
+                raise ValueError("Synaptic gains must be non-negative."
+                                 f"Got {gain} for '{conn_type}'.")
+
+            conn_indices = pick_connection(net, src_gids=e_vals,
+                                           target_gids=i_vals)
+            for conn_idx in conn_indices:
+                net.connectivity[conn_idx]['nc_dict']['gain'] = gain
+
+        if copy:
+            return net
+
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.
 
@@ -1495,6 +1546,8 @@ class _Connectivity(dict):
             Synaptic delay in ms.
         lamtha : float
             Space constant.
+        gain : float
+            Multiplicative factor for synaptic weight.
     probability : float
         Probability of connection between any src-target pair.
         Defaults to 1.0 producing an all-to-all pattern.
