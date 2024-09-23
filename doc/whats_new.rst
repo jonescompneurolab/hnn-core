@@ -12,11 +12,20 @@ Current
 
 Changelog
 ~~~~~~~~~
+- Add button to delete a single drive on GUI drive windows, by
+  `George Dang`_ in :gh:`890`
+
+- Add minimum spectral frequency widget to GUI for adjusting spectrogram
+  frequency axis, by `George Dang`_ in :gh:`894`
+
 
 Bug
 ~~~
 - Fix GUI over-plotting of loaded data where the app stalled and did not plot
   RMSE, by `George Dang`_ in :gh:`869`
+
+- Fix scaling and smoothing of loaded data dipoles to the GUI, by `George Dang`_
+  in :gh:`892`
 
 API
 ~~~
