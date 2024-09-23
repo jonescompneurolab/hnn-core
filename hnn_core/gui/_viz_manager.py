@@ -10,8 +10,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from IPython.display import display
-from ipywidgets import (Box, Button, Dropdown, FloatText, HBox, Label, Layout,
-                        Output, Tab, VBox, link)
+from ipywidgets import (Box, Button, Dropdown, BoundedFloatText, FloatText,
+                        HBox, Label, Layout, Output, Tab, VBox, link)
 
 from hnn_core.dipole import average_dipoles, _rmse
 from hnn_core.gui._logging import logger
@@ -592,15 +592,19 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         layout=layout,
         style=analysis_style)
 
-    min_spectral_frequency = FloatText(
+    min_spectral_frequency = BoundedFloatText(
         value=10,
+        min=0.1,
+        max=1000,
         description='Min Spectral Frequency (Hz):',
         disabled=False,
         layout=layout,
         style=analysis_style)
 
-    max_spectral_frequency = FloatText(
+    max_spectral_frequency = BoundedFloatText(
         value=100,
+        min=0.1,
+        max=1000,
         description='Max Spectral Frequency (Hz):',
         disabled=False,
         layout=layout,
