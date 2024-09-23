@@ -477,6 +477,7 @@ class NetworkBuilder(object):
         for conn in connectivity:
             loc, receptor = conn['loc'], conn['receptor']
             nc_dict = deepcopy(conn['nc_dict'])
+            nc_dict['A_weight'] *= nc_dict['gain']
             # Gather indices of targets on current node
             valid_targets = set()
             for src_gid, target_gids in conn['gid_pairs'].items():
