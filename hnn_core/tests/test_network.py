@@ -934,6 +934,19 @@ def test_synaptic_gains():
         else:
             assert conn['nc_dict']['gain'] == 1.0
 
+    # Two argument check
+    net.update_weights(i_e=0.5, i_i=0.25, copy=False)
+    for conn in net.connectivity:
+        if (conn['src_type'] in i_cell_names and
+                conn['target_type'] in e_cell_names):
+            assert conn['nc_dict']['gain'] == 0.5
+        elif (conn['src_type'] in i_cell_names and
+                conn['target_type'] in i_cell_names):
+            assert conn['nc_dict']['gain'] == 0.25
+        else:
+            assert conn['nc_dict']['gain'] == 1.0
+
+
 
 class TestPickConnection:
     """Tests for the pick_connection function."""
