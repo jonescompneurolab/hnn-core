@@ -913,18 +913,19 @@ def test_synaptic_gains():
     with pytest.raises(TypeError, match='must be an instance of bool'):
         net.update_weights(copy='True')
 
+    # Single argument check with copy
     net_updated = net.update_weights(e_e=2.0, copy=True)
-
-    for conn in net.connectivity:
-        assert conn['nc_dict']['gain'] == 1.0
-
     for conn in net_updated.connectivity:
         if (conn['src_type'] in e_cell_names and
                 conn['target_type'] in e_cell_names):
             assert conn['nc_dict']['gain'] == 2.0
         else:
             assert conn['nc_dict']['gain'] == 1.0
+    # Ensure that the original network gains did not change
+    for conn in net.connectivity:
+        assert conn['nc_dict']['gain'] == 1.0
 
+    # Single argument with inplace change
     net.update_weights(i_e=0.5, copy=False)
     for conn in net.connectivity:
         if (conn['src_type'] in i_cell_names and
