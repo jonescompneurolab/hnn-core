@@ -947,10 +947,11 @@ def test_synaptic_gains():
         else:
             assert conn['nc_dict']['gain'] == 1.0
 
-    nb_updated = NetworkBuilder(net)
     # Check weights are altered
     def _get_weight(nb, conn_name, idx=0):
         return nb.ncs[conn_name][idx].weight[0]
+
+    nb_updated = NetworkBuilder(net)
     # i_e check
     assert (_get_weight(nb_updated, 'L2Basket_L2Pyr_gabaa') /
             _get_weight(nb_base, 'L2Basket_L2Pyr_gabaa')) == 0.5
