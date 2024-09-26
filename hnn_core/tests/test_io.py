@@ -268,7 +268,8 @@ def test_conn_to_dict(jones_2009_network):
                       'nc_dict': {'A_delay': 0.1,
                                   'A_weight': 0.006562,
                                   'lamtha': 3.0,
-                                  'threshold': 0.0},
+                                  'threshold': 0.0,
+                                  'gain': 1.0},
                       'allow_autapses': 1,
                       'probability': 1.0}
 
