@@ -103,7 +103,8 @@ def check_equal_networks(net1, net2):
                             'connectivity', 'copy', 'gid_to_type',
                             'plot_cells', 'set_cell_positions',
                             'to_dict', 'write_configuration',
-                            'external_drives', 'external_biases'])
+                            'external_drives', 'external_biases',
+                            'update_weights'])
     attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
     for attr in attrs_to_check:
         check_equality(getattr(net1, attr), getattr(net2, attr),
