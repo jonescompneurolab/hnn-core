@@ -898,6 +898,7 @@ def test_network_mesh():
 def test_synaptic_gains():
     """Test synaptic gains update"""
     net = jones_2009_model()
+    nb_base = NetworkBuilder(net)
     e_cell_names = ['L2_pyramidal', 'L5_pyramidal']
     i_cell_names = ['L2_basket', 'L5_basket']
 
@@ -946,6 +947,19 @@ def test_synaptic_gains():
         else:
             assert conn['nc_dict']['gain'] == 1.0
 
+    nb_updated = NetworkBuilder(net)
+    # Check weights are altered
+    def _get_weight(nb, conn_name, idx=0):
+        return nb.ncs[conn_name][idx].weight[0]
+    # i_e check
+    assert (_get_weight(nb_updated, 'L2Basket_L2Pyr_gabaa') /
+            _get_weight(nb_base, 'L2Basket_L2Pyr_gabaa')) == 0.5
+    # i_i check
+    assert (_get_weight(nb_updated, 'L2Basket_L2Basket_gabaa') /
+            _get_weight(nb_base, 'L2Basket_L2Basket_gabaa')) == 0.25
+    # Unaltered check
+    assert (_get_weight(nb_updated, 'L2Pyr_L5Basket_ampa') /
+            _get_weight(nb_base, 'L2Pyr_L5Basket_ampa')) == 1
 
 
 class TestPickConnection:
