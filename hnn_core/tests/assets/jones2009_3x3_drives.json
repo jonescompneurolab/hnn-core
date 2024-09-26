@@ -2180,7 +2180,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.006562,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -2217,7 +2218,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.019482,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -2284,7 +2286,8 @@
                 "A_delay": 0.1,
                 "A_weight": 7e-06,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -2351,7 +2354,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.004317,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -2418,7 +2422,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.1423,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -2485,7 +2490,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.080074,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -2522,7 +2528,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.08831,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -2559,7 +2566,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.0,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -2626,7 +2634,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.01525,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -2693,7 +2702,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.0,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -2730,7 +2740,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.19934,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -2767,7 +2778,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -2834,7 +2846,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.00865,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -2901,7 +2914,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -2938,7 +2952,8 @@
                 "A_delay": 0.1,
                 "A_weight": 3e-06,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -2975,7 +2990,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.0,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -3042,7 +3058,8 @@
                 "A_delay": 0.1,
                 "A_weight": 1.43884,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -3109,7 +3126,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.0,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -3146,7 +3164,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.008958,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -3183,7 +3202,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -3250,7 +3270,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.684013,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -3317,7 +3338,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -3447,7 +3469,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0005,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 0,
             "probability": 1.0
@@ -3577,7 +3600,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0005,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 0,
             "probability": 1.0
@@ -3707,7 +3731,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0005,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 0,
             "probability": 1.0
@@ -3837,7 +3862,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0005,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 0,
             "probability": 1.0
@@ -3904,7 +3930,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.05,
                 "lamtha": 50.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -3971,7 +3998,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.05,
                 "lamtha": 50.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -4038,7 +4066,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.025,
                 "lamtha": 70.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -4105,7 +4134,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.025,
                 "lamtha": 70.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -4244,7 +4274,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.00025,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -4383,7 +4414,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.00025,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -4450,7 +4482,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.001,
                 "lamtha": 50.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -4529,7 +4562,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0005,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -4572,7 +4606,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.02,
                 "lamtha": 20.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -4612,7 +4647,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.02,
                 "lamtha": 20.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 0,
             "probability": 1.0
@@ -4691,7 +4727,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0005,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -4770,7 +4807,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.00025,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -4855,7 +4893,8 @@
                 "A_delay": 0.0,
                 "A_weight": 0.0,
                 "lamtha": 100.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -4940,7 +4979,8 @@
                 "A_delay": 0.0,
                 "A_weight": 0.0,
                 "lamtha": 100.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -5091,7 +5131,8 @@
                 "A_delay": 0.1,
                 "A_weight": 5.4e-05,
                 "lamtha": 100.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -5242,7 +5283,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.0,
                 "lamtha": 100.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -5327,7 +5369,8 @@
                 "A_delay": 0.0,
                 "A_weight": 0.0,
                 "lamtha": 100.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -5412,7 +5455,8 @@
                 "A_delay": 0.0,
                 "A_weight": 0.0,
                 "lamtha": 100.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -5563,7 +5607,8 @@
                 "A_delay": 1.0,
                 "A_weight": 5.4e-05,
                 "lamtha": 100.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -5714,7 +5759,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0,
                 "lamtha": 100.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -5751,7 +5797,8 @@
                 "A_delay": 0.0,
                 "A_weight": 0.0,
                 "lamtha": 100.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -5788,7 +5835,8 @@
                 "A_delay": 0.0,
                 "A_weight": 0.0,
                 "lamtha": 100.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -5855,7 +5903,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.0008,
                 "lamtha": 100.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -5922,7 +5971,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.0,
                 "lamtha": 100.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -5959,7 +6009,8 @@
                 "A_delay": 0.0,
                 "A_weight": 0.0,
                 "lamtha": 100.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -5996,7 +6047,8 @@
                 "A_delay": 0.0,
                 "A_weight": 0.0,
                 "lamtha": 100.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -6063,7 +6115,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0075,
                 "lamtha": 100.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -6130,7 +6183,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0,
                 "lamtha": 100.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
