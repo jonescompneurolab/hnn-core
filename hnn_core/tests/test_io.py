@@ -104,9 +104,6 @@ def generate_test_files(jones_2009_network):
     """ Generates files used in read-in tests """
     net = jones_2009_network
     net.write_configuration(Path('.', 'assets/jones2009_3x3_drives.json'))
-    simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
-    net.write_configuration(Path('.',
-                                 'assets/jones2009_3x3_drives_simulated.json'))
 
 
 def test_eq(jones_2009_network, calcium_network):
