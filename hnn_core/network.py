@@ -313,6 +313,40 @@ def pick_connection(net, src_gids=None, target_gids=None, loc=None, receptor=Non
     return sorted(conn_set)
 
 
+def _get_cell_index_by_synapse_type(net):
+    """Returns the indices of excitatory and inhibitory cells in the network.
+
+    This function extracts the source GIDs (cell ID) of excitatory
+    and inhibitory cells based on their connection types. Excitatory cells are
+    identified by their synaptic connections using AMPA and NMDA receptors,
+    while inhibitory cells are identified by their connections using GABAA and
+    GABAB receptors.
+
+    Parameters
+    ----------
+    net : Instance of Network object
+        The Network object
+
+    Returns
+    -------
+    tuple: A tuple containing two lists:
+        - e_cells (list): The source GIDs of excitatory cells.
+        - i_cells (list): The source GIDs of inhibitory cells.
+    """
+
+    def list_src_gids(indices):
+        return np.concatenate([list(net.connectivity[conn_idx]['src_gids'])
+                               for conn_idx in indices]).tolist()
+
+    picks_e = pick_connection(net, receptor=['ampa', 'nmda'])
+    e_cells = list_src_gids(picks_e)
+
+    picks_i = pick_connection(net, receptor=['gabaa', 'gabab'])
+    i_cells = list_src_gids(picks_i)
+
+    return e_cells, i_cells
+
+
 class Network:
     """The Network class.
 
@@ -1921,7 +1955,8 @@ class Network:
             }
         )
 
-    def update_weights(self, e_e=None, e_i=None, i_e=None, i_i=None, copy=False):
+    def set_synaptic_gains(self, e_e=None, e_i=None,
+                           i_e=None, i_i=None, copy=False):
         """Update synaptic weights of the network.
 
         Parameters
@@ -1995,6 +2030,50 @@ class Network:
 
         if copy:
             return net
+
+    def get_synaptic_gains(self):
+        """Retrieve gain values for different connection types in the network.
+
+        This function identifies excitatory and inhibitory cells in the network
+        and retrieves the gain value for each type of synaptic connection:
+        - excitatory to excitatory (e_e)
+        - excitatory to inhibitory (e_i)
+        - inhibitory to excitatory (i_e)
+        - inhibitory to inhibitory (i_i)
+
+        The gain is assumed to be uniform within each connection type, and only
+        the first connection's gain value is used for each type.
+
+        Returns
+        -------
+        values : dict
+             A dictionary with the connection types ('e_e', 'e_i', 'i_e',
+        'i_i') as keys and their corresponding gain values.
+        """
+        values = {}
+        e_cells, i_cells = _get_cell_index_by_synapse_type(self)
+
+        # Define the connection types and source/target cell indexes
+        conn_types = {
+            'e_e': (e_cells, e_cells),
+            'e_i': (e_cells, i_cells),
+            'i_e': (i_cells, e_cells),
+            'i_i': (i_cells, i_cells)
+        }
+
+        # Retrieve the gain value for each connection type
+        for conn_type, (src_idxs, target_idxs) in conn_types.items():
+            picks = pick_connection(self,
+                                    src_gids=src_idxs,
+                                    target_gids=target_idxs)
+
+            if picks:
+                # Extract the gain from the first connection
+                values[conn_type] = (
+                    self.connectivity[picks[0]]['nc_dict']['gain']
+                )
+
+        return values
 
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.

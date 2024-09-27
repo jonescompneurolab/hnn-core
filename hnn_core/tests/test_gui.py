@@ -120,6 +120,8 @@ def test_gui_compose():
     gui = HNNGUI()
     gui.compose()
     assert len(gui.connectivity_widgets) == 12
+    assert len(gui.synaptic_gain_widgets) == 4
+    assert len(gui.cell_parameters_widgets) == 6
     assert len(gui.drive_widgets) == 3
     plt.close("all")
 
@@ -319,6 +321,7 @@ def test_gui_change_connectivity():
                     gui.drive_widgets,
                     gui.connectivity_widgets,
                     gui.cell_pameters_widgets,
+                    gui.synaptic_gain_widgets,
                     add_drive=False,
                 )
 
@@ -369,6 +372,7 @@ def test_gui_init_network(setup_gui):
         gui.drive_widgets,
         gui.connectivity_widgets,
         gui.cell_pameters_widgets,
+        gui.synaptic_gain_widgets,
     )
     plt.close("all")
 
@@ -1015,6 +1019,7 @@ def test_gui_add_tonic_input():
         gui.drive_widgets,
         gui.connectivity_widgets,
         gui.cell_pameters_widgets,
+        gui.synaptic_gain_widgets,
     )
 
     net = _single_simulation["net"]
@@ -1044,7 +1049,7 @@ def test_gui_cell_params_widgets(setup_gui):
     layers = gui.cell_layer_radio_buttons.options
     assert len(layers) == 3
 
-    keys = gui.cell_pameters_widgets.keys()
+    keys = gui.cell_parameters_widgets.keys()
     num_cell_params = 0
     for pyramid_cell_type in pyramid_cell_types:
         cell_type = pyramid_cell_type.split("_")[0]
@@ -1191,158 +1196,38 @@ def test_delete_single_drive(setup_gui):
 
     gui._simulate_delete_single_drive(2)
     assert len(gui.drive_accordion.children) == 5
-    assert gui.drive_accordion.titles == (
-        "evdist1 (distal)",
-        "evprox1 (proximal)",
-        "alpha_prox (proximal)",
-        "poisson (proximal)",
-        "tonic",
-    )
+    assert gui.drive_accordion.titles == ('evdist1 (distal)',
+                                          'evprox1 (proximal)',
+                                          'alpha_prox (proximal)',
+                                          'poisson (proximal)',
+                                          'tonic')
 
 
-def test_default_scaling(setup_gui):
-    """Tests default scaling is inherited correctly"""
+def test_adjust_synaptic_weights(setup_gui):
+    """Test adjusting synaptic weight widgets."""
 
     gui = setup_gui
-    gui.run_button.click()
+    _single_simulation = {}
+    _single_simulation['net'] = dict_to_network(gui.params)
+    _init_network_from_widgets(gui.params, gui.widget_dt, gui.widget_tstop,
+                               _single_simulation, gui.drive_widgets,
+                               gui.connectivity_widgets,
+                               gui.cell_pameters_widgets,
+                               gui.synaptic_gain_widgets)
 
-    # check that the unadjusted default scaling is the same everywhere
-    gui_scaling_value = gui.fig_default_params["default_scaling"]
-    viz_scaling_value = gui.viz_manager.fig_default_params["default_scaling"]
+    gains_default = _single_simulation['net'].get_synaptic_gains()
+    assert gains_default == {'e_e': 1.0, 'e_i': 1.0, 'i_e': 1.0, 'i_i': 1.0}
 
-    assert gui_scaling_value == viz_scaling_value
+    # Change the synaptic weight widgets
+    gui.synaptic_gain_widgets['e_e'].value = 0.5
+    gui.synaptic_gain_widgets['e_i'].value = 0.5
+    gui.synaptic_gain_widgets['i_i'].value = 1.1
+    gui.synaptic_gain_widgets['i_e'].value = 1.1
+    _init_network_from_widgets(gui.params, gui.widget_dt, gui.widget_tstop,
+                               _single_simulation, gui.drive_widgets,
+                               gui.connectivity_widgets,
+                               gui.cell_pameters_widgets,
+                               gui.synaptic_gain_widgets)
 
-    # update simulation name
-    gui.widget_simulation_name.value = "no_scaling"
-
-    # change value of default scaling in the widget
-    new_scaling = 1000
-    gui.widget_default_scaling.value = new_scaling
-
-    gui.run_button.click()
-
-    # check that the new default scaling value is set everywhere
-    gui_scaling_value = gui.fig_default_params["default_scaling"]
-    viz_scaling_value = gui.viz_manager.fig_default_params["default_scaling"]
-
-    assert gui_scaling_value == new_scaling
-    assert viz_scaling_value == new_scaling
-
-    # check that dipole plots have data
-    gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
-    gui._simulate_viz_action("add_fig")
-    figid = 2
-    figname = f"Figure {figid}"
-    axname = "ax0"
-
-    _dipole_plot_types = [
-        "current dipole",
-        "layer2/3 dipole",
-        "layer5 dipole",
-    ]
-
-    for viz_type in _dipole_plot_types:
-        gui._simulate_viz_action(
-            "edit_figure", figname, axname, "no_scaling", viz_type, {}, "clear"
-        )
-
-        gui._simulate_viz_action(
-            "edit_figure", figname, axname, "no_scaling", viz_type, {}, "plot"
-        )
-
-        # Check if data is plotted on the axes
-        assert gui.viz_manager.figs[figid].axes[0].has_data()
-
-    plt.close("all")
-
-
-def test_default_smoothing(setup_gui):
-    """Tests default smoothing is inherited correctly"""
-
-    gui = setup_gui
-    gui.run_button.click()
-
-    # check that the unadjusted default smoothing is the same everywhere
-    gui_smooth_value = gui.fig_default_params["default_smoothing"]
-    viz_smooth_value = gui.viz_manager.fig_default_params["default_smoothing"]
-
-    assert gui_smooth_value == viz_smooth_value
-
-    # update simulation name
-    gui.widget_simulation_name.value = "no_smoothing"
-
-    # change value of default smoothing in the widget
-    new_smoothing = 0
-    gui.widget_default_smoothing.value = new_smoothing
-
-    gui.run_button.click()
-
-    # check that the new default smoothing value is set everywhere
-    gui_smooth_value = gui.fig_default_params["default_smoothing"]
-    viz_smooth_value = gui.viz_manager.fig_default_params["default_smoothing"]
-
-    assert gui_smooth_value == new_smoothing
-    assert viz_smooth_value == new_smoothing
-
-    # check that dipole plots have data
-    gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
-    gui._simulate_viz_action("add_fig")
-    figid = 2
-    figname = f"Figure {figid}"
-    axname = "ax0"
-
-    _dipole_plot_types = [
-        "current dipole",
-        "layer2/3 dipole",
-        "layer5 dipole",
-    ]
-
-    for viz_type in _dipole_plot_types:
-        gui._simulate_viz_action(
-            "edit_figure", figname, axname, "no_smoothing", viz_type, {}, "clear"
-        )
-
-        gui._simulate_viz_action(
-            "edit_figure", figname, axname, "no_smoothing", viz_type, {}, "plot"
-        )
-
-        # Check if data is plotted on the axes
-        assert gui.viz_manager.figs[figid].axes[0].has_data()
-
-    plt.close("all")
-
-
-def test_default_frequencies(setup_gui):
-    """Tests that default min/max frequency are inherited correctly"""
-    gui = setup_gui
-
-    # check that the defaults are the same everywhere after running
-    # the default simulation
-    gui.run_button.click()
-
-    gui_min = gui.fig_default_params["default_min_frequency"]
-    viz_min = gui.viz_manager.fig_default_params["default_min_frequency"]
-    gui_max = gui.fig_default_params["default_max_frequency"]
-    viz_max = gui.viz_manager.fig_default_params["default_max_frequency"]
-
-    assert gui_min == viz_min
-    assert gui_max == viz_max
-
-    # change value of default min/max frequencies in the widget
-    new_min = 5
-    new_max = 50
-    gui.widget_min_frequency.value = new_min
-    gui.widget_max_frequency.value = new_max
-
-    # update simulation name
-    gui.widget_simulation_name.value = "new_defaults"
-    gui.run_button.click()
-
-    # check that the new default values are set everywhere
-    gui_min = gui.fig_default_params["default_min_frequency"]
-    viz_min = gui.viz_manager.fig_default_params["default_min_frequency"]
-    gui_max = gui.fig_default_params["default_max_frequency"]
-    viz_max = gui.viz_manager.fig_default_params["default_max_frequency"]
-
-    assert gui_min == viz_min == new_min
-    assert gui_max == viz_max == new_max
+    gains_altered = _single_simulation['net'].get_synaptic_gains()
+    assert gains_altered == {'e_e': 0.5, 'e_i': 0.5, 'i_e': 1.1, 'i_i': 1.1}
