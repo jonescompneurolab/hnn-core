@@ -1432,7 +1432,7 @@ class Network:
                                      min_distance=min_distance)})
 
     def update_weights(self, e_e=None, e_i=None,
-                       i_e=None, i_i=None, copy=True):
+                       i_e=None, i_i=None, copy=False):
         """Update synaptic weights of the network.
 
         Parameters
@@ -1452,6 +1452,7 @@ class Network:
         copy : bool
             If True, returns a copy of the network. If False,
             the network is updated in place with a return of None.
+            (default False)
 
         Returns
         -------
