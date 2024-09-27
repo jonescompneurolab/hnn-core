@@ -1453,7 +1453,6 @@ class Network:
             If True, returns a copy of the network. If False,
             the network is updated in place with a return of None.
 
-
         Returns
         -------
         net : instance of Network
