@@ -561,6 +561,8 @@ class HNNGUI:
 
         # Cell parameter list
         self.cell_pameters_widgets = dict()
+        # Cell parameter dict
+        self.cell_parameters_widgets = dict()
 
         self._init_ui_components()
         self.add_logging_window_logger()
@@ -2286,7 +2288,6 @@ def _init_network_from_widgets(
                 ] = vbox_key.children[1].value
 
     # Update cell params
-
     update_functions = {
         "L2 Geometry": _update_L2_geometry_cell_params,
         "L5 Geometry": _update_L5_geometry_cell_params,
