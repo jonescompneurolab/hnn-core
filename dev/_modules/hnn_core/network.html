@@ -608,7 +608,8 @@
                                 <span class="s1">&#39;clear_connectivity&#39;</span><span class="p">,</span> <span class="s1">&#39;clear_drives&#39;</span><span class="p">,</span>
                                 <span class="s1">&#39;connectivity&#39;</span><span class="p">,</span> <span class="s1">&#39;copy&#39;</span><span class="p">,</span> <span class="s1">&#39;gid_to_type&#39;</span><span class="p">,</span>
                                 <span class="s1">&#39;plot_cells&#39;</span><span class="p">,</span> <span class="s1">&#39;set_cell_positions&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;to_dict&#39;</span><span class="p">,</span> <span class="s1">&#39;write_configuration&#39;</span><span class="p">])</span>
+                                <span class="s1">&#39;to_dict&#39;</span><span class="p">,</span> <span class="s1">&#39;write_configuration&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;update_weights&#39;</span><span class="p">])</span>
         <span class="n">attrs_to_check</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_attrs</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attrs_to_ignore</span><span class="p">]</span>
 
         <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs_to_check</span><span class="p">:</span>
@@ -1493,6 +1494,8 @@
             <span class="n">_validate_type</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="n">arg_name</span><span class="p">,</span> <span class="s1">&#39;int or float&#39;</span><span class="p">)</span>
             <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;nc_dict&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
 
+        <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;nc_dict&#39;</span><span class="p">][</span><span class="s1">&#39;gain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
         <span class="c1"># Probabilistically define connections</span>
         <span class="k">if</span> <span class="n">probability</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
             <span class="n">_connection_probability</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">probability</span><span class="p">,</span> <span class="n">conn_seed</span><span class="p">)</span>
@@ -1563,6 +1566,76 @@
                                      <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
                                      <span class="n">min_distance</span><span class="o">=</span><span class="n">min_distance</span><span class="p">)})</span></div>
 
+<div class="viewcode-block" id="Network.update_weights"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.update_weights">[docs]</a>    <span class="k">def</span> <span class="nf">update_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e_e</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">e_i</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">i_e</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">i_i</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update synaptic weights of the network.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        e_e : float</span>
+<span class="sd">            Synaptic gain of excitatory to excitatory connections</span>
+<span class="sd">            (default None)</span>
+<span class="sd">        e_i : float</span>
+<span class="sd">            Synaptic gain of excitatory to inhibitory connections</span>
+<span class="sd">            (default None)</span>
+<span class="sd">        i_e : float</span>
+<span class="sd">            Synaptic gain of inhibitory to excitatory connections</span>
+<span class="sd">            (default None)</span>
+<span class="sd">        i_i : float</span>
+<span class="sd">            Synaptic gain of inhibitory to inhibitory connections</span>
+<span class="sd">            (default None)</span>
+<span class="sd">        copy : bool</span>
+<span class="sd">            If True, returns a copy of the network. If False,</span>
+<span class="sd">            the network is updated in place with a return of None.</span>
+<span class="sd">            (default False)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        net : instance of Network</span>
+<span class="sd">            A copy of the instance with updated synaptic gains if copy=True.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Synaptic gains must be non-negative. The synaptic gains will only be</span>
+<span class="sd">        updated if a float value is provided. If None is provided</span>
+<span class="sd">        (the default), the synapticgain will remain unchanged.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">copy</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s1">&#39;copy&#39;</span><span class="p">)</span>
+
+        <span class="n">net</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="n">copy</span> <span class="k">else</span> <span class="bp">self</span>
+
+        <span class="n">e_conns</span> <span class="o">=</span> <span class="n">pick_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receptor</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ampa&#39;</span><span class="p">,</span> <span class="s1">&#39;nmda&#39;</span><span class="p">])</span>
+        <span class="n">e_cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span>
+            <span class="n">conn_idx</span><span class="p">][</span><span class="s1">&#39;src_gids&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">conn_idx</span> <span class="ow">in</span> <span class="n">e_conns</span><span class="p">])</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="n">i_conns</span> <span class="o">=</span> <span class="n">pick_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receptor</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gabaa&#39;</span><span class="p">,</span> <span class="s1">&#39;gabab&#39;</span><span class="p">])</span>
+        <span class="n">i_cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span>
+            <span class="n">conn_idx</span><span class="p">][</span><span class="s1">&#39;src_gids&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">conn_idx</span> <span class="ow">in</span> <span class="n">i_conns</span><span class="p">])</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">conn_types</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;e_e&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">e_e</span><span class="p">,</span> <span class="n">e_cells</span><span class="p">,</span> <span class="n">e_cells</span><span class="p">),</span>
+            <span class="s1">&#39;e_i&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">e_i</span><span class="p">,</span> <span class="n">e_cells</span><span class="p">,</span> <span class="n">i_cells</span><span class="p">),</span>
+            <span class="s1">&#39;i_e&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">i_e</span><span class="p">,</span> <span class="n">i_cells</span><span class="p">,</span> <span class="n">e_cells</span><span class="p">),</span>
+            <span class="s1">&#39;i_i&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">i_i</span><span class="p">,</span> <span class="n">i_cells</span><span class="p">,</span> <span class="n">i_cells</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">conn_type</span><span class="p">,</span> <span class="p">(</span><span class="n">gain</span><span class="p">,</span> <span class="n">e_vals</span><span class="p">,</span> <span class="n">i_vals</span><span class="p">)</span> <span class="ow">in</span> <span class="n">conn_types</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">gain</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">_validate_type</span><span class="p">(</span><span class="n">gain</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="n">conn_type</span><span class="p">,</span> <span class="s1">&#39;int or float&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">gain</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Synaptic gains must be non-negative.&quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">gain</span><span class="si">}</span><span class="s2"> for &#39;</span><span class="si">{</span><span class="n">conn_type</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+
+            <span class="n">conn_indices</span> <span class="o">=</span> <span class="n">pick_connection</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">src_gids</span><span class="o">=</span><span class="n">e_vals</span><span class="p">,</span>
+                                           <span class="n">target_gids</span><span class="o">=</span><span class="n">i_vals</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">conn_idx</span> <span class="ow">in</span> <span class="n">conn_indices</span><span class="p">:</span>
+                <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_idx</span><span class="p">][</span><span class="s1">&#39;nc_dict&#39;</span><span class="p">][</span><span class="s1">&#39;gain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gain</span>
+
+        <span class="k">if</span> <span class="n">copy</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">net</span></div>
+
 <div class="viewcode-block" id="Network.plot_cells"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.plot_cells">[docs]</a>    <span class="k">def</span> <span class="nf">plot_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the cells using Network.pos_dict.</span>
 
@@ -1630,6 +1703,8 @@
 <span class="sd">            Synaptic delay in ms.</span>
 <span class="sd">        lamtha : float</span>
 <span class="sd">            Space constant.</span>
+<span class="sd">        gain : float</span>
+<span class="sd">            Multiplicative factor for synaptic weight.</span>
 <span class="sd">    probability : float</span>
 <span class="sd">        Probability of connection between any src-target pair.</span>
 <span class="sd">        Defaults to 1.0 producing an all-to-all pattern.</span>

@@ -18,6 +18,8 @@ Changelog
 - Add minimum spectral frequency widget to GUI for adjusting spectrogram
   frequency axis, by `George Dang`_ in :gh:`894`
 
+- Add method to modify synaptic gains, by `Nick Tolley`_  and `George Dang`_
+  in :gh:`897`
 
 Bug
 ~~~
