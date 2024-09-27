@@ -763,9 +763,8 @@ def _add_figure(b, widgets, data, template_type, scale=0.95, dpi=96):
         with plt.ioff():
             fig = plt.figure(figsize=figsize, dpi=dpi, layout='constrained')
             axd = fig.subplot_mosaic(mosaic, **kwargs)
-
-        fig.canvas.header_visible = False
-        fig.canvas.footer_visible = False
+            fig.canvas.header_visible = False
+            fig.canvas.footer_visible = False
 
         if data['use_ipympl'] is False:
             plt.show()
