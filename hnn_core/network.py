@@ -1431,22 +1431,40 @@ class Network:
                                      method=method,
                                      min_distance=min_distance)})
 
-    def update_weights(self, e_e=1.0, e_i=1.0, i_e=1.0, i_i=1.0, copy=True):
+    def update_weights(self, e_e=None, e_i=None,
+                       i_e=None, i_i=None, copy=True):
         """Update synaptic weights of the network.
 
         Parameters
         ----------
         e_e : float
-            Synaptic gain of excitatory to excitatory connections (default 1.0)
+            Synaptic gain of excitatory to excitatory connections
+            (default None)
         e_i : float
-            Synaptic gain of excitatory to inhibitory connections (default 1.0)
+            Synaptic gain of excitatory to inhibitory connections
+            (default None)
         i_e : float
-            Synaptic gain of inhibitory to excitatory connections (default 1.0)
+            Synaptic gain of inhibitory to excitatory connections
+            (default None)
         i_i : float
-            Synaptic gain of inhibitory to inhibitory connections (default 1.0)
+            Synaptic gain of inhibitory to inhibitory connections
+            (default None)
         copy : bool
-            If True, create a copy of the network. If False, update the network
-            in place (default True)
+            If True, returns a copy of the network. If False,
+            the network is updated in place with a return of None.
+
+
+        Returns
+        -------
+        net : instance of Network
+            A copy of the instance with updated synaptic gains if copy=True.
+
+        Notes
+        -----
+        Synaptic gains must be non-negative. The synaptic gains will only be
+        updated if a float value is provided. If None is provided
+        (the default), the synapticgain will remain unchanged.
+
         """
         _validate_type(copy, bool, 'copy')
 
@@ -1467,6 +1485,9 @@ class Network:
         }
 
         for conn_type, (gain, e_vals, i_vals) in conn_types.items():
+            if gain is None:
+                continue
+
             _validate_type(gain, (int, float), conn_type, 'int or float')
             if gain < 0.0:
                 raise ValueError("Synaptic gains must be non-negative."
