@@ -94,19 +94,11 @@ def check_equal_networks(net1, net2):
                         message=f'{bias_name}>{cell_type}>')
 
     # Check all other attributes
-    all_attrs = dir(net1)
-    attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
-    attrs_to_ignore.extend(['add_bursty_drive', 'add_connection',
-                            'add_electrode_array', 'add_evoked_drive',
-                            'add_poisson_drive', 'add_tonic_bias',
-                            'clear_connectivity', 'clear_drives',
-                            'connectivity', 'copy', 'gid_to_type',
-                            'plot_cells', 'set_cell_positions',
-                            'to_dict', 'write_configuration',
-                            'external_drives', 'external_biases',
-                            'update_weights'])
-    attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
-    for attr in attrs_to_check:
+    attrs_to_ignore = ['connectivity', 'external_drives', 'external_biases']
+    for attr in vars(net1).keys():
+        if attr.startswith('_') or attr in attrs_to_ignore:
+            continue
+
         check_equality(getattr(net1, attr), getattr(net2, attr),
                        f'{attr} not equal')
 
