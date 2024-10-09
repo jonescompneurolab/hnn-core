@@ -465,20 +465,16 @@ class Network:
             return False
 
         # Check all other attributes
-        all_attrs = dir(self)
-        attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
-        attrs_to_ignore.extend(['add_bursty_drive', 'add_connection',
-                                'add_electrode_array', 'add_evoked_drive',
-                                'add_poisson_drive', 'add_tonic_bias',
-                                'clear_connectivity', 'clear_drives',
-                                'connectivity', 'copy', 'gid_to_type',
-                                'plot_cells', 'set_cell_positions',
-                                'to_dict', 'write_configuration',
-                                'update_weights'])
-        attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
+        attrs_to_ignore = ['connectivity']
+        for attr in vars(self).keys():
+            if attr.startswith('_') or attr in attrs_to_ignore:
+                continue
 
-        for attr in attrs_to_check:
-            if getattr(self, attr) != getattr(other, attr):
+            if hasattr(self, attr) and hasattr(other, attr):
+                if getattr(self, attr) != getattr(other, attr):
+                    return False
+            else:
+                # Does not have the same set of attributes
                 return False
 
         return True
