@@ -397,12 +397,12 @@ def dict_to_network(net_data,
 
     Parameters
     ----------
-    fname : str or Path
-        Path to configuration file
-    read_drives : bool
-        Read-in drives to Network object
-    read_external_biases
-        Read-in external biases to Network object
+    net_data : dict
+        Dictionary containing network configurations.
+    read_drives : bool, optional
+        Read-in drives to Network object. Default is True.
+    read_external_biases : bool, optional
+        Read-in external biases to Network object. Default is True.
 
     Returns : Network
     -------
