@@ -509,8 +509,8 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
 
 
 def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
-                       cell_types = ['L2_basket', 'L2_pyramidal',
-                                     'L5_basket','L5_pyramidal'],
+                       cell_types=['L2_basket', 'L2_pyramidal',
+                                   'L5_basket', 'L5_pyramidal'],
                        colors=None,
                        ):
     """Plot the aggregate spiking activity according to cell type.
@@ -554,7 +554,6 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
                              f"cell types. {len(colors)} colors provided "
                              f"for {len(cell_types)} cell types.")
 
-
     # Extract desired trials
     spike_times = np.concatenate(
         np.array(cell_response._spike_times, dtype=object)[trial_idx])
@@ -575,7 +574,7 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
     for cell_type in cell_types:
         cell_type_gids = np.unique(spike_gids[spike_types == cell_type])
         cell_type_times, cell_type_ypos = [], []
-        color =  next(color_iter)
+        color = next(color_iter)
 
         for gid in cell_type_gids:
             gid_time = spike_times[spike_gids == gid]
