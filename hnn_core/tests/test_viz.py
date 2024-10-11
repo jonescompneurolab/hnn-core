@@ -19,6 +19,13 @@ from hnn_core.dipole import simulate_dipole
 matplotlib.use('agg')
 
 
+@pytest.fixture(autouse=True)
+def cleanup_matplotlib():
+    # Code runs after the test finishes
+    yield
+    plt.close('all')
+
+
 @pytest.fixture
 def setup_net():
     hnn_core_root = op.dirname(hnn_core.__file__)
