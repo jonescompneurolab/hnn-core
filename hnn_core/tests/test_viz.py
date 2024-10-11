@@ -291,9 +291,10 @@ class TestCellResponsePlotters:
             fig = net.cell_response.plot_spikes_raster(trial_idx=index_arg,
                                                        show=False)
             # Check that collections contain data
-            assert (all([collection.get_positions() != [-1]
-                         for collection in fig.axes[0].collections]),
-                    "No data plotted in raster plot")
+            assert all(
+                [collection.get_positions() != [-1]
+                 for collection in fig.axes[0].collections]
+            ), "No data plotted in raster plot"
 
     def test_spikes_raster_colors(self, base_simulation_spikes):
         net, _ = base_simulation_spikes
