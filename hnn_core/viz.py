@@ -339,7 +339,8 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 
 
 def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
-                     color=None, show=True, **kwargs_hist):
+                     color=None, invert_spike_types=None, show=True,
+                     **kwargs_hist):
     """Plot the histogram of spiking activity across trials.
 
     Parameters
@@ -369,6 +370,16 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         Valid strings also include leading characters of spike types
 
         | Ex: ``'ev'`` is equivalent to ``['evdist', 'evprox']``
+    invert_spike_types: string | list | None
+        String input of a valid spike type to be mirrored about the y axis
+
+        | Ex: ``'evdist'``, ``'evprox'``, ...
+
+        List of valid spike types to be mirrored about the y axis
+
+        | Ex: ``['evdist', 'evprox']``
+
+        If None, all input spike types are plotted on the same y axis 
     color : str | list of str | dict | None
         Input defining colors of plotted histograms. If str, all
         histograms plotted with same color. If list of str provided,
@@ -490,11 +501,51 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         spike_type_times[spike_label].extend(
             spike_times[spike_types_mask[spike_type]])
 
+    if invert_spike_types is None:
+        invert_spike_types = list()
+    else:
+        if isinstance(invert_spike_types, dict):
+            raise TypeError(
+                f"'invert_spike_types' must be a string or a list of strings")
+        if isinstance(invert_spike_types, str):
+            invert_spike_types = [invert_spike_types]
+        
+        invert_spike_types = {spike_type for spike_type in invert_spike_types}
+
+        # Check that spike types to invert are correctly specified
+        unique_inputs = set(spike_labels.values())
+        if not invert_spike_types.intersection(unique_inputs) == invert_spike_types:
+            raise ValueError(
+                f"Elements of 'invert_spike_types' must map to valid input types"
+            )
+    
+    # Initialize secondary axis
+    ax1 = None
+
     # Plot aggregated spike_times
     for spike_label, plot_data in spike_type_times.items():
         hist_color = spike_color[spike_label]
-        ax.hist(plot_data, bins,
-                label=spike_label, color=hist_color, **kwargs_hist)
+
+        # Plot on the primary y-axis
+        if spike_label not in invert_spike_types:
+            ax.hist(plot_data, bins,
+                    label=spike_label, color=hist_color, **kwargs_hist)
+        # Plot on secondary y-axis
+        else:
+            if ax1 is None:
+                ax1 = ax.twinx()
+            ax1.hist(plot_data, bins,
+                     label=spike_label, color=hist_color, **kwargs_hist)
+
+    # Set the y-limits based on the maximum across both axes
+    if ax1 is not None:
+        ax_ylim = ax.get_ylim()[1]
+        ax1_ylim = ax1.get_ylim()[1]
+        
+        y_max = max(ax_ylim, ax1_ylim)
+        ax.set_ylim(0, y_max)
+        ax1.set_ylim(0, y_max)
+        ax1.invert_yaxis()
 
     if len(cell_response.times) > 0:
         ax.set_xlim(left=0, right=cell_response.times[-1])
@@ -502,7 +553,17 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         ax.set_xlim(left=0)
 
     ax.set_ylabel("Counts")
-    ax.legend()
+
+    if ax1 is not None:
+        # Combine legends
+        handles, labels = ax.get_legend_handles_labels()
+        handles1, labels1 = ax1.get_legend_handles_labels()
+        handles.extend(handles1)
+        labels.extend(labels1)
+
+        ax.legend(handles, labels, loc='upper left')
+    else:
+        ax.legend()
 
     plt_show(show)
     return ax.get_figure()
