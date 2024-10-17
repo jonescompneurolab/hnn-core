@@ -600,20 +600,16 @@
             <span class="k">return</span> <span class="kc">False</span>
 
         <span class="c1"># Check all other attributes</span>
-        <span class="n">all_attrs</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">attrs_to_ignore</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_attrs</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)]</span>
-        <span class="n">attrs_to_ignore</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;add_bursty_drive&#39;</span><span class="p">,</span> <span class="s1">&#39;add_connection&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;add_electrode_array&#39;</span><span class="p">,</span> <span class="s1">&#39;add_evoked_drive&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;add_poisson_drive&#39;</span><span class="p">,</span> <span class="s1">&#39;add_tonic_bias&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;clear_connectivity&#39;</span><span class="p">,</span> <span class="s1">&#39;clear_drives&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;connectivity&#39;</span><span class="p">,</span> <span class="s1">&#39;copy&#39;</span><span class="p">,</span> <span class="s1">&#39;gid_to_type&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;plot_cells&#39;</span><span class="p">,</span> <span class="s1">&#39;set_cell_positions&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;to_dict&#39;</span><span class="p">,</span> <span class="s1">&#39;write_configuration&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;update_weights&#39;</span><span class="p">])</span>
-        <span class="n">attrs_to_check</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_attrs</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attrs_to_ignore</span><span class="p">]</span>
+        <span class="n">attrs_to_ignore</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;connectivity&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">attr</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs_to_ignore</span><span class="p">:</span>
+                <span class="k">continue</span>
 
-        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs_to_check</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Does not have the same set of attributes</span>
                 <span class="k">return</span> <span class="kc">False</span>
 
         <span class="k">return</span> <span class="kc">True</span>
