@@ -413,7 +413,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     unique_types = np.unique(spike_types_data)
     spike_types_mask = {s_type: np.isin(spike_types_data, s_type)
                         for s_type in unique_types}
-    cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
+    cell_types = cell_response._cell_type_names
     input_types = np.setdiff1d(unique_types, cell_types)
 
     if isinstance(spike_types, str):
@@ -506,7 +506,8 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     return ax.get_figure()
 
 
-def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
+def plot_spikes_raster(cell_response, trial_idx=None, color=None,
+                       ax=None, show=True):
     """Plot the aggregate spiking activity according to cell type.
 
     Parameters
@@ -515,6 +516,10 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
         The CellResponse object from net.cell_response
     trial_idx : int | list of int | None
         Index of trials to be plotted. If None, all trials plotted
+    color: list of str | dict | None
+        Input defining colors of cell spikes. If list of str provided,
+        rasters for each spike type will be plotted by cycling
+        through colors in the list.
     ax : instance of matplotlib axis | None
         An axis object from matplotlib. If None, a new figure is created.
     show : bool
@@ -543,9 +548,26 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
     spike_gids = np.concatenate(
         np.array(cell_response._spike_gids, dtype=object)[trial_idx])
 
-    cell_types = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
-    cell_type_colors = {'L5_pyramidal': 'r', 'L5_basket': 'b',
-                        'L2_pyramidal': 'g', 'L2_basket': 'w'}
+    cell_types = cell_response._cell_type_names
+    
+    _validate_type(color, (list, dict, None),
+                   'color', 'list of str or dict')
+    color_map = ['r', 'g', 'b', 'y', 'm', 'c']
+    if color is None:
+        color_cycle = cycle(color_map)
+    elif isinstance(color, str):
+        color_cycle = cycle([color_map])
+    elif isinstance(color, list):
+        color_cycle = cycle(color_map)
+
+    # Create a new dictionary with the new keys and old values
+    new_cell_type_colors = dict(zip(cell_types, color_cycle))
+
+    # Check if all colors in cell_color are valid
+    for cell, color in new_cell_type_colors.items():
+        if color not in color_map:
+            raise ValueError(f"Color '{color}' for cell type '{cell}' is not"
+                             f"in the allowed color list: {color_map}")
 
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
@@ -562,7 +584,7 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
         if cell_type_times:
             events.append(
                 ax.eventplot(cell_type_times, lineoffsets=cell_type_ypos,
-                             color=cell_type_colors[cell_type],
+                             color=new_cell_type_colors[cell_type],
                              label=cell_type, linelengths=5))
         else:
             events.append(
@@ -614,18 +636,17 @@ def plot_cells(net, ax=None, show=True):
         raise TypeError("Expected 'ax' to be an instance of Axes3D, "
                         f"but got {type(ax).__name__}")
 
-    colors = {'L5_pyramidal': 'b', 'L2_pyramidal': 'c',
-              'L5_basket': 'r', 'L2_basket': 'm'}
-    markers = {'L5_pyramidal': '^', 'L2_pyramidal': '^',
-               'L5_basket': 'x', 'L2_basket': 'x'}
+    # re-arranged cell_colors to match old colors dictionary
+    cell_colors = ['m', 'c', 'r', 'b']
+    colors = dict(zip(net.cell_types.keys(), cell_colors))
 
     for cell_type in net.cell_types:
+        marker = 'o'
         x = [pos[0] for pos in net.pos_dict[cell_type]]
         y = [pos[1] for pos in net.pos_dict[cell_type]]
         z = [pos[2] for pos in net.pos_dict[cell_type]]
         if cell_type in colors:
             color = colors[cell_type]
-            marker = markers[cell_type]
             ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
 
     if net.rec_arrays:
