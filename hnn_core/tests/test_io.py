@@ -39,27 +39,34 @@ def jones_2009_network(params):
                            mesh_shape=(3, 3))
 
     # Adding bias
-    tonic_bias = {
-        'L2_pyramidal': 1.0
-    }
+    tonic_bias = {'L2_pyramidal': 1.0, 'L5_pyramidal': 0.0,
+                  'L2_basket': 0.0, 'L5_basket': 0.0}
     net.add_tonic_bias(amplitude=tonic_bias)
 
     # Add drives
     location = 'proximal'
     burst_std = 20
-    weights_ampa_p = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
-    syn_delays_p = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
+    weights_ampa_p = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5,
+                      'L2_basket': 0.0, 'L5_basket': 0.0}
+    weights_nmda_p = {'L2_pyramidal': 0.0, 'L5_pyramidal': 0.0,
+                      'L2_basket': 0.0, 'L5_basket': 0.0}
+    syn_delays_p = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.,
+                    'L2_basket': 0.0, 'L5_basket': 0.0}
     net.add_bursty_drive(
         'alpha_prox', tstart=1., burst_rate=10, burst_std=burst_std,
         numspikes=2, spike_isi=10, n_drive_cells=10, location=location,
-        weights_ampa=weights_ampa_p, synaptic_delays=syn_delays_p,
-        event_seed=284)
+        weights_ampa=weights_ampa_p, weights_nmda=weights_nmda_p,
+        synaptic_delays=syn_delays_p, event_seed=284)
 
-    weights_ampa = {'L2_pyramidal': 0.0008, 'L5_pyramidal': 0.0075}
-    synaptic_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0}
-    rate_constant = {'L2_pyramidal': 140.0, 'L5_pyramidal': 40.0}
+    weights_ampa = {'L2_pyramidal': 0.0008, 'L5_pyramidal': 0.0075,
+                    'L2_basket': 0.0, 'L5_basket': 0.0}
+    synaptic_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0,
+                       'L2_basket': 0.0, 'L5_basket': 0.0}
+    rate_constant = {'L2_pyramidal': 140.0, 'L5_pyramidal': 40.0,
+                     'L2_basket': 40.0, 'L5_basket': 40.0}
     net.add_poisson_drive(
-        'poisson', rate_constant=rate_constant, weights_ampa=weights_ampa,
+        'poisson', rate_constant=rate_constant,
+        weights_ampa=weights_ampa, weights_nmda=weights_nmda_p,
         location='proximal', synaptic_delays=synaptic_delays,
         event_seed=1349)
 
@@ -97,9 +104,6 @@ def generate_test_files(jones_2009_network):
     """ Generates files used in read-in tests """
     net = jones_2009_network
     net.write_configuration(Path('.', 'assets/jones2009_3x3_drives.json'))
-    simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)
-    net.write_configuration(Path('.',
-                                 'assets/jones2009_3x3_drives_simulated.json'))
 
 
 def test_eq(jones_2009_network, calcium_network):
@@ -215,7 +219,7 @@ def test_cell_response_to_dict(jones_2009_network):
     result2 = _cell_response_to_dict(net, write_output=True)
     assert bool(result2) and isinstance(result2, dict)
 
-    # Check for None if kw supplied
+    # Check for empty dict if kw supplied
     result3 = _cell_response_to_dict(net, write_output=False)
     assert result3 == dict()
 
@@ -261,7 +265,8 @@ def test_conn_to_dict(jones_2009_network):
                       'nc_dict': {'A_delay': 0.1,
                                   'A_weight': 0.006562,
                                   'lamtha': 3.0,
-                                  'threshold': 0.0},
+                                  'threshold': 0.0,
+                                  'gain': 1.0},
                       'allow_autapses': 1,
                       'probability': 1.0}
 
@@ -322,6 +327,27 @@ def test_read_configuration_json(jones_2009_network):
                                           'jones2009_3x3_drives.json')
                                      )
     assert net == jones_2009_network
+
+    # Read without drives
+    net_no_drives = read_network_configuration(
+        Path(assets_path, 'jones2009_3x3_drives.json'),
+        read_drives=False
+    )
+    # Check there are no external drives
+    assert len(net_no_drives.external_drives) == 0
+    # Check there are no external drive connections
+    connection_src_types = [connection['src_type']
+                            for connection in net_no_drives.connectivity]
+    assert not any([src_type in net.external_drives.keys()
+                    for src_type in connection_src_types])
+
+    # Read without external bias
+    net_no_bias = read_network_configuration(
+        Path(assets_path, 'jones2009_3x3_drives.json'),
+        read_external_biases=False
+    )
+    assert len(net_no_bias.external_biases) == 0
+    assert len(net_no_bias.external_drives) > 0
 
 
 def test_read_incorrect_format(tmp_path):

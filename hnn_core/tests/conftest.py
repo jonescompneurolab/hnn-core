@@ -75,8 +75,8 @@ def pytest_runtest_setup(item):
 def run_hnn_core_fixture():
     def _run_hnn_core_fixture(backend=None, n_procs=None, n_jobs=1,
                               reduced=False, record_vsec=False,
-                              record_isec=False, postproc=False,
-                              electrode_array=None):
+                              record_isec=False, record_ca=False,
+                              postproc=False, electrode_array=None):
         hnn_core_root = op.dirname(hnn_core.__file__)
 
         # default params
@@ -106,15 +106,18 @@ def run_hnn_core_fixture():
             with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
                 dpls = simulate_dipole(net, record_vsec=record_vsec,
                                        record_isec=record_isec,
+                                       record_ca=record_ca,
                                        postproc=postproc, tstop=tstop)
         elif backend == 'joblib':
             with JoblibBackend(n_jobs=n_jobs):
                 dpls = simulate_dipole(net, record_vsec=record_vsec,
                                        record_isec=record_isec,
+                                       record_ca=record_ca,
                                        postproc=postproc, tstop=tstop)
         else:
             dpls = simulate_dipole(net, record_vsec=record_vsec,
                                    record_isec=record_isec,
+                                   record_ca=record_ca,
                                    postproc=postproc, tstop=tstop)
 
         # check that the network object is picklable after the simulation

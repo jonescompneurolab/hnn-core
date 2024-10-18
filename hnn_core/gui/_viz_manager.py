@@ -10,8 +10,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from IPython.display import display
-from ipywidgets import (Box, Button, Dropdown, FloatText, HBox, Label, Layout,
-                        Output, Tab, VBox, link)
+from ipywidgets import (Box, Button, Dropdown, BoundedFloatText, FloatText,
+                        HBox, Label, Layout, Output, Tab, VBox, link)
 
 from hnn_core.dipole import average_dipoles, _rmse
 from hnn_core.gui._logging import logger
@@ -138,7 +138,7 @@ data_templates = {
 
 def check_sim_plot_types(
         new_sim_name, plot_type_selection, target_selection, data):
-    if data["simulations"][new_sim_name.new]['net'] is None:
+    if not _is_simulation(data["simulations"][new_sim_name]):
         plot_type_selection.options = [
             pt for pt in _plot_types if pt not in _ext_data_disabled_plot_types
         ]
@@ -146,7 +146,7 @@ def check_sim_plot_types(
         plot_type_selection.options = _plot_types
     # deal with target data
     all_possible_targets = list(data["simulations"].keys())
-    all_possible_targets.remove(new_sim_name.new)
+    all_possible_targets.remove(new_sim_name)
     target_selection.options = all_possible_targets + ['None']
     target_selection.value = 'None'
 
@@ -258,7 +258,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
 
     elif plot_type == 'spectrogram':
         if len(dpls_copied) > 0:
-            min_f = 10.0
+            min_f = plot_config['min_spectral_frequency']
             max_f = plot_config['max_spectral_frequency']
             step_f = 1.0
             freqs = np.arange(min_f, max_f, step_f)
@@ -333,19 +333,32 @@ def _static_rerender(widgets, fig, fig_idx):
     fig_output = widgets['figs_tabs'].children[fig_tab_idx]
     fig_output.clear_output()
     with fig_output:
-        fig.tight_layout()
         display(fig)
 
 
 def _dynamic_rerender(fig):
     fig.canvas.draw()
     fig.canvas.flush_events()
-    fig.tight_layout()
+
+
+def _avg_dipole_check(dpls):
+    """Check for averaged dipole, else average the trials"""
+    # Check if there is an averaged dipole already
+    if not dpls:
+        return None
+
+    avg_dpls = [d for d in dpls if d.nave > 1]
+    if avg_dpls:
+        dpl = avg_dpls[0]
+    else:
+        dpl = average_dipoles(dpls)
+    return dpl
 
 
 def _plot_on_axes(b, simulations_widget, widgets_plot_type,
                   data_widget,
-                  spectrogram_colormap_selection, max_spectral_frequency,
+                  spectrogram_colormap_selection,
+                  min_spectral_frequency, max_spectral_frequency,
                   dipole_smooth, dipole_scaling, data_smooth, data_scaling,
                   widgets, data, fig_idx, fig, ax, existing_plots):
     """Plotting different types of data on the given axes.
@@ -366,6 +379,8 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
         A dropdown widget that contains all the colormaps for spectrogram.
     dipole_smooth : ipywidgets.FloatText
         A textfield widget that specifies the smoothing window size.
+    min_spectral_frequency : ipywidgets.FloatText
+        A textfield that specifies the minimum frequency for spectrogram plot.
     max_spectral_frequency : ipywidgets.FloatText
         A textfield that specifies the max frequency for spectrogram plot.
     dipole_scaling : ipywidgets.FloatText
@@ -397,6 +412,7 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
     simulation_plot_config = {
         "dipole_scaling": dipole_scaling.value,
         "dipole_smooth": dipole_smooth.value,
+        "min_spectral_frequency": min_spectral_frequency.value,
         "max_spectral_frequency": max_spectral_frequency.value,
         "spectrogram_cm": spectrogram_colormap_selection.value
     }
@@ -414,6 +430,7 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
         data_plot_config = {
             "dipole_scaling": data_scaling.value,
             "dipole_smooth": data_smooth.value,
+            "min_spectral_frequency": min_spectral_frequency.value,
             "max_spectral_frequency": max_spectral_frequency.value,
             "spectrogram_cm": spectrogram_colormap_selection.value
         }
@@ -427,7 +444,7 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
         t0 = 0.0
         tstop = dpls_processed[-1].times[-1]
         if len(dpls_processed) > 1:
-            dpl = average_dipoles(dpls_processed)
+            dpl = _avg_dipole_check(dpls_processed)
         else:
             dpl = dpls_processed
         rmse = _rmse(dpl, target_dpl_processed, t0, tstop)
@@ -489,32 +506,30 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
     analysis_style = {'description_width': '200px'}
     layout = Layout(width="98%")
     simulation_names = tuple(data['simulations'].keys())
-    sim_name_default = simulation_names[-1]
-
-    if len(simulation_names) == 0:
-        simulation_names = [
-            "None",
-        ]
+    sim_index = 0
+    if not simulation_names:
+        simulation_names = ("None",)
+    else:
+        # Find the last simulation with a non-None 'net'
+        sim_index = next(
+            (idx for idx, sim_name in
+             reversed(list(enumerate(simulation_names)))
+             if _is_simulation(data["simulations"][sim_name])),
+            0  # Default value if no such simulation is found
+        )
 
     simulation_selection = Dropdown(
         options=simulation_names,
-        value=simulation_names[0],
+        value=simulation_names[sim_index],
         description='Simulation Data:',
         disabled=False,
         layout=layout,
         style=analysis_style,
     )
 
-    if data['simulations'][sim_name_default]['net'] is None:
-        valid_plot_types = [
-            pt for pt in _plot_types if pt not in _ext_data_disabled_plot_types
-        ]
-    else:
-        valid_plot_types = _plot_types
-
     plot_type_selection = Dropdown(
-        options=valid_plot_types,
-        value=valid_plot_types[0],
+        options=_plot_types,
+        value=_plot_types[0],
         description='Type:',
         disabled=False,
         layout=layout,
@@ -533,6 +548,12 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         layout=layout,
         style=analysis_style,
     )
+
+    # This will check the sim plot types dropdown available options
+    # for the specific sim name in the simulation_selection dropdown options
+    check_sim_plot_types(
+        simulation_names[sim_index],
+        plot_type_selection, target_data_selection, data)
 
     spectrogram_colormap_selection = Dropdown(
         description='Spectrogram Colormap:',
@@ -569,8 +590,19 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         layout=layout,
         style=analysis_style)
 
-    max_spectral_frequency = FloatText(
+    min_spectral_frequency = BoundedFloatText(
+        value=10,
+        min=0.1,
+        max=1000,
+        description='Min Spectral Frequency (Hz):',
+        disabled=False,
+        layout=layout,
+        style=analysis_style)
+
+    max_spectral_frequency = BoundedFloatText(
         value=100,
+        min=0.1,
+        max=1000,
         description='Max Spectral Frequency (Hz):',
         disabled=False,
         layout=layout,
@@ -583,14 +615,15 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
 
     def _on_sim_data_change(new_sim_name):
         return check_sim_plot_types(
-            new_sim_name, plot_type_selection, target_data_selection, data)
+            new_sim_name.new, plot_type_selection, target_data_selection, data)
 
     def _on_target_comparison_change(new_target_name):
         return target_comparison_change(new_target_name, simulation_selection,
                                         data)
 
     def _on_plot_type_change(new_plot_type):
-        return plot_type_coupled_change(new_plot_type, target_data_selection)
+        return plot_type_coupled_change(new_plot_type.new,
+                                        target_data_selection)
 
     simulation_selection.observe(_on_sim_data_change, 'value')
     target_data_selection.observe(_on_target_comparison_change, 'value')
@@ -616,6 +649,7 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
             widgets_plot_type=plot_type_selection,
             data_widget=target_data_selection,
             spectrogram_colormap_selection=spectrogram_colormap_selection,
+            min_spectral_frequency=min_spectral_frequency,
             max_spectral_frequency=max_spectral_frequency,
             dipole_smooth=simulation_dipole_smooth,
             dipole_scaling=simulation_dipole_scaling,
@@ -632,7 +666,7 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
     vbox = VBox([
         plot_type_selection, simulation_selection, simulation_dipole_smooth,
         simulation_dipole_scaling, target_data_selection, data_dipole_smooth,
-        data_dipole_scaling, max_spectral_frequency,
+        data_dipole_scaling, min_spectral_frequency, max_spectral_frequency,
         spectrogram_colormap_selection,
         HBox(
             [plot_button, clear_button],
@@ -726,15 +760,11 @@ def _add_figure(b, widgets, data, template_type, scale=0.95, dpi=96):
                    scale * ((int(viz_output_layout.height[:-2]) - 10) / dpi))
         mosaic = template_type['mosaic']
         kwargs = template_type['kwargs']
-        plt.ioff()
-        fig, axd = plt.subplot_mosaic(mosaic,
-                                      figsize=figsize,
-                                      dpi=dpi,
-                                      **kwargs)
-        plt.ion()
-        fig.tight_layout()
-        fig.canvas.header_visible = False
-        fig.canvas.footer_visible = False
+        with plt.ioff():
+            fig = plt.figure(figsize=figsize, dpi=dpi, layout='constrained')
+            axd = fig.subplot_mosaic(mosaic, **kwargs)
+            fig.canvas.header_visible = False
+            fig.canvas.footer_visible = False
 
         if data['use_ipympl'] is False:
             plt.show()
@@ -745,7 +775,33 @@ def _add_figure(b, widgets, data, template_type, scale=0.95, dpi=96):
 
     data['figs'][fig_idx] = fig
     widgets['figs_tabs'].selected_index = n_tabs
+    widgets['axes_config_tabs'].selected_index = n_tabs
     data['fig_idx']['idx'] += 1
+
+
+def _postprocess_template(template_name, fig, idx,
+                          use_ipympl=True, widgets=None):
+    """Post-processes and re-renders plot templates with determined styles
+
+    Templates are constructed on panel-by-panel basis. If adjustments need to
+    be made based on information other plots in the figure, it is adjusted with
+    this function. For example, L2 and L5 dipole plots should have the same
+    y-axis range.
+    """
+    if template_name not in ['Dipole Layers (3x1)']:
+        return
+
+    if template_name == 'Dipole Layers (3x1)':
+        # Make the L2 and L5 plots the same y-range
+        y_lims_list = [ax.get_ylim() for ax in fig.axes[0:2]]
+        y_lims = (np.min(y_lims_list), np.max(y_lims_list))
+        [ax.set_ylim(y_lims) for ax in fig.axes[0:2]]
+
+    # Re-render
+    if not use_ipympl:
+        _static_rerender(widgets, fig, idx)
+    else:
+        _dynamic_rerender(fig)
 
 
 class _VizManager:
@@ -840,8 +896,14 @@ class _VizManager:
         for tab in self.axes_config_tabs.children:
             controls = tab.children[1]
             for ax_control in controls.children:
-                simulation_selection = ax_control.children[0]
-                simulation_selection.options = simulation_names
+                # Update the options for the simulation data selection dropdown
+                simulation_data_selection = ax_control.children[1]
+                simulation_data_selection.options = simulation_names
+
+                # Update the options for the data to compare dropdown
+                simulation_to_compare = ax_control.children[4]
+                simulation_to_compare.options = simulation_names
+
         # recover the default layout
         if template_name is None:
             template_name = list(fig_templates.keys())[0]
@@ -933,6 +995,15 @@ class _VizManager:
                 # paint fig in axis
                 self._simulate_edit_figure(fig_name, ax_name, sim_name,
                                            plot_type, {}, "plot")
+            # template post-processing
+            fig_key = self.data['fig_idx']['idx'] - 1
+            _postprocess_template(template_name,
+                                  fig=self.figs[fig_key],
+                                  idx=fig_key,
+                                  use_ipympl=self.use_ipympl,
+                                  widgets=self.widgets,
+                                  )
+
             logger.info(f"Figure {template_name} for "
                         f"simulation {sim_name} "
                         "has been created"
@@ -972,8 +1043,11 @@ class _VizManager:
                 Type of visualization.
             preprocessing_config : dict
                 A dict of visualization preprocessing parameters. Allowed keys:
-                `dipole_smooth`, `dipole_scaling`, `max_spectral_frequency`,
-                `spectrogram_colormap_selection`. config could be empty: `{}`.
+                `dipole_smooth`, `dipole_scaling`,
+                `data_to_compare`, `data_smooth`, `data_scaling`
+                `min_spectral_frequency`, `max_spectral_frequency`,
+                `spectrogram_colormap_selection`.
+                config could be empty: `{}`.
             operation : str
                 `"plot"` if you want to plot and `"clear"` if you want to
                 remove previously plotted visualizations.
@@ -982,31 +1056,38 @@ class _VizManager:
         assert plot_type in _plot_types
         assert operation in ("plot", "clear")
 
+        # Select the figure tab
         tab = self.axes_config_tabs
         titles = tab.titles
         assert fig_name in titles, "No such figure"
         tab_idx = titles.index(fig_name)
         self.axes_config_tabs.selected_index = tab_idx
 
+        # Select the figure panel/ax tab
         ax_control_tabs = self.axes_config_tabs.children[tab_idx].children[1]
         ax_titles = ax_control_tabs.titles
         assert ax_name in ax_titles, "No such axis"
         ax_idx = ax_titles.index(ax_name)
         ax_control_tabs.selected_index = ax_idx
 
-        # ax config
-        simulation_ctrl = ax_control_tabs.children[ax_idx].children[1]
-        # return simulation_ctrl
-        simulation_ctrl.value = simulation_name
+        # Select the simulation
+        simulation_selector = ax_control_tabs.children[ax_idx].children[1]
+        simulation_selector.value = simulation_name
 
-        plot_type_ctrl = ax_control_tabs.children[ax_idx].children[0]
-        plot_type_ctrl.value = plot_type
+        # Select the plot type
+        plot_type_selector = ax_control_tabs.children[ax_idx].children[0]
+        plot_type_selector.value = plot_type
 
+        # Set the plot configurations
         config_name_idx = {
             "dipole_smooth": 2,
             "dipole_scaling": 3,
-            "max_spectral_frequency": 4,
-            "spectrogram_colormap_selection": 5,
+            "data_to_compare": 4,
+            "data_smooth": 5,
+            "data_scaling": 6,
+            "min_spectral_frequency": 7,
+            "max_spectral_frequency": 8,
+            "spectrogram_colormap_selection": 9,
         }
         for conf_key, conf_val in preprocessing_config.items():
             assert conf_key in config_name_idx.keys()
@@ -1019,3 +1100,8 @@ class _VizManager:
             buttons.children[0].click()
         elif operation == "clear":
             buttons.children[1].click()
+
+
+def _is_simulation(data):
+    """Determines if saved data is a simulation."""
+    return data['net'] is not None

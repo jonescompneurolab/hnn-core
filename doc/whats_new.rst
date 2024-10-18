@@ -12,6 +12,41 @@ Current
 
 Changelog
 ~~~~~~~~~
+- Add button to delete a single drive on GUI drive windows, by
+  `George Dang`_ in :gh:`890`
+
+- Add minimum spectral frequency widget to GUI for adjusting spectrogram
+  frequency axis, by `George Dang`_ in :gh:`894`
+
+- Add method to modify synaptic gains, by `Nick Tolley`_  and `George Dang`_
+  in :gh:`897`
+
+Bug
+~~~
+- Fix GUI over-plotting of loaded data where the app stalled and did not plot
+  RMSE, by `George Dang`_ in :gh:`869`
+
+- Fix scaling and smoothing of loaded data dipoles to the GUI, by `George Dang`_
+  in :gh:`892`
+
+API
+~~~
+
+.. _0.4:
+
+0.4
+---
+
+Changelog
+~~~~~~~~~
+- Fix bug in :func:`~hnn_core.Network.add_poisson_drive` where an error is
+  thrown when passing an int for rate_constant when ``cell_specific=True``,
+  by `Dylan Daniels`_ in :gh:`818`
+
+- Fix bug in :func:`~hnn_core.Network.add_poisson_drive` where an error is
+  thrown when passing a float for rate_constant when ``cell_specific=False``,
+  by `Dylan Daniels`_ in :gh:`814`
+  
 - Add ability to customize plot colors for each cell section in
   :func:`~hnn_core.Cell.plot_morphology`, by `Nick Tolley`_ in :gh:`646`
   
@@ -29,18 +64,15 @@ Changelog
 
 - Add ability to specify number of cells in :class:`~hnn_core.Network`,
   by `Nick Tolley`_ in :gh:`705`
-
-- Add feature to convert param and json files to HDF5 format, by `George Dang`_
-  in :gh:`723`
   
 - Fixed figure annotation overlap in multiple sub-plots, 
   by `Camilo Diaz`_ in :gh:`741`
 
-- Fix bug in :func:`~hnn_core/network/pick_connection` where connections are
+- Fix bug in :func:`~hnn_core.network.pick_connection` where connections are
   returned for cases when there should be no valid matches, by `George Dang`_
   in :gh:`739`
 
-- Added check for invalid Axes object in :func:`~hnn_core/viz/plot_cells` 
+- Added check for invalid Axes object in :func:`~hnn_core.viz.plot_cells` 
   function, by `Abdul Samad Siddiqui`_ in :gh:`744`.
 
 - Added kwargs options to `plot_spikes_hist` for adjusting the histogram plots 
@@ -58,19 +90,71 @@ Changelog
 - Added feature to read/write :class:`~hnn_core.Network` configurations to
   json, by `George Dang`_ and `Rajat Partani`_ in :gh:`757`
 
-- Added :class:`~hnn_core/viz/NetworkPlotter` to visualize and animate network simulations,
+- Added :class:`~hnn_core.viz.NetworkPlotter` to visualize and animate network simulations,
   by `Nick Tolley`_ in :gh:`649`.
+
+- Added GUI feature to include Tonic input drives in simulations,
+  by `Camilo Diaz` :gh:`773`
+
+- :func:`~plot_lfp`, :func:`~plot_dipole`, :func:`~plot_spikes_hist`,
+  and :func:`~plot_spikes_raster` now plotted from 0 to tstop. Inputs tmin and tmax are deprecated,
+  by `Katharina Duecker`_ in :gh:`769`
+
+- Add function :func:`~hnn_core.params.convert_to_json` to convert legacy param
+  and json files to new json format, by `George Dang`_ in :gh:`772`
+
+- Add :class:`~hnn_core.BatchSimulate` for batch simulation capability,
+  by `Abdul Samad Siddiqui`_ in :gh:`782`.
+
+- Updated `plot_spikes_raster` logic to include all neurons in network model.
+  Removed GUI exclusion from build, by `Abdul Samad Siddiqui`_  in :gh:`754`.
+
+- Added GUI feature to read and modify cell parameters,
+  by `Camilo Diaz`_  in :gh:`806`.
+  
+- Add ability to optimize parameters associated with rhythmic drives,
+  by `Carolina Fernandez Pujol`_ in :gh:`673`.
+
+- Added features to :func:`~plot_csd`: to set color of sinks and sources, range of the colormap,
+  and interpolation method to smoothen CSD plot,
+  by `Katharina Duecker`_ in :gh:`815`
+
+- Cleaned up internal logic in :class:`~hnn_core.CellResponse`,
+  by `Nick Tolley`_ in :gh:`647`.
+
+- Changed the configuration/parameter file format support of the GUI. Loading
+  of connectivity and drives use a new multi-level json structure that mirrors
+  the structure of the Network object. Flat parameter and json configuration
+  files are no longer supported by the GUI, by `George Dang`_ in :gh:`837`
+
+- Updated the GUI load drive widget to be able to load tonic biases from a
+  network configuration file. `George Dang`_ in :gh:`852`
+
+- Added "No. Drive Cells" input widget to the GUI and changed the "Synchronous
+  Input" checkbox to "Cell-Specific" to align with the API `George Dang`_ in :gh:`861`
 
 Bug
 ~~~
 - Fix inconsistent connection mapping from drive gids to cell gids, by
   `Ryan Thorpe`_ in :gh:`642`.
 
-- Objective function called by :func:`~hnn_core/optimization/optimize_evoked`
+- Objective function called by :func:`~hnn_core.optimization.optimize_evoked`
   now returns a scalar instead of tuple, by `Ryan Thorpe`_ in :gh:`670`.
 
 - Fix GUI plotting bug due to deprecation of matplotlib color cycling method,
   by `George Dang`_ in :gh:`695`.
+
+- Fix loading of drives in the GUI: drives are now overwritten instead of updated,
+  by `Mainak Jas`_ in :gh:`795`.
+
+- Use `np.isin()` in place of `np.in1d()` to address numpy deprecation,
+  by `Nick Tolley`_ in :gh:`799.
+
+- Fix drive seeding so that event times are unique across multiple trials,
+  by `Nick Tolley`_ in :gh:`810`.
+
+- Fix bug in :func:`~hnn_core.network.clear_drives` where network object are not
+  accurately updated, by `Nick Tolley`_ in :gh:`812`.
 
 API
 ~~~
@@ -92,6 +176,25 @@ API
 - :func:`network.add_tonic_bias` cell-specific tonic bias can now be 
   provided using the argument amplitude in network.add_tonic_bias`,
   by `Camilo Diaz`_ in :gh:`766`
+
+People who contributed to this release (in alphabetical order):
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- `Huzi Cheng`_
+- `Tianqi Cheng`_
+- `Dylan Daniels`_
+- `George Dang`_
+- `Camilo Diaz`_
+- `Katharina Duecker`_
+- `Carolina Fernandez Pujol`_
+- `Yaroslav Halchenko`_
+- `Mainak Jas`_
+- `Nick Tolley`_
+- `Orsolya Beatrix Kolozsvari`_
+- `Rajat Partani`_
+- `Abdul Samad Siddiqui`_
+- `Ryan Thorpe`_
+- `Stephanie R. Jones`_
 
 .. _0.3:
 
@@ -187,7 +290,7 @@ API
   :meth:`~hnn_core.extracellular.ExtracellularArray.plot_lfp`, by
   `Steven Brandt`_ and `Ryan Thorpe`_ in :gh:`517`.
 
-- Recorded voltages/currents from the soma, as well all sections, are enabled by
+- Recorded voltages/currents from the soma, as well as all sections, are enabled by
   setting either `record_vsec` or `record_isec` to `'all'` or `'soma'` 
   in :func:`~hnn_core.simulate_dipole`. Recordings are now accessed through
   :class:`~hnn_core.CellResponse.vsec` and :class:`~hnn_core.CellResponse.isec`,
@@ -196,6 +299,11 @@ API
 - legacy_mode is now set to False by default in all for all
   :class:`~hnn_core.Network` objects, 
   by `Nick Tolley`_ and `Ryan Thorpe`_ in :gh:`619`.
+
+- Recorded calcium conncetration from the soma, as well as all sections, are enabled
+  by setting `record_ca` to `soma` or `all` in :func:`~hnn_core.simulate_dipole`.
+  Recordings are accessed through :class:`~hnn_core.CellResponse.ca`, 
+  by `Katharina Duecker`_ in :gh:`804`
 
 People who contributed to this release (in alphabetical order):
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -490,3 +598,6 @@ People who contributed to this release (in alphabetical order):
 .. _George Dang: https://github.com/gtdang
 .. _Camilo Diaz: https://github.com/kmilo9999
 .. _Abdul Samad Siddiqui: https://github.com/samadpls
+.. _Katharina Duecker: https://github.com/katduecker
+.. _Yaroslav Halchenko:  https://github.com/yarikoptic
+.. _Tianqi Cheng: https://github.com/tianqi-cheng

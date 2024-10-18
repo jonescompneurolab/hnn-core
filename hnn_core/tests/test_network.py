@@ -895,6 +895,74 @@ def test_network_mesh():
     _ = law_2021_model(mesh_shape=mesh_shape)
 
 
+def test_synaptic_gains():
+    """Test synaptic gains update"""
+    net = jones_2009_model()
+    nb_base = NetworkBuilder(net)
+    e_cell_names = ['L2_pyramidal', 'L5_pyramidal']
+    i_cell_names = ['L2_basket', 'L5_basket']
+
+    # Type check on gains
+    arg_names = ['e_e', 'e_i', 'i_e', 'i_i']
+    for arg in arg_names:
+        with pytest.raises(TypeError, match='must be an instance of int or'):
+            net.update_weights(**{arg: 'abc'})
+
+        with pytest.raises(ValueError, match='must be non-negative'):
+            net.update_weights(**{arg: -1})
+
+    with pytest.raises(TypeError, match='must be an instance of bool'):
+        net.update_weights(copy='True')
+
+    # Single argument check with copy
+    net_updated = net.update_weights(e_e=2.0, copy=True)
+    for conn in net_updated.connectivity:
+        if (conn['src_type'] in e_cell_names and
+                conn['target_type'] in e_cell_names):
+            assert conn['nc_dict']['gain'] == 2.0
+        else:
+            assert conn['nc_dict']['gain'] == 1.0
+    # Ensure that the original network gains did not change
+    for conn in net.connectivity:
+        assert conn['nc_dict']['gain'] == 1.0
+
+    # Single argument with inplace change
+    net.update_weights(i_e=0.5, copy=False)
+    for conn in net.connectivity:
+        if (conn['src_type'] in i_cell_names and
+                conn['target_type'] in e_cell_names):
+            assert conn['nc_dict']['gain'] == 0.5
+        else:
+            assert conn['nc_dict']['gain'] == 1.0
+
+    # Two argument check
+    net.update_weights(i_e=0.5, i_i=0.25, copy=False)
+    for conn in net.connectivity:
+        if (conn['src_type'] in i_cell_names and
+                conn['target_type'] in e_cell_names):
+            assert conn['nc_dict']['gain'] == 0.5
+        elif (conn['src_type'] in i_cell_names and
+                conn['target_type'] in i_cell_names):
+            assert conn['nc_dict']['gain'] == 0.25
+        else:
+            assert conn['nc_dict']['gain'] == 1.0
+
+    # Check weights are altered
+    def _get_weight(nb, conn_name, idx=0):
+        return nb.ncs[conn_name][idx].weight[0]
+
+    nb_updated = NetworkBuilder(net)
+    # i_e check
+    assert (_get_weight(nb_updated, 'L2Basket_L2Pyr_gabaa') /
+            _get_weight(nb_base, 'L2Basket_L2Pyr_gabaa')) == 0.5
+    # i_i check
+    assert (_get_weight(nb_updated, 'L2Basket_L2Basket_gabaa') /
+            _get_weight(nb_base, 'L2Basket_L2Basket_gabaa')) == 0.25
+    # Unaltered check
+    assert (_get_weight(nb_updated, 'L2Pyr_L5Basket_ampa') /
+            _get_weight(nb_base, 'L2Pyr_L5Basket_ampa')) == 1
+
+
 class TestPickConnection:
     """Tests for the pick_connection function."""
     @pytest.mark.parametrize("arg_name",

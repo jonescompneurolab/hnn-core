@@ -5,10 +5,8 @@ import os
 import subprocess
 import shutil
 
-from setuptools import setup, find_packages
-
-from distutils.command.build_py import build_py
-from distutils.cmd import Command
+from setuptools import setup, find_packages, Command
+from setuptools.command.build_py import build_py
 
 descr = """Code for biophysical simulation of a cortical column using Neuron"""
 
@@ -81,7 +79,7 @@ if __name__ == "__main__":
         'parallel': ['joblib', 'psutil'],
         'test': ['flake8', 'pytest', 'pytest-cov', ],
         'docs': ['mne', 'nibabel', 'pooch', 'tdqm',
-                 'sphinx', 'nbsphinx', 'sphinx-gallery',
+                 'sphinx', 'sphinx-gallery',
                  'sphinx_bootstrap_theme', 'sphinx-copybutton',
                  'pillow', 'numpydoc',
                  ],

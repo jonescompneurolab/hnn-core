@@ -99,8 +99,7 @@ axs[1].set_xlabel('')
 net.cell_response.plot_spikes_raster(ax=axs[2], show=False)
 
 # Finally, add the CSD to the bottom subplot
-net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot_csd(
-    ax=axs[3], show=False)
+net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot_csd(ax=axs[3], show=False)
 plt.tight_layout()
 plt.show()
 

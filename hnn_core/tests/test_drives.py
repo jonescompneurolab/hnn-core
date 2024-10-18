@@ -16,6 +16,16 @@ from hnn_core import simulate_dipole
 hnn_core_root = op.dirname(hnn_core.__file__)
 
 
+@pytest.fixture
+def setup_net():
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+    net = jones_2009_model(params, mesh_shape=(3, 3))
+
+    return net
+
+
 def test_external_drive_times():
     """Test the different external drives."""
 
@@ -76,13 +86,81 @@ def test_external_drive_times():
     events_per_cycle = 5
     cycle_events_isi = 20
     with pytest.raises(ValueError,
-                       match=r'Burst duration (?s).* cannot be greater than'):
+                       match=r'(?s)Burst duration .* cannot be greater than'):
         _create_bursty_input(t0=t0, t0_stdev=t0_stdev,
                              tstop=tstop, f_input=f_input,
                              events_jitter_std=events_jitter_std,
                              events_per_cycle=events_per_cycle,
                              cycle_events_isi=cycle_events_isi,
                              prng=prng, prng2=prng2)
+
+
+def test_drive_seeds(setup_net):
+    """Test that unique spike times are generated across trials"""
+    net = setup_net
+    weights_ampa = {'L2_basket': 0.3, 'L2_pyramidal': 0.3,
+                    'L5_basket': 0.3, 'L5_pyramidal': 0.3}
+    synaptic_delays = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
+                       'L5_basket': 1., 'L5_pyramidal': 1.}
+    net.add_evoked_drive(
+        'prox', mu=40, sigma=8.33, numspikes=1,
+        weights_ampa=weights_ampa, location='proximal',
+        synaptic_delays=synaptic_delays, event_seed=1)
+
+    _ = simulate_dipole(net, tstop=100, dt=0.5, n_trials=2)
+    trial1_spikes = np.array(sorted(
+        net.external_drives['prox']['events'][0]))
+    trial2_spikes = np.array(sorted(
+        net.external_drives['prox']['events'][1]))
+    # No two spikes should be perfectly identical across seeds
+    assert ~np.any(np.allclose(trial1_spikes, trial2_spikes))
+
+
+def test_clear_drives(setup_net):
+    """Test clearing drives updates Network"""
+    net = setup_net
+    weights_ampa = {'L5_pyramidal': 0.3}
+    synaptic_delays = {'L5_pyramidal': 1.}
+
+    # Test attributes after adding 2 drives
+    n_gids = net._n_gids
+    net.add_evoked_drive(
+        'prox', mu=40, sigma=8.33, numspikes=1,
+        weights_ampa=weights_ampa, location='proximal',
+        synaptic_delays=synaptic_delays, cell_specific=True)
+
+    net.add_evoked_drive(
+        'dist', mu=40, sigma=8.33, numspikes=1,
+        weights_ampa=weights_ampa, location='distal',
+        synaptic_delays=synaptic_delays, cell_specific=True)
+
+    for drive_name in ['prox', 'dist']:
+        assert len(net.external_drives) == 2
+        assert drive_name in net.external_drives
+        assert drive_name in net.gid_ranges
+        assert drive_name in net.pos_dict
+        assert net._n_gids == n_gids + len(net.gid_ranges['L5_pyramidal']) * 2
+
+    # Test attributes after clearing drives
+    net.clear_drives()
+    for drive_name in ['prox', 'dist']:
+        assert len(net.external_drives) == 0
+        assert drive_name not in net.external_drives
+        assert drive_name not in net.gid_ranges
+        assert drive_name not in net.pos_dict
+        assert net._n_gids == n_gids
+
+    # Test attributes after adding 1 drive
+    net.add_evoked_drive(
+        'prox', mu=40, sigma=8.33, numspikes=1,
+        weights_ampa=weights_ampa, location='proximal',
+        synaptic_delays=synaptic_delays, cell_specific=True)
+
+    assert len(net.external_drives) == 1
+    assert 'prox' in net.external_drives
+    assert 'prox' in net.gid_ranges
+    assert 'prox' in net.pos_dict
+    assert net._n_gids == n_gids + len(net.gid_ranges['L5_pyramidal'])
 
 
 def test_add_drives():
@@ -339,7 +417,7 @@ def test_add_drives():
         net.add_bursty_drive('bursty_drive', tstart=10, tstop=1,
                              location='distal', burst_rate=10)
 
-    msg = (r'Burst duration (?s).* cannot be greater than '
+    msg = (r'(?s)Burst duration .* cannot be greater than '
            'burst period')
     with pytest.raises(ValueError, match=msg):
         net.add_bursty_drive('bursty_drive', location='distal',
@@ -434,3 +512,23 @@ def test_drive_random_state():
     net._instantiate_drives(tstop=170.)
     assert (net.external_drives['evprox1']['events'] ==
             net.external_drives['evprox2']['events'])
+
+
+@pytest.mark.parametrize("rate_constant,cell_specific,n_drive_cells",
+                         [(2, False, 1), (2.0, False, 1),
+                          (2, True, 'n_cells'), (2.0, True, 'n_cells'),
+                          ])
+def test_add_poisson_drive(setup_net, rate_constant, cell_specific,
+                           n_drive_cells):
+    """Testing rate constant when adding non-cell-specific poisson drive"""
+    net = setup_net
+
+    weights_ampa_noise = {'L2_basket': 0.01, 'L2_pyramidal': 0.002,
+                          'L5_pyramidal': 0.02}
+
+    net.add_poisson_drive('noise_global', rate_constant=rate_constant,
+                          location='distal', weights_ampa=weights_ampa_noise,
+                          space_constant=100, n_drive_cells=n_drive_cells,
+                          cell_specific=cell_specific)
+
+    simulate_dipole(net, tstop=5)

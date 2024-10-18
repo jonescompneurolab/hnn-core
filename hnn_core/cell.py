@@ -348,6 +348,9 @@ class Cell:
         by synapse type (keys can be soma_gabaa, soma_gabab etc.).
         Must be enabled by running simulate_dipole(net, record_isec=True)
         or simulate_dipole(net, record_isoma=True)
+    ca : dict
+        Contains recording of section speicifc calcium concentration.
+        Must be enabled by running simulate_dipole(net, record_ca=True).
     tonic_biases : list of h.IClamp
         The current clamps inserted at each section of the cell
         for tonic biasing inputs.
@@ -391,6 +394,7 @@ class Cell:
         self.dipole_pp = list()
         self.vsec = dict()
         self.isec = dict()
+        self.ca = dict()
         # insert iclamp
         self.list_IClamp = list()
         self._gid = None
@@ -468,6 +472,7 @@ class Cell:
         cell_data['dipole_pp'] = self.dipole_pp
         cell_data['vsec'] = self.vsec
         cell_data['isec'] = self.isec
+        cell_data['ca'] = self.ca
         cell_data['tonic_biases'] = self.tonic_biases
         return cell_data
 
@@ -743,7 +748,7 @@ class Cell:
         stim.amp = amplitude
         self.tonic_biases.append(stim)
 
-    def record(self, record_vsec=False, record_isec=False):
+    def record(self, record_vsec=False, record_isec=False, record_ca=False):
         """ Record current and voltage from all sections
 
         Parameters
@@ -754,6 +759,9 @@ class Cell:
         record_isec : 'all' | 'soma' | False
             Option to record voltages from all sections ('all'), or just
             the soma ('soma'). Default: False.
+        record_ca : 'all' | 'soma' | False
+            Option to record calcium concentration from all sections ('all'),
+            or just the soma ('soma'). Default: False.
         """
 
         section_names = list(self.sections.keys())
@@ -783,9 +791,21 @@ class Cell:
 
                 for syn_name in self.isec[sec_name]:
                     self.isec[sec_name][syn_name] = h.Vector()
-
                     self.isec[sec_name][syn_name].record(
                         self._nrn_synapses[syn_name]._ref_i)
+
+        # calcium concentration
+        if record_ca == 'soma':
+            self.ca = dict.fromkeys(['soma'])
+        elif record_ca == 'all':
+            self.ca = dict.fromkeys(section_names)
+
+        if record_ca:
+            for sec_name in self.ca:
+                if hasattr(self._nrn_sections[sec_name](0.5), '_ref_cai'):
+                    self.ca[sec_name] = h.Vector()
+                    self.ca[sec_name].record(
+                        self._nrn_sections[sec_name](0.5)._ref_cai)
 
     def syn_create(self, secloc, e, tau1, tau2):
         """Create an h.Exp2Syn synapse.

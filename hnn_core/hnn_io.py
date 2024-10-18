@@ -9,6 +9,7 @@ import json
 import numpy as np
 
 from collections import OrderedDict
+from pathlib import Path
 
 from .cell import Cell, Section
 from .cell_response import CellResponse
@@ -167,10 +168,8 @@ def _set_from_cell_specific(drive_data):
     return drive_data['n_drive_cells']
 
 
-def _read_external_drive(net, drive_data, read_drives, read_output):
+def _read_external_drive(net, drive_data, read_output):
     """Adds drives encoded in json data to a Network"""
-    if not read_drives:
-        return None
 
     if (drive_data['type'] == 'evoked') or (drive_data['type'] == 'gaussian'):
         # Skipped n_drive_cells here
@@ -179,6 +178,7 @@ def _read_external_drive(net, drive_data, read_drives, read_output):
                              sigma=drive_data['dynamics']['sigma'],
                              numspikes=drive_data['dynamics']['numspikes'],
                              location=drive_data['location'],
+                             n_drive_cells=_set_from_cell_specific(drive_data),
                              cell_specific=drive_data['cell_specific'],
                              weights_ampa=drive_data['weights_ampa'],
                              weights_nmda=drive_data['weights_nmda'],
@@ -320,7 +320,7 @@ def network_to_dict(net, write_output=False):
 
 
 @fill_doc
-def write_network_configuration(net, fname, overwrite=True):
+def write_network_configuration(net, output, overwrite=True):
     """Writes network configuration to a json file.
 
     Writes network configurations as a hierarchical json similar to the Network
@@ -329,25 +329,33 @@ def write_network_configuration(net, fname, overwrite=True):
 
     Parameters
     ----------
-    %(net)s
-    %(fname)s
-    %(overwrite)s
+    net : Network
+        hnn-core Network object
+    output : str, Path, or StringIO
+        Path or buffer to write outputs
+    overwrite : bool
+        Overwrite file if it exists. Default: True
 
-    Yields
-    ------
-    A json file containing the Network configurations.
+    Returns
+    -------
+    None
     """
-
-    if overwrite is False and os.path.exists(fname):
-        raise FileExistsError('File already exists at path %s. Rename '
-                              'the file or set overwrite=True.' % (fname,))
 
     net_data = net.to_dict(write_output=False)
     net_data_converted = _convert_np_array_to_list(net_data)
 
-    # Saving file
-    with open(fname, 'w', encoding='utf-8') as f:
-        json.dump(net_data_converted, f, ensure_ascii=False, indent=4)
+    if isinstance(output, (str, Path)):
+        if overwrite is False and os.path.exists(output):
+            raise FileExistsError('File already exists at path %s. Rename '
+                                  'the file or set overwrite=True.' % (output,)
+                                  )
+        # Saving file
+        with open(output, 'w', encoding='utf-8') as f:
+            json.dump(net_data_converted, f, ensure_ascii=False, indent=4)
+    else:
+        # Write to StringIO buffer
+        json.dump(net_data_converted, output, ensure_ascii=False, indent=4)
+        output.seek(0)  # Reset buffer position to the start
 
 
 def _order_drives(gid_ranges, external_drives):
@@ -382,31 +390,27 @@ def _order_drives(gid_ranges, external_drives):
     return ordered_drives
 
 
-@fill_doc
-def read_network_configuration(fname, read_drives=True):
-    """Read network from a json configuration file.
+def dict_to_network(net_data,
+                    read_drives=True,
+                    read_external_biases=True):
+    """Converts a dict of network configurations to a Network
 
     Parameters
     ----------
-    %(fname)s
-    %(read_drives)s
+    fname : str or Path
+        Path to configuration file
+    read_drives : bool
+        Read-in drives to Network object
+    read_external_biases
+        Read-in external biases to Network object
 
-    Yields
-    ------
-    %(net)s
+    Returns : Network
+    -------
     """
+
     # Importing Network.
     # Cannot do this globally due to circular import.
     from .network import Network
-
-    with open(fname, 'r') as file:
-        net_data = json.load(file)
-
-    if net_data.get('object_type') != 'Network':
-        raise ValueError('The json should encode a Network object. '
-                         'The file contains object of '
-                         'type %s' % (net_data.get('object_type')))
-
     params = dict()
     params['celsius'] = net_data['celsius']
     params['threshold'] = net_data['threshold']
@@ -439,9 +443,10 @@ def read_network_configuration(fname, read_drives=True):
                                         net_data['external_drives'])
     for key in external_drive_data.keys():
         _read_external_drive(net, external_drive_data[key],
-                             read_output=False, read_drives=read_drives)
+                             read_output=False)
     # Set external biases
-    net.external_biases = net_data['external_biases']
+    if read_external_biases:
+        net.external_biases = net_data['external_biases']
     # Set connectivity
     _read_connectivity(net, net_data['connectivity'])
     # Set rec_arrays
@@ -450,5 +455,40 @@ def read_network_configuration(fname, read_drives=True):
     net.threshold = net_data['threshold']
     # Set delay
     net.delay = net_data['delay']
+
+    if not read_drives:
+        net.clear_drives()
+
+    return net
+
+
+def read_network_configuration(fname,
+                               read_drives=True,
+                               read_external_biases=True):
+    """Read network from a json configuration file.
+
+    Parameters
+    ----------
+    fname : str or Path
+        Path to configuration file
+    read_drives : bool
+        Read-in drives to Network object
+    read_external_biases
+        Read-in external biases to Network object
+
+    Returns : Network
+    -------
+
+    """
+
+    with open(fname, 'r') as file:
+        net_data = json.load(file)
+
+    if net_data.get('object_type') != 'Network':
+        raise ValueError('The json should encode a Network object. '
+                         'The file contains object of '
+                         'type %s' % (net_data.get('object_type')))
+
+    net = dict_to_network(net_data, read_drives, read_external_biases)
 
     return net

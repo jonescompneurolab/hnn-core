@@ -443,6 +443,9 @@ class Network:
         if add_drives_from_params:
             _add_drives_from_params(self)
 
+        self._tstop = None
+        self._dt = None
+
     def __repr__(self):
         class_name = self.__class__.__name__
         s = ("%d x %d Pyramidal cells (L2, L5)"
@@ -462,19 +465,16 @@ class Network:
             return False
 
         # Check all other attributes
-        all_attrs = dir(self)
-        attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
-        attrs_to_ignore.extend(['add_bursty_drive', 'add_connection',
-                                'add_electrode_array', 'add_evoked_drive',
-                                'add_poisson_drive', 'add_tonic_bias',
-                                'clear_connectivity', 'clear_drives',
-                                'connectivity', 'copy', 'gid_to_type',
-                                'plot_cells', 'set_cell_positions',
-                                'to_dict', 'write_configuration'])
-        attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
+        attrs_to_ignore = ['connectivity']
+        for attr in vars(self).keys():
+            if attr.startswith('_') or attr in attrs_to_ignore:
+                continue
 
-        for attr in attrs_to_check:
-            if getattr(self, attr) != getattr(other, attr):
+            if hasattr(self, attr) and hasattr(other, attr):
+                if getattr(self, attr) != getattr(other, attr):
+                    return False
+            else:
+                # Does not have the same set of attributes
                 return False
 
         return True
@@ -745,9 +745,10 @@ class Network:
                                  f"n_drive_cells='n_cells'. Got cell_specific"
                                  f" cell_specific={cell_specific} and "
                                  f"n_drive_cells={n_drive_cells}.")
-        elif isinstance(rate_constant, float):
-            rate_constant = {cell_type: rate_constant for cell_type in
-                             target_populations}
+        elif isinstance(rate_constant, (float, int)):
+            if cell_specific:
+                rate_constant = {cell_type: rate_constant for cell_type in
+                                 target_populations}
 
         drive = _NetworkDrive()
         drive['type'] = 'poisson'
@@ -1097,6 +1098,7 @@ class Network:
                 for drive_cell_gid in self.gid_ranges[drive['name']]:
                     drive_cell_gid_offset = (drive_cell_gid -
                                              self.gid_ranges[drive['name']][0])
+                    trial_seed_offset = self._n_gids
                     if drive['cell_specific']:
                         # loop over drives (one for each target cell
                         # population) and create event times
@@ -1113,7 +1115,8 @@ class Network:
                                 trial_idx=trial_idx,
                                 drive_cell_gid=drive_cell_gid_offset,
                                 event_seed=drive['event_seed'],
-                                tstop=tstop)
+                                tstop=tstop,
+                                trial_seed_offset=trial_seed_offset)
                             )
                     else:
                         src_event_times = _drive_cell_event_times(
@@ -1123,7 +1126,8 @@ class Network:
                             target_type='any',
                             trial_idx=trial_idx,
                             drive_cell_gid=drive_cell_gid_offset,
-                            event_seed=drive['event_seed'])
+                            event_seed=drive['event_seed'],
+                            trial_seed_offset=trial_seed_offset)
                         event_times.append(src_event_times)
                 # 'events': nested list (n_trials x n_drive_cells x n_events)
                 self.external_drives[
@@ -1299,7 +1303,7 @@ class Network:
         gid_pairs = dict()
         for src_gid, target_src_pair in zip(src_gids, target_gids):
             if not allow_autapses:
-                mask = np.in1d(target_src_pair, src_gid, invert=True)
+                mask = np.isin(target_src_pair, src_gid, invert=True)
                 target_src_pair = np.array(target_src_pair)[mask].tolist()
             gid_pairs[src_gid] = target_src_pair
 
@@ -1351,6 +1355,8 @@ class Network:
             _validate_type(item, (int, float), arg_name, 'int or float')
             conn['nc_dict'][key] = item
 
+        conn['nc_dict']['gain'] = 1.0
+
         # Probabilistically define connections
         if probability != 1.0:
             _connection_probability(conn, probability, conn_seed)
@@ -1371,12 +1377,17 @@ class Network:
 
     def clear_drives(self):
         """Remove all drives defined in Network.connectivity"""
-        connectivity = list()
-        for conn in self.connectivity:
-            if conn['src_type'] not in self.external_drives.keys():
-                connectivity.append(conn)
+        self.connectivity = [conn for conn in self.connectivity if
+                             conn['src_type'] not
+                             in self.external_drives.keys()]
+
+        for cell_name in list(self.gid_ranges.keys()):
+            if cell_name in self.external_drives:
+                self._n_gids -= len(self.gid_ranges[cell_name])
+                del self.gid_ranges[cell_name]
+                del self.pos_dict[cell_name]
+
         self.external_drives = dict()
-        self.connectivity = connectivity
 
     def add_electrode_array(self, name, electrode_pos, *, conductivity=0.3,
                             method='psa', min_distance=0.5):
@@ -1415,6 +1426,76 @@ class Network:
                                      conductivity=conductivity,
                                      method=method,
                                      min_distance=min_distance)})
+
+    def update_weights(self, e_e=None, e_i=None,
+                       i_e=None, i_i=None, copy=False):
+        """Update synaptic weights of the network.
+
+        Parameters
+        ----------
+        e_e : float
+            Synaptic gain of excitatory to excitatory connections
+            (default None)
+        e_i : float
+            Synaptic gain of excitatory to inhibitory connections
+            (default None)
+        i_e : float
+            Synaptic gain of inhibitory to excitatory connections
+            (default None)
+        i_i : float
+            Synaptic gain of inhibitory to inhibitory connections
+            (default None)
+        copy : bool
+            If True, returns a copy of the network. If False,
+            the network is updated in place with a return of None.
+            (default False)
+
+        Returns
+        -------
+        net : instance of Network
+            A copy of the instance with updated synaptic gains if copy=True.
+
+        Notes
+        -----
+        Synaptic gains must be non-negative. The synaptic gains will only be
+        updated if a float value is provided. If None is provided
+        (the default), the synapticgain will remain unchanged.
+
+        """
+        _validate_type(copy, bool, 'copy')
+
+        net = self.copy() if copy else self
+
+        e_conns = pick_connection(self, receptor=['ampa', 'nmda'])
+        e_cells = np.concatenate([list(net.connectivity[
+            conn_idx]['src_gids']) for conn_idx in e_conns]).tolist()
+
+        i_conns = pick_connection(self, receptor=['gabaa', 'gabab'])
+        i_cells = np.concatenate([list(net.connectivity[
+            conn_idx]['src_gids']) for conn_idx in i_conns]).tolist()
+        conn_types = {
+            'e_e': (e_e, e_cells, e_cells),
+            'e_i': (e_i, e_cells, i_cells),
+            'i_e': (i_e, i_cells, e_cells),
+            'i_i': (i_i, i_cells, i_cells)
+        }
+
+        for conn_type, (gain, e_vals, i_vals) in conn_types.items():
+            if gain is None:
+                continue
+
+            _validate_type(gain, (int, float), conn_type, 'int or float')
+            if gain < 0.0:
+                raise ValueError("Synaptic gains must be non-negative."
+                                 f"Got {gain} for '{conn_type}'.")
+
+            conn_indices = pick_connection(net, src_gids=e_vals,
+                                           target_gids=i_vals)
+            for conn_idx in conn_indices:
+                net.connectivity[conn_idx]['nc_dict']['gain'] = gain
+
+        if copy:
+            return net
 
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.
@@ -1483,6 +1564,8 @@ class _Connectivity(dict):
             Synaptic delay in ms.
         lamtha : float
             Space constant.
+        gain : float
+            Multiplicative factor for synaptic weight.
     probability : float
         Probability of connection between any src-target pair.
         Defaults to 1.0 producing an all-to-all pattern.

@@ -41,9 +41,14 @@ def test_extracellular_api():
     # all remaining input arguments checked by ExtracellularArray
 
     rec_arr = ExtracellularArray(electrode_pos)
-    with pytest.raises(AttributeError, match="can't set attribute"):
+
+    # Added second string in the match pattern due to changes in python >=3.11
+    # AttributeError message changed to "property X of object Y has no setter"
+    with pytest.raises(AttributeError,
+                       match="has no setter|can't set attribute"):
         rec_arr.times = [1, 2, 3]
-    with pytest.raises(AttributeError, match="can't set attribute"):
+    with pytest.raises(AttributeError,
+                       match="has no setter|can't set attribute"):
         rec_arr.voltages = [1, 2, 3]
     with pytest.raises(TypeError, match="trial index must be int"):
         _ = rec_arr['0']
@@ -172,10 +177,10 @@ def test_extracellular_backends(run_hnn_core_fixture):
                                 (2, 2, 1000)]}
     _, joblib_net = run_hnn_core_fixture(
         backend='joblib', n_jobs=1, reduced=True, record_isec='soma',
-        record_vsec='soma', electrode_array=electrode_array)
+        record_vsec='soma', record_ca='soma', electrode_array=electrode_array)
     _, mpi_net = run_hnn_core_fixture(
         backend='mpi', n_procs=2, reduced=True, record_isec='soma',
-        record_vsec='soma', electrode_array=electrode_array)
+        record_vsec='soma', record_ca='soma', electrode_array=electrode_array)
 
     assert (len(electrode_array['arr1']) ==
             len(joblib_net.rec_arrays['arr1'].positions) ==
@@ -258,3 +263,26 @@ def test_rec_array_calculation():
         assert_allclose(net.rec_arrays['arr1']._data[trial_idx][1],
                         net.rec_arrays['arr2']._data[trial_idx][1],
                         rtol=1e-3, atol=1e-3)
+
+
+def test_extracellular_viz():
+    """Test if deprecation warning is raised in plot_laminar_lfp."""
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params = read_params(params_fname)
+    params.update({'t_evprox_1': 7, 't_evdist_1': 17})
+    net = jones_2009_model(params, mesh_shape=(3, 3),
+                           add_drives_from_params=True)
+
+    # one electrode inside, one above the active elements of the network,
+    # and two more to allow calculation of CSD (2nd spatial derivative)
+    electrode_pos = [(1, 2, 1000), (2, 3, 3000), (3, 4, 5000), (4, 5, 7000)]
+    net.add_electrode_array('arr1', electrode_pos)
+    _ = simulate_dipole(net, tstop=5, n_trials=1)
+
+    with pytest.deprecated_call():
+        net.rec_arrays['arr1'].plot_lfp(show=False, tmin=10, tmax=100)
+    with pytest.raises(RuntimeError, match='Please use sink = "b" or '
+                       'sink = "r". Only colormap "jet" is supported '
+                       'for CSD.'):
+        net.rec_arrays['arr1'].plot_csd(show=False, sink='g')

@@ -166,18 +166,18 @@ Bug reports
 ===========
 
 Use the `github issue tracker <https://github.com/jonescompneurolab/hnn-core/issues>`_ to
-report bugs. For user questions and scientific discussions, please join the
-`HNN Google group <https://groups.google.com/g/hnnsolver>`_.
+report bugs. For user questions and scientific discussions, please see our
+`GitHub Discussions page <https://github.com/jonescompneurolab/hnn-core/discussions>`_.
 
 Interested in Contributing?
 ===========================
 
 Read our `contributing guide`_.
 
-Roadmap
-=======
+Governance Structure
+====================
 
-Read our `roadmap`_.
+Read our `governance structure`_.
 
 Citing
 ======
@@ -189,12 +189,13 @@ If you use HNN-core in your work, please cite our
    circuit-level interpretation of human MEG/EEG. *Journal of Open Source
    Software*, 8(92), 5848, https://doi.org/10.21105/joss.05848
 
-.. _precompiled installers: https://www.neuron.yale.edu/neuron/download
+.. _precompiled installers: https://nrn.readthedocs.io/en/latest/
 .. _NEURON forum: https://www.neuron.yale.edu/phpbb/
-.. _contributing guide: https://jonescompneurolab.github.io/hnn-core/dev/contributing.html
-.. _parallel backend guide: https://jonescompneurolab.github.io/hnn-core/dev/parallel.html
+.. _contributing guide: https://jonescompneurolab.github.io/hnn-core/stable/contributing.html
+.. _governance structure: https://jonescompneurolab.github.io/hnn-core/stable/governance.html
+.. _parallel backend guide: https://jonescompneurolab.github.io/hnn-core/stable/parallel.html
 
-.. |tests| image:: https://github.com/jonescompneurolab/hnn-core/actions/workflows/unit_tests.yml/badge.svg?branch=master
+.. |tests| image:: https://github.com/jonescompneurolab/hnn-core/actions/workflows/unix_unit_tests.yml/badge.svg?branch=master
    :target: https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:master+event:push
 
 .. |CircleCI| image:: https://circleci.com/gh/jonescompneurolab/hnn-core.svg?style=svg
@@ -206,7 +207,7 @@ If you use HNN-core in your work, please cite our
 .. |PyPI| image:: https://img.shields.io/pypi/dm/hnn-core.svg?label=PyPI%20downloads
    :target: https://pypi.org/project/hnn-core/
 
-.. |HNN-GUI| image:: https://user-images.githubusercontent.com/11160442/226248652-1711cdf4-f72b-439e-b4bb-15677fbe6ea5.png
+.. |HNN-GUI| image:: https://raw.githubusercontent.com/jonescompneurolab/hnn-core/acbcc4a598610dc3be5d4b0b7c59f98251ea7690/.github/images/hnn_gui.png
 
 .. |Gitter| image:: https://badges.gitter.im/jonescompneurolab/hnn_core.svg
    :target: https://gitter.im/jonescompneurolab/hnn-core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge

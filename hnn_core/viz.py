@@ -7,7 +7,7 @@
 import numpy as np
 from itertools import cycle
 import colorsys
-
+import warnings
 from .externals.mne import _validate_type
 
 
@@ -21,7 +21,7 @@ def _lighten_color(color, amount=0.5):
     return colorsys.hls_to_rgb(c[0], 1 - amount * (1 - c[1]), c[2])
 
 
-def _get_plot_data_trange(times, data, tmin, tmax):
+def _get_plot_data_trange(times, data, tmin=None, tmax=None):
     """Get slices of times and data based on tmin and tmax"""
     if isinstance(times, list):
         times = np.array(times)
@@ -89,10 +89,6 @@ def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
         Sampling times (in ms).
     data : Two-dimensional Numpy array
         The extracellular voltages as an (n_contacts, n_times) array.
-    tmin : float | None
-        Start time of plot in milliseconds. If None, plot entire simulation.
-    tmax : float | None
-        End time of plot in milliseconds. If None, plot entire simulation.
     ax : instance of matplotlib figure | None
         The matplotlib axis
     decim : int | list of int | None (default)
@@ -168,7 +164,8 @@ def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
         trace_offsets = np.arange(n_offsets)[:, np.newaxis] * voltage_offset
 
     for contact_no, trace in enumerate(np.atleast_2d(data)):
-        plot_data, plot_times = _get_plot_data_trange(times, trace, tmin, tmax)
+        plot_data = trace
+        plot_times = times
 
         if decim is not None:
             plot_data, plot_times = _decimate_plot_data(decim, plot_data,
@@ -183,6 +180,16 @@ def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
         ax.plot(plot_times, plot_data + trace_offsets[contact_no],
                 label=f'C{contact_no}', color=col)
 
+        # To be removed after deprecation cycle
+        if tmin is not None or tmax is not None:
+            ax.set_xlim(left=tmin, right=tmax)
+            warnings.warn('tmin and tmax are deprecated and will be '
+                          'removed in future releases of hnn-core. Please'
+                          'use matplotlib plt.xlim to set tmin and tmax.',
+                          DeprecationWarning)
+
+        else:
+            ax.set_xlim(left=times[0], right=times[-1])
     if voltage_offset is not None:
         ax.set_ylim(-voltage_offset, n_offsets * voltage_offset)
         ylabel = 'Individual contact traces'
@@ -228,10 +235,6 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     ----------
     dpl : instance of Dipole | list of Dipole instances
         The Dipole object.
-    tmin : float or None
-        Start time of plot in milliseconds. If None, plot entire simulation.
-    tmax : float or None
-        End time of plot in milliseconds. If None, plot entire simulation.
     ax : instance of matplotlib figure | None
         The matplotlib axis
     layer : str
@@ -288,9 +291,9 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
             if layer in dpl_trial.data.keys():
 
                 # extract scaled data and times
-                data, times = _get_plot_data_trange(dpl_trial.times,
-                                                    dpl_trial.data[layer],
-                                                    tmin, tmax)
+                data = dpl_trial.data[layer]
+                times = dpl_trial.times
+
                 if decim is not None:
                     data, times = _decimate_plot_data(decim, data, times)
                 if idx == len(dpl) - 1 and average:
@@ -301,6 +304,17 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
                     ax.plot(times, data, color=_lighten_color(color, 0.5),
                             alpha=alpha, lw=1.)
 
+            # To be removed after deprecation cycle
+            if tmin is not None or tmax is not None:
+                if tmin is not None or tmax is not None:
+                    warnings.warn('tmin and tmax are deprecated and will be '
+                                  'removed in future releases of hnn-core. '
+                                  'Please use matplotlib plt.xlim to set tmin'
+                                  ' and tmax.',
+                                  DeprecationWarning)
+                ax.set_xlim(left=tmin, right=tmax)
+            else:
+                ax.set_xlim(left=0, right=times[-1])
         if average:
             ax.legend()
 
@@ -408,7 +422,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         spike_types_data = np.array([])
 
     unique_types = np.unique(spike_types_data)
-    spike_types_mask = {s_type: np.in1d(spike_types_data, s_type)
+    spike_types_mask = {s_type: np.isin(spike_types_data, s_type)
                         for s_type in unique_types}
     cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
     input_types = np.setdiff1d(unique_types, cell_types)
@@ -462,7 +476,10 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     elif isinstance(color, list):
         color_cycle = cycle(color)
 
-    bins = np.linspace(0, spike_times[-1], 50)
+    if len(cell_response.times) > 0:
+        bins = np.linspace(0, cell_response.times[-1], 50)
+    else:
+        bins = np.linspace(0, spike_times[-1], 50)
 
     # Create dictionary to aggregate spike times that have the same spike_label
     spike_type_times = {spike_label: list() for
@@ -575,17 +592,12 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
     _validate_type(trial_idx, list, 'trial_idx', 'int, list of int')
 
     # Extract desired trials
-    if len(cell_response._spike_times[0]) > 0:
-        spike_times = np.concatenate(
-            np.array(cell_response._spike_times, dtype=object)[trial_idx])
-        spike_types = np.concatenate(
-            np.array(cell_response._spike_types, dtype=object)[trial_idx])
-        spike_gids = np.concatenate(
-            np.array(cell_response._spike_gids, dtype=object)[trial_idx])
-    else:
-        spike_times = np.array([])
-        spike_types = np.array([])
-        spike_gids = np.array([])
+    spike_times = np.concatenate(
+        np.array(cell_response._spike_times, dtype=object)[trial_idx])
+    spike_types = np.concatenate(
+        np.array(cell_response._spike_types, dtype=object)[trial_idx])
+    spike_gids = np.concatenate(
+        np.array(cell_response._spike_gids, dtype=object)[trial_idx])
 
     cell_types = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
     cell_type_colors = {'L5_pyramidal': 'r', 'L5_basket': 'b',
@@ -594,7 +606,6 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
-    ypos = 0
     events = []
     for cell_type in cell_types:
         cell_type_gids = np.unique(spike_gids[spike_types == cell_type])
@@ -602,12 +613,16 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
         for gid in cell_type_gids:
             gid_time = spike_times[spike_gids == gid]
             cell_type_times.append(gid_time)
-            cell_type_ypos.append(ypos)
-            ypos = ypos - 1
+            cell_type_ypos.append(-gid)
 
         if cell_type_times:
             events.append(
                 ax.eventplot(cell_type_times, lineoffsets=cell_type_ypos,
+                             color=cell_type_colors[cell_type],
+                             label=cell_type, linelengths=5))
+        else:
+            events.append(
+                ax.eventplot([-1], lineoffsets=[-1],
                              color=cell_type_colors[cell_type],
                              label=cell_type, linelengths=5))
 
@@ -615,6 +630,11 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
     ax.set_facecolor('k')
     ax.set_xlabel('Time (ms)')
     ax.get_yaxis().set_visible(False)
+
+    if len(cell_response.times) > 0:
+        ax.set_xlim(left=0, right=cell_response.times[-1])
+    else:
+        ax.set_xlim(left=0)
     ax.set_xlim(left=0)
 
     plt_show(show)
@@ -1054,7 +1074,7 @@ def plot_connectivity_matrix(net, conn_idx, ax=None, show_weight=True,
 
     for src_gid, target_src_pair in conn['gid_pairs'].items():
         src_idx = np.where(src_range == src_gid)[0][0]
-        target_indeces = np.where(np.in1d(target_range, target_src_pair))[0]
+        target_indeces = np.where(np.isin(target_range, target_src_pair))[0]
         for target_idx in target_indeces:
             src_pos = src_type_pos[src_idx]
             target_pos = target_type_pos[target_idx]
@@ -1104,7 +1124,7 @@ def _update_target_plot(ax, conn, src_gid, src_type_pos, target_type_pos,
     # Extract indices to get position in network
     # Index in gid range aligns with net.pos_dict
     target_src_pair = conn['gid_pairs'][src_gid]
-    target_indeces = np.where(np.in1d(target_range, target_src_pair))[0]
+    target_indeces = np.where(np.isin(target_range, target_src_pair))[0]
 
     src_idx = np.where(src_range == src_gid)[0][0]
     src_pos = src_type_pos[src_idx]
@@ -1191,7 +1211,7 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
     src_range = np.array(net.gid_ranges[conn['src_type']])
 
     valid_src_gids = list(net.connectivity[conn_idx]['gid_pairs'].keys())
-    src_pos_valid = src_type_pos[np.in1d(src_range, valid_src_gids)]
+    src_pos_valid = src_type_pos[np.isin(src_range, valid_src_gids)]
 
     if src_gid is None:
         src_gid = valid_src_gids[0]
@@ -1268,6 +1288,7 @@ def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
 
 
 def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
+                     vmin=None, vmax=None, sink='b', interpolation='spline',
                      show=True):
     """Plot laminar current source density (CSD) estimation from LFP array.
 
@@ -1284,6 +1305,19 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
     contact_labels : list
         Labels associated with the contacts to plot. Passed as-is to
         :func:`~matplotlib.axes.Axes.set_yticklabels`.
+    vmin: float, optional
+        lower bound of the color axis.
+        Will be set automatically of None.
+    vmax: float, optional
+        upper bound of the color axis.
+        Will be set automatically of None.
+    sink : str
+        If set to 'blue' or 'b', plots sinks in blue and sources in red,
+        if set to 'red' or 'r', sinks plotted in red and sources blue.
+    interpolation : str | None
+        If 'spline', will smoothen the CSD using spline method,
+        if None, no smoothing will be applied.
+
     show : bool
         If True, show the plot.
 
@@ -1293,19 +1327,44 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
         The matplotlib figure handle.
     """
     import matplotlib.pyplot as plt
+    from scipy.interpolate import RectBivariateSpline
+
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
-    im = ax.pcolormesh(times, contact_labels, np.array(data),
-                       cmap="jet_r", shading='auto')
-    ax.set_title("CSD")
+    if sink[0].lower() == 'b':
+        cmap = "jet"
+    elif sink[0].lower() == 'r':
+        cmap = "jet_r"
+    elif sink[0].lower() != 'b' or sink[0].lower() != 'r':
+        raise RuntimeError('Please use sink = "b" or sink = "r".'
+                           ' Only colormap "jet" is supported for CSD.')
 
+    if interpolation == 'spline':
+        # create interpolation function
+        interp_data = RectBivariateSpline(times, contact_labels, data.T)
+        # increase number of contacts
+        new_depths = np.linspace(contact_labels[0], contact_labels[-1],
+                                 contact_labels[-1] - contact_labels[0])
+        # interpolate
+        data = interp_data(times, new_depths).T
+    elif interpolation is None:
+        data = data
+        new_depths = contact_labels
+
+    # if vmin and vmax are both None, set colormap such that green = zero
+    if vmin is None and vmax is None:
+        vmin = -np.max(np.abs(data))
+        vmax = np.max(np.abs(data))
+
+    im = ax.pcolormesh(times, new_depths, data,
+                       cmap=cmap, shading='auto', vmin=vmin, vmax=vmax)
+    ax.set_xlabel('time (s)')
+    ax.set_ylabel('electrode depth')
     if colorbar:
         color_axis = ax.inset_axes([1.05, 0, 0.02, 1], transform=ax.transAxes)
         plt.colorbar(im, ax=ax, cax=color_axis).set_label(r'$CSD (uV/um^{2})$')
 
-    ax.set_xlabel('Time (ms)')
-    ax.set_ylabel('Electrode depth')
     plt.tight_layout()
     plt_show(show)
 

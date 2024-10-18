@@ -31,11 +31,11 @@ sys.path.append(os.path.abspath(os.path.join(curdir, 'sphinxext')))
 # -- Project information -----------------------------------------------------
 
 project = 'hnn-core'
-copyright = '2023, HNN Developers'
+copyright = '2024, HNN Developers'
 author = 'HNN Developers'
 
 # The short X.Y version
-version = '0.4.dev0'
+version = '0.4'
 # The full version, including alpha/beta/rc tags
 release = ''
 
@@ -56,7 +56,6 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'numpydoc',
-    'nbsphinx',
     'sphinx_copybutton',
     'gh_substitutions'  # custom extension, see ./sphinxext/gh_substitutions.py
 ]
@@ -94,7 +93,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path .
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'gui/index.rst']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -115,7 +114,6 @@ html_theme_options = {
     'navbar_sidebarrel': False,
     'navbar_links': [
         ("Examples", "auto_examples/index"),
-        ("GUI", "gui/index"),
         ("API", "api"),
         ("Glossary", "glossary"),
         ("What's new", "whats_new"),
@@ -206,11 +204,12 @@ intersphinx_mapping = {
 intersphinx_timeout = 5
 
 linkcheck_ignore = [
-   'https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#',
-   'https://neuron.yale.edu/neuron',
-   'https://doi.org/10.1152/jn.00535.2009',
-   'https://doi.org/10.1152/jn.00122.2010',
-   'https://groups.google.com/g/hnnsolver'
+    'https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#',
+    'https://neuron.yale.edu/neuron',
+    'https://doi.org/10.1152/jn.00535.2009',
+    'https://doi.org/10.1152/jn.00122.2010',
+    'https://doi.org/10.1101/2021.04.16.440210',
+    'https://groups.google.com/g/hnnsolver'
 ]
 
 # Resolve binder filepath_prefix. From the docs:
@@ -225,6 +224,11 @@ else:
     filepath_prefix = 'v{}'.format(version)
 
 sphinx_gallery_conf = {
+    'first_notebook_cell': ("import pyvista as pv\n"
+                            "from mne.viz import set_3d_backend\n"
+                            "set_3d_backend('notebook')\n"
+                            "pv.set_jupyter_backend('client')"
+                            ),
     'doc_module': 'hnn_core',
     # path to your examples scripts
     'examples_dirs': '../examples',
@@ -241,33 +245,8 @@ sphinx_gallery_conf = {
                'repo': 'hnn-core',
                'branch': 'gh-pages',
                'binderhub_url': 'https://mybinder.org',
-               'notebooks_dir': f'{filepath_prefix}/notebooks',
+               'filepath_prefix': filepath_prefix,
+               'notebooks_dir': 'notebooks',
                'dependencies': 'Dockerfile'
                }
 }
-
-suppress_warnings = [
-    'nbsphinx',
-]
-
-nbsphinx_execute = 'always'
-
-nbsphinx_prolog = """
-.. raw:: html
-
-    <style>
-        .body {
-            max-width: 100% !important;
-        }
-        .nbinput.container {
-            padding-top: 5px;
-            display: none !important;
-        }
-        div.nboutput.container div.prompt {
-            display: none !important;
-        }
-        div.nboutput.container div.output_area.stderr {
-            display: none !important;
-        }
-    </style>
-"""

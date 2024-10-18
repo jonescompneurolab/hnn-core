@@ -69,13 +69,16 @@ def _read_legacy_params(param_data):
     return params_input
 
 
-def read_params(params_fname):
+def read_params(params_fname, file_contents=None):
     """Read param values from a file (.json or .param).
 
     Parameters
     ----------
     params_fname : str
         Full path to the file (.param)
+    file_contents : str | None
+        If file_contents are provided as a string,
+        it is parsed into a dictionary.
 
     Returns
     -------
@@ -90,10 +93,12 @@ def read_params(params_fname):
         raise ValueError('Unrecognized extension, expected one of' +
                          ' .json, .param. Got %s' % ext)
 
+    if file_contents is None:
+        with open(params_fname, 'r') as fp:
+            file_contents = fp.read()
+
     read_func = {'.json': _read_json, '.param': _read_legacy_params}
-    with open(params_fname, 'r') as fp:
-        param_data = fp.read()
-        params_dict = read_func[ext](param_data)
+    params_dict = read_func[ext](file_contents)
 
     if len(params_dict) == 0:
         raise ValueError("Failed to read parameters from file: %s" %
@@ -657,9 +662,80 @@ def compare_dictionaries(d1, d2):
     return d1
 
 
-def convert_to_hdf5(params_fname, out_fname, include_drives=True,
-                    overwrite=True, write_output=False):
-    """Converts json or param format to hdf5
+def _any_positive_weights(drive):
+    """ Checks a drive for any positive weights. """
+    weights = (list(drive['weights_ampa'].values()) +
+               list(drive['weights_nmda'].values()))
+    if any([val > 0 for val in weights]):
+        return True
+    else:
+        return False
+
+
+def remove_nulled_drives(net):
+    """Removes drives from network if they have been given null parameters.
+
+    Legacy param files contained parameter placeholders for non-functional
+    drives. These drives were nulled by assigning values outside typical
+    ranges. This function removes drives on the following conditions:
+        1. Start time is larger than stop time
+        2. All weights are non-positive
+
+    Parameters
+    ----------
+    net : Network object
+
+    Returns
+    -------
+    net : Network object
+
+    """
+    from .network import pick_connection
+
+    net = deepcopy(net)
+    drives_copy = net.external_drives.copy()
+
+    extras = dict()
+    for drive_name, drive in net.external_drives.items():
+        conn_indices = pick_connection(net, src_gids=drive_name)
+
+        space_constant = net.connectivity[conn_indices[0]]['nc_dict']['lamtha']
+        probability = net.connectivity[conn_indices[0]]['probability']
+
+        extras[drive_name] = {'space_constant': space_constant,
+                              'probability': probability}
+
+    net.clear_drives()
+    for drive_name, drive in drives_copy.items():
+        # Do not add drive if tstart is > tstop, or negative
+        t_start = drive['dynamics'].get('tstart')
+        t_stop = drive['dynamics'].get('tstop')
+        if (t_start is not None and t_stop is not None and
+                ((t_start > t_stop) or
+                 (t_start < 0) or
+                 (t_stop < 0))):
+            continue
+        # Do not add if all 0 weights
+        elif not _any_positive_weights(drive):
+            continue
+        else:
+            # Set n_drive_cells to 'n_cells' if equal to max number of cells
+            if drive['cell_specific']:
+                drive['n_drive_cells'] = 'n_cells'
+            net._attach_drive(drive['name'], drive, drive['weights_ampa'],
+                              drive['weights_nmda'], drive['location'],
+                              extras[drive_name]['space_constant'],
+                              drive['synaptic_delays'],
+                              drive['n_drive_cells'], drive['cell_specific'],
+                              extras[drive_name]['probability'])
+    return net
+
+
+def convert_to_json(params_fname,
+                    out_fname,
+                    include_drives=True,
+                    overwrite=True):
+    """Converts legacy json or param format to hierarchical json format
 
     Parameters
     ----------
@@ -671,13 +747,12 @@ def convert_to_hdf5(params_fname, out_fname, include_drives=True,
         Include drives from params file
     overwrite: bool, default=True
         Overwrite file
-    write_output: bool, default=False
-        Write out simulations
     Returns
     -------
     None
     """
-    from .network import Network
+    from .network_models import jones_2009_model
+
     # Validate inputs
     _validate_type(params_fname, (str, Path), 'params_fname')
     _validate_type(out_fname, (str, Path), 'out_fname')
@@ -687,17 +762,21 @@ def convert_to_hdf5(params_fname, out_fname, include_drives=True,
     params_suffix = params_fname.suffix.lower().split('.')[-1]
 
     # Add suffix if not supplied
-    if out_fname.suffix != '.hdf5':
-        out_fname = out_fname.with_suffix('.hdf5')
+    if out_fname.suffix != '.json':
+        out_fname = out_fname.with_suffix('.json')
 
-    net = Network(params=read_params(params_fname),
-                  add_drives_from_params=include_drives,
-                  legacy_mode=True if params_suffix == 'param' else False,
-                  )
-    net.write(fname=out_fname,
-              overwrite=overwrite,
-              write_output=write_output,
-              )
+    net = jones_2009_model(params=read_params(params_fname),
+                           add_drives_from_params=include_drives,
+                           legacy_mode=(True if params_suffix == 'param'
+                                        else False),
+                           )
+
+    # Remove drives that have null attributes
+    net = remove_nulled_drives(net)
+
+    net.write_configuration(fname=out_fname,
+                            overwrite=overwrite,
+                            )
     return
 
 
