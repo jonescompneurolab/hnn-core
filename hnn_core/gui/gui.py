@@ -7,8 +7,9 @@ import codecs
 import io
 import logging
 import mimetypes
-import multiprocessing
 import numpy as np
+import platform
+import psutil
 import sys
 import json
 import urllib.parse
@@ -35,6 +36,7 @@ from hnn_core.params_default import (get_L2Pyr_params_default,
                                      get_L5Pyr_params_default)
 from hnn_core.hnn_io import dict_to_network, write_network_configuration
 from hnn_core.cells_default import _exp_g_at_dist
+from hnn_core.parallel_backends import _has_mpi4py, _has_psutil
 
 hnn_core_root = Path(hnn_core.__file__).parent
 default_network_configuration = (hnn_core_root / 'param' /
@@ -320,6 +322,9 @@ class HNNGUI:
         # load default parameters
         self.params = self.load_parameters(network_configuration)
 
+        # Number of available cores
+        self.n_cores = self._available_cores()
+
         # In-memory storage of all simulation and visualization related data
         self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
 
@@ -336,15 +341,16 @@ class HNNGUI:
                                            placeholder='ID of your simulation',
                                            description='Name:',
                                            disabled=False)
-        self.widget_backend_selection = Dropdown(options=[('Joblib', 'Joblib'),
-                                                          ('MPI', 'MPI')],
-                                                 value='Joblib',
-                                                 description='Backend:')
+        self.widget_backend_selection = (
+            Dropdown(options=[('Joblib', 'Joblib'),
+                              ('MPI', 'MPI')],
+                     value=self._check_backend(),
+                     description='Backend:'))
         self.widget_mpi_cmd = Text(value='mpiexec',
                                    placeholder='Fill if applies',
                                    description='MPI cmd:', disabled=False)
         self.widget_n_jobs = BoundedIntText(value=1, min=1,
-                                            max=multiprocessing.cpu_count(),
+                                            max=self.n_cores,
                                             description='Cores:',
                                             disabled=False)
         self.load_data_button = FileUpload(
@@ -427,6 +433,30 @@ class HNNGUI:
 
         self._init_ui_components()
         self.add_logging_window_logger()
+
+    @staticmethod
+    def _available_cores():
+        """Return the number of available cores to the process.
+
+        This is important for systems where the number of available cores is
+        partitioned such as on HPC systems. Linux and Windows can return cpu
+        affinity, which is the number of available cores. MacOS can only return
+        total system cores.
+        """
+        # For macos
+        if platform.system() == 'Darwin':
+            return psutil.cpu_count()
+        # For Linux and Windows
+        else:
+            return len(psutil.Process().cpu_affinity())
+
+    @staticmethod
+    def _check_backend():
+        """Checks for MPI and returns the default backend name"""
+        default_backend = 'Joblib'
+        if _has_mpi4py() and _has_psutil():
+            default_backend = 'MPI'
+        return default_backend
 
     def get_cell_parameters_dict(self):
         """Returns the number of elements in the
@@ -566,8 +596,9 @@ class HNNGUI:
                 self.widget_simulation_name, self._log_out, self.drive_widgets,
                 self.data, self.widget_dt, self.widget_tstop,
                 self.widget_ntrials, self.widget_backend_selection,
-                self.widget_mpi_cmd, self.widget_n_jobs, self.params,
-                self._simulation_status_bar, self._simulation_status_contents,
+                self.widget_mpi_cmd, self.widget_n_jobs,
+                self.params, self._simulation_status_bar,
+                self._simulation_status_contents,
                 self.connectivity_widgets, self.viz_manager,
                 self.simulation_list_widget, self.cell_pameters_widgets)
 
@@ -672,6 +703,10 @@ class HNNGUI:
                 self.widget_ntrials, self.widget_backend_selection,
                 self._backend_config_out]),
         ], layout=self.layout['config_box'])
+        # Displays the default backend options
+        handle_backend_change(self.widget_backend_selection.value,
+                              self._backend_config_out, self.widget_mpi_cmd,
+                              self.widget_n_jobs)
 
         connectivity_configuration = Tab()
 
@@ -1938,7 +1973,8 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
         print("start simulation")
         if backend_selection.value == "MPI":
             backend = MPIBackend(
-                n_procs=multiprocessing.cpu_count() - 1, mpi_cmd=mpi_cmd.value)
+                n_procs=n_jobs.value,
+                mpi_cmd=mpi_cmd.value)
         else:
             backend = JoblibBackend(n_jobs=n_jobs.value)
             print(f"Using Joblib with {n_jobs.value} core(s).")
@@ -2232,7 +2268,7 @@ def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
     backend_config.clear_output()
     with backend_config:
         if backend_type == "MPI":
-            display(mpi_cmd)
+            display(VBox(children=[n_jobs, mpi_cmd]))
         elif backend_type == "Joblib":
             display(n_jobs)
 
