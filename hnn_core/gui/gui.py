@@ -1971,7 +1971,7 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
 def _update_cell_params_vbox(cell_type_out, cell_parameters_list,
                              cell_type, cell_layer):
     cell_parameters_key = f"{cell_type}_{cell_layer}"
-    if "Biophysics" or 'Geometry' in cell_layer:
+    if cell_layer in ['Biophysics', 'Geometry']:
         cell_parameters_key += f" {cell_type.split(' ')[0]}"
 
     if cell_parameters_key in cell_parameters_list:
