@@ -400,7 +400,7 @@ class HNNGUI:
             button_color=self.layout['theme_color'])
 
         self.cell_type_radio_buttons = RadioButtons(
-            options=['L2 Pyramidal', 'L5 Pyramidal'],
+            options=['L2/3 Pyramidal', 'L5 Pyramidal'],
             description='Cell type:')
 
         self.cell_layer_radio_buttons = RadioButtons(
@@ -1973,6 +1973,9 @@ def _update_cell_params_vbox(cell_type_out, cell_parameters_list,
     cell_parameters_key = f"{cell_type}_{cell_layer}"
     if cell_layer in ['Biophysics', 'Geometry']:
         cell_parameters_key += f" {cell_type.split(' ')[0]}"
+
+    # Needed for the button to display L2/3, but the underlying data to use L2
+    cell_parameters_key = cell_parameters_key.replace("L2/3", "L2")
 
     if cell_parameters_key in cell_parameters_list:
         cell_type_out.clear_output()
