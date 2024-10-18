@@ -400,7 +400,7 @@ class HNNGUI:
             button_color=self.layout['theme_color'])
 
         self.cell_type_radio_buttons = RadioButtons(
-            options=['L2 Pyramidal', 'L5 Pyramidal'],
+            options=['L2/3 Pyramidal', 'L5 Pyramidal'],
             description='Cell type:')
 
         self.cell_layer_radio_buttons = RadioButtons(

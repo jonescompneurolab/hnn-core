@@ -327,7 +327,9 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
                 r'$\times$ {:.0f})'.format(scale_applied)
         ax.set_ylabel(ylabel, multialignment='center')
         if layer == 'agg':
-            title_str = 'Aggregate (L2 + L5)'
+            title_str = 'Aggregate (L2/3 + L5)'
+        elif layer == 'L2':
+            title_str = 'L2/3'
         else:
             title_str = layer
         ax.set_title(title_str)
