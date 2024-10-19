@@ -73,8 +73,8 @@ def set_params(param_values, net=None):
 
 
 param_grid = {
-    'weight_basket': np.logspace(-4, -1, 10),
-    'weight_pyr': np.logspace(-4, -1, 10)
+    'weight_basket': np.logspace(-4, -1, 20),
+    'weight_pyr': np.logspace(-4, -1, 20)
 }
 
 ###############################################################################
@@ -120,7 +120,7 @@ batch_simulation = BatchSimulate(net=net,
 simulation_results = batch_simulation.run(param_grid,
                                           n_jobs=n_jobs,
                                           combinations=False,
-                                          backend='multiprocessing')
+                                          backend='loky')
 # backend='dask' if installed
 print("Simulation results:", simulation_results)
 ###############################################################################
