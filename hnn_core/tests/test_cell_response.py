@@ -24,7 +24,7 @@ def test_cell_response(tmp_path):
                                  spike_gids=spike_gids,
                                  spike_types=spike_types,
                                  times=sim_times)
-    
+
     assert set(cell_response.cell_types) == set(gid_ranges.keys())
     assert cell_response.spike_times_by_type['L2_basket'] == [[7.89], []]
     assert cell_response.spike_times_by_type['L5_pyramidal'] == [[], [4.2812]]

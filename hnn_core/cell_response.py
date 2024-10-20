@@ -156,7 +156,8 @@ class CellResponse(object):
     @property
     def cell_types(self):
         """Get unique cell types."""
-        spike_types_data = np.concatenate(np.array(self.spike_types, dtype=object))
+        spike_types_data = np.concatenate(np.array(self.spike_types,
+                                                   dtype=object))
         return np.unique(spike_types_data).tolist()
 
     @property
@@ -165,10 +166,11 @@ class CellResponse(object):
         spike_times = dict()
         for cell_type in self.cell_types:
             spike_times[cell_type] = list()
-            for trial_spike_times, trial_spike_types in zip(self.spike_times, self.spike_types):
+            for trial_spike_times, trial_spike_types in zip(self.spike_times,
+                                                            self.spike_types):
                 mask = np.isin(trial_spike_types, cell_type)
-                trial_cell_spike_times = np.array(trial_spike_times)[mask].tolist()
-                spike_times[cell_type].append(trial_cell_spike_times)
+                cell_spike_times = np.array(trial_spike_times)[mask].tolist()
+                spike_times[cell_type].append(cell_spike_times)
         return spike_times
 
     @property
