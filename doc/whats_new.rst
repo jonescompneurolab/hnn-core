@@ -21,6 +21,8 @@ Changelog
 - Add method to modify synaptic gains, by `Nick Tolley`_  and `George Dang`_
   in :gh:`897`
 
+- Update GUI to display "L2/3", by `Austin Soplata`_ in :gh:`904`
+
 Bug
 ~~~
 - Fix GUI over-plotting of loaded data where the app stalled and did not plot
