@@ -574,9 +574,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
 
 
 def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
-                       cell_types=['L2_basket', 'L2_pyramidal',
-                                   'L5_basket', 'L5_pyramidal'],
-                       colors=None,
+                       cell_types=None, colors=None,
                        ):
     """Plot the aggregate spiking activity according to cell type.
 
@@ -610,6 +608,13 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
     if isinstance(trial_idx, int):
         trial_idx = [trial_idx]
     _validate_type(trial_idx, list, 'trial_idx', 'int, list of int')
+
+    # validate cell types
+    if cell_types:
+        _validate_type(cell_types, list, 'cell_types', 'list of str')
+    else:
+        cell_types = ['L2_basket', 'L2_pyramidal',
+                      'L5_basket', 'L5_pyramidal']
 
     # validate colors argument
     if colors:
