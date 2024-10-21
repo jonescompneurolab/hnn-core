@@ -539,25 +539,49 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
     if trial_idx is None:
         trial_idx = list(range(n_trials))
 
+    # Get spike types
+    spike_types_data = np.concatenate(np.array(cell_response.spike_types,
+                                               dtype=object))
+    spike_types = np.unique(spike_types_data).tolist()
+
     # validate trial argument
     if isinstance(trial_idx, int):
         trial_idx = [trial_idx]
     _validate_type(trial_idx, list, 'trial_idx', 'int, list of int')
 
     # validate cell types
+    default_cell_types = ['L2_basket', 'L2_pyramidal',
+                          'L5_basket', 'L5_pyramidal']
     if cell_types:
         _validate_type(cell_types, list, 'cell_types', 'list of str')
-    else:
-        cell_types = ['L2_basket', 'L2_pyramidal',
-                      'L5_basket', 'L5_pyramidal']
+        if not set(cell_types).issubset(set(spike_types)):
+            raise ValueError("Invalid cell types provided. "
+                             f"Must be of set {spike_types}. "
+                             f"Got {cell_types}")
+        default_cell_types = cell_types
+
+    # Set default colors
+    default_colors = plt.rcParams['axes.prop_cycle'].by_key()['color'][:len(default_cell_types)]
+    cell_colors = {cell: color for cell, color in zip(default_cell_types, default_colors)}
 
     # validate colors argument
+    _validate_type(colors, (list, dict, None),'color', 'list of str, or dict')
     if colors:
-        _validate_type(colors, list, 'colors', 'list of str')
-        if len(colors) != len(cell_types):
-            raise ValueError(f"Number of colors must be equal to number of "
-                             f"cell types. {len(colors)} colors provided "
-                             f"for {len(cell_types)} cell types.")
+        if isinstance(colors, list):
+            if len(colors) != len(default_cell_types):
+                raise ValueError(
+                    f"Number of colors must be equal to number of "
+                    f"cell types. {len(colors)} colors provided "
+                    f"for {len(default_cell_types)} cell types.")
+            cell_colors = {cell: color for cell, color in zip(default_cell_types, colors)}
+
+        if isinstance(colors, dict):
+            # Check valid cell types
+            if not set(colors.keys()).issubset(set(spike_types)):
+                raise ValueError("Invalid cell types provided. "
+                                 f"Must be of set {spike_types}. "
+                                 f"Got {colors.keys()}")
+            cell_colors.update(colors)
 
     # Extract desired trials
     spike_times = np.concatenate(
@@ -570,16 +594,10 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
-    # Check if custom colors are provided, else use the default color cycle
-    if colors is None:
-        colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
-    color_iter = iter(colors)
-
     events = []
-    for cell_type in cell_types:
+    for cell_type, color in cell_colors.items():
         cell_type_gids = np.unique(spike_gids[spike_types == cell_type])
         cell_type_times, cell_type_ypos = [], []
-        color = next(color_iter)
 
         for gid in cell_type_gids:
             gid_time = spike_times[spike_gids == gid]
