@@ -279,6 +279,7 @@ class TestCellResponsePlotters:
         return net, dpls
 
     def test_spikes_raster_trial_idx(self, base_simulation_spikes):
+        """Plotting with different index arguments"""
         net, _ = base_simulation_spikes
 
         # Bad index argument raises error
@@ -297,6 +298,7 @@ class TestCellResponsePlotters:
             ), "No data plotted in raster plot"
 
     def test_spikes_raster_colors(self, base_simulation_spikes):
+        """Plotting with different color arguments"""
         net, _ = base_simulation_spikes
 
         def _get_line_hex_colors(fig):
