@@ -535,7 +535,7 @@
             <span class="n">button_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">])</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">cell_type_radio_buttons</span> <span class="o">=</span> <span class="n">RadioButtons</span><span class="p">(</span>
-            <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;L2 Pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;L5 Pyramidal&#39;</span><span class="p">],</span>
+            <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;L2/3 Pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;L5 Pyramidal&#39;</span><span class="p">],</span>
             <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Cell type:&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">cell_layer_radio_buttons</span> <span class="o">=</span> <span class="n">RadioButtons</span><span class="p">(</span>
@@ -2108,6 +2108,9 @@
     <span class="n">cell_parameters_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">cell_layer</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="k">if</span> <span class="n">cell_layer</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Biophysics&#39;</span><span class="p">,</span> <span class="s1">&#39;Geometry&#39;</span><span class="p">]:</span>
         <span class="n">cell_parameters_key</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">cell_type</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="c1"># Needed for the button to display L2/3, but the underlying data to use L2</span>
+    <span class="n">cell_parameters_key</span> <span class="o">=</span> <span class="n">cell_parameters_key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;L2/3&quot;</span><span class="p">,</span> <span class="s2">&quot;L2&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">cell_parameters_key</span> <span class="ow">in</span> <span class="n">cell_parameters_list</span><span class="p">:</span>
         <span class="n">cell_type_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>

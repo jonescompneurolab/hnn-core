@@ -462,7 +462,9 @@
                 <span class="sa">r</span><span class="s1">&#39;$\times$ </span><span class="si">{:.0f}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">scale_applied</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">ylabel</span><span class="p">,</span> <span class="n">multialignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">layer</span> <span class="o">==</span> <span class="s1">&#39;agg&#39;</span><span class="p">:</span>
-            <span class="n">title_str</span> <span class="o">=</span> <span class="s1">&#39;Aggregate (L2 + L5)&#39;</span>
+            <span class="n">title_str</span> <span class="o">=</span> <span class="s1">&#39;Aggregate (L2/3 + L5)&#39;</span>
+        <span class="k">elif</span> <span class="n">layer</span> <span class="o">==</span> <span class="s1">&#39;L2&#39;</span><span class="p">:</span>
+            <span class="n">title_str</span> <span class="o">=</span> <span class="s1">&#39;L2/3&#39;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">title_str</span> <span class="o">=</span> <span class="n">layer</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title_str</span><span class="p">)</span>
