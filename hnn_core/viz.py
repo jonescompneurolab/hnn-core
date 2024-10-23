@@ -626,11 +626,13 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
         default_cell_types = cell_types
 
     # Set default colors
-    default_colors = plt.rcParams['axes.prop_cycle'].by_key()['color'][:len(default_cell_types)]
-    cell_colors = {cell: color for cell, color in zip(default_cell_types, default_colors)}
+    default_colors = (plt.rcParams['axes.prop_cycle']
+                      .by_key()['color'][:len(default_cell_types)])
+    cell_colors = {cell: color
+                   for cell, color in zip(default_cell_types, default_colors)}
 
     # validate colors argument
-    _validate_type(colors, (list, dict, None),'color', 'list of str, or dict')
+    _validate_type(colors, (list, dict, None), 'color', 'list of str, or dict')
     if colors:
         if isinstance(colors, list):
             if len(colors) != len(default_cell_types):
@@ -638,7 +640,8 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
                     f"Number of colors must be equal to number of "
                     f"cell types. {len(colors)} colors provided "
                     f"for {len(default_cell_types)} cell types.")
-            cell_colors = {cell: color for cell, color in zip(default_cell_types, colors)}
+            cell_colors = {cell: color
+                           for cell, color in zip(default_cell_types, colors)}
 
         if isinstance(colors, dict):
             # Check valid cell types
