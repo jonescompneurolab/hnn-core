@@ -363,7 +363,6 @@ class TestCellResponsePlotters:
                                                  colors=dict_mapping)
 
 
-
 def test_network_plotter_init(setup_net):
     """Test init keywords of NetworkPlotter class."""
     net = setup_net
