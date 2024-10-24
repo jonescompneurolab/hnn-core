@@ -508,7 +508,9 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     return ax.get_figure()
 
 
-def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
+def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
+                       cell_types=None, colors=None,
+                       ):
     """Plot the aggregate spiking activity according to cell type.
 
     Parameters
@@ -521,6 +523,10 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
         An axis object from matplotlib. If None, a new figure is created.
     show : bool
         If True, show the figure.
+    cell_types: list of str
+        List of cell types to plot
+    colors: list of str | None
+        Optional custom colors to plot. Default will use the color cycler.
 
     Returns
     -------
@@ -533,9 +539,52 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
     if trial_idx is None:
         trial_idx = list(range(n_trials))
 
+    # Get spike types
+    spike_types_data = np.concatenate(np.array(cell_response.spike_types,
+                                               dtype=object))
+    spike_types = np.unique(spike_types_data).tolist()
+
+    # validate trial argument
     if isinstance(trial_idx, int):
         trial_idx = [trial_idx]
     _validate_type(trial_idx, list, 'trial_idx', 'int, list of int')
+
+    # validate cell types
+    default_cell_types = ['L2_basket', 'L2_pyramidal',
+                          'L5_basket', 'L5_pyramidal']
+    if cell_types:
+        _validate_type(cell_types, list, 'cell_types', 'list of str')
+        if not set(cell_types).issubset(set(spike_types)):
+            raise ValueError("Invalid cell types provided. "
+                             f"Must be of set {spike_types}. "
+                             f"Got {cell_types}")
+        default_cell_types = cell_types
+
+    # Set default colors
+    default_colors = (plt.rcParams['axes.prop_cycle']
+                      .by_key()['color'][:len(default_cell_types)])
+    cell_colors = {cell: color
+                   for cell, color in zip(default_cell_types, default_colors)}
+
+    # validate colors argument
+    _validate_type(colors, (list, dict, None), 'color', 'list of str, or dict')
+    if colors:
+        if isinstance(colors, list):
+            if len(colors) != len(default_cell_types):
+                raise ValueError(
+                    f"Number of colors must be equal to number of "
+                    f"cell types. {len(colors)} colors provided "
+                    f"for {len(default_cell_types)} cell types.")
+            cell_colors = {cell: color
+                           for cell, color in zip(default_cell_types, colors)}
+
+        if isinstance(colors, dict):
+            # Check valid cell types
+            if not set(colors.keys()).issubset(set(spike_types)):
+                raise ValueError("Invalid cell types provided. "
+                                 f"Must be of set {spike_types}. "
+                                 f"Got {colors.keys()}")
+            cell_colors.update(colors)
 
     # Extract desired trials
     spike_times = np.concatenate(
@@ -545,17 +594,14 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
     spike_gids = np.concatenate(
         np.array(cell_response._spike_gids, dtype=object)[trial_idx])
 
-    cell_types = ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']
-    cell_type_colors = {'L5_pyramidal': 'r', 'L5_basket': 'b',
-                        'L2_pyramidal': 'g', 'L2_basket': 'w'}
-
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
     events = []
-    for cell_type in cell_types:
+    for cell_type, color in cell_colors.items():
         cell_type_gids = np.unique(spike_gids[spike_types == cell_type])
         cell_type_times, cell_type_ypos = [], []
+
         for gid in cell_type_gids:
             gid_time = spike_times[spike_gids == gid]
             cell_type_times.append(gid_time)
@@ -564,16 +610,15 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True):
         if cell_type_times:
             events.append(
                 ax.eventplot(cell_type_times, lineoffsets=cell_type_ypos,
-                             color=cell_type_colors[cell_type],
+                             color=color,
                              label=cell_type, linelengths=5))
         else:
             events.append(
                 ax.eventplot([-1], lineoffsets=[-1],
-                             color=cell_type_colors[cell_type],
+                             color=color,
                              label=cell_type, linelengths=5))
 
     ax.legend(handles=[e[0] for e in events], loc=1)
-    ax.set_facecolor('k')
     ax.set_xlabel('Time (ms)')
     ax.get_yaxis().set_visible(False)
 
