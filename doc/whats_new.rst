@@ -33,6 +33,8 @@ Bug
 
 API
 ~~~
+- Add :func:`~hnn_core.CellResponse.spike_times_by_type` to get cell spiking times
+  organized by cell type, by `Mainak Jas`_ in :gh:`916`.
 
 .. _0.4:
 
