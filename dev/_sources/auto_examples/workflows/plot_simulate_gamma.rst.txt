@@ -256,7 +256,7 @@ time to reach steady state. Hence, we omit the first 50 ms in our analysis.
 
 
 .. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_002.png
-   :alt: Aggregate (L2 + L5)
+   :alt: Aggregate (L2/3 + L5)
    :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_002.png
    :class: sphx-glr-single-img
 
@@ -292,7 +292,7 @@ is applied to the entire duration of the simulation.
 
 
 .. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_003.png
-   :alt: Aggregate (L2 + L5)
+   :alt: Aggregate (L2/3 + L5)
    :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_003.png
    :class: sphx-glr-single-img
 
@@ -424,7 +424,7 @@ frequency from ~50 to ~65 Hz.
 
 
 .. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_006.png
-   :alt: Aggregate (L2 + L5)
+   :alt: Aggregate (L2/3 + L5)
    :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_gamma_006.png
    :class: sphx-glr-single-img
 
@@ -478,7 +478,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (2 minutes 2.352 seconds)
+   **Total running time of the script:** (2 minutes 38.344 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_gamma.py:

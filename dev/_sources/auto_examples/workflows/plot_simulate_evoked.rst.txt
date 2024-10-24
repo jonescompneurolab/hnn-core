@@ -261,7 +261,7 @@ Plot the amplitudes of the simulated aggregate dipole moments over time
 
 
 .. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_003.png
-   :alt: Aggregate (L2 + L5)
+   :alt: Aggregate (L2/3 + L5)
    :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_003.png
    :class: sphx-glr-single-img
 
@@ -293,7 +293,7 @@ a list of axes to ``ax`` to visualize the dipole moments separately.
 
 
 .. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_004.png
-   :alt: L2, L5, Aggregate (L2 + L5)
+   :alt: L2/3, L5, Aggregate (L2/3 + L5)
    :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_004.png
    :class: sphx-glr-single-img
 
@@ -392,7 +392,7 @@ object, this time we make a copy of it before smoothing and scaling.
     *
 
       .. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_005.png
-         :alt: Aggregate (L2 + L5)
+         :alt: Aggregate (L2/3 + L5)
          :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_evoked_005.png
          :class: sphx-glr-multi-img
 
@@ -453,7 +453,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 58.954 seconds)
+   **Total running time of the script:** (1 minutes 12.032 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_evoked.py:

@@ -118,7 +118,7 @@ start the simulation across the number of processors (cores) specified by
 
 
 .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_simulate_mpi_backend_001.png
-   :alt: Aggregate (L2 + L5)
+   :alt: Aggregate (L2/3 + L5)
    :srcset: /auto_examples/howto/images/sphx_glr_plot_simulate_mpi_backend_001.png
    :class: sphx-glr-single-img
 
@@ -172,7 +172,7 @@ start the simulation across the number of processors (cores) specified by
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 21.620 seconds)
+   **Total running time of the script:** (0 minutes 24.156 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_simulate_mpi_backend.py:
