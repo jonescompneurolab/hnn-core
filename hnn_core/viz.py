@@ -510,12 +510,11 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         if isinstance(invert_spike_types, str):
             invert_spike_types = [invert_spike_types]
 
-        invert_spike_types = {spike_type for spike_type in invert_spike_types}
-
         # Check that spike types to invert are correctly specified
         unique_inputs = set(spike_labels.values())
-        check_intersection = invert_spike_types.intersection(unique_inputs)
-        if not check_intersection == invert_spike_types:
+        unique_invert_inputs = set(invert_spike_types)
+        check_intersection = unique_invert_inputs.intersection(unique_inputs)
+        if not check_intersection == unique_invert_inputs:
             raise ValueError(
                 "Elements of 'invert_spike_types' must"
                 "map to valid input types"
