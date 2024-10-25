@@ -365,6 +365,21 @@ def test_invert_spike_types(setup_net):
 
     _ = simulate_dipole(net, dt=0.5, tstop=80., n_trials=1)
 
+    # test string input
+    net.cell_response.plot_spikes_hist(
+        spike_types=['evprox', 'evdist'],
+        invert_spike_types='evdist',
+        show=False,
+    )
+
+    # test case where all inputs are flipped
+    net.cell_response.plot_spikes_hist(
+        spike_types=['evprox', 'evdist'],
+        invert_spike_types=['evprox', 'evdist'],
+        show=False,
+    )
+
+    # test case where some inputs are flipped
     fig = net.cell_response.plot_spikes_hist(
         spike_types=['evprox', 'evdist'],
         invert_spike_types=['evdist'],
@@ -382,5 +397,8 @@ def test_invert_spike_types(setup_net):
     y2_max = max(y2.get_ylim())
 
     assert y1_max == y2_max
+
+    # check that data are plotted
+    assert y1_max > 1
 
     plt.close('all')
