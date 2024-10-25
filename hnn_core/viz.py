@@ -611,12 +611,13 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
             events.append(
                 ax.eventplot(cell_type_times, lineoffsets=cell_type_ypos,
                              color=color,
-                             label=cell_type, linelengths=5))
+                             label=cell_type, linelengths=1))
         else:
+            # Blank plot for no spiking
             events.append(
                 ax.eventplot([-1], lineoffsets=[-1],
                              color=color,
-                             label=cell_type, linelengths=5))
+                             label=cell_type, linelengths=1))
 
     ax.legend(handles=[e[0] for e in events], loc=1)
     ax.set_xlabel('Time (ms)')
