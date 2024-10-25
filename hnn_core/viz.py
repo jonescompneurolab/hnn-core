@@ -379,7 +379,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
 
         | Ex: ``['evdist', 'evprox']``
 
-        If None, all input spike types are plotted on the same y axis 
+        If None, all input spike types are plotted on the same y axis
     color : str | list of str | dict | None
         Input defining colors of plotted histograms. If str, all
         histograms plotted with same color. If list of str provided,
@@ -506,19 +506,21 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     else:
         if not isinstance(invert_spike_types, (str, list)):
             raise TypeError(
-                f"'invert_spike_types' must be a string or a list of strings")
+                "'invert_spike_types' must be a string or a list of strings")
         if isinstance(invert_spike_types, str):
             invert_spike_types = [invert_spike_types]
-        
+
         invert_spike_types = {spike_type for spike_type in invert_spike_types}
 
         # Check that spike types to invert are correctly specified
         unique_inputs = set(spike_labels.values())
-        if not invert_spike_types.intersection(unique_inputs) == invert_spike_types:
+        check_intersection = invert_spike_types.intersection(unique_inputs)
+        if not check_intersection == invert_spike_types:
             raise ValueError(
-                f"Elements of 'invert_spike_types' must map to valid input types"
+                "Elements of 'invert_spike_types' must"
+                "map to valid input types"
             )
-    
+
     # Initialize secondary axis
     ax1 = None
 
@@ -541,7 +543,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     if ax1 is not None:
         ax_ylim = ax.get_ylim()[1]
         ax1_ylim = ax1.get_ylim()[1]
-        
+
         y_max = max(ax_ylim, ax1_ylim)
         ax.set_ylim(0, y_max)
         ax1.set_ylim(0, y_max)
