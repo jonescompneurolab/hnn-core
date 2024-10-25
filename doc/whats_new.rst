@@ -18,10 +18,15 @@ Changelog
 - Add minimum spectral frequency widget to GUI for adjusting spectrogram
   frequency axis, by `George Dang`_ in :gh:`894`
 
-- Add method to modify synaptic gains, by `Nick Tolley`_  and `George Dang`_
-  in :gh:`897`
+- Add method to :class:`~hnn_core.Network` to modify synaptic gains, by
+  `Nick Tolley`_  and `George Dang`_ in :gh:`897`
 
 - Update GUI to display "L2/3", by `Austin Soplata`_ in :gh:`904`
+
+- Add argument to change colors of `plot_spikes_raster`, shortened line lengths
+  to prevent overlap, and added an argument for custom cell types, by
+  `George Dang`_ in :gh:`895`
+
 
 Bug
 ~~~
