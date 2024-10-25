@@ -504,7 +504,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     if invert_spike_types is None:
         invert_spike_types = list()
     else:
-        if isinstance(invert_spike_types, dict):
+        if not isinstance(invert_spike_types, (str, list)):
             raise TypeError(
                 f"'invert_spike_types' must be a string or a list of strings")
         if isinstance(invert_spike_types, str):
