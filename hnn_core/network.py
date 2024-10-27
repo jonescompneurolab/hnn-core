@@ -1133,8 +1133,8 @@ class Network:
                 self.external_drives[
                     drive['name']]['events'].append(event_times)
 
-    def add_tonic_bias(self, *, cell_type=None, sect_name='soma', bias_name='tonic',
-                       amplitude, t0=0, tstop=None):
+    def add_tonic_bias(self, *, cell_type=None, sect_name='soma',
+                       bias_name='tonic', amplitude, t0=0, tstop=None):
         """Attaches parameters of tonic bias input for given cell types
 
         Parameters
@@ -1146,7 +1146,7 @@ class Network:
         sect_name : str | 'soma'
             section the bias should be added to.
         bias_name : str | 'tonic'
-            The name of the bias (allows several biases to be added to the cell).
+            The name of the bias.
         amplitude: dict | float
             A dictionary of cell type keys (str) to amplitude values (float).
             Valid inputs for cell types are those listed in `net.cell_types`.
@@ -1186,7 +1186,7 @@ class Network:
 
             for _cell_type, _amplitude in amplitude.items():
                 _add_cell_type_bias(network=self, cell_type=_cell_type,
-                                    sect_name=sect_name,bias_name=bias_name,
+                                    sect_name=sect_name, bias_name=bias_name,
                                     amplitude=_amplitude,
                                     t_0=t0, t_stop=tstop)
 
@@ -1676,7 +1676,8 @@ def _add_cell_type_bias(network: Network, amplitude: Union[float, dict],
             network.external_biases[bias_name] = dict()
 
         if cell_type in network.external_biases[bias_name]:
-            raise ValueError(f'Bias named {bias_name} already defined for {cell_type}')
+            raise ValueError(f'Bias named {bias_name} already defined '
+                             f'for {cell_type}')
 
         cell_type_bias = {
             'amplitude': amplitude,

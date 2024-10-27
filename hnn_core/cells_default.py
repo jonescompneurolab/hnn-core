@@ -418,7 +418,7 @@ def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
     override_params['L5Pyr_soma_gnabar_hh2'] = 0.32
 
     gbar_ca = partial(
-        _linear_g_at_dist, gsoma=10., gdend=40., xkink=1501)   # Sarah's values: gsoma=10, gdend = 40
+        _linear_g_at_dist, gsoma=10., gdend=40., xkink=1501)
     gbar_na = partial(
         _linear_g_at_dist, gsoma=override_params['L5Pyr_soma_gnabar_hh2'],
         gdend=28e-4, xkink=962)

@@ -728,7 +728,8 @@ class Cell:
             dpp.ztan = seg_lens_z[-1]
         self.dipole = h.Vector().record(self.dpl_ref)
 
-    def create_tonic_bias(self, amplitude, t0, tstop, sect_name='soma',loc=0.5):
+    def create_tonic_bias(self, amplitude, t0, tstop, sect_name='soma',
+                          loc=0.5):
         """Create tonic bias at the soma.
 
         Parameters
