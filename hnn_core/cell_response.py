@@ -314,7 +314,8 @@ class CellResponse(object):
             cell_response=self, trial_idx=trial_idx, ax=ax, show=show)
 
     def plot_spikes_hist(self, trial_idx=None, ax=None, spike_types=None,
-                         color=None, show=True, **kwargs_hist):
+                         invert_spike_types=None, color=None, show=True,
+                         **kwargs_hist):
         """Plot the histogram of spiking activity across trials.
 
         Parameters
@@ -366,8 +367,9 @@ class CellResponse(object):
             The matplotlib figure handle.
         """
         return plot_spikes_hist(self, trial_idx=trial_idx, ax=ax,
-                                spike_types=spike_types, color=color,
-                                show=show, **kwargs_hist)
+                                spike_types=spike_types,
+                                invert_spike_types=invert_spike_types,
+                                color=color, show=show, **kwargs_hist)
 
     def to_dict(self):
         """Return cell response as a dict object.

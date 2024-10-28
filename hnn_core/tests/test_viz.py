@@ -342,3 +342,63 @@ def test_network_plotter_export(tmp_path, setup_net):
     assert path_out.is_file()
 
     plt.close('all')
+
+
+def test_invert_spike_types(setup_net):
+    """Test plotting a histogram with an inverted external drive"""
+    net = setup_net
+
+    weights_ampa = {'L2_pyramidal': 0.15, 'L5_pyramidal': 0.15}
+    syn_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
+
+    net.add_evoked_drive(
+        'evdist1', mu=63.53, sigma=3.85, numspikes=1,
+        weights_ampa=weights_ampa, location='distal',
+        synaptic_delays=syn_delays, event_seed=274
+    )
+
+    net.add_evoked_drive(
+        'evprox1', mu=26.61, sigma=2.47, numspikes=1,
+        weights_ampa=weights_ampa, location='proximal',
+        synaptic_delays=syn_delays, event_seed=274
+    )
+
+    _ = simulate_dipole(net, dt=0.5, tstop=80., n_trials=1)
+
+    # test string input
+    net.cell_response.plot_spikes_hist(
+        spike_types=['evprox', 'evdist'],
+        invert_spike_types='evdist',
+        show=False,
+    )
+
+    # test case where all inputs are flipped
+    net.cell_response.plot_spikes_hist(
+        spike_types=['evprox', 'evdist'],
+        invert_spike_types=['evprox', 'evdist'],
+        show=False,
+    )
+
+    # test case where some inputs are flipped
+    fig = net.cell_response.plot_spikes_hist(
+        spike_types=['evprox', 'evdist'],
+        invert_spike_types=['evdist'],
+        show=False,
+    )
+
+    # check that there are 2 y axes
+    assert len(fig.axes) == 2
+
+    # check for equivalency of both y axes
+    y1 = fig.axes[0]
+    y2 = fig.axes[1]
+
+    y1_max = max(y1.get_ylim())
+    y2_max = max(y2.get_ylim())
+
+    assert y1_max == y2_max
+
+    # check that data are plotted
+    assert y1_max > 1
+
+    plt.close('all')
