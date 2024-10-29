@@ -304,6 +304,10 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
             freqs = np.arange(min_f, max_f, step_f)
             n_cycles = freqs / 2.
 
+            if freqs[0] > freqs[-1]:
+                freqs = freqs[::-1]
+                ax.invert_yaxis()
+
             try:
                 dpls_copied[0].plot_tfr_morlet(
                     freqs,
