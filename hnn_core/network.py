@@ -1685,8 +1685,8 @@ def _add_cell_type_bias(network: Network, amplitude: Union[float, dict],
             'tstop': t_stop
         }
 
-        # Deprecation cyle?
-        # Ensures backwards compatibility with exisiting json
+        # Deprecation cycle?
+        # Ensures backwards compatibility with existing json
         # files (see test_read_configuration_json in test_io.py)
         if section is None:
             warnings.warn("Section for tonic bias is not defined."
