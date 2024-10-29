@@ -1682,7 +1682,12 @@ def _add_cell_type_bias(network: Network, amplitude: Union[float, dict],
         cell_type_bias = {
             'amplitude': amplitude,
             't0': t_0,
-            'tstop': t_stop,
-            'section': section
+            'tstop': t_stop
         }
+
+        # This ensures backwards compatibility with exisiting json
+        # files (see test_read_configuration_json in test_io.py)
+        if section != 'soma':
+            cell_type_bias['section'] = section
+
         network.external_biases[bias_name][cell_type] = cell_type_bias

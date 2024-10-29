@@ -730,7 +730,7 @@ class Cell:
 
     def create_tonic_bias(self, amplitude, t0, tstop, section='soma',
                           loc=0.5):
-        """Create tonic bias at the soma.
+        """Create tonic bias at defined section.
 
         Parameters
         ----------
