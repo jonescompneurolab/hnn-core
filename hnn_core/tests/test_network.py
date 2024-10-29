@@ -743,6 +743,7 @@ def test_add_cell_type():
 
 
 def test_tonic_biases():
+
     """Test tonic biases."""
     hnn_core_root = op.dirname(hnn_core.__file__)
 
@@ -858,6 +859,21 @@ def test_tonic_biases():
     with pytest.raises(ValueError, match=r'Bias named tonic already defined '
                        r'for.*$'):
         net.add_tonic_bias(amplitude=tonic_bias_2)
+
+    # non-existent section
+    net.external_biases = dict()
+
+    with pytest.raises(ValueError, match=r'section must be an existing '
+                       r'section of the current cell or None. '
+                       r'Got apical_4.'):
+        net.add_tonic_bias(amplitude={'L2_pyramidal': .5}, section='apical_4')
+
+    # deprecation warning when section not defined
+    net.external_biases = dict()
+    with pytest.warns(DeprecationWarning,
+                      match=r"Section for tonic bias is not defined."
+                      r"Defaulting to 'soma'."):
+        net.add_tonic_bias(amplitude={'L2_pyramidal': .5})
 
 
 def test_network_mesh():
