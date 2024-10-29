@@ -1133,7 +1133,7 @@ class Network:
                 self.external_drives[
                     drive['name']]['events'].append(event_times)
 
-    def add_tonic_bias(self, *, cell_type=None, sect_name='soma',
+    def add_tonic_bias(self, *, cell_type=None, section='soma',
                        bias_name='tonic', amplitude, t0=0, tstop=None):
         """Attaches parameters of tonic bias input for given cell types
 
@@ -1143,8 +1143,8 @@ class Network:
             The name of the cell type to add a tonic input. When supplied,
             a float value must be provided with the `amplitude` keyword.
             Valid inputs are those listed in  `net.cell_types`.
-        sect_name : str | 'soma'
-            section the bias should be added to.
+        section : str | 'soma'
+            section the bias should be applied to.
         bias_name : str | 'tonic'
             The name of the bias.
         amplitude: dict | float
@@ -1174,7 +1174,7 @@ class Network:
             _validate_type(amplitude, (float, int), 'amplitude')
 
             _add_cell_type_bias(network=self, cell_type=cell_type,
-                                sect_name=sect_name, bias_name=bias_name,
+                                section=section, bias_name=bias_name,
                                 amplitude=float(amplitude),
                                 t_0=t0, t_stop=tstop)
         else:
@@ -1186,7 +1186,7 @@ class Network:
 
             for _cell_type, _amplitude in amplitude.items():
                 _add_cell_type_bias(network=self, cell_type=_cell_type,
-                                    sect_name=sect_name, bias_name=bias_name,
+                                    section=section, bias_name=bias_name,
                                     amplitude=_amplitude,
                                     t_0=t0, t_stop=tstop)
 
@@ -1655,7 +1655,7 @@ class _NetworkDrive(dict):
 
 
 def _add_cell_type_bias(network: Network, amplitude: Union[float, dict],
-                        cell_type=None, sect_name='soma', bias_name='tonic',
+                        cell_type=None, section='soma', bias_name='tonic',
                         t_0=0, t_stop=None):
 
     if network is None:
@@ -1683,6 +1683,6 @@ def _add_cell_type_bias(network: Network, amplitude: Union[float, dict],
             'amplitude': amplitude,
             't0': t_0,
             'tstop': t_stop,
-            'sect_name': sect_name
+            'section': section
         }
         network.external_biases[bias_name][cell_type] = cell_type_bias
