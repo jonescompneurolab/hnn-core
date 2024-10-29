@@ -24,6 +24,9 @@ orphan: true
   to prevent overlap, and added an argument for custom cell types, by
   [George Dang][] in {gh}`895`
 
+- Added check for invalid Axes object in :func:`~hnn_core.viz.plot_cells`
+  function, by [Abdul Samad Siddiqui][] in {gh}`744`.
+
 ### Bug
 
 - Fix GUI over-plotting of loaded data where the app stalled and did not plot
