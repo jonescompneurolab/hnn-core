@@ -1133,7 +1133,7 @@ class Network:
                 self.external_drives[
                     drive['name']]['events'].append(event_times)
 
-    def add_tonic_bias(self, *, cell_type=None, section='soma',
+    def add_tonic_bias(self, *, cell_type=None, section=None,
                        bias_name='tonic', amplitude, t0=0, tstop=None):
         """Attaches parameters of tonic bias input for given cell types
 
@@ -1655,7 +1655,7 @@ class _NetworkDrive(dict):
 
 
 def _add_cell_type_bias(network: Network, amplitude: Union[float, dict],
-                        cell_type=None, section='soma', bias_name='tonic',
+                        cell_type=None, section=None, bias_name='tonic',
                         t_0=0, t_stop=None):
 
     if network is None:
@@ -1685,9 +1685,14 @@ def _add_cell_type_bias(network: Network, amplitude: Union[float, dict],
             'tstop': t_stop
         }
 
-        # This ensures backwards compatibility with exisiting json
+        # Deprecation cyle?
+        # Ensures backwards compatibility with exisiting json
         # files (see test_read_configuration_json in test_io.py)
-        if section != 'soma':
+        if section is None:
+            warnings.warn("Section for tonic bias is not defined."
+                          "Defaulting to 'soma'. Please define section.",
+                          DeprecationWarning, stacklevel=1)
+        else:
             cell_type_bias['section'] = section
 
         network.external_biases[bias_name][cell_type] = cell_type_bias
