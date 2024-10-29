@@ -1163,11 +1163,6 @@ class Network:
             multiple are specified with the `amplitude` keyword.
         """
 
-        if section is None:
-            warnings.warn("Section for tonic bias is not defined."
-                          "Defaulting to 'soma'.",
-                          DeprecationWarning, stacklevel=1)
-
         # old functionality single cell type - amplitude
         if cell_type is not None:
             warnings.warn('cell_type argument will be deprecated and '
@@ -1697,7 +1692,7 @@ def _add_cell_type_bias(network: Network, amplitude: Union[float, dict],
         if section is None:
             warnings.warn("Section for tonic bias is not defined."
                           "Defaulting to 'soma'.",
-                          UserWarning, stacklevel=1)
+                          DeprecationWarning, stacklevel=1)
         # error when section is defined that doesn't exist.
         elif section not in sections:
             raise ValueError(f'section must be an existing '
