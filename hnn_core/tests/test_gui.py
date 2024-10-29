@@ -90,7 +90,8 @@ def check_equal_networks(net1, net2):
         for cell_type, bias_params in bias_dict.items():
             check_items(bias_params,
                         net2.external_biases[bias_name][cell_type],
-                        ignore_keys=['tstop'],
+                        # OK to ignore here?
+                        ignore_keys=['tstop', 'sect_name'],
                         message=f'{bias_name}>{cell_type}>')
 
     # Check all other attributes

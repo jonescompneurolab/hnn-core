@@ -855,7 +855,8 @@ def test_tonic_biases():
     assert 'tonic' in net.external_biases
     assert 'L5_pyramidal' not in net.external_biases['tonic']
     assert net.external_biases['tonic']['L2_pyramidal']['t0'] == 0
-    with pytest.raises(ValueError, match=r'Tonic bias already defined for.*$'):
+    with pytest.raises(ValueError, match=r'Bias named tonic already defined '
+                       r'for.*$'):
         net.add_tonic_bias(amplitude=tonic_bias_2)
 
 
