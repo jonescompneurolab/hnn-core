@@ -248,7 +248,37 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
 
     elif plot_type == 'input histogram':
         if net_copied.cell_response:
-            net_copied.cell_response.plot_spikes_hist(ax=ax, show=False)
+            net_copied.external_drives.keys()
+
+            # initialize dictionary for drives, locations
+            drive_locations = dict()
+
+            for name, drive in net_copied.external_drives.items():
+                # remove all increments of default 'evdist' inputs
+                if 'evdist' in name:
+                    if 'evdist' not in drive_locations.keys():
+                        drive_locations['evdist'] = drive['location']
+                # remove all increments of default 'evprox' inputs
+                elif 'evprox' in name:
+                    if 'evprox' not in drive_locations.keys():
+                        drive_locations['evprox'] = drive['location']
+                else:
+                    drive_locations[name] = drive['location']
+
+            # all drives to plot, excluding 'evdist' and 'evprox' increments
+            all_drives = list(drive_locations.keys())
+
+            # initialize list for distal drives
+            distal_drives = list()
+
+            for name, location in drive_locations.items():
+                if location == 'distal':
+                    distal_drives.append(name)
+
+            net_copied.cell_response.plot_spikes_hist(
+                ax=ax, show=False, spike_types=all_drives,
+                invert_spike_types=distal_drives,
+            )
 
     elif plot_type == 'PSD':
         if len(dpls_copied) > 0:
