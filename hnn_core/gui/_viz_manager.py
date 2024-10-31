@@ -565,7 +565,7 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         style=analysis_style,
     )
     simulation_dipole_smooth = FloatText(
-        value=0,
+        value=30,
         description='Dipole Smooth Window (ms):',
         disabled=False,
         layout=layout,
