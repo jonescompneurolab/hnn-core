@@ -1759,7 +1759,7 @@ def on_upload_data_change(change, data, viz_manager, log_out):
         # Create a dipole plot
         _template_name = "[Blank] single figure"
         viz_manager.reset_fig_config_tabs(template_name=_template_name)
-        viz_manager.add_figure()
+        viz_manager.add_figure(default_smoothing=0)
         fig_name = _idx2figname(viz_manager.data['fig_idx']['idx'] - 1)
         process_configs = {'dipole_smooth': 0, 'dipole_scaling': 1}
         viz_manager._simulate_edit_figure(fig_name,
