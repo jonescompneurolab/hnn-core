@@ -860,6 +860,11 @@ def test_tonic_biases():
                        r'for.*$'):
         net.add_tonic_bias(amplitude=tonic_bias_2)
 
+    net = Network(params)
+    net.add_tonic_bias(amplitude=tonic_bias_2, bias_name='tonic_2', t0=100)
+    assert 'tonic_2' in net.external_biases
+    assert net.external_biases['tonic_2']['L2_pyramidal']['t0'] == 100
+
     # non-existent section
     net.external_biases = dict()
 
