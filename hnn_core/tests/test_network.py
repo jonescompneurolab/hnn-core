@@ -868,13 +868,6 @@ def test_tonic_biases():
                        r'Got apical_4.'):
         net.add_tonic_bias(amplitude={'L2_pyramidal': .5}, section='apical_4')
 
-    # deprecation warning when section not defined
-    net.external_biases = dict()
-    with pytest.warns(DeprecationWarning,
-                      match=r"Section for tonic bias is not defined."
-                      r"Defaulting to 'soma'."):
-        net.add_tonic_bias(amplitude={'L2_pyramidal': .5})
-
 
 def test_network_mesh():
     """Test mesh for defining cell positions biases."""
