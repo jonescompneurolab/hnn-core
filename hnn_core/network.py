@@ -1143,8 +1143,9 @@ class Network:
             The name of the cell type to add a tonic input. When supplied,
             a float value must be provided with the `amplitude` keyword.
             Valid inputs are those listed in  `net.cell_types`.
-        section : str | None
-            section the bias should be applied to.
+        section : str | 'soma'
+            name of cell section the bias should be applied to.
+            See net.cell_types[cell_type].sections.keys()
         bias_name : str | 'tonic'
             The name of the bias.
         amplitude: dict | float
@@ -1690,9 +1691,10 @@ def _add_cell_type_bias(network: Network, amplitude: Union[float, dict],
 
         # error when section is defined that doesn't exist.
         if section not in sections:
-            raise ValueError(f'section must be an existing '
-                             f'section of the current cell or None. '
-                             f'Got {section}.')
+            print(f"section must be one of "
+                  f"{sections}. Got {section}.")
+            raise ValueError(f"section must be one of "
+                             f"{sections}. Got {section}.")
         else:
             cell_type_bias['section'] = section
 
