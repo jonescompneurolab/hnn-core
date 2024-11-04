@@ -429,7 +429,6 @@ def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
     override_params['L5Pyr_dend_gbar_ca'] = gbar_ca
     override_params['L5Pyr_dend_gnabar_hh2'] = gbar_na
     override_params['L5Pyr_dend_gkbar_hh2'] = gbar_k
-    override_params['L5Pyr_soma_gbar_ca'] = 10.
 
     cell = pyramidal(cell_name, pos, override_params=override_params,
                      gid=gid)
