@@ -1691,10 +1691,8 @@ def _add_cell_type_bias(network: Network, amplitude: Union[float, dict],
 
         # error when section is defined that doesn't exist.
         if section not in sections:
-            print(f"section must be one of "
-                  f"{sections}. Got {section}.")
-            raise ValueError(f"section must be one of "
-                             f"{sections}. Got {section}.")
+            raise ValueError(f"section must be one of {sections}. "
+                             f"Got {section}.")
         else:
             cell_type_bias['section'] = section
 

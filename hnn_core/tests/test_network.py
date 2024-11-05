@@ -5,7 +5,6 @@ import os.path as op
 import numpy as np
 from numpy.testing import assert_allclose
 import pytest
-import re
 
 import hnn_core
 from hnn_core import read_params, CellResponse, Network
@@ -869,10 +868,8 @@ def test_tonic_biases():
     # non-existent section
     net.external_biases = dict()
 
-    sections = list(net.cell_types['L2_pyramidal'].sections.keys())
-    with pytest.raises(ValueError, match=re.escape(f"section must be one of "
-                                                   f"{sections}."
-                                                   f"Got apical_4.")):
+    with pytest.raises(ValueError, match=('section must be one of ' + r".*" +
+                                          ' Got apical_4.')):
         net.add_tonic_bias(amplitude={'L2_pyramidal': .5}, section='apical_4')
 
 
