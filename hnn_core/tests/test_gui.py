@@ -651,63 +651,48 @@ def test_gui_figure_overlay(setup_gui):
     plt.close('all')
 
 
-def test_gui_adaptive_spectrogram(setup_gui):
-    """Test the adaptive spectrogram functionality of the HNNGUI."""
-    gui = setup_gui
-
-    gui.run_button.click()
-    figid = 1
-    figname = f'Figure {figid}'
-    axname = 'ax1'
-    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
-                             'spectrogram', {}, 'clear')
-    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
-                             'spectrogram', {}, 'plot')
-    # make sure the colorbar is correctly added
-    assert any(['_cbar-ax-' in attr
-                for attr in dir(gui.viz_manager.figs[figid])]) is True
-    assert len(gui.viz_manager.figs[1].axes) == 3
-    # make sure the colorbar is safely removed
-    gui._simulate_viz_action("edit_figure", figname, axname, 'default',
-                             'spectrogram', {}, 'clear')
-    assert any(['_cbar-ax-' in attr
-                for attr in dir(gui.viz_manager.figs[figid])]) is False
-    assert len(gui.viz_manager.figs[1].axes) == 2
-    plt.close('all')
-
-
 def test_gui_visualization(setup_gui):
     """Tests updating a figure creates plots with data."""
 
     gui = setup_gui
     gui.run_button.click()
 
-    figid = 1
+    gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
+    gui._simulate_viz_action("add_fig")
+    figid = 2
     figname = f'Figure {figid}'
-    axname = 'ax1'
-    # Spectrogram has a separate test and does not need to be tested here
-    gui_plots_no_spectrogram = [s for s in _plot_types if s != 'spectrogram']
+    axname = 'ax0'
 
-    plot_types = ['current dipole',
-                  'layer2 dipole',
-                  'layer5 dipole',
-                  'input histogram',
-                  'spikes',
-                  'PSD',
-                  'network']
-    # Make sure all plot types are tested.
-    assert len(plot_types) == len(gui_plots_no_spectrogram)
-    assert all([name in gui_plots_no_spectrogram for name in plot_types])
-
-    for viz_type in plot_types:
+    for viz_type in _plot_types:
         gui._simulate_viz_action("edit_figure", figname,
                                  axname, 'default', viz_type, {}, 'clear')
         gui._simulate_viz_action("edit_figure", figname,
                                  axname, 'default', viz_type, {}, 'plot')
         # Check if data is plotted on the axes
-        assert len(gui.viz_manager.figs[figid].axes) == 2
-        # Check default figs have data on their axis
-        assert gui.viz_manager.figs[figid].axes[1].has_data()
+        assert gui.viz_manager.figs[figid].axes[0].has_data()
+
+        if viz_type == "input histogram":
+            # Check if the correct number of axes are present
+            # "input histogram" is a special case due to "plot_spikes_hist"
+            # using 2 axes
+            assert len(gui.viz_manager.figs[figid].axes) == 2
+        elif viz_type == "spectrogram":
+            # make sure the colorbar is correctly added
+            assert any(['_cbar-ax-' in attr
+                        for attr in dir(gui.viz_manager.figs[figid])]) is True
+            assert len(gui.viz_manager.figs[figid].axes) == 2
+
+            # make sure the colorbar is safely removed
+            gui._simulate_viz_action("edit_figure", figname, axname, 'default',
+                                     'spectrogram', {}, 'clear')
+            assert any(['_cbar-ax-' in attr
+                        for attr in dir(gui.viz_manager.figs[figid])]) is False
+            assert len(gui.viz_manager.figs[figid].axes) == 1
+
+        else:
+            # Check if the correct number of axes are present
+            assert len(gui.viz_manager.figs[figid].axes) == 1
+
     plt.close('all')
 
 
