@@ -562,7 +562,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         handles.extend(handles1)
         labels.extend(labels1)
 
-        ax.legend(handles, labels, loc='upper left')
+        ax1.legend(handles, labels, loc='upper left')
     else:
         ax.legend()
 
