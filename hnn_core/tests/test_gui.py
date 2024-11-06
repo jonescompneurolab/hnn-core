@@ -673,7 +673,8 @@ def test_gui_visualization(setup_gui):
 
         if viz_type == "input histogram":
             # Check if the correct number of axes are present
-            # "input histogram" is a special case due to "plot_spikes_hist" using 2 axes
+            # "input histogram" is a special case due to "plot_spikes_hist"
+            # using 2 axes
             assert len(gui.viz_manager.figs[figid].axes) == 2
         elif viz_type == "spectrogram":
             # make sure the colorbar is correctly added
