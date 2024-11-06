@@ -314,7 +314,7 @@ class CellResponse(object):
             cell_response=self, trial_idx=trial_idx, ax=ax, show=show)
 
     def plot_spikes_hist(self, trial_idx=None, ax=None, spike_types=None,
-                         invert_spike_types=None, color=None, show=True,
+                         color=None, invert_spike_types=None, show=True,
                          **kwargs_hist):
         """Plot the histogram of spiking activity across trials.
 

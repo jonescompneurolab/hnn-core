@@ -537,6 +537,8 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
                 ax1 = ax.twinx()
             ax1.hist(plot_data, bins,
                      label=spike_label, color=hist_color, **kwargs_hist)
+            # Need to add label for easy removal later
+            ax1.set_label("Inverted second axis")
 
     # Set the y-limits based on the maximum across both axes
     if ax1 is not None:
