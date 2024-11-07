@@ -670,6 +670,11 @@ def test_gui_visualization(setup_gui):
     for viz_type in _plot_types:
         gui._simulate_viz_action("edit_figure", figname,
                                  axname, 'default', viz_type, {}, 'clear')
+        # Check that extra axes have been successfully removed
+        assert len(gui.viz_manager.figs[figid].axes) == 1
+        # Check if data on the axes has been successfully cleared
+        assert not gui.viz_manager.figs[figid].axes[0].has_data()
+
         gui._simulate_viz_action("edit_figure", figname,
                                  axname, 'default', viz_type, {}, 'plot')
         # Check if data is plotted on the axes

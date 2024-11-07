@@ -538,7 +538,6 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
             ax1.hist(plot_data, bins,
                      label=spike_label, color=hist_color, **kwargs_hist)
             # Need to add label for easy removal later
-            ax1.set_label("Inverted second axis")
 
     # Set the y-limits based on the maximum across both axes
     if ax1 is not None:
@@ -549,6 +548,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         ax.set_ylim(0, y_max)
         ax1.set_ylim(0, y_max)
         ax1.invert_yaxis()
+        ax1.set_label("Inverted spike histogram")
 
     if len(cell_response.times) > 0:
         ax.set_xlim(left=0, right=cell_response.times[-1])
@@ -556,6 +556,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
         ax.set_xlim(left=0)
 
     ax.set_ylabel("Counts")
+    ax.set_label("Spike histogram")
 
     if ax1 is not None:
         # Combine legends
