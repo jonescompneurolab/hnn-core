@@ -513,6 +513,8 @@ def test_gui_add_data_dependent_figure(setup_gui):
     axes_config_tabs = gui.viz_manager.axes_config_tabs
     assert len(fig_tabs.children) == 0
     assert len(axes_config_tabs.children) == 0
+    # Spectrogram needs longer time for wavelet analysis
+    gui.widget_tstop.value = 500
 
     # after each run we should have a default fig
     gui.run_button.click()
@@ -655,6 +657,8 @@ def test_gui_visualization(setup_gui):
     """Tests updating a figure creates plots with data."""
 
     gui = setup_gui
+    # Spectrogram needs longer time for wavelet analysis
+    gui.widget_tstop.value = 500
     gui.run_button.click()
 
     gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
