@@ -526,10 +526,12 @@ def _clear_axis(b, widgets, data, fig_idx, fig, ax, widgets_plot_type,
                 existing_plots, add_plot_button):
     ax.clear()
 
-    # Remove "plot_spikes_hist"'s inverted second axes object, if exists
-    for axis in fig.axes:
-        if axis._label == "Inverted second axis":
-            axis.remove()
+    # Remove "plot_spikes_hist"'s inverted second axes object, if exists, and
+    # if the axis you are clearing is the spike histogram
+    if ax._label == "Spike histogram":
+        for axis in fig.axes:
+            if axis._label == "Inverted spike histogram":
+                axis.remove()
 
     # remove attached colorbar if exists
     if hasattr(fig, f'_cbar-ax-{id(ax)}'):
