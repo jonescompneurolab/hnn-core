@@ -1146,7 +1146,7 @@ class Network:
         section : str | 'soma'
             name of cell section the bias should be applied to.
             See net.cell_types[cell_type].sections.keys()
-        bias_name : str | 'tonic'
+        bias_name : str
             The name of the bias.
         amplitude: dict | float
             A dictionary of cell type keys (str) to amplitude values (float).
