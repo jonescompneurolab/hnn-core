@@ -743,7 +743,6 @@ def test_add_cell_type():
 
 
 def test_tonic_biases():
-
     """Test tonic biases."""
     hnn_core_root = op.dirname(hnn_core.__file__)
 
