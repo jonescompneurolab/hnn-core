@@ -1143,7 +1143,7 @@ class Network:
             The name of the cell type to add a tonic input. When supplied,
             a float value must be provided with the `amplitude` keyword.
             Valid inputs are those listed in  `net.cell_types`.
-        section : str | 'soma'
+        section : str
             name of cell section the bias should be applied to.
             See net.cell_types[cell_type].sections.keys()
         bias_name : str
