@@ -868,8 +868,8 @@ def test_tonic_biases():
     # non-existent section
     net.external_biases = dict()
 
-    with pytest.raises(ValueError, match=('section must be one of ' + r".*" +
-                                          ' Got apical_4.')):
+    with pytest.raises(ValueError, match=(r'section must be one of .*'
+                                                                    ' Got apical_4.')):
         net.add_tonic_bias(amplitude={'L2_pyramidal': .5}, section='apical_4')
 
 
