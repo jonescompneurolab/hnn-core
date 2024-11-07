@@ -41,6 +41,10 @@ API
 - Add :func:`~hnn_core.CellResponse.spike_times_by_type` to get cell spiking times
   organized by cell type, by `Mainak Jas`_ in :gh:`916`.
 
+- Add option to apply a tonic bias to any compartment of the cell, and option to 
+add multiple biases per simulation and cell :func:`hnn_core.network.add_tonic_bias`, 
+by `Katharina Duecker`_ in :gh:`922`.
+
 .. _0.4:
 
 0.4
