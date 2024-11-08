@@ -9,8 +9,16 @@ from hnn_core import simulate_dipole
 from ..dipole import _rmse
 
 
-def _rmse_evoked(initial_net, initial_params, set_params, predicted_params,
-                 update_params, obj_values, tstop, obj_fun_kwargs):
+def _rmse_evoked(
+    initial_net,
+    initial_params,
+    set_params,
+    predicted_params,
+    update_params,
+    obj_values,
+    tstop,
+    obj_fun_kwargs,
+):
     """The objective function for evoked responses.
 
     Parameters
@@ -56,8 +64,16 @@ def _rmse_evoked(initial_net, initial_params, set_params, predicted_params,
     return obj
 
 
-def _maximize_psd(initial_net, initial_params, set_params, predicted_params,
-                  update_params, obj_values, tstop, obj_fun_kwargs):
+def _maximize_psd(
+    initial_net,
+    initial_params,
+    set_params,
+    predicted_params,
+    update_params,
+    obj_values,
+    tstop,
+    obj_fun_kwargs,
+):
     """The objective function for PSDs.
 
     Parameters
@@ -113,16 +129,19 @@ def _maximize_psd(initial_net, initial_params, set_params, predicted_params,
     # resample?
 
     # get psd of simulated dpl
-    freqs_simulated, psd_simulated = periodogram(dpl.data['agg'], dpl.sfreq,
-                                                 window='hamming')
+    freqs_simulated, psd_simulated = periodogram(
+        dpl.data['agg'], dpl.sfreq, window='hamming'
+    )
 
     # for each f band
     f_bands_psds = list()
     for idx, f_band in enumerate(obj_fun_kwargs['f_bands']):
-        f_band_idx = np.where(np.logical_and(freqs_simulated >= f_band[0],
-                                             freqs_simulated <= f_band[1]))[0]
-        f_bands_psds.append(-obj_fun_kwargs['relative_bandpower'][idx] *
-                            sum(psd_simulated[f_band_idx]))
+        f_band_idx = np.where(
+            np.logical_and(freqs_simulated >= f_band[0], freqs_simulated <= f_band[1])
+        )[0]
+        f_bands_psds.append(
+            -obj_fun_kwargs['relative_bandpower'][idx] * sum(psd_simulated[f_band_idx])
+        )
 
     # grand sum
     obj = sum(f_bands_psds) / sum(psd_simulated)

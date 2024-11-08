@@ -11,9 +11,15 @@ import pytest
 
 import hnn_core
 from hnn_core import read_params, jones_2009_model
-from hnn_core.viz import (plot_cells, plot_dipole, plot_psd, plot_tfr_morlet,
-                          plot_connectivity_matrix, plot_cell_connectivity,
-                          NetworkPlotter)
+from hnn_core.viz import (
+    plot_cells,
+    plot_dipole,
+    plot_psd,
+    plot_tfr_morlet,
+    plot_connectivity_matrix,
+    plot_cell_connectivity,
+    NetworkPlotter,
+)
 from hnn_core.dipole import simulate_dipole
 
 matplotlib.use('agg')
@@ -33,8 +39,7 @@ def _fake_click(fig, ax, point, button=1):
     """Fake a click at a point within axes."""
     x, y = ax.transData.transform_point(point)
     button_press_event = backend_bases.MouseEvent(
-        name='button_press_event', canvas=fig.canvas,
-        x=x, y=y, button=button
+        name='button_press_event', canvas=fig.canvas, x=x, y=y, button=button
     )
     fig.canvas.callbacks.process('button_press_event', button_press_event)
 
@@ -77,8 +82,7 @@ def test_network_visualization(setup_net):
         cell_type.plot_morphology(color='r')
 
         sections = list(cell_type.sections.keys())
-        section_color = {sect_name: f'C{idx}' for
-                         idx, sect_name in enumerate(sections)}
+        section_color = {sect_name: f'C{idx}' for idx, sect_name in enumerate(sections)}
         cell_type.plot_morphology(color=section_color)
 
     cell_type = net.cell_types['L2_basket']
@@ -91,8 +95,9 @@ def test_network_visualization(setup_net):
 
     # test for invalid Axes object to plot_cells
     fig, axes = plt.subplots(1, 1)
-    with pytest.raises(TypeError,
-                       match="'ax' to be an instance of Axes3D, but got Axes"):
+    with pytest.raises(
+        TypeError, match="'ax' to be an instance of Axes3D, but got Axes"
+    ):
         plot_cells(net, ax=axes, show=False)
     cell_type.plot_morphology(pos=(1.0, 2.0, 3.0))
     with pytest.raises(TypeError, match='pos must be'):
@@ -107,10 +112,16 @@ def test_network_visualization(setup_net):
     # test interactive clicking updates the position of src_cell in plot
     del net.connectivity[-1]
     conn_idx = 15
-    net.add_connection(net.gid_ranges['L2_pyramidal'][::2],
-                       'L5_basket', 'soma',
-                       'ampa', 0.00025, 1.0, lamtha=3.0,
-                       probability=0.8)
+    net.add_connection(
+        net.gid_ranges['L2_pyramidal'][::2],
+        'L5_basket',
+        'soma',
+        'ampa',
+        0.00025,
+        1.0,
+        lamtha=3.0,
+        probability=0.8,
+    )
     fig = plot_cell_connectivity(net, conn_idx, show=False)
     ax_src, ax_target, _ = fig.axes
 
@@ -126,26 +137,42 @@ def test_dipole_visualization(setup_net):
     net = setup_net
 
     # Test plotting of simulations with no spiking
-    dpls = simulate_dipole(net, tstop=100., n_trials=1)
+    dpls = simulate_dipole(net, tstop=100.0, n_trials=1)
     net.cell_response.plot_spikes_raster()
     net.cell_response.plot_spikes_hist()
 
     weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
-    syn_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
+    syn_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0}
 
     net.add_bursty_drive(
-        'beta_prox', tstart=0., burst_rate=25, burst_std=5,
-        numspikes=1, spike_isi=0, n_drive_cells=11, location='proximal',
-        weights_ampa=weights_ampa, synaptic_delays=syn_delays,
-        event_seed=14)
+        'beta_prox',
+        tstart=0.0,
+        burst_rate=25,
+        burst_std=5,
+        numspikes=1,
+        spike_isi=0,
+        n_drive_cells=11,
+        location='proximal',
+        weights_ampa=weights_ampa,
+        synaptic_delays=syn_delays,
+        event_seed=14,
+    )
 
     net.add_bursty_drive(
-        'beta_dist', tstart=0., burst_rate=25, burst_std=5,
-        numspikes=1, spike_isi=0, n_drive_cells=11, location='distal',
-        weights_ampa=weights_ampa, synaptic_delays=syn_delays,
-        event_seed=14)
+        'beta_dist',
+        tstart=0.0,
+        burst_rate=25,
+        burst_std=5,
+        numspikes=1,
+        spike_isi=0,
+        n_drive_cells=11,
+        location='distal',
+        weights_ampa=weights_ampa,
+        synaptic_delays=syn_delays,
+        event_seed=14,
+    )
 
-    dpls = simulate_dipole(net, tstop=100., n_trials=2, record_vsec='all')
+    dpls = simulate_dipole(net, tstop=100.0, n_trials=2, record_vsec='all')
     fig = dpls[0].plot()  # plot the first dipole alone
     axes = fig.get_axes()[0]
     dpls[0].copy().smooth(window_len=10).plot(ax=axes)  # add smoothed versions
@@ -153,9 +180,10 @@ def test_dipole_visualization(setup_net):
 
     # test decimation options
     plot_dipole(dpls[0], decim=2, show=False)
-    for dec in [-1, [2, 2.]]:
-        with pytest.raises(ValueError,
-                           match='each decimation factor must be a positive'):
+    for dec in [-1, [2, 2.0]]:
+        with pytest.raises(
+            ValueError, match='each decimation factor must be a positive'
+        ):
             plot_dipole(dpls[0], decim=dec, show=False)
 
     # test plotting multiple dipoles as overlay
@@ -172,30 +200,24 @@ def test_dipole_visualization(setup_net):
     fig, axes = plt.subplots(nrows=3, ncols=1)
     fig = plot_dipole(dpls, show=False, ax=axes, layer=['L2', 'L5', 'agg'])
     fig, axes = plt.subplots(nrows=3, ncols=1)
-    fig = plot_dipole(dpls,
-                      show=False,
-                      ax=[axes[0], axes[1], axes[2]],
-                      layer=['L2', 'L5', 'agg'])
+    fig = plot_dipole(
+        dpls, show=False, ax=[axes[0], axes[1], axes[2]], layer=['L2', 'L5', 'agg']
+    )
 
     plt.close('all')
 
-    with pytest.raises(AssertionError,
-                       match="ax and layer should have the same size"):
+    with pytest.raises(AssertionError, match='ax and layer should have the same size'):
         fig, axes = plt.subplots(nrows=3, ncols=1)
         fig = plot_dipole(dpls, show=False, ax=axes, layer=['L2', 'L5'])
 
     # multiple TFRs get averaged
-    fig = plot_tfr_morlet(dpls, freqs=np.arange(23, 26, 1.), n_cycles=3,
-                          show=False)
+    fig = plot_tfr_morlet(dpls, freqs=np.arange(23, 26, 1.0), n_cycles=3, show=False)
 
-    with pytest.raises(RuntimeError,
-                       match="All dipoles must be scaled equally!"):
+    with pytest.raises(RuntimeError, match='All dipoles must be scaled equally!'):
         plot_dipole([dpls[0].copy().scale(10), dpls[1].copy().scale(20)])
-    with pytest.raises(RuntimeError,
-                       match="All dipoles must be scaled equally!"):
+    with pytest.raises(RuntimeError, match='All dipoles must be scaled equally!'):
         plot_psd([dpls[0].copy().scale(10), dpls[1].copy().scale(20)])
-    with pytest.raises(RuntimeError,
-                       match="All dipoles must be sampled equally!"):
+    with pytest.raises(RuntimeError, match='All dipoles must be sampled equally!'):
         dpl_sfreq = dpls[0].copy()
         dpl_sfreq.sfreq /= 10
         plot_psd([dpls[0], dpl_sfreq])
@@ -205,36 +227,34 @@ def test_dipole_visualization(setup_net):
         plot_dipole(dpls[0], show=False, tmin=10, tmax=100)
 
     # test cell response plotting
-    with pytest.raises(TypeError, match="trial_idx must be an instance of"):
+    with pytest.raises(TypeError, match='trial_idx must be an instance of'):
         net.cell_response.plot_spikes_raster(trial_idx='blah', show=False)
     net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
     fig = net.cell_response.plot_spikes_raster(trial_idx=[0, 1], show=False)
-    assert len(fig.axes[0].collections) > 0, "No data plotted in raster plot"
+    assert len(fig.axes[0].collections) > 0, 'No data plotted in raster plot'
 
-    with pytest.raises(TypeError, match="trial_idx must be an instance of"):
+    with pytest.raises(TypeError, match='trial_idx must be an instance of'):
         net.cell_response.plot_spikes_hist(trial_idx='blah')
     net.cell_response.plot_spikes_hist(trial_idx=0, show=False)
     net.cell_response.plot_spikes_hist(trial_idx=[0, 1], show=False)
     net.cell_response.plot_spikes_hist(color='r')
     net.cell_response.plot_spikes_hist(color=['C0', 'C1'])
-    net.cell_response.plot_spikes_hist(color={'beta_prox': 'r',
-                                              'beta_dist': 'g'})
+    net.cell_response.plot_spikes_hist(color={'beta_prox': 'r', 'beta_dist': 'g'})
     net.cell_response.plot_spikes_hist(
-        spike_types={'group1': ['beta_prox', 'beta_dist']},
-        color={'group1': 'r'})
+        spike_types={'group1': ['beta_prox', 'beta_dist']}, color={'group1': 'r'}
+    )
     net.cell_response.plot_spikes_hist(
-        spike_types={'group1': ['beta']}, color={'group1': 'r'})
+        spike_types={'group1': ['beta']}, color={'group1': 'r'}
+    )
 
-    with pytest.raises(TypeError, match="color must be an instance of"):
+    with pytest.raises(TypeError, match='color must be an instance of'):
         net.cell_response.plot_spikes_hist(color=123)
     with pytest.raises(ValueError):
         net.cell_response.plot_spikes_hist(color='z')
     with pytest.raises(ValueError):
-        net.cell_response.plot_spikes_hist(color={'beta_prox': 'z',
-                                                  'beta_dist': 'g'})
-    with pytest.raises(TypeError, match="Dictionary values of color must"):
-        net.cell_response.plot_spikes_hist(color={'beta_prox': 123,
-                                                  'beta_dist': 'g'})
+        net.cell_response.plot_spikes_hist(color={'beta_prox': 'z', 'beta_dist': 'g'})
+    with pytest.raises(TypeError, match='Dictionary values of color must'):
+        net.cell_response.plot_spikes_hist(color={'beta_prox': 123, 'beta_dist': 'g'})
     with pytest.raises(ValueError, match="'beta_dist' must be"):
         net.cell_response.plot_spikes_hist(color={'beta_prox': 'r'})
     plt.close('all')
@@ -244,8 +264,18 @@ def test_network_plotter_init(setup_net):
     """Test init keywords of NetworkPlotter class."""
     net = setup_net
     # test NetworkPlotter class
-    args = ['xlim', 'ylim', 'zlim', 'elev', 'azim', 'vmin', 'vmax',
-            'trial_idx', 'time_idx', 'colorbar']
+    args = [
+        'xlim',
+        'ylim',
+        'zlim',
+        'elev',
+        'azim',
+        'vmin',
+        'vmax',
+        'trial_idx',
+        'time_idx',
+        'colorbar',
+    ]
     for arg in args:
         with pytest.raises(TypeError, match=f'{arg} must be'):
             net_plot = NetworkPlotter(net, **{arg: 'blah'})
@@ -298,17 +328,35 @@ def test_network_plotter_setter(setup_net):
     net = setup_net
     net_plot = NetworkPlotter(net)
     # Type check errors
-    args = ['xlim', 'ylim', 'zlim', 'elev', 'azim', 'vmin', 'vmax',
-            'trial_idx', 'time_idx', 'colorbar']
+    args = [
+        'xlim',
+        'ylim',
+        'zlim',
+        'elev',
+        'azim',
+        'vmin',
+        'vmax',
+        'trial_idx',
+        'time_idx',
+        'colorbar',
+    ]
     for arg in args:
         with pytest.raises(TypeError, match=f'{arg} must be'):
             setattr(net_plot, arg, 'blah')
 
     # Check that the setters and getters work
-    arg_dict = {'xlim': (-100, 100), 'ylim': (-100, 100), 'zlim': (-100, 100),
-                'elev': 10, 'azim': 10, 'vmin': 0, 'vmax': 100,
-                'bgcolor': 'white', 'voltage_colormap': 'jet',
-                'colorbar': False}
+    arg_dict = {
+        'xlim': (-100, 100),
+        'ylim': (-100, 100),
+        'zlim': (-100, 100),
+        'elev': 10,
+        'azim': 10,
+        'vmin': 0,
+        'vmax': 100,
+        'bgcolor': 'white',
+        'voltage_colormap': 'jet',
+        'colorbar': False,
+    }
     for arg, val in arg_dict.items():
         setattr(net_plot, arg, val)
         assert getattr(net_plot, arg) == val
@@ -328,8 +376,7 @@ def test_network_plotter_setter(setup_net):
 def test_network_plotter_export(tmp_path, setup_net):
     """Test NetworkPlotter class export methods."""
     net = setup_net
-    _ = simulate_dipole(net, dt=0.5, tstop=10, n_trials=1,
-                        record_vsec='all')
+    _ = simulate_dipole(net, dt=0.5, tstop=10, n_trials=1, record_vsec='all')
     net_plot = NetworkPlotter(net)
 
     # Check no file is already written
@@ -349,21 +396,31 @@ def test_invert_spike_types(setup_net):
     net = setup_net
 
     weights_ampa = {'L2_pyramidal': 0.15, 'L5_pyramidal': 0.15}
-    syn_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
+    syn_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0}
 
     net.add_evoked_drive(
-        'evdist1', mu=63.53, sigma=3.85, numspikes=1,
-        weights_ampa=weights_ampa, location='distal',
-        synaptic_delays=syn_delays, event_seed=274
+        'evdist1',
+        mu=63.53,
+        sigma=3.85,
+        numspikes=1,
+        weights_ampa=weights_ampa,
+        location='distal',
+        synaptic_delays=syn_delays,
+        event_seed=274,
     )
 
     net.add_evoked_drive(
-        'evprox1', mu=26.61, sigma=2.47, numspikes=1,
-        weights_ampa=weights_ampa, location='proximal',
-        synaptic_delays=syn_delays, event_seed=274
+        'evprox1',
+        mu=26.61,
+        sigma=2.47,
+        numspikes=1,
+        weights_ampa=weights_ampa,
+        location='proximal',
+        synaptic_delays=syn_delays,
+        event_seed=274,
     )
 
-    _ = simulate_dipole(net, dt=0.5, tstop=80., n_trials=1)
+    _ = simulate_dipole(net, dt=0.5, tstop=80.0, n_trials=1)
 
     # test string input
     net.cell_response.plot_spikes_hist(

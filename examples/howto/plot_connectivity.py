@@ -10,12 +10,10 @@ This example demonstrates how to modify the network connectivity.
 
 # sphinx_gallery_thumbnail_number = 2
 
-import os.path as op
 
 ###############################################################################
 # Let us import ``hnn_core``.
 
-import hnn_core
 from hnn_core import jones_2009_model, simulate_dipole
 
 ###############################################################################
@@ -42,8 +40,12 @@ from hnn_core.network import pick_connection
 print(len(net_erp.connectivity))
 
 conn_indices = pick_connection(
-    net=net_erp, src_gids='L5_basket', target_gids='L5_pyramidal',
-    loc='soma', receptor='gabaa')
+    net=net_erp,
+    src_gids='L5_basket',
+    target_gids='L5_pyramidal',
+    loc='soma',
+    receptor='gabaa',
+)
 conn_idx = conn_indices[0]
 print(net_erp.connectivity[conn_idx])
 plot_connectivity_matrix(net_erp, conn_idx)
@@ -57,8 +59,9 @@ fig = plot_cell_connectivity(net_erp, conn_idx, src_gid)
 # Data recorded during simulations are stored under
 # :class:`~hnn_core.Cell_Response`. Spiking activity can be visualized after
 # a simulation is using :meth:`~hnn_core.Cell_Response.plot_spikes_raster`
-dpl_erp = simulate_dipole(net_erp, tstop=170., n_trials=1)
+dpl_erp = simulate_dipole(net_erp, tstop=170.0, n_trials=1)
 net_erp.cell_response.plot_spikes_raster()
+
 
 ###############################################################################
 # We can also define our own connections to test the effect of different
@@ -80,30 +83,46 @@ def get_network(probability=1.0):
     src = 'L5_pyramidal'
     conn_seed = 3
     for target in ['L5_pyramidal', 'L2_basket']:
-        net.add_connection(src, target, location, receptor,
-                           delay, weight, lamtha, probability=probability,
-                           conn_seed=conn_seed)
+        net.add_connection(
+            src,
+            target,
+            location,
+            receptor,
+            delay,
+            weight,
+            lamtha,
+            probability=probability,
+            conn_seed=conn_seed,
+        )
 
     # Basket cell connections
     location, receptor = 'soma', 'gabaa'
     weight, delay, lamtha = 1.0, 1.0, 70
     src = 'L2_basket'
     for target in ['L5_pyramidal', 'L2_basket']:
-        net.add_connection(src, target, location, receptor,
-                           delay, weight, lamtha, probability=probability,
-                           conn_seed=conn_seed)
+        net.add_connection(
+            src,
+            target,
+            location,
+            receptor,
+            delay,
+            weight,
+            lamtha,
+            probability=probability,
+            conn_seed=conn_seed,
+        )
     return net
 
 
 net_all = get_network()
-dpl_all = simulate_dipole(net_all, tstop=170., n_trials=1)
+dpl_all = simulate_dipole(net_all, tstop=170.0, n_trials=1)
 
 ###############################################################################
 # We can additionally use the ``probability`` argument to create a sparse
 # connectivity pattern instead of all-to-all. Let's try creating the same
 # network with a 10% chance of cells connecting to each other.
 net_sparse = get_network(probability=0.1)
-dpl_sparse = simulate_dipole(net_sparse, tstop=170., n_trials=1)
+dpl_sparse = simulate_dipole(net_sparse, tstop=170.0, n_trials=1)
 
 ###############################################################################
 # With the previous connection pattern there appears to be synchronous rhythmic
@@ -117,8 +136,12 @@ net_sparse.cell_response.plot_spikes_raster()
 ###############################################################################
 # We can plot the sparse connectivity pattern between cell populations.
 conn_indices = pick_connection(
-    net=net_sparse, src_gids='L2_basket', target_gids='L2_basket',
-    loc='soma', receptor='gabaa')
+    net=net_sparse,
+    src_gids='L2_basket',
+    target_gids='L2_basket',
+    loc='soma',
+    receptor='gabaa',
+)
 
 conn_idx = conn_indices[0]
 plot_connectivity_matrix(net_sparse, conn_idx)
@@ -136,16 +159,17 @@ plot_cell_connectivity(net_sparse, conn_idx, src_gid=src_gid)
 # the aggregate current dipole.
 import matplotlib.pyplot as plt
 from hnn_core.viz import plot_dipole
-fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6),
-                         constrained_layout=True)
+
+fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6), constrained_layout=True)
 
 window_len = 30  # ms
 scaling_factor = 3000
-dpls = [dpl_erp[0].smooth(window_len).scale(scaling_factor),
-        dpl_all[0].smooth(window_len).scale(scaling_factor),
-        dpl_sparse[0].smooth(window_len).scale(scaling_factor)]
+dpls = [
+    dpl_erp[0].smooth(window_len).scale(scaling_factor),
+    dpl_all[0].smooth(window_len).scale(scaling_factor),
+    dpl_sparse[0].smooth(window_len).scale(scaling_factor),
+]
 
 plot_dipole(dpls, ax=axes[0], layer='agg', show=False)
 axes[0].legend(['Default', 'Custom All', 'Custom Sparse'])
-net_erp.cell_response.plot_spikes_hist(
-    ax=axes[1], spike_types=['evprox', 'evdist'])
+net_erp.cell_response.plot_spikes_hist(ax=axes[1], spike_types=['evprox', 'evdist'])

@@ -18,9 +18,7 @@ without the need to install and configure MPI.
 
 ###############################################################################
 # Let us import hnn_core
-import os.path as op
 
-import hnn_core
 from hnn_core import simulate_dipole, jones_2009_model
 
 ###############################################################################
@@ -35,9 +33,17 @@ net = jones_2009_model()
 
 weights_ampa = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
 net.add_bursty_drive(
-    'bursty', tstart=50., burst_rate=10, burst_std=20., numspikes=2,
-    spike_isi=10, n_drive_cells=10, location='distal',
-    weights_ampa=weights_ampa, event_seed=278)
+    'bursty',
+    tstart=50.0,
+    burst_rate=10,
+    burst_std=20.0,
+    numspikes=2,
+    spike_isi=10,
+    n_drive_cells=10,
+    location='distal',
+    weights_ampa=weights_ampa,
+    event_seed=278,
+)
 
 ###############################################################################
 # Finally, to simulate we use the
@@ -48,7 +54,7 @@ net.add_bursty_drive(
 from hnn_core import MPIBackend
 
 with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
-    dpls = simulate_dipole(net, tstop=310., n_trials=1)
+    dpls = simulate_dipole(net, tstop=310.0, n_trials=1)
 
 trial_idx = 0
 dpls[trial_idx].plot()

@@ -40,17 +40,28 @@ def test_gid_assignment():
 
     net = jones_2009_model(add_drives_from_params=False)
     weights_ampa = {'L2_basket': 1.0, 'L2_pyramidal': 2.0, 'L5_pyramidal': 3.0}
-    syn_delays = {'L2_basket': .1, 'L2_pyramidal': .2, 'L5_pyramidal': .3}
+    syn_delays = {'L2_basket': 0.1, 'L2_pyramidal': 0.2, 'L5_pyramidal': 0.3}
 
     net.add_bursty_drive(
-        'bursty_dist', location='distal', burst_rate=10,
-        weights_ampa=weights_ampa, synaptic_delays=syn_delays,
-        cell_specific=False, n_drive_cells=5)
+        'bursty_dist',
+        location='distal',
+        burst_rate=10,
+        weights_ampa=weights_ampa,
+        synaptic_delays=syn_delays,
+        cell_specific=False,
+        n_drive_cells=5,
+    )
     net.add_evoked_drive(
-        'evoked_prox', mu=1.0, sigma=1.0, numspikes=1,
-        weights_ampa=weights_ampa, location='proximal',
-        synaptic_delays=syn_delays, cell_specific=True,
-        n_drive_cells='n_cells')
+        'evoked_prox',
+        mu=1.0,
+        sigma=1.0,
+        numspikes=1,
+        weights_ampa=weights_ampa,
+        location='proximal',
+        synaptic_delays=syn_delays,
+        cell_specific=True,
+        n_drive_cells='n_cells',
+    )
     net._instantiate_drives(tstop=20, n_trials=2)
 
     all_gids = list()
@@ -77,7 +88,7 @@ def test_gid_assignment():
 
 
 @pytest.mark.incremental
-class TestParallelBackends():
+class TestParallelBackends:
     dpls_reduced_mpi = None
     dpls_reduced_default = None
     dpls_reduced_joblib = None
@@ -87,20 +98,26 @@ class TestParallelBackends():
         global dpls_reduced_default
         dpls_reduced_default, _ = run_hnn_core_fixture(None, reduced=True)
         # test consistency across all parallel backends for multiple trials
-        assert_raises(AssertionError, assert_array_equal,
-                      dpls_reduced_default[0].data['agg'],
-                      dpls_reduced_default[1].data['agg'])
+        assert_raises(
+            AssertionError,
+            assert_array_equal,
+            dpls_reduced_default[0].data['agg'],
+            dpls_reduced_default[1].data['agg'],
+        )
 
     def test_run_joblibbackend(self, run_hnn_core_fixture):
         """Test consistency between joblib backend simulation with master"""
         global dpls_reduced_default, dpls_reduced_joblib
 
-        dpls_reduced_joblib, _ = run_hnn_core_fixture(backend='joblib',
-                                                      n_jobs=2, reduced=True)
+        dpls_reduced_joblib, _ = run_hnn_core_fixture(
+            backend='joblib', n_jobs=2, reduced=True
+        )
 
         for trial_idx in range(len(dpls_reduced_default)):
-            assert_array_equal(dpls_reduced_default[trial_idx].data['agg'],
-                               dpls_reduced_joblib[trial_idx].data['agg'])
+            assert_array_equal(
+                dpls_reduced_default[trial_idx].data['agg'],
+                dpls_reduced_joblib[trial_idx].data['agg'],
+            )
 
     @requires_mpi4py
     @requires_psutil
@@ -119,9 +136,12 @@ class TestParallelBackends():
         dpls_reduced_mpi, _ = run_hnn_core_fixture(backend='mpi', reduced=True)
         for trial_idx in range(len(dpls_reduced_default)):
             # account for rounding error incured during MPI parallelization
-            assert_allclose(dpls_reduced_default[trial_idx].data['agg'],
-                            dpls_reduced_mpi[trial_idx].data['agg'], rtol=0,
-                            atol=1e-14)
+            assert_allclose(
+                dpls_reduced_default[trial_idx].data['agg'],
+                dpls_reduced_mpi[trial_idx].data['agg'],
+                rtol=0,
+                atol=1e-14,
+            )
 
     @requires_mpi4py
     @requires_psutil
@@ -130,19 +150,16 @@ class TestParallelBackends():
         hnn_core_root = op.dirname(hnn_core.__file__)
         params_fname = op.join(hnn_core_root, 'param', 'default.json')
         params = read_params(params_fname)
-        params.update({'t_evprox_1': 5,
-                       't_evdist_1': 10,
-                       't_evprox_2': 20,
-                       'N_trials': 2})
-        net = jones_2009_model(params, add_drives_from_params=True,
-                               mesh_shape=(3, 3))
+        params.update(
+            {'t_evprox_1': 5, 't_evdist_1': 10, 't_evprox_2': 20, 'N_trials': 2}
+        )
+        net = jones_2009_model(params, add_drives_from_params=True, mesh_shape=(3, 3))
 
         with MPIBackend() as backend:
             event = Event()
             # start background thread that will kill all MPIBackends
             # until event.set()
-            kill_t = Thread(target=_terminate_mpibackend,
-                            args=(event, backend))
+            kill_t = Thread(target=_terminate_mpibackend, args=(event, backend))
             # make thread a daemon in case we throw an exception
             # and don't run event.set() so that py.test will
             # not hang before exiting
@@ -151,12 +168,12 @@ class TestParallelBackends():
 
             with pytest.warns(UserWarning) as record:
                 with pytest.raises(
-                        RuntimeError,
-                        match="MPI simulation failed. Return code: 1"):
+                    RuntimeError, match='MPI simulation failed. Return code: 1'
+                ):
                     simulate_dipole(net, tstop=40)
 
             event.set()
-        expected_string = "Child process failed unexpectedly"
+        expected_string = 'Child process failed unexpectedly'
         assert expected_string in record[0].message.args[0]
 
     @requires_mpi4py
@@ -166,18 +183,17 @@ class TestParallelBackends():
         hnn_core_root = op.dirname(hnn_core.__file__)
         params_fname = op.join(hnn_core_root, 'param', 'default.json')
         params = read_params(params_fname)
-        params.update({'t_evprox_1': 5,
-                       't_evdist_1': 10,
-                       't_evprox_2': 20,
-                       'N_trials': 2})
-        net = jones_2009_model(params, add_drives_from_params=True,
-                               mesh_shape=(3, 3))
+        params.update(
+            {'t_evprox_1': 5, 't_evdist_1': 10, 't_evprox_2': 20, 'N_trials': 2}
+        )
+        net = jones_2009_model(params, add_drives_from_params=True, mesh_shape=(3, 3))
 
         # try running with more procs than cells in the network (will probably
         # oversubscribe)
         too_many_procs = net._n_cells + 1
-        with pytest.raises(ValueError, match='More MPI processes were '
-                           'assigned than there are cells'):
+        with pytest.raises(
+            ValueError, match='More MPI processes were ' 'assigned than there are cells'
+        ):
             with MPIBackend(n_procs=too_many_procs) as backend:
                 simulate_dipole(net, tstop=40)
 
@@ -185,24 +201,26 @@ class TestParallelBackends():
         # always enough cells in the network
         oversubscribed_procs = cpu_count() + 1
         n_grid_1d = int(np.ceil(np.sqrt(oversubscribed_procs)))
-        params.update({'t_evprox_1': 5,
-                       't_evdist_1': 10,
-                       't_evprox_2': 20,
-                       'N_trials': 2})
-        net = jones_2009_model(params, add_drives_from_params=True,
-                               mesh_shape=(n_grid_1d, n_grid_1d))
+        params.update(
+            {'t_evprox_1': 5, 't_evdist_1': 10, 't_evprox_2': 20, 'N_trials': 2}
+        )
+        net = jones_2009_model(
+            params, add_drives_from_params=True, mesh_shape=(n_grid_1d, n_grid_1d)
+        )
         with MPIBackend(n_procs=oversubscribed_procs) as backend:
             assert backend.n_procs == oversubscribed_procs
             simulate_dipole(net, tstop=40)
 
-    @pytest.mark.parametrize("backend", ['mpi', 'joblib'])
+    @pytest.mark.parametrize('backend', ['mpi', 'joblib'])
     def test_compare_hnn_core(self, run_hnn_core_fixture, backend, n_jobs=1):
         """Test hnn-core does not break."""
         # small snippet of data on data branch for now. To be deleted
         # later. Data branch should have only commit so it does not
         # pollute the history.
-        data_url = ('https://raw.githubusercontent.com/jonescompneurolab/'
-                    'hnn-core/test_data/dpl.txt')
+        data_url = (
+            'https://raw.githubusercontent.com/jonescompneurolab/'
+            'hnn-core/test_data/dpl.txt'
+        )
         if not op.exists('dpl.txt'):
             urlretrieve(data_url, 'dpl.txt')
         dpl_master = loadtxt('dpl.txt')
@@ -228,13 +246,15 @@ class TestParallelBackends():
         assert 'common' not in spike_type_counts
         assert 'exgauss' not in spike_type_counts
         assert 'extpois' not in spike_type_counts
-        assert spike_type_counts == {'evprox1': 270,
-                                     'L2_basket': 55,
-                                     'L2_pyramidal': 114,
-                                     'L5_pyramidal': 396,
-                                     'L5_basket': 86,
-                                     'evdist1': 270,
-                                     'evprox2': 270}
+        assert spike_type_counts == {
+            'evprox1': 270,
+            'L2_basket': 55,
+            'L2_pyramidal': 114,
+            'L5_pyramidal': 396,
+            'L5_basket': 86,
+            'evdist1': 270,
+            'evprox2': 270,
+        }
 
 
 # there are no dependencies if this unit tests fails; no need to be in
@@ -244,19 +264,18 @@ class TestParallelBackends():
 def test_mpi_failure(run_hnn_core_fixture):
     """Test that an MPI failure is handled and messages are printed"""
     # this MPI parameter will cause a MPI job to fail
-    environ["OMPI_MCA_btl"] = "self"
+    environ['OMPI_MCA_btl'] = 'self'
 
     with pytest.warns(UserWarning) as record:
         with io.StringIO() as buf, redirect_stdout(buf):
-            with pytest.raises(RuntimeError, match="MPI simulation failed"):
-                run_hnn_core_fixture(backend='mpi', reduced=True,
-                                     postproc=False)
+            with pytest.raises(RuntimeError, match='MPI simulation failed'):
+                run_hnn_core_fixture(backend='mpi', reduced=True, postproc=False)
             stdout = buf.getvalue()
 
-    assert "MPI processes are unable to reach each other" in stdout
+    assert 'MPI processes are unable to reach each other' in stdout
 
-    expected_string = "Child process failed unexpectedly"
+    expected_string = 'Child process failed unexpectedly'
     assert len(record) == 1
     assert record[0].message.args[0] == expected_string
 
-    del environ["OMPI_MCA_btl"]
+    del environ['OMPI_MCA_btl']

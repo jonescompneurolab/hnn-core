@@ -26,15 +26,15 @@ def _str_to_net(input_str):
     data_str = _extract_data(input_str, 'net')
     if len(data_str) > 0:
         # get the size, but start the search after data
-        net_size = _extract_data_length(input_str[len(data_str):],
-                                        'net')
+        net_size = _extract_data_length(input_str[len(data_str) :], 'net')
         # check the size
         if len(data_str) != net_size:
-            raise ValueError("Got incorrect network size: %d bytes " %
-                             len(data_str) + "expected length: %d" % net_size)
+            raise ValueError(
+                'Got incorrect network size: %d bytes ' % len(data_str)
+                + 'expected length: %d' % net_size
+            )
         # unpickle the net
-        net = pickle.loads(base64.b64decode(data_str.encode(),
-                                            validate=True))
+        net = pickle.loads(base64.b64decode(data_str.encode(), validate=True))
     return net
 
 
@@ -52,6 +52,7 @@ class MPISimulation(object):
     rank : int
         The rank for each processor part of the MPI communicator
     """
+
     def __init__(self, skip_mpi_import=False):
         self.skip_mpi_import = skip_mpi_import
         if skip_mpi_import:
@@ -69,6 +70,7 @@ class MPISimulation(object):
         # skip Finalize() if we didn't import MPI on __init__
         if hasattr(self, 'comm'):
             from mpi4py import MPI
+
             MPI.Finalize()
 
     def _read_net(self):
@@ -144,6 +146,7 @@ if __name__ == '__main__':
     """This file is called on command-line from nrniv"""
 
     import traceback
+
     rc = 0
 
     try:

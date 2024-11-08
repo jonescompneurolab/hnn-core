@@ -39,22 +39,31 @@ def set_params(param_values, net=None):
     net : instance of Network, optional
         If None, a new network is created using the specified model type.
     """
-    weights_ampa = {'L2_basket': param_values['weight_basket'],
-                    'L2_pyramidal': param_values['weight_pyr'],
-                    'L5_basket': param_values['weight_basket'],
-                    'L5_pyramidal': param_values['weight_pyr']}
+    weights_ampa = {
+        'L2_basket': param_values['weight_basket'],
+        'L2_pyramidal': param_values['weight_pyr'],
+        'L5_basket': param_values['weight_basket'],
+        'L5_pyramidal': param_values['weight_pyr'],
+    }
 
-    synaptic_delays = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                       'L5_basket': 1., 'L5_pyramidal': 1.}
+    synaptic_delays = {
+        'L2_basket': 0.1,
+        'L2_pyramidal': 0.1,
+        'L5_basket': 1.0,
+        'L5_pyramidal': 1.0,
+    }
 
     # Add an evoked drive to the network.
-    net.add_evoked_drive('evprox',
-                         mu=40,
-                         sigma=5,
-                         numspikes=1,
-                         location='proximal',
-                         weights_ampa=weights_ampa,
-                         synaptic_delays=synaptic_delays)
+    net.add_evoked_drive(
+        'evprox',
+        mu=40,
+        sigma=5,
+        numspikes=1,
+        location='proximal',
+        weights_ampa=weights_ampa,
+        synaptic_delays=synaptic_delays,
+    )
+
 
 ###############################################################################
 # Define a parameter grid for the batch simulation.
@@ -62,7 +71,7 @@ def set_params(param_values, net=None):
 
 param_grid = {
     'weight_basket': np.logspace(-4 - 1, 10),
-    'weight_pyr': np.logspace(-4, -1, 10)
+    'weight_pyr': np.logspace(-4, -1, 10),
 }
 
 ###############################################################################
@@ -92,6 +101,7 @@ def summary_func(results):
         summary_stats.append({'min_peak': min_peak, 'max_peak': max_peak})
     return summary_stats
 
+
 ###############################################################################
 # Run the batch simulation and collect the results.
 
@@ -102,15 +112,14 @@ def summary_func(results):
 
 # Run the batch simulation and collect the results.
 net = jones_2009_model(mesh_shape=(3, 3))
-batch_simulation = BatchSimulate(net=net,
-                                 set_params=set_params,
-                                 summary_func=summary_func)
-simulation_results = batch_simulation.run(param_grid,
-                                          n_jobs=n_jobs,
-                                          combinations=False,
-                                          backend='multiprocessing')
+batch_simulation = BatchSimulate(
+    net=net, set_params=set_params, summary_func=summary_func
+)
+simulation_results = batch_simulation.run(
+    param_grid, n_jobs=n_jobs, combinations=False, backend='multiprocessing'
+)
 # backend='dask' if installed
-print("Simulation results:", simulation_results)
+print('Simulation results:', simulation_results)
 ###############################################################################
 # This plot shows an overlay of all smoothed dipole waveforms from the
 # batch simulation. Each line represents a different set of parameters,
@@ -137,8 +146,9 @@ plt.show()
 # dipole activity changes as we vary the synaptic strength parameter.
 
 min_peaks, max_peaks, param_values = [], [], []
-for summary_list, data_list in zip(simulation_results['summary_statistics'],
-                                   simulation_results['simulated_data']):
+for summary_list, data_list in zip(
+    simulation_results['summary_statistics'], simulation_results['simulated_data']
+):
     for summary, data in zip(summary_list, data_list):
         min_peaks.append(summary['min_peak'])
         max_peaks.append(summary['max_peak'])

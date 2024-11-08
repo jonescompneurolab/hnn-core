@@ -38,15 +38,14 @@ def expected_improvement(gp, best_f, all_x):
     """
 
     with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
+        warnings.simplefilter('ignore')
         # (n_samples, n_features)
         y, y_std = gp.predict(all_x, return_std=True)
     Z = (y - best_f) / (y_std + 1e-12)
     return (y - best_f) * st.norm.cdf(Z) + y_std * st.norm.pdf(Z)
 
 
-def bayes_opt(func, x0, cons, acquisition, maxfun=200,
-              debug=False, random_state=None):
+def bayes_opt(func, x0, cons, acquisition, maxfun=200, debug=False, random_state=None):
     """The actual bayesian optimization function.
 
     Parameters
@@ -86,14 +85,15 @@ def bayes_opt(func, x0, cons, acquisition, maxfun=200,
     gp = gaussian_process.GaussianProcessRegressor(random_state=random_state)
 
     if debug:
-        print("iter", -1, "best_x", best_x, best_f)
+        print('iter', -1, 'best_x', best_x, best_f)
 
     for i in range(maxfun):
-
         # draw samples from distribution
-        all_x = np.random.uniform(low=[idx[0] for idx in cons],
-                                  high=[idx[1] for idx in cons],
-                                  size=(10000, len(cons)))
+        all_x = np.random.uniform(
+            low=[idx[0] for idx in cons],
+            high=[idx[1] for idx in cons],
+            size=(10000, len(cons)),
+        )
 
         gp.fit(np.array(X), np.array(y))  # (n_samples, n_features)
 
@@ -111,7 +111,7 @@ def bayes_opt(func, x0, cons, acquisition, maxfun=200,
             best_x = new_x
 
         if debug:
-            print("iter", i, "best_x", best_x, best_f)
+            print('iter', i, 'best_x', best_x, best_f)
 
     return best_x, best_f
 
@@ -119,11 +119,14 @@ def bayes_opt(func, x0, cons, acquisition, maxfun=200,
 if __name__ == '__main__':
     from scipy.optimize import rosen
 
-    opt_params, obj_vals = bayes_opt(rosen,
-                                     [0.5, 0.6], [(-1, 1), (-1, 1)],
-                                     expected_improvement,
-                                     maxfun=200,
-                                     random_state=1)
+    opt_params, obj_vals = bayes_opt(
+        rosen,
+        [0.5, 0.6],
+        [(-1, 1), (-1, 1)],
+        expected_improvement,
+        maxfun=200,
+        random_state=1,
+    )
 
     x = np.linspace(-1, 1, 50)
     y = np.linspace(-1, 1, 50)

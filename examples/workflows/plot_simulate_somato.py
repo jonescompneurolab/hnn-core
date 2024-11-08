@@ -38,10 +38,18 @@ from mne.minimum_norm import apply_inverse, make_inverse_operator
 data_path = somato.data_path()
 subject = '01'
 task = 'somato'
-raw_fname = op.join(data_path, 'sub-{}'.format(subject), 'meg',
-                    'sub-{}_task-{}_meg.fif'.format(subject, task))
-fwd_fname = op.join(data_path, 'derivatives', 'sub-{}'.format(subject),
-                    'sub-{}_task-{}-fwd.fif'.format(subject, task))
+raw_fname = op.join(
+    data_path,
+    'sub-{}'.format(subject),
+    'meg',
+    'sub-{}_task-{}_meg.fif'.format(subject, task),
+)
+fwd_fname = op.join(
+    data_path,
+    'derivatives',
+    'sub-{}'.format(subject),
+    'sub-{}_task-{}-fwd.fif'.format(subject, task),
+)
 subjects_dir = op.join(data_path, 'derivatives', 'freesurfer', 'subjects')
 
 ###############################################################################
@@ -56,10 +64,18 @@ raw.filter(l_freq, h_freq)
 events = mne.find_events(raw, stim_channel='STI 014')
 
 # Define epochs within the time series
-event_id, tmin, tmax = 1, -.2, .17
+event_id, tmin, tmax = 1, -0.2, 0.17
 baseline = None
-epochs = mne.Epochs(raw, events, event_id, tmin, tmax, baseline=baseline,
-                    reject=dict(grad=4000e-13, eog=350e-6), preload=True)
+epochs = mne.Epochs(
+    raw,
+    events,
+    event_id,
+    tmin,
+    tmax,
+    baseline=baseline,
+    reject=dict(grad=4000e-13, eog=350e-6),
+    preload=True,
+)
 
 # Compute the inverse operator
 fwd = mne.read_forward_solution(fwd_fname)
@@ -75,21 +91,27 @@ inv = make_inverse_operator(epochs.info, fwd, cov)
 # to note that the dipole currents simulated with HNN are assumed to be normal
 # to the cortical surface. Hence, using the option ``pick_ori='normal'`` is
 # appropriate.
-snr = 3.
-lambda2 = 1. / snr ** 2
+snr = 3.0
+lambda2 = 1.0 / snr**2
 evoked = epochs.average()
-stc = apply_inverse(evoked, inv, lambda2, method='MNE',
-                    pick_ori="normal", return_residual=False,
-                    verbose=True)
+stc = apply_inverse(
+    evoked,
+    inv,
+    lambda2,
+    method='MNE',
+    pick_ori='normal',
+    return_residual=False,
+    verbose=True,
+)
 
 ###############################################################################
 # To extract the primary response in primary somatosensory cortex (S1), we
 # create a label for the postcentral gyrus (S1) in source-space
 hemi = 'rh'
 label_tag = 'G_postcentral'
-label_s1 = mne.read_labels_from_annot(subject, parc='aparc.a2009s', hemi=hemi,
-                                      regexp=label_tag,
-                                      subjects_dir=subjects_dir)[0]
+label_s1 = mne.read_labels_from_annot(
+    subject, parc='aparc.a2009s', hemi=hemi, regexp=label_tag, subjects_dir=subjects_dir
+)[0]
 
 ###############################################################################
 # Visualizing the distributed S1 activation in reference to the geometric
@@ -103,7 +125,7 @@ label_s1 = mne.read_labels_from_annot(subject, parc='aparc.a2009s', hemi=hemi,
 # post-central gyrus label from which the dipole time course was extracted and
 # the second showing MNE activation at 0.040 sec that resemble the following
 # images.
-'''
+"""
 Brain = mne.viz.get_brain_class()
 brain_label = Brain(subject, hemi, 'white', subjects_dir=subjects_dir)
 brain_label.add_label(label_s1, color='green', alpha=0.9)
@@ -111,7 +133,7 @@ stc_label = stc.in_label(label_s1)
 brain = stc_label.plot(subjects_dir=subjects_dir, hemi=hemi, surface='white',
                        view_layout='horizontal', initial_time=0.04,
                        backend='pyvista')
-'''
+"""
 
 ###############################################################################
 # |mne_label_fig|
@@ -127,8 +149,7 @@ brain = stc_label.plot(subjects_dir=subjects_dir, hemi=hemi, surface='white',
 # extracted waveform so that the deflection at ~0.040 sec is pointed downwards.
 # Thus, the ~0.040 sec deflection corresponds to current flow traveling from
 # superficial to deep layers of cortex.
-flip_data = stc.extract_label_time_course(label_s1, inv['src'],
-                                          mode='pca_flip')
+flip_data = stc.extract_label_time_course(label_s1, inv['src'], mode='pca_flip')
 dipole_tc = -flip_data[0] * 1e9
 
 plt.figure()
@@ -162,60 +183,110 @@ net = jones_2009_model(params_fname)
 # in the network.
 
 # Early proximal drive
-weights_ampa_p = {'L2_basket': 0.0036, 'L2_pyramidal': 0.0039,
-                  'L5_basket': 0.0019, 'L5_pyramidal': 0.0020}
-weights_nmda_p = {'L2_basket': 0.0029, 'L2_pyramidal': 0.0005,
-                  'L5_basket': 0.0030, 'L5_pyramidal': 0.0019}
-synaptic_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                     'L5_basket': 1.0, 'L5_pyramidal': 1.0}
+weights_ampa_p = {
+    'L2_basket': 0.0036,
+    'L2_pyramidal': 0.0039,
+    'L5_basket': 0.0019,
+    'L5_pyramidal': 0.0020,
+}
+weights_nmda_p = {
+    'L2_basket': 0.0029,
+    'L2_pyramidal': 0.0005,
+    'L5_basket': 0.0030,
+    'L5_pyramidal': 0.0019,
+}
+synaptic_delays_p = {
+    'L2_basket': 0.1,
+    'L2_pyramidal': 0.1,
+    'L5_basket': 1.0,
+    'L5_pyramidal': 1.0,
+}
 
 net.add_evoked_drive(
-    'evprox1', mu=21., sigma=4., numspikes=1, location='proximal',
-    n_drive_cells=1, cell_specific=False, weights_ampa=weights_ampa_p,
-    weights_nmda=weights_nmda_p, synaptic_delays=synaptic_delays_p,
-    event_seed=276)
+    'evprox1',
+    mu=21.0,
+    sigma=4.0,
+    numspikes=1,
+    location='proximal',
+    n_drive_cells=1,
+    cell_specific=False,
+    weights_ampa=weights_ampa_p,
+    weights_nmda=weights_nmda_p,
+    synaptic_delays=synaptic_delays_p,
+    event_seed=276,
+)
 
 # Late proximal drive
-weights_ampa_p = {'L2_basket': 0.003, 'L2_pyramidal': 0.0039,
-                  'L5_basket': 0.004, 'L5_pyramidal': 0.0020}
-weights_nmda_p = {'L2_basket': 0.001, 'L2_pyramidal': 0.0005,
-                  'L5_basket': 0.002, 'L5_pyramidal': 0.0020}
-synaptic_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                     'L5_basket': 1.0, 'L5_pyramidal': 1.0}
+weights_ampa_p = {
+    'L2_basket': 0.003,
+    'L2_pyramidal': 0.0039,
+    'L5_basket': 0.004,
+    'L5_pyramidal': 0.0020,
+}
+weights_nmda_p = {
+    'L2_basket': 0.001,
+    'L2_pyramidal': 0.0005,
+    'L5_basket': 0.002,
+    'L5_pyramidal': 0.0020,
+}
+synaptic_delays_p = {
+    'L2_basket': 0.1,
+    'L2_pyramidal': 0.1,
+    'L5_basket': 1.0,
+    'L5_pyramidal': 1.0,
+}
 
 net.add_evoked_drive(
-    'evprox2', mu=134., sigma=4.5, numspikes=1, location='proximal',
-    n_drive_cells=1, cell_specific=False, weights_ampa=weights_ampa_p,
-    weights_nmda=weights_nmda_p, synaptic_delays=synaptic_delays_p,
-    event_seed=276)
+    'evprox2',
+    mu=134.0,
+    sigma=4.5,
+    numspikes=1,
+    location='proximal',
+    n_drive_cells=1,
+    cell_specific=False,
+    weights_ampa=weights_ampa_p,
+    weights_nmda=weights_nmda_p,
+    synaptic_delays=synaptic_delays_p,
+    event_seed=276,
+)
 
 # Early distal drive
-weights_ampa_d = {'L2_basket': 0.0043, 'L2_pyramidal': 0.0032,
-                  'L5_pyramidal': 0.0009}
-weights_nmda_d = {'L2_basket': 0.0029, 'L2_pyramidal': 0.0051,
-                  'L5_pyramidal': 0.0010}
-synaptic_delays_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                     'L5_pyramidal': 0.1}
+weights_ampa_d = {'L2_basket': 0.0043, 'L2_pyramidal': 0.0032, 'L5_pyramidal': 0.0009}
+weights_nmda_d = {'L2_basket': 0.0029, 'L2_pyramidal': 0.0051, 'L5_pyramidal': 0.0010}
+synaptic_delays_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1, 'L5_pyramidal': 0.1}
 
 net.add_evoked_drive(
-    'evdist1', mu=32., sigma=2.5, numspikes=1, location='distal',
-    n_drive_cells=1, cell_specific=False, weights_ampa=weights_ampa_d,
-    weights_nmda=weights_nmda_d, synaptic_delays=synaptic_delays_d,
-    event_seed=277)
+    'evdist1',
+    mu=32.0,
+    sigma=2.5,
+    numspikes=1,
+    location='distal',
+    n_drive_cells=1,
+    cell_specific=False,
+    weights_ampa=weights_ampa_d,
+    weights_nmda=weights_nmda_d,
+    synaptic_delays=synaptic_delays_d,
+    event_seed=277,
+)
 
 # Late distal drive
-weights_ampa_d = {'L2_basket': 0.0041, 'L2_pyramidal': 0.0019,
-                  'L5_pyramidal': 0.0018}
-weights_nmda_d = {'L2_basket': 0.0032, 'L2_pyramidal': 0.0018,
-                  'L5_pyramidal': 0.0017}
-synaptic_delays_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                     'L5_pyramidal': 0.1}
+weights_ampa_d = {'L2_basket': 0.0041, 'L2_pyramidal': 0.0019, 'L5_pyramidal': 0.0018}
+weights_nmda_d = {'L2_basket': 0.0032, 'L2_pyramidal': 0.0018, 'L5_pyramidal': 0.0017}
+synaptic_delays_d = {'L2_basket': 0.1, 'L2_pyramidal': 0.1, 'L5_pyramidal': 0.1}
 
 net.add_evoked_drive(
-    'evdist2', mu=84., sigma=4.5, numspikes=1, location='distal',
-    n_drive_cells=1, cell_specific=False, weights_ampa=weights_ampa_d,
-    weights_nmda=weights_nmda_d, synaptic_delays=synaptic_delays_d,
-    event_seed=275)
+    'evdist2',
+    mu=84.0,
+    sigma=4.5,
+    numspikes=1,
+    location='distal',
+    n_drive_cells=1,
+    cell_specific=False,
+    weights_ampa=weights_ampa_d,
+    weights_nmda=weights_nmda_d,
+    synaptic_delays=synaptic_delays_d,
+    event_seed=275,
+)
 
 ###############################################################################
 # Now we run the simulation over 2 trials so that we can plot the average
@@ -224,7 +295,7 @@ net.add_evoked_drive(
 n_trials = 2
 # n_trials = 25
 with JoblibBackend(n_jobs=2):
-    dpls = simulate_dipole(net, tstop=170., n_trials=n_trials)
+    dpls = simulate_dipole(net, tstop=170.0, n_trials=n_trials)
 
 ###############################################################################
 # Since the model is a reduced representation of the larger network
@@ -243,11 +314,10 @@ for dpl in dpls:
 ###############################################################################
 # Finally, we plot the driving spike histogram, empirical and simulated median
 # nerve evoked response waveforms, and output spike histogram.
-fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 6),
-                         constrained_layout=True)
-net.cell_response.plot_spikes_hist(ax=axes[0],
-                                   spike_types=['evprox', 'evdist'],
-                                   show=False)
+fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 6), constrained_layout=True)
+net.cell_response.plot_spikes_hist(
+    ax=axes[0], spike_types=['evprox', 'evdist'], show=False
+)
 axes[1].axhline(0, c='k', ls=':', label='_nolegend_')
 axes[1].plot(1e3 * stc.times, dipole_tc, 'r--')
 average_dipoles(dpls).plot(ax=axes[1], show=False)

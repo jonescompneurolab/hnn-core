@@ -90,8 +90,9 @@ def read_params(params_fname, file_contents=None):
     ext = split_fname[1]
 
     if ext not in ['.json', '.param']:
-        raise ValueError('Unrecognized extension, expected one of' +
-                         ' .json, .param. Got %s' % ext)
+        raise ValueError(
+            'Unrecognized extension, expected one of' + ' .json, .param. Got %s' % ext
+        )
 
     if file_contents is None:
         with open(params_fname, 'r') as fp:
@@ -101,8 +102,9 @@ def read_params(params_fname, file_contents=None):
     params_dict = read_func[ext](file_contents)
 
     if len(params_dict) == 0:
-        raise ValueError("Failed to read parameters from file: %s" %
-                         op.normpath(params_fname))
+        raise ValueError(
+            'Failed to read parameters from file: %s' % op.normpath(params_fname)
+        )
 
     params = Params(params_dict)
 
@@ -110,16 +112,24 @@ def read_params(params_fname, file_contents=None):
 
 
 def _long_name(short_name):
-    long_name = dict(L2Basket='L2_basket', L5Basket='L5_basket',
-                     L2Pyr='L2_pyramidal', L5Pyr='L5_pyramidal')
+    long_name = dict(
+        L2Basket='L2_basket',
+        L5Basket='L5_basket',
+        L2Pyr='L2_pyramidal',
+        L5Pyr='L5_pyramidal',
+    )
     if short_name in long_name:
         return long_name[short_name]
     return short_name
 
 
 def _short_name(short_name):
-    long_name = dict(L2_basket='L2Basket', L5_basket='L5Basket',
-                     L2_pyramidal='L2Pyr', L5_pyramidal='L5Pyr')
+    long_name = dict(
+        L2_basket='L2Basket',
+        L5_basket='L5Basket',
+        L2_pyramidal='L2Pyr',
+        L5_pyramidal='L5Pyr',
+    )
     if short_name in long_name:
         return long_name[short_name]
     return short_name
@@ -130,25 +140,26 @@ def _extract_bias_specs_from_hnn_params(params, cellname_list):
     bias_specs = {'tonic': {}}  # currently only 'tonic' biases known
     for cellname in cellname_list:
         short_name = _short_name(cellname)
-        is_tonic_present = [f'Itonic_{p}_{short_name}_soma' in
-                            params for p in ['A', 't0', 'T']]
+        is_tonic_present = [
+            f'Itonic_{p}_{short_name}_soma' in params for p in ['A', 't0', 'T']
+        ]
         if any(is_tonic_present):
             if not all(is_tonic_present):
                 raise ValueError(
                     f'Tonic input must have the amplitude, '
                     f'start time and end time specified. One '
                     f'or more parameter may be missing for '
-                    f'cell type {cellname}')
+                    f'cell type {cellname}'
+                )
             bias_specs['tonic'][cellname] = {
                 'amplitude': params[f'Itonic_A_{short_name}_soma'],
                 't0': params[f'Itonic_t0_{short_name}_soma'],
-                'tstop': params[f'Itonic_T_{short_name}_soma']
+                'tstop': params[f'Itonic_T_{short_name}_soma'],
             }
     return bias_specs
 
 
-def _extract_drive_specs_from_hnn_params(
-        params, cellname_list, legacy_mode=False):
+def _extract_drive_specs_from_hnn_params(params, cellname_list, legacy_mode=False):
     """Create 'drive specification' dicts from saved parameters"""
     # convert legacy params-dict to legacy "feeds" dicts
     p_common, p_unique = create_pext(params, params['tstop'])
@@ -162,14 +173,16 @@ def _extract_drive_specs_from_hnn_params(
         drive = dict()
         drive['type'] = 'bursty'
         drive['cell_specific'] = False
-        drive['dynamics'] = {'tstart': par['t0'],
-                             'tstart_std': par['t0_stdev'],
-                             'tstop': par['tstop'],
-                             'burst_rate': par['f_input'],
-                             'burst_std': par['stdev'],
-                             'numspikes': par['events_per_cycle'],
-                             'n_drive_cells': par['n_drive_cells'],
-                             'spike_isi': 10}  # not exposed in params-files
+        drive['dynamics'] = {
+            'tstart': par['t0'],
+            'tstart_std': par['t0_stdev'],
+            'tstop': par['tstop'],
+            'burst_rate': par['f_input'],
+            'burst_std': par['stdev'],
+            'numspikes': par['events_per_cycle'],
+            'n_drive_cells': par['n_drive_cells'],
+            'spike_isi': 10,
+        }  # not exposed in params-files
         drive['location'] = par['loc']
         drive['space_constant'] = par['lamtha']
         drive['event_seed'] = par['prng_seedcore']
@@ -201,16 +214,14 @@ def _extract_drive_specs_from_hnn_params(
         drive['weights_nmda'] = dict()
         drive['synaptic_delays'] = dict()
 
-        if (feed_name.startswith('evprox') or
-                feed_name.startswith('evdist')):
+        if feed_name.startswith('evprox') or feed_name.startswith('evdist'):
             drive['type'] = 'evoked'
             if feed_name.startswith('evprox'):
                 drive['location'] = 'proximal'
             else:
                 drive['location'] = 'distal'
 
-            cell_keys_present = [key for key in par if
-                                 key in cellname_list]
+            cell_keys_present = [key for key in par if key in cellname_list]
             sigma = par[cell_keys_present[0]][3]  # IID for all cells!
 
             n_drive_cells = 'n_cells'
@@ -218,10 +229,12 @@ def _extract_drive_specs_from_hnn_params(
                 n_drive_cells = 1
                 drive['cell_specific'] = False
 
-            drive['dynamics'] = {'mu': par['t0'],
-                                 'sigma': sigma,
-                                 'numspikes': par['numspikes'],
-                                 'n_drive_cells': n_drive_cells}
+            drive['dynamics'] = {
+                'mu': par['t0'],
+                'sigma': sigma,
+                'numspikes': par['numspikes'],
+                'n_drive_cells': n_drive_cells,
+            }
             drive['space_constant'] = par['lamtha']
             drive['event_seed'] = par['prng_seedcore']
             # XXX Force random states to be the same as HNN-gui for the default
@@ -240,16 +253,17 @@ def _extract_drive_specs_from_hnn_params(
 
         # Skip drive if not in legacy mode
         elif feed_name.startswith('extgauss'):
-            if (not legacy_mode) and par[
-                    'L2_basket'][3] > params['tstop']:
+            if (not legacy_mode) and par['L2_basket'][3] > params['tstop']:
                 continue
             drive['type'] = 'gaussian'
             drive['location'] = par['loc']
 
-            drive['dynamics'] = {'mu': par['L2_basket'][3],  # NB IID
-                                 'sigma': par['L2_basket'][4],
-                                 'numspikes': 50,  # NB hard-coded in GUI!
-                                 'sync_within_trial': False}
+            drive['dynamics'] = {
+                'mu': par['L2_basket'][3],  # NB IID
+                'sigma': par['L2_basket'][4],
+                'numspikes': 50,  # NB hard-coded in GUI!
+                'sync_within_trial': False,
+            }
             drive['space_constant'] = par['lamtha']
             drive['event_seed'] = par['prng_seedcore']
 
@@ -262,8 +276,7 @@ def _extract_drive_specs_from_hnn_params(
 
             drive['weights_nmda'] = dict()  # no NMDA weights for Gaussians
         elif feed_name.startswith('extpois'):
-            if (not legacy_mode) and par['t_interval'][1] < par[
-                    't_interval'][0]:
+            if (not legacy_mode) and par['t_interval'][1] < par['t_interval'][0]:
                 continue
             drive['type'] = 'poisson'
             drive['location'] = par['loc']
@@ -287,9 +300,11 @@ def _extract_drive_specs_from_hnn_params(
                     drive['synaptic_delays'][cellname] = synaptic_delays
 
             # do NOT allow negative times sometimes used in param-files
-            drive['dynamics'] = {'tstart': max(0, par['t_interval'][0]),
-                                 'tstop': max(0, par['t_interval'][1]),
-                                 'rate_constant': rate_params}
+            drive['dynamics'] = {
+                'tstart': max(0, par['t_interval'][0]),
+                'tstop': max(0, par['t_interval'][1]),
+                'rate_constant': rate_params,
+            }
 
         drive_specs[feed_name] = drive
     return drive_specs
@@ -305,7 +320,6 @@ class Params(dict):
     """
 
     def __init__(self, params_input=None):
-
         if params_input is None:
             params_input = dict()
 
@@ -320,8 +334,9 @@ class Params(dict):
                 else:
                     self[key] = params_default[key]
         else:
-            raise ValueError('params_input must be dict or None. Got %s'
-                             % type(params_input))
+            raise ValueError(
+                'params_input must be dict or None. Got %s' % type(params_input)
+            )
 
     def __repr__(self):
         """Display the params nicely."""
@@ -400,9 +415,9 @@ def _validate_feed(p_ext_d, tstop):
     if not p_ext_d['stdev']:
         for key in p_ext_d.keys():
             if key.endswith('Pyr'):
-                p_ext_d[key] = (p_ext_d[key][0] * 5., p_ext_d[key][1])
+                p_ext_d[key] = (p_ext_d[key][0] * 5.0, p_ext_d[key][1])
             elif key.endswith('Basket'):
-                p_ext_d[key] = (p_ext_d[key][0] * 5., p_ext_d[key][1])
+                p_ext_d[key] = (p_ext_d[key][0] * 5.0, p_ext_d[key][1])
 
     # if L5 delay is -1, use same delays as L2 unless L2 delay is 0.1 in
     # which case use 1. <<---- SN: WHAT IS THIS RULE!?!?!?
@@ -412,7 +427,7 @@ def _validate_feed(p_ext_d, tstop):
                 if p_ext_d['L2Pyr'][1] != 0.1:
                     p_ext_d[key] = (p_ext_d[key][0], p_ext_d['L2Pyr'][1])
                 else:
-                    p_ext_d[key] = (p_ext_d[key][0], 1.)
+                    p_ext_d[key] = (p_ext_d[key][0], 1.0)
 
     return p_ext_d
 
@@ -425,8 +440,9 @@ def check_evoked_synkeys(p, nprox, ndist):
     # evoked proximal target cell types
     lctdist = ['L2Pyr', 'L5Pyr', 'L2Basket']
     lsy = ['ampa', 'nmda']  # synapse types used in evoked inputs
-    for nev, pref, lct in zip([nprox, ndist], ['evprox_', 'evdist_'],
-                              [lctprox, lctdist]):
+    for nev, pref, lct in zip(
+        [nprox, ndist], ['evprox_', 'evdist_'], [lctprox, lctdist]
+    ):
         for i in range(nev):
             skey = pref + str(i + 1)
             for sy in lsy:
@@ -436,6 +452,7 @@ def check_evoked_synkeys(p, nprox, ndist):
                     # existing weight for both ampa,nmda
                     if k not in p:
                         p[k] = p['gbar_' + skey + '_' + ct]
+
 
 #
 
@@ -451,6 +468,7 @@ def check_pois_synkeys(p):
             # if the synapse-specific weight not present, set it to 0 in p
             if k not in p:
                 p[k] = 0.0
+
 
 # creates the external feed params based on individual simulation params p
 
@@ -478,29 +496,33 @@ def create_pext(p, tstop):
         't0': p['t0_input_prox'],
         'tstop': p['tstop_input_prox'],
         'stdev': p['f_stdev_prox'],
-        'L2Pyr_ampa': (p['input_prox_A_weight_L2Pyr_ampa'],
-                       p['input_prox_A_delay_L2']),
-        'L2Pyr_nmda': (p['input_prox_A_weight_L2Pyr_nmda'],
-                       p['input_prox_A_delay_L2']),
-        'L5Pyr_ampa': (p['input_prox_A_weight_L5Pyr_ampa'],
-                       p['input_prox_A_delay_L5']),
-        'L5Pyr_nmda': (p['input_prox_A_weight_L5Pyr_nmda'],
-                       p['input_prox_A_delay_L5']),
-        'L2Basket_ampa': (p['input_prox_A_weight_L2Basket_ampa'],
-                          p['input_prox_A_delay_L2']),
-        'L2Basket_nmda': (p['input_prox_A_weight_L2Basket_nmda'],
-                          p['input_prox_A_delay_L2']),
-        'L5Basket_ampa': (p['input_prox_A_weight_L5Basket_ampa'],
-                          p['input_prox_A_delay_L5']),
-        'L5Basket_nmda': (p['input_prox_A_weight_L5Basket_nmda'],
-                          p['input_prox_A_delay_L5']),
+        'L2Pyr_ampa': (p['input_prox_A_weight_L2Pyr_ampa'], p['input_prox_A_delay_L2']),
+        'L2Pyr_nmda': (p['input_prox_A_weight_L2Pyr_nmda'], p['input_prox_A_delay_L2']),
+        'L5Pyr_ampa': (p['input_prox_A_weight_L5Pyr_ampa'], p['input_prox_A_delay_L5']),
+        'L5Pyr_nmda': (p['input_prox_A_weight_L5Pyr_nmda'], p['input_prox_A_delay_L5']),
+        'L2Basket_ampa': (
+            p['input_prox_A_weight_L2Basket_ampa'],
+            p['input_prox_A_delay_L2'],
+        ),
+        'L2Basket_nmda': (
+            p['input_prox_A_weight_L2Basket_nmda'],
+            p['input_prox_A_delay_L2'],
+        ),
+        'L5Basket_ampa': (
+            p['input_prox_A_weight_L5Basket_ampa'],
+            p['input_prox_A_delay_L5'],
+        ),
+        'L5Basket_nmda': (
+            p['input_prox_A_weight_L5Basket_nmda'],
+            p['input_prox_A_delay_L5'],
+        ),
         'events_per_cycle': p['events_per_cycle_prox'],
         'prng_seedcore': int(p['prng_seedcore_input_prox']),
-        'lamtha': 100.,
+        'lamtha': 100.0,
         'loc': 'proximal',
         'n_drive_cells': p['repeats_prox'],
         't0_stdev': p['t0_input_stdev_prox'],
-        'threshold': p['threshold']
+        'threshold': p['threshold'],
     }
 
     # ensures time interval makes sense
@@ -512,25 +534,25 @@ def create_pext(p, tstop):
         't0': p['t0_input_dist'],
         'tstop': p['tstop_input_dist'],
         'stdev': p['f_stdev_dist'],
-        'L2Pyr_ampa': (p['input_dist_A_weight_L2Pyr_ampa'],
-                       p['input_dist_A_delay_L2']),
-        'L2Pyr_nmda': (p['input_dist_A_weight_L2Pyr_nmda'],
-                       p['input_dist_A_delay_L2']),
-        'L5Pyr_ampa': (p['input_dist_A_weight_L5Pyr_ampa'],
-                       p['input_dist_A_delay_L5']),
-        'L5Pyr_nmda': (p['input_dist_A_weight_L5Pyr_nmda'],
-                       p['input_dist_A_delay_L5']),
-        'L2Basket_ampa': (p['input_dist_A_weight_L2Basket_ampa'],
-                          p['input_dist_A_delay_L2']),
-        'L2Basket_nmda': (p['input_dist_A_weight_L2Basket_nmda'],
-                          p['input_dist_A_delay_L2']),
+        'L2Pyr_ampa': (p['input_dist_A_weight_L2Pyr_ampa'], p['input_dist_A_delay_L2']),
+        'L2Pyr_nmda': (p['input_dist_A_weight_L2Pyr_nmda'], p['input_dist_A_delay_L2']),
+        'L5Pyr_ampa': (p['input_dist_A_weight_L5Pyr_ampa'], p['input_dist_A_delay_L5']),
+        'L5Pyr_nmda': (p['input_dist_A_weight_L5Pyr_nmda'], p['input_dist_A_delay_L5']),
+        'L2Basket_ampa': (
+            p['input_dist_A_weight_L2Basket_ampa'],
+            p['input_dist_A_delay_L2'],
+        ),
+        'L2Basket_nmda': (
+            p['input_dist_A_weight_L2Basket_nmda'],
+            p['input_dist_A_delay_L2'],
+        ),
         'events_per_cycle': p['events_per_cycle_dist'],
         'prng_seedcore': int(p['prng_seedcore_input_dist']),
-        'lamtha': 100.,
+        'lamtha': 100.0,
         'loc': 'distal',
         'n_drive_cells': p['repeats_dist'],
         't0_stdev': p['t0_input_stdev_dist'],
-        'threshold': p['threshold']
+        'threshold': p['threshold'],
     }
 
     p_common.append(_validate_feed(feed_dist, tstop))
@@ -554,24 +576,36 @@ def create_pext(p, tstop):
         skey = 'evprox_' + str(i + 1)
         p_unique['evprox' + str(i + 1)] = {
             't0': p['t_' + skey],
-            'L2_pyramidal': (p['gbar_' + skey + '_L2Pyr_ampa'],
-                             p['gbar_' + skey + '_L2Pyr_nmda'],
-                             0.1, p['sigma_t_' + skey]),
-            'L2_basket': (p['gbar_' + skey + '_L2Basket_ampa'],
-                          p['gbar_' + skey + '_L2Basket_nmda'],
-                          0.1, p['sigma_t_' + skey]),
-            'L5_pyramidal': (p['gbar_' + skey + '_L5Pyr_ampa'],
-                             p['gbar_' + skey + '_L5Pyr_nmda'],
-                             1., p['sigma_t_' + skey]),
-            'L5_basket': (p['gbar_' + skey + '_L5Basket_ampa'],
-                          p['gbar_' + skey + '_L5Basket_nmda'],
-                          1., p['sigma_t_' + skey]),
+            'L2_pyramidal': (
+                p['gbar_' + skey + '_L2Pyr_ampa'],
+                p['gbar_' + skey + '_L2Pyr_nmda'],
+                0.1,
+                p['sigma_t_' + skey],
+            ),
+            'L2_basket': (
+                p['gbar_' + skey + '_L2Basket_ampa'],
+                p['gbar_' + skey + '_L2Basket_nmda'],
+                0.1,
+                p['sigma_t_' + skey],
+            ),
+            'L5_pyramidal': (
+                p['gbar_' + skey + '_L5Pyr_ampa'],
+                p['gbar_' + skey + '_L5Pyr_nmda'],
+                1.0,
+                p['sigma_t_' + skey],
+            ),
+            'L5_basket': (
+                p['gbar_' + skey + '_L5Basket_ampa'],
+                p['gbar_' + skey + '_L5Basket_nmda'],
+                1.0,
+                p['sigma_t_' + skey],
+            ),
             'prng_seedcore': int(p['prng_seedcore_' + skey]),
-            'lamtha': 3.,
+            'lamtha': 3.0,
             'loc': 'proximal',
             'sync_evinput': p['sync_evinput'],
             'threshold': p['threshold'],
-            'numspikes': p['numspikes_' + skey]
+            'numspikes': p['numspikes_' + skey],
         }
 
     # Create distal evoked response parameters
@@ -580,21 +614,30 @@ def create_pext(p, tstop):
         skey = 'evdist_' + str(i + 1)
         p_unique['evdist' + str(i + 1)] = {
             't0': p['t_' + skey],
-            'L2_pyramidal': (p['gbar_' + skey + '_L2Pyr_ampa'],
-                             p['gbar_' + skey + '_L2Pyr_nmda'],
-                             0.1, p['sigma_t_' + skey]),
-            'L5_pyramidal': (p['gbar_' + skey + '_L5Pyr_ampa'],
-                             p['gbar_' + skey + '_L5Pyr_nmda'],
-                             0.1, p['sigma_t_' + skey]),
-            'L2_basket': (p['gbar_' + skey + '_L2Basket_ampa'],
-                          p['gbar_' + skey + '_L2Basket_nmda'],
-                          0.1, p['sigma_t_' + skey]),
+            'L2_pyramidal': (
+                p['gbar_' + skey + '_L2Pyr_ampa'],
+                p['gbar_' + skey + '_L2Pyr_nmda'],
+                0.1,
+                p['sigma_t_' + skey],
+            ),
+            'L5_pyramidal': (
+                p['gbar_' + skey + '_L5Pyr_ampa'],
+                p['gbar_' + skey + '_L5Pyr_nmda'],
+                0.1,
+                p['sigma_t_' + skey],
+            ),
+            'L2_basket': (
+                p['gbar_' + skey + '_L2Basket_ampa'],
+                p['gbar_' + skey + '_L2Basket_nmda'],
+                0.1,
+                p['sigma_t_' + skey],
+            ),
             'prng_seedcore': int(p['prng_seedcore_' + skey]),
-            'lamtha': 3.,
+            'lamtha': 3.0,
             'loc': 'distal',
             'sync_evinput': p['sync_evinput'],
             'threshold': p['threshold'],
-            'numspikes': p['numspikes_' + skey]
+            'numspikes': p['numspikes_' + skey],
         }
 
     # this needs to create many feeds
@@ -603,23 +646,38 @@ def create_pext(p, tstop):
     # inputs
     p_unique['extgauss'] = {
         'stim': 'gaussian',
-        'L2_basket': (p['L2Basket_Gauss_A_weight'],
-                      p['L2Basket_Gauss_A_weight'],
-                      1., p['L2Basket_Gauss_mu'],
-                      p['L2Basket_Gauss_sigma']),
-        'L2_pyramidal': (p['L2Pyr_Gauss_A_weight'],
-                         p['L2Pyr_Gauss_A_weight'],
-                         0.1, p['L2Pyr_Gauss_mu'], p['L2Pyr_Gauss_sigma']),
-        'L5_basket': (p['L5Basket_Gauss_A_weight'],
-                      p['L5Basket_Gauss_A_weight'],
-                      1., p['L5Basket_Gauss_mu'], p['L5Basket_Gauss_sigma']),
-        'L5_pyramidal': (p['L5Pyr_Gauss_A_weight'],
-                         p['L5Pyr_Gauss_A_weight'],
-                         1., p['L5Pyr_Gauss_mu'], p['L5Pyr_Gauss_sigma']),
-        'lamtha': 100.,
+        'L2_basket': (
+            p['L2Basket_Gauss_A_weight'],
+            p['L2Basket_Gauss_A_weight'],
+            1.0,
+            p['L2Basket_Gauss_mu'],
+            p['L2Basket_Gauss_sigma'],
+        ),
+        'L2_pyramidal': (
+            p['L2Pyr_Gauss_A_weight'],
+            p['L2Pyr_Gauss_A_weight'],
+            0.1,
+            p['L2Pyr_Gauss_mu'],
+            p['L2Pyr_Gauss_sigma'],
+        ),
+        'L5_basket': (
+            p['L5Basket_Gauss_A_weight'],
+            p['L5Basket_Gauss_A_weight'],
+            1.0,
+            p['L5Basket_Gauss_mu'],
+            p['L5Basket_Gauss_sigma'],
+        ),
+        'L5_pyramidal': (
+            p['L5Pyr_Gauss_A_weight'],
+            p['L5Pyr_Gauss_A_weight'],
+            1.0,
+            p['L5Pyr_Gauss_mu'],
+            p['L5Pyr_Gauss_sigma'],
+        ),
+        'lamtha': 100.0,
         'prng_seedcore': int(p['prng_seedcore_extgauss']),
         'loc': 'proximal',
-        'threshold': p['threshold']
+        'threshold': p['threshold'],
     }
 
     check_pois_synkeys(p)
@@ -628,23 +686,35 @@ def create_pext(p, tstop):
     # NEW: setting up AMPA and NMDA for Poisson inputs; why delays differ?
     p_unique['extpois'] = {
         'stim': 'poisson',
-        'L2_basket': (p['L2Basket_Pois_A_weight_ampa'],
-                      p['L2Basket_Pois_A_weight_nmda'],
-                      1., p['L2Basket_Pois_lamtha']),
-        'L2_pyramidal': (p['L2Pyr_Pois_A_weight_ampa'],
-                         p['L2Pyr_Pois_A_weight_nmda'],
-                         0.1, p['L2Pyr_Pois_lamtha']),
-        'L5_basket': (p['L5Basket_Pois_A_weight_ampa'],
-                      p['L5Basket_Pois_A_weight_nmda'],
-                      1., p['L5Basket_Pois_lamtha']),
-        'L5_pyramidal': (p['L5Pyr_Pois_A_weight_ampa'],
-                         p['L5Pyr_Pois_A_weight_nmda'],
-                         1., p['L5Pyr_Pois_lamtha']),
-        'lamtha': 100.,
+        'L2_basket': (
+            p['L2Basket_Pois_A_weight_ampa'],
+            p['L2Basket_Pois_A_weight_nmda'],
+            1.0,
+            p['L2Basket_Pois_lamtha'],
+        ),
+        'L2_pyramidal': (
+            p['L2Pyr_Pois_A_weight_ampa'],
+            p['L2Pyr_Pois_A_weight_nmda'],
+            0.1,
+            p['L2Pyr_Pois_lamtha'],
+        ),
+        'L5_basket': (
+            p['L5Basket_Pois_A_weight_ampa'],
+            p['L5Basket_Pois_A_weight_nmda'],
+            1.0,
+            p['L5Basket_Pois_lamtha'],
+        ),
+        'L5_pyramidal': (
+            p['L5Pyr_Pois_A_weight_ampa'],
+            p['L5Pyr_Pois_A_weight_nmda'],
+            1.0,
+            p['L5Pyr_Pois_lamtha'],
+        ),
+        'lamtha': 100.0,
         'prng_seedcore': int(p['prng_seedcore_extpois']),
         't_interval': (p['t0_pois'], p['T_pois']),
         'loc': 'proximal',
-        'threshold': p['threshold']
+        'threshold': p['threshold'],
     }
 
     return p_common, p_unique
@@ -663,9 +733,10 @@ def compare_dictionaries(d1, d2):
 
 
 def _any_positive_weights(drive):
-    """ Checks a drive for any positive weights. """
-    weights = (list(drive['weights_ampa'].values()) +
-               list(drive['weights_nmda'].values()))
+    """Checks a drive for any positive weights."""
+    weights = list(drive['weights_ampa'].values()) + list(
+        drive['weights_nmda'].values()
+    )
     if any([val > 0 for val in weights]):
         return True
     else:
@@ -702,18 +773,21 @@ def remove_nulled_drives(net):
         space_constant = net.connectivity[conn_indices[0]]['nc_dict']['lamtha']
         probability = net.connectivity[conn_indices[0]]['probability']
 
-        extras[drive_name] = {'space_constant': space_constant,
-                              'probability': probability}
+        extras[drive_name] = {
+            'space_constant': space_constant,
+            'probability': probability,
+        }
 
     net.clear_drives()
     for drive_name, drive in drives_copy.items():
         # Do not add drive if tstart is > tstop, or negative
         t_start = drive['dynamics'].get('tstart')
         t_stop = drive['dynamics'].get('tstop')
-        if (t_start is not None and t_stop is not None and
-                ((t_start > t_stop) or
-                 (t_start < 0) or
-                 (t_stop < 0))):
+        if (
+            t_start is not None
+            and t_stop is not None
+            and ((t_start > t_stop) or (t_start < 0) or (t_stop < 0))
+        ):
             continue
         # Do not add if all 0 weights
         elif not _any_positive_weights(drive):
@@ -722,19 +796,22 @@ def remove_nulled_drives(net):
             # Set n_drive_cells to 'n_cells' if equal to max number of cells
             if drive['cell_specific']:
                 drive['n_drive_cells'] = 'n_cells'
-            net._attach_drive(drive['name'], drive, drive['weights_ampa'],
-                              drive['weights_nmda'], drive['location'],
-                              extras[drive_name]['space_constant'],
-                              drive['synaptic_delays'],
-                              drive['n_drive_cells'], drive['cell_specific'],
-                              extras[drive_name]['probability'])
+            net._attach_drive(
+                drive['name'],
+                drive,
+                drive['weights_ampa'],
+                drive['weights_nmda'],
+                drive['location'],
+                extras[drive_name]['space_constant'],
+                drive['synaptic_delays'],
+                drive['n_drive_cells'],
+                drive['cell_specific'],
+                extras[drive_name]['probability'],
+            )
     return net
 
 
-def convert_to_json(params_fname,
-                    out_fname,
-                    include_drives=True,
-                    overwrite=True):
+def convert_to_json(params_fname, out_fname, include_drives=True, overwrite=True):
     """Converts legacy json or param format to hierarchical json format
 
     Parameters
@@ -765,18 +842,19 @@ def convert_to_json(params_fname,
     if out_fname.suffix != '.json':
         out_fname = out_fname.with_suffix('.json')
 
-    net = jones_2009_model(params=read_params(params_fname),
-                           add_drives_from_params=include_drives,
-                           legacy_mode=(True if params_suffix == 'param'
-                                        else False),
-                           )
+    net = jones_2009_model(
+        params=read_params(params_fname),
+        add_drives_from_params=include_drives,
+        legacy_mode=(True if params_suffix == 'param' else False),
+    )
 
     # Remove drives that have null attributes
     net = remove_nulled_drives(net)
 
-    net.write_configuration(fname=out_fname,
-                            overwrite=overwrite,
-                            )
+    net.write_configuration(
+        fname=out_fname,
+        overwrite=overwrite,
+    )
     return
 
 

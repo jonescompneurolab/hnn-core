@@ -16,15 +16,29 @@ from .network_models import jones_2009_model
 
 
 class BatchSimulate(object):
-    def __init__(self, set_params, net=jones_2009_model(), tstop=170,
-                 dt=0.025, n_trials=1, record_vsec=False,
-                 record_isec=False, postproc=False, save_outputs=False,
-                 save_folder='./sim_results', batch_size=100,
-                 overwrite=True, summary_func=None,
-                 save_dpl=True, save_spiking=False,
-                 save_lfp=False, save_voltages=False,
-                 save_currents=False, save_calcium=False,
-                 clear_cache=False):
+    def __init__(
+        self,
+        set_params,
+        net=jones_2009_model(),
+        tstop=170,
+        dt=0.025,
+        n_trials=1,
+        record_vsec=False,
+        record_isec=False,
+        postproc=False,
+        save_outputs=False,
+        save_folder='./sim_results',
+        batch_size=100,
+        overwrite=True,
+        summary_func=None,
+        save_dpl=True,
+        save_spiking=False,
+        save_lfp=False,
+        save_voltages=False,
+        save_currents=False,
+        save_calcium=False,
+        clear_cache=False,
+    ):
         """Initialize the BatchSimulate class.
 
         Parameters
@@ -129,10 +143,10 @@ class BatchSimulate(object):
         _validate_type(clear_cache, types=(bool,), item_name='clear_cache')
 
         if set_params is not None and not callable(set_params):
-            raise TypeError("set_params must be a callable function")
+            raise TypeError('set_params must be a callable function')
 
         if summary_func is not None and not callable(summary_func):
-            raise TypeError("summary_func must be a callable function")
+            raise TypeError('summary_func must be a callable function')
 
         self.net = net
         self.set_params = set_params
@@ -155,9 +169,15 @@ class BatchSimulate(object):
         self.save_calcium = save_calcium
         self.clear_cache = clear_cache
 
-    def run(self, param_grid, return_output=True,
-            combinations=True, n_jobs=1, backend='loky',
-            verbose=50):
+    def run(
+        self,
+        param_grid,
+        return_output=True,
+        combinations=True,
+        n_jobs=1,
+        backend='loky',
+        verbose=50,
+    ):
         """Run batch simulations.
 
         Parameters
@@ -194,12 +214,12 @@ class BatchSimulate(object):
         """
         _validate_type(param_grid, types=(dict,), item_name='param_grid')
         _validate_type(n_jobs, types='int', item_name='n_jobs')
-        _check_option('backend', backend, ['loky', 'threading',
-                                           'multiprocessing', 'dask'])
+        _check_option(
+            'backend', backend, ['loky', 'threading', 'multiprocessing', 'dask']
+        )
         _validate_type(verbose, types='int', item_name='verbose')
 
-        param_combinations = self._generate_param_combinations(
-            param_grid, combinations)
+        param_combinations = self._generate_param_combinations(param_grid, combinations)
         total_sims = len(param_combinations)
         num_sims_per_batch = max(total_sims // self.batch_size, 1)
         batch_size = min(self.batch_size, total_sims)
@@ -215,7 +235,8 @@ class BatchSimulate(object):
                 param_combinations[start_idx:end_idx],
                 n_jobs=n_jobs,
                 backend=backend,
-                verbose=verbose)
+                verbose=verbose,
+            )
 
             if self.save_outputs:
                 self._save(batch_results, start_idx, end_idx)
@@ -234,13 +255,11 @@ class BatchSimulate(object):
 
         if return_output:
             if self.clear_cache:
-                return {"summary_statistics": results}
+                return {'summary_statistics': results}
             else:
-                return {"summary_statistics": results,
-                        "simulated_data": simulated_data}
+                return {'summary_statistics': results, 'simulated_data': simulated_data}
 
-    def simulate_batch(self, param_combinations, n_jobs=1,
-                       backend='loky', verbose=50):
+    def simulate_batch(self, param_combinations, n_jobs=1, backend='loky', verbose=50):
         """Simulate a batch of parameter sets in parallel.
 
         Parameters
@@ -264,17 +283,19 @@ class BatchSimulate(object):
             - `dpl`: The simulated dipole.
             - `param_values`: The parameter values used for the simulation.
         """
-        _validate_type(param_combinations, types=(list,),
-                       item_name='param_combinations')
+        _validate_type(
+            param_combinations, types=(list,), item_name='param_combinations'
+        )
         _validate_type(n_jobs, types='int', item_name='n_jobs')
-        _check_option('backend', backend, ['loky', 'threading',
-                                           'multiprocessing', 'dask'])
+        _check_option(
+            'backend', backend, ['loky', 'threading', 'multiprocessing', 'dask']
+        )
         _validate_type(verbose, types='int', item_name='verbose')
 
         with parallel_config(backend=backend):
             res = Parallel(n_jobs=n_jobs, verbose=verbose)(
-                delayed(self._run_single_sim)(
-                    params) for params in param_combinations)
+                delayed(self._run_single_sim)(params) for params in param_combinations
+            )
         return res
 
     def _run_single_sim(self, param_values):
@@ -301,20 +322,22 @@ class BatchSimulate(object):
         results = {'net': net, 'param_values': param_values}
 
         if self.save_dpl:
-            dpl = simulate_dipole(net,
-                                  tstop=self.tstop,
-                                  dt=self.dt,
-                                  n_trials=self.n_trials,
-                                  record_vsec=self.record_vsec,
-                                  record_isec=self.record_isec,
-                                  postproc=self.postproc)
+            dpl = simulate_dipole(
+                net,
+                tstop=self.tstop,
+                dt=self.dt,
+                n_trials=self.n_trials,
+                record_vsec=self.record_vsec,
+                record_isec=self.record_isec,
+                postproc=self.postproc,
+            )
             results['dpl'] = dpl
 
         if self.save_spiking:
             results['spiking'] = {
                 'spike_times': net.cell_response.spike_times,
                 'spike_types': net.cell_response.spike_types,
-                'spike_gids': net.cell_response.spike_gids
+                'spike_gids': net.cell_response.spike_gids,
             }
 
         if self.save_lfp:
@@ -352,11 +375,13 @@ class BatchSimulate(object):
 
         keys, values = zip(*param_grid.items())
         if combinations:
-            param_combinations = [dict(zip(keys, combination))
-                                  for combination in product(*values)]
+            param_combinations = [
+                dict(zip(keys, combination)) for combination in product(*values)
+            ]
         else:
-            param_combinations = [dict(zip(keys, combination))
-                                  for combination in zip(*values)]
+            param_combinations = [
+                dict(zip(keys, combination)) for combination in zip(*values)
+            ]
         return param_combinations
 
     def _save(self, results, start_idx, end_idx):
@@ -378,22 +403,25 @@ class BatchSimulate(object):
         if not os.path.exists(self.save_folder):
             os.makedirs(self.save_folder)
 
-        save_data = {
-            'param_values': [result['param_values'] for result in results]
-        }
+        save_data = {'param_values': [result['param_values'] for result in results]}
 
-        attributes_to_save = ['dpl', 'spiking', 'lfp',
-                              'voltages', 'currents', 'calcium']
+        attributes_to_save = [
+            'dpl',
+            'spiking',
+            'lfp',
+            'voltages',
+            'currents',
+            'calcium',
+        ]
         for attr in attributes_to_save:
             if getattr(self, f'save_{attr}') and attr in results[0]:
                 save_data[attr] = [result[attr] for result in results]
 
-        file_name = os.path.join(self.save_folder,
-                                 f'sim_run_{start_idx}-{end_idx}.npz')
+        file_name = os.path.join(self.save_folder, f'sim_run_{start_idx}-{end_idx}.npz')
         if os.path.exists(file_name) and not self.overwrite:
             raise FileExistsError(
-                f"File {file_name} already exists and "
-                "overwrite is set to False.")
+                f'File {file_name} already exists and ' 'overwrite is set to False.'
+            )
 
         np.savez(file_name, **save_data)
 
@@ -429,8 +457,11 @@ class BatchSimulate(object):
                 return_data.append('calcium')
 
         data = np.load(file_path, allow_pickle=True)
-        results = {key: data[key].tolist() for key in data.files
-                   if key in return_data or key == 'param_values'}
+        results = {
+            key: data[key].tolist()
+            for key in data.files
+            if key in return_data or key == 'param_values'
+        }
         return results
 
     def load_all_results(self):
