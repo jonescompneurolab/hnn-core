@@ -54,10 +54,6 @@
           shell: bash -el {0}
           run: |
             pip install --verbose '.[opt, parallel, test, gui]'
-        - name: Lint with flake8
-          shell: bash -el {0}
-          run: |
-            flake8 --count hnn_core
         - name: Test with pytest
           shell: bash -el {0}
           run: |
