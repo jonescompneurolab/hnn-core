@@ -18,9 +18,7 @@ without the need to install and configure MPI.
 
 ###############################################################################
 # Let us import hnn_core
-import os.path as op
 
-import hnn_core
 from hnn_core import simulate_dipole, jones_2009_model
 
 ###############################################################################

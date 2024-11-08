@@ -16,8 +16,13 @@ check-manifest:
 format:
 	ruff format
 
+lint:
+	ruff check
+
 modl:
 	cd hnn_core/mod/ && nrnivmodl
 
 test:
+	ruff format --check
+	ruff check --no-fix
 	pytest .

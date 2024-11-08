@@ -16,7 +16,6 @@ import tempfile
 ###############################################################################
 # Let us import ``hnn_core``.
 
-import hnn_core
 from hnn_core import read_spikes, jones_2009_model, simulate_dipole
 
 ###############################################################################

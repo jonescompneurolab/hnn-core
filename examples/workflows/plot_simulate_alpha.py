@@ -20,12 +20,10 @@ visualization of the corresponding time-frequency spectrograms [1]_.
 #          Nick Tolley <nicholas_tolley@brown.edu>
 #          Christopher Bailey <bailey.cj@gmail.com>
 
-import os.path as op
 
 ###############################################################################
 # Let us import hnn_core
 
-import hnn_core
 from hnn_core import simulate_dipole, jones_2009_model
 
 ###############################################################################
@@ -72,7 +70,7 @@ dpl[trial_idx].scale(3000)
 # included in our biophysical model. We can confirm that what we simulate is
 # indeed 10 Hz activity by plotting the power spectral density (PSD).
 import matplotlib.pyplot as plt
-from hnn_core.viz import plot_dipole, plot_psd
+from hnn_core.viz import plot_psd
 
 fig, axes = plt.subplots(2, 1, constrained_layout=True)
 tmin, tmax = 10, 300  # exclude the initial burn-in period from the plots

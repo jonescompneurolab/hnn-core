@@ -21,15 +21,10 @@ to the recorded data.
 
 # sphinx_gallery_thumbnail_number = 3
 
-import os.path as op
-import tempfile
-
-import matplotlib.pyplot as plt
 
 ###############################################################################
 # Let us import hnn_core
 
-import hnn_core
 from hnn_core import simulate_dipole, jones_2009_model
 from hnn_core.viz import plot_dipole
 

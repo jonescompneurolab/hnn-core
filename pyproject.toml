@@ -12,3 +12,11 @@ ignore-words-list = 'tha,nam,sherif,dout'
 exclude = ["*.ipynb"]
 [tool.ruff.format]
 quote-style = "single"
+[tool.ruff.lint]
+exclude = ["__init__.py"]
+# We don't include rule "W504", which was in our old flake8 "setup.cfg" file for 2 reasons: it is an
+# invalid option for the ruff linter, and the ruff formatter already applies that rule.
+ignore = [
+   "E402",  # Needed for notes at beginning of example scripts
+   "E722",  # From original flake8 'setup.cfg' file, needed in viz.py
+]

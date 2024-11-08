@@ -54,6 +54,14 @@
           shell: bash -el {0}
           run: |
             pip install --verbose '.[opt, parallel, test, gui]'
+        - name: Lint with ruff
+          shell: bash -el {0}
+          run: |
+            ruff check --no-fix
+        - name: Check formatting with ruff
+          shell: bash -el {0}
+          run: |
+            ruff format --check
         - name: Test with pytest
           shell: bash -el {0}
           run: |

@@ -10,12 +10,10 @@ This example demonstrates how to modify the network connectivity.
 
 # sphinx_gallery_thumbnail_number = 2
 
-import os.path as op
 
 ###############################################################################
 # Let us import ``hnn_core``.
 
-import hnn_core
 from hnn_core import jones_2009_model, simulate_dipole
 
 ###############################################################################
