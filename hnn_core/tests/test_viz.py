@@ -251,6 +251,7 @@ class TestCellResponsePlotters:
     """Tests plotting methods of the CellResponse class"""
     @pytest.fixture(scope='class')
     def class_setup_net(self):
+        """Creates a base network for tests within this class"""
         hnn_core_root = op.dirname(hnn_core.__file__)
         params_fname = op.join(hnn_core_root, 'param', 'default.json')
         params = read_params(params_fname)
@@ -260,6 +261,7 @@ class TestCellResponsePlotters:
 
     @pytest.fixture(scope='class')
     def base_simulation_spikes(self, class_setup_net):
+        """Adds drives with spikes for testing of spike visualizations"""
         net = class_setup_net
         weights_ampa = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
         syn_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
