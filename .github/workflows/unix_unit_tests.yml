@@ -58,14 +58,14 @@
           shell: bash -el {0}
           run: |
             flake8 --count hnn_core
-        - name: Test embarrassingly parallel tests with pytest
+        - name: Test non-MPI, embarrassingly parallel tests with pytest
           shell: bash -el {0}
           run: |
-            python -m pytest ./hnn_core/tests/ -m "not already_parallel" -n auto --cov=hnn_core --cov-report=xml
-        - name: Test true parallel tests with pytest
+            python -m pytest ./hnn_core/tests/ -m "not uses_mpi" -n auto --cov=hnn_core --cov-report=xml
+        - name: Test MPI-using parallel tests with pytest
           shell: bash -el {0}
           run: |
-            python -m pytest ./hnn_core/tests/ -m "already_parallel" --cov=hnn_core --cov-report=xml --cov-append
+            python -m pytest ./hnn_core/tests/ -m "uses_mpi" --cov=hnn_core --cov-report=xml --cov-append
         - name:  Upload coverage to Codecov
           shell: bash -el {0}
           run: |

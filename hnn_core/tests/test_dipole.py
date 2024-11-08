@@ -213,7 +213,7 @@ def test_dipole_simulation():
 
 @requires_mpi4py
 @requires_psutil
-@pytest.mark.already_parallel
+@pytest.mark.uses_mpi
 def test_cell_response_backends(run_hnn_core_fixture):
     """Test cell_response outputs across backends."""
 
