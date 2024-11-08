@@ -77,6 +77,7 @@ def test_gid_assignment():
 
 
 @pytest.mark.incremental
+@pytest.mark.already_parallel
 class TestParallelBackends():
     dpls_reduced_mpi = None
     dpls_reduced_default = None
@@ -241,6 +242,7 @@ class TestParallelBackends():
 # class marked incremental
 @requires_mpi4py
 @requires_psutil
+@pytest.mark.already_parallel
 def test_mpi_failure(run_hnn_core_fixture):
     """Test that an MPI failure is handled and messages are printed"""
     # this MPI parameter will cause a MPI job to fail

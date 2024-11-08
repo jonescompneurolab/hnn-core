@@ -170,6 +170,7 @@ def test_transfer_resistance():
 
 @requires_mpi4py
 @requires_psutil
+@pytest.mark.already_parallel
 def test_extracellular_backends(run_hnn_core_fixture):
     """Test extracellular outputs across backends."""
     # calculation of CSD requires >=4 electrode contacts
