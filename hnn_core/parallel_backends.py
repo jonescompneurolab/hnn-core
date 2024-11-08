@@ -41,12 +41,12 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
 
     # Create array of equally sampled time points for simulating currents
     cell_type_names = list(net.cell_types.keys())
-    cell_response = CellResponse(times=sim_data[0]['times'],
-                                 cell_type_names=cell_type_names)
+    cell_response = CellResponse(
+        times=sim_data[0]['times'], cell_type_names=cell_type_names
+    )
     net.cell_response = cell_response
 
     for idx in range(n_trials):
-
         # cell response
         net.cell_response._spike_times.append(sim_data[idx]['spike_times'])
         net.cell_response._spike_gids.append(sim_data[idx]['spike_gids'])
@@ -62,8 +62,7 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
             arr._times = sim_data[idx]['rec_times'][arr_name]
 
         # dipole
-        dpl = Dipole(times=sim_data[idx]['times'],
-                     data=sim_data[idx]['dpl_data'])
+        dpl = Dipole(times=sim_data[idx]['times'], data=sim_data[idx]['dpl_data'])
 
         N_pyr_x = net._N_pyr_x
         N_pyr_y = net._N_pyr_y
@@ -86,11 +85,11 @@ def _get_mpi_env():
     my_env = os.environ.copy()
     # For Linux systems
     if sys.platform != 'win32':
-        my_env["OMPI_MCA_btl_base_warn_component_unused"] = '0'
+        my_env['OMPI_MCA_btl_base_warn_component_unused'] = '0'
 
     if 'darwin' in sys.platform:
-        my_env["PMIX_MCA_gds"] = "^ds12"  # open-mpi/ompi/issues/7516
-        my_env["TMPDIR"] = "/tmp"  # open-mpi/ompi/issues/2956
+        my_env['PMIX_MCA_gds'] = '^ds12'  # open-mpi/ompi/issues/7516
+        my_env['TMPDIR'] = '/tmp'  # open-mpi/ompi/issues/2956
     return my_env
 
 
@@ -127,8 +126,7 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     threads_started = False
 
     try:
-        proc = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE, *args,
-                     **kwargs)
+        proc = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE, *args, **kwargs)
 
         # now that the process has started, add it to the queue
         # used by MPIBackend.terminate()
@@ -138,10 +136,8 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
         # set up polling first so all of child's stdout/stderr
         # gets captured
         event = Event()
-        out_t = Thread(target=_thread_handler,
-                       args=(event, proc.stdout, out_q))
-        err_t = Thread(target=_thread_handler,
-                       args=(event, proc.stderr, err_q))
+        out_t = Thread(target=_thread_handler, args=(event, proc.stdout, out_q))
+        err_t = Thread(target=_thread_handler, args=(event, proc.stderr, err_q))
         out_t.start()
         err_t.start()
         threads_started = True
@@ -166,7 +162,7 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
                 elif child_terminated:
                     # child terminated early, and we already
                     # captured output left in queues
-                    warn("Child process failed unexpectedly")
+                    warn('Child process failed unexpectedly')
                     kill_proc_name('nrniv')
                     break
 
@@ -178,8 +174,10 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
                     # child failed during _write_net(). get the
                     # output and break out of loop on the next
                     # iteration
-                    warn("Received BrokenPipeError exception. "
-                         "Child process failed unexpectedly")
+                    warn(
+                        'Received BrokenPipeError exception. '
+                        'Child process failed unexpectedly'
+                    )
                     continue
                 else:
                     sent_network = True
@@ -192,14 +190,15 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
                 # the network has been sent)
                 break
 
-            if not child_terminated and \
-                    count_since_last_output > timeout_cycles:
-                warn("Timeout exceeded while waiting for child process output"
-                     ". Terminating...")
+            if not child_terminated and count_since_last_output > timeout_cycles:
+                warn(
+                    'Timeout exceeded while waiting for child process output'
+                    '. Terminating...'
+                )
                 kill_proc_name('nrniv')
                 break
     except KeyboardInterrupt:
-        warn("Received KeyboardInterrupt. Stopping simulation process...")
+        warn('Received KeyboardInterrupt. Stopping simulation process...')
 
     if threads_started:
         # stop the threads
@@ -228,12 +227,11 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
         try:
             proc.wait(1)  # wait maximum of 1s
         except TimeoutExpired:
-            warn("Could not kill python subprocess: PID %d" % proc.pid)
+            warn('Could not kill python subprocess: PID %d' % proc.pid)
 
     if not proc.returncode == 0:
         # simulation failed with a numeric return code
-        raise RuntimeError("MPI simulation failed. Return code: %d" %
-                           proc.returncode)
+        raise RuntimeError('MPI simulation failed. Return code: %d' % proc.returncode)
 
     child_data = _process_child_data(proc_data_bytes, data_len)
 
@@ -261,8 +259,10 @@ def _process_child_data(data_bytes, data_len):
     """
     if not data_len == len(data_bytes):
         # This is indicative of a failure. For debugging purposes.
-        warn("Length of received data unexpected. Expecting %d bytes, "
-             "got %d" % (data_len, len(data_bytes)))
+        warn(
+            'Length of received data unexpected. Expecting %d bytes, '
+            'got %d' % (data_len, len(data_bytes))
+        )
 
     if len(data_bytes) == 0:
         raise RuntimeError("MPI simulation didn't return any data")
@@ -274,9 +274,10 @@ def _process_child_data(data_bytes, data_len):
         # This is here for future debugging purposes. Unit tests can't
         # reproduce an incorrectly padded string, but this has been an
         # issue before
-        raise ValueError("Incorrect padding for data length %d bytes" %
-                         len(data_len) + " (mod 4 = %d)" %
-                         (len(data_len) % 4))
+        raise ValueError(
+            'Incorrect padding for data length %d bytes' % len(data_len)
+            + ' (mod 4 = %d)' % (len(data_len) % 4)
+        )
 
     # unpickle the data
     return pickle.loads(data_pickled)
@@ -351,10 +352,11 @@ def requires_mpi4py(function):
 
     try:
         import mpi4py
+
         assert hasattr(mpi4py, '__version__')
         skip = False
     except (ImportError, ModuleNotFoundError) as err:
-        if "TRAVIS_OS_NAME" not in os.environ:
+        if 'TRAVIS_OS_NAME' not in os.environ:
             skip = True
         else:
             raise ImportError(err)
@@ -368,10 +370,11 @@ def requires_psutil(function):
 
     try:
         import psutil
+
         assert hasattr(psutil, '__version__')
         skip = False
     except (ImportError, ModuleNotFoundError) as err:
-        if "TRAVIS_OS_NAME" not in os.environ:
+        if 'TRAVIS_OS_NAME' not in os.environ:
             skip = True
         else:
             raise ImportError(err)
@@ -380,8 +383,7 @@ def requires_psutil(function):
 
 
 def _extract_data_length(data_str, object_name):
-    data_len_match = re.search('@end_of_%s:' % object_name + r'(\d+)@',
-                               data_str)
+    data_len_match = re.search('@end_of_%s:' % object_name + r'(\d+)@', data_str)
     if data_len_match is not None:
         return int(data_len_match.group(1))
     else:
@@ -431,12 +433,15 @@ def _get_procs_running(proc_name):
     from psutil import process_iter
 
     process_list = []
-    for p in process_iter(attrs=["name", "exe", "cmdline"]):
-        if proc_name == p.info['name'] or \
-                (p.info['exe'] is not None and
-                 os.path.basename(p.info['exe']) == proc_name) or \
-                (p.info['cmdline'] and
-                 p.info['cmdline'][0] == proc_name):
+    for p in process_iter(attrs=['name', 'exe', 'cmdline']):
+        if (
+            proc_name == p.info['name']
+            or (
+                p.info['exe'] is not None
+                and os.path.basename(p.info['exe']) == proc_name
+            )
+            or (p.info['cmdline'] and p.info['cmdline'][0] == proc_name)
+        ):
             process_list.append(p)
     return process_list
 
@@ -463,8 +468,7 @@ def kill_proc_name(proc_name):
             if len(running) < len(procs):
                 killed_procs = True
             pids = [str(proc.pid) for proc in running]
-            warn("Failed to kill nrniv process(es) %s" %
-                 ','.join(pids))
+            warn('Failed to kill nrniv process(es) %s' % ','.join(pids))
         else:
             killed_procs = True
 
@@ -499,6 +503,7 @@ class JoblibBackend(object):
     n_jobs : int
         The number of jobs to start in parallel
     """
+
     def __init__(self, n_jobs=1):
         self.n_jobs = n_jobs
 
@@ -554,14 +559,18 @@ class JoblibBackend(object):
             The Dipole results from each simulation trial
         """
 
-        print(f"Joblib will run {n_trials} trial(s) in parallel by "
-              f"distributing trials over {self.n_jobs} jobs.")
+        print(
+            f'Joblib will run {n_trials} trial(s) in parallel by '
+            f'distributing trials over {self.n_jobs} jobs.'
+        )
         parallel, myfunc = self._parallel_func(_simulate_single_trial)
-        sim_data = parallel(myfunc(net, tstop, dt, trial_idx) for
-                            trial_idx in range(n_trials))
+        sim_data = parallel(
+            myfunc(net, tstop, dt, trial_idx) for trial_idx in range(n_trials)
+        )
 
-        dpls = _gather_trial_data(sim_data, net=net, n_trials=n_trials,
-                                  postproc=postproc)
+        dpls = _gather_trial_data(
+            sim_data, net=net, n_trials=n_trials, postproc=postproc
+        )
 
         return dpls
 
@@ -596,6 +605,7 @@ class MPIBackend(object):
         There will be a valid process handle present the queue when a MPI
         åsimulation is running.
     """
+
     def __init__(self, n_procs=None, mpi_cmd='mpiexec'):
         self.expected_data_length = 0
         self.proc = None
@@ -643,10 +653,14 @@ class MPIBackend(object):
 
         self.mpi_cmd += ' -np ' + str(self.n_procs)
 
-        self.mpi_cmd += ' nrniv -python -mpi -nobanner ' + \
-            sys.executable + ' ' + \
-            os.path.join(os.path.dirname(sys.modules[__name__].__file__),
-                         'mpi_child.py')
+        self.mpi_cmd += (
+            ' nrniv -python -mpi -nobanner '
+            + sys.executable
+            + ' '
+            + os.path.join(
+                os.path.dirname(sys.modules[__name__].__file__), 'mpi_child.py'
+            )
+        )
 
         # Split the command into shell arguments for passing to Popen
         use_posix = True if sys.platform != 'win32' else False
@@ -694,29 +708,39 @@ class MPIBackend(object):
 
         # just use the joblib backend for a single core
         if self.n_procs == 1:
-            print("MPIBackend is set to use 1 core: transferring the "
-                  "simulation to JoblibBackend....")
-            return JoblibBackend(n_jobs=1).simulate(net, tstop=tstop,
-                                                    dt=dt,
-                                                    n_trials=n_trials,
-                                                    postproc=postproc)
+            print(
+                'MPIBackend is set to use 1 core: transferring the '
+                'simulation to JoblibBackend....'
+            )
+            return JoblibBackend(n_jobs=1).simulate(
+                net, tstop=tstop, dt=dt, n_trials=n_trials, postproc=postproc
+            )
 
         if self.n_procs > net._n_cells:
-            raise ValueError(f'More MPI processes were assigned than there '
-                             f'are cells in the network. Please decrease '
-                             f'the number of parallel processes (got n_procs='
-                             f'{self.n_procs}) over which you will '
-                             f'distribute the {net._n_cells} network neurons.')
+            raise ValueError(
+                f'More MPI processes were assigned than there '
+                f'are cells in the network. Please decrease '
+                f'the number of parallel processes (got n_procs='
+                f'{self.n_procs}) over which you will '
+                f'distribute the {net._n_cells} network neurons.'
+            )
 
-        print(f"MPI will run {n_trials} trial(s) sequentially by "
-              f"distributing network neurons over {self.n_procs} processes.")
+        print(
+            f'MPI will run {n_trials} trial(s) sequentially by '
+            f'distributing network neurons over {self.n_procs} processes.'
+        )
 
         env = _get_mpi_env()
 
         self.proc, sim_data = run_subprocess(
-            command=self.mpi_cmd, obj=[net, tstop, dt, n_trials], timeout=30,
-            proc_queue=self.proc_queue, env=env, cwd=os.getcwd(),
-            universal_newlines=True)
+            command=self.mpi_cmd,
+            obj=[net, tstop, dt, n_trials],
+            timeout=30,
+            proc_queue=self.proc_queue,
+            env=env,
+            cwd=os.getcwd(),
+            universal_newlines=True,
+        )
 
         dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
         return dpls
@@ -731,12 +755,11 @@ class MPIBackend(object):
         try:
             proc = self.proc_queue.get(timeout=1)
         except Empty:
-            warn("No currently running process to terminate")
+            warn('No currently running process to terminate')
 
         if proc is not None:
             proc.terminate()
             try:
                 proc.wait(5)  # wait maximum of 5s
             except TimeoutExpired:
-                warn("Could not kill python subprocess: PID %d" %
-                     proc.pid)
+                warn('Could not kill python subprocess: PID %d' % proc.pid)

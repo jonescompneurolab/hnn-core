@@ -8,7 +8,6 @@ This example demonstrates how to animate HNN simulations
 
 # Author: Nick Tolley <nicholas_tolley@brown.edu>
 
-
 ###############################################################################
 # First, we'll import the necessary modules for instantiating a network and
 # running a simulation that we would like to animate.

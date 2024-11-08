@@ -13,6 +13,7 @@ from neuron import h
 
 # This is due to: https://github.com/neuronsimulator/nrn/pull/746
 from neuron import __version__
+
 if int(__version__[0]) >= 8:
     h.nrnunit_use_legacy(1)
 
@@ -44,7 +45,7 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
 
     global _PC, _CVODE
 
-    h.load_file("stdrun.hoc")
+    h.load_file('stdrun.hoc')
 
     rank = _get_rank()
 
@@ -98,7 +99,8 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
         isec_py[gid] = dict()
         for sec_name, isec in isec_dict.items():
             isec_py[gid][sec_name] = {
-                key: isec.to_python() for key, isec in isec.items()}
+                key: isec.to_python() for key, isec in isec.items()
+            }
 
     ca_py = dict()
     for gid, ca_dict in neuron_net._ca.items():
@@ -108,10 +110,10 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
                 ca_py[gid][sec_name] = ca.to_python()
 
     dpl_data = np.c_[
-        neuron_net._nrn_dipoles['L2_pyramidal'].as_numpy() +
-        neuron_net._nrn_dipoles['L5_pyramidal'].as_numpy(),
+        neuron_net._nrn_dipoles['L2_pyramidal'].as_numpy()
+        + neuron_net._nrn_dipoles['L5_pyramidal'].as_numpy(),
         neuron_net._nrn_dipoles['L2_pyramidal'].as_numpy(),
-        neuron_net._nrn_dipoles['L5_pyramidal'].as_numpy()
+        neuron_net._nrn_dipoles['L5_pyramidal'].as_numpy(),
     ]
 
     rec_arr_py = dict()
@@ -120,16 +122,18 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
         rec_arr_py.update({arr_name: nrn_arr._get_nrn_voltages()})
         rec_times_py.update({arr_name: nrn_arr._get_nrn_times()})
 
-    data = {'dpl_data': dpl_data,
-            'spike_times': neuron_net._all_spike_times.to_python(),
-            'spike_gids': neuron_net._all_spike_gids.to_python(),
-            'gid_ranges': net.gid_ranges,
-            'vsec': vsec_py,
-            'isec': isec_py,
-            'ca': ca_py,
-            'rec_data': rec_arr_py,
-            'rec_times': rec_times_py,
-            'times': times.to_python()}
+    data = {
+        'dpl_data': dpl_data,
+        'spike_times': neuron_net._all_spike_times.to_python(),
+        'spike_gids': neuron_net._all_spike_gids.to_python(),
+        'gid_ranges': net.gid_ranges,
+        'vsec': vsec_py,
+        'isec': isec_py,
+        'ca': ca_py,
+        'rec_data': rec_arr_py,
+        'rec_times': rec_times_py,
+        'times': times.to_python(),
+    }
 
     return data
 
@@ -151,7 +155,6 @@ def _is_loaded_mechanisms():
 
 
 def load_custom_mechanisms():
-
     if _is_loaded_mechanisms():
         return
 
@@ -337,10 +340,12 @@ class NetworkBuilder(object):
         record_vsec = self.net._params['record_vsec']
         record_isec = self.net._params['record_isec']
         record_ca = self.net._params['record_ca']
-        self._create_cells_and_drives(threshold=self.net._params['threshold'],
-                                      record_vsec=record_vsec,
-                                      record_isec=record_isec,
-                                      record_ca=record_ca)
+        self._create_cells_and_drives(
+            threshold=self.net._params['threshold'],
+            record_vsec=record_vsec,
+            record_isec=record_isec,
+            record_ca=record_ca,
+        )
 
         self.state_init()
 
@@ -390,15 +395,17 @@ class NetworkBuilder(object):
                     conn_idxs = pick_connection(self.net, src_gids=src_gid)
                     target_gids = set()
                     for conn_idx in conn_idxs:
-                        gid_pairs = self.net.connectivity[
-                            conn_idx]['gid_pairs']
+                        gid_pairs = self.net.connectivity[conn_idx]['gid_pairs']
                         if src_gid in gid_pairs:
-                            target_gids.update(self.net.connectivity[conn_idx]
-                                               ['gid_pairs'][src_gid])
+                            target_gids.update(
+                                self.net.connectivity[conn_idx]['gid_pairs'][src_gid]
+                            )
 
                     for target_gid in target_gids:
-                        if (target_gid in self._gid_list and
-                                src_gid not in self._gid_list):
+                        if (
+                            target_gid in self._gid_list
+                            and src_gid not in self._gid_list
+                        ):
                             self._gid_list.append(src_gid)
             else:
                 # round robin assignment of drive gids
@@ -409,8 +416,9 @@ class NetworkBuilder(object):
         # extremely important to get the gids in the right order
         self._gid_list.sort()
 
-    def _create_cells_and_drives(self, threshold, record_vsec=False,
-                                 record_isec=False, record_ca=False):
+    def _create_cells_and_drives(
+        self, threshold, record_vsec=False, record_isec=False, record_ca=False
+    ):
         """Parallel create cells AND external drives
 
         NB: _Cell.__init__ calls h.Section -> non-picklable!
@@ -441,10 +449,13 @@ class NetworkBuilder(object):
                 else:
                     cell.build()
                 # add tonic biases
-                if ('tonic' in self.net.external_biases and
-                        src_type in self.net.external_biases['tonic']):
-                    cell.create_tonic_bias(**self.net.external_biases
-                                           ['tonic'][src_type])
+                if (
+                    'tonic' in self.net.external_biases
+                    and src_type in self.net.external_biases['tonic']
+                ):
+                    cell.create_tonic_bias(
+                        **self.net.external_biases['tonic'][src_type]
+                    )
                 cell.record(record_vsec, record_isec, record_ca)
 
                 # this call could belong in init of a _Cell (with threshold)?
@@ -455,8 +466,9 @@ class NetworkBuilder(object):
 
             # external driving inputs are special types of artificial-cells
             else:
-                event_times = self.net.external_drives[
-                    src_type]['events'][self.trial_idx][gid_idx]
+                event_times = self.net.external_drives[src_type]['events'][
+                    self.trial_idx
+                ][gid_idx]
                 drive_cell = _ArtificialCell(event_times, threshold, gid=gid)
                 _PC.cell(drive_cell.gid, drive_cell.nrn_netcon)
                 self._drive_cells.append(drive_cell)
@@ -500,14 +512,15 @@ class NetworkBuilder(object):
                     src_type = self.net.gid_to_type(src_gid)
                     target_type = self.net.gid_to_type(target_gid)
                     target_cell = self._cells[target_filter[target_gid]]
-                    connection_name = f'{_short_name(src_type)}_'\
-                                      f'{_short_name(target_type)}_{receptor}'
+                    connection_name = (
+                        f'{_short_name(src_type)}_'
+                        f'{_short_name(target_type)}_{receptor}'
+                    )
                     if connection_name not in self.ncs:
                         self.ncs[connection_name] = list()
                     pos_idx = src_gid - net.gid_ranges[_long_name(src_type)][0]
                     # NB pos_dict for this drive must include ALL cell types!
-                    nc_dict['pos_src'] = net.pos_dict[
-                        _long_name(src_type)][pos_idx]
+                    nc_dict['pos_src'] = net.pos_dict[_long_name(src_type)][pos_idx]
 
                     # get synapse locations
                     syn_keys = list()
@@ -521,9 +534,11 @@ class NetworkBuilder(object):
 
                     for syn_key in syn_keys:
                         nc = target_cell.parconnect_from_src(
-                            src_gid, deepcopy(nc_dict),
+                            src_gid,
+                            deepcopy(nc_dict),
                             target_cell._nrn_synapses[syn_key],
-                            net._inplane_distance)
+                            net._inplane_distance,
+                        )
                         self.ncs[connection_name].append(nc)
 
     def _record_extracellular(self):
@@ -567,10 +582,12 @@ class NetworkBuilder(object):
             # add dipoles across neurons on the current thread
             if hasattr(cell, 'dipole'):
                 if cell.dipole.size() != n_samples:
-                    raise ValueError(f"n_samples does not match the size "
-                                     f"of at least one cell's dipole vector. "
-                                     f"Got n_samples={n_samples}, {cell.name}."
-                                     f"dipole.size()={cell.dipole.size()}.")
+                    raise ValueError(
+                        f'n_samples does not match the size '
+                        f"of at least one cell's dipole vector. "
+                        f'Got n_samples={n_samples}, {cell.name}.'
+                        f'dipole.size()={cell.dipole.size()}.'
+                    )
                 nrn_dpl = self._nrn_dipoles[_long_name(cell.name)]
                 nrn_dpl.add(cell.dipole)
 
@@ -626,7 +643,7 @@ class NetworkBuilder(object):
                         elif sect.name() == 'L5Pyr_apical_tuft':
                             seg.v = -67.30
                         else:
-                            seg.v = -72.
+                            seg.v = -72.0
                     elif cell.name == 'L2Basket':
                         seg.v = -64.9737
                     elif cell.name == 'L5Basket':

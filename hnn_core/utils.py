@@ -42,19 +42,18 @@ def _savgol_filter(data, h_freq, sfreq):
     from scipy.signal import savgol_filter
 
     _validate_type(sfreq, (float, int), 'sfreq')
-    assert sfreq > 0.
+    assert sfreq > 0.0
     _validate_type(h_freq, (float, int), 'h_freq')
-    assert h_freq > 0.
+    assert h_freq > 0.0
 
     h_freq = float(h_freq)
-    if h_freq >= sfreq / 2.:
+    if h_freq >= sfreq / 2.0:
         raise ValueError('h_freq must be less than half the sample rate')
 
     # savitzky-golay filtering
     window_length = (int(np.round(sfreq / h_freq)) // 2) * 2 + 1
     # loop over 'agg', 'L2', and 'L5'
-    filt_data = savgol_filter(data, axis=-1, polyorder=5,
-                              window_length=window_length)
+    filt_data = savgol_filter(data, axis=-1, polyorder=5, window_length=window_length)
     return filt_data
 
 
@@ -76,8 +75,9 @@ def smooth_waveform(data, window_len, sfreq):
     data_filt : np.ndarray
         The filtered data
     """
-    if ((isinstance(data, np.ndarray) and data.ndim > 1) or
-            (isinstance(data, list) and isinstance(data[0], list))):
+    if (isinstance(data, np.ndarray) and data.ndim > 1) or (
+        isinstance(data, list) and isinstance(data[0], list)
+    ):
         raise RuntimeError('smoothing currently only supported for 1D-arrays')
 
     if not isinstance(window_len, (float, int)) or window_len < 0:
@@ -86,12 +86,13 @@ def smooth_waveform(data, window_len, sfreq):
         raise ValueError('Window length less than 1 ms is not supported')
 
     _validate_type(sfreq, (float, int), 'sfreq')
-    assert sfreq > 0.
+    assert sfreq > 0.0
     # convolutional filter length is given in samples
     winsz = np.round(1e-3 * window_len * sfreq)
     if winsz > len(data):
         raise ValueError(
             f'Window length too long: {winsz} samples; data length is '
-            f'{len(data)} samples')
+            f'{len(data)} samples'
+        )
 
     return _hammfilt(data, winsz)

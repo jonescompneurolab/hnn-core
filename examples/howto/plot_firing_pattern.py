@@ -33,46 +33,83 @@ net = jones_2009_model()
 # "evoked drive" defines inputs that are normally distributed with a certain
 # mean and standard deviation.
 
-weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': 7e-6,
-                   'L5_pyramidal': 0.142300}
-weights_nmda_d1 = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
-                   'L5_pyramidal': 0.080074}
-synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                      'L5_pyramidal': 0.1}
+weights_ampa_d1 = {
+    'L2_basket': 0.006562,
+    'L2_pyramidal': 7e-6,
+    'L5_pyramidal': 0.142300,
+}
+weights_nmda_d1 = {
+    'L2_basket': 0.019482,
+    'L2_pyramidal': 0.004317,
+    'L5_pyramidal': 0.080074,
+}
+synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1, 'L5_pyramidal': 0.1}
 net.add_evoked_drive(
-    'evdist1', mu=63.53, sigma=3.85, numspikes=1, weights_ampa=weights_ampa_d1,
-    weights_nmda=weights_nmda_d1, location='distal',
-    synaptic_delays=synaptic_delays_d1, event_seed=274)
+    'evdist1',
+    mu=63.53,
+    sigma=3.85,
+    numspikes=1,
+    weights_ampa=weights_ampa_d1,
+    weights_nmda=weights_nmda_d1,
+    location='distal',
+    synaptic_delays=synaptic_delays_d1,
+    event_seed=274,
+)
 
 ###############################################################################
 # The reason it is called an "evoked drive" is it can be used to simulate
 # waveforms resembling evoked responses. Here, we show how to do it with two
 # proximal drives which drive current up the dendrite and one distal drive
 # which drives current down the dendrite producing the negative deflection.
-weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
-                   'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
-synaptic_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                        'L5_basket': 1., 'L5_pyramidal': 1.}
+weights_ampa_p1 = {
+    'L2_basket': 0.08831,
+    'L2_pyramidal': 0.01525,
+    'L5_basket': 0.19934,
+    'L5_pyramidal': 0.00865,
+}
+synaptic_delays_prox = {
+    'L2_basket': 0.1,
+    'L2_pyramidal': 0.1,
+    'L5_basket': 1.0,
+    'L5_pyramidal': 1.0,
+}
 
 # all NMDA weights are zero; pass None explicitly
 net.add_evoked_drive(
-    'evprox1', mu=26.61, sigma=2.47, numspikes=1, weights_ampa=weights_ampa_p1,
-    weights_nmda=None, location='proximal',
-    synaptic_delays=synaptic_delays_prox, event_seed=544)
+    'evprox1',
+    mu=26.61,
+    sigma=2.47,
+    numspikes=1,
+    weights_ampa=weights_ampa_p1,
+    weights_nmda=None,
+    location='proximal',
+    synaptic_delays=synaptic_delays_prox,
+    event_seed=544,
+)
 
 ###############################################################################
 # Now we add the second proximal evoked drive and simulate the network
 # dynamics with somatic voltage recordings enabled. Note: only AMPA weights
 # differ from first.
-weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
-                   'L5_basket': 0.008958, 'L5_pyramidal': 0.684013}
+weights_ampa_p2 = {
+    'L2_basket': 0.000003,
+    'L2_pyramidal': 1.438840,
+    'L5_basket': 0.008958,
+    'L5_pyramidal': 0.684013,
+}
 # all NMDA weights are zero; omit weights_nmda (defaults to None)
 net.add_evoked_drive(
-    'evprox2', mu=137.12, sigma=8.33, numspikes=1,
-    weights_ampa=weights_ampa_p2, location='proximal',
-    synaptic_delays=synaptic_delays_prox, event_seed=814)
+    'evprox2',
+    mu=137.12,
+    sigma=8.33,
+    numspikes=1,
+    weights_ampa=weights_ampa_p2,
+    location='proximal',
+    synaptic_delays=synaptic_delays_prox,
+    event_seed=814,
+)
 
-dpls = simulate_dipole(net, tstop=170., record_vsec='soma')
+dpls = simulate_dipole(net, tstop=170.0, record_vsec='soma')
 
 ###############################################################################
 # Here, we explain more details about the data structures and how they can
@@ -115,12 +152,12 @@ cell_response.plot_spikes_raster()
 ###############################################################################
 # We can additionally calculate the mean spike rates for each cell class by
 # specifying a time window with ``tstart`` and ``tstop``.
-all_rates = cell_response.mean_rates(tstart=0, tstop=170,
-                                     gid_ranges=net.gid_ranges,
-                                     mean_type='all')
-trial_rates = cell_response.mean_rates(tstart=0, tstop=170,
-                                       gid_ranges=net.gid_ranges,
-                                       mean_type='trial')
+all_rates = cell_response.mean_rates(
+    tstart=0, tstop=170, gid_ranges=net.gid_ranges, mean_type='all'
+)
+trial_rates = cell_response.mean_rates(
+    tstart=0, tstop=170, gid_ranges=net.gid_ranges, mean_type='trial'
+)
 print('Mean spike rates across trials:')
 print(all_rates)
 print('Mean spike rates for individual trials:')
@@ -138,6 +175,6 @@ for idx in range(10):  # only 10 cells per cell-type
     gid = gid_ranges['L5_pyramidal'][idx]
     axes[0].plot(net.cell_response.times, vsec[gid]['soma'], color='r')
 net.cell_response.plot_spikes_raster(ax=axes[1])
-net.cell_response.plot_spikes_hist(ax=axes[2],
-                                   spike_types=['L5_pyramidal',
-                                                'L2_pyramidal'])
+net.cell_response.plot_spikes_hist(
+    ax=axes[2], spike_types=['L5_pyramidal', 'L2_pyramidal']
+)

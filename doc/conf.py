@@ -14,6 +14,7 @@
 #
 import os
 import sys
+
 # sys.path.insert(0, os.path.abspath('.'))
 import sphinx_gallery
 from sphinx_gallery.sorting import ExampleTitleSortKey, ExplicitOrder
@@ -57,7 +58,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'numpydoc',
     'sphinx_copybutton',
-    'gh_substitutions'  # custom extension, see ./sphinxext/gh_substitutions.py
+    'gh_substitutions',  # custom extension, see ./sphinxext/gh_substitutions.py
 ]
 
 # generate autosummary even if no references
@@ -68,7 +69,7 @@ numpydoc_attributes_as_param_list = True
 default_role = 'autolink'  # XXX silently allows bad syntax, someone should fix
 
 # Sphinx-Copybutton configuration
-copybutton_prompt_text = r">>> |\.\.\. |\$ "
+copybutton_prompt_text = r'>>> |\.\.\. |\$ '
 copybutton_prompt_is_regexp = True
 
 # Add any paths that contain templates here, relative to this directory.
@@ -113,13 +114,13 @@ html_theme = 'bootstrap'
 html_theme_options = {
     'navbar_sidebarrel': False,
     'navbar_links': [
-        ("Examples", "auto_examples/index"),
-        ("API", "api"),
-        ("Glossary", "glossary"),
-        ("What's new", "whats_new"),
-        ("GitHub", "https://github.com/jonescompneurolab/hnn-core", True)
+        ('Examples', 'auto_examples/index'),
+        ('API', 'api'),
+        ('Glossary', 'glossary'),
+        ("What's new", 'whats_new'),
+        ('GitHub', 'https://github.com/jonescompneurolab/hnn-core', True),
     ],
-    'bootswatch_theme': "yeti"
+    'bootswatch_theme': 'yeti',
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -150,15 +151,12 @@ latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
     # 'papersize': 'letterpaper',
-
     # The font size ('10pt', '11pt' or '12pt').
     #
     # 'pointsize': '10pt',
-
     # Additional stuff for the LaTeX preamble.
     #
     # 'preamble': '',
-
     # Latex figure (float) alignment
     #
     # 'figure_align': 'htbp',
@@ -168,8 +166,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'hnn-core.tex', 'hnn-core Documentation',
-     'Mainak Jas', 'manual'),
+    (master_doc, 'hnn-core.tex', 'hnn-core Documentation', 'Mainak Jas', 'manual'),
 ]
 
 
@@ -177,10 +174,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'hnn-core', 'hnn-core Documentation',
-     [author], 1)
-]
+man_pages = [(master_doc, 'hnn-core', 'hnn-core Documentation', [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------------
@@ -189,9 +183,15 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'hnn-core', 'hnn-core Documentation',
-     author, 'hnn-core', 'One line description of project.',
-     'Miscellaneous'),
+    (
+        master_doc,
+        'hnn-core',
+        'hnn-core Documentation',
+        author,
+        'hnn-core',
+        'One line description of project.',
+        'Miscellaneous',
+    ),
 ]
 
 intersphinx_mapping = {
@@ -199,7 +199,7 @@ intersphinx_mapping = {
     'mne': ('https://mne.tools/dev', None),
     'numpy': ('https://numpy.org/devdocs', None),
     'scipy': ('https://scipy.github.io/devdocs', None),
-    'matplotlib': ('https://matplotlib.org', None)
+    'matplotlib': ('https://matplotlib.org', None),
 }
 intersphinx_timeout = 5
 
@@ -209,7 +209,7 @@ linkcheck_ignore = [
     'https://doi.org/10.1152/jn.00535.2009',
     'https://doi.org/10.1152/jn.00122.2010',
     'https://doi.org/10.1101/2021.04.16.440210',
-    'https://groups.google.com/g/hnnsolver'
+    'https://groups.google.com/g/hnnsolver',
 ]
 
 # Resolve binder filepath_prefix. From the docs:
@@ -224,29 +224,28 @@ else:
     filepath_prefix = 'v{}'.format(version)
 
 sphinx_gallery_conf = {
-    'first_notebook_cell': ("import pyvista as pv\n"
-                            "from mne.viz import set_3d_backend\n"
-                            "set_3d_backend('notebook')\n"
-                            "pv.set_jupyter_backend('client')"
-                            ),
+    'first_notebook_cell': (
+        'import pyvista as pv\n'
+        'from mne.viz import set_3d_backend\n'
+        "set_3d_backend('notebook')\n"
+        "pv.set_jupyter_backend('client')"
+    ),
     'doc_module': 'hnn_core',
     # path to your examples scripts
     'examples_dirs': '../examples',
     # path where to save gallery generated examples
     'gallery_dirs': 'auto_examples',
     'backreferences_dir': 'generated',
-    'reference_url': {
-        'hnn_core': None
-    },
+    'reference_url': {'hnn_core': None},
     'within_subsection_order': ExampleTitleSortKey,
-    'subsection_order': ExplicitOrder(['../examples/workflows/',
-                                       '../examples/howto/']),
-    'binder': {'org': 'jonescompneurolab',
-               'repo': 'hnn-core',
-               'branch': 'gh-pages',
-               'binderhub_url': 'https://mybinder.org',
-               'filepath_prefix': filepath_prefix,
-               'notebooks_dir': 'notebooks',
-               'dependencies': 'Dockerfile'
-               }
+    'subsection_order': ExplicitOrder(['../examples/workflows/', '../examples/howto/']),
+    'binder': {
+        'org': 'jonescompneurolab',
+        'repo': 'hnn-core',
+        'branch': 'gh-pages',
+        'binderhub_url': 'https://mybinder.org',
+        'filepath_prefix': filepath_prefix,
+        'notebooks_dir': 'notebooks',
+        'dependencies': 'Dockerfile',
+    },
 }

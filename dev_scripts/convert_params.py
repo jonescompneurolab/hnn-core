@@ -31,7 +31,7 @@ def download_folder_contents(owner, repo, path):
     -------
     Path to temporary directory or None
     """
-    url = f"https://api.github.com/repos/{owner}/{repo}/contents/{path}"
+    url = f'https://api.github.com/repos/{owner}/{repo}/contents/{path}'
 
     try:
         response = requests.get(url)
@@ -47,7 +47,7 @@ def download_folder_contents(owner, repo, path):
             file_name = os.path.join(temp_dir, item['name'])
             with open(file_name, 'wb') as f:
                 f.write(requests.get(download_url).content)
-                print(f"Downloaded: {file_name}")
+                print(f'Downloaded: {file_name}')
     return temp_dir
 
 
@@ -70,36 +70,38 @@ def convert_param_files_from_repo(owner, repo, repo_path, local_path):
     # Download param files
     temp_dir = download_folder_contents(owner, repo, repo_path)
     # Get list of json and param files
-    file_list = [Path(temp_dir, f)
-                 for f in os.listdir(temp_dir)
-                 if f.endswith('.param') or f.endswith('.json')]
+    file_list = [
+        Path(temp_dir, f)
+        for f in os.listdir(temp_dir)
+        if f.endswith('.param') or f.endswith('.json')
+    ]
     # Assign output location and names
     output_dir = Path(local_path)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    output_filenames = [Path(output_dir, f.name.split('.')[0])
-                        for f in file_list]
+    output_filenames = [Path(output_dir, f.name.split('.')[0]) for f in file_list]
 
-    [convert_to_json(file, outfile)
-     for (file, outfile) in zip(file_list, output_filenames)]
+    [
+        convert_to_json(file, outfile)
+        for (file, outfile) in zip(file_list, output_filenames)
+    ]
 
     # Delete downloads
     shutil.rmtree(temp_dir)
 
 
 if __name__ == '__main__':
-
     # hnn param files
-    convert_param_files_from_repo(owner='jonescompneurolab',
-                                  repo='hnn',
-                                  repo_path='param',
-                                  local_path=(root_path /
-                                              'network_configuration'),
-                                  )
+    convert_param_files_from_repo(
+        owner='jonescompneurolab',
+        repo='hnn',
+        repo_path='param',
+        local_path=(root_path / 'network_configuration'),
+    )
     # hnn-core json files
-    convert_param_files_from_repo(owner='jonescompneurolab',
-                                  repo='hnn-core',
-                                  repo_path='hnn_core/param',
-                                  local_path=(root_path /
-                                              'network_configuration'),
-                                  )
+    convert_param_files_from_repo(
+        owner='jonescompneurolab',
+        repo='hnn-core',
+        repo_path='hnn_core/param',
+        local_path=(root_path / 'network_configuration'),
+    )

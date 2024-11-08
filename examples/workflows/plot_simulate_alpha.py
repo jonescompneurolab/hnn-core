@@ -34,22 +34,31 @@ from hnn_core import simulate_dipole, jones_2009_model
 # simulation. Each burst consists of a pair (2) of spikes, spaced 10 ms apart.
 # The occurrence of each burst is jittered by a random, normally distributed
 # amount (20 ms standard deviation). We repeat the burst train 10 times, each
-# time with unique randomization. The drive is only connected to the 
+# time with unique randomization. The drive is only connected to the
 # :term:`proximal` (dendritic) AMPA synapses on L2/3 and L5 pyramidal neurons.
 net = jones_2009_model()
 
 location = 'proximal'
 burst_std = 20
 weights_ampa_p = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
-syn_delays_p = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
+syn_delays_p = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0}
 
 net.add_bursty_drive(
-    'alpha_prox', tstart=50., burst_rate=10, burst_std=burst_std, numspikes=2,
-    spike_isi=10, n_drive_cells=10, location=location,
-    weights_ampa=weights_ampa_p, synaptic_delays=syn_delays_p, event_seed=284)
+    'alpha_prox',
+    tstart=50.0,
+    burst_rate=10,
+    burst_std=burst_std,
+    numspikes=2,
+    spike_isi=10,
+    n_drive_cells=10,
+    location=location,
+    weights_ampa=weights_ampa_p,
+    synaptic_delays=syn_delays_p,
+    event_seed=284,
+)
 
 # simulate the dipole, but do not automatically scale or smooth the result
-dpl = simulate_dipole(net, tstop=310., n_trials=1)
+dpl = simulate_dipole(net, tstop=310.0, n_trials=1)
 
 trial_idx = 0  # single trial simulated, choose the first index
 # to emulate a larger patch of cortex, we can apply a simple scaling factor
@@ -78,7 +87,7 @@ dpl[trial_idx].plot(tmin=tmin, tmax=tmax, color='b', ax=axes[0], show=False)
 dpl_smooth.plot(tmin=tmin, tmax=tmax, color='r', ax=axes[0], show=False)
 axes[0].set_xlim((1, 399))
 
-plot_psd(dpl[trial_idx], fmin=1., fmax=1e3, tmin=tmin, ax=axes[1], show=False)
+plot_psd(dpl[trial_idx], fmin=1.0, fmax=1e3, tmin=tmin, ax=axes[1], show=False)
 axes[1].set_xscale('log')
 plt.tight_layout()
 ###############################################################################
@@ -90,12 +99,21 @@ plt.tight_layout()
 location = 'distal'
 burst_std = 15
 weights_ampa_d = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
-syn_delays_d = {'L2_pyramidal': 5., 'L5_pyramidal': 5.}
+syn_delays_d = {'L2_pyramidal': 5.0, 'L5_pyramidal': 5.0}
 net.add_bursty_drive(
-    'alpha_dist', tstart=50., burst_rate=10, burst_std=burst_std, numspikes=2,
-    spike_isi=10, n_drive_cells=10, location=location,
-    weights_ampa=weights_ampa_d, synaptic_delays=syn_delays_d, event_seed=296)
-dpl = simulate_dipole(net, tstop=310., n_trials=1)
+    'alpha_dist',
+    tstart=50.0,
+    burst_rate=10,
+    burst_std=burst_std,
+    numspikes=2,
+    spike_isi=10,
+    n_drive_cells=10,
+    location=location,
+    weights_ampa=weights_ampa_d,
+    synaptic_delays=syn_delays_d,
+    event_seed=296,
+)
+dpl = simulate_dipole(net, tstop=310.0, n_trials=1)
 
 ###############################################################################
 # We can verify that beta frequency activity was produced by inspecting the PSD
@@ -114,7 +132,7 @@ smooth_dpl = dpl[trial_idx].copy().smooth(window_len)
 dpl[trial_idx].plot(tmin=tmin, tmax=tmax, ax=axes[1], color='b', show=False)
 smooth_dpl.plot(tmin=tmin, tmax=tmax, ax=axes[1], color='r', show=False)
 
-dpl[trial_idx].plot_psd(fmin=0., fmax=40., tmin=tmin, ax=axes[2])
+dpl[trial_idx].plot_psd(fmin=0.0, fmax=40.0, tmin=tmin, ax=axes[2])
 plt.tight_layout()
 
 ###############################################################################

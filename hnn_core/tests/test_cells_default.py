@@ -23,15 +23,21 @@ def test_cells_default():
     # specified in get_L5Pyr_params_default (or overridden in a params file).
     # Note that the lengths implied by _secs_L5Pyr are completely ignored:
     # NEURON extends the sections as needed to match the sec.L 's
-    vertical_secs = ['basal_1', 'soma', 'apical_trunk', 'apical_1', 'apical_2',
-                     'apical_tuft']
+    vertical_secs = [
+        'basal_1',
+        'soma',
+        'apical_trunk',
+        'apical_1',
+        'apical_2',
+        'apical_tuft',
+    ]
     for sec_name in vertical_secs:
         sec = l5p._nrn_sections[sec_name]
         vert_len = np.abs(sec.z3d(1) - sec.z3d(0))
         assert np.allclose(vert_len, sec.L)
 
     # smoke test to check if cell can be used in simulation
-    h.load_file("stdrun.hoc")
+    h.load_file('stdrun.hoc')
     h.tstop = 40
     h.dt = 0.025
     h.celsius = 37
@@ -42,8 +48,8 @@ def test_cells_default():
 
     stim = h.IClamp(l5p._nrn_sections['soma'](0.5))
     stim.delay = 5
-    stim.dur = 5.
-    stim.amp = 2.
+    stim.dur = 5.0
+    stim.amp = 2.0
 
     h.finitialize()
     h.fcurrent()

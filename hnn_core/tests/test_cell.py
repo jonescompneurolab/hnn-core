@@ -16,64 +16,52 @@ def test_cell():
     load_custom_mechanisms()
 
     name = 'test'
-    pos = (0., 0., 0.)
-    sections = {'soma': Section(L=1, diam=5, Ra=3, cm=100,
-                                end_pts=[[0, 0, 0], [0, 39., 0]])}
-    synapses = {'ampa': dict(e=0, tau1=0.5, tau2=5.)}
-    cell_tree = {
-        ('soma', 0): [('soma', 1)]
+    pos = (0.0, 0.0, 0.0)
+    sections = {
+        'soma': Section(L=1, diam=5, Ra=3, cm=100, end_pts=[[0, 0, 0], [0, 39.0, 0]])
     }
+    synapses = {'ampa': dict(e=0, tau1=0.5, tau2=5.0)}
+    cell_tree = {('soma', 0): [('soma', 1)]}
     sect_loc = {'proximal': 'soma'}
     # GID is assigned exactly once for each cell, either at initialisation...
     cell = Cell(name, pos, sections, synapses, sect_loc, cell_tree, gid=42)
     assert cell.gid == 42
-    with pytest.raises(RuntimeError,
-                       match='Global ID for this cell already assigned!'):
+    with pytest.raises(RuntimeError, match='Global ID for this cell already assigned!'):
         cell.gid += 1
     # ... or later
     # cells can exist fine without gid
     cell = Cell(name, pos, sections, synapses, sect_loc, cell_tree)
     assert cell.gid is None  # check that it's initialised to None
-    with pytest.raises(ValueError,
-                       match='gid must be an integer'):
+    with pytest.raises(ValueError, match='gid must be an integer'):
         cell.gid = [1]
     cell.gid = 42
     assert cell.gid == 42
-    with pytest.raises(ValueError,
-                       match='gid must be an integer'):
+    with pytest.raises(ValueError, match='gid must be an integer'):
         # test init checks gid
-        cell = Cell(name, pos, sections, synapses, sect_loc, cell_tree,
-                    gid='one')
+        cell = Cell(name, pos, sections, synapses, sect_loc, cell_tree, gid='one')
 
     # test that ExpSyn always takes nrn.Segment, not float
     with pytest.raises(TypeError, match='secloc must be instance of'):
-        cell.syn_create(0.5, e=0., tau1=0.5, tau2=5.)
+        cell.syn_create(0.5, e=0.0, tau1=0.5, tau2=5.0)
 
     pickle.dumps(cell)  # check cell object is picklable until built
 
-    bad_sections = {'blah': Section(L=1, diam=5, Ra=3, cm=100,
-                    end_pts=[[0, 0, 0], [0, 39., 0]])}
+    bad_sections = {
+        'blah': Section(L=1, diam=5, Ra=3, cm=100, end_pts=[[0, 0, 0], [0, 39.0, 0]])
+    }
     # Check soma must be included in sections
     with pytest.raises(KeyError, match='soma must be defined'):
         cell = Cell(name, pos, bad_sections, synapses, sect_loc, cell_tree)
 
     sections = {
         'soma': Section(
-            L=39,
-            diam=20,
-            cm=0.85,
-            Ra=200.,
-            end_pts=[[0, 0, 0], [0, 39., 0]]
+            L=39, diam=20, cm=0.85, Ra=200.0, end_pts=[[0, 0, 0], [0, 39.0, 0]]
         )
     }
     sections['soma'].syns = ['ampa']
     sections['soma'].mechs = {
-        'km': {
-            'gbar_km': 60
-        },
-        'ca': {
-            'gbar_ca': lambda x: 3e-3 * x
-        }
+        'km': {'gbar_km': 60},
+        'ca': {'gbar_ca': lambda x: 3e-3 * x},
     }
 
     cell = Cell(name, pos, sections, synapses, sect_loc, cell_tree)
@@ -82,8 +70,7 @@ def test_cell():
     cell.build()
     assert 'soma' in cell._nrn_sections
     assert cell._nrn_sections['soma'].L == sections['soma'].L
-    assert cell._nrn_sections['soma'].gbar_km == sections[
-        'soma'].mechs['km']['gbar_km']
+    assert cell._nrn_sections['soma'].gbar_km == sections['soma'].mechs['km']['gbar_km']
     # test building cell with a dipole oriented to a nonexitent section
     with pytest.raises(ValueError, match='sec_name_apical must be an'):
         cell.build(sec_name_apical='blah')
@@ -110,10 +97,10 @@ def test_cell():
     cell1 = pyramidal(cell_name='L5Pyr')
 
     # Test other not NotImplemented for Cell Class
-    assert (cell1 == "cell") is False
+    assert (cell1 == 'cell') is False
 
     # Test other not NotImplemented for Section Class
-    assert (cell1.sections['soma'] == "section") is False
+    assert (cell1.sections['soma'] == 'section') is False
 
     end_pts_original = list()
     end_pts_new = list()
@@ -131,8 +118,7 @@ def test_cell():
     cell1.plot_morphology(show=True)
     for end_pt_original, end_pt_new in zip(end_pts_original, end_pts_new):
         for pt_original, pt_new in zip(end_pt_original, end_pt_new):
-            np.testing.assert_almost_equal(list(np.array(pt_original) * 2),
-                                           pt_new, 5)
+            np.testing.assert_almost_equal(list(np.array(pt_original) * 2), pt_new, 5)
 
     for sec_name in cell1.sections.keys():
         section = cell1.sections[sec_name]
@@ -182,17 +168,17 @@ def test_artificial_cell():
     # GID is assigned exactly once for each cell, either at initialisation...
     cell = _ArtificialCell(event_times, threshold, gid=42)
     assert cell.gid == 42
-    with pytest.raises(RuntimeError,
-                       match='Global ID for this cell already assigned!'):
+    with pytest.raises(RuntimeError, match='Global ID for this cell already assigned!'):
         cell.gid += 1
-    with pytest.raises(ValueError,
-                       match='gid must be an integer'):
+    with pytest.raises(ValueError, match='gid must be an integer'):
         cell.gid = [1]
     # ... or later
     cell = _ArtificialCell(event_times, threshold)  # fine without gid
     assert cell.gid is None  # check that it's initialised to None
     cell.gid = 42
     assert cell.gid == 42
-    with pytest.raises(ValueError,  # test init checks gid
-                       match='gid must be an integer'):
+    with pytest.raises(
+        ValueError,  # test init checks gid
+        match='gid must be an integer',
+    ):
         cell = _ArtificialCell(event_times, threshold, gid='one')

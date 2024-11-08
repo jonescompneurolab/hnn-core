@@ -19,8 +19,9 @@ from .externals.mne import _validate_type, _check_option
 
 def _get_cos_theta(sections, sec_name_apical):
     """Get cos(theta) to compute dipole along the apical dendrite."""
-    a = (np.array(sections[sec_name_apical].end_pts[1]) -
-         np.array(sections[sec_name_apical].end_pts[0]))
+    a = np.array(sections[sec_name_apical].end_pts[1]) - np.array(
+        sections[sec_name_apical].end_pts[0]
+    )
     cos_thetas = dict()
     for sec_name, section in sections.items():
         b = np.array(section.end_pts[1]) - np.array(section.end_pts[0])
@@ -55,8 +56,7 @@ def _calculate_gaussian(x_val, height, lamtha):
     return x_height
 
 
-def _get_gaussian_connection(src_pos, target_pos, nc_dict,
-                             inplane_distance=1.):
+def _get_gaussian_connection(src_pos, target_pos, nc_dict, inplane_distance=1.0):
     """Calculate distance dependent connection properties.
 
     Parameters
@@ -88,15 +88,13 @@ def _get_gaussian_connection(src_pos, target_pos, nc_dict,
     cell_dist = np.sqrt(x_dist**2 + y_dist**2)
     scaled_lamtha = nc_dict['lamtha'] * inplane_distance
 
-    weight = _calculate_gaussian(
-        cell_dist, nc_dict['A_weight'], scaled_lamtha)
-    delay = nc_dict['A_delay'] / _calculate_gaussian(
-        cell_dist, 1, scaled_lamtha)
+    weight = _calculate_gaussian(cell_dist, nc_dict['A_weight'], scaled_lamtha)
+    delay = nc_dict['A_delay'] / _calculate_gaussian(cell_dist, 1, scaled_lamtha)
     return weight, delay
 
 
 def node_to_str(node):
-    return node[0] + "," + str(node[1])
+    return node[0] + ',' + str(node[1])
 
 
 class _ArtificialCell:
@@ -127,6 +125,7 @@ class _ArtificialCell:
     gid : int
         GID of the cell in a network (or None if not yet assigned)
     """
+
     def __init__(self, event_times, threshold, gid=None):
         # Convert event times into nrn vector
         self.nrn_eventvec = h.Vector()
@@ -160,8 +159,8 @@ class _ArtificialCell:
 
 def _get_nseg(L):
     nseg = 1
-    if L > 100.:  # 100 um
-        nseg = int(L / 50.)
+    if L > 100.0:  # 100 um
+        nseg = int(L / 50.0)
         # make dend.nseg odd for all sections
         if not nseg % 2:
             nseg += 1
@@ -205,8 +204,8 @@ class Section:
     nseg : int
         Number of segments in the section
     """
-    def __init__(self, L, diam, Ra, cm, end_pts=None):
 
+    def __init__(self, L, diam, Ra, cm, end_pts=None):
         self._L = L
         self._diam = diam
         self._Ra = Ra
@@ -238,8 +237,7 @@ class Section:
 
         # Check end_pts
         for self_end_pt, other_end_pt in zip(self.end_pts, other.end_pts):
-            if np.testing.assert_almost_equal(self_end_pt,
-                                              other_end_pt, 5) is not None:
+            if np.testing.assert_almost_equal(self_end_pt, other_end_pt, 5) is not None:
                 return False
 
         all_attrs = dir(self)
@@ -378,14 +376,15 @@ class Cell:
         )
     """
 
-    def __init__(self, name, pos, sections, synapses, sect_loc, cell_tree,
-                 gid=None):
+    def __init__(self, name, pos, sections, synapses, sect_loc, cell_tree, gid=None):
         self.name = name
         self.pos = pos
         for section in sections.values():
             if not isinstance(section, Section):
-                raise ValueError(f'Items in section must be instances'
-                                 f' of Section. Got {type(section)}')
+                raise ValueError(
+                    f'Items in section must be instances'
+                    f' of Section. Got {type(section)}'
+                )
         self.sections = sections
         self.synapses = synapses
         self.sect_loc = sect_loc
@@ -419,12 +418,25 @@ class Cell:
 
         all_attrs = dir(self)
         attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
-        attrs_to_ignore.extend(['build', 'copy', 'create_tonic_bias',
-                                'define_shape', 'distance_section', 'gid',
-                                'list_IClamp', 'modify_section',
-                                'parconnect_from_src', 'plot_morphology',
-                                'record', 'sections', 'setup_source_netcon',
-                                'syn_create', 'to_dict'])
+        attrs_to_ignore.extend(
+            [
+                'build',
+                'copy',
+                'create_tonic_bias',
+                'define_shape',
+                'distance_section',
+                'gid',
+                'list_IClamp',
+                'modify_section',
+                'parconnect_from_src',
+                'plot_morphology',
+                'record',
+                'sections',
+                'setup_source_netcon',
+                'syn_create',
+                'to_dict',
+            ]
+        )
         attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
 
         # Check all other attributes
@@ -508,8 +520,7 @@ class Cell:
         # Python version of the Neuron distance function
         # https://nrn.readthedocs.io/en/latest/python/modelspec/programmatic/topology/geometry.html#distance  # noqa
         if self.cell_tree is None:
-            raise TypeError("distance_section() "
-                            "cannot work with cell_tree as None.")
+            raise TypeError('distance_section() ' 'cannot work with cell_tree as None.')
         if curr_node not in self.cell_tree:
             return np.nan
 
@@ -530,9 +541,11 @@ class Cell:
 
         # Recursion to find distance
         for node in self.cell_tree[curr_node]:
-            if (node[0] == curr_node[0]):
-                dist_temp = (self.distance_section(target_sec_name, node) +
-                             self.sections[node[0]].L)
+            if node[0] == curr_node[0]:
+                dist_temp = (
+                    self.distance_section(target_sec_name, node)
+                    + self.sections[node[0]].L
+                )
             else:
                 dist_temp = self.distance_section(target_sec_name, node)
             if np.isnan(dist) and np.isnan(dist_temp):
@@ -576,18 +589,15 @@ class Cell:
                 for attr, val in p_mech.items():
                     if hasattr(val, '__call__'):
                         seg_xs, seg_vals = list(), list()
-                        section_distance = self.distance_section(sec_name,
-                                                                 ('soma', 0))
-                        seg_centers = (np.linspace(0, 1, section.nseg * 2 + 1)
-                                       [1::2])
+                        section_distance = self.distance_section(sec_name, ('soma', 0))
+                        seg_centers = np.linspace(0, 1, section.nseg * 2 + 1)[1::2]
 
                         for seg_x in seg_centers:
                             # sec_end_dist is distance between 0 end of soma to
                             # the 0 or 1 end of section (whichever is closer)
                             sec_end_dist = section_distance - (section.L / 2)
                             seg_xs.append(seg_x)
-                            seg_vals.append(val(sec_end_dist +
-                                                (seg_x * section.L)))
+                            seg_vals.append(val(sec_end_dist + (seg_x * section.L)))
                         p_mech[attr] = [seg_xs, seg_vals]
         return self.sections
 
@@ -597,8 +607,7 @@ class Cell:
             for receptor in sections[sec_name].syns:
                 syn_key = f'{sec_name}_{receptor}'
                 seg = self._nrn_sections[sec_name](0.5)
-                self._nrn_synapses[syn_key] = self.syn_create(
-                    seg, **synapses[receptor])
+                self._nrn_synapses[syn_key] = self.syn_create(seg, **synapses[receptor])
 
     def _create_sections(self, sections, cell_tree):
         """Create soma and set geometry.
@@ -662,9 +671,11 @@ class Cell:
         if sec_name_apical in self._nrn_sections:
             self._insert_dipole(sec_name_apical)
         elif sec_name_apical is not None:
-            raise ValueError(f'sec_name_apical must be an existing '
-                             f'section of the current cell or None. '
-                             f'Got {sec_name_apical}.')
+            raise ValueError(
+                f'sec_name_apical must be an existing '
+                f'section of the current cell or None. '
+                f'Got {sec_name_apical}.'
+            )
 
     def copy(self):
         """Return copy of instance."""
@@ -749,7 +760,7 @@ class Cell:
         self.tonic_biases.append(stim)
 
     def record(self, record_vsec=False, record_isec=False, record_ca=False):
-        """ Record current and voltage from all sections
+        """Record current and voltage from all sections
 
         Parameters
         ----------
@@ -775,8 +786,7 @@ class Cell:
         if record_vsec:
             for sec_name in self.vsec:
                 self.vsec[sec_name] = h.Vector()
-                self.vsec[sec_name].record(
-                    self._nrn_sections[sec_name](0.5)._ref_v)
+                self.vsec[sec_name].record(self._nrn_sections[sec_name](0.5)._ref_v)
 
         if record_isec == 'soma':
             self.isec = dict.fromkeys(['soma'])
@@ -785,14 +795,18 @@ class Cell:
 
         if record_isec:
             for sec_name in self.isec:
-                list_syn = [key for key in self._nrn_synapses.keys()
-                            if key.startswith(f'{sec_name}_')]
+                list_syn = [
+                    key
+                    for key in self._nrn_synapses.keys()
+                    if key.startswith(f'{sec_name}_')
+                ]
                 self.isec[sec_name] = dict.fromkeys(list_syn)
 
                 for syn_name in self.isec[sec_name]:
                     self.isec[sec_name][syn_name] = h.Vector()
                     self.isec[sec_name][syn_name].record(
-                        self._nrn_synapses[syn_name]._ref_i)
+                        self._nrn_synapses[syn_name]._ref_i
+                    )
 
         # calcium concentration
         if record_ca == 'soma':
@@ -804,8 +818,7 @@ class Cell:
             for sec_name in self.ca:
                 if hasattr(self._nrn_sections[sec_name](0.5), '_ref_cai'):
                     self.ca[sec_name] = h.Vector()
-                    self.ca[sec_name].record(
-                        self._nrn_sections[sec_name](0.5)._ref_cai)
+                    self.ca[sec_name].record(self._nrn_sections[sec_name](0.5)._ref_cai)
 
     def syn_create(self, secloc, e, tau1, tau2):
         """Create an h.Exp2Syn synapse.
@@ -827,8 +840,9 @@ class Cell:
             A two state kinetic scheme synapse.
         """
         if not isinstance(secloc, nrn.Segment):
-            raise TypeError(f'secloc must be instance of'
-                            f'nrn.Segment. Got {type(secloc)}')
+            raise TypeError(
+                f'secloc must be instance of' f'nrn.Segment. Got {type(secloc)}'
+            )
         syn = h.Exp2Syn(secloc)
         syn.e = e
         syn.tau1 = tau1
@@ -843,13 +857,13 @@ class Cell:
         threshold : float
             The voltage threshold for action potential.
         """
-        nc = h.NetCon(self._nrn_sections['soma'](0.5)._ref_v, None,
-                      sec=self._nrn_sections['soma'])
+        nc = h.NetCon(
+            self._nrn_sections['soma'](0.5)._ref_v, None, sec=self._nrn_sections['soma']
+        )
         nc.threshold = threshold
         return nc
 
-    def parconnect_from_src(self, gid_presyn, nc_dict, postsyn,
-                            inplane_distance):
+    def parconnect_from_src(self, gid_presyn, nc_dict, postsyn, inplane_distance):
         """Parallel receptor-centric connect FROM presyn TO this cell,
            based on GID.
 
@@ -878,14 +892,21 @@ class Cell:
         # set props here.
         nc.threshold = nc_dict['threshold']
         nc.weight[0], nc.delay = _get_gaussian_connection(
-            nc_dict['pos_src'], self.pos, nc_dict,
-            inplane_distance=inplane_distance)
+            nc_dict['pos_src'], self.pos, nc_dict, inplane_distance=inplane_distance
+        )
 
         return nc
 
-    def plot_morphology(self, ax=None, color=None, pos=(0, 0, 0),
-                        xlim=(-250, 150), ylim=(-100, 100), zlim=(-100, 1200),
-                        show=True):
+    def plot_morphology(
+        self,
+        ax=None,
+        color=None,
+        pos=(0, 0, 0),
+        xlim=(-250, 150),
+        ylim=(-100, 100),
+        zlim=(-100, 1200),
+        show=True,
+    ):
         """Plot the cell morphology.
 
         Parameters
@@ -916,8 +937,16 @@ class Cell:
         axes : instance of Axes3D
             The matplotlib 3D axis handle.
         """
-        return plot_cell_morphology(self, ax=ax, color=color, pos=pos,
-                                    xlim=xlim, ylim=ylim, zlim=zlim, show=show)
+        return plot_cell_morphology(
+            self,
+            ax=ax,
+            color=color,
+            pos=pos,
+            xlim=xlim,
+            ylim=ylim,
+            zlim=zlim,
+            show=show,
+        )
 
     def _update_section_end_pts_L(self, node, dpt):
         if self.cell_tree is None:
@@ -966,8 +995,7 @@ class Cell:
             node_opp_end = 0
         pts = self.sections[node[0]].end_pts
         x0, y0, z0 = pts[node[1]][0], pts[node[1]][1], pts[node[1]][2]
-        x1, y1, z1 = (pts[node_opp_end][0], pts[node_opp_end][1],
-                      pts[node_opp_end][2])
+        x1, y1, z1 = (pts[node_opp_end][0], pts[node_opp_end][1], pts[node_opp_end][2])
 
         # Find the factor by which length is changed
         end_1 = np.array((x0, y0, z0))
@@ -1017,13 +1045,7 @@ class Cell:
             end_pts = self.sections[sec_name].end_pts
             updated_end_pts = list()
             for pt in end_pts:
-                updated_end_pts.append(
-                    [
-                        pt[0] + dx,
-                        pt[1] + dy,
-                        pt[2] + dz
-                    ]
-                )
+                updated_end_pts.append([pt[0] + dx, pt[1] + dy, pt[2] + dz])
             self.sections[sec_name]._end_pts = updated_end_pts
 
         # Check and update all end pts starting from root according to length
