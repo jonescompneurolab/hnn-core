@@ -7,3 +7,8 @@ check-hidden = true
 # in jupyter notebooks - images and also some embedded outputs
 ignore-regex = '^\s*"image/\S+": ".*|.*%22%3A%20.*'
 ignore-words-list = 'tha,nam,sherif,dout'
+
+[tool.ruff]
+exclude = ["*.ipynb"]
+[tool.ruff.format]
+quote-style = "single"

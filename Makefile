@@ -7,14 +7,17 @@
 
 all: modl
 
-modl:
-	cd hnn_core/mod/ && nrnivmodl
-
 clean :
 	rm -rf hnn_core/mod/x86_64/*
 
 check-manifest:
 	check-manifest
+
+format:
+	ruff format
+
+modl:
+	cd hnn_core/mod/ && nrnivmodl
 
 test:
 	pytest .
