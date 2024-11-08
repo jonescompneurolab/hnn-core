@@ -116,6 +116,8 @@ def test_gui_compose():
     gui = HNNGUI()
     gui.compose()
     assert len(gui.connectivity_widgets) == 12
+    assert len(gui.synaptic_gain_widgets) == 4
+    assert len(gui.cell_parameters_widgets) == 6
     assert len(gui.drive_widgets) == 3
     plt.close('all')
 
@@ -309,7 +311,8 @@ def test_gui_change_connectivity():
                                            _single_simulation,
                                            gui.drive_widgets,
                                            gui.connectivity_widgets,
-                                           gui.cell_pameters_widgets,
+                                           gui.cell_parameters_widgets,
+                                           gui.synaptic_gain_widgets,
                                            add_drive=False)
 
                 # test if the new value is reflected in the network
@@ -348,7 +351,8 @@ def test_gui_init_network(setup_gui):
     _init_network_from_widgets(gui.params, gui.widget_dt, gui.widget_tstop,
                                _single_simulation, gui.drive_widgets,
                                gui.connectivity_widgets,
-                               gui.cell_pameters_widgets)
+                               gui.cell_parameters_widgets,
+                               gui.synaptic_gain_widgets)
     plt.close('all')
 
     net_from_gui = _single_simulation['net']
@@ -933,7 +937,8 @@ def test_gui_add_tonic_input():
     _init_network_from_widgets(gui.params, gui.widget_dt, gui.widget_tstop,
                                _single_simulation, gui.drive_widgets,
                                gui.connectivity_widgets,
-                               gui.cell_pameters_widgets)
+                               gui.cell_parameters_widgets,
+                               gui.synaptic_gain_widgets)
 
     net = _single_simulation['net']
     assert net.external_biases['tonic'] is not None
@@ -960,7 +965,7 @@ def test_gui_cell_params_widgets(setup_gui):
     layers = gui.cell_layer_radio_buttons.options
     assert (len(layers) == 3)
 
-    keys = gui.cell_pameters_widgets.keys()
+    keys = gui.cell_parameters_widgets.keys()
     num_cell_params = 0
     for pyramid_cell_type in pyramid_cell_types:
         cell_type = pyramid_cell_type.split('_')[0]
@@ -1116,3 +1121,33 @@ def test_delete_single_drive(setup_gui):
                                           'alpha_prox (proximal)',
                                           'poisson (proximal)',
                                           'tonic')
+
+
+def test_adjust_synaptic_weights(setup_gui):
+    """Test adjusting synaptic weight widgets."""
+
+    gui = setup_gui
+    _single_simulation = {}
+    _single_simulation['net'] = dict_to_network(gui.params)
+    _init_network_from_widgets(gui.params, gui.widget_dt, gui.widget_tstop,
+                               _single_simulation, gui.drive_widgets,
+                               gui.connectivity_widgets,
+                               gui.cell_parameters_widgets,
+                               gui.synaptic_gain_widgets)
+
+    gains_default = _single_simulation['net'].get_synaptic_gains()
+    assert gains_default == {'e_e': 1.0, 'e_i': 1.0, 'i_e': 1.0, 'i_i': 1.0}
+
+    # Change the synaptic weight widgets
+    gui.synaptic_gain_widgets['e_e'].value = 0.5
+    gui.synaptic_gain_widgets['e_i'].value = 0.5
+    gui.synaptic_gain_widgets['i_i'].value = 1.1
+    gui.synaptic_gain_widgets['i_e'].value = 1.1
+    _init_network_from_widgets(gui.params, gui.widget_dt, gui.widget_tstop,
+                               _single_simulation, gui.drive_widgets,
+                               gui.connectivity_widgets,
+                               gui.cell_parameters_widgets,
+                               gui.synaptic_gain_widgets)
+
+    gains_altered = _single_simulation['net'].get_synaptic_gains()
+    assert gains_altered == {'e_e': 0.5, 'e_i': 0.5, 'i_e': 1.1, 'i_i': 1.1}
