@@ -318,6 +318,40 @@ def test_gui_change_connectivity():
     plt.close('all')
 
 
+def test_gui_connectivty_probability():
+    gui = HNNGUI()
+    _ = gui.compose()
+
+    for conn_widget in gui.connectivity_widgets:
+        assert conn_widget[0].children[2].description == 'probability'
+        assert isinstance(conn_widget[0].children[2].value, float)
+
+    # Change probability of the first widget
+    probability = 0.5
+    gui.connectivity_widgets[0][0].children[2].value = probability
+    conn_specs = gui.connectivity_widgets[0][0]._belongsto
+
+    # now the default parameter has been loaded.
+    single_simulation = {}
+    single_simulation['net'] = jones_2009_model(gui.params)
+
+    conn_idx = pick_connection(
+        net=single_simulation['net'],
+        src_gids=conn_specs['src_gids'],
+        target_gids=conn_specs['target_gids'],
+        loc=conn_specs['location'],
+        receptor=conn_specs['receptor'])
+
+    _init_network_from_widgets(gui.params, gui.widget_dt, gui.widget_tstop,
+                               single_simulation, gui.drive_widgets,
+                               gui.connectivity_widgets,
+                               gui.cell_pameters_widgets)
+
+    conn = single_simulation['net'].connectivity[conn_idx[0]]
+
+    assert conn['probability'] == probability
+
+
 def test_gui_add_drives():
     """Test if gui add different type of drives."""
     gui = HNNGUI()

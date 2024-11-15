@@ -1148,17 +1148,23 @@ def _get_connectivity_widgets(conn_data):
 
     style = {'description_width': '150px'}
     style = {}
-    sliders = list()
+    conn_widgets = list()
     for receptor_name in conn_data.keys():
-        w_text_input = BoundedFloatText(
+        weight_text_input = BoundedFloatText(
             value=conn_data[receptor_name]['weight'], disabled=False,
             continuous_update=False, min=0, max=1e6, step=0.01,
             description="weight", style=style)
+        probability_text_input = BoundedFloatText(
+            value=conn_data[receptor_name]['probability'], disabled=False,
+            continuous_update=False, min=0, max=1.0, step=0.01,
+            description="probability", style=style)
 
         conn_widget = VBox([
-            HTML(value=f"""<p>
-            Receptor: {conn_data[receptor_name]['receptor']}</p>"""),
-            w_text_input, HTML(value="<hr style='margin-bottom:5px'/>")
+            HTML(value=f"""<p>Receptor: {conn_data[receptor_name]['receptor']}
+                           </p>"""),
+            weight_text_input,
+            probability_text_input,
+            HTML(value="<hr style='margin-bottom:5px'/>")
         ])
 
         conn_widget._belongsto = {
@@ -1167,9 +1173,9 @@ def _get_connectivity_widgets(conn_data):
             "src_gids": conn_data[receptor_name]['src_gids'],
             "target_gids": conn_data[receptor_name]['target_gids'],
         }
-        sliders.append(conn_widget)
+        conn_widgets.append(conn_widget)
 
-    return sliders
+    return conn_widgets
 
 
 def _get_drive_weight_widgets(layout, style, location, data=None):
