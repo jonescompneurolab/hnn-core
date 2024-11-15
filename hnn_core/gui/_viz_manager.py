@@ -303,12 +303,23 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
             step_f = 1.0
             freqs = np.arange(min_f, max_f, step_f)
             n_cycles = freqs / 2.
-            dpls_copied[0].plot_tfr_morlet(
-                freqs,
-                n_cycles=n_cycles,
-                colormap=plot_config['spectrogram_cm'],
-                ax=ax, colorbar_inside=True,
-                show=False)
+
+            try:
+                dpls_copied[0].plot_tfr_morlet(
+                    freqs,
+                    n_cycles=n_cycles,
+                    colormap=plot_config['spectrogram_cm'],
+                    ax=ax, colorbar_inside=True,
+                    show=False)
+
+            except ValueError as ex:
+                if str(ex) == ('At least one of the wavelets is longer than '
+                               'the signal. Use a longer signal or shorter '
+                               'wavelets.'):
+                    logger.error('At least one of the wavelets is '
+                                 'longer than the signal. Use a longer signal '
+                                 'or shorter wavelets. No spectrogram will be '
+                                 'plotted.')
 
     elif 'dipole' in plot_type:
         if len(dpls_copied) > 0:
