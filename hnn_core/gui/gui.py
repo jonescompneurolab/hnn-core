@@ -323,7 +323,7 @@ class HNNGUI:
         # In-memory storage of all simulation and visualization related data
         self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
 
-        # Default vizualization params for figures
+        # Default visualization params for figures
         self.widget_default_smoothing = BoundedFloatText(
             value=30.0, description='Smoothing:',
             min=0.0, max=100.0, step=1.0, disabled=False)
