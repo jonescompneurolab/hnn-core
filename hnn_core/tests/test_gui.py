@@ -1120,42 +1120,49 @@ def test_delete_single_drive(setup_gui):
 
 def test_default_smoothing(setup_gui):
     """Tests default smoothing is inherited correctly"""
-    import pdb  # pdb
 
     gui = setup_gui
     gui.run_button.click()
 
     gui.widget_simulation_name.value = 'no_smoothing'
-    gui.widget_default_smoothing.value = 0
+
+    # change value of default smoothing via the widget
+    new_smoothing = 0
+    gui.widget_default_smoothing.value = new_smoothing
 
     gui.run_button.click()
 
-    pdb.set_trace()  # pdb ##################################################
+    # check that new default smoothing value is set everywhere
+    gui_smooth_value = gui.fig_default_params['default_smoothing']
+    viz_smooth_value = gui.viz_manager.fig_default_params['default_smoothing']
 
-    # gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
-    # gui._simulate_viz_action("add_fig")
-    # figid = 2
-    # figname = f'Figure {figid}'
-    # axname = 'ax0'
+    assert gui_smooth_value == new_smoothing
+    assert viz_smooth_value == new_smoothing
 
-    # _dipole_plot_types = [
-    #     'current dipole',
-    #     'layer2 dipole',
-    #     'layer5 dipole',
-    # ]
+    # check that dipole plots have data
+    gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
+    gui._simulate_viz_action("add_fig")
+    figid = 2
+    figname = f'Figure {figid}'
+    axname = 'ax0'
 
-    # for viz_type in _dipole_plot_types:
-    #     gui._simulate_viz_action("edit_figure", figname,
-    #                              axname, 'default', viz_type, {}, 'clear')
+    _dipole_plot_types = [
+        'current dipole',
+        'layer2 dipole',
+        'layer5 dipole',
+    ]
 
-    #     # Check that extra axes have been successfully removed
-    #     assert len(gui.viz_manager.figs[figid].axes) == 1
-    #     # Check if data on the axes has been successfully cleared
-    #     assert not gui.viz_manager.figs[figid].axes[0].has_data()
+    for viz_type in _dipole_plot_types:
+        gui._simulate_viz_action(
+            "edit_figure", figname,
+            axname, 'no_smoothing', viz_type, {}, 'clear'
+        )
 
-    #     gui._simulate_viz_action("edit_figure", figname,
-    #                              axname, 'default', viz_type, {}, 'plot')
-    #     # Check if data is plotted on the axes
-    #     assert gui.viz_manager.figs[figid].axes[0].has_data()
+        gui._simulate_viz_action(
+            "edit_figure", figname,
+            axname, 'no_smoothing', viz_type, {}, 'plot')
+
+        # Check if data is plotted on the axes
+        assert gui.viz_manager.figs[figid].axes[0].has_data()
 
     plt.close('all')
