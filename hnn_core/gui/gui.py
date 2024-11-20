@@ -323,10 +323,16 @@ class HNNGUI:
         # In-memory storage of all simulation and visualization related data
         self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
 
-        # Simulation parameters
+        # Default vizualization params for figures
         self.widget_default_smoothing = BoundedFloatText(
             value=30.0, description='Smoothing:',
             min=0.0, max=100.0, step=1.0, disabled=False)
+
+        self.fig_default_params = {
+            'default_smoothing': self.widget_default_smoothing.value
+        }
+
+        # Simulation parameters
         self.widget_tstop = BoundedFloatText(
             value=170, description='tstop (ms):', min=0, max=1e6, step=1,
             disabled=False)
@@ -480,7 +486,7 @@ class HNNGUI:
         self._log_out = Output()
 
         self.viz_manager = _VizManager(self.data, self.layout,
-                                       self.widget_default_smoothing.value)
+                                       self.fig_default_params)
 
         # detailed configuration of backends
         self._backend_config_out = Output()
@@ -519,6 +525,11 @@ class HNNGUI:
     def data(self):
         """Provides easy access to simulation-related data."""
         return {"simulation_data": self.simulation_data}
+
+    # @property
+    # def fig_default_params(self):
+    #     """Expose default visualization parameters for figures"""
+    #     return {"fig_default_params": self.fig_default_params}
 
     @staticmethod
     def load_parameters(params_fname):
@@ -569,7 +580,7 @@ class HNNGUI:
             return run_button_clicked(
                 self.widget_simulation_name, self._log_out, self.drive_widgets,
                 self.data, self.widget_dt, self.widget_tstop,
-                self.widget_default_smoothing,
+                self.fig_default_params, self.widget_default_smoothing,
                 self.widget_ntrials, self.widget_backend_selection,
                 self.widget_mpi_cmd, self.widget_n_jobs, self.params,
                 self._simulation_status_bar, self._simulation_status_contents,
@@ -1759,7 +1770,7 @@ def on_upload_data_change(change, data, viz_manager, log_out):
         # Create a dipole plot
         _template_name = "[Blank] single figure"
         viz_manager.reset_fig_config_tabs(template_name=_template_name)
-        viz_manager.add_figure(default_smoothing=0)
+        viz_manager.add_figure()
         fig_name = _idx2figname(viz_manager.data['fig_idx']['idx'] - 1)
         process_configs = {'dipole_smooth': 0, 'dipole_scaling': 1}
         viz_manager._simulate_edit_figure(fig_name,
@@ -1915,7 +1926,8 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
 
 
 def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
-                       all_data, dt, tstop, widget_default_smoothing,
+                       all_data, dt, tstop,
+                       fig_default_params, widget_default_smoothing,
                        ntrials, backend_selection,
                        mpi_cmd, n_jobs, params, simulation_status_bar,
                        simulation_status_contents, connectivity_textfields,
@@ -1966,9 +1978,13 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
             simulations_list_widget.value = sim_names[0]
 
     viz_manager.reset_fig_config_tabs()
-    default_smoothing = widget_default_smoothing.value
-    viz_manager.default_smoothing = default_smoothing
-    viz_manager.add_figure(default_smoothing=default_smoothing)
+    # set default_smoothing in fig_default_params
+    display(widget_default_smoothing.value)
+    fig_default_params['default_smoothing'] = widget_default_smoothing.value
+    # change default smoothing in viz_manager
+    new_default_smoothing = fig_default_params['default_smoothing']
+    viz_manager.fig_default_params['default_smoothing'] = new_default_smoothing
+    viz_manager.add_figure()
     fig_name = _idx2figname(viz_manager.data['fig_idx']['idx'] - 1)
     ax_plots = [("ax0", "input histogram"), ("ax1", "current dipole")]
     for ax_name, plot_type in ax_plots:

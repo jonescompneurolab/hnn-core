@@ -1116,3 +1116,46 @@ def test_delete_single_drive(setup_gui):
                                           'alpha_prox (proximal)',
                                           'poisson (proximal)',
                                           'tonic')
+
+
+def test_default_smoothing(setup_gui):
+    """Tests default smoothing is inherited correctly"""
+    import pdb  # pdb
+
+    gui = setup_gui
+    gui.run_button.click()
+
+    gui.widget_simulation_name.value = 'no_smoothing'
+    gui.widget_default_smoothing.value = 0
+
+    gui.run_button.click()
+
+    pdb.set_trace()  # pdb ##################################################
+
+    # gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
+    # gui._simulate_viz_action("add_fig")
+    # figid = 2
+    # figname = f'Figure {figid}'
+    # axname = 'ax0'
+
+    # _dipole_plot_types = [
+    #     'current dipole',
+    #     'layer2 dipole',
+    #     'layer5 dipole',
+    # ]
+
+    # for viz_type in _dipole_plot_types:
+    #     gui._simulate_viz_action("edit_figure", figname,
+    #                              axname, 'default', viz_type, {}, 'clear')
+
+    #     # Check that extra axes have been successfully removed
+    #     assert len(gui.viz_manager.figs[figid].axes) == 1
+    #     # Check if data on the axes has been successfully cleared
+    #     assert not gui.viz_manager.figs[figid].axes[0].has_data()
+
+    #     gui._simulate_viz_action("edit_figure", figname,
+    #                              axname, 'default', viz_type, {}, 'plot')
+    #     # Check if data is plotted on the axes
+    #     assert gui.viz_manager.figs[figid].axes[0].has_data()
+
+    plt.close('all')
