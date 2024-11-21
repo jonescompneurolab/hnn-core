@@ -46,7 +46,7 @@ docs = [
     'sphinx-gallery', 'sphinx_bootstrap_theme', 'sphinx-copybutton',
     'pillow', 'numpydoc',
 ]
-parallel = ['joblib', 'psutil', 'mpi4py']
+parallel = ['joblib', 'psutil']
 gui = ['ipywidgets>=8.0.0', 'ipykernel', 'ipympl', 'voila']
 dev = ["hnn-core[opt,test,docs,parallel,gui]"]
 
