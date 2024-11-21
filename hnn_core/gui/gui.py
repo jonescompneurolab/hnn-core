@@ -526,11 +526,6 @@ class HNNGUI:
         """Provides easy access to simulation-related data."""
         return {"simulation_data": self.simulation_data}
 
-    # @property
-    # def fig_default_params(self):
-    #     """Expose default visualization parameters for figures"""
-    #     return {"fig_default_params": self.fig_default_params}
-
     @staticmethod
     def load_parameters(params_fname):
         """Read parameters from file."""
