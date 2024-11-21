@@ -906,9 +906,6 @@ class _VizManager:
             button_style="primary",
             style={'button_color': self.viz_layout['theme_color']},
             layout=self.viz_layout['btn'])
-        # self.make_fig_button.on_click(
-        #     lambda b: self.add_figure(self.default_smoothing)
-        # )
         self.make_fig_button.on_click(self.add_figure)
 
         self.datasets_dropdown = Dropdown(
