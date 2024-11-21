@@ -1124,6 +1124,14 @@ def test_default_smoothing(setup_gui):
     gui = setup_gui
     gui.run_button.click()
 
+    # check that the unadjusted default smoothing is the same everywhere
+    gui_smooth_value = gui.fig_default_params['default_smoothing']
+    viz_smooth_value = gui.viz_manager.fig_default_params['default_smoothing']
+
+    assert gui_smooth_value == 30
+    assert viz_smooth_value == 30
+
+    # update simulation name
     gui.widget_simulation_name.value = 'no_smoothing'
 
     # change value of default smoothing via the widget
@@ -1132,7 +1140,7 @@ def test_default_smoothing(setup_gui):
 
     gui.run_button.click()
 
-    # check that new default smoothing value is set everywhere
+    # check that the new default smoothing value is set everywhere
     gui_smooth_value = gui.fig_default_params['default_smoothing']
     viz_smooth_value = gui.viz_manager.fig_default_params['default_smoothing']
 
