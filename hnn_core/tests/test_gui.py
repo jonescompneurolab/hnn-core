@@ -1134,7 +1134,7 @@ def test_default_smoothing(setup_gui):
     # update simulation name
     gui.widget_simulation_name.value = 'no_smoothing'
 
-    # change value of default smoothing via the widget
+    # change value of default smoothing in the widget
     new_smoothing = 0
     gui.widget_default_smoothing.value = new_smoothing
 

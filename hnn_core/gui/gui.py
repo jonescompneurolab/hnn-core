@@ -1973,12 +1973,14 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
             simulations_list_widget.value = sim_names[0]
 
     viz_manager.reset_fig_config_tabs()
-    # set default_smoothing in fig_default_params
-    display(widget_default_smoothing.value)
+
+    # update default_smoothing in gui based on widget
     fig_default_params['default_smoothing'] = widget_default_smoothing.value
-    # change default smoothing in viz_manager
+
+    # change default smoothing in viz_manager to mirror gui
     new_default_smoothing = fig_default_params['default_smoothing']
     viz_manager.fig_default_params['default_smoothing'] = new_default_smoothing
+
     viz_manager.add_figure()
     fig_name = _idx2figname(viz_manager.data['fig_idx']['idx'] - 1)
     ax_plots = [("ax0", "input histogram"), ("ax1", "current dipole")]

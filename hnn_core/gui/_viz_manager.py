@@ -872,10 +872,10 @@ class _VizManager:
         A dict of external simulation data object
     """
 
-    def __init__(self, gui_data, viz_layout, fig_defaults):
+    def __init__(self, gui_data, viz_layout, fig_default_params):
         plt.close("all")
         self.viz_layout = viz_layout
-        self.fig_defaults = fig_defaults
+        self.fig_default_params = fig_default_params
         self.use_ipympl = 'ipympl' in matplotlib.get_backend()
 
         self.axes_config_output = Output()
@@ -940,11 +940,6 @@ class _VizManager:
             "visualization_output": self.viz_layout['visualization_output'],
             "figs": self.figs
         }
-
-    @property
-    def fig_default_params(self):
-        """Expose default visualization parameters for figures"""
-        return self.fig_defaults
 
     def reset_fig_config_tabs(self, template_name=None):
         """Reset the figure config tabs with most recent simulation data."""
