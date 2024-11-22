@@ -458,6 +458,15 @@
         <span class="c1"># In-memory storage of all simulation and visualization related data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">net</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpls</span><span class="o">=</span><span class="nb">list</span><span class="p">()))</span>
 
+        <span class="c1"># Default visualization params for figures</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_smoothing</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Smoothing:&#39;</span><span class="p">,</span>
+            <span class="nb">min</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig_default_params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;default_smoothing&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_smoothing</span><span class="o">.</span><span class="n">value</span>
+        <span class="p">}</span>
+
         <span class="c1"># Simulation parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
             <span class="n">value</span><span class="o">=</span><span class="mi">170</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;tstop (ms):&#39;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -611,7 +620,8 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">viz_manager</span> <span class="o">=</span> <span class="n">_VizManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">viz_manager</span> <span class="o">=</span> <span class="n">_VizManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span>
+                                       <span class="bp">self</span><span class="o">.</span><span class="n">fig_default_params</span><span class="p">)</span>
 
         <span class="c1"># detailed configuration of backends</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_backend_config_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>
@@ -700,6 +710,7 @@
             <span class="k">return</span> <span class="n">run_button_clicked</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fig_default_params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_smoothing</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_mpi_cmd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_n_jobs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_bar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_contents</span><span class="p">,</span>
@@ -804,8 +815,8 @@
         <span class="n">simulation_box</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span>
             <span class="n">VBox</span><span class="p">([</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_backend_config_out</span><span class="p">]),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_smoothing</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend_config_out</span><span class="p">]),</span>
         <span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;config_box&#39;</span><span class="p">])</span>
 
         <span class="n">connectivity_configuration</span> <span class="o">=</span> <span class="n">Tab</span><span class="p">()</span>
@@ -2045,7 +2056,9 @@
 
 
 <span class="k">def</span> <span class="nf">run_button_clicked</span><span class="p">(</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span>
-                       <span class="n">all_data</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">ntrials</span><span class="p">,</span> <span class="n">backend_selection</span><span class="p">,</span>
+                       <span class="n">all_data</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
+                       <span class="n">fig_default_params</span><span class="p">,</span> <span class="n">widget_default_smoothing</span><span class="p">,</span>
+                       <span class="n">ntrials</span><span class="p">,</span> <span class="n">backend_selection</span><span class="p">,</span>
                        <span class="n">mpi_cmd</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">simulation_status_bar</span><span class="p">,</span>
                        <span class="n">simulation_status_contents</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">,</span>
                        <span class="n">viz_manager</span><span class="p">,</span> <span class="n">simulations_list_widget</span><span class="p">,</span>
@@ -2095,6 +2108,14 @@
             <span class="n">simulations_list_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">sim_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="n">viz_manager</span><span class="o">.</span><span class="n">reset_fig_config_tabs</span><span class="p">()</span>
+
+    <span class="c1"># update default_smoothing in gui based on widget</span>
+    <span class="n">fig_default_params</span><span class="p">[</span><span class="s1">&#39;default_smoothing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_default_smoothing</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="c1"># change default smoothing in viz_manager to mirror gui</span>
+    <span class="n">new_default_smoothing</span> <span class="o">=</span> <span class="n">fig_default_params</span><span class="p">[</span><span class="s1">&#39;default_smoothing&#39;</span><span class="p">]</span>
+    <span class="n">viz_manager</span><span class="o">.</span><span class="n">fig_default_params</span><span class="p">[</span><span class="s1">&#39;default_smoothing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_default_smoothing</span>
+
     <span class="n">viz_manager</span><span class="o">.</span><span class="n">add_figure</span><span class="p">()</span>
     <span class="n">fig_name</span> <span class="o">=</span> <span class="n">_idx2figname</span><span class="p">(</span><span class="n">viz_manager</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;fig_idx&#39;</span><span class="p">][</span><span class="s1">&#39;idx&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">ax_plots</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;ax0&quot;</span><span class="p">,</span> <span class="s2">&quot;input histogram&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;ax1&quot;</span><span class="p">,</span> <span class="s2">&quot;current dipole&quot;</span><span class="p">)]</span>
