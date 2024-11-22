@@ -23,7 +23,7 @@ from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload, VBox,
                         HBox, IntText, Layout, Output, RadioButtons, Tab, Text,
-                        Checkbox)
+                        Checkbox, Box)
 from ipywidgets.embed import embed_minimal_html
 import hnn_core
 from hnn_core import JoblibBackend, MPIBackend, simulate_dipole
@@ -290,7 +290,7 @@ class HNNGUI:
                                     height=f"{operation_box_height}px",
                                     flex_wrap="wrap",
                                     ),
-            "config_box": Layout(width=f"{left_sidebar_width}px",
+            "config_box": Layout(width=f"{left_sidebar_width-40}px",
                                  height=f"{config_box_height - 100}px"),
             "drive_widget": Layout(width="auto"),
             "drive_textbox": Layout(width='270px', height='auto'),
@@ -324,9 +324,32 @@ class HNNGUI:
         self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
 
         # Default visualization params for figures
+        analysis_style = {'description_width': '200px'}
+        layout = Layout(width="300px")
+
         self.widget_default_smoothing = BoundedFloatText(
             value=30.0, description='Smoothing:',
-            min=0.0, max=100.0, step=1.0, disabled=False)
+            min=0.0, max=100.0, step=1.0, disabled=False,
+            layout=layout, style=analysis_style,
+        )
+
+        self.min_spectral_frequency = BoundedFloatText(
+            value=10,
+            min=0.1,
+            max=1000,
+            description='Min Spectral Frequency (Hz):',
+            disabled=False,
+            layout=layout,
+            style=analysis_style)
+
+        self.max_spectral_frequency = BoundedFloatText(
+            value=100,
+            min=0.1,
+            max=1000,
+            description='Max Spectral Frequency (Hz):',
+            disabled=False,
+            layout=layout,
+            style=analysis_style)
 
         self.fig_default_params = {
             'default_smoothing': self.widget_default_smoothing.value
@@ -677,11 +700,31 @@ class HNNGUI:
             If the method returns the layout object which can be rendered by
             IPython.display.display() method.
         """
+        box_style = """
+            style="
+                background: gray;
+                color: white;
+                # font-weight: bold;
+                width: 290px;
+                padding: 0px 5px;
+                margin-bottom: 2px;
+            "
+        """
         simulation_box = VBox([
+            HTML(f"<div {box_style}>Simulation Parameters</div>"),
             VBox([
                 self.widget_simulation_name, self.widget_tstop, self.widget_dt,
-                self.widget_ntrials, self.widget_default_smoothing,
+                self.widget_ntrials,
                 self.widget_backend_selection, self._backend_config_out]),
+            Box(layout=Layout(height="20px")),
+            HTML(
+                f"<div {box_style}'>Default Visualization Parameters</div>",
+            ),
+            VBox([
+                self.widget_default_smoothing,
+                self.min_spectral_frequency,
+                self.max_spectral_frequency,
+            ])
         ], layout=self.layout['config_box'])
 
         connectivity_configuration = Tab()
@@ -1157,20 +1200,34 @@ def create_expanded_button(description, button_style, layout, disabled=False,
 def _get_connectivity_widgets(conn_data):
     """Create connectivity box widgets from specified weight and probability"""
 
-    style = {'description_width': '150px'}
-    style = {}
+    style = {'description_width': '100px'}
     sliders = list()
     for receptor_name in conn_data.keys():
         w_text_input = BoundedFloatText(
             value=conn_data[receptor_name]['weight'], disabled=False,
             continuous_update=False, min=0, max=1e6, step=0.01,
-            description="weight", style=style)
+            description="Weight:", style=style)
+
+        display_name = conn_data[receptor_name]['receptor'].upper()
+
+        map_display_names = {
+            'GABAA': 'GABA<sub>A</sub>',
+            'GABAB': 'GABA<sub>B</sub>',
+        }
+
+        if display_name in map_display_names:
+            display_name = map_display_names[display_name]
+
+        html_tab = '&emsp;'
 
         conn_widget = VBox([
-            HTML(value=f"""<p>
-            Receptor: {conn_data[receptor_name]['receptor']}</p>"""),
-            w_text_input, HTML(value="<hr style='margin-bottom:5px'/>")
+            HTML(value=f"""<p style='margin:5px;'><b>{html_tab}{html_tab}
+            Receptor: {display_name}</b></p>"""),
+            w_text_input
         ])
+
+        #  Add class to child Vboxes for targeted CSS
+        conn_widget.add_class('connectivity-subsection')
 
         conn_widget._belongsto = {
             "receptor": conn_data[receptor_name]['receptor'],
@@ -1672,13 +1729,44 @@ def add_network_connectivity_tab(net, connectivity_out,
                     connectivity_textfields.append(
                         _get_connectivity_widgets(receptor_related_conn))
 
+    # Style the contents of the Connectivity Tab
+    # -------------------------------------------------------------------------
+
+    # define custom Vbox layout
+    # no_padding_layout = Layout(padding="0", margin="0") # unused
+
+    # Initialize sections within the Accordion
+
     connectivity_boxes = [VBox(slider) for slider in connectivity_textfields]
+
+    # Add class to child Vboxes for targeted CSS
+    for box in connectivity_boxes:
+        box.add_class("connectivity-contents")
+
+    # Initialize the Accordion section
+
     cell_connectivity = Accordion(children=connectivity_boxes)
+
+    # Add class to Accordion section for targeted CSS
+    cell_connectivity.add_class("connectivity-section")
+
     for idx, connectivity_name in enumerate(connectivity_names):
         cell_connectivity.set_title(idx, connectivity_name)
 
+    # Style the <div> automatically creted around connectivity boxes
+    connectivity_out_style = HTML("""
+    <style>
+        /* CSS to style elements inside the Accordion */
+        .connectivity-section .jupyter-widget-Collapse-contents {
+            padding: 0px 0px 10px 0px !important;
+            margin: 0 !important;
+        }
+    </style>
+    """)
+
+    # Display the Accordion with styling
     with connectivity_out:
-        display(cell_connectivity)
+        display(connectivity_out_style, cell_connectivity)
 
     return net
 
