@@ -323,6 +323,15 @@ class HNNGUI:
         # In-memory storage of all simulation and visualization related data
         self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
 
+        # Default visualization params for figures
+        self.widget_default_smoothing = BoundedFloatText(
+            value=30.0, description='Smoothing:',
+            min=0.0, max=100.0, step=1.0, disabled=False)
+
+        self.fig_default_params = {
+            'default_smoothing': self.widget_default_smoothing.value
+        }
+
         # Simulation parameters
         self.widget_tstop = BoundedFloatText(
             value=170, description='tstop (ms):', min=0, max=1e6, step=1,
@@ -476,7 +485,8 @@ class HNNGUI:
 
         self._log_out = Output()
 
-        self.viz_manager = _VizManager(self.data, self.layout)
+        self.viz_manager = _VizManager(self.data, self.layout,
+                                       self.fig_default_params)
 
         # detailed configuration of backends
         self._backend_config_out = Output()
@@ -565,6 +575,7 @@ class HNNGUI:
             return run_button_clicked(
                 self.widget_simulation_name, self._log_out, self.drive_widgets,
                 self.data, self.widget_dt, self.widget_tstop,
+                self.fig_default_params, self.widget_default_smoothing,
                 self.widget_ntrials, self.widget_backend_selection,
                 self.widget_mpi_cmd, self.widget_n_jobs, self.params,
                 self._simulation_status_bar, self._simulation_status_contents,
@@ -669,8 +680,8 @@ class HNNGUI:
         simulation_box = VBox([
             VBox([
                 self.widget_simulation_name, self.widget_tstop, self.widget_dt,
-                self.widget_ntrials, self.widget_backend_selection,
-                self._backend_config_out]),
+                self.widget_ntrials, self.widget_default_smoothing,
+                self.widget_backend_selection, self._backend_config_out]),
         ], layout=self.layout['config_box'])
 
         connectivity_configuration = Tab()
@@ -1910,7 +1921,9 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
 
 
 def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
-                       all_data, dt, tstop, ntrials, backend_selection,
+                       all_data, dt, tstop,
+                       fig_default_params, widget_default_smoothing,
+                       ntrials, backend_selection,
                        mpi_cmd, n_jobs, params, simulation_status_bar,
                        simulation_status_contents, connectivity_textfields,
                        viz_manager, simulations_list_widget,
@@ -1960,6 +1973,14 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
             simulations_list_widget.value = sim_names[0]
 
     viz_manager.reset_fig_config_tabs()
+
+    # update default_smoothing in gui based on widget
+    fig_default_params['default_smoothing'] = widget_default_smoothing.value
+
+    # change default smoothing in viz_manager to mirror gui
+    new_default_smoothing = fig_default_params['default_smoothing']
+    viz_manager.fig_default_params['default_smoothing'] = new_default_smoothing
+
     viz_manager.add_figure()
     fig_name = _idx2figname(viz_manager.data['fig_idx']['idx'] - 1)
     ax_plots = [("ax0", "input histogram"), ("ax1", "current dipole")]

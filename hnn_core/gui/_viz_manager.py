@@ -549,11 +549,12 @@ def _clear_axis(b, widgets, data, fig_idx, fig, ax, widgets_plot_type,
         _dynamic_rerender(fig)
 
 
-def _get_ax_control(widgets, data, fig_idx, fig, ax):
+def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
     analysis_style = {'description_width': '200px'}
     layout = Layout(width="98%")
     simulation_names = tuple(data['simulations'].keys())
     sim_index = 0
+    default_smoothing = fig_default_params['default_smoothing']
     if not simulation_names:
         simulation_names = ("None",)
     else:
@@ -610,7 +611,7 @@ def _get_ax_control(widgets, data, fig_idx, fig, ax):
         style=analysis_style,
     )
     simulation_dipole_smooth = FloatText(
-        value=30,
+        value=default_smoothing,
         description='Dipole Smooth Window (ms):',
         disabled=False,
         layout=layout,
@@ -761,12 +762,13 @@ def _close_figure(b, widgets, data, fig_idx):
                     display(Label(_fig_placeholder))
 
 
-def _add_axes_controls(widgets, data, fig, axd):
+def _add_axes_controls(widgets, data, fig_default_smoothing, fig, axd):
     fig_idx = data['fig_idx']['idx']
 
     controls = Tab()
     children = [
-        _get_ax_control(widgets, data, fig_idx=fig_idx, fig=fig, ax=ax)
+        _get_ax_control(widgets, data, fig_default_smoothing, fig_idx=fig_idx,
+                        fig=fig, ax=ax)
         for ax_key, ax in axd.items()
     ]
     controls.children = children
@@ -786,7 +788,8 @@ def _add_axes_controls(widgets, data, fig, axd):
     widgets['axes_config_tabs'].set_title(n_tabs, _idx2figname(fig_idx))
 
 
-def _add_figure(b, widgets, data, template_type, scale=0.95, dpi=96):
+def _add_figure(b, widgets, data, fig_default_smoothing,
+                template_type, scale=0.95, dpi=96):
     fig_idx = data['fig_idx']['idx']
     viz_output_layout = data['visualization_output']
     fig_outputs = Output()
@@ -818,7 +821,7 @@ def _add_figure(b, widgets, data, template_type, scale=0.95, dpi=96):
         else:
             display(fig.canvas)
 
-    _add_axes_controls(widgets, data, fig=fig, axd=axd)
+    _add_axes_controls(widgets, data, fig_default_smoothing, fig=fig, axd=axd)
 
     data['figs'][fig_idx] = fig
     widgets['figs_tabs'].selected_index = n_tabs
@@ -869,9 +872,10 @@ class _VizManager:
         A dict of external simulation data object
     """
 
-    def __init__(self, gui_data, viz_layout):
+    def __init__(self, gui_data, viz_layout, fig_default_params):
         plt.close("all")
         self.viz_layout = viz_layout
+        self.fig_default_params = fig_default_params
         self.use_ipympl = 'ipympl' in matplotlib.get_backend()
 
         self.axes_config_output = Output()
@@ -1029,6 +1033,7 @@ class _VizManager:
         _add_figure(None,
                     self.widgets,
                     self.data,
+                    self.fig_default_params,
                     template_type,
                     scale=0.97,
                     dpi=self.viz_layout['dpi'])
