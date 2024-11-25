@@ -1761,7 +1761,7 @@ def add_network_connectivity_tab(net, connectivity_out,
     for idx, connectivity_name in enumerate(connectivity_names):
         cell_connectivity.set_title(idx, connectivity_name)
 
-    # Style the <div> automatically creted around connectivity boxes
+    # Style the <div> automatically created around connectivity boxes
     connectivity_out_style = HTML("""
     <style>
         /* CSS to style elements inside the Accordion */
