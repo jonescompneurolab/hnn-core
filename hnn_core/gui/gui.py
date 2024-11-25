@@ -290,7 +290,7 @@ class HNNGUI:
                                     height=f"{operation_box_height}px",
                                     flex_wrap="wrap",
                                     ),
-            "config_box": Layout(width=f"{left_sidebar_width-40}px",
+            "config_box": Layout(width=f"{left_sidebar_width - 40}px",
                                  height=f"{config_box_height - 100}px"),
             "drive_widget": Layout(width="auto"),
             "drive_textbox": Layout(width='270px', height='auto'),
