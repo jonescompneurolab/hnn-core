@@ -397,16 +397,20 @@ class HNNGUI:
                                                description='',
                                                layout={'width': '15%'})
         # Drive selection
-        self.widget_drive_type_selection = RadioButtons(
+        self.widget_drive_type_selection = Dropdown(
             options=['Evoked', 'Poisson', 'Rhythmic', 'Tonic'],
             value='Evoked',
-            description='Drive:',
+            description='Drive type:',
             disabled=False,
-            layout=self.layout['drive_widget'])
-        self.widget_location_selection = RadioButtons(
-            options=['proximal', 'distal'], value='proximal',
-            description='Location', disabled=False,
-            layout=self.layout['drive_widget'])
+            layout=self.layout['drive_widget'],
+            style={'description_width': '100px'}
+        )
+        self.widget_location_selection = Dropdown(
+            options=['Proximal', 'Distal'], value='Proximal',
+            description='Drive location:', disabled=False,
+            layout=self.layout['drive_widget'],
+            style={'description_width': '100px'},
+        )
         self.add_drive_button = create_expanded_button(
             'Add drive', 'primary', layout=self.layout['btn'],
             button_color=self.layout['theme_color'])
@@ -428,7 +432,7 @@ class HNNGUI:
             button_style='success')
 
         self.delete_drive_button = create_expanded_button(
-            'Delete drives', 'success', layout=self.layout['btn'],
+            'Delete all drives', 'success', layout=self.layout['btn'],
             button_color=self.layout['theme_color'])
 
         self.cell_type_radio_buttons = RadioButtons(
@@ -566,9 +570,10 @@ class HNNGUI:
                                          self.widget_n_jobs)
 
         def _add_drive_button_clicked(b):
+            location = self.widget_location_selection.value.lower()
             return self.add_drive_widget(
                 self.widget_drive_type_selection.value,
-                self.widget_location_selection.value,
+                location,
             )
 
         def _delete_drives_clicked(b):
