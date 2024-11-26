@@ -9,7 +9,6 @@ import numpy as np
 import os
 from joblib import Parallel, delayed, parallel_config
 
-from .parallel_backends import JoblibBackend
 from .network import Network
 from .externals.mne import _validate_type, _check_option
 from .dipole import simulate_dipole
@@ -294,15 +293,14 @@ class BatchSimulate(object):
         results = {'net': net, 'param_values': param_values}
 
         if self.save_dpl:
-            with JoblibBackend(n_jobs=n_jobs):
-                dpl = simulate_dipole(net,
-                                      tstop=self.tstop,
-                                      dt=self.dt,
-                                      n_trials=self.n_trials,
-                                      record_vsec=self.record_vsec,
-                                      record_isec=self.record_isec,
-                                      postproc=self.postproc)
-                results['dpl'] = dpl
+            dpl = simulate_dipole(net,
+                                  tstop=self.tstop,
+                                  dt=self.dt,
+                                  n_trials=self.n_trials,
+                                  record_vsec=self.record_vsec,
+                                  record_isec=self.record_isec,
+                                  postproc=self.postproc)
+            results['dpl'] = dpl
 
         if self.save_spiking:
             results['spiking'] = {

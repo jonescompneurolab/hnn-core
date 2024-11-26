@@ -24,7 +24,7 @@ from hnn_core.batch_simulate import BatchSimulate
 from hnn_core import jones_2009_model
 
 # The number of cores may need modifying depending on your current machine.
-n_jobs = 10
+n_jobs = 4
 ###############################################################################
 # The `add_evoked_drive` function simulates external input to the network,
 # mimicking sensory stimulation or other external events.
@@ -116,7 +116,8 @@ def summary_func(results):
 net = jones_2009_model(mesh_shape=(3, 3))
 batch_simulation = BatchSimulate(net=net,
                                  set_params=set_params,
-                                 summary_func=summary_func)
+                                 summary_func=summary_func,
+                                 n_trials=10)
 simulation_results = batch_simulation.run(param_grid,
                                           n_jobs=n_jobs,
                                           combinations=False,
