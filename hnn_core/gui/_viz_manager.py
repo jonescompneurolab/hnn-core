@@ -298,20 +298,28 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
             min_f = plot_config['min_spectral_frequency']
             max_f = plot_config['max_spectral_frequency']
             color = ax._get_lines.get_next_color()
-            dpls_copied[0].plot_psd(fmin=min_f, fmax=max_f, ax=ax, color=color,
-                                    label=sim_name, show=False)
+            label = sim_name + " (Aggregate)"
+            dpls_copied[0].plot_psd(
+                fmin=min_f,
+                fmax=max_f,
+                color=color,
+                label=label,
+                ax=ax,
+                show=False
+            )
 
     elif plot_type == 'layer 2 PSD':
         if len(dpls_copied) > 0:
             min_f = plot_config['min_spectral_frequency']
             max_f = plot_config['max_spectral_frequency']
             color = ax._get_lines.get_next_color()
+            label = sim_name + " (Layer 2/3)"
             dpls_copied[0].plot_psd(
                 fmin=min_f,
                 fmax=max_f,
                 layer='L2',
                 color=color,
-                label=sim_name,
+                label=label,
                 ax=ax,
                 show=False
             )
@@ -321,12 +329,13 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
             min_f = plot_config['min_spectral_frequency']
             max_f = plot_config['max_spectral_frequency']
             color = ax._get_lines.get_next_color()
+            label = sim_name + " (Layer 5)"
             dpls_copied[0].plot_psd(
                 fmin=min_f,
                 fmax=max_f,
                 layer='L5',
                 color=color,
-                label=sim_name,
+                label=label,
                 ax=ax,
                 show=False
             )
