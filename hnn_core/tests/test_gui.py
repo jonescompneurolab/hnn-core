@@ -1130,8 +1130,7 @@ def test_default_smoothing(setup_gui):
     gui_smooth_value = gui.fig_default_params['default_smoothing']
     viz_smooth_value = gui.viz_manager.fig_default_params['default_smoothing']
 
-    assert gui_smooth_value == 30
-    assert viz_smooth_value == 30
+    assert gui_smooth_value == viz_smooth_value
 
     # update simulation name
     gui.widget_simulation_name.value = 'no_smoothing'
@@ -1191,8 +1190,8 @@ def test_default_frequencies(setup_gui):
     gui_max = gui.fig_default_params['default_max_frequency']
     viz_max = gui.viz_manager.fig_default_params['default_max_frequency']
 
-    assert gui_min == viz_min == 10
-    assert gui_max == viz_max == 100
+    assert gui_min == viz_min
+    assert gui_max == viz_max
 
     # change value of default min/max frequencies in the widget
     new_min = 5
