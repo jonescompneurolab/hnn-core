@@ -1176,3 +1176,39 @@ def test_default_smoothing(setup_gui):
         assert gui.viz_manager.figs[figid].axes[0].has_data()
 
     plt.close('all')
+
+
+def test_default_frequencies(setup_gui):
+    """Tests that default min/max frequency are inherited correctly"""
+    gui = setup_gui
+
+    # check that the defaults are the same everywhere after running
+    # the default simulation
+    gui.run_button.click()
+
+    gui_min = gui.fig_default_params['default_min_frequency']
+    viz_min = gui.viz_manager.fig_default_params['default_min_frequency']
+    gui_max = gui.fig_default_params['default_max_frequency']
+    viz_max = gui.viz_manager.fig_default_params['default_max_frequency']
+
+    assert gui_min == viz_min == 10
+    assert gui_max == viz_max == 100
+
+    # change value of default min/max frequencies in the widget
+    new_min = 5
+    new_max = 50
+    gui.widget_min_frequency.value = new_min
+    gui.widget_max_frequency.value = new_max
+
+    # update simulation name
+    gui.widget_simulation_name.value = 'new_defaults'
+    gui.run_button.click()
+
+    # check that the new default smoothing value is set everywhere
+    gui_min = gui.fig_default_params['default_min_frequency']
+    viz_min = gui.viz_manager.fig_default_params['default_min_frequency']
+    gui_max = gui.fig_default_params['default_max_frequency']
+    viz_max = gui.viz_manager.fig_default_params['default_max_frequency']
+
+    assert gui_min == viz_min == new_min
+    assert gui_max == viz_max == new_max
