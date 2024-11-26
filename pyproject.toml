@@ -1,6 +1,69 @@
 [build-system]
 requires = ["setuptools>=40.8.0", "NEURON >=7.7; platform_system != 'Windows'"]
-build-backend = "setuptools.build_meta:__legacy__"
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hnn-core"
+dynamic = ["version"]
+authors = [
+    { name="Mainak Jas", email="mainakjas@gmail.com" },
+    { name="Nicholas Tolley", email="nicholas_tolley@brown.edu" },
+    { name="Ryan Thorpe", email="ryan_thorpe@brown.edu" },
+    { name="Stephanie Jones", email="stephanie_jones@brown.edu" },
+]
+maintainers = [
+    {name="George Dang", email="george_dang@brown.edu"},
+    {name="Dylan Daniels", email="dylan_s_daniels@brown.edu"},
+]
+description = "Tools for biophysical simulation of a cortical column using Neuron"
+readme = "README.rst"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD (3-clause)",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development",
+    "Topic :: Scientific/Engineering",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Operating System :: MacOS",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "numpy >= 1.14",
+    "matplotlib >= 3.5.3",
+    "scipy",
+    "NEURON >= 7.7; sys_platform != 'win32'",
+    "h5io",
+]
+
+[project.optional-dependencies]
+opt = ['scikit-learn']
+test = ['flake8', 'pytest', 'pytest-cov']
+docs = [
+    'mne', 'nibabel', 'pooch', 'tdqm', 'sphinx',
+    'sphinx-gallery', 'sphinx_bootstrap_theme', 'sphinx-copybutton',
+    'pillow', 'numpydoc',
+]
+parallel = ['joblib', 'psutil']
+gui = ['ipywidgets>=8.0.0', 'ipykernel', 'ipympl', 'voila']
+dev = ["hnn-core[opt,test,docs,parallel,gui]"]
+
+[project.gui-scripts]
+hnn-gui = "hnn_core.gui.gui:launch"
+
+[project.urls]
+"Homepage" = "https://jonescompneurolab.github.io/hnn-core"
+"Source Code" = "http://github.com/jonescompneurolab/hnn-core"
+
+[tool.setuptools]
+packages = ["hnn_core"]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = {attr = "hnn_core.__version__"}
+
 [tool.codespell]
 skip = '.git,*.pdf,*.svg'
 check-hidden = true

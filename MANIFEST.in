@@ -1,5 +1,6 @@
 include *.rst
-include hnn_core/__init__.py 
+include hnn_core/__init__.py
+include hnn_core/param/*.json
 
 recursive-include examples *.py
 recursive-include examples *.txt
