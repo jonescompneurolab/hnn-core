@@ -75,18 +75,19 @@ class build_py_mod(build_py):
 
 if __name__ == "__main__":
     extras = {
-        'opt': ['scikit-learn'],
-        'parallel': ['joblib', 'psutil'],
-        'test': ['flake8', 'pytest', 'pytest-cov', ],
         'docs': ['mne', 'nibabel', 'pooch', 'tdqm',
                  'sphinx', 'sphinx-gallery',
                  'sphinx_bootstrap_theme', 'sphinx-copybutton',
                  'pillow', 'numpydoc',
                  ],
         'gui': ['ipywidgets>=8.0.0', 'ipykernel', 'ipympl', 'voila', ],
+        'opt': ['scikit-learn'],
+        'parallel': ['joblib', 'psutil'],
+        'sbi': ['sbi'],
+        'test': ['flake8', 'pytest', 'pytest-cov', ],
     }
-    extras['dev'] = (extras['opt'] + extras['parallel'] + extras['test'] +
-                     extras['docs'] + extras['gui']
+    extras['dev'] = (extras['docs'] + extras['gui'] + extras['opt']
+                     + extras['parallel'] + extras['sbi'] + extras['test']
                      )
 
 
