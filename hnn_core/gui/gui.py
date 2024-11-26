@@ -151,12 +151,36 @@ class _OutputWidgetHandler(logging.Handler):
 
     def emit(self, record):
         formatted_record = self.format(record)
+        # Further format the message for GUI presentation
+        try:
+            formatted_record = formatted_record.replace("  - ", "\n")
+            formatted_record = "[TIME] " + formatted_record + "\n"
+        except:
+            pass
         new_output = {
             'name': 'stdout',
             'output_type': 'stream',
             'text': formatted_record + '\n'
         }
         self.out.outputs = (new_output, ) + self.out.outputs
+
+
+class _GUI_PrintToLogger:
+    """Class to redirect print messages to the logger in the GUI"""
+    # when print is used, call the write method instead
+    def write(self, message):
+        # avoid logging empty/new lines
+        if message.strip():
+            # send the message to the logger
+            logger.info(message.strip())
+
+    # The flush method is required for compatibility with print
+    def flush(self):
+        pass
+
+
+# assign class to stdout to redirect print statements to the logger
+sys.stdout = _GUI_PrintToLogger()
 
 
 class HNNGUI:
