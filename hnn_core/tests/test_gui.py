@@ -324,7 +324,7 @@ def test_gui_add_drives():
     _ = gui.compose()
 
     for val_drive_type in ("Poisson", "Evoked", "Rhythmic"):
-        for val_location in ("distal", "proximal"):
+        for val_location in ("Distal", "Proximal"):
             gui.delete_drive_button.click()
             assert len(gui.drive_widgets) == 0
 
@@ -334,7 +334,9 @@ def test_gui_add_drives():
 
             assert len(gui.drive_widgets) == 1
             assert gui.drive_widgets[0]['type'] == val_drive_type
-            assert gui.drive_widgets[0]['location'] == val_location
+            # note that val_location is transformed to .lower() after the
+            # add_drive_button.click() action
+            assert gui.drive_widgets[0]['location'] == val_location.lower()
             assert val_drive_type in gui.drive_widgets[0]['name']
     plt.close('all')
 
