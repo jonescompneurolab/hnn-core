@@ -286,12 +286,36 @@
 
     <span class="k">def</span> <span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
         <span class="n">formatted_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+        <span class="c1"># Further format the message for GUI presentation</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">formatted_record</span> <span class="o">=</span> <span class="n">formatted_record</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;  - &quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">formatted_record</span> <span class="o">=</span> <span class="s2">&quot;[TIME] &quot;</span> <span class="o">+</span> <span class="n">formatted_record</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
         <span class="n">new_output</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;stdout&#39;</span><span class="p">,</span>
             <span class="s1">&#39;output_type&#39;</span><span class="p">:</span> <span class="s1">&#39;stream&#39;</span><span class="p">,</span>
             <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">formatted_record</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">outputs</span> <span class="o">+</span> <span class="p">(</span><span class="n">new_output</span><span class="p">,</span> <span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">_GUI_PrintToLogger</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to redirect print messages to the logger in the GUI&quot;&quot;&quot;</span>
+    <span class="c1"># when print is used, call the write method instead</span>
+    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="c1"># avoid logging empty/new lines</span>
+        <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="c1"># send the message to the logger</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+    <span class="c1"># The flush method is required for compatibility with print</span>
+    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+
+<span class="c1"># assign class to stdout to redirect print statements to the logger</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">_GUI_PrintToLogger</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="HNNGUI"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI">[docs]</a><span class="k">class</span> <span class="nc">HNNGUI</span><span class="p">:</span>
