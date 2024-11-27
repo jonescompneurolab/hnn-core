@@ -23,7 +23,7 @@ from IPython.display import IFrame, display
 from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload, VBox,
                         HBox, IntText, Layout, Output, RadioButtons, Tab, Text,
-                        Checkbox)
+                        Checkbox, Box)
 from ipywidgets.embed import embed_minimal_html
 import hnn_core
 from hnn_core import JoblibBackend, MPIBackend, simulate_dipole
@@ -290,7 +290,7 @@ class HNNGUI:
                                     height=f"{operation_box_height}px",
                                     flex_wrap="wrap",
                                     ),
-            "config_box": Layout(width=f"{left_sidebar_width}px",
+            "config_box": Layout(width=f"{left_sidebar_width - 40}px",
                                  height=f"{config_box_height - 100}px"),
             "drive_widget": Layout(width="auto"),
             "drive_textbox": Layout(width='270px', height='auto'),
@@ -324,12 +324,37 @@ class HNNGUI:
         self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
 
         # Default visualization params for figures
+        analysis_style = {'description_width': '200px'}
+        layout = Layout(width="300px")
+
         self.widget_default_smoothing = BoundedFloatText(
             value=30.0, description='Smoothing:',
-            min=0.0, max=100.0, step=1.0, disabled=False)
+            min=0.0, max=100.0, step=1.0, disabled=False,
+            layout=layout, style=analysis_style,
+        )
+
+        self.widget_min_frequency = BoundedFloatText(
+            value=10,
+            min=0.1,
+            max=1000,
+            description='Min Spectral Frequency (Hz):',
+            disabled=False,
+            layout=layout,
+            style=analysis_style)
+
+        self.widget_max_frequency = BoundedFloatText(
+            value=100,
+            min=0.1,
+            max=1000,
+            description='Max Spectral Frequency (Hz):',
+            disabled=False,
+            layout=layout,
+            style=analysis_style)
 
         self.fig_default_params = {
-            'default_smoothing': self.widget_default_smoothing.value
+            'default_smoothing': self.widget_default_smoothing.value,
+            'default_min_frequency': self.widget_min_frequency.value,
+            'default_max_frequency': self.widget_max_frequency.value,
         }
 
         # Simulation parameters
@@ -374,16 +399,20 @@ class HNNGUI:
                                                description='',
                                                layout={'width': '15%'})
         # Drive selection
-        self.widget_drive_type_selection = RadioButtons(
+        self.widget_drive_type_selection = Dropdown(
             options=['Evoked', 'Poisson', 'Rhythmic', 'Tonic'],
             value='Evoked',
-            description='Drive:',
+            description='Drive type:',
             disabled=False,
-            layout=self.layout['drive_widget'])
-        self.widget_location_selection = RadioButtons(
-            options=['proximal', 'distal'], value='proximal',
-            description='Location', disabled=False,
-            layout=self.layout['drive_widget'])
+            layout=self.layout['drive_widget'],
+            style={'description_width': '100px'}
+        )
+        self.widget_location_selection = Dropdown(
+            options=['Proximal', 'Distal'], value='Proximal',
+            description='Drive location:', disabled=False,
+            layout=self.layout['drive_widget'],
+            style={'description_width': '100px'},
+        )
         self.add_drive_button = create_expanded_button(
             'Add drive', 'primary', layout=self.layout['btn'],
             button_color=self.layout['theme_color'])
@@ -405,7 +434,7 @@ class HNNGUI:
             button_style='success')
 
         self.delete_drive_button = create_expanded_button(
-            'Delete drives', 'success', layout=self.layout['btn'],
+            'Delete all drives', 'success', layout=self.layout['btn'],
             button_color=self.layout['theme_color'])
 
         self.cell_type_radio_buttons = RadioButtons(
@@ -543,9 +572,10 @@ class HNNGUI:
                                          self.widget_n_jobs)
 
         def _add_drive_button_clicked(b):
+            location = self.widget_location_selection.value.lower()
             return self.add_drive_widget(
                 self.widget_drive_type_selection.value,
-                self.widget_location_selection.value,
+                location,
             )
 
         def _delete_drives_clicked(b):
@@ -576,6 +606,7 @@ class HNNGUI:
                 self.widget_simulation_name, self._log_out, self.drive_widgets,
                 self.data, self.widget_dt, self.widget_tstop,
                 self.fig_default_params, self.widget_default_smoothing,
+                self.widget_min_frequency, self.widget_max_frequency,
                 self.widget_ntrials, self.widget_backend_selection,
                 self.widget_mpi_cmd, self.widget_n_jobs, self.params,
                 self._simulation_status_bar, self._simulation_status_contents,
@@ -677,11 +708,31 @@ class HNNGUI:
             If the method returns the layout object which can be rendered by
             IPython.display.display() method.
         """
+        box_style = """
+            style="
+                background: gray;
+                color: white;
+                # font-weight: bold;
+                width: 290px;
+                padding: 0px 5px;
+                margin-bottom: 2px;
+            "
+        """
         simulation_box = VBox([
+            HTML(f"<div {box_style}>Simulation Parameters</div>"),
             VBox([
                 self.widget_simulation_name, self.widget_tstop, self.widget_dt,
-                self.widget_ntrials, self.widget_default_smoothing,
+                self.widget_ntrials,
                 self.widget_backend_selection, self._backend_config_out]),
+            Box(layout=Layout(height="20px")),
+            HTML(
+                f"<div {box_style}'>Default Visualization Parameters</div>",
+            ),
+            VBox([
+                self.widget_default_smoothing,
+                self.widget_min_frequency,
+                self.widget_max_frequency,
+            ])
         ], layout=self.layout['config_box'])
 
         connectivity_configuration = Tab()
@@ -1157,20 +1208,34 @@ def create_expanded_button(description, button_style, layout, disabled=False,
 def _get_connectivity_widgets(conn_data):
     """Create connectivity box widgets from specified weight and probability"""
 
-    style = {'description_width': '150px'}
-    style = {}
+    style = {'description_width': '100px'}
     sliders = list()
     for receptor_name in conn_data.keys():
         w_text_input = BoundedFloatText(
             value=conn_data[receptor_name]['weight'], disabled=False,
             continuous_update=False, min=0, max=1e6, step=0.01,
-            description="weight", style=style)
+            description="Weight:", style=style)
+
+        display_name = conn_data[receptor_name]['receptor'].upper()
+
+        map_display_names = {
+            'GABAA': 'GABA<sub>A</sub>',
+            'GABAB': 'GABA<sub>B</sub>',
+        }
+
+        if display_name in map_display_names:
+            display_name = map_display_names[display_name]
+
+        html_tab = '&emsp;'
 
         conn_widget = VBox([
-            HTML(value=f"""<p>
-            Receptor: {conn_data[receptor_name]['receptor']}</p>"""),
-            w_text_input, HTML(value="<hr style='margin-bottom:5px'/>")
+            HTML(value=f"""<p style='margin:5px;'><b>{html_tab}{html_tab}
+            Receptor: {display_name}</b></p>"""),
+            w_text_input
         ])
+
+        #  Add class to child Vboxes for targeted CSS
+        conn_widget.add_class('connectivity-subsection')
 
         conn_widget._belongsto = {
             "receptor": conn_data[receptor_name]['receptor'],
@@ -1672,13 +1737,44 @@ def add_network_connectivity_tab(net, connectivity_out,
                     connectivity_textfields.append(
                         _get_connectivity_widgets(receptor_related_conn))
 
+    # Style the contents of the Connectivity Tab
+    # -------------------------------------------------------------------------
+
+    # define custom Vbox layout
+    # no_padding_layout = Layout(padding="0", margin="0") # unused
+
+    # Initialize sections within the Accordion
+
     connectivity_boxes = [VBox(slider) for slider in connectivity_textfields]
+
+    # Add class to child Vboxes for targeted CSS
+    for box in connectivity_boxes:
+        box.add_class("connectivity-contents")
+
+    # Initialize the Accordion section
+
     cell_connectivity = Accordion(children=connectivity_boxes)
+
+    # Add class to Accordion section for targeted CSS
+    cell_connectivity.add_class("connectivity-section")
+
     for idx, connectivity_name in enumerate(connectivity_names):
         cell_connectivity.set_title(idx, connectivity_name)
 
+    # Style the <div> automatically created around connectivity boxes
+    connectivity_out_style = HTML("""
+    <style>
+        /* CSS to style elements inside the Accordion */
+        .connectivity-section .jupyter-widget-Collapse-contents {
+            padding: 0px 0px 10px 0px !important;
+            margin: 0 !important;
+        }
+    </style>
+    """)
+
+    # Display the Accordion with styling
     with connectivity_out:
-        display(cell_connectivity)
+        display(connectivity_out_style, cell_connectivity)
 
     return net
 
@@ -1923,6 +2019,7 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
 def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
                        all_data, dt, tstop,
                        fig_default_params, widget_default_smoothing,
+                       widget_min_frequency, widget_max_frequency,
                        ntrials, backend_selection,
                        mpi_cmd, n_jobs, params, simulation_status_bar,
                        simulation_status_contents, connectivity_textfields,
@@ -1974,12 +2071,14 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
 
     viz_manager.reset_fig_config_tabs()
 
-    # update default_smoothing in gui based on widget
+    # update default visualization params in gui based on widget
     fig_default_params['default_smoothing'] = widget_default_smoothing.value
+    fig_default_params['default_min_frequency'] = widget_min_frequency.value
+    fig_default_params['default_max_frequency'] = widget_max_frequency.value
 
-    # change default smoothing in viz_manager to mirror gui
-    new_default_smoothing = fig_default_params['default_smoothing']
-    viz_manager.fig_default_params['default_smoothing'] = new_default_smoothing
+    # change default visualization params in viz_manager to mirror gui
+    for widget, value in fig_default_params.items():
+        viz_manager.fig_default_params[widget] = value
 
     viz_manager.add_figure()
     fig_name = _idx2figname(viz_manager.data['fig_idx']['idx'] - 1)
