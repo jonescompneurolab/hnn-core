@@ -158,7 +158,7 @@
 <span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="p">(</span><span class="n">HTML</span><span class="p">,</span> <span class="n">Accordion</span><span class="p">,</span> <span class="n">AppLayout</span><span class="p">,</span> <span class="n">BoundedFloatText</span><span class="p">,</span>
                         <span class="n">BoundedIntText</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">Dropdown</span><span class="p">,</span> <span class="n">FileUpload</span><span class="p">,</span> <span class="n">VBox</span><span class="p">,</span>
                         <span class="n">HBox</span><span class="p">,</span> <span class="n">IntText</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">Output</span><span class="p">,</span> <span class="n">RadioButtons</span><span class="p">,</span> <span class="n">Tab</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span>
-                        <span class="n">Checkbox</span><span class="p">)</span>
+                        <span class="n">Checkbox</span><span class="p">,</span> <span class="n">Box</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">ipywidgets.embed</span> <span class="kn">import</span> <span class="n">embed_minimal_html</span>
 <span class="kn">import</span> <span class="nn">hnn_core</span>
 <span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <span class="n">JoblibBackend</span><span class="p">,</span> <span class="n">MPIBackend</span><span class="p">,</span> <span class="n">simulate_dipole</span>
@@ -425,7 +425,7 @@
                                     <span class="n">height</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">operation_box_height</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
                                     <span class="n">flex_wrap</span><span class="o">=</span><span class="s2">&quot;wrap&quot;</span><span class="p">,</span>
                                     <span class="p">),</span>
-            <span class="s2">&quot;config_box&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">left_sidebar_width</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;config_box&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">left_sidebar_width</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">40</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span>
                                  <span class="n">height</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config_box_height</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">100</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">),</span>
             <span class="s2">&quot;drive_widget&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">),</span>
             <span class="s2">&quot;drive_textbox&quot;</span><span class="p">:</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;270px&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">),</span>
@@ -459,12 +459,37 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">net</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpls</span><span class="o">=</span><span class="nb">list</span><span class="p">()))</span>
 
         <span class="c1"># Default visualization params for figures</span>
+        <span class="n">analysis_style</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description_width&#39;</span><span class="p">:</span> <span class="s1">&#39;200px&#39;</span><span class="p">}</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;300px&quot;</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_smoothing</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
             <span class="n">value</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Smoothing:&#39;</span><span class="p">,</span>
-            <span class="nb">min</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="nb">min</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">analysis_style</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_min_frequency</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+            <span class="nb">min</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+            <span class="nb">max</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Min Spectral Frequency (Hz):&#39;</span><span class="p">,</span>
+            <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">analysis_style</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_max_frequency</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+            <span class="nb">min</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+            <span class="nb">max</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Max Spectral Frequency (Hz):&#39;</span><span class="p">,</span>
+            <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">analysis_style</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">fig_default_params</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;default_smoothing&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_smoothing</span><span class="o">.</span><span class="n">value</span>
+            <span class="s1">&#39;default_smoothing&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_smoothing</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s1">&#39;default_min_frequency&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_min_frequency</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s1">&#39;default_max_frequency&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_max_frequency</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="c1"># Simulation parameters</span>
@@ -509,16 +534,20 @@
                                                <span class="n">description</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
                                                <span class="n">layout</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;15%&#39;</span><span class="p">})</span>
         <span class="c1"># Drive selection</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">widget_drive_type_selection</span> <span class="o">=</span> <span class="n">RadioButtons</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_drive_type_selection</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span>
             <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Evoked&#39;</span><span class="p">,</span> <span class="s1">&#39;Poisson&#39;</span><span class="p">,</span> <span class="s1">&#39;Rhythmic&#39;</span><span class="p">,</span> <span class="s1">&#39;Tonic&#39;</span><span class="p">],</span>
             <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Evoked&#39;</span><span class="p">,</span>
-            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Drive:&#39;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Drive type:&#39;</span><span class="p">,</span>
             <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;drive_widget&#39;</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">widget_location_selection</span> <span class="o">=</span> <span class="n">RadioButtons</span><span class="p">(</span>
-            <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;proximal&#39;</span><span class="p">,</span> <span class="s1">&#39;distal&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;proximal&#39;</span><span class="p">,</span>
-            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Location&#39;</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;drive_widget&#39;</span><span class="p">])</span>
+            <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;drive_widget&#39;</span><span class="p">],</span>
+            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;description_width&#39;</span><span class="p">:</span> <span class="s1">&#39;100px&#39;</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_location_selection</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Proximal&#39;</span><span class="p">,</span> <span class="s1">&#39;Distal&#39;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Proximal&#39;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Drive location:&#39;</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;drive_widget&#39;</span><span class="p">],</span>
+            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;description_width&#39;</span><span class="p">:</span> <span class="s1">&#39;100px&#39;</span><span class="p">},</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_drive_button</span> <span class="o">=</span> <span class="n">create_expanded_button</span><span class="p">(</span>
             <span class="s1">&#39;Add drive&#39;</span><span class="p">,</span> <span class="s1">&#39;primary&#39;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;btn&#39;</span><span class="p">],</span>
             <span class="n">button_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">])</span>
@@ -540,7 +569,7 @@
             <span class="n">button_style</span><span class="o">=</span><span class="s1">&#39;success&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">delete_drive_button</span> <span class="o">=</span> <span class="n">create_expanded_button</span><span class="p">(</span>
-            <span class="s1">&#39;Delete drives&#39;</span><span class="p">,</span> <span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;btn&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;Delete all drives&#39;</span><span class="p">,</span> <span class="s1">&#39;success&#39;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;btn&#39;</span><span class="p">],</span>
             <span class="n">button_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">])</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">cell_type_radio_buttons</span> <span class="o">=</span> <span class="n">RadioButtons</span><span class="p">(</span>
@@ -678,9 +707,10 @@
                                          <span class="bp">self</span><span class="o">.</span><span class="n">widget_n_jobs</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">_add_drive_button_clicked</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+            <span class="n">location</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_location_selection</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_drive_widget</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_drive_type_selection</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">widget_location_selection</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">location</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">_delete_drives_clicked</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
@@ -711,6 +741,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">fig_default_params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_smoothing</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_min_frequency</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_max_frequency</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_mpi_cmd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_n_jobs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_bar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_contents</span><span class="p">,</span>
@@ -812,11 +843,31 @@
 <span class="sd">            If the method returns the layout object which can be rendered by</span>
 <span class="sd">            IPython.display.display() method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">box_style</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            style=&quot;</span>
+<span class="s2">                background: gray;</span>
+<span class="s2">                color: white;</span>
+<span class="s2">                # font-weight: bold;</span>
+<span class="s2">                width: 290px;</span>
+<span class="s2">                padding: 0px 5px;</span>
+<span class="s2">                margin-bottom: 2px;</span>
+<span class="s2">            &quot;</span>
+<span class="s2">        &quot;&quot;&quot;</span>
         <span class="n">simulation_box</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span>
+            <span class="n">HTML</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&lt;div </span><span class="si">{</span><span class="n">box_style</span><span class="si">}</span><span class="s2">&gt;Simulation Parameters&lt;/div&gt;&quot;</span><span class="p">),</span>
             <span class="n">VBox</span><span class="p">([</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_smoothing</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend_config_out</span><span class="p">]),</span>
+            <span class="n">Box</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="s2">&quot;20px&quot;</span><span class="p">)),</span>
+            <span class="n">HTML</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;&lt;div </span><span class="si">{</span><span class="n">box_style</span><span class="si">}</span><span class="s2">&#39;&gt;Default Visualization Parameters&lt;/div&gt;&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">VBox</span><span class="p">([</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_smoothing</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_min_frequency</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_max_frequency</span><span class="p">,</span>
+            <span class="p">])</span>
         <span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;config_box&#39;</span><span class="p">])</span>
 
         <span class="n">connectivity_configuration</span> <span class="o">=</span> <span class="n">Tab</span><span class="p">()</span>
@@ -1292,20 +1343,34 @@
 <span class="k">def</span> <span class="nf">_get_connectivity_widgets</span><span class="p">(</span><span class="n">conn_data</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create connectivity box widgets from specified weight and probability&quot;&quot;&quot;</span>
 
-    <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description_width&#39;</span><span class="p">:</span> <span class="s1">&#39;150px&#39;</span><span class="p">}</span>
-    <span class="n">style</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description_width&#39;</span><span class="p">:</span> <span class="s1">&#39;100px&#39;</span><span class="p">}</span>
     <span class="n">sliders</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">receptor_name</span> <span class="ow">in</span> <span class="n">conn_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="n">w_text_input</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
             <span class="n">value</span><span class="o">=</span><span class="n">conn_data</span><span class="p">[</span><span class="n">receptor_name</span><span class="p">][</span><span class="s1">&#39;weight&#39;</span><span class="p">],</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">continuous_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
-            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">)</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Weight:&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">)</span>
+
+        <span class="n">display_name</span> <span class="o">=</span> <span class="n">conn_data</span><span class="p">[</span><span class="n">receptor_name</span><span class="p">][</span><span class="s1">&#39;receptor&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+        <span class="n">map_display_names</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;GABAA&#39;</span><span class="p">:</span> <span class="s1">&#39;GABA&lt;sub&gt;A&lt;/sub&gt;&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;GABAB&#39;</span><span class="p">:</span> <span class="s1">&#39;GABA&lt;sub&gt;B&lt;/sub&gt;&#39;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">display_name</span> <span class="ow">in</span> <span class="n">map_display_names</span><span class="p">:</span>
+            <span class="n">display_name</span> <span class="o">=</span> <span class="n">map_display_names</span><span class="p">[</span><span class="n">display_name</span><span class="p">]</span>
+
+        <span class="n">html_tab</span> <span class="o">=</span> <span class="s1">&#39;&amp;emsp;&#39;</span>
 
         <span class="n">conn_widget</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">([</span>
-            <span class="n">HTML</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;p&gt;</span>
-<span class="s2">            Receptor: </span><span class="si">{</span><span class="n">conn_data</span><span class="p">[</span><span class="n">receptor_name</span><span class="p">][</span><span class="s1">&#39;receptor&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&lt;/p&gt;&quot;&quot;&quot;</span><span class="p">),</span>
-            <span class="n">w_text_input</span><span class="p">,</span> <span class="n">HTML</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;&lt;hr style=&#39;margin-bottom:5px&#39;/&gt;&quot;</span><span class="p">)</span>
+            <span class="n">HTML</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;p style=&#39;margin:5px;&#39;&gt;&lt;b&gt;</span><span class="si">{</span><span class="n">html_tab</span><span class="si">}{</span><span class="n">html_tab</span><span class="si">}</span>
+<span class="s2">            Receptor: </span><span class="si">{</span><span class="n">display_name</span><span class="si">}</span><span class="s2">&lt;/b&gt;&lt;/p&gt;&quot;&quot;&quot;</span><span class="p">),</span>
+            <span class="n">w_text_input</span>
         <span class="p">])</span>
+
+        <span class="c1">#  Add class to child Vboxes for targeted CSS</span>
+        <span class="n">conn_widget</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s1">&#39;connectivity-subsection&#39;</span><span class="p">)</span>
 
         <span class="n">conn_widget</span><span class="o">.</span><span class="n">_belongsto</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;receptor&quot;</span><span class="p">:</span> <span class="n">conn_data</span><span class="p">[</span><span class="n">receptor_name</span><span class="p">][</span><span class="s1">&#39;receptor&#39;</span><span class="p">],</span>
@@ -1807,13 +1872,44 @@
                     <span class="n">connectivity_textfields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                         <span class="n">_get_connectivity_widgets</span><span class="p">(</span><span class="n">receptor_related_conn</span><span class="p">))</span>
 
+    <span class="c1"># Style the contents of the Connectivity Tab</span>
+    <span class="c1"># -------------------------------------------------------------------------</span>
+
+    <span class="c1"># define custom Vbox layout</span>
+    <span class="c1"># no_padding_layout = Layout(padding=&quot;0&quot;, margin=&quot;0&quot;) # unused</span>
+
+    <span class="c1"># Initialize sections within the Accordion</span>
+
     <span class="n">connectivity_boxes</span> <span class="o">=</span> <span class="p">[</span><span class="n">VBox</span><span class="p">(</span><span class="n">slider</span><span class="p">)</span> <span class="k">for</span> <span class="n">slider</span> <span class="ow">in</span> <span class="n">connectivity_textfields</span><span class="p">]</span>
+
+    <span class="c1"># Add class to child Vboxes for targeted CSS</span>
+    <span class="k">for</span> <span class="n">box</span> <span class="ow">in</span> <span class="n">connectivity_boxes</span><span class="p">:</span>
+        <span class="n">box</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;connectivity-contents&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Initialize the Accordion section</span>
+
     <span class="n">cell_connectivity</span> <span class="o">=</span> <span class="n">Accordion</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="n">connectivity_boxes</span><span class="p">)</span>
+
+    <span class="c1"># Add class to Accordion section for targeted CSS</span>
+    <span class="n">cell_connectivity</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;connectivity-section&quot;</span><span class="p">)</span>
+
     <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">connectivity_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">connectivity_names</span><span class="p">):</span>
         <span class="n">cell_connectivity</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">connectivity_name</span><span class="p">)</span>
 
+    <span class="c1"># Style the &lt;div&gt; automatically created around connectivity boxes</span>
+    <span class="n">connectivity_out_style</span> <span class="o">=</span> <span class="n">HTML</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    &lt;style&gt;</span>
+<span class="s2">        /* CSS to style elements inside the Accordion */</span>
+<span class="s2">        .connectivity-section .jupyter-widget-Collapse-contents {</span>
+<span class="s2">            padding: 0px 0px 10px 0px !important;</span>
+<span class="s2">            margin: 0 !important;</span>
+<span class="s2">        }</span>
+<span class="s2">    &lt;/style&gt;</span>
+<span class="s2">    &quot;&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Display the Accordion with styling</span>
     <span class="k">with</span> <span class="n">connectivity_out</span><span class="p">:</span>
-        <span class="n">display</span><span class="p">(</span><span class="n">cell_connectivity</span><span class="p">)</span>
+        <span class="n">display</span><span class="p">(</span><span class="n">connectivity_out_style</span><span class="p">,</span> <span class="n">cell_connectivity</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">net</span>
 
@@ -2058,6 +2154,7 @@
 <span class="k">def</span> <span class="nf">run_button_clicked</span><span class="p">(</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span>
                        <span class="n">all_data</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
                        <span class="n">fig_default_params</span><span class="p">,</span> <span class="n">widget_default_smoothing</span><span class="p">,</span>
+                       <span class="n">widget_min_frequency</span><span class="p">,</span> <span class="n">widget_max_frequency</span><span class="p">,</span>
                        <span class="n">ntrials</span><span class="p">,</span> <span class="n">backend_selection</span><span class="p">,</span>
                        <span class="n">mpi_cmd</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">simulation_status_bar</span><span class="p">,</span>
                        <span class="n">simulation_status_contents</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">,</span>
@@ -2109,12 +2206,14 @@
 
     <span class="n">viz_manager</span><span class="o">.</span><span class="n">reset_fig_config_tabs</span><span class="p">()</span>
 
-    <span class="c1"># update default_smoothing in gui based on widget</span>
+    <span class="c1"># update default visualization params in gui based on widget</span>
     <span class="n">fig_default_params</span><span class="p">[</span><span class="s1">&#39;default_smoothing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_default_smoothing</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">fig_default_params</span><span class="p">[</span><span class="s1">&#39;default_min_frequency&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_min_frequency</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">fig_default_params</span><span class="p">[</span><span class="s1">&#39;default_max_frequency&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_max_frequency</span><span class="o">.</span><span class="n">value</span>
 
-    <span class="c1"># change default smoothing in viz_manager to mirror gui</span>
-    <span class="n">new_default_smoothing</span> <span class="o">=</span> <span class="n">fig_default_params</span><span class="p">[</span><span class="s1">&#39;default_smoothing&#39;</span><span class="p">]</span>
-    <span class="n">viz_manager</span><span class="o">.</span><span class="n">fig_default_params</span><span class="p">[</span><span class="s1">&#39;default_smoothing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_default_smoothing</span>
+    <span class="c1"># change default visualization params in viz_manager to mirror gui</span>
+    <span class="k">for</span> <span class="n">widget</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">fig_default_params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">viz_manager</span><span class="o">.</span><span class="n">fig_default_params</span><span class="p">[</span><span class="n">widget</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="n">viz_manager</span><span class="o">.</span><span class="n">add_figure</span><span class="p">()</span>
     <span class="n">fig_name</span> <span class="o">=</span> <span class="n">_idx2figname</span><span class="p">(</span><span class="n">viz_manager</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;fig_idx&#39;</span><span class="p">][</span><span class="s1">&#39;idx&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
