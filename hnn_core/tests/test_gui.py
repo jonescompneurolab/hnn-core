@@ -368,6 +368,7 @@ def test_gui_init_network(setup_gui):
 
 @requires_mpi4py
 @requires_psutil
+@pytest.mark.uses_mpi
 def test_gui_run_simulation_mpi():
     """Test if run button triggers simulation with MPIBackend."""
     gui = HNNGUI()
