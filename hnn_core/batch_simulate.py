@@ -266,10 +266,10 @@ class BatchSimulate(object):
         with parallel_config(backend=backend):
             res = Parallel(n_jobs=n_jobs, verbose=verbose)(
                 delayed(self._run_single_sim)(
-                    params, n_jobs) for params in param_combinations)
+                    params) for params in param_combinations)
         return res
 
-    def _run_single_sim(self, param_values, n_jobs=1):
+    def _run_single_sim(self, param_values):
         """Run a single simulation.
 
         Parameters

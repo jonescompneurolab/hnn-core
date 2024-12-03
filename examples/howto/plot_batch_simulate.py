@@ -116,8 +116,7 @@ def summary_func(results):
 net = jones_2009_model(mesh_shape=(3, 3))
 batch_simulation = BatchSimulate(net=net,
                                  set_params=set_params,
-                                 summary_func=summary_func,
-                                 n_trials=10)
+                                 summary_func=summary_func)
 simulation_results = batch_simulation.run(param_grid,
                                           n_jobs=n_jobs,
                                           combinations=False,
