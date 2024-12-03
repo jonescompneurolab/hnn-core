@@ -855,8 +855,21 @@ def test_tonic_biases():
     assert 'tonic' in net.external_biases
     assert 'L5_pyramidal' not in net.external_biases['tonic']
     assert net.external_biases['tonic']['L2_pyramidal']['t0'] == 0
-    with pytest.raises(ValueError, match=r'Tonic bias already defined for.*$'):
+    with pytest.raises(ValueError, match=r'Bias named tonic already defined '
+                       r'for.*$'):
         net.add_tonic_bias(amplitude=tonic_bias_2)
+
+    net = jones_2009_model()
+    net.add_tonic_bias(amplitude=tonic_bias_2, bias_name='tonic_2', t0=100)
+    assert 'tonic_2' in net.external_biases
+    assert net.external_biases['tonic_2']['L2_pyramidal']['t0'] == 100
+
+    # non-existent section
+    net.external_biases = dict()
+
+    with pytest.raises(ValueError, match=(r'section must be one of .*'
+                                          ' Got apical_4.')):
+        net.add_tonic_bias(amplitude={'L2_pyramidal': .5}, section='apical_4')
 
 
 def test_network_mesh():
