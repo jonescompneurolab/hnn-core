@@ -165,12 +165,24 @@ for comprehensive analysis.</p>
 <span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a>
 
 <span class="c1"># The number of cores may need modifying depending on your current machine.</span>
-<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_jobs</span></a> <span class="o">=</span> <span class="mi">10</span>
+<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_jobs</span></a> <span class="o">=</span> <span class="mi">4</span>
 </pre></div>
 </div>
+<p>The <em class="xref py py-obj">add_evoked_drive</em> function simulates external input to the network,
+mimicking sensory stimulation or other external events.</p>
+<ul class="simple">
+<li><p><em class="xref py py-obj">evprox</em> indicates a proximal drive, targeting dendrites near the cell
+bodies.</p></li>
+<li><p><em class="xref py py-obj">mu=40</em> and <em class="xref py py-obj">sigma=5</em> define the timing (mean and spread) of the input.</p></li>
+<li><p><em class="xref py py-obj">weights_ampa</em> and <em class="xref py py-obj">synaptic_delays</em> control the strength and
+timing of the input.</p></li>
+</ul>
+<p>This evoked drive causes the initial positive deflection in the dipole
+signal, triggering a cascade of activity through the network and
+resulting in the complex waveforms observed.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">param_values</span></a><span class="p">,</span> <a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Set parameters in the network drives.</span>
+<span class="sd">    Set parameters for the network drives.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -197,14 +209,14 @@ for comprehensive analysis.</p>
                          <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">synaptic_delays</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Define a parameter grid for the batch simulation.</p>
+<p>Next, we define a parameter grid for the batch simulation.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">param_grid</span></a> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;weight_basket&#39;</span><span class="p">:</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.logspace.html#numpy.logspace" title="numpy.logspace" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">logspace</span></a><span class="p">(</span><span class="o">-</span><span class="mi">4</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
-    <span class="s1">&#39;weight_pyr&#39;</span><span class="p">:</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.logspace.html#numpy.logspace" title="numpy.logspace" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">logspace</span></a><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="s1">&#39;weight_basket&#39;</span><span class="p">:</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.logspace.html#numpy.logspace" title="numpy.logspace" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">logspace</span></a><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+    <span class="s1">&#39;weight_pyr&#39;</span><span class="p">:</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.logspace.html#numpy.logspace" title="numpy.logspace" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">logspace</span></a><span class="p">(</span><span class="o">-</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Define a function to calculate summary statistics</p>
+<p>We then define a function to calculate summary statistics.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">summary_func</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the min and max dipole peak for each simulation result.</span>
@@ -230,12 +242,7 @@ for comprehensive analysis.</p>
 </pre></div>
 </div>
 <p>Run the batch simulation and collect the results.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Comment off this code, if dask and distributed Python packages are installed</span>
-<span class="c1"># from dask.distributed import Client</span>
-<span class="c1"># client = Client(threads_per_worker=1, n_workers=5, processes=False)</span>
-
-
-<span class="c1"># Run the batch simulation and collect the results.</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialize the network model and run the batch simulation.</span>
 <a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">(</span><span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 <span class="n">batch_simulation</span> <span class="o">=</span> <span class="n">BatchSimulate</span><span class="p">(</span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="o">=</span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a><span class="p">,</span>
                                  <span class="n">set_params</span><span class="o">=</span><span class="n">set_params</span><span class="p">,</span>
@@ -243,66 +250,105 @@ for comprehensive analysis.</p>
 <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">simulation_results</span></a> <span class="o">=</span> <span class="n">batch_simulation</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">param_grid</span></a><span class="p">,</span>
                                           <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_jobs</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">n_jobs</span></a><span class="p">,</span>
                                           <span class="n">combinations</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                          <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;multiprocessing&#39;</span><span class="p">)</span>
-<span class="c1"># backend=&#39;dask&#39; if installed</span>
+                                          <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;loky&#39;</span><span class="p">)</span>
+
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Simulation results:&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">simulation_results</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-[Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.7s
-[Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-[Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.7s
-[Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-[Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.7s
-[Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-[Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.7s
-[Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-[Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.7s
-[Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-[Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.7s
-[Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-[Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.7s
-[Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-[Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.7s
-[Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-[Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.7s
-[Parallel(n_jobs=10)]: Using backend MultiprocessingBackend with 10 concurrent workers.
-[Parallel(n_jobs=10)]: Done   1 tasks      | elapsed:    1.7s
-Simulation results: {&#39;summary_statistics&#39;: [[{&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 2.438299811172486e-05}], [{&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 5.406961258004377e-05}], [{&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.00011922352353898099}], [{&#39;min_peak&#39;: -0.0006636604554164317, &#39;max_peak&#39;: 0.0011404645089040637}], [{&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.0009097461915339956}], [{&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.0011362095936085991}], [{&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.001168458230350182}], [{&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.0012737618628301784}], [{&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.0014391544369764205}], [{&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.001616939552849071}]], &#39;simulated_data&#39;: [[{&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
+[Parallel(n_jobs=4)]: Done   1 tasks      | elapsed:    3.3s
+[Parallel(n_jobs=4)]: Done   2 tasks      | elapsed:    3.4s
+[Parallel(n_jobs=4)]: Done   3 tasks      | elapsed:    3.4s
+[Parallel(n_jobs=4)]: Done   4 tasks      | elapsed:    3.4s
+[Parallel(n_jobs=4)]: Done   5 tasks      | elapsed:    6.1s
+[Parallel(n_jobs=4)]: Done   6 tasks      | elapsed:    6.1s
+[Parallel(n_jobs=4)]: Done   7 tasks      | elapsed:    6.1s
+[Parallel(n_jobs=4)]: Done   8 tasks      | elapsed:    6.1s
+[Parallel(n_jobs=4)]: Done   9 tasks      | elapsed:    8.8s
+[Parallel(n_jobs=4)]: Done  10 tasks      | elapsed:    8.9s
+[Parallel(n_jobs=4)]: Done  11 tasks      | elapsed:    8.9s
+[Parallel(n_jobs=4)]: Done  12 tasks      | elapsed:    8.9s
+[Parallel(n_jobs=4)]: Done  13 tasks      | elapsed:   11.6s
+[Parallel(n_jobs=4)]: Done  14 out of  20 | elapsed:   11.6s remaining:    5.0s
+[Parallel(n_jobs=4)]: Done  15 out of  20 | elapsed:   11.7s remaining:    3.9s
+[Parallel(n_jobs=4)]: Done  16 out of  20 | elapsed:   11.7s remaining:    2.9s
+[Parallel(n_jobs=4)]: Done  17 out of  20 | elapsed:   14.3s remaining:    2.5s
+[Parallel(n_jobs=4)]: Done  18 out of  20 | elapsed:   14.4s remaining:    1.6s
+[Parallel(n_jobs=4)]: Done  20 out of  20 | elapsed:   14.5s finished
+Simulation results: {&#39;summary_statistics&#39;: [[{&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 2.438299811172486e-05}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 3.5625970074068246e-05}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 5.187123572695809e-05}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 7.53973769021331e-05}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.00010962271639761121}, {&#39;min_peak&#39;: -0.0008187098140745109, &#39;max_peak&#39;: 0.0011853731897260896}, {&#39;min_peak&#39;: -0.0006900911098816427, &#39;max_peak&#39;: 0.001453236614203405}, {&#39;min_peak&#39;: -7.443630674152117e-05, &#39;max_peak&#39;: 0.0006303483688791793}, {&#39;min_peak&#39;: -0.0003831247250500206, &#39;max_peak&#39;: 0.0015588783545865902}, {&#39;min_peak&#39;: -0.0005827286517536018, &#39;max_peak&#39;: 0.0014794795458269632}, {&#39;min_peak&#39;: -0.0005759203533290847, &#39;max_peak&#39;: 0.0014539235295249087}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.001326218239424397}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.0013283313099600618}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.0011853462053579688}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.0011649633329457493}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.0011845854148153823}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.001231155285096076}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.0013115554222262672}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.0014314315232221652}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.001512378997571943}]], &#39;simulated_data&#39;: [[{&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
 3 L2 basket cells
-3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 9.999999999999999e-06, &#39;weight_pyr&#39;: 9.999999999999999e-05}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f8c19741b50&gt;]}], [{&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 9.999999999999999e-05, &#39;weight_pyr&#39;: 9.999999999999999e-05}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f8455afe7c0&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
 3 L2 basket cells
-3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 2.0235896477251556e-05, &#39;weight_pyr&#39;: 0.00021544346900318845}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f8c2136de20&gt;]}], [{&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.00014384498882876628, &#39;weight_pyr&#39;: 0.00014384498882876628}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f8455ceed60&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
 3 L2 basket cells
-3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 4.094915062380427e-05, &#39;weight_pyr&#39;: 0.00046415888336127773}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f8c229db940&gt;]}], [{&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.000206913808111479, &#39;weight_pyr&#39;: 0.000206913808111479}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f845a3c3460&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
 3 L2 basket cells
-3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 8.286427728546842e-05, &#39;weight_pyr&#39;: 0.001}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f8c213af790&gt;]}], [{&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.00029763514416313193, &#39;weight_pyr&#39;: 0.00029763514416313193}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f845b6e1310&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
 3 L2 basket cells
-3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.00016768329368110083, &#39;weight_pyr&#39;: 0.002154434690031882}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f8c2ac5b4f0&gt;]}], [{&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.00042813323987193956, &#39;weight_pyr&#39;: 0.00042813323987193956}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f8457219f70&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
 3 L2 basket cells
-3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.00033932217718953293, &#39;weight_pyr&#39;: 0.004641588833612777}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f8c211fd670&gt;]}], [{&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.0006158482110660266, &#39;weight_pyr&#39;: 0.0006158482110660266}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f844df62550&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
 3 L2 basket cells
-3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.0006866488450042998, &#39;weight_pyr&#39;: 0.01}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f8c297f19d0&gt;]}], [{&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.0008858667904100822, &#39;weight_pyr&#39;: 0.0008858667904100822}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f845a2f24f0&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
 3 L2 basket cells
-3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.0013894954943731376, &#39;weight_pyr&#39;: 0.021544346900318822}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f8c34736790&gt;]}], [{&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.0012742749857031334, &#39;weight_pyr&#39;: 0.0012742749857031334}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f845a4bc580&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
 3 L2 basket cells
-3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.002811768697974231, &#39;weight_pyr&#39;: 0.046415888336127774}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f8c2acfb1f0&gt;]}], [{&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.0018329807108324356, &#39;weight_pyr&#39;: 0.0018329807108324356}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f8460a6efa0&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
 3 L2 basket cells
-3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.005689866029018299, &#39;weight_pyr&#39;: 0.09999999999999999}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f8c1944a610&gt;]}]]}
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.002636650898730358, &#39;weight_pyr&#39;: 0.002636650898730358}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f845a59e310&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L2 basket cells
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.00379269019073225, &#39;weight_pyr&#39;: 0.00379269019073225}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f844df2d370&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L2 basket cells
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.005455594781168514, &#39;weight_pyr&#39;: 0.005455594781168514}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f846931d310&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L2 basket cells
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.007847599703514606, &#39;weight_pyr&#39;: 0.007847599703514606}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f8455ea7e50&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L2 basket cells
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.011288378916846885, &#39;weight_pyr&#39;: 0.011288378916846885}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f845a215160&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L2 basket cells
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.01623776739188721, &#39;weight_pyr&#39;: 0.01623776739188721}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f845a3c6d30&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L2 basket cells
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.023357214690901212, &#39;weight_pyr&#39;: 0.023357214690901212}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f845a6925b0&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L2 basket cells
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.033598182862837805, &#39;weight_pyr&#39;: 0.033598182862837805}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f846051bfd0&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L2 basket cells
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.04832930238571752, &#39;weight_pyr&#39;: 0.04832930238571752}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f84554c8790&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L2 basket cells
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.06951927961775606, &#39;weight_pyr&#39;: 0.06951927961775606}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f8460730160&gt;]}, {&#39;net&#39;: &lt;Network | 3 x 3 Pyramidal cells (L2, L5)
+3 L2 basket cells
+3 L5 basket cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.09999999999999999, &#39;weight_pyr&#39;: 0.09999999999999999}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f844df494c0&gt;]}]]}
 </pre></div>
 </div>
 <p>This plot shows an overlay of all smoothed dipole waveforms from the
-batch simulation. Each line represents a different set of parameters,
-allowing us to visualize the range of responses across the parameter space.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpl_waveforms</span></a> <span class="o">=</span> <span class="p">[]</span>
+batch simulation. Each line represents a different set of synaptic strength
+parameters (<em class="xref py py-obj">weight_basket</em>), allowing us to visualize the range of responses
+across the parameter space.
+The colormap represents synaptic strengths, from weaker (purple)
+to stronger (yellow).</p>
+<p>As drive strength increases, dipole responses show progressively larger
+amplitudes and more distinct features, reflecting heightened network
+activity. Weak drives (purple lines) produce smaller amplitude signals with
+simpler waveforms, while stronger drives (yellow lines) generate
+larger responses with more pronounced oscillatory features, indicating
+more robust network activity.</p>
+<p>The y-axis represents dipole amplitude in nAm (nanoAmpere-meters), which is
+the product of current flow and distance in the neural tissue.</p>
+<p>Stronger synaptic connections (yellow lines) generally show larger
+amplitude responses and more pronounced features throughout the simulation.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpl_waveforms</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">param_values</span></a> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
 <span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data_list</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">simulation_results</span></a><span class="p">[</span><span class="s1">&#39;simulated_data&#39;</span><span class="p">]:</span>
     <span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data_list</span></a><span class="p">:</span>
         <span class="n">dpl_smooth</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span></a><span class="p">[</span><span class="s1">&#39;dpl&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">window_len</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
         <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpl_waveforms</span></a><span class="o">.</span><span class="n">append</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpl_smooth</span><span class="o">.</span><span class="n">data</span></a><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">])</span>
+        <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">param_values</span></a><span class="o">.</span><span class="n">append</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span></a><span class="p">[</span><span class="s1">&#39;param_values&#39;</span><span class="p">][</span><span class="s1">&#39;weight_basket&#39;</span><span class="p">])</span>
 
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib.pyplot.figure" title="matplotlib.pyplot.figure" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span></a><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-<span class="k">for</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpl_waveforms</span></a><span class="p">:</span>
-    <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="matplotlib.pyplot.plot" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">plot</span></a><span class="p">(</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="matplotlib.colors.ListedColormap" class="sphx-glr-backref-module-matplotlib-colors sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cmap</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.get_cmap.html#matplotlib.pyplot.get_cmap" title="matplotlib.pyplot.get_cmap" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span></a><span class="p">(</span><span class="s1">&#39;viridis&#39;</span><span class="p">)</span>
+<a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">log_param_values</span></a> <span class="o">=</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">np</span><span class="o">.</span><span class="n">log10</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">param_values</span></a><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.colors.Normalize.html#matplotlib.colors.Normalize" title="matplotlib.colors.Normalize" class="sphx-glr-backref-module-matplotlib-colors sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">norm</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.colors.Normalize.html#matplotlib.colors.Normalize" title="matplotlib.colors.Normalize" class="sphx-glr-backref-module-matplotlib-colors sphx-glr-backref-type-py-class"><span class="n">plt</span><span class="o">.</span><span class="n">Normalize</span></a><span class="p">(</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">log_param_values</span></a><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">log_param_values</span></a><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+
+<span class="k">for</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">log_param</span></a> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpl_waveforms</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">log_param_values</span></a><span class="p">):</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">color</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib.colors.ListedColormap" title="matplotlib.colors.ListedColormap" class="sphx-glr-backref-module-matplotlib-colors sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cmap</span></a><span class="p">(</span><a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.colors.Normalize.html#matplotlib.colors.Normalize" title="matplotlib.colors.Normalize" class="sphx-glr-backref-module-matplotlib-colors sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">norm</span></a><span class="p">(</span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">log_param</span></a><span class="p">))</span>
+    <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html#matplotlib.pyplot.plot" title="matplotlib.pyplot.plot" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">plot</span></a><span class="p">(</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">waveform</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">color</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">color</span></a><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.title.html#matplotlib.pyplot.title" title="matplotlib.pyplot.title" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">title</span></a><span class="p">(</span><span class="s1">&#39;Overlay of Dipole Waveforms&#39;</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.xlabel.html#matplotlib.pyplot.xlabel" title="matplotlib.pyplot.xlabel" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span></a><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.ylabel.html#matplotlib.pyplot.ylabel" title="matplotlib.pyplot.ylabel" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span></a><span class="p">(</span><span class="s1">&#39;Dipole Amplitude (nAm)&#39;</span><span class="p">)</span>
@@ -336,7 +382,7 @@ dipole activity changes as we vary the synaptic strength parameter.</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_batch_simulate_002.png" srcset="../../_images/sphx_glr_plot_batch_simulate_002.png" alt="Min and Max Dipole Peaks across Simulations" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 17.916 seconds)</p>
+<img src="../../_images/sphx_glr_plot_batch_simulate_002.png" srcset="../../_images/sphx_glr_plot_batch_simulate_002.png" alt="Min and Max Dipole Peaks across Simulations" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 15.054 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-batch-simulate-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=v0.4/notebooks/auto_examples/howto/plot_batch_simulate.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" width="150px" /></a>
