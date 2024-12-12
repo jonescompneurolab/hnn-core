@@ -2,7 +2,6 @@ import os.path as op
 from os import environ
 import io
 from contextlib import redirect_stdout
-from multiprocessing import cpu_count
 from threading import Thread, Event
 from time import sleep
 from urllib.request import urlretrieve
@@ -16,7 +15,11 @@ import pytest
 import hnn_core
 from hnn_core import MPIBackend, jones_2009_model, read_params
 from hnn_core.dipole import simulate_dipole
-from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
+from hnn_core.parallel_backends import (
+    requires_mpi4py,
+    requires_psutil,
+    _determine_cores_hwthreading,
+)
 from hnn_core.network_builder import NetworkBuilder
 
 
@@ -74,8 +77,6 @@ def test_gid_assignment():
 # simulation when there are failures in previous (faster) tests. When a test
 # in the sequence fails, all subsequent tests will be marked "xfailed" rather
 # than skipped.
-
-
 @pytest.mark.incremental
 @pytest.mark.uses_mpi
 class TestParallelBackends():
@@ -102,6 +103,35 @@ class TestParallelBackends():
         for trial_idx in range(len(dpls_reduced_default)):
             assert_array_equal(dpls_reduced_default[trial_idx].data['agg'],
                                dpls_reduced_joblib[trial_idx].data['agg'])
+
+    @requires_mpi4py
+    @requires_psutil
+    @pytest.mark.parametrize("sensible_default", [False, True])
+    def test_detect_cores(self, sensible_default):
+        """Test that multiple cores can be detected"""
+        [detected_cores_nohw, detected_hwthreading] = \
+            _determine_cores_hwthreading(
+                enable_hwthreading=False,
+                sensible_default_cores=sensible_default)
+        assert detected_cores_nohw > 1
+        assert isinstance(detected_hwthreading, bool)
+
+        [detected_cores_yeshw, detected_hwthreading] = \
+            _determine_cores_hwthreading(
+                enable_hwthreading=True,
+                sensible_default_cores=sensible_default)
+        assert detected_cores_yeshw > 1
+        assert isinstance(detected_hwthreading, bool)
+
+        [detected_cores_maybehw, detected_hwthreading] = \
+            _determine_cores_hwthreading(
+                enable_hwthreading=None,
+                sensible_default_cores=sensible_default)
+        assert detected_cores_maybehw > 1
+        assert isinstance(detected_hwthreading, bool)
+
+        assert detected_cores_yeshw >= detected_cores_nohw
+        assert detected_cores_maybehw >= detected_cores_nohw
 
     @requires_mpi4py
     @requires_psutil
@@ -162,7 +192,9 @@ class TestParallelBackends():
 
     @requires_mpi4py
     @requires_psutil
-    def test_run_mpibackend_oversubscribed(self, run_hnn_core_fixture):
+    @pytest.mark.parametrize("hwthreading_enabled", [None, False, True])
+    def test_run_mpibackend_oversubscribed(self, run_hnn_core_fixture,
+                                           hwthreading_enabled):
         """Test running MPIBackend with oversubscribed number of procs"""
         hnn_core_root = op.dirname(hnn_core.__file__)
         params_fname = op.join(hnn_core_root, 'param', 'default.json')
@@ -174,17 +206,24 @@ class TestParallelBackends():
         net = jones_2009_model(params, add_drives_from_params=True,
                                mesh_shape=(3, 3))
 
-        # try running with more procs than cells in the network (will probably
-        # oversubscribe)
+        # Fail state: try running with more procs than cells in the network
+        # (will probably oversubscribe too)
         too_many_procs = net._n_cells + 1
-        with pytest.raises(ValueError, match='More MPI processes were '
-                           'assigned than there are cells'):
+
+        with pytest.raises(ValueError,
+                           match=('More MPI processes were '
+                                  'assigned than there are cells')):
             with MPIBackend(n_procs=too_many_procs) as backend:
                 simulate_dipole(net, tstop=40)
 
-        # force oversubscription + hyperthreading, but make sure there are
-        # always enough cells in the network
-        oversubscribed_procs = cpu_count() + 1
+        # Force oversubscription and make sure there are always enough cells in
+        # the network
+        [detected_cores, detected_hwthreading] = \
+            _determine_cores_hwthreading(
+                enable_hwthreading=hwthreading_enabled,
+                sensible_default_cores=False)
+
+        oversubscribed_procs = detected_cores + 1
         n_grid_1d = int(np.ceil(np.sqrt(oversubscribed_procs)))
         params.update({'t_evprox_1': 5,
                        't_evdist_1': 10,
@@ -192,8 +231,51 @@ class TestParallelBackends():
                        'N_trials': 2})
         net = jones_2009_model(params, add_drives_from_params=True,
                                mesh_shape=(n_grid_1d, n_grid_1d))
-        with MPIBackend(n_procs=oversubscribed_procs) as backend:
-            assert backend.n_procs == oversubscribed_procs
+
+        # Check that oversubscription turns on if needed, and provides a
+        # warning
+        with pytest.warns(UserWarning,
+                          match=("Number of requested MPI processes exceeds "
+                                 "available cores. Enabling MPI "
+                                 "oversubscription automatically.")):
+            with MPIBackend(
+                    n_procs=oversubscribed_procs,
+                    hwthreading=hwthreading_enabled) as backend:
+                assert backend.n_procs == oversubscribed_procs
+                assert "--oversubscribe" in ' '.join(backend.mpi_cmd)
+                if detected_hwthreading:
+                    assert "--use-hwthread-cpus" in ' '.join(backend.mpi_cmd)
+                simulate_dipole(net, tstop=40)
+
+        # Check that the simulation fails if oversubscribe is forced off
+        with pytest.warns(UserWarning) as record:
+            with MPIBackend(
+                    n_procs=oversubscribed_procs,
+                    hwthreading=hwthreading_enabled,
+                    oversubscribe=False,
+            ) as backend:
+                assert "--oversubscribe" not in ' '.join(backend.mpi_cmd)
+                if detected_hwthreading:
+                    assert "--use-hwthread-cpus" in ' '.join(backend.mpi_cmd)
+                with pytest.raises(
+                        RuntimeError,
+                        match="MPI simulation failed. Return code: 1"):
+                    simulate_dipole(net, tstop=40)
+
+            expected_string = ('Received BrokenPipeError exception. '
+                               'Child process failed unexpectedly')
+            assert len(record) == 2
+            assert expected_string in record[0].message.args[0]
+
+        # Check that simulation succeeds if oversubscription is activated but
+        # unnecessary
+        with MPIBackend(
+                n_procs=2,
+                hwthreading=hwthreading_enabled,
+                oversubscribe=True) as backend:
+            assert "--oversubscribe" in ' '.join(backend.mpi_cmd)
+            if detected_hwthreading:
+                assert "--use-hwthread-cpus" in ' '.join(backend.mpi_cmd)
             simulate_dipole(net, tstop=40)
 
     @pytest.mark.parametrize("backend", ['mpi', 'joblib'])
