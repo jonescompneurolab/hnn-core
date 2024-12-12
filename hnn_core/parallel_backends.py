@@ -6,7 +6,6 @@
 import os
 import sys
 import re
-import multiprocessing
 import shlex
 import pickle
 import base64
@@ -15,6 +14,8 @@ from subprocess import Popen, PIPE, TimeoutExpired
 import binascii
 from queue import Queue, Empty
 from threading import Thread, Event
+
+from typing import Union
 
 from .cell_response import CellResponse
 from .dipole import Dipole
@@ -554,16 +555,210 @@ class JoblibBackend(object):
             The Dipole results from each simulation trial
         """
 
-        print(f"Joblib will run {n_trials} trial(s) in parallel by "
-              f"distributing trials over {self.n_jobs} jobs.")
+        print(
+            f"Joblib will run {n_trials} trial(s) in parallel by "
+            f"distributing trials over {self.n_jobs} jobs."
+        )
         parallel, myfunc = self._parallel_func(_simulate_single_trial)
-        sim_data = parallel(myfunc(net, tstop, dt, trial_idx) for
-                            trial_idx in range(n_trials))
+        sim_data = parallel(
+            myfunc(net, tstop, dt, trial_idx) for trial_idx in range(n_trials)
+        )
 
-        dpls = _gather_trial_data(sim_data, net=net, n_trials=n_trials,
-                                  postproc=postproc)
+        dpls = _gather_trial_data(
+            sim_data, net=net, n_trials=n_trials, postproc=postproc
+        )
 
         return dpls
+
+
+def _determine_cores_hwthreading(
+        enable_hwthreading: Union[None, bool] = True,
+        sensible_default_cores: bool = False,
+) -> [int, bool]:
+    """Return the number of available cores and if hardware-threading is used.
+
+    This is important for systems where the number of available cores is
+    partitioned such as on HPC systems, but is also important for determining
+    hardware support for hardware-threading. Hardware-threading ("hwthread" in
+    OpenMPI parlance), simultaneous multi-threading (SMT,
+    https://en.wikipedia.org/wiki/Simultaneous_multithreading ), and [Intel]
+    Hyperthreading are all terms used interchangeably, and are essentially
+    equivalent.
+
+    Parameters
+    ----------
+    enable_hwthreading : bool
+        Whether to detect support for hardware-threading and, if the feature is
+        detected, return the available number of 'logical' hardware-threaded
+        cores. Defaults to True. If 'False', or the feature is not detected,
+        return the available number of 'physical' cores (excluding
+        double-counting of hardware-threaded cores).
+    sensible_default_cores : bool
+        Whether to decrease the number of cores returned in a reasonable
+        manner, such that it balances speed with the user experience (e.g.,
+        preventing the machine 'locking-up'). Defaults to 'False'.
+
+    Returns
+    -------
+    core_count : int
+        Number of logical CPU cores available for use by a process.
+    hwthreading_present : bool
+        Whether or not hardware-threading is present on some or all of the
+        logical CPU cores.
+    """
+    # Needs its own import checks since it may be called by the GUI before
+    # MPIBackend()
+    if _has_mpi4py() and _has_psutil():
+        if enable_hwthreading is None:
+            # This lets us pass the same arg to this function and MPIBackend()
+            # in case we want to use the default approaches.
+            enable_hwthreading = True
+        import platform
+        import psutil
+        if platform.system() == "Darwin":
+            # In Macos' case here, the situation is relatively simple, and we
+            # can determine all the information we need. We are never using
+            # Macos in an HPC environment, so even though we cannot use
+            # `psutil.Process().cpu_affinity()` in Macos, we do not need it.
+
+            # First, let's get both the "logical" and "physical" cores of the
+            # system: 1. In the case of older Macs with Intel CPUs, this will
+            # detect each *single* Intel-Hyperthreaded physical-CPU as *two*
+            # distinct logical-CPUs. Similarly, the number of physical-CPUs
+            # detected will be less than the number of logical-CPUs (though not
+            # necessarily half!).  2. In the case of newer Macs with Apple
+            # Silicon CPUs, the logical-CPUs will be equal to the
+            # physical-CPUs, since these CPUs do not tell the system that they
+            # have hardware-threading.
+            logical_core_count = psutil.cpu_count(logical=True)
+            physical_core_count = psutil.cpu_count(logical=False)
+
+            # We can compare these numbers to automatically determine which CPU
+            # architecture is present, and therefore if hardware-threading is
+            # present too:
+            hwthreading_detected = logical_core_count != physical_core_count
+
+            # By default, return logical core number and, if present,
+            # hardware-threading. If the user informs us that they don't want
+            # hardware-threading, return physical core number and no
+            # hwthreading flag.
+            if enable_hwthreading:
+                core_count = logical_core_count
+                hwthreading_present = hwthreading_detected
+            else:
+                core_count = physical_core_count
+                hwthreading_present = False
+
+        elif platform.system() == "Linux":
+            # In Linux's case here, the situation is more complex:
+            #
+            # 1. In the case of non-HPC Linux computers with Intel chips, the
+            #    situation will be similar to the above Macos Intel-CPU case:
+            #    if there are Intel-Hyperthreaded cores, then the number of
+            #    logical cores will be greater than the number of physical
+            #    cores (but not necessarily double!). Additionally, in this
+            #    case, the number of "affinity" cores (which are the cores
+            #    actually able to be used by new Processes) will be equal to
+            #    the number of logical cores. Pretty simple.
+            #
+            # 2. In the case of non-HPC Linux computers with AMD chips, I do
+            #    not know what will happen. I suspect that, for AMD chips with
+            #    their "SMT" feature ("Simultaneous Multi-Threading",
+            #    equivalent to Intel's trademarked Hyperthreading), they will
+            #    probably behave identically to the Intel Linux case, and
+            #    should work the same.
+            #
+            # 3. In the case of HPC Linux computers such as allocations on
+            #    OSCAR, however, it's different:
+            #
+            #    A. Hardware-Threading: The number of logical and physical
+            #    cores reported are always equal to each other. It is not clear
+            #    to me if you can enable true hardware-threading on OSCAR, nor
+            #    if you can even detect it. The closest that OSCAR has to
+            #    documentation about requesting multiple threads is here:
+            #    https://docs.ccv.brown.edu/oscar/submitting-jobs/
+            #    mpi-jobs#hybrid-mpiopenmp
+            #    which discusses using `--cpus-per-task` and then setting a
+            #    custom OpenMP environment variable. (Note that OpenMP is a
+            #    very, very different technology than OpenMPI!) Similarly, I
+            #    cannot get a successful allocation using the option
+            #    `--threads-per-core` (see
+            #    https://slurm.schedmd.com/sbatch.html ) when using any value
+            #    except one. Fortunately, since the logical CPU number appears
+            #    to always match the physical number, OSCAR should always fail
+            #    our hardware-threading detection "test".
+            #
+            #    B. Cores: Depending on your OSCAR allocation, the number of
+            #    cores you are allowed to use will change, but it appears it
+            #    will always be reflected by the affinity CPU count. In
+            #    contrast, the logical or physical CPU counts are those of the
+            #    node as a whole, which you do NOT necessarily have access to,
+            #    depending on your allocation. For a single node, the number of
+            #    physical and logical cores appears to always be equal. The
+            #    affinity core number will always be less than or equal to the
+            #    number of physical (or logical) cores.
+            logical_core_count = psutil.cpu_count(logical=True)
+            physical_core_count = psutil.cpu_count(logical=False)
+            affinity_core_count = len(psutil.Process().cpu_affinity())
+
+            hwthreading_detected = logical_core_count != physical_core_count
+
+            if enable_hwthreading:
+                # If we want to use hardware-threading if it's detected, then
+                # in all three of the above cases, we can simply use the CPU
+                # affinity count for our number of cores, and pass the result
+                # of our hardware-threading detection check.
+                core_count = affinity_core_count
+                hwthreading_present = hwthreading_detected
+            else:
+                # If the user informs us they don't want hardware-threading,
+                # then:
+                # 1. In the Linux-laptop case, affinity core number is the same
+                #    as logical core number (i.e. including hardware-threaded
+                #    cores). We should use the physical core number, which will
+                #    always be less than or equal to the affinity core number.
+                # 2. In the OSCAR/HPC case, physical core number is the same as
+                #    logical core number. We should use the affinity core
+                #    number, which, in a single node, will always be less than
+                #    or equal to the physical core number.
+                core_count = min(physical_core_count, affinity_core_count)
+                hwthreading_present = False
+
+        else:
+            # In Windows' case here, "all bets are off". We do not currently
+            # officially support MPIBackend() usage on Windows due to the
+            # difficulty of its install, and there are outstanding issues with
+            # trying to use hardware-threads in particular: see
+            # https://github.com/jonescompneurolab/hnn-core/issues/589 .
+            #
+            # Therefore, we also do not support hardware-threading in this
+            # case, and it is disabled by default here. The cores reported are
+            # the non-hardware-threaded physical cores.
+            physical_core_count = psutil.cpu_count(logical=False)
+            core_count = physical_core_count
+            hwthreading_present = False
+
+        default_threshold = 12
+        if sensible_default_cores:
+            if core_count > default_threshold:
+                core_count = default_threshold
+            elif core_count > 2:
+                # This way, sensible defaults still always returns multiple
+                # cores if multiple are available.
+                core_count = core_count - 1
+    else:
+        missing_packages = list()
+        if not _has_mpi4py():
+            missing_packages += ["mpi4py"]
+        if not _has_psutil():
+            missing_packages += ["psutil"]
+        missing_packages = " and ".join(missing_packages)
+        warn(f"{missing_packages} not installed. Will run on single "
+             "processor, with no hardware-threading.")
+        core_count = 1
+        hwthreading_present = False
+
+    return [core_count, hwthreading_present]
 
 
 class MPIBackend(object):
@@ -571,17 +766,26 @@ class MPIBackend(object):
 
     Parameters
     ----------
-    n_procs : int | None
-        The number of MPI processes requested by the user. If None, then will
-        attempt to detect number of cores (including hyperthreads) and start
-        parallel simulation over all of them.
+    n_procs : None | int
+        The number of MPI processes requested by the user. Defaults to 'None',
+        in which case it will attempt to detect the number of cores (including
+        hardware-threads) and start parallel simulation over all of them.
     mpi_cmd : str
-        The name of the mpi launcher executable. Will use 'mpiexec'
-        (openmpi) by default.
+        The name of the mpi launcher executable. Will use 'mpiexec' (openmpi)
+        by default.
+    hwthreading : None | bool
+        Whether or not to tell MPI to use hardware-threading. Defaults to
+        'None', in which case it will use a heuristic for determing whether to
+        use it. If 'False', then hardware-threading is never used, and if
+        'True', then hardware-threading is always used.
+    oversubscribe : None | bool
+        Whether or not to tell MPI to use oversubscription. Defaults to 'None',
+        in which case it will use a heuristic for determing whether to use
+        it. If 'False', then oversubscription is never used, and if 'True',
+        then oversubscription is always used.
 
     Attributes
     ----------
-
     n_procs : int
         The number of processes MPI will actually use (spread over cores). If 1
         is specified or mpi4py could not be loaded, the simulation will be run
@@ -594,59 +798,59 @@ class MPIBackend(object):
     proc_queue : threading.Queue
         A Queue object to hold process handles from Popen in a thread-safe way.
         There will be a valid process handle present the queue when a MPI
-        åsimulation is running.
+        simulation is running.
     """
-    def __init__(self, n_procs=None, mpi_cmd='mpiexec'):
+
+    def __init__(
+        self,
+        n_procs: Union[None, int] = None,
+        mpi_cmd: str = "mpiexec",
+        hwthreading: Union[None, bool] = None,
+        oversubscribe: Union[None, bool] = None,
+    ) -> None:
         self.expected_data_length = 0
         self.proc = None
         self.proc_queue = Queue()
 
-        n_logical_cores = multiprocessing.cpu_count()
-        if n_procs is None:
-            self.n_procs = n_logical_cores
-        else:
-            self.n_procs = n_procs
+        # Check of psutil and mpi4py import has been moved into this function,
+        # since this function is called by GUI before MPIBackend()
+        # instantiated.
+        [n_available_cores, hwthreading_available] = \
+            _determine_cores_hwthreading(
+                enable_hwthreading=(False if (hwthreading is False) else True))
 
-        # did user try to force running on more cores than available?
-        oversubscribe = False
-        if self.n_procs > n_logical_cores:
+        self.n_procs = n_available_cores if (n_procs is None) else n_procs
+
+        # Heuristic: did user try to force running on more cores than
+        # available?
+        if (oversubscribe is None) and (self.n_procs > n_available_cores):
+            warn(
+                "Number of requested MPI processes exceeds available "
+                "cores. Enabling MPI oversubscription automatically."
+            )
             oversubscribe = True
 
-        hyperthreading = False
-
-        if _has_mpi4py() and _has_psutil():
-            import psutil
-
-            n_physical_cores = psutil.cpu_count(logical=False)
-
-            # detect if we need to use hwthread-cpus with mpiexec
-            if self.n_procs > n_physical_cores:
-                hyperthreading = True
-
-        else:
-            packages = list()
-            if not _has_mpi4py():
-                packages += ['mpi4py']
-            if not _has_psutil():
-                packages += ['psutil']
-            packages = ' and '.join(packages)
-            warn(f'{packages} not installed. Will run on single processor')
-            self.n_procs = 1
+        if (hwthreading is None) and hwthreading_available:
+            hwthreading = True
 
         self.mpi_cmd = mpi_cmd
 
-        if hyperthreading:
-            self.mpi_cmd += ' --use-hwthread-cpus'
+        if hwthreading:
+            self.mpi_cmd += " --use-hwthread-cpus"
 
         if oversubscribe:
-            self.mpi_cmd += ' --oversubscribe'
+            self.mpi_cmd += " --oversubscribe"
 
-        self.mpi_cmd += ' -np ' + str(self.n_procs)
+        self.mpi_cmd += " -np " + str(self.n_procs)
 
-        self.mpi_cmd += ' nrniv -python -mpi -nobanner ' + \
-            sys.executable + ' ' + \
-            os.path.join(os.path.dirname(sys.modules[__name__].__file__),
-                         'mpi_child.py')
+        self.mpi_cmd += (
+            " nrniv -python -mpi -nobanner " +
+            sys.executable +
+            " " +
+            os.path.join(
+                os.path.dirname(sys.modules[__name__].__file__), "mpi_child.py"
+            )
+        )
 
         # Split the command into shell arguments for passing to Popen
         use_posix = True if sys.platform != 'win32' else False

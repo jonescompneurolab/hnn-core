@@ -8,8 +8,6 @@ import io
 import logging
 import mimetypes
 import numpy as np
-import platform
-import psutil
 import sys
 import json
 import urllib.parse
@@ -36,7 +34,9 @@ from hnn_core.params_default import (get_L2Pyr_params_default,
                                      get_L5Pyr_params_default)
 from hnn_core.hnn_io import dict_to_network, write_network_configuration
 from hnn_core.cells_default import _exp_g_at_dist
-from hnn_core.parallel_backends import _has_mpi4py, _has_psutil
+from hnn_core.parallel_backends import (_determine_cores_hwthreading,
+                                        _has_mpi4py,
+                                        _has_psutil)
 
 hnn_core_root = Path(hnn_core.__file__).parent
 default_network_configuration = (hnn_core_root / 'param' /
@@ -347,7 +347,10 @@ class HNNGUI:
         self.params = self.load_parameters(network_configuration)
 
         # Number of available cores
-        self.n_cores = self._available_cores()
+        [self.n_cores, _] = _determine_cores_hwthreading(
+            enable_hwthreading=False,
+            sensible_default_cores=True,
+        )
 
         # In-memory storage of all simulation and visualization related data
         self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
@@ -407,7 +410,8 @@ class HNNGUI:
         self.widget_mpi_cmd = Text(value='mpiexec',
                                    placeholder='Fill if applies',
                                    description='MPI cmd:', disabled=False)
-        self.widget_n_jobs = BoundedIntText(value=1, min=1,
+        self.widget_n_jobs = BoundedIntText(value=1,
+                                            min=1,
                                             max=self.n_cores,
                                             description='Cores:',
                                             disabled=False)
@@ -495,22 +499,6 @@ class HNNGUI:
 
         self._init_ui_components()
         self.add_logging_window_logger()
-
-    @staticmethod
-    def _available_cores():
-        """Return the number of available cores to the process.
-
-        This is important for systems where the number of available cores is
-        partitioned such as on HPC systems. Linux and Windows can return cpu
-        affinity, which is the number of available cores. MacOS can only return
-        total system cores.
-        """
-        # For macos
-        if platform.system() == 'Darwin':
-            return psutil.cpu_count()
-        # For Linux and Windows
-        else:
-            return len(psutil.Process().cpu_affinity())
 
     @staticmethod
     def _check_backend():
@@ -2108,7 +2096,10 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
         if backend_selection.value == "MPI":
             backend = MPIBackend(
                 n_procs=n_jobs.value,
-                mpi_cmd=mpi_cmd.value)
+                mpi_cmd=mpi_cmd.value,
+                hwthreading=False,
+                oversubscribe=False,
+            )
         else:
             backend = JoblibBackend(n_jobs=n_jobs.value)
             print(f"Using Joblib with {n_jobs.value} core(s).")
