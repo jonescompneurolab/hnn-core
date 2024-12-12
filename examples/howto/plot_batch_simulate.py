@@ -107,10 +107,6 @@ def summary_func(results):
 ###############################################################################
 # Run the batch simulation and collect the results.
 
-# Uncomment this code if dask and distributed Python packages are installed.
-# from dask.distributed import Client
-# client = Client(threads_per_worker=1, n_workers=5, processes=False)
-
 
 # Initialize the network model and run the batch simulation.
 net = jones_2009_model(mesh_shape=(3, 3))
@@ -121,7 +117,7 @@ simulation_results = batch_simulation.run(param_grid,
                                           n_jobs=n_jobs,
                                           combinations=False,
                                           backend='loky')
-# backend='dask' if installed
+
 print("Simulation results:", simulation_results)
 ###############################################################################
 # This plot shows an overlay of all smoothed dipole waveforms from the

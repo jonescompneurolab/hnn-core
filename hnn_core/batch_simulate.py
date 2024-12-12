@@ -16,7 +16,7 @@ from .network_models import jones_2009_model
 
 
 class BatchSimulate(object):
-    def __init__(self, set_params, net=None,
+    def __init__(self, set_params, net=jones_2009_model(),
                  tstop=170, dt=0.025, n_trials=1,
                  save_folder='./sim_results', batch_size=100,
                  overwrite=True, save_outputs=False, save_dpl=True,
@@ -106,7 +106,7 @@ class BatchSimulate(object):
         will be overwritten.
         """
 
-        _validate_type(net, (Network, None), 'net', 'Network')
+        _validate_type(net, Network, 'net', 'Network')
         _validate_type(tstop, types='numeric', item_name='tstop')
         _validate_type(dt, types='numeric', item_name='dt')
         _validate_type(n_trials, types='int', item_name='n_trials')
@@ -129,7 +129,7 @@ class BatchSimulate(object):
         if summary_func is not None and not callable(summary_func):
             raise TypeError("summary_func must be a callable function")
 
-        self.net = net if net is not None else jones_2009_model()
+        self.net = net
         self.set_params = set_params
         self.tstop = tstop
         self.dt = dt
