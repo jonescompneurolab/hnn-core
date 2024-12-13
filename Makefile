@@ -16,16 +16,15 @@ clean :
 check-manifest:
 	check-manifest
 
-test: flake
+test: lint
 	pytest ./hnn_core/tests/ -m "not uses_mpi" -n auto
 	pytest ./hnn_core/tests/ -m "uses_mpi"
 
-flake:
-	@if command -v flake8 > /dev/null; then \
-		echo "Running flake8"; \
-		flake8 hnn_core --count; \
+lint:
+	@if command -v ruff > /dev/null; then \
+		echo "Running ruff check"; \
+		ruff check hnn_core; \
 	else \
-		echo "flake8 not found, please install it!"; \
+		echo "ruff not found, please install it!"; \
 		exit 1; \
 	fi;
-	@echo "flake8 passed"

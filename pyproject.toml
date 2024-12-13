@@ -7,3 +7,13 @@ check-hidden = true
 # in jupyter notebooks - images and also some embedded outputs
 ignore-regex = '^\s*"image/\S+": ".*|.*%22%3A%20.*'
 ignore-words-list = 'tha,nam,sherif,dout'
+
+[tool.ruff]
+exclude = ["*.ipynb"]
+[tool.ruff.lint]
+exclude = ["__init__.py"]
+# We don't include rule "W504", which was in our old flake8 "setup.cfg" file, because the ruff
+# linter does not detect it.
+ignore = [
+   "E722",  # From original flake8 'setup.cfg' file, needed in gui.py and viz.py
+]
