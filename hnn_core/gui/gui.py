@@ -2076,7 +2076,10 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
 
 
 def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
-                       all_data, dt, tstop, ntrials, backend_selection,
+                       all_data, dt, tstop,
+                       fig_default_params, widget_default_smoothing,
+                       widget_min_frequency, widget_max_frequency,
+                       ntrials, backend_selection,
                        mpi_cmd, n_jobs, params, simulation_status_bar,
                        simulation_status_contents, connectivity_textfields,
                        viz_manager, simulations_list_widget,
