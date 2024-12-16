@@ -17,7 +17,8 @@ check-manifest:
 	check-manifest
 
 test: flake
-	pytest .
+	pytest ./hnn_core/tests/ -m "not uses_mpi" -n auto
+	pytest ./hnn_core/tests/ -m "uses_mpi"
 
 flake:
 	@if command -v flake8 > /dev/null; then \
