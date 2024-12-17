@@ -12,8 +12,9 @@ ignore-words-list = 'tha,nam,sherif,dout'
 exclude = ["*.ipynb"]
 [tool.ruff.lint]
 exclude = ["__init__.py"]
-# We don't include rule "W504", which was in our old flake8 "setup.cfg" file, because the ruff
-# linter does not detect it.
 ignore = [
-   "E722",  # From original flake8 'setup.cfg' file, needed in gui.py and viz.py
+   "E722",  # E722 is a pycodestyle PEP8 style violation called "bare-except".
+            # It indicates that the best practice of catching a specific
+            # Exception, as opposed to any, was not followed. For more details,
+            # see https://www.flake8rules.com/rules/E722.html
 ]
