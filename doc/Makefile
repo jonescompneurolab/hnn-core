@@ -25,7 +25,7 @@ help:
 	@echo "  html-noplot to make standalone HTML files, without plotting anything"
 	@echo "  html       to make standalone HTML files"
 	@echo "  html_dev-pattern to make standalone HTML files for one example dir (dev version)"
-	@ech "   view	    to view the documentation in a browser"
+	@echo "  view	    to view the documentation in a browser"
 	@echo "  linkcheck        to check all external links for integrity"
 
 .PHONY: clean
@@ -37,7 +37,7 @@ clean:
 	rm -rf modules/*
 
 html-noplot:
-	$(SPHINXBUILD) -D plot_gallery=0 -D -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	$(SPHINXBUILD) -D plot_gallery=0 -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
