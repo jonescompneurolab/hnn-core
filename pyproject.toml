@@ -7,3 +7,14 @@ check-hidden = true
 # in jupyter notebooks - images and also some embedded outputs
 ignore-regex = '^\s*"image/\S+": ".*|.*%22%3A%20.*'
 ignore-words-list = 'tha,nam,sherif,dout'
+
+[tool.ruff]
+exclude = ["*.ipynb"]
+[tool.ruff.lint]
+exclude = ["__init__.py"]
+ignore = [
+   "E722",  # E722 is a pycodestyle PEP8 style violation called "bare-except".
+            # It indicates that the best practice of catching a specific
+            # Exception, as opposed to any, was not followed. For more details,
+            # see https://www.flake8rules.com/rules/E722.html
+]
