@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hnn_core.params &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=9afac83c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
@@ -138,20 +138,20 @@
 <span class="c1"># Authors: Mainak Jas &lt;mjas@mgh.harvard.edu&gt;</span>
 <span class="c1">#          Sam Neymotin &lt;samnemo@gmail.com&gt;</span>
 
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">fnmatch</span>
-<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">fnmatch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">op</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
 
-<span class="kn">from</span> <span class="nn">.params_default</span> <span class="kn">import</span> <span class="n">get_params_default</span>
-<span class="kn">from</span> <span class="nn">.externals.mne</span> <span class="kn">import</span> <span class="n">_validate_type</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.params_default</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_params_default</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.externals.mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">_validate_type</span>
 
 
 <span class="c1"># return number of evoked inputs (proximal, distal)</span>
 <span class="c1"># using dictionary d (or if d is a string, first load the dictionary from</span>
 <span class="c1"># filename d)</span>
-<span class="k">def</span> <span class="nf">_count_evoked_inputs</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_count_evoked_inputs</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
     <span class="n">nprox</span> <span class="o">=</span> <span class="n">ndist</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;t_&#39;</span><span class="p">):</span>
@@ -162,7 +162,7 @@
     <span class="k">return</span> <span class="n">nprox</span><span class="p">,</span> <span class="n">ndist</span>
 
 
-<span class="k">def</span> <span class="nf">_read_json</span><span class="p">(</span><span class="n">param_data</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_json</span><span class="p">(</span><span class="n">param_data</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Read param values from a .json file.</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -177,7 +177,7 @@
     <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">param_data</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_read_legacy_params</span><span class="p">(</span><span class="n">param_data</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_legacy_params</span><span class="p">(</span><span class="n">param_data</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Read param values from a .param file (legacy).</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -204,7 +204,7 @@
     <span class="k">return</span> <span class="n">params_input</span>
 
 
-<div class="viewcode-block" id="read_params"><a class="viewcode-back" href="../../generated/hnn_core.read_params.html#hnn_core.read_params">[docs]</a><span class="k">def</span> <span class="nf">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span> <span class="n">file_contents</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="read_params"><a class="viewcode-back" href="../../generated/hnn_core.read_params.html#hnn_core.read_params">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span> <span class="n">file_contents</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Read param values from a file (.json or .param).</span>
 
 <span class="sd">    Parameters</span>
@@ -244,7 +244,7 @@
     <span class="k">return</span> <span class="n">params</span></div>
 
 
-<span class="k">def</span> <span class="nf">_long_name</span><span class="p">(</span><span class="n">short_name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_long_name</span><span class="p">(</span><span class="n">short_name</span><span class="p">):</span>
     <span class="n">long_name</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">L2Basket</span><span class="o">=</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">,</span> <span class="n">L5Basket</span><span class="o">=</span><span class="s1">&#39;L5_basket&#39;</span><span class="p">,</span>
                      <span class="n">L2Pyr</span><span class="o">=</span><span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">,</span> <span class="n">L5Pyr</span><span class="o">=</span><span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">short_name</span> <span class="ow">in</span> <span class="n">long_name</span><span class="p">:</span>
@@ -252,7 +252,7 @@
     <span class="k">return</span> <span class="n">short_name</span>
 
 
-<span class="k">def</span> <span class="nf">_short_name</span><span class="p">(</span><span class="n">short_name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_short_name</span><span class="p">(</span><span class="n">short_name</span><span class="p">):</span>
     <span class="n">long_name</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">L2_basket</span><span class="o">=</span><span class="s1">&#39;L2Basket&#39;</span><span class="p">,</span> <span class="n">L5_basket</span><span class="o">=</span><span class="s1">&#39;L5Basket&#39;</span><span class="p">,</span>
                      <span class="n">L2_pyramidal</span><span class="o">=</span><span class="s1">&#39;L2Pyr&#39;</span><span class="p">,</span> <span class="n">L5_pyramidal</span><span class="o">=</span><span class="s1">&#39;L5Pyr&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">short_name</span> <span class="ow">in</span> <span class="n">long_name</span><span class="p">:</span>
@@ -260,7 +260,7 @@
     <span class="k">return</span> <span class="n">short_name</span>
 
 
-<span class="k">def</span> <span class="nf">_extract_bias_specs_from_hnn_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">cellname_list</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_extract_bias_specs_from_hnn_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">cellname_list</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create &#39;bias specification&#39; dicts from saved parameters&quot;&quot;&quot;</span>
     <span class="n">bias_specs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;tonic&#39;</span><span class="p">:</span> <span class="p">{}}</span>  <span class="c1"># currently only &#39;tonic&#39; biases known</span>
     <span class="k">for</span> <span class="n">cellname</span> <span class="ow">in</span> <span class="n">cellname_list</span><span class="p">:</span>
@@ -282,7 +282,7 @@
     <span class="k">return</span> <span class="n">bias_specs</span>
 
 
-<span class="k">def</span> <span class="nf">_extract_drive_specs_from_hnn_params</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_extract_drive_specs_from_hnn_params</span><span class="p">(</span>
         <span class="n">params</span><span class="p">,</span> <span class="n">cellname_list</span><span class="p">,</span> <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create &#39;drive specification&#39; dicts from saved parameters&quot;&quot;&quot;</span>
     <span class="c1"># convert legacy params-dict to legacy &quot;feeds&quot; dicts</span>
@@ -430,7 +430,7 @@
     <span class="k">return</span> <span class="n">drive_specs</span>
 
 
-<span class="k">class</span> <span class="nc">Params</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Params</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Params object.</span>
 
 <span class="sd">    Parameters</span>
@@ -439,7 +439,7 @@
 <span class="sd">        Dictionary of parameters. If None, use default parameters.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params_input</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params_input</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">params_input</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">params_input</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -458,11 +458,11 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;params_input must be dict or None. Got </span><span class="si">%s</span><span class="s1">&#39;</span>
                              <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">params_input</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Display the params nicely.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a subset of parameters.&quot;&quot;&quot;</span>
         <span class="n">keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
@@ -477,7 +477,7 @@
                     <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">params</span>
 
-    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the value for a subset of parameters.&quot;&quot;&quot;</span>
         <span class="n">keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
@@ -490,10 +490,10 @@
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span><span class="p">})</span>
 
-    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Write param values to a file.</span>
 
 <span class="sd">        Parameters</span>
@@ -505,7 +505,7 @@
             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_validate_feed</span><span class="p">(</span><span class="n">p_ext_d</span><span class="p">,</span> <span class="n">tstop</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_feed</span><span class="p">(</span><span class="n">p_ext_d</span><span class="p">,</span> <span class="n">tstop</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate external inputs that are fed to all</span>
 <span class="sd">    cells uniformly (i.e., rather than individually).</span>
 <span class="sd">    For now, this only includes rhythmic inputs.</span>
@@ -552,7 +552,7 @@
     <span class="k">return</span> <span class="n">p_ext_d</span>
 
 
-<span class="k">def</span> <span class="nf">check_evoked_synkeys</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">nprox</span><span class="p">,</span> <span class="n">ndist</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_evoked_synkeys</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">nprox</span><span class="p">,</span> <span class="n">ndist</span><span class="p">):</span>
     <span class="c1"># make sure ampa,nmda gbar values are in the param dict for evoked</span>
     <span class="c1"># inputs(for backwards compatibility)</span>
     <span class="c1"># evoked distal target cell types</span>
@@ -575,7 +575,7 @@
 <span class="c1">#</span>
 
 
-<span class="k">def</span> <span class="nf">check_pois_synkeys</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_pois_synkeys</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
     <span class="c1"># make sure ampa,nmda gbar values are in the param dict for Poisson inputs</span>
     <span class="c1"># (for backwards compatibility)</span>
     <span class="n">lct</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;L2Pyr&#39;</span><span class="p">,</span> <span class="s1">&#39;L5Pyr&#39;</span><span class="p">,</span> <span class="s1">&#39;L2Basket&#39;</span><span class="p">,</span> <span class="s1">&#39;L5Basket&#39;</span><span class="p">]</span>  <span class="c1"># target cell types</span>
@@ -590,7 +590,7 @@
 <span class="c1"># creates the external feed params based on individual simulation params p</span>
 
 
-<span class="k">def</span> <span class="nf">create_pext</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">tstop</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_pext</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">tstop</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Indexable Python list of param dicts for parallel.</span>
 
 <span class="sd">    Turn off individual feeds by commenting out relevant line here.</span>
@@ -788,7 +788,7 @@
 <span class="c1"># Takes two dictionaries (d1 and d2) and compares the keys in d1 to those in d2</span>
 <span class="c1"># if any match, updates the (key, value) pair of d1 to match that of d2</span>
 <span class="c1"># not real happy with variable names, but will have to do for now</span>
-<span class="k">def</span> <span class="nf">compare_dictionaries</span><span class="p">(</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compare_dictionaries</span><span class="p">(</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">):</span>
     <span class="c1"># iterate over intersection of key sets (i.e. any common keys)</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">d1</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="n">d2</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="c1"># update d1 to have same (key, value) pair as d2</span>
@@ -797,7 +797,7 @@
     <span class="k">return</span> <span class="n">d1</span>
 
 
-<span class="k">def</span> <span class="nf">_any_positive_weights</span><span class="p">(</span><span class="n">drive</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_any_positive_weights</span><span class="p">(</span><span class="n">drive</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Checks a drive for any positive weights. &quot;&quot;&quot;</span>
     <span class="n">weights</span> <span class="o">=</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span>
                <span class="nb">list</span><span class="p">(</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;weights_nmda&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
@@ -807,7 +807,7 @@
         <span class="k">return</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">remove_nulled_drives</span><span class="p">(</span><span class="n">net</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">remove_nulled_drives</span><span class="p">(</span><span class="n">net</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Removes drives from network if they have been given null parameters.</span>
 
 <span class="sd">    Legacy param files contained parameter placeholders for non-functional</span>
@@ -825,7 +825,7 @@
 <span class="sd">    net : Network object</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">.network</span> <span class="kn">import</span> <span class="n">pick_connection</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.network</span><span class="w"> </span><span class="kn">import</span> <span class="n">pick_connection</span>
 
     <span class="n">net</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
     <span class="n">drives_copy</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">external_drives</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -866,7 +866,7 @@
     <span class="k">return</span> <span class="n">net</span>
 
 
-<span class="k">def</span> <span class="nf">convert_to_json</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_to_json</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span>
                     <span class="n">out_fname</span><span class="p">,</span>
                     <span class="n">include_drives</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                     <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -886,7 +886,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">.network_models</span> <span class="kn">import</span> <span class="n">jones_2009_model</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.network_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">jones_2009_model</span>
 
     <span class="c1"># Validate inputs</span>
     <span class="n">_validate_type</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">),</span> <span class="s1">&#39;params_fname&#39;</span><span class="p">)</span>

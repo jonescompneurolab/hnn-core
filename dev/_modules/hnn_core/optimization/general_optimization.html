@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hnn_core.optimization.general_optimization &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css?v=9afac83c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
@@ -140,13 +140,13 @@
 <span class="c1">#          Ryan Thorpe &lt;ryan_thorpe@brown.edu&gt;</span>
 <span class="c1">#          Mainak Jas &lt;mjas@mgh.harvard.edu&gt;</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">.objective_functions</span> <span class="kn">import</span> <span class="n">_rmse_evoked</span><span class="p">,</span> <span class="n">_maximize_psd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.objective_functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">_rmse_evoked</span><span class="p">,</span> <span class="n">_maximize_psd</span>
 
 
-<div class="viewcode-block" id="Optimizer"><a class="viewcode-back" href="../../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer">[docs]</a><span class="k">class</span> <span class="nc">Optimizer</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">set_params</span><span class="p">,</span>
+<div class="viewcode-block" id="Optimizer"><a class="viewcode-back" href="../../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Optimizer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">set_params</span><span class="p">,</span>
                  <span class="n">solver</span><span class="o">=</span><span class="s1">&#39;bayesian&#39;</span><span class="p">,</span> <span class="n">obj_fun</span><span class="o">=</span><span class="s1">&#39;dipole_rmse&#39;</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">200</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parameter optimization.</span>
 
@@ -231,7 +231,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">obj_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">opt_params_</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="Optimizer.__repr__"><a class="viewcode-back" href="../../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Optimizer.__repr__"><a class="viewcode-back" href="../../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer.__repr__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">is_fit</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">net_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">is_fit</span> <span class="o">=</span> <span class="kc">True</span>
@@ -239,7 +239,7 @@
         <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s2">solver=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">solver</span><span class="si">}</span><span class="se">\n</span><span class="s2">fit=</span><span class="si">{</span><span class="n">is_fit</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div>
 
-<div class="viewcode-block" id="Optimizer.fit"><a class="viewcode-back" href="../../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">obj_fun_kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Optimizer.fit"><a class="viewcode-back" href="../../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer.fit">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">obj_fun_kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Runs optimization routine.</span>
 
 <span class="sd">        Parameters</span>
@@ -279,7 +279,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">obj_</span> <span class="o">=</span> <span class="n">obj</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">opt_params_</span> <span class="o">=</span> <span class="n">opt_params</span></div>
 
-<div class="viewcode-block" id="Optimizer.plot_convergence"><a class="viewcode-back" href="../../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer.plot_convergence">[docs]</a>    <span class="k">def</span> <span class="nf">plot_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Optimizer.plot_convergence"><a class="viewcode-back" href="../../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer.plot_convergence">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">plot_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convergence plot.</span>
 
 <span class="sd">        Parameters</span>
@@ -295,8 +295,8 @@
 <span class="sd">            The matplotlib figure handle.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
-        <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpl</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
         <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -318,7 +318,7 @@
         <span class="k">return</span> <span class="n">axis</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div></div>
 
 
-<span class="k">def</span> <span class="nf">_get_initial_params</span><span class="p">(</span><span class="n">constraints</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_initial_params</span><span class="p">(</span><span class="n">constraints</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets initial parameters as midpoints of parameter ranges.</span>
 
 <span class="sd">    Parameters</span>
@@ -340,7 +340,7 @@
     <span class="k">return</span> <span class="n">initial_params</span>
 
 
-<span class="k">def</span> <span class="nf">_assemble_constraints_bayesian</span><span class="p">(</span><span class="n">constraints</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_assemble_constraints_bayesian</span><span class="p">(</span><span class="n">constraints</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Assembles constraints in format required by gp_minimize.</span>
 
 <span class="sd">    Parameters</span>
@@ -359,7 +359,7 @@
     <span class="k">return</span> <span class="n">cons_bayesian</span>
 
 
-<span class="k">def</span> <span class="nf">_assemble_constraints_cobyla</span><span class="p">(</span><span class="n">constraints</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_assemble_constraints_cobyla</span><span class="p">(</span><span class="n">constraints</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Assembles constraints in format required by fmin_cobyla.</span>
 
 <span class="sd">    Parameters</span>
@@ -384,7 +384,7 @@
     <span class="k">return</span> <span class="n">cons_cobyla</span>
 
 
-<span class="k">def</span> <span class="nf">_update_params</span><span class="p">(</span><span class="n">initial_params</span><span class="p">,</span> <span class="n">predicted_params</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_update_params</span><span class="p">(</span><span class="n">initial_params</span><span class="p">,</span> <span class="n">predicted_params</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Update params with predicted parameters.</span>
 
 <span class="sd">    Parameters</span>
@@ -407,7 +407,7 @@
     <span class="k">return</span> <span class="n">params</span>
 
 
-<span class="k">def</span> <span class="nf">_run_opt_bayesian</span><span class="p">(</span><span class="n">initial_net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">set_params</span><span class="p">,</span> <span class="n">obj_fun</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_opt_bayesian</span><span class="p">(</span><span class="n">initial_net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">set_params</span><span class="p">,</span> <span class="n">obj_fun</span><span class="p">,</span>
                       <span class="n">initial_params</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">,</span> <span class="n">obj_fun_kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs optimization routine with gp_minimize optimizer.</span>
 
@@ -438,11 +438,11 @@
 <span class="sd">        Optimized network object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="kn">from</span> <span class="nn">..externals.bayesopt</span> <span class="kn">import</span> <span class="n">bayes_opt</span><span class="p">,</span> <span class="n">expected_improvement</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">..externals.bayesopt</span><span class="w"> </span><span class="kn">import</span> <span class="n">bayes_opt</span><span class="p">,</span> <span class="n">expected_improvement</span>
 
     <span class="n">obj_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_obj_func</span><span class="p">(</span><span class="n">predicted_params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_obj_func</span><span class="p">(</span><span class="n">predicted_params</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">obj_fun</span><span class="p">(</span><span class="n">initial_net</span><span class="o">=</span><span class="n">initial_net</span><span class="p">,</span>
                        <span class="n">initial_params</span><span class="o">=</span><span class="n">initial_params</span><span class="p">,</span>
                        <span class="n">set_params</span><span class="o">=</span><span class="n">set_params</span><span class="p">,</span>
@@ -472,7 +472,7 @@
     <span class="k">return</span> <span class="n">opt_params</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">net_</span>
 
 
-<span class="k">def</span> <span class="nf">_run_opt_cobyla</span><span class="p">(</span><span class="n">initial_net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">set_params</span><span class="p">,</span> <span class="n">obj_fun</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_opt_cobyla</span><span class="p">(</span><span class="n">initial_net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">set_params</span><span class="p">,</span> <span class="n">obj_fun</span><span class="p">,</span>
                     <span class="n">initial_params</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">,</span> <span class="n">obj_fun_kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs optimization routine with fmin_cobyla optimizer.</span>
 
@@ -503,11 +503,11 @@
 <span class="sd">        Optimized network object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">fmin_cobyla</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">fmin_cobyla</span>
 
     <span class="n">obj_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_obj_func</span><span class="p">(</span><span class="n">predicted_params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_obj_func</span><span class="p">(</span><span class="n">predicted_params</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">obj_fun</span><span class="p">(</span><span class="n">initial_net</span><span class="o">=</span><span class="n">initial_net</span><span class="p">,</span>
                        <span class="n">initial_params</span><span class="o">=</span><span class="n">initial_params</span><span class="p">,</span>
                        <span class="n">set_params</span><span class="o">=</span><span class="n">set_params</span><span class="p">,</span>

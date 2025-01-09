@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>05. Optimize simulated evoked response parameters &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=9afac83c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
@@ -154,14 +154,14 @@ of the model simulation to match an experimental dipole waveform.</p>
 <span class="c1">#          Ryan Thorpe &lt;ryan_thorpe@brown.edu&gt;</span>
 <span class="c1">#          Mainak Jas &lt;mjas@mgh.harvard.edu&gt;</span>
 
-<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">op</span>
 
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 </pre></div>
 </div>
 <p>Let us import hnn_core</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">hnn_core</span>
-<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <span class="p">(</span><span class="n">MPIBackend</span><span class="p">,</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">,</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">,</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">hnn_core</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">MPIBackend</span><span class="p">,</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">,</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">,</span>
                       <a href="../../generated/hnn_core.read_dipole.html#hnn_core.read_dipole" title="hnn_core.read_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">read_dipole</span></a><span class="p">)</span>
 
 <span class="n">hnn_core_root</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.dirname" title="os.path.dirname" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">dirname</span></a><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">))</span>
@@ -174,7 +174,7 @@ of the model simulation to match an experimental dipole waveform.</p>
 <p>This is a different experiment than the one to which the base parameters were
 tuned. So, the initial RMSE will be large, giving the optimization procedure
 a lot to work with.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <a href="https://docs.python.org/3/library/urllib.request.html#urllib.request.urlretrieve" title="urllib.request.urlretrieve" class="sphx-glr-backref-module-urllib-request sphx-glr-backref-type-py-function"><span class="n">urlretrieve</span></a>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">urllib.request</span><span class="w"> </span><span class="kn">import</span> <a href="https://docs.python.org/3/library/urllib.request.html#urllib.request.urlretrieve" title="urllib.request.urlretrieve" class="sphx-glr-backref-module-urllib-request sphx-glr-backref-type-py-function"><span class="n">urlretrieve</span></a>
 
 <span class="n">data_url</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/jonescompneurolab/hnn/master/&#39;</span>
             <span class="s1">&#39;data/MEG_detection_data/S1_SupraT.txt&#39;</span><span class="p">)</span>
@@ -246,7 +246,7 @@ a lot to work with.</p>
 modify the network drive parameters. The function will take in the Network
 object with no attached drives, and a dictionary of the parameters we wish to
 optimize.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">set_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">set_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
 
     <span class="c1"># Proximal 1</span>
     <span class="n">net</span><span class="o">.</span><span class="n">add_evoked_drive</span><span class="p">(</span><span class="s1">&#39;evprox1&#39;</span><span class="p">,</span>
@@ -314,7 +314,7 @@ were chosen so as to keep the model in physiologically realistic regimes.</p>
 </pre></div>
 </div>
 <p>Now we define and fit the optimizer.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hnn_core.optimization</span> <span class="kn">import</span> <a href="../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer" title="hnn_core.optimization.Optimizer" class="sphx-glr-backref-module-hnn_core-optimization sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Optimizer</span></a>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core.optimization</span><span class="w"> </span><span class="kn">import</span> <a href="../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer" title="hnn_core.optimization.Optimizer" class="sphx-glr-backref-module-hnn_core-optimization sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Optimizer</span></a>
 
 <span class="n">net</span> <span class="o">=</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">()</span>
 <span class="n">optim</span> <span class="o">=</span> <a href="../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer" title="hnn_core.optimization.Optimizer" class="sphx-glr-backref-module-hnn_core-optimization sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Optimizer</span></a><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>

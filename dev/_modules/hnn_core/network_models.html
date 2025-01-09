@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hnn_core.network_models &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=9afac83c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
@@ -137,16 +137,16 @@
 
 <span class="c1"># Authors: Nick Tolley &lt;nicholas_tolley@brown.edu&gt;</span>
 
-<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
-<span class="kn">import</span> <span class="nn">hnn_core</span>
-<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <span class="n">read_params</span>
-<span class="kn">from</span> <span class="nn">.network</span> <span class="kn">import</span> <span class="n">Network</span>
-<span class="kn">from</span> <span class="nn">.params</span> <span class="kn">import</span> <span class="n">_short_name</span>
-<span class="kn">from</span> <span class="nn">.cells_default</span> <span class="kn">import</span> <span class="n">pyramidal_ca</span>
-<span class="kn">from</span> <span class="nn">.externals.mne</span> <span class="kn">import</span> <span class="n">_validate_type</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">op</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hnn_core</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_params</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.network</span><span class="w"> </span><span class="kn">import</span> <span class="n">Network</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.params</span><span class="w"> </span><span class="kn">import</span> <span class="n">_short_name</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cells_default</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyramidal_ca</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.externals.mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">_validate_type</span>
 
 
-<div class="viewcode-block" id="jones_2009_model"><a class="viewcode-back" href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model">[docs]</a><span class="k">def</span> <span class="nf">jones_2009_model</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<div class="viewcode-block" id="jones_2009_model"><a class="viewcode-back" href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">jones_2009_model</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                      <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the network model described in</span>
 <span class="sd">    Jones et al. J. of Neurophys. 2009 [1]_</span>
@@ -310,7 +310,7 @@
     <span class="k">return</span> <span class="n">net</span></div>
 
 
-<div class="viewcode-block" id="law_2021_model"><a class="viewcode-back" href="../../generated/hnn_core.law_2021_model.html#hnn_core.law_2021_model">[docs]</a><span class="k">def</span> <span class="nf">law_2021_model</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<div class="viewcode-block" id="law_2021_model"><a class="viewcode-back" href="../../generated/hnn_core.law_2021_model.html#hnn_core.law_2021_model">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">law_2021_model</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                    <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the expansion of Jones 2009 model to study beta</span>
 <span class="sd">    modulated ERPs as described in</span>
@@ -397,7 +397,7 @@
 
 <span class="c1"># Remove params argument after updating examples</span>
 <span class="c1"># (only relevant for Jones 2009 model)</span>
-<div class="viewcode-block" id="calcium_model"><a class="viewcode-back" href="../../generated/hnn_core.calcium_model.html#hnn_core.calcium_model">[docs]</a><span class="k">def</span> <span class="nf">calcium_model</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<div class="viewcode-block" id="calcium_model"><a class="viewcode-back" href="../../generated/hnn_core.calcium_model.html#hnn_core.calcium_model">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">calcium_model</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                   <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the Jones 2009 model with improved calcium dynamics in</span>
 <span class="sd">    L5 pyramidal neurons. For more details on changes to calcium dynamics</span>
@@ -444,7 +444,7 @@
     <span class="k">return</span> <span class="n">net</span></div>
 
 
-<span class="k">def</span> <span class="nf">add_erp_drives_to_jones_model</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_erp_drives_to_jones_model</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add drives necessary for an event related potential (ERP)</span>
 
 <span class="sd">    Parameters</span>

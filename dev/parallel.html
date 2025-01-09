@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Parallel backends &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css?v=9afac83c" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
@@ -155,7 +155,7 @@
 </pre></div>
 </div>
 <p><strong>Usage</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <span class="n">JoblibBackend</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <span class="n">JoblibBackend</span>
 
 <span class="c1"># set n_jobs to the number of trials to run in parallel with Joblib (up to number of cores on system)</span>
 <span class="k">with</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
@@ -204,7 +204,7 @@ Hello from proc 1
 </div>
 <p>Verifies that MPI, NEURON, and Python are all working together.</p>
 <p><strong>Usage</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <span class="n">MPIBackend</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPIBackend</span>
 
 <span class="c1"># Set n_procs to the number of processors MPI can use (up to number of cores on system)</span>
 <span class="c1"># A different launch command can be specified for MPI distributions other than openmpi</span>

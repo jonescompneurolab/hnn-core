@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hnn_core.gui.gui &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css?v=9afac83c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
@@ -137,39 +137,39 @@
 
 <span class="c1"># Authors: Mainak Jas &lt;mjas@mgh.harvard.edu&gt;</span>
 <span class="c1">#          Huzi Cheng &lt;hzcheng15@icloud.com&gt;</span>
-<span class="kn">import</span> <span class="nn">base64</span>
-<span class="kn">import</span> <span class="nn">codecs</span>
-<span class="kn">import</span> <span class="nn">io</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">mimetypes</span>
-<span class="kn">import</span> <span class="nn">multiprocessing</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">urllib.parse</span>
-<span class="kn">import</span> <span class="nn">urllib.request</span>
-<span class="kn">import</span> <span class="nn">zipfile</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">IFrame</span><span class="p">,</span> <span class="n">display</span>
-<span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="kn">import</span> <span class="p">(</span><span class="n">HTML</span><span class="p">,</span> <span class="n">Accordion</span><span class="p">,</span> <span class="n">AppLayout</span><span class="p">,</span> <span class="n">BoundedFloatText</span><span class="p">,</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">codecs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mimetypes</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.parse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">zipfile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">IFrame</span><span class="p">,</span> <span class="n">display</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">HTML</span><span class="p">,</span> <span class="n">Accordion</span><span class="p">,</span> <span class="n">AppLayout</span><span class="p">,</span> <span class="n">BoundedFloatText</span><span class="p">,</span>
                         <span class="n">BoundedIntText</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">Dropdown</span><span class="p">,</span> <span class="n">FileUpload</span><span class="p">,</span> <span class="n">VBox</span><span class="p">,</span>
                         <span class="n">HBox</span><span class="p">,</span> <span class="n">IntText</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">Output</span><span class="p">,</span> <span class="n">RadioButtons</span><span class="p">,</span> <span class="n">Tab</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span>
                         <span class="n">Checkbox</span><span class="p">,</span> <span class="n">Box</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">ipywidgets.embed</span> <span class="kn">import</span> <span class="n">embed_minimal_html</span>
-<span class="kn">import</span> <span class="nn">hnn_core</span>
-<span class="kn">from</span> <span class="nn">hnn_core</span> <span class="kn">import</span> <span class="n">JoblibBackend</span><span class="p">,</span> <span class="n">MPIBackend</span><span class="p">,</span> <span class="n">simulate_dipole</span>
-<span class="kn">from</span> <span class="nn">hnn_core.gui._logging</span> <span class="kn">import</span> <span class="n">logger</span>
-<span class="kn">from</span> <span class="nn">hnn_core.gui._viz_manager</span> <span class="kn">import</span> <span class="n">_VizManager</span><span class="p">,</span> <span class="n">_idx2figname</span>
-<span class="kn">from</span> <span class="nn">hnn_core.network</span> <span class="kn">import</span> <span class="n">pick_connection</span>
-<span class="kn">from</span> <span class="nn">hnn_core.dipole</span> <span class="kn">import</span> <span class="n">_read_dipole_txt</span>
-<span class="kn">from</span> <span class="nn">hnn_core.params_default</span> <span class="kn">import</span> <span class="p">(</span><span class="n">get_L2Pyr_params_default</span><span class="p">,</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ipywidgets.embed</span><span class="w"> </span><span class="kn">import</span> <span class="n">embed_minimal_html</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hnn_core</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <span class="n">JoblibBackend</span><span class="p">,</span> <span class="n">MPIBackend</span><span class="p">,</span> <span class="n">simulate_dipole</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core.gui._logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core.gui._viz_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">_VizManager</span><span class="p">,</span> <span class="n">_idx2figname</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core.network</span><span class="w"> </span><span class="kn">import</span> <span class="n">pick_connection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core.dipole</span><span class="w"> </span><span class="kn">import</span> <span class="n">_read_dipole_txt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core.params_default</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">get_L2Pyr_params_default</span><span class="p">,</span>
                                      <span class="n">get_L5Pyr_params_default</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">hnn_core.hnn_io</span> <span class="kn">import</span> <span class="n">dict_to_network</span><span class="p">,</span> <span class="n">write_network_configuration</span>
-<span class="kn">from</span> <span class="nn">hnn_core.cells_default</span> <span class="kn">import</span> <span class="n">_exp_g_at_dist</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core.hnn_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">dict_to_network</span><span class="p">,</span> <span class="n">write_network_configuration</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core.cells_default</span><span class="w"> </span><span class="kn">import</span> <span class="n">_exp_g_at_dist</span>
 
 <span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
 <span class="n">default_network_configuration</span> <span class="o">=</span> <span class="p">(</span><span class="n">hnn_core_root</span> <span class="o">/</span> <span class="s1">&#39;param&#39;</span> <span class="o">/</span>
@@ -279,12 +279,12 @@
 <span class="p">}</span>
 
 
-<span class="k">class</span> <span class="nc">_OutputWidgetHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Handler</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_widget</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_OutputWidgetHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Handler</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_widget</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">_OutputWidgetHandler</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">out</span> <span class="o">=</span> <span class="n">output_widget</span>
 
-    <span class="k">def</span> <span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
         <span class="n">formatted_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
         <span class="c1"># Further format the message for GUI presentation</span>
         <span class="k">try</span><span class="p">:</span>
@@ -300,17 +300,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">outputs</span> <span class="o">+</span> <span class="p">(</span><span class="n">new_output</span><span class="p">,</span> <span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">_GUI_PrintToLogger</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_GUI_PrintToLogger</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to redirect print messages to the logger in the GUI&quot;&quot;&quot;</span>
     <span class="c1"># when print is used, call the write method instead</span>
-    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
         <span class="c1"># avoid logging empty/new lines</span>
         <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
             <span class="c1"># send the message to the logger</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
 
     <span class="c1"># The flush method is required for compatibility with print</span>
-    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span>
 
 
@@ -318,7 +318,7 @@
 <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">_GUI_PrintToLogger</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="HNNGUI"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI">[docs]</a><span class="k">class</span> <span class="nc">HNNGUI</span><span class="p">:</span>
+<div class="viewcode-block" id="HNNGUI"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">HNNGUI</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;HNN GUI class</span>
 
 <span class="sd">    Parameters</span>
@@ -396,7 +396,7 @@
 <span class="sd">        in the network.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theme_color</span><span class="o">=</span><span class="s2">&quot;#802989&quot;</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theme_color</span><span class="o">=</span><span class="s2">&quot;#802989&quot;</span><span class="p">,</span>
                  <span class="n">total_height</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
                  <span class="n">total_width</span><span class="o">=</span><span class="mi">1300</span><span class="p">,</span>
                  <span class="n">header_height</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
@@ -625,13 +625,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_ui_components</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_logging_window_logger</span><span class="p">()</span>
 
-<div class="viewcode-block" id="HNNGUI.get_cell_parameters_dict"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.get_cell_parameters_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_cell_parameters_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="HNNGUI.get_cell_parameters_dict"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.get_cell_parameters_dict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_cell_parameters_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of elements in the</span>
 <span class="sd">            cell_parameters_dict dictionary.</span>
 <span class="sd">            This is for testing purposes &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">cell_parameters_dict</span></div>
 
-    <span class="k">def</span> <span class="nf">_init_html_download_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_html_download_button</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">):</span>
         <span class="n">b64</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="n">b64</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
         <span class="c1"># Initialliting HTML code for download button</span>
@@ -654,13 +654,13 @@
                         <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
                         <span class="n">mimetype</span><span class="o">=</span><span class="n">mimetype</span><span class="p">)))</span>
 
-    <span class="k">def</span> <span class="nf">add_logging_window_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_logging_window_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">handler</span> <span class="o">=</span> <span class="n">_OutputWidgetHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">)</span>
         <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1">  - [</span><span class="si">%(levelname)s</span><span class="s1">] </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">))</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_init_ui_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_ui_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize larger UI components and dynamical output windows.</span>
 
 <span class="sd">        It&#39;s not encouraged for users to modify or access attributes in this</span>
@@ -698,7 +698,7 @@
 <span class="s2">            HUMAN NEOCORTICAL NEUROSOLVER&lt;/div&gt;&quot;&quot;&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">analysis_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">analysis_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Provides everything viz window needs except for the data.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;viz_style&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;visualization_output&#39;</span><span class="p">],</span>
@@ -710,34 +710,34 @@
         <span class="p">}</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Provides easy access to simulation-related data.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;simulation_data&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span><span class="p">}</span>
 
 <div class="viewcode-block" id="HNNGUI.load_parameters"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.load_parameters">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">load_parameters</span><span class="p">(</span><span class="n">params_fname</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_parameters</span><span class="p">(</span><span class="n">params_fname</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Read parameters from file.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">params_fname</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
             <span class="n">parameters</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">parameters</span></div>
 
-    <span class="k">def</span> <span class="nf">_link_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_link_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Link callbacks to UI components.&quot;&quot;&quot;</span>
-        <span class="k">def</span> <span class="nf">_handle_backend_change</span><span class="p">(</span><span class="n">backend_type</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_handle_backend_change</span><span class="p">(</span><span class="n">backend_type</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">handle_backend_change</span><span class="p">(</span><span class="n">backend_type</span><span class="o">.</span><span class="n">new</span><span class="p">,</span>
                                          <span class="bp">self</span><span class="o">.</span><span class="n">_backend_config_out</span><span class="p">,</span>
                                          <span class="bp">self</span><span class="o">.</span><span class="n">widget_mpi_cmd</span><span class="p">,</span>
                                          <span class="bp">self</span><span class="o">.</span><span class="n">widget_n_jobs</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_add_drive_button_clicked</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_add_drive_button_clicked</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
             <span class="n">location</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_location_selection</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_drive_widget</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_drive_type_selection</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                 <span class="n">location</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_delete_drives_clicked</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_delete_drives_clicked</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
             <span class="c1"># black magic: the following does not work</span>
             <span class="c1"># global drive_widgets; drive_widgets = list()</span>
@@ -745,22 +745,22 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">drive_boxes</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
 
-        <span class="k">def</span> <span class="nf">_on_upload_connectivity</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_on_upload_connectivity</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
             <span class="n">new_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_upload_params_change</span><span class="p">(</span>
                 <span class="n">change</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;drive_textbox&#39;</span><span class="p">],</span> <span class="n">load_type</span><span class="o">=</span><span class="s2">&quot;connectivity&quot;</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">new_params</span>
 
-        <span class="k">def</span> <span class="nf">_on_upload_drives</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_on_upload_drives</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
             <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_upload_params_change</span><span class="p">(</span>
                 <span class="n">change</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;drive_textbox&#39;</span><span class="p">],</span> <span class="n">load_type</span><span class="o">=</span><span class="s2">&quot;drives&quot;</span>
             <span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_on_upload_data</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_on_upload_data</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">on_upload_data_change</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz_manager</span><span class="p">,</span>
                                          <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_run_button_clicked</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_run_button_clicked</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">run_button_clicked</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span>
@@ -772,7 +772,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz_manager</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_simulation_list_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_simulation_list_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="c1"># Simulation Data</span>
             <span class="n">_simulation_data</span><span class="p">,</span> <span class="n">file_extension</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="n">_serialize_simulation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span>
@@ -807,17 +807,17 @@
                     <span class="n">color_theme</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;theme_color&#39;</span><span class="p">],</span>
                     <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Save Network&#39;</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="s1">&#39;application/json&#39;</span><span class="p">))</span>
 
-        <span class="k">def</span> <span class="nf">_driver_type_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_driver_type_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">widget_location_selection</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="kc">True</span> <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">new</span> <span class="o">==</span> <span class="s2">&quot;Tonic&quot;</span> <span class="k">else</span> <span class="kc">False</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_cell_type_radio_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_cell_type_radio_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="n">_update_cell_params_vbox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cell_params_out</span><span class="p">,</span>
                                      <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span><span class="p">,</span>
                                      <span class="n">value</span><span class="o">.</span><span class="n">new</span><span class="p">,</span>
                                      <span class="bp">self</span><span class="o">.</span><span class="n">cell_layer_radio_buttons</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="nf">_cell_layer_radio_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_cell_layer_radio_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="n">_update_cell_params_vbox</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cell_params_out</span><span class="p">,</span>
                                      <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span><span class="p">,</span>
                                      <span class="bp">self</span><span class="o">.</span><span class="n">cell_type_radio_buttons</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
@@ -839,7 +839,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cell_layer_radio_buttons</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">_cell_layer_radio_change</span><span class="p">,</span>
                                               <span class="s1">&#39;value&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_delete_single_drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_delete_single_drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
         <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_accordion</span><span class="o">.</span><span class="n">selected_index</span>
 
         <span class="c1"># Remove selected drive from drive lists</span>
@@ -858,7 +858,7 @@
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span><span class="p">:</span>
             <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">drive_accordion</span><span class="p">)</span>
 
-<div class="viewcode-block" id="HNNGUI.compose"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.compose">[docs]</a>    <span class="k">def</span> <span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="HNNGUI.compose"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.compose">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">compose</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compose widgets.</span>
 
 <span class="sd">        Parameters</span>
@@ -968,10 +968,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_layout</span></div>
 
-    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">app_layout</span><span class="p">)</span>
 
-<div class="viewcode-block" id="HNNGUI.capture"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.capture">[docs]</a>    <span class="k">def</span> <span class="nf">capture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extra_margin</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="HNNGUI.capture"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.capture">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">capture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extra_margin</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">render</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Take a screenshot of the current GUI.</span>
 
 <span class="sd">        Parameters</span>
@@ -1004,7 +1004,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">screenshot</span></div>
 
-<div class="viewcode-block" id="HNNGUI.run_notebook_cells"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.run_notebook_cells">[docs]</a>    <span class="k">def</span> <span class="nf">run_notebook_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="HNNGUI.run_notebook_cells"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.run_notebook_cells">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">run_notebook_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run all but the last cells sequentially in a Jupyter notebook.</span>
 
 <span class="sd">        To properly use this function:</span>
@@ -1068,19 +1068,19 @@
         <span class="k">return</span> <span class="n">js_string</span></div>
 
     <span class="c1"># below are a series of methods that are used to manipulate the GUI</span>
-    <span class="k">def</span> <span class="nf">_simulate_upload_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_url</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_simulate_upload_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_url</span><span class="p">):</span>
         <span class="n">uploaded_value</span> <span class="o">=</span> <span class="n">_prepare_upload_file</span><span class="p">(</span><span class="n">file_url</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_data_button</span><span class="o">.</span><span class="n">set_trait</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">uploaded_value</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_simulate_upload_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_url</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_simulate_upload_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_url</span><span class="p">):</span>
         <span class="n">uploaded_value</span> <span class="o">=</span> <span class="n">_prepare_upload_file</span><span class="p">(</span><span class="n">file_url</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_connectivity_button</span><span class="o">.</span><span class="n">set_trait</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">uploaded_value</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_simulate_upload_drives</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_url</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_simulate_upload_drives</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_url</span><span class="p">):</span>
         <span class="n">uploaded_value</span> <span class="o">=</span> <span class="n">_prepare_upload_file</span><span class="p">(</span><span class="n">file_url</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_drives_button</span><span class="o">.</span><span class="n">set_trait</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="n">uploaded_value</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_simulate_left_tab_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_title</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_simulate_left_tab_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_title</span><span class="p">):</span>
         <span class="c1"># Get left tab group object</span>
         <span class="n">left_tab</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_layout</span><span class="o">.</span><span class="n">left_sidebar</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="c1"># Check that the title is in the tab group</span>
@@ -1090,11 +1090,11 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Tab title does not exist.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_simulate_make_figure</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_simulate_make_figure</span><span class="p">(</span><span class="bp">self</span><span class="p">,):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_simulate_left_tab_click</span><span class="p">(</span><span class="s2">&quot;Visualization&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">viz_manager</span><span class="o">.</span><span class="n">make_fig_button</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_simulate_viz_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_simulate_viz_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action_name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;A shortcut to call simulated actions in _VizManager.</span>
 
 <span class="sd">        Parameters</span>
@@ -1111,11 +1111,11 @@
         <span class="n">action</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">viz_manager</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;_simulate_</span><span class="si">{</span><span class="n">action_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">action</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_simulate_delete_single_drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_simulate_delete_single_drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">drive_accordion</span><span class="o">.</span><span class="n">selected_index</span> <span class="o">=</span> <span class="n">idx</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">drive_boxes</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">click</span><span class="p">()</span>
 
-<div class="viewcode-block" id="HNNGUI.load_drive_and_connectivity"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.load_drive_and_connectivity">[docs]</a>    <span class="k">def</span> <span class="nf">load_drive_and_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="HNNGUI.load_drive_and_connectivity"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.load_drive_and_connectivity">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_drive_and_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add drive and connectivity ipywidgets from params.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">:</span>
             <span class="c1"># Add connectivity</span>
@@ -1131,7 +1131,7 @@
             <span class="c1"># Add drives</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_drive_tab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="HNNGUI.add_drive_widget"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.add_drive_widget">[docs]</a>    <span class="k">def</span> <span class="nf">add_drive_widget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="HNNGUI.add_drive_widget"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.add_drive_widget">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_drive_widget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                          <span class="n">drive_type</span><span class="p">,</span>
                          <span class="n">location</span><span class="p">,</span>
                          <span class="n">prespecified_drive_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1195,7 +1195,7 @@
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span><span class="p">:</span>
                 <span class="n">display</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">drive_accordion</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">add_drive_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_drive_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="n">net</span> <span class="o">=</span> <span class="n">dict_to_network</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="n">drive_specs</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">external_drives</span>
         <span class="n">tonic_specs</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">external_biases</span>
@@ -1235,7 +1235,7 @@
                                   <span class="n">expand_last_drive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                                   <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">on_upload_params_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">change</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">load_type</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_upload_params_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">change</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">load_type</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;owner&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span>
@@ -1269,7 +1269,7 @@
         <span class="k">return</span> <span class="n">params</span></div>
 
 
-<span class="k">def</span> <span class="nf">_prepare_upload_file_from_local</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_prepare_upload_file_from_local</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
         <span class="n">content</span> <span class="o">=</span> <span class="nb">memoryview</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
@@ -1286,7 +1286,7 @@
     <span class="k">return</span> <span class="n">upload_structure</span>
 
 
-<span class="k">def</span> <span class="nf">_prepare_upload_file_from_url</span><span class="p">(</span><span class="n">file_url</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_prepare_upload_file_from_url</span><span class="p">(</span><span class="n">file_url</span><span class="p">):</span>
     <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">file_url</span><span class="p">)</span>
     <span class="n">content</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">()</span>
@@ -1304,7 +1304,7 @@
     <span class="k">return</span> <span class="n">upload_structure</span>
 
 
-<span class="k">def</span> <span class="nf">_prepare_upload_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_prepare_upload_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Simulates output of the FileUpload widget for testing.</span>
 
 <span class="sd">    Unit tests for the GUI simulate user upload of files. File source can</span>
@@ -1320,7 +1320,7 @@
     <span class="k">return</span> <span class="n">uploaded_value</span>
 
 
-<span class="k">def</span> <span class="nf">_update_nested_dict</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="n">new</span><span class="p">,</span> <span class="n">skip_none</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_update_nested_dict</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="n">new</span><span class="p">,</span> <span class="n">skip_none</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Updates dictionary values from another dictionary</span>
 
 <span class="sd">    Will update nested dictionaries in the structure. New items from the</span>
@@ -1357,14 +1357,14 @@
     <span class="k">return</span> <span class="n">updated</span>
 
 
-<span class="k">def</span> <span class="nf">create_expanded_button</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">button_style</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_expanded_button</span><span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">button_style</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                            <span class="n">button_color</span><span class="o">=</span><span class="s2">&quot;#8A2BE2&quot;</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">button_style</span><span class="o">=</span><span class="n">button_style</span><span class="p">,</span>
                   <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;button_color&#39;</span><span class="p">:</span> <span class="n">button_color</span><span class="p">},</span>
                   <span class="n">disabled</span><span class="o">=</span><span class="n">disabled</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_connectivity_widgets</span><span class="p">(</span><span class="n">conn_data</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_connectivity_widgets</span><span class="p">(</span><span class="n">conn_data</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create connectivity box widgets from specified weight and probability&quot;&quot;&quot;</span>
 
     <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description_width&#39;</span><span class="p">:</span> <span class="s1">&#39;100px&#39;</span><span class="p">}</span>
@@ -1407,7 +1407,7 @@
     <span class="k">return</span> <span class="n">sliders</span>
 
 
-<span class="k">def</span> <span class="nf">_get_drive_weight_widgets</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_drive_weight_widgets</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">default_data</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;weights_ampa&#39;</span><span class="p">:</span> <span class="p">{</span>
             <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.</span><span class="p">,</span>
@@ -1462,14 +1462,14 @@
     <span class="k">return</span> <span class="n">widgets_list</span><span class="p">,</span> <span class="n">widgets_dict</span>
 
 
-<span class="k">def</span> <span class="nf">_cell_spec_change</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">widget</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_cell_spec_change</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">widget</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">change</span><span class="p">[</span><span class="s1">&#39;new&#39;</span><span class="p">]:</span>
         <span class="n">widget</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">widget</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span>
 
 
-<span class="k">def</span> <span class="nf">_get_rhythmic_widget</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">tstop_widget</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_rhythmic_widget</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">tstop_widget</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span>
                          <span class="n">data</span><span class="o">=</span><span class="p">{},</span> <span class="n">weights_ampa</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                          <span class="n">weights_nmda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">delays</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                          <span class="n">n_drive_cells</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cell_specific</span><span class="o">=</span><span class="kc">None</span>
@@ -1559,7 +1559,7 @@
     <span class="k">return</span> <span class="n">drive</span><span class="p">,</span> <span class="n">drive_box</span>
 
 
-<span class="k">def</span> <span class="nf">_get_poisson_widget</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">tstop_widget</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{},</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_poisson_widget</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">tstop_widget</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{},</span>
                         <span class="n">weights_ampa</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weights_nmda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">delays</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_drive_cells</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">cell_specific</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -1649,7 +1649,7 @@
     <span class="k">return</span> <span class="n">drive</span><span class="p">,</span> <span class="n">drive_box</span>
 
 
-<span class="k">def</span> <span class="nf">_get_evoked_widget</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{},</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_evoked_widget</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{},</span>
                        <span class="n">weights_ampa</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weights_nmda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="n">delays</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_drive_cells</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cell_specific</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">default_data</span> <span class="o">=</span> <span class="p">{</span>
@@ -1717,7 +1717,7 @@
     <span class="k">return</span> <span class="n">drive</span><span class="p">,</span> <span class="n">drive_box</span>
 
 
-<span class="k">def</span> <span class="nf">_get_tonic_widget</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">tstop_widget</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_tonic_widget</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">tstop_widget</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">cell_types</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;L5_basket&#39;</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">]</span>
     <span class="n">default_values</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;amplitude&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
@@ -1772,7 +1772,7 @@
     <span class="k">return</span> <span class="n">drive</span><span class="p">,</span> <span class="n">drive_box</span>
 
 
-<span class="k">def</span> <span class="nf">_build_drive_objects</span><span class="p">(</span><span class="n">drive_type</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tstop_widget</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_drive_objects</span><span class="p">(</span><span class="n">drive_type</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">tstop_widget</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="p">,</span>
                          <span class="n">location</span><span class="p">,</span> <span class="n">drive_data</span><span class="p">,</span> <span class="n">weights_ampa</span><span class="p">,</span>
                          <span class="n">weights_nmda</span><span class="p">,</span> <span class="n">delays</span><span class="p">,</span> <span class="n">n_drive_cells</span><span class="p">,</span>
                          <span class="n">cell_specific</span><span class="p">):</span>
@@ -1832,7 +1832,7 @@
     <span class="k">return</span> <span class="n">drive</span><span class="p">,</span> <span class="n">drive_box</span>
 
 
-<span class="k">def</span> <span class="nf">add_connectivity_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_connectivity_tab</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">,</span>
                          <span class="n">cell_params_out</span><span class="p">,</span> <span class="n">cell_pameters_vboxes</span><span class="p">,</span>
                          <span class="n">cell_layer_radio_button</span><span class="p">,</span> <span class="n">cell_type_radio_button</span><span class="p">,</span>
                          <span class="n">layout</span><span class="p">):</span>
@@ -1850,7 +1850,7 @@
     <span class="k">return</span> <span class="n">net</span>
 
 
-<span class="k">def</span> <span class="nf">add_network_connectivity_tab</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_network_connectivity_tab</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span>
                                  <span class="n">connectivity_textfields</span><span class="p">):</span>
     <span class="n">cell_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">ct</span> <span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
     <span class="n">receptors</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;ampa&#39;</span><span class="p">,</span> <span class="s1">&#39;nmda&#39;</span><span class="p">,</span> <span class="s1">&#39;gabaa&#39;</span><span class="p">,</span> <span class="s1">&#39;gabab&#39;</span><span class="p">)</span>
@@ -1938,7 +1938,7 @@
     <span class="k">return</span> <span class="n">net</span>
 
 
-<span class="k">def</span> <span class="nf">add_cell_parameters_tab</span><span class="p">(</span><span class="n">cell_params_out</span><span class="p">,</span> <span class="n">cell_pameters_vboxes</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_cell_parameters_tab</span><span class="p">(</span><span class="n">cell_params_out</span><span class="p">,</span> <span class="n">cell_pameters_vboxes</span><span class="p">,</span>
                             <span class="n">cell_layer_radio_button</span><span class="p">,</span> <span class="n">cell_type_radio_button</span><span class="p">,</span>
                             <span class="n">layout</span><span class="p">):</span>
     <span class="n">L2_default_values</span> <span class="o">=</span> <span class="n">get_L2Pyr_params_default</span><span class="p">()</span>
@@ -1985,11 +1985,11 @@
                              <span class="n">cell_layer_radio_button</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">get_cell_param_default_value</span><span class="p">(</span><span class="n">cell_type_key</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_cell_param_default_value</span><span class="p">(</span><span class="n">cell_type_key</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">param_dict</span><span class="p">[</span><span class="n">cell_type_key</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">on_upload_data_change</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">viz_manager</span><span class="p">,</span> <span class="n">log_out</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">on_upload_data_change</span><span class="p">(</span><span class="n">change</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">viz_manager</span><span class="p">,</span> <span class="n">log_out</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">change</span><span class="p">[</span><span class="s1">&#39;owner&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span>
     <span class="c1"># Parsing file information from the &#39;change&#39; object passed in from</span>
@@ -2034,7 +2034,7 @@
         <span class="n">change</span><span class="p">[</span><span class="s1">&#39;owner&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">[]</span>
 
 
-<span class="k">def</span> <span class="nf">_drive_widget_to_dict</span><span class="p">(</span><span class="n">drive</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_drive_widget_to_dict</span><span class="p">(</span><span class="n">drive</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates a dict of input widget values</span>
 
 <span class="sd">    Input widgets for drive parameters are structured in a nested</span>
@@ -2058,7 +2058,7 @@
     <span class="p">}</span>
 
 
-<span class="k">def</span> <span class="nf">_init_network_from_widgets</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">single_simulation_data</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_init_network_from_widgets</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">single_simulation_data</span><span class="p">,</span>
                                <span class="n">drive_widgets</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">,</span>
                                <span class="n">cell_params_vboxes</span><span class="p">,</span>
                                <span class="n">add_drive</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -2175,7 +2175,7 @@
                     <span class="o">**</span><span class="n">sync_inputs_kwargs</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">run_button_clicked</span><span class="p">(</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_button_clicked</span><span class="p">(</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span>
                        <span class="n">all_data</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
                        <span class="n">fig_default_params</span><span class="p">,</span> <span class="n">widget_default_smoothing</span><span class="p">,</span>
                        <span class="n">widget_min_frequency</span><span class="p">,</span> <span class="n">widget_max_frequency</span><span class="p">,</span>
@@ -2247,7 +2247,7 @@
                                           <span class="n">plot_type</span><span class="p">,</span> <span class="p">{},</span> <span class="s2">&quot;plot&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_update_cell_params_vbox</span><span class="p">(</span><span class="n">cell_type_out</span><span class="p">,</span> <span class="n">cell_parameters_list</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_update_cell_params_vbox</span><span class="p">(</span><span class="n">cell_type_out</span><span class="p">,</span> <span class="n">cell_parameters_list</span><span class="p">,</span>
                              <span class="n">cell_type</span><span class="p">,</span> <span class="n">cell_layer</span><span class="p">):</span>
     <span class="n">cell_parameters_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">cell_layer</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="k">if</span> <span class="n">cell_layer</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Biophysics&#39;</span><span class="p">,</span> <span class="s1">&#39;Geometry&#39;</span><span class="p">]:</span>
@@ -2262,7 +2262,7 @@
             <span class="n">display</span><span class="p">(</span><span class="n">cell_parameters_list</span><span class="p">[</span><span class="n">cell_parameters_key</span><span class="p">])</span>
 
 
-<span class="k">def</span> <span class="nf">_update_L2_geometry_cell_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">cell_param_key</span><span class="p">,</span> <span class="n">param_list</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_update_L2_geometry_cell_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">cell_param_key</span><span class="p">,</span> <span class="n">param_list</span><span class="p">):</span>
     <span class="n">cell_params</span> <span class="o">=</span> <span class="n">param_list</span>
     <span class="n">cell_type</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_param_key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">_pyramidal&#39;</span>
 
@@ -2292,7 +2292,7 @@
         <span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">_Ra</span> <span class="o">=</span> <span class="n">dendrite_Ra</span>
 
 
-<span class="k">def</span> <span class="nf">_update_L5_geometry_cell_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">cell_param_key</span><span class="p">,</span> <span class="n">param_list</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_update_L5_geometry_cell_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">cell_param_key</span><span class="p">,</span> <span class="n">param_list</span><span class="p">):</span>
     <span class="n">cell_params</span> <span class="o">=</span> <span class="n">param_list</span>
     <span class="n">cell_type</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_param_key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">_pyramidal&#39;</span>
 
@@ -2323,7 +2323,7 @@
         <span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">_Ra</span> <span class="o">=</span> <span class="n">dendrite_Ra</span>
 
 
-<span class="k">def</span> <span class="nf">_update_synapse_cell_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">cell_param_key</span><span class="p">,</span> <span class="n">param_list</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_update_synapse_cell_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">cell_param_key</span><span class="p">,</span> <span class="n">param_list</span><span class="p">):</span>
     <span class="n">cell_params</span> <span class="o">=</span> <span class="n">param_list</span>
     <span class="n">cell_type</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_param_key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">_pyramidal&#39;</span>
     <span class="n">network_synapses</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span><span class="o">.</span><span class="n">synapses</span>
@@ -2339,7 +2339,7 @@
         <span class="n">network_synapses</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="s1">&#39;tau2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_params</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span><span class="o">.</span><span class="n">value</span>
 
 
-<span class="k">def</span> <span class="nf">_update_L2_biophysics_cell_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">cell_param_key</span><span class="p">,</span> <span class="n">param_list</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_update_L2_biophysics_cell_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">cell_param_key</span><span class="p">,</span> <span class="n">param_list</span><span class="p">):</span>
 
     <span class="n">cell_type</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_param_key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">_pyramidal&#39;</span>
     <span class="n">sections</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span><span class="o">.</span><span class="n">sections</span>
@@ -2368,7 +2368,7 @@
     <span class="n">update_common_dendrite_sections</span><span class="p">(</span><span class="n">sections</span><span class="p">,</span> <span class="n">mechs_params</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_update_L5_biophysics_cell_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">cell_param_key</span><span class="p">,</span> <span class="n">param_list</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_update_L5_biophysics_cell_params</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">cell_param_key</span><span class="p">,</span> <span class="n">param_list</span><span class="p">):</span>
     <span class="n">cell_type</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cell_param_key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">_pyramidal&#39;</span>
     <span class="n">sections</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span><span class="o">.</span><span class="n">sections</span>
     <span class="c1"># Soma</span>
@@ -2427,7 +2427,7 @@
     <span class="n">update_common_dendrite_sections</span><span class="p">(</span><span class="n">sections</span><span class="p">,</span> <span class="n">mechs_params</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">update_common_dendrite_sections</span><span class="p">(</span><span class="n">sections</span><span class="p">,</span> <span class="n">mechs_params</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_common_dendrite_sections</span><span class="p">(</span><span class="n">sections</span><span class="p">,</span> <span class="n">mechs_params</span><span class="p">):</span>
     <span class="n">dendrite_sections</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">sections</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;soma&#39;</span>
     <span class="p">]</span>
@@ -2435,7 +2435,7 @@
         <span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span><span class="o">.</span><span class="n">mechs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">mechs_params</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">_serialize_simulation</span><span class="p">(</span><span class="n">log_out</span><span class="p">,</span> <span class="n">sim_data</span><span class="p">,</span> <span class="n">simulation_list_widget</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_serialize_simulation</span><span class="p">(</span><span class="n">log_out</span><span class="p">,</span> <span class="n">sim_data</span><span class="p">,</span> <span class="n">simulation_list_widget</span><span class="p">):</span>
     <span class="c1"># Only download if there is at least one simulation</span>
     <span class="n">sim_name</span> <span class="o">=</span> <span class="n">simulation_list_widget</span><span class="o">.</span><span class="n">value</span>
 
@@ -2443,7 +2443,7 @@
         <span class="k">return</span> <span class="n">serialize_simulation</span><span class="p">(</span><span class="n">sim_data</span><span class="p">,</span> <span class="n">sim_name</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">serialize_simulation</span><span class="p">(</span><span class="n">simulations_data</span><span class="p">,</span> <span class="n">simulation_name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">serialize_simulation</span><span class="p">(</span><span class="n">simulations_data</span><span class="p">,</span> <span class="n">simulation_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Serializes simulation data to CSV.</span>
 
 <span class="sd">        Creates a single CSV file or a ZIP file containing multiple CSVs,</span>
@@ -2479,7 +2479,7 @@
         <span class="k">return</span> <span class="n">_create_zip</span><span class="p">(</span><span class="n">csv_trials_output</span><span class="p">,</span> <span class="n">simulation_name</span><span class="p">),</span> <span class="s2">&quot;.zip&quot;</span>
 
 
-<span class="k">def</span> <span class="nf">_serialize_config</span><span class="p">(</span><span class="n">log_out</span><span class="p">,</span> <span class="n">sim_data</span><span class="p">,</span> <span class="n">simulation_list_widget</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_serialize_config</span><span class="p">(</span><span class="n">log_out</span><span class="p">,</span> <span class="n">sim_data</span><span class="p">,</span> <span class="n">simulation_list_widget</span><span class="p">):</span>
     <span class="c1"># Only download if there is at least one simulation</span>
     <span class="n">sim_name</span> <span class="o">=</span> <span class="n">simulation_list_widget</span><span class="o">.</span><span class="n">value</span>
 
@@ -2487,7 +2487,7 @@
         <span class="k">return</span> <span class="n">serialize_config</span><span class="p">(</span><span class="n">sim_data</span><span class="p">,</span> <span class="n">sim_name</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">serialize_config</span><span class="p">(</span><span class="n">simulations_data</span><span class="p">,</span> <span class="n">simulation_name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">serialize_config</span><span class="p">(</span><span class="n">simulations_data</span><span class="p">,</span> <span class="n">simulation_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Serializes Network configuration data to json.&quot;&quot;&quot;</span>
 
     <span class="c1"># Get network from data dictionary</span>
@@ -2499,7 +2499,7 @@
         <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">_create_zip</span><span class="p">(</span><span class="n">csv_data_list</span><span class="p">,</span> <span class="n">simulation_name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_create_zip</span><span class="p">(</span><span class="n">csv_data_list</span><span class="p">,</span> <span class="n">simulation_name</span><span class="p">):</span>
     <span class="c1"># Zip all files and keep it in memory</span>
     <span class="k">with</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">()</span> <span class="k">as</span> <span class="n">zip_buffer</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_buffer</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZIP_DEFLATED</span><span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
@@ -2509,7 +2509,7 @@
         <span class="k">return</span> <span class="n">zip_buffer</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">handle_backend_change</span><span class="p">(</span><span class="n">backend_type</span><span class="p">,</span> <span class="n">backend_config</span><span class="p">,</span> <span class="n">mpi_cmd</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">handle_backend_change</span><span class="p">(</span><span class="n">backend_type</span><span class="p">,</span> <span class="n">backend_config</span><span class="p">,</span> <span class="n">mpi_cmd</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Switch backends between MPI and Joblib.&quot;&quot;&quot;</span>
     <span class="n">backend_config</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
     <span class="k">with</span> <span class="n">backend_config</span><span class="p">:</span>
@@ -2519,19 +2519,19 @@
             <span class="n">display</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_is_valid_add_tonic_input</span><span class="p">(</span><span class="n">drive_widgets</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_is_valid_add_tonic_input</span><span class="p">(</span><span class="n">drive_widgets</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">drive</span> <span class="ow">in</span> <span class="n">drive_widgets</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Tonic&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
     <span class="k">return</span> <span class="kc">True</span>
 
 
-<span class="k">def</span> <span class="nf">launch</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">launch</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Launch voila with hnn_widget.ipynb.</span>
 
 <span class="sd">    You can pass voila commandline parameters as usual.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">voila.app</span> <span class="kn">import</span> <span class="n">main</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">voila.app</span><span class="w"> </span><span class="kn">import</span> <span class="n">main</span>
     <span class="n">notebook_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s1">&#39;hnn_widget.ipynb&#39;</span>
     <span class="n">main</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">notebook_path</span><span class="o">.</span><span class="n">resolve</span><span class="p">()),</span> <span class="o">*</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]])</span>
 </pre></div>

@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hnn_core.viz &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=9afac83c" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
@@ -139,15 +139,15 @@
 <span class="c1">#          Sam Neymotin &lt;samnemo@gmail.com&gt;</span>
 <span class="c1">#          Christopher Bailey &lt;cjb@cfin.au.dk&gt;</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">cycle</span>
-<span class="kn">import</span> <span class="nn">colorsys</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">.externals.mne</span> <span class="kn">import</span> <span class="n">_validate_type</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cycle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">colorsys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.externals.mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">_validate_type</span>
 
 
-<span class="k">def</span> <span class="nf">_lighten_color</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">amount</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">matplotlib.colors</span> <span class="k">as</span> <span class="nn">mc</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_lighten_color</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">amount</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mc</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">c</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">cnames</span><span class="p">[</span><span class="n">color</span><span class="p">]</span>
     <span class="k">except</span><span class="p">:</span>
@@ -156,7 +156,7 @@
     <span class="k">return</span> <span class="n">colorsys</span><span class="o">.</span><span class="n">hls_to_rgb</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">amount</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
 
 
-<span class="k">def</span> <span class="nf">_get_plot_data_trange</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_plot_data_trange</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get slices of times and data based on tmin and tmax&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
@@ -174,8 +174,8 @@
     <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">times</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_decimate_plot_data</span><span class="p">(</span><span class="n">decim</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">sfreq</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">decimate</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_decimate_plot_data</span><span class="p">(</span><span class="n">decim</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">sfreq</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">decimate</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">decim</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="n">decim</span> <span class="o">=</span> <span class="p">[</span><span class="n">decim</span><span class="p">]</span>
 
@@ -193,7 +193,7 @@
         <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">sfreq</span>
 
 
-<span class="k">def</span> <span class="nf">plt_show</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">plt_show</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Show a figure while suppressing warnings.</span>
 
 <span class="sd">    NB copied from :func:`mne.viz.utils.plt_show`.</span>
@@ -207,13 +207,13 @@
 <span class="sd">    **kwargs : dict</span>
 <span class="sd">        Extra arguments for :func:`matplotlib.pyplot.show`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">get_backend</span>
-    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_backend</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
     <span class="k">if</span> <span class="n">show</span> <span class="ow">and</span> <span class="n">get_backend</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;agg&#39;</span><span class="p">:</span>
         <span class="p">(</span><span class="n">fig</span> <span class="ow">or</span> <span class="n">plt</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="plot_laminar_lfp"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_laminar_lfp.html#hnn_core.viz.plot_laminar_lfp">[docs]</a><span class="k">def</span> <span class="nf">plot_laminar_lfp</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">contact_labels</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="plot_laminar_lfp"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_laminar_lfp.html#hnn_core.viz.plot_laminar_lfp">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">plot_laminar_lfp</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">contact_labels</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;cividis&#39;</span><span class="p">,</span>
                      <span class="n">voltage_offset</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">voltage_scalebar</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot laminar extracellular electrode array voltage time series.</span>
@@ -254,8 +254,8 @@
 <span class="sd">    fig : instance of plt.fig</span>
 <span class="sd">        The matplotlib figure handle into which time series were plotted.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-    <span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">ListedColormap</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ListedColormap</span>
     <span class="n">_validate_type</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> <span class="s1">&#39;times&#39;</span><span class="p">)</span>
     <span class="n">_validate_type</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
@@ -341,7 +341,7 @@
             <span class="n">voltage_scalebar</span> <span class="o">=</span> <span class="n">voltage_offset</span>
 
     <span class="k">if</span> <span class="n">voltage_scalebar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1.anchored_artists</span> <span class="kn">import</span> <span class="n">AnchoredSizeBar</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">mpl_toolkits.axes_grid1.anchored_artists</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnchoredSizeBar</span>
         <span class="n">scalebar</span> <span class="o">=</span> <span class="n">AnchoredSizeBar</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">transData</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
                                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">voltage_scalebar</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1"> &#39;</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;$\mu V$&#39;</span><span class="p">,</span>
                                    <span class="s1">&#39;upper left&#39;</span><span class="p">,</span>
@@ -362,7 +362,7 @@
     <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="plot_dipole"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_dipole.html#hnn_core.viz.plot_dipole">[docs]</a><span class="k">def</span> <span class="nf">plot_dipole</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="plot_dipole"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_dipole.html#hnn_core.viz.plot_dipole">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">plot_dipole</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;average&quot;</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Simple layer-specific plot function.</span>
 
@@ -394,8 +394,8 @@
 <span class="sd">    fig : instance of plt.fig</span>
 <span class="sd">        The matplotlib figure handle.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-    <span class="kn">from</span> <span class="nn">.dipole</span> <span class="kn">import</span> <span class="n">Dipole</span><span class="p">,</span> <span class="n">average_dipoles</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.dipole</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dipole</span><span class="p">,</span> <span class="n">average_dipoles</span>
 
     <span class="n">layers</span> <span class="o">=</span> <span class="n">layer</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">layer</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -473,7 +473,7 @@
     <span class="k">return</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="plot_spikes_hist"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_spikes_hist.html#hnn_core.viz.plot_spikes_hist">[docs]</a><span class="k">def</span> <span class="nf">plot_spikes_hist</span><span class="p">(</span><span class="n">cell_response</span><span class="p">,</span> <span class="n">trial_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">spike_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="plot_spikes_hist"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_spikes_hist.html#hnn_core.viz.plot_spikes_hist">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">plot_spikes_hist</span><span class="p">(</span><span class="n">cell_response</span><span class="p">,</span> <span class="n">trial_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">spike_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">invert_spike_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                      <span class="o">**</span><span class="n">kwargs_hist</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the histogram of spiking activity across trials.</span>
@@ -539,7 +539,7 @@
 <span class="sd">    fig : instance of matplotlib Figure</span>
 <span class="sd">        The matplotlib figure handle.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
     <span class="n">n_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell_response</span><span class="o">.</span><span class="n">spike_times</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">trial_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">trial_idx</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">))</span>
@@ -708,7 +708,7 @@
     <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="plot_spikes_raster"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_spikes_raster.html#hnn_core.viz.plot_spikes_raster">[docs]</a><span class="k">def</span> <span class="nf">plot_spikes_raster</span><span class="p">(</span><span class="n">cell_response</span><span class="p">,</span> <span class="n">trial_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<div class="viewcode-block" id="plot_spikes_raster"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_spikes_raster.html#hnn_core.viz.plot_spikes_raster">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">plot_spikes_raster</span><span class="p">(</span><span class="n">cell_response</span><span class="p">,</span> <span class="n">trial_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                        <span class="n">cell_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                        <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the aggregate spiking activity according to cell type.</span>
@@ -734,7 +734,7 @@
 <span class="sd">        The matplotlib figure object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
     <span class="n">n_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell_response</span><span class="o">.</span><span class="n">spike_times</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">trial_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">trial_idx</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">))</span>
@@ -831,7 +831,7 @@
     <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="plot_cells"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_cells.html#hnn_core.viz.plot_cells">[docs]</a><span class="k">def</span> <span class="nf">plot_cells</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="plot_cells"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_cells.html#hnn_core.viz.plot_cells">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">plot_cells</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the cells using Network.pos_dict.</span>
 
 <span class="sd">    Parameters</span>
@@ -849,8 +849,8 @@
 <span class="sd">    fig : instance of matplotlib Figure</span>
 <span class="sd">        The matplotlib figure handle.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-    <span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mpl_toolkits.mplot3d</span><span class="w"> </span><span class="kn">import</span> <span class="n">Axes3D</span>
 
     <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
@@ -889,7 +889,7 @@
     <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="plot_tfr_morlet"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_tfr_morlet.html#hnn_core.viz.plot_tfr_morlet">[docs]</a><span class="k">def</span> <span class="nf">plot_tfr_morlet</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">n_cycles</span><span class="o">=</span><span class="mf">7.</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="plot_tfr_morlet"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_tfr_morlet.html#hnn_core.viz.plot_tfr_morlet">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">plot_tfr_morlet</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">n_cycles</span><span class="o">=</span><span class="mf">7.</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39;zeros&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">colorbar_inside</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -935,10 +935,10 @@
 <span class="sd">    fig : instance of matplotlib Figure</span>
 <span class="sd">        The matplotlib figure handle.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-    <span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">ScalarFormatter</span>
-    <span class="kn">from</span> <span class="nn">.externals.mne</span> <span class="kn">import</span> <span class="n">tfr_array_morlet</span>
-    <span class="kn">from</span> <span class="nn">.dipole</span> <span class="kn">import</span> <span class="n">Dipole</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.ticker</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalarFormatter</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.externals.mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">tfr_array_morlet</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.dipole</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dipole</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">Dipole</span><span class="p">):</span>
         <span class="n">dpl</span> <span class="o">=</span> <span class="p">[</span><span class="n">dpl</span><span class="p">]</span>
@@ -1030,7 +1030,7 @@
     <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="plot_psd"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_psd.html#hnn_core.viz.plot_psd">[docs]</a><span class="k">def</span> <span class="nf">plot_psd</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">fmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span>
+<div class="viewcode-block" id="plot_psd"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_psd.html#hnn_core.viz.plot_psd">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">plot_psd</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">fmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span>
              <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot power spectral density (PSD) of dipole time course</span>
 
@@ -1068,9 +1068,9 @@
 <span class="sd">    fig : instance of matplotlib Figure</span>
 <span class="sd">        The matplotlib figure handle.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-    <span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">periodogram</span>
-    <span class="kn">from</span> <span class="nn">.dipole</span> <span class="kn">import</span> <span class="n">Dipole</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">periodogram</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.dipole</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dipole</span>
 
     <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1114,7 +1114,7 @@
     <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
 
 
-<span class="k">def</span> <span class="nf">_linewidth_from_data_units</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">linewidth</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_linewidth_from_data_units</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">linewidth</span><span class="p">):</span>
     <span class="c1"># see: https://stackoverflow.com/a/35501485</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span>
     <span class="n">length</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">bbox_inches</span><span class="o">.</span><span class="n">width</span> <span class="o">*</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span><span class="o">.</span><span class="n">width</span>
@@ -1124,7 +1124,7 @@
     <span class="k">return</span> <span class="n">linewidth</span> <span class="o">*</span> <span class="p">(</span><span class="n">length</span> <span class="o">/</span> <span class="n">value_range</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="plot_cell_morphology"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_cell_morphology.html#hnn_core.viz.plot_cell_morphology">[docs]</a><span class="k">def</span> <span class="nf">plot_cell_morphology</span><span class="p">(</span>
+<div class="viewcode-block" id="plot_cell_morphology"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_cell_morphology.html#hnn_core.viz.plot_cell_morphology">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">plot_cell_morphology</span><span class="p">(</span>
         <span class="n">cell</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">250</span><span class="p">,</span> <span class="mi">150</span><span class="p">),</span>
         <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="n">zlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1200</span><span class="p">),</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the cell morphology.</span>
@@ -1161,8 +1161,8 @@
 <span class="sd">    axes : list of instance of Axes3D</span>
 <span class="sd">        The matplotlib 3D axis handle.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-    <span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="kn">import</span> <span class="n">Axes3D</span>  <span class="c1"># noqa</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">mpl_toolkits.mplot3d</span><span class="w"> </span><span class="kn">import</span> <span class="n">Axes3D</span>  <span class="c1"># noqa</span>
 
     <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
@@ -1210,7 +1210,7 @@
     <span class="k">return</span> <span class="n">ax</span></div>
 
 
-<div class="viewcode-block" id="plot_connectivity_matrix"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_connectivity_matrix.html#hnn_core.viz.plot_connectivity_matrix">[docs]</a><span class="k">def</span> <span class="nf">plot_connectivity_matrix</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">conn_idx</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_weight</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<div class="viewcode-block" id="plot_connectivity_matrix"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_connectivity_matrix.html#hnn_core.viz.plot_connectivity_matrix">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">plot_connectivity_matrix</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">conn_idx</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show_weight</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                              <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;Greys&#39;</span><span class="p">,</span>
                              <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot connectivity matrix with color bar for synaptic weights</span>
@@ -1239,10 +1239,10 @@
 <span class="sd">    fig : instance of matplotlib Figure</span>
 <span class="sd">        The matplotlib figure handle.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-    <span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">ScalarFormatter</span>
-    <span class="kn">from</span> <span class="nn">.network</span> <span class="kn">import</span> <span class="n">Network</span>
-    <span class="kn">from</span> <span class="nn">.cell</span> <span class="kn">import</span> <span class="n">_get_gaussian_connection</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.ticker</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalarFormatter</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.network</span><span class="w"> </span><span class="kn">import</span> <span class="n">Network</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.cell</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_gaussian_connection</span>
 
     <span class="n">_validate_type</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">Network</span><span class="p">,</span> <span class="s1">&#39;net&#39;</span><span class="p">,</span> <span class="s1">&#39;Network&#39;</span><span class="p">)</span>
     <span class="n">_validate_type</span><span class="p">(</span><span class="n">conn_idx</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;conn_idx&#39;</span><span class="p">,</span> <span class="s1">&#39;int&#39;</span><span class="p">)</span>
@@ -1306,10 +1306,10 @@
     <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
 
 
-<span class="k">def</span> <span class="nf">_update_target_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">src_gid</span><span class="p">,</span> <span class="n">src_type_pos</span><span class="p">,</span> <span class="n">target_type_pos</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_update_target_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">src_gid</span><span class="p">,</span> <span class="n">src_type_pos</span><span class="p">,</span> <span class="n">target_type_pos</span><span class="p">,</span>
                         <span class="n">src_range</span><span class="p">,</span> <span class="n">target_range</span><span class="p">,</span> <span class="n">nc_dict</span><span class="p">,</span> <span class="n">colormap</span><span class="p">,</span>
                         <span class="n">inplane_distance</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">.cell</span> <span class="kn">import</span> <span class="n">_get_gaussian_connection</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.cell</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_gaussian_connection</span>
 
     <span class="c1"># Extract indices to get position in network</span>
     <span class="c1"># Index in gid range aligns with net.pos_dict</span>
@@ -1341,7 +1341,7 @@
     <span class="k">return</span> <span class="n">im</span>
 
 
-<div class="viewcode-block" id="plot_cell_connectivity"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_cell_connectivity.html#hnn_core.viz.plot_cell_connectivity">[docs]</a><span class="k">def</span> <span class="nf">plot_cell_connectivity</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">conn_idx</span><span class="p">,</span> <span class="n">src_gid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="plot_cell_connectivity"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_cell_connectivity.html#hnn_core.viz.plot_cell_connectivity">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">plot_cell_connectivity</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">conn_idx</span><span class="p">,</span> <span class="n">src_gid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                            <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot synaptic weight of connections.</span>
 
@@ -1384,9 +1384,9 @@
 <span class="sd">    the connection corresponds to a drive, ex: poisson, bursty, etc.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-    <span class="kn">from</span> <span class="nn">.network</span> <span class="kn">import</span> <span class="n">Network</span>
-    <span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">ScalarFormatter</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.network</span><span class="w"> </span><span class="kn">import</span> <span class="n">Network</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.ticker</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalarFormatter</span>
 
     <span class="n">_validate_type</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">Network</span><span class="p">,</span> <span class="s1">&#39;net&#39;</span><span class="p">,</span> <span class="s1">&#39;Network&#39;</span><span class="p">)</span>
     <span class="n">_validate_type</span><span class="p">(</span><span class="n">conn_idx</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;conn_idx&#39;</span><span class="p">,</span> <span class="s1">&#39;int&#39;</span><span class="p">)</span>
@@ -1443,7 +1443,7 @@
     <span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;src_type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">-&gt; </span><span class="si">{</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
                  <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;loc&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;receptor&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_onclick</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_onclick</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">inaxes</span> <span class="ow">in</span> <span class="p">[</span><span class="n">ax</span><span class="p">]</span> <span class="ow">or</span> <span class="n">event</span><span class="o">.</span><span class="n">inaxes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
 
@@ -1477,7 +1477,7 @@
     <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="plot_laminar_csd"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_laminar_csd.html#hnn_core.viz.plot_laminar_csd">[docs]</a><span class="k">def</span> <span class="nf">plot_laminar_csd</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">contact_labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<div class="viewcode-block" id="plot_laminar_csd"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_laminar_csd.html#hnn_core.viz.plot_laminar_csd">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">plot_laminar_csd</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">contact_labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                      <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sink</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;spline&#39;</span><span class="p">,</span>
                      <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot laminar current source density (CSD) estimation from LFP array.</span>
@@ -1516,8 +1516,8 @@
 <span class="sd">    fig : instance of matplotlib Figure</span>
 <span class="sd">        The matplotlib figure handle.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-    <span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">RectBivariateSpline</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.interpolate</span><span class="w"> </span><span class="kn">import</span> <span class="n">RectBivariateSpline</span>
 
     <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1561,7 +1561,7 @@
     <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="NetworkPlotter"><a class="viewcode-back" href="../../generated/hnn_core.viz.NetworkPlotter.html#hnn_core.viz.NetworkPlotter">[docs]</a><span class="k">class</span> <span class="nc">NetworkPlotter</span><span class="p">:</span>
+<div class="viewcode-block" id="NetworkPlotter"><a class="viewcode-back" href="../../generated/hnn_core.viz.NetworkPlotter.html#hnn_core.viz.NetworkPlotter">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">NetworkPlotter</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper class to visualize full morphology of HNN model.</span>
 
 <span class="sd">    Parameters</span>
@@ -1599,11 +1599,11 @@
 <span class="sd">    time_idx : int</span>
 <span class="sd">        Index of time point plotted. Default: 0</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">100</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">bg_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=-</span><span class="mi">100</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">bg_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span>
                  <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">voltage_colormap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">elev</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">azim</span><span class="o">=-</span><span class="mi">500</span><span class="p">,</span>
                  <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">200</span><span class="p">,</span> <span class="mi">3100</span><span class="p">),</span> <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">200</span><span class="p">,</span> <span class="mi">3100</span><span class="p">),</span> <span class="n">zlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">300</span><span class="p">,</span> <span class="mi">2200</span><span class="p">),</span>
                  <span class="n">trial_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">time_idx</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">colormaps</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">colormaps</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_parameters</span><span class="p">(</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="p">,</span> <span class="n">bg_color</span><span class="p">,</span> <span class="n">voltage_colormap</span><span class="p">,</span>
                                   <span class="n">colorbar</span><span class="p">,</span> <span class="n">elev</span><span class="p">,</span> <span class="n">azim</span><span class="p">,</span> <span class="n">xlim</span><span class="p">,</span> <span class="n">ylim</span><span class="p">,</span> <span class="n">zlim</span><span class="p">,</span>
@@ -1641,7 +1641,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cbar</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="nf">_validate_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="p">,</span> <span class="n">bg_color</span><span class="p">,</span> <span class="n">voltage_colormap</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="p">,</span> <span class="n">bg_color</span><span class="p">,</span> <span class="n">voltage_colormap</span><span class="p">,</span>
                              <span class="n">colorbar</span><span class="p">,</span> <span class="n">elev</span><span class="p">,</span> <span class="n">azim</span><span class="p">,</span> <span class="n">xlim</span><span class="p">,</span> <span class="n">ylim</span><span class="p">,</span> <span class="n">zlim</span><span class="p">,</span> <span class="n">trial_idx</span><span class="p">,</span>
                              <span class="n">time_idx</span><span class="p">):</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">vmin</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;vmin&#39;</span><span class="p">)</span>
@@ -1657,7 +1657,7 @@
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">trial_idx</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;trial_idx&#39;</span><span class="p">)</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">time_idx</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;time_idx&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_check_network_simulation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_network_simulation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">times</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">vsec_recorded</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="c1"># Check if network simulated</span>
@@ -1669,8 +1669,8 @@
                 <span class="n">vsec_recorded</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="n">times</span><span class="p">,</span> <span class="n">vsec_recorded</span>
 
-    <span class="k">def</span> <span class="nf">_initialize_plots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_plots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
         <span class="c1"># Create figure</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
@@ -1680,7 +1680,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_network_plot</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_axes</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_get_voltages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_voltages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">vsec_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">:</span>
             <span class="n">gid_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span>
@@ -1698,7 +1698,7 @@
         <span class="n">vsec_array</span> <span class="o">=</span> <span class="p">(</span><span class="n">vsec_array</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">vmin</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vmax</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">vmin</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">vsec_array</span>
 
-    <span class="k">def</span> <span class="nf">_update_section_voltages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t_idx</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_section_voltages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t_idx</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vsec_recorded</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Network must be simulated with&quot;</span>
                                <span class="s2">&quot;`simulate_dipole(record_vsec=&#39;all&#39;)` before&quot;</span>
@@ -1707,7 +1707,7 @@
         <span class="k">for</span> <span class="n">line</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">lines</span><span class="p">,</span> <span class="n">color_list</span><span class="p">):</span>
             <span class="n">line</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_init_network_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_network_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="p">:</span>
             <span class="n">gid_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">gid_idx</span><span class="p">,</span> <span class="n">gid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gid_range</span><span class="p">):</span>
@@ -1721,16 +1721,16 @@
                                      <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">xlim</span><span class="p">,</span>
                                      <span class="n">ylim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ylim</span><span class="p">,</span> <span class="n">zlim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zlim</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_update_axes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_axes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ylim</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_zlim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zlim</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_elev</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_azim</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_update_colorbar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-        <span class="kn">import</span> <span class="nn">matplotlib.colors</span> <span class="k">as</span> <span class="nn">mc</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_colorbar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.colors</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mc</span>
 
         <span class="n">fig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span>
         <span class="n">sm</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span>
@@ -1738,7 +1738,7 @@
             <span class="n">norm</span><span class="o">=</span><span class="n">mc</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">vmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vmax</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cbar</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">sm</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="p">)</span>
 
-<div class="viewcode-block" id="NetworkPlotter.export_movie"><a class="viewcode-back" href="../../generated/hnn_core.viz.NetworkPlotter.html#hnn_core.viz.NetworkPlotter.export_movie">[docs]</a>    <span class="k">def</span> <span class="nf">export_movie</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<div class="viewcode-block" id="NetworkPlotter.export_movie"><a class="viewcode-back" href="../../generated/hnn_core.viz.NetworkPlotter.html#hnn_core.viz.NetworkPlotter.export_movie">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">export_movie</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
                      <span class="n">interval</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">frame_start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">frame_stop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">writer</span><span class="o">=</span><span class="s1">&#39;pillow&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Export movie of network activity</span>
@@ -1765,7 +1765,7 @@
 <span class="sd">            Alternative movie writers can be found at</span>
 <span class="sd">            https://matplotlib.org/stable/api/animation_api.html</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">matplotlib.animation</span> <span class="k">as</span> <span class="nn">animation</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.animation</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">animation</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vsec_recorded</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Network must be simulated with&quot;</span>
@@ -1784,63 +1784,63 @@
 
     <span class="c1"># Axis limits</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">xlim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">xlim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span>
 
     <span class="nd">@xlim</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">xlim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xlim</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">xlim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xlim</span><span class="p">):</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">xlim</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="s1">&#39;xlim&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span> <span class="o">=</span> <span class="n">xlim</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">ylim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ylim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ylim</span>
 
     <span class="nd">@ylim</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">ylim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ylim</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ylim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ylim</span><span class="p">):</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">ylim</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="s1">&#39;ylim&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ylim</span> <span class="o">=</span> <span class="n">ylim</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ylim</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">zlim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zlim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zlim</span>
 
     <span class="nd">@zlim</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">zlim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zlim</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">zlim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zlim</span><span class="p">):</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">zlim</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="s1">&#39;zlim&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_zlim</span> <span class="o">=</span> <span class="n">zlim</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_zlim</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zlim</span><span class="p">)</span>
 
     <span class="c1"># Elevation and azimuth of 3D viewpoint</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">elev</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">elev</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_elev</span>
 
     <span class="nd">@elev</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">elev</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elev</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">elev</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elev</span><span class="p">):</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">elev</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;elev&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_elev</span> <span class="o">=</span> <span class="n">elev</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_elev</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_azim</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">azim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">azim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_azim</span>
 
     <span class="nd">@azim</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">azim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">azim</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">azim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">azim</span><span class="p">):</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">azim</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;azim&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_azim</span> <span class="o">=</span> <span class="n">azim</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_elev</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_azim</span><span class="p">)</span>
 
     <span class="c1"># Minimum and maximum voltages</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">vmin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">vmin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vmin</span>
 
     <span class="nd">@vmin</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">vmin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vmin</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">vmin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vmin</span><span class="p">):</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">vmin</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;vmin&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vmin</span> <span class="o">=</span> <span class="n">vmin</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vsec_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_voltages</span><span class="p">()</span>
@@ -1850,11 +1850,11 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_update_colorbar</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">vmax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">vmax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vmax</span>
 
     <span class="nd">@vmax</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">vmax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vmax</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">vmax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vmax</span><span class="p">):</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">vmax</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;vmax&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vmax</span> <span class="o">=</span> <span class="n">vmax</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vsec_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_voltages</span><span class="p">()</span>
@@ -1865,11 +1865,11 @@
 
     <span class="c1"># Time and trial indices</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">trial_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trial_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trial_idx</span>
 
     <span class="nd">@trial_idx</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">trial_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_idx</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trial_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_idx</span><span class="p">):</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">trial_idx</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;trial_idx&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vsec_recorded</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Network must be simulated with&quot;</span>
@@ -1881,11 +1881,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_section_voltages</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_time_idx</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">time_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">time_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_time_idx</span>
 
     <span class="nd">@time_idx</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">time_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_idx</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">time_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_idx</span><span class="p">):</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">time_idx</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">),</span> <span class="s1">&#39;time_idx&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vsec_recorded</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Network must be simulated with&quot;</span>
@@ -1895,25 +1895,25 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_section_voltages</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_time_idx</span><span class="p">)</span>
 
     <span class="c1"># Callable update function for making animations</span>
-    <span class="k">def</span> <span class="nf">_set_time_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_idx</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_time_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_idx</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">time_idx</span> <span class="o">=</span> <span class="n">time_idx</span>
 
     <span class="c1"># Background color and voltage colormaps</span>
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">bg_color</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bg_color</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bg_color</span>
 
     <span class="nd">@bg_color</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">bg_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bg_color</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">bg_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bg_color</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bg_color</span> <span class="o">=</span> <span class="n">bg_color</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_bg_color</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">voltage_colormap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">voltage_colormap</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_voltage_colormap</span>
 
     <span class="nd">@voltage_colormap</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">voltage_colormap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">voltage_colormap</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">voltage_colormap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">voltage_colormap</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_voltage_colormap</span> <span class="o">=</span> <span class="n">voltage_colormap</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_colormap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colormaps</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_voltage_colormap</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">color_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colormap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vsec_array</span><span class="p">)</span>
@@ -1922,11 +1922,11 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_update_colorbar</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">colorbar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">colorbar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colorbar</span>
 
     <span class="nd">@colorbar</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">colorbar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colorbar</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">colorbar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colorbar</span><span class="p">):</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">colorbar</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s1">&#39;colorbar&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_colorbar</span> <span class="o">=</span> <span class="n">colorbar</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colorbar</span><span class="p">:</span>
