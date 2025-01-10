@@ -31,6 +31,7 @@ if version is None:
 
 # test install with:
 # $ rm -rf hnn_core/mod/x86_64/
+# $ rm -rf hnn_core/mod/arm64/
 # $ python setup.py clean --all install
 #
 # to make sure there are no residual mod files
