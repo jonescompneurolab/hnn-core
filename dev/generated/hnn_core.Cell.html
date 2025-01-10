@@ -257,8 +257,8 @@ list of nodes (children nodes) connected to the parent node.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.copy" title="hnn_core.Cell.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
 <td><p>Return copy of instance.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.create_tonic_bias" title="hnn_core.Cell.create_tonic_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_tonic_bias</span></code></a>(amplitude, t0, tstop[, loc])</p></td>
-<td><p>Create tonic bias at the soma.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.create_tonic_bias" title="hnn_core.Cell.create_tonic_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_tonic_bias</span></code></a>(amplitude, t0, tstop[, ...])</p></td>
+<td><p>Create tonic bias at defined section.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.define_shape" title="hnn_core.Cell.define_shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">define_shape</span></code></a>(node)</p></td>
 <td><p>Redefines end_pts according to section lengths.</p></td>
@@ -319,8 +319,8 @@ of a pyramidal neuron.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Cell.create_tonic_bias">
-<span class="sig-name descname"><span class="pre">create_tonic_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.create_tonic_bias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.create_tonic_bias" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create tonic bias at the soma.</p>
+<span class="sig-name descname"><span class="pre">create_tonic_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'soma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.create_tonic_bias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.create_tonic_bias" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create tonic bias at defined section.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -330,7 +330,9 @@ of a pyramidal neuron.</p>
 </dd>
 <dt><strong>tstop</strong><span class="classifier">float</span></dt><dd><p>The end time of tonic input (in ms).</p>
 </dd>
-<dt><strong>loc</strong><span class="classifier">float (0 to 1)</span></dt><dd><p>The location of the input in the soma section.</p>
+<dt><strong>section</strong><span class="classifier">str</span></dt><dd><p>Section tonic input is applied to.</p>
+</dd>
+<dt><strong>loc</strong><span class="classifier">float (0 to 1)</span></dt><dd><p>The location of the input in the section.</p>
 </dd>
 </dl>
 </dd>

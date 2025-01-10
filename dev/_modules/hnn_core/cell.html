@@ -863,8 +863,9 @@
             <span class="n">dpp</span><span class="o">.</span><span class="n">ztan</span> <span class="o">=</span> <span class="n">seg_lens_z</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dipole</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dpl_ref</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Cell.create_tonic_bias"><a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.create_tonic_bias">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_tonic_bias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create tonic bias at the soma.</span>
+<div class="viewcode-block" id="Cell.create_tonic_bias"><a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.create_tonic_bias">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_tonic_bias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="s1">&#39;soma&#39;</span><span class="p">,</span>
+                          <span class="n">loc</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create tonic bias at defined section.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -874,10 +875,13 @@
 <span class="sd">            The start time of tonic input (in ms).</span>
 <span class="sd">        tstop : float</span>
 <span class="sd">            The end time of tonic input (in ms).</span>
+<span class="sd">        section : str</span>
+<span class="sd">            Section tonic input is applied to.</span>
 <span class="sd">        loc : float (0 to 1)</span>
-<span class="sd">            The location of the input in the soma section.</span>
+<span class="sd">            The location of the input in the section.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">stim</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">IClamp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">](</span><span class="n">loc</span><span class="p">))</span>
+
+        <span class="n">stim</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">IClamp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="n">section</span><span class="p">](</span><span class="n">loc</span><span class="p">))</span>
         <span class="n">stim</span><span class="o">.</span><span class="n">delay</span> <span class="o">=</span> <span class="n">t0</span>
         <span class="n">stim</span><span class="o">.</span><span class="n">dur</span> <span class="o">=</span> <span class="n">tstop</span> <span class="o">-</span> <span class="n">t0</span>
         <span class="n">stim</span><span class="o">.</span><span class="n">amp</span> <span class="o">=</span> <span class="n">amplitude</span>

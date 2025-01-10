@@ -1268,7 +1268,8 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">external_drives</span><span class="p">[</span>
                     <span class="n">drive</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]][</span><span class="s1">&#39;events&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event_times</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Network.add_tonic_bias"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_tonic_bias">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_tonic_bias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">cell_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Network.add_tonic_bias"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_tonic_bias">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_tonic_bias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">cell_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="s1">&#39;soma&#39;</span><span class="p">,</span>
+                       <span class="n">bias_name</span><span class="o">=</span><span class="s1">&#39;tonic&#39;</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Attaches parameters of tonic bias input for given cell types</span>
 
 <span class="sd">        Parameters</span>
@@ -1277,6 +1278,11 @@
 <span class="sd">            The name of the cell type to add a tonic input. When supplied,</span>
 <span class="sd">            a float value must be provided with the `amplitude` keyword.</span>
 <span class="sd">            Valid inputs are those listed in  `net.cell_types`.</span>
+<span class="sd">        section : str</span>
+<span class="sd">            name of cell section the bias should be applied to.</span>
+<span class="sd">            See net.cell_types[cell_type].sections.keys()</span>
+<span class="sd">        bias_name : str</span>
+<span class="sd">            The name of the bias.</span>
 <span class="sd">        amplitude: dict | float</span>
 <span class="sd">            A dictionary of cell type keys (str) to amplitude values (float).</span>
 <span class="sd">            Valid inputs for cell types are those listed in `net.cell_types`.</span>
@@ -1304,6 +1310,7 @@
             <span class="n">_validate_type</span><span class="p">(</span><span class="n">amplitude</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s1">&#39;amplitude&#39;</span><span class="p">)</span>
 
             <span class="n">_add_cell_type_bias</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_type</span><span class="o">=</span><span class="n">cell_type</span><span class="p">,</span>
+                                <span class="n">section</span><span class="o">=</span><span class="n">section</span><span class="p">,</span> <span class="n">bias_name</span><span class="o">=</span><span class="n">bias_name</span><span class="p">,</span>
                                 <span class="n">amplitude</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">amplitude</span><span class="p">),</span>
                                 <span class="n">t_0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">t_stop</span><span class="o">=</span><span class="n">tstop</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1315,6 +1322,7 @@
 
             <span class="k">for</span> <span class="n">_cell_type</span><span class="p">,</span> <span class="n">_amplitude</span> <span class="ow">in</span> <span class="n">amplitude</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">_add_cell_type_bias</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_type</span><span class="o">=</span><span class="n">_cell_type</span><span class="p">,</span>
+                                    <span class="n">section</span><span class="o">=</span><span class="n">section</span><span class="p">,</span> <span class="n">bias_name</span><span class="o">=</span><span class="n">bias_name</span><span class="p">,</span>
                                     <span class="n">amplitude</span><span class="o">=</span><span class="n">_amplitude</span><span class="p">,</span>
                                     <span class="n">t_0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">t_stop</span><span class="o">=</span><span class="n">tstop</span><span class="p">)</span></div>
 
@@ -1783,7 +1791,7 @@
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_add_cell_type_bias</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Network</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span>
-                        <span class="n">cell_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">cell_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="s1">&#39;soma&#39;</span><span class="p">,</span> <span class="n">bias_name</span><span class="o">=</span><span class="s1">&#39;tonic&#39;</span><span class="p">,</span>
                         <span class="n">t_0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">t_stop</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
     <span class="k">if</span> <span class="n">network</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1800,18 +1808,30 @@
                              <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s1">. &#39;</span>
                              <span class="sa">f</span><span class="s1">&#39;Got </span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="s1">&#39;tonic&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">network</span><span class="o">.</span><span class="n">external_biases</span><span class="p">:</span>
-            <span class="n">network</span><span class="o">.</span><span class="n">external_biases</span><span class="p">[</span><span class="s1">&#39;tonic&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">bias_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">network</span><span class="o">.</span><span class="n">external_biases</span><span class="p">:</span>
+            <span class="n">network</span><span class="o">.</span><span class="n">external_biases</span><span class="p">[</span><span class="n">bias_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">network</span><span class="o">.</span><span class="n">external_biases</span><span class="p">[</span><span class="s1">&#39;tonic&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Tonic bias already defined for </span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">network</span><span class="o">.</span><span class="n">external_biases</span><span class="p">[</span><span class="n">bias_name</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Bias named </span><span class="si">{</span><span class="n">bias_name</span><span class="si">}</span><span class="s1"> already defined &#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;for </span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="n">cell_type_bias</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;amplitude&#39;</span><span class="p">:</span> <span class="n">amplitude</span><span class="p">,</span>
             <span class="s1">&#39;t0&#39;</span><span class="p">:</span> <span class="n">t_0</span><span class="p">,</span>
-            <span class="s1">&#39;tstop&#39;</span><span class="p">:</span> <span class="n">t_stop</span>
+            <span class="s1">&#39;tstop&#39;</span><span class="p">:</span> <span class="n">t_stop</span><span class="p">,</span>
+            <span class="s1">&#39;section&#39;</span><span class="p">:</span> <span class="n">section</span>
         <span class="p">}</span>
-        <span class="n">network</span><span class="o">.</span><span class="n">external_biases</span><span class="p">[</span><span class="s1">&#39;tonic&#39;</span><span class="p">][</span><span class="n">cell_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_type_bias</span>
+
+        <span class="n">sections</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span><span class="o">.</span><span class="n">sections</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="c1"># error when section is defined that doesn&#39;t exist.</span>
+        <span class="k">if</span> <span class="n">section</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;section must be one of </span><span class="si">{</span><span class="n">sections</span><span class="si">}</span><span class="s2">. &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cell_type_bias</span><span class="p">[</span><span class="s1">&#39;section&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">section</span>
+
+        <span class="n">network</span><span class="o">.</span><span class="n">external_biases</span><span class="p">[</span><span class="n">bias_name</span><span class="p">][</span><span class="n">cell_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_type_bias</span>
 </pre></div>
 
     </div>
