@@ -12,6 +12,7 @@ modl:
 
 clean :
 	rm -rf hnn_core/mod/x86_64/*
+	rm -rf hnn_core/mod/arm64/*
 
 check-manifest:
 	check-manifest
