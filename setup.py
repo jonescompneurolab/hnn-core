@@ -82,8 +82,7 @@ if __name__ == "__main__":
         'docs': ['mne', 'nibabel', 'pooch', 'tdqm',
                  'sphinx', 'sphinx-gallery',
                  'sphinx_bootstrap_theme', 'sphinx-copybutton',
-                 'pillow', 'numpydoc',
-                 ],
+                 'pillow', 'numpydoc'],
         'gui': ['ipywidgets>=8.0.0', 'ipykernel', 'ipympl', 'voila', ],
     }
     extras['dev'] = (extras['opt'] + extras['parallel'] + extras['test'] +
