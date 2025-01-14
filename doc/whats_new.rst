@@ -36,6 +36,9 @@ Bug
 - Fix scaling and smoothing of loaded data dipoles to the GUI, by `George Dang`_
   in :gh:`892`
 
+- Refactor dipole visualization to support reversed y-axis in plot_tfr_morlet
+  for min_freq greater than max_freq, by `Abdul Samad Siddiqui`_ in :gh:`903`
+
 API
 ~~~
 - Add :func:`~hnn_core.CellResponse.spike_times_by_type` to get cell spiking times

@@ -194,6 +194,13 @@ def test_dipole_visualization(setup_net):
     # multiple TFRs get averaged
     fig = plot_tfr_morlet(dpls, freqs=np.arange(23, 26, 1.), n_cycles=3,
                           show=False)
+    # when min_freq > max_freq (y-axis inversion)
+    fig = plot_tfr_morlet(dpls, freqs=np.array([30, 20, 10]),
+                          n_cycles=3, show=False)
+    ax = fig.get_axes()[0]
+    y_limits = ax.get_ylim()
+    assert y_limits[0] > y_limits[1], \
+        "Y-axis should be inverted when min_freq > max_freq"
 
     with pytest.raises(RuntimeError,
                        match="All dipoles must be scaled equally!"):
