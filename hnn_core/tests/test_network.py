@@ -1168,7 +1168,8 @@ class TestPickConnection:
 def test_rename_cell():
     """Tests renaming cell function"""
     params = read_params(params_fname)
-    net = hnn_core.jones_2009_model(params)
+    net = jones_2009_model(params)
+    assert net.connectivity
     # adding a list of new_names
     new_names = ['L2_basket_test', 'L2_pyramidal_test',
                  'L5_basket_test', 'L5_pyrmidal_test']
@@ -1194,5 +1195,5 @@ def test_rename_cell():
 
     # Tests for non-string new_name
     new_name = 5
-    with pytest.raises(TypeError, match=f"'{new_name}' must be a string"):
+    with pytest.raises(TypeError, match="new_name must be an instance of str"):
         net.rename_cell('L2_basket_test', 5)
