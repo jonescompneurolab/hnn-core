@@ -140,9 +140,12 @@ def _read_cell_response(cell_response_data, read_output):
     """Returns CellResponse from json encoded data"""
     if (not cell_response_data) or (not read_output):
         return None
-    cell_response = CellResponse(spike_times=cell_response_data['spike_times'],
-                                 spike_gids=cell_response_data['spike_gids'],
-                                 spike_types=cell_response_data['spike_types'])
+    cell_response = CellResponse(
+        cell_type_names=cell_response_data['cell_type_names'],
+        spike_times=cell_response_data['spike_times'],
+        spike_gids=cell_response_data['spike_gids'],
+        spike_types=cell_response_data['spike_types'],
+    )
 
     cell_response._times = cell_response_data['times']
     cell_response._vsec = list()

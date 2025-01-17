@@ -16,6 +16,9 @@ class CellResponse(object):
 
     Parameters
     ----------
+    cell_type_names : list
+        List of unique cell type names that are explicitly modeled in the
+        network.
     spike_times : list (n_trials,) of list (n_spikes,) of float | None
         Each element of the outer list is a trial.
         The inner list contains the time stamps of spikes.
@@ -24,16 +27,14 @@ class CellResponse(object):
         The inner list contains the cell IDs of neurons that
         spiked.
     spike_types : list (n_trials,) of list (n_spikes,) of float | None
-        Each element of the outer list is a trial.
-        The inner list contains the type of spike (e.g., evprox1
-        or L2_pyramidal) that occurred at the corresponding time stamp.
-        Each gid corresponds to a type via Network().gid_ranges.
+        Each element of the outer list is a trial. The inner list contains the
+        type of spike (e.g., evprox1 or L2_pyramidal) that occurred at the
+        corresponding time stamp.  Each gid corresponds to a type via
+        Network().gid_ranges. Note that the type of spike can be from a
+        cell type or a drive.
     times : numpy array | None
         Array of time points for samples in continuous data.
         This includes vsoma and isoma.
-    cell_type_names : list
-        List of unique cell type names that are explicitly modeled in the
-        network
 
     Attributes
     ----------
@@ -45,10 +46,11 @@ class CellResponse(object):
         The inner list contains the cell IDs of neurons that
         spiked.
     spike_types : list (n_trials,) of list (n_spikes,) of float
-        Each element of the outer list is a trial.
-        The inner list contains the type of spike (e.g., evprox1
-        or L2_pyramidal) that occurred at the corresponding time stamp.
-        Each gid corresponds to a type via Network::gid_ranges.
+        Each element of the outer list is a trial. The inner list contains the
+        type of spike (e.g., evprox1 or L2_pyramidal) that occurred at the
+        corresponding time stamp.  Each gid corresponds to a type via
+        Network().gid_ranges. Note that the type of spike can be from a
+        cell type or a drive.
     vsec : list (n_trials,) of dict
         Each element of the outer list is a trial.
         Dictionary indexed by gids containing voltages for cell sections.
@@ -120,8 +122,7 @@ class CellResponse(object):
                 raise TypeError("'times' is an np.ndarray of simulation times")
         self._times = np.array(times)
         self._cell_type_names = cell_type_names
-        self._gid_ranges = dict()
-        
+
     def __repr__(self):
         class_name = self.__class__.__name__
         n_trials = len(self._spike_times)
