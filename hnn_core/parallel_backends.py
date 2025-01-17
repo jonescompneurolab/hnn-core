@@ -774,15 +774,15 @@ class MPIBackend(object):
         The name of the mpi launcher executable. Will use 'mpiexec' (openmpi)
         by default.
     hwthreading : None | bool
-        Whether or not to tell MPI to use hardware-threading. Defaults to
-        'None', in which case it will use a heuristic for determing whether to
-        use it. If 'False', then hardware-threading is never used, and if
-        'True', then hardware-threading is always used.
+        Specifies if MPI should use hardware-threading. Defaults to 'None',
+        in which a heuristic will be used to decide. If 'False', then
+        hardware-threading is disabled, and if 'True', then hardware-threading
+        is always enabled.
     oversubscribe : None | bool
-        Whether or not to tell MPI to use oversubscription. Defaults to 'None',
-        in which case it will use a heuristic for determing whether to use
-        it. If 'False', then oversubscription is never used, and if 'True',
-        then oversubscription is always used.
+        Specifies if MPI should use oversubscription. Defaults to 'None',
+        in which a heuristic will be used to decide. If 'False', then
+        oversubscription is disabled, and if 'True', then oversubscription is
+        always enabled.
 
     Attributes
     ----------
