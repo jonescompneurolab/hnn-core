@@ -447,7 +447,7 @@ class Network:
     def __repr__(self):
         class_name = self.__class__.__name__
         # Dynamically create the description based on the current cell types
-        descriptions = []
+        descriptions = list()
         for cell_name in self.cell_types:
             count = len(self.pos_dict.get(cell_name, []))
             descriptions.append(f"{count} {cell_name} cells")
