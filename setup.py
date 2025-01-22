@@ -79,7 +79,7 @@ if __name__ == "__main__":
         'opt': ['scikit-learn'],
         'parallel': ['joblib', 'psutil'],
         'test': ['pytest', 'pytest-cov', 'pytest-xdist', 'ruff'],
-        'docs': ['mne', 'nibabel', 'pooch', 'tdqm',
+        'docs': ['mne', 'myst-parser', 'nibabel', 'pooch', 'tdqm',
                  'sphinx', 'sphinx-gallery',
                  'sphinx_bootstrap_theme', 'sphinx-copybutton',
                  'pillow', 'numpydoc',
@@ -87,8 +87,7 @@ if __name__ == "__main__":
         'gui': ['ipywidgets>=8.0.0', 'ipykernel', 'ipympl', 'voila', ],
     }
     extras['dev'] = (extras['opt'] + extras['parallel'] + extras['test'] +
-                     extras['docs'] + extras['gui']
-                     )
+                     extras['docs'] + extras['gui'])
 
 
     setup(name=DISTNAME,
@@ -99,7 +98,7 @@ if __name__ == "__main__":
           url=URL,
           version=version,
           download_url=DOWNLOAD_URL,
-          long_description=open('README.rst').read(),
+          long_description=open('README.md').read(),
           classifiers=[
               'Intended Audience :: Science/Research',
               'Intended Audience :: Developers',
