@@ -7,7 +7,7 @@ import hnn_core
 from hnn_core import read_params
 from .network import Network
 from .params import _short_name
-from .cells_default import pyramidal_ca
+from .cells_default import pyramidal_ca, pyramidal_l5, pyramidal_l23, interneuron
 from .externals.mne import _validate_type
 
 
@@ -308,6 +308,155 @@ def calcium_model(params=None, add_drives_from_params=False,
 
     return net
 
+def new_calcium_model(params=None, add_drives_from_params=False,
+                  legacy_mode=False, mesh_shape=(10, 10)):
+
+
+    """"Initiate like old calcium model and then replace with new cells"""
+
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    if params is None:
+        params = read_params(params_fname)
+
+    net = Network(params, add_drives_from_params=add_drives_from_params,
+                  legacy_mode=legacy_mode, mesh_shape=mesh_shape)
+    
+
+    delay = net.delay
+
+    # source of synapse is always at soma
+
+    # layer2 Pyr -> layer2 Pyr
+    # layer5 Pyr -> layer5 Pyr
+    lamtha = 3.0
+    loc = 'proximal'
+    for target_cell in ['L2_pyramidal', 'L5_pyramidal']:
+        for receptor in ['nmda', 'ampa']:
+            key = f'gbar_{_short_name(target_cell)}_'\
+                  f'{_short_name(target_cell)}_{receptor}'
+            weight = net._params[key]
+            net.add_connection(
+                target_cell, target_cell, loc, receptor, weight,
+                delay, lamtha, allow_autapses=False)
+
+    # layer2 Basket -> layer2 Pyr
+    src_cell = 'L2_basket'
+    target_cell = 'L2_pyramidal'
+    lamtha = 50.
+    loc = 'soma'
+    for receptor in ['gabaa', 'gabab']:
+        key = f'gbar_L2Basket_L2Pyr_{receptor}'
+        weight = net._params[key]
+        net.add_connection(
+            src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    # layer5 Basket -> layer5 Pyr
+    src_cell = 'L5_basket'
+    target_cell = 'L5_pyramidal'
+    lamtha = 70.
+    loc = 'soma'
+    for receptor in ['gabaa', 'gabab']:
+        key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
+        weight = net._params[key]
+        net.add_connection(
+            src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    # layer2 Pyr -> layer5 Pyr
+    src_cell = 'L2_pyramidal'
+    lamtha = 3.
+    receptor = 'ampa'
+    for loc in ['proximal', 'distal']:
+        key = f'gbar_L2Pyr_{_short_name(target_cell)}'
+        weight = net._params[key]*2
+        net.add_connection(
+            src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    # layer2 Basket -> layer5 Pyr
+    src_cell = 'L2_basket'
+    lamtha = 50.
+    key = f'gbar_L2Basket_{_short_name(target_cell)}'
+    weight = net._params[key]
+    loc = 'distal'
+    receptor = 'gabaa'
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    # xx -> layer2 Basket
+    src_cell = 'L2_pyramidal'
+    target_cell = 'L2_basket'
+    lamtha = 3.
+    key = f'gbar_L2Pyr_{_short_name(target_cell)}'
+    weight = net._params[key]
+    loc = 'soma'
+    receptor = 'ampa'
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    src_cell = 'L2_basket'
+    lamtha = 20.
+    key = f'gbar_L2Basket_{_short_name(target_cell)}'
+    weight = net._params[key]
+    loc = 'soma'
+    receptor = 'gabaa'
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    # xx -> layer5 Basket
+    src_cell = 'L5_basket'
+    target_cell = 'L5_basket'
+    lamtha = 20.
+    loc = 'soma'
+    receptor = 'gabaa'
+    key = f'gbar_L5Basket_{_short_name(target_cell)}'
+    weight = net._params[key]
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha,
+        allow_autapses=False)
+
+    src_cell = 'L5_pyramidal'
+    lamtha = 3.
+    key = f'gbar_L5Pyr_{_short_name(target_cell)}'
+    weight = net._params[key]*1.5
+    loc = 'soma'
+    receptor = 'ampa'
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    src_cell = 'L2_pyramidal'
+    lamtha = 3.
+    key = f'gbar_L2Pyr_{_short_name(target_cell)}'
+    weight = net._params[key]*1.5
+    loc = 'soma'
+    receptor = 'ampa'
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+    
+    # Replace cells
+
+    # L5
+    cell_name = 'L5_pyramidal'
+    pos = net.cell_types[cell_name].pos
+    net.cell_types[cell_name] = pyramidal_l5(
+        cell_name=_short_name(cell_name), pos=pos)
+    
+    cell_name = 'L5_basket'
+    pos = net.cell_types[cell_name].pos
+    net.cell_types[cell_name] = interneuron(
+        cell_name=_short_name(cell_name), pos=pos)
+    
+    # L2/3
+    cell_name = 'L2_pyramidal'
+    pos = net.cell_types[cell_name].pos
+    net.cell_types[cell_name] = pyramidal_l23(
+        cell_name=_short_name(cell_name), pos=pos)
+    
+    cell_name = 'L2_basket'
+    pos = net.cell_types[cell_name].pos
+    net.cell_types[cell_name] = interneuron(
+        cell_name=_short_name(cell_name), pos=pos)
+    
+    return net
 
 def add_erp_drives_to_jones_model(net, tstart=0.0):
     """Add drives necessary for an event related potential (ERP)
