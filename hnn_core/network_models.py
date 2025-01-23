@@ -7,7 +7,7 @@ import hnn_core
 from hnn_core import read_params
 from .network import Network, _create_cell_coords
 from .params import _short_name
-from .cells_default import pyramidal_ca, pyramidal, basket
+from .cells_default import pyramidal_ca, pyramidal_l5, pyramidal_l23, interneuron
 from .externals.mne import _validate_type
 
 # ToDO -> direct _cell_L2Pyr calling
@@ -191,11 +191,11 @@ def jones_2009_model(
         net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # layer2 Pyr -> layer5 Pyr
-    src_cell = "L2_pyramidal"
-    lamtha = 3.0
-    receptor = "ampa"
-    for loc in ["proximal", "distal"]:
-        key = f"gbar_L2Pyr_{_short_name(target_cell)}"
+    src_cell = 'L2_pyramidal'
+    lamtha = 3.
+    receptor = 'ampa'
+    for loc in ['proximal', 'distal']:
+        key = f'gbar_L2Pyr_{_short_name(target_cell)}'
         weight = net._params[key]
         net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
@@ -386,16 +386,14 @@ def calcium_model(
     if params is None:
         params = read_params(params_fname)
 
-    net = jones_2009_model(
-        params, add_drives_from_params, legacy_mode, mesh_shape=mesh_shape
-    )
+    net = jones_2009_model(params, add_drives_from_params, legacy_mode,
+                           mesh_shape=mesh_shape)
 
     # Replace L5 pyramidal cell template with updated calcium
-    cell_name = "L5_pyramidal"
-    pos = net.cell_types[cell_name]["cell_object"].pos
-    net.cell_types[cell_name]["cell_object"] = pyramidal_ca(
-        cell_name=cell_name, pos=pos
-    )
+    cell_name = 'L5_pyramidal'
+    pos = net.cell_types[cell_name].pos
+    net.cell_types[cell_name] = pyramidal_ca(
+        cell_name=_short_name(cell_name), pos=pos)
 
     return net
 
