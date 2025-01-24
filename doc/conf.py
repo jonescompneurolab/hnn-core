@@ -14,11 +14,7 @@
 #
 import os
 import sys
-# sys.path.insert(0, os.path.abspath('.'))
-import sphinx_gallery
 from sphinx_gallery.sorting import ExampleTitleSortKey, ExplicitOrder
-
-import sphinx_bootstrap_theme
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -98,48 +94,68 @@ language = None
 # This pattern also affects html_static_path and html_extra_path .
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'gui/index.rst']
 
-# The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
-
-
 # -- Options for HTML output -------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
+html_theme = "pydata_sphinx_theme"
+
+# versions
 #
-html_theme = 'bootstrap'
+# TODO GH #969 Once we're ready to merge this into `master`, we need to switch
+# this to dev's version
+#
+# The actual, local version of `versions.json` that you should edit (if
+# necessary) is in `_static/versions.json`.
+json_versions_url = "https://jonescompneurolab.github.io/hnn-core/stable/_static/versions.json"
+switcher_version_match = "dev" if ".rc" in version else version
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
-# documentation.
-#
+# documentation:
+# https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html
 html_theme_options = {
-    'navbar_sidebarrel': False,
-    'navbar_links': [
-        ("Examples", "auto_examples/index"),
-        ("API", "api"),
-        ("Glossary", "glossary"),
-        ("What's new", "whats_new"),
-        ("GitHub", "https://github.com/jonescompneurolab/hnn-core", True)
+    "external_links": [
+        {
+            "url": "https://github.com/jonescompneurolab/hnn-core",
+            "name": "GitHub (Code)",
+        },
+        {
+            "url": "https://pypi.org/project/hnn-core/",
+            "name": "PyPI",
+        },
+        {
+            "url": "https://hnn.brown.edu/",
+            "name": "HNN Frontpage",
+        },
     ],
-    'bootswatch_theme': "yeti"
+    "header_links_before_dropdown": 7,
+    "navbar_align": "left",
+    "navbar_start": ["navbar-logo"],
+    "navbar_center": ["navbar-nav"],
+    "navbar_end": ["version-switcher"],
+    "pygments_dark_style": "monokai",
+    "switcher": {
+        "json_url": json_versions_url,
+        "version_match": switcher_version_match,
+    },
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+# so a file named "default.css" will overwrite the builtin "default.css". This
+# folder also holds versions.json.
+html_static_path = ["_static"]
+html_logo = "_static/hnn-medium.png"
 
-# Custom sidebar templates, must be a dictionary that maps document names
-# to template names.
-#
-# The default sidebars (for documents that don't match any pattern) are
-# defined by theme itself.  Builtin themes are using these templates by
-# default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
-# 'searchbox.html']``.
-#
-# html_sidebars = {}
-
+# The default sidebars (for documents that don't match any pattern) are defined
+# by theme itself.  Builtin themes are using these templates by default:
+# ``['localtoc.html', 'relations.html', 'sourcelink.html',
+# 'searchbox.html']``. Not that the following removes the "primary" sidebar (on
+# the left), but not the "secondary" # sidebar (on the right), for the PyData
+# theme. From
+# https://pydata-sphinx-theme.readthedocs.io/en/latest/user_guide/layout.html#remove-the-primary-sidebar-from-pages
+html_sidebars = {
+    "**": []
+}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
