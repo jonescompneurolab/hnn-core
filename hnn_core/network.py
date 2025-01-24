@@ -625,7 +625,7 @@ class Network:
         and conn_seed (n_trials > 1 in simulate_dipole(..., n_trials):
 
         - event_seed
-            Across trials, the random seed is incremented leading such that
+            Across trials, the random seed is incremented such that
             the exact spike times are different
         - conn_seed
             The random seed does not change across trials. This means for
