@@ -3,6 +3,7 @@
 ```{toctree}
 :hidden:
 
+Install <install>
 Examples <auto_examples/index>
 API <api>
 glossary
