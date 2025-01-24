@@ -61,8 +61,8 @@ typical contribution process is to
 
     You should see:
 
-        origin  https://github.com/<username>/hnn-core (fetch)
-        origin  https://github.com/<username>/hnn-core (push)
+        origin      https://github.com/<username>/hnn-core (fetch)
+        origin      https://github.com/<username>/hnn-core (push)
         upstream    https://github.com/jonescompneurolab/hnn-core (fetch)
         upstream    https://github.com/jonescompneurolab/hnn-core (push)
 
@@ -150,9 +150,8 @@ To run the tests simply type into your terminal:
 
 MPI tests are skipped if the `mpi4py` module is not installed. We highly
 encourage contributors to follow the
-`parallel backend guide <parallel>`{.interpreted-text role="doc"} to
-install `mpi4py` so that they can run the entire test suite locally on
-their computer.
+{doc}`parallel backend guide <parallel>` to install `mpi4py` so that
+they can run the entire test suite locally on their computer.
 
 ## Updating documentation
 
