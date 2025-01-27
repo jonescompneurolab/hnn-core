@@ -1180,6 +1180,8 @@ def test_rename_cell():
     for new_name in new_names:
         assert new_name in net.cell_types.keys()
         assert new_name in net.pos_dict.keys()
+        assert original_name not in net.cell_types.keys()
+        assert original_name not in net.pos_dict.keys()
     assert not net.connectivity
     # Tests for non-existent original_name
     original_name = 'original_name'
