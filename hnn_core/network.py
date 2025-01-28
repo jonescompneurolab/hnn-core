@@ -364,7 +364,6 @@ class Network:
     produce a network with no cell-to-cell connections. As such,
     connectivity information contained in ``params`` will be ignored.
     """
-
     def __init__(self, params, add_drives_from_params=False,
                  legacy_mode=False, mesh_shape=(10, 10)):
         # Save the parameters used to create the Network
@@ -448,12 +447,15 @@ class Network:
 
     def __repr__(self):
         class_name = self.__class__.__name__
-        s = ("%d x %d Pyramidal cells (L2, L5)"
-             % (self._N_pyr_x, self._N_pyr_y))
-        s += ("\n%d L2 basket cells\n%d L5 basket cells"
-              % (len(self.pos_dict['L2_basket']),
-                 len(self.pos_dict['L5_basket'])))
-        return '<%s | %s>' % (class_name, s)
+        # Dynamically create the description based on the current cell types
+        descriptions = list()
+        for cell_name in self.cell_types:
+            count = len(self.pos_dict.get(cell_name, []))
+            descriptions.append(f"{count} {cell_name} cells")
+
+        # Combine all descriptions into a single string
+        description_str = "\n".join(descriptions)
+        return f'<{class_name} | {description_str}>'
 
     def __eq__(self, other):
         if not isinstance(other, Network):
@@ -1196,11 +1198,45 @@ class Network:
         ll = self._n_gids
         self._n_gids += len(pos)
         self.gid_ranges[cell_name] = range(ll, self._n_gids)
-
         self.pos_dict[cell_name] = pos
         if cell_template is not None:
             self.cell_types.update({cell_name: cell_template})
             self._n_cells += len(pos)
+
+    def rename_cell(self, original_name, new_name):
+        """Renames cells in the network and clears connectivity so user can
+        set new connections.
+
+        Parameters
+        ----------
+        original_name: str
+            The original cell name in the network to be changed.
+        new_name: str
+            The desired new cell name in the network.
+        """
+        _validate_type(original_name, str, 'original_name')
+        _validate_type(new_name, str, 'new_name')
+        if original_name not in self.cell_types.keys():
+            # Raises error if the original name is not in cell_types
+            raise ValueError(f"'{original_name}' is not in cell_types!")
+        elif new_name in self.cell_types.keys():
+            # Raises error if the new name is already in cell_types
+            raise ValueError(f"'{new_name}' is already in cell_types!")
+        elif original_name in self.cell_types.keys():
+            # Update cell name in places where order doesn't matter
+            self.cell_types[new_name] = self.cell_types.pop(original_name)
+            self.pos_dict[new_name] = self.pos_dict.pop(original_name)
+
+            # Update cell name in gid_ranges: order matters for consistency!
+            for _ in range(len(self.gid_ranges)):
+                name, gid_range = self.gid_ranges.popitem(last=False)
+                if name == original_name:
+                    # Insert the new name with the value of the original name
+                    self.gid_ranges[new_name] = gid_range
+                else:
+                    # Insert the value as it is
+                    self.gid_ranges[name] = gid_range
+        self.clear_connectivity()
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""

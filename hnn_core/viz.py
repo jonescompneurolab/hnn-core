@@ -574,8 +574,7 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
 
 
 def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
-                       cell_types=None, colors=None,
-                       ):
+                       cell_types=None, colors=None):
     """Plot the aggregate spiking activity according to cell type.
 
     Parameters
