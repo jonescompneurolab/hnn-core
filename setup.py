@@ -79,12 +79,10 @@ if __name__ == "__main__":
         'opt': ['scikit-learn'],
         'parallel': ['joblib', 'psutil'],
         'test': ['pytest', 'pytest-cov', 'pytest-xdist', 'ruff'],
-        'docs': ['mne', 'myst-parser', 'nibabel', 'pooch', 'tdqm',
-                 'sphinx', 'sphinx-gallery',
-                 'sphinx_bootstrap_theme', 'sphinx-copybutton',
-                 'pillow', 'numpydoc',
-                 ],
-        'gui': ['ipywidgets>=8.0.0', 'ipykernel', 'ipympl', 'voila', ],
+        'docs': ['mne', 'myst-parser', 'nibabel', 'numpydoc', 'pillow',
+                 'pooch', 'pydata-sphinx-theme', 'sphinx', 'sphinx-gallery',
+                 'sphinx-copybutton', 'tdqm'],
+        'gui': ['ipywidgets>=8.0.0', 'ipykernel', 'ipympl', 'voila'],
     }
     extras['dev'] = (extras['opt'] + extras['parallel'] + extras['test'] +
                      extras['docs'] + extras['gui'])
