@@ -348,7 +348,7 @@ class HNNGUI:
 
         # Number of available cores
         [self.n_cores, _] = _determine_cores_hwthreading(
-            enable_hwthreading=False,
+            use_hwthreading_if_found=False,
             sensible_default_cores=True,
         )
 
@@ -2094,11 +2094,15 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
 
         print("start simulation")
         if backend_selection.value == "MPI":
+            # 'use_hwthreading_if_found' and 'sensible_default_cores' have
+            # already been set elsewhere, and do not need to be re-set here.
+            # Hardware-threading and oversubscription will always be disabled
+            # to prevent edge cases in the GUI.
             backend = MPIBackend(
                 n_procs=n_jobs.value,
                 mpi_cmd=mpi_cmd.value,
-                hwthreading=False,
-                oversubscribe=False,
+                override_hwthreading_option=False,
+                override_oversubscribe_option=False,
             )
         else:
             backend = JoblibBackend(n_jobs=n_jobs.value)

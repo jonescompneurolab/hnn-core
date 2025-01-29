@@ -572,10 +572,28 @@ class JoblibBackend(object):
 
 
 def _determine_cores_hwthreading(
-        enable_hwthreading: Union[None, bool] = True,
+        use_hwthreading_if_found: bool = True,
         sensible_default_cores: bool = False,
 ) -> [int, bool]:
-    """Return the number of available cores and if hardware-threading is used.
+    """Return the available core number and if hardware-threading is detected.
+
+    If the first argument 'use_hwthreading_if_found' is 'True', then the
+    function will attempt to detect if hardware-threading is present via
+    comparing the logical vs physical number of cores. In this case, one of the
+    two following outcomes happens:
+
+    Outcome 1. If hardware-threading is detected, the returned 'core_count'
+        will return the number of available cores assuming that each physical
+        core provides 2 threaded 'logical' cores. The returned
+        'hwthreading_present' will return 'True'.
+    Outcome 2. If hardware-threading is not detected, the returned 'core_count'
+        will return the number of available cores, and each available physical
+        core will only be counted once. The returned 'hwthreading_present' will
+        return 'False'.
+
+    If the first argument 'use_hwthreading_if_found' is 'False', then the
+    function always returns the same behavior as Outcome 2 above, regardless of
+    whether hardware-threading is detected or not.
 
     This is important for systems where the number of available cores is
     partitioned such as on HPC systems, but is also important for determining
@@ -587,21 +605,23 @@ def _determine_cores_hwthreading(
 
     Parameters
     ----------
-    enable_hwthreading : bool
-        Whether to detect support for hardware-threading and, if the feature is
-        detected, return the available number of 'logical' hardware-threaded
-        cores. Defaults to True. If 'False', or the feature is not detected,
-        return the available number of 'physical' cores (excluding
-        double-counting of hardware-threaded cores).
+    use_hwthreading_if_found : bool
+        Whether to detect support for hardware-threading. Defaults to
+        'True'. See above for description of behavior.
     sensible_default_cores : bool
-        Whether to decrease the number of cores returned in a reasonable
-        manner, such that it balances speed with the user experience (e.g.,
-        preventing the machine 'locking-up'). Defaults to 'False'.
+        Whether to decrease the number of cores returned in a "reasonable
+        manner", such that it balances speed with the user
+        experience. Specifically, this means that if the number of available
+        cores is greater than some threshold (default 12), the threshold number
+        of cores will be used instead of the total. If the number of cores is
+        greater than 2 but less than the threshold (default 12), then the
+        number of cores used will be subtracted by 1, so that there is a core
+        left unused for the sake of the OS. Defaults to 'False'.
 
     Returns
     -------
     core_count : int
-        Number of logical CPU cores available for use by a process.
+        Number of CPU cores available for use by a process.
     hwthreading_present : bool
         Whether or not hardware-threading is present on some or all of the
         logical CPU cores.
@@ -609,10 +629,6 @@ def _determine_cores_hwthreading(
     # Needs its own import checks since it may be called by the GUI before
     # MPIBackend()
     if _has_mpi4py() and _has_psutil():
-        if enable_hwthreading is None:
-            # This lets us pass the same arg to this function and MPIBackend()
-            # in case we want to use the default approaches.
-            enable_hwthreading = True
         import platform
         import psutil
         if platform.system() == "Darwin":
@@ -641,8 +657,8 @@ def _determine_cores_hwthreading(
             # By default, return logical core number and, if present,
             # hardware-threading. If the user informs us that they don't want
             # hardware-threading, return physical core number and no
-            # hwthreading flag.
-            if enable_hwthreading:
+            # hwthreading_present flag.
+            if use_hwthreading_if_found:
                 core_count = logical_core_count
                 hwthreading_present = hwthreading_detected
             else:
@@ -703,7 +719,7 @@ def _determine_cores_hwthreading(
 
             hwthreading_detected = logical_core_count != physical_core_count
 
-            if enable_hwthreading:
+            if use_hwthreading_if_found:
                 # If we want to use hardware-threading if it's detected, then
                 # in all three of the above cases, we can simply use the CPU
                 # affinity count for our number of cores, and pass the result
@@ -725,10 +741,10 @@ def _determine_cores_hwthreading(
                 hwthreading_present = False
 
         else:
-            # In Windows' case here, "all bets are off". We do not currently
-            # officially support MPIBackend() usage on Windows due to the
-            # difficulty of its install, and there are outstanding issues with
-            # trying to use hardware-threads in particular: see
+            # In Windows' and all other cases here, "all bets are off". We do
+            # not currently officially support MPIBackend() usage on Windows
+            # due to the difficulty of its install, and there are outstanding
+            # issues with trying to use hardware-threads in particular: see
             # https://github.com/jonescompneurolab/hnn-core/issues/589 .
             #
             # Therefore, we also do not support hardware-threading in this
@@ -773,16 +789,32 @@ class MPIBackend(object):
     mpi_cmd : str
         The name of the mpi launcher executable. Will use 'mpiexec' (openmpi)
         by default.
-    hwthreading : None | bool
-        Specifies if MPI should use hardware-threading. Defaults to 'None',
-        in which a heuristic will be used to decide. If 'False', then
-        hardware-threading is disabled, and if 'True', then hardware-threading
-        is always enabled.
-    oversubscribe : None | bool
-        Specifies if MPI should use oversubscription. Defaults to 'None',
-        in which a heuristic will be used to decide. If 'False', then
-        oversubscription is disabled, and if 'True', then oversubscription is
-        always enabled.
+    use_hwthreading_if_found : bool
+        Specifies whether the class should try to detect hardware-threading,
+        and, if it is found, then both use MPI's '--use-hwthread-cpus' option
+        and change the number of CPU cores used. Defaults to 'True'. Note that
+        this is passed to an option of the same name in
+        `_determine_cores_hwthreading`; see that function for more details.
+    sensible_default_cores : bool
+        Specifies whether to limit the number of CPU cores used based on a
+        "reasonable" heuristic. Defaults to 'False'. Note that this is passed
+        to an option of the same name in `_determine_cores_hwthreading`; see
+        that function for more details.
+    override_hwthreading_option : None | bool
+        Force use of MPI's '--use-hwthread-cpus' support if changed from its
+        default value of 'None'. By default, '--use-hwthread-cpus' is only
+        passed if the above argument 'use_hwthreading_if_found' is 'True' and
+        if hardware-threading is detected. If this argument is set to 'True',
+        then '--use-hwthread-cpus' will always be used, regardless of
+        hardware-threading detection. If 'False', then '--use-hwthread-cpus'
+        will never be used.
+    override_oversubscribe_option : None | bool
+        Force use of MPI's '--oversubscribe' support if changed from its
+        default value of 'None'. By default, '--oversubscribe' is only passed
+        if the user specifies a custom number of cores via 'n_procs' and if
+        that number exceeds the number of detected available cores. If this
+        argument is set to 'True', then '--oversubscribe' will always be
+        used. If 'False', then '--oversubscribe' will never be used.
 
     Attributes
     ----------
@@ -805,8 +837,10 @@ class MPIBackend(object):
         self,
         n_procs: Union[None, int] = None,
         mpi_cmd: str = "mpiexec",
-        hwthreading: Union[None, bool] = None,
-        oversubscribe: Union[None, bool] = None,
+        use_hwthreading_if_found: bool = True,
+        sensible_default_cores: bool = False,
+        override_hwthreading_option: Union[None, bool] = None,
+        override_oversubscribe_option: Union[None, bool] = None,
     ) -> None:
         self.expected_data_length = 0
         self.proc = None
@@ -817,28 +851,41 @@ class MPIBackend(object):
         # instantiated.
         [n_available_cores, hwthreading_available] = \
             _determine_cores_hwthreading(
-                enable_hwthreading=(False if (hwthreading is False) else True))
+                use_hwthreading_if_found=use_hwthreading_if_found,
+                sensible_default_cores=sensible_default_cores)
 
         self.n_procs = n_available_cores if (n_procs is None) else n_procs
 
-        # Heuristic: did user try to force running on more cores than
-        # available?
-        if (oversubscribe is None) and (self.n_procs > n_available_cores):
+        # Begin constructing the main command.
+        self.mpi_cmd = mpi_cmd
+
+        # Use the hwthread option if the user wants to force it. Otherwise, use
+        # hardware-threading if:
+        # 1. the user has not changed 'override_hwthreading_option',
+        # 2. if the user wants to use hardware-threading, and
+        # 3. hardware-threading is detected.
+        if ((override_hwthreading_option is True) or
+            (
+                (override_hwthreading_option is None) and
+                (use_hwthreading_if_found is True) and
+                hwthreading_available
+        )):
+            self.mpi_cmd += " --use-hwthread-cpus"
+
+        # Use the oversubscribe option if the user wants to force
+        # it. Otherwise, if the user has not changed
+        # 'override_oversubscribe_option', use our original heuristic: did user
+        # specify the number of cores (see `n_procs` logic above), AND did they
+        # specify more cores than are available?
+        if ((override_oversubscribe_option is True) or
+            (
+                (override_oversubscribe_option is None) and
+                (self.n_procs > n_available_cores)
+        )):
             warn(
                 "Number of requested MPI processes exceeds available "
                 "cores. Enabling MPI oversubscription automatically."
             )
-            oversubscribe = True
-
-        if (hwthreading is None) and hwthreading_available:
-            hwthreading = True
-
-        self.mpi_cmd = mpi_cmd
-
-        if hwthreading:
-            self.mpi_cmd += " --use-hwthread-cpus"
-
-        if oversubscribe:
             self.mpi_cmd += " --oversubscribe"
 
         self.mpi_cmd += " -np " + str(self.n_procs)
