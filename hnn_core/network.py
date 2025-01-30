@@ -64,7 +64,7 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
         list_coords = [pos for pos in it.product(xxrange, yyrange, [zdiff])]
         return list_coords
 
-    def _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff, inplane_distance, weight):
+    def _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
         xzero = np.arange(0, n_pyr_x, 3) * inplane_distance
         xone = np.arange(1, n_pyr_x, 3) * inplane_distance
         # split even and odd y vals
@@ -76,7 +76,7 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
         coords_sorted = sorted(coords, key=lambda pos: pos[1])
 
         # append the z value for position
-        list_coords = [(pos_xy[0], pos_xy[1], weight * zdiff)
+        list_coords = [(pos_xy[0], pos_xy[1], zdiff)
                        for pos_xy in coords_sorted]
 
         return list_coords
@@ -97,12 +97,10 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
     pos_dict = {
         'L5_pyramidal': _calc_pyramidal_coord(xxrange, yyrange, zdiff=0),
         'L2_pyramidal': _calc_pyramidal_coord(xxrange, yyrange, zdiff=zdiff),
-        'L5_basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
-                                        inplane_distance, weight=0.2
-                                        ),
-        'L2_basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
-                                        inplane_distance, weight=0.8
-                                        ),
+        'L5_basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff=0,
+                                        inplane_distance=inplane_distance),
+        'L2_basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff=zdiff,
+                                        inplane_distance=inplane_distance),
         'origin': _calc_origin(xxrange, yyrange, zdiff),
     }
 
