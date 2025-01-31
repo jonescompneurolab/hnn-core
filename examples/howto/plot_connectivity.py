@@ -36,7 +36,7 @@ net_erp = jones_2009_model(add_drives_from_params=True)
 # :func:`~hnn_core.viz.plot_cell_connectivity`. We can search for specific
 # connections using ``pick_connection`` which returns the indices
 # of ``net.connectivity`` that match the provided parameters.
-from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
+from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity, plot_drive_strength
 from hnn_core.network import pick_connection
 
 print(len(net_erp.connectivity))
@@ -128,6 +128,20 @@ plot_connectivity_matrix(net_sparse, conn_idx)
 # from the source cell.
 src_gid = net_sparse.connectivity[conn_idx]['src_gids'].copy().pop()
 plot_cell_connectivity(net_sparse, conn_idx, src_gid=src_gid)
+
+###############################################################################
+#We can plot the relative strength of each external drive across each cell types.
+weights_ampa = {'L2_pyramidal': 0.0008, 'L5_pyramidal': 0.0075,'L2_basket': 0.003,  'L5_basket': 0.004}
+synaptic_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0, 'L2_basket': 0.1, 'L5_basket': 1.0}
+rate_constant = {'L2_pyramidal': 140.0, 'L5_pyramidal': 40.0,'L2_basket': 100.0, 'L5_basket': 90.0}
+
+# To add an external drive 
+net_erp.add_poisson_drive(
+    'poisson', rate_constant=rate_constant, weights_ampa=weights_ampa,
+    location='proximal', synaptic_delays=synaptic_delays,
+    event_seed=1349)
+
+plot_drive_strength(net_erp)
 
 ###############################################################################
 # In the sparse network, there still appears to be some rhythmicity
