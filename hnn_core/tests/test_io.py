@@ -100,12 +100,6 @@ def calcium_network(params):
     return net
 
 
-def generate_test_files(jones_2009_network):
-    """ Generates files used in read-in tests """
-    net = jones_2009_network
-    net.write_configuration(Path('.', 'assets/jones2009_3x3_drives.json'))
-
-
 def test_eq(jones_2009_network, calcium_network):
     net1 = jones_2009_network
     net2 = calcium_network
