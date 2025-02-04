@@ -1,36 +1,63 @@
+
 <!DOCTYPE html>
 
-<html lang="en">
+
+<html lang="en" data-content_root="" >
+
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Contributions &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css?v=9afac83c" />
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'contributing';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.14.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/stable/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="What’s new?" href="whats_new.html" />
 
-<meta charset='utf-8'>
-<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
-<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
-<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
 <script>
@@ -42,131 +69,414 @@
 </script>
 
 
-  </head><body>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
-    <div class="container">
-      <div class="navbar-header">
-        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="index.html">
-          hnn-core</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.4</b></span>
-      </div>
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
 
-        <div class="collapse navbar-collapse nav-collapse">
-          <ul class="nav navbar-nav">
-            
-                <li><a href="auto_examples/index.html">Examples</a></li>
-                <li><a href="api.html">API</a></li>
-                <li><a href="glossary.html">Glossary</a></li>
-                <li><a href="whats_new.html">What's new</a></li>
-                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
-            
-            
-              <li class="dropdown globaltoc-container">
-  <a role="button"
-     id="dLabelGlobalToc"
-     data-toggle="dropdown"
-     data-target="#"
-     href="index.html">Site <b class="caret"></b></a>
-  <ul class="dropdown-menu globaltoc"
-      role="menu"
-      aria-labelledby="dLabelGlobalToc"><ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html#how-to">How to</a></li>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
-<li class="toctree-l1"><a class="reference internal" href="whats_new.html">What’s new?</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing</a></li>
-</ul>
-</ul>
-</li>
-              
-                <li class="dropdown">
-  <a role="button"
-     id="dLabelLocalToc"
-     data-toggle="dropdown"
-     data-target="#"
-     href="#">Page <b class="caret"></b></a>
-  <ul class="dropdown-menu localtoc"
-      role="menu"
-      aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">Contributions</a><ul>
-<li><a class="reference internal" href="#setting-up-your-local-development-environment">Setting up your local development environment</a><ul>
-<li><a class="reference internal" href="#configuring-git">Configuring git</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#making-your-first-pull-request">Making your first pull request</a></li>
-<li><a class="reference internal" href="#installing-editable-hnn-core">Installing editable hnn-core</a></li>
-<li><a class="reference internal" href="#running-tests">Running tests</a></li>
-<li><a class="reference internal" href="#updating-documentation">Updating documentation</a><ul>
-<li><a class="reference internal" href="#building-the-documentation">Building the documentation</a></li>
-<li><a class="reference internal" href="#writing-the-documentation">Writing the documentation</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#how-to-rebase">How to rebase</a></li>
-<li><a class="reference internal" href="#continuous-integration">Continuous Integration</a></li>
-</ul>
-</li>
-</ul>
-</ul>
-</li>
-              
-            
-            
-            
-            
-            
-              <li class="hidden-sm">
-<div id="sourcelink">
-  <a href="_sources/contributing.md.txt"
-     rel="nofollow">Source</a>
-</div></li>
-            
-          </ul>
-
-          
-<div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
-  <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
-    v0.4
-    <span class="caret"></span>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
   </button>
-  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/index.html">Development</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.2/index.html">v0.2</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.3/index.html">v0.3</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.4/index.html">v0.4</a></li>
-  </ul>
-</div>
 
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
 
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core  documentation - Home"/>
+    <script>document.write(`<img src="_static/hnn-medium.png" class="logo__image only-dark" alt="hnn-core  documentation - Home"/>`);</script>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="auto_examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api.html">
+                        API
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="glossary.html">
+                        Glossary
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="whats_new.html">
+                        What’s new?
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Contributing
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+                    GitHub (Code)
+                  </a>
+                </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+                    PyPI
+                  </a>
+                </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                <li class="nav-item">
+                  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
+                    HNN Frontpage
+                  </a>
+                </li>
+                
+                </ul>
+            </li>
             
-<form class="navbar-form navbar-right" action="search.html" method="get">
- <div class="form-group">
-  <input type="text" name="q" class="form-control" placeholder="Search" />
- </div>
-  <input type="hidden" name="check_keywords" value="yes" />
-  <input type="hidden" name="area" value="default" />
-</form>
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
           
 
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
         </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
     </div>
   </div>
-
-<div class="container">
-  <div class="row">
-    <div class="body col-md-12 content" role="main">
+`);
+</script></div>
       
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="auto_examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api.html">
+                        API
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="glossary.html">
+                        Glossary
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="whats_new.html">
+                        What’s new?
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="#">
+                        Contributing
+                      </a>
+                    </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+                    GitHub (Code)
+                  </a>
+                </li>
+                
+
+                <li class="nav-item">
+                  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+                    PyPI
+                  </a>
+                </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                <li class="nav-item">
+                  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
+                    HNN Frontpage
+                  </a>
+                </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Contributions</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
   <section id="contributions">
-<span id="contributing"></span><h1>Contributions<a class="headerlink" href="#contributions" title="Permalink to this heading">¶</a></h1>
+<span id="contributing"></span><h1>Contributions<a class="headerlink" href="#contributions" title="Permalink to this heading">#</a></h1>
 <p>Please read the contribution guide <strong>until the end</strong> before beginning
 contributions.</p>
 <p>Contributions are welcome in the form of pull requests.</p>
@@ -178,16 +488,16 @@ installation as shown below.</p>
 <p>If your contributions will make use of parallel backends for using more
 than one core, please see the additional installation steps in our <a class="reference internal" href="parallel.html"><span class="doc">parallel backend guide</span></a>.</p>
 <section id="setting-up-your-local-development-environment">
-<h2>Setting up your local development environment<a class="headerlink" href="#setting-up-your-local-development-environment" title="Permalink to this heading">¶</a></h2>
+<h2>Setting up your local development environment<a class="headerlink" href="#setting-up-your-local-development-environment" title="Permalink to this heading">#</a></h2>
 <section id="configuring-git">
-<h3>Configuring git<a class="headerlink" href="#configuring-git" title="Permalink to this heading">¶</a></h3>
+<h3>Configuring git<a class="headerlink" href="#configuring-git" title="Permalink to this heading">#</a></h3>
 <p>Instructions for how to configure git can be found on the git book
 <a class="reference external" href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration">configuration</a>
 page.</p>
 </section>
 </section>
 <section id="making-your-first-pull-request">
-<h2>Making your first pull request<a class="headerlink" href="#making-your-first-pull-request" title="Permalink to this heading">¶</a></h2>
+<h2>Making your first pull request<a class="headerlink" href="#making-your-first-pull-request" title="Permalink to this heading">#</a></h2>
 <p>Changes to hnn-core are typically made by “forking” the hnn-core
 repository, making changes to your fork (usually by “cloning” it to
 your personal computer, making the changes locally, and then “pushing”
@@ -196,7 +506,7 @@ the local changes up to your fork on GitHub), and finally creating a
 “upstream” version of the codebase.</p>
 <p>In general you’ll be working with three different copies of the
 hnn-core codebase: the official remote copy at
-<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core">https://github.com/jonescompneurolab/hnn-core</a> (usually called
+<a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core">jonescompneurolab/hnn-core</a> (usually called
 <code class="docutils literal notranslate"><span class="pre">upstream</span></code>), your remote fork of the upstream repository (similar URL,
 but with your username in place of <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>, and usually called
 <code class="docutils literal notranslate"><span class="pre">origin</span></code>), and the local copy of the codebase on your computer. The
@@ -263,7 +573,7 @@ for tips on informative commit messages.</p>
 </pre></div>
 </div>
 </li>
-<li><p>Go to <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/compare">https://github.com/jonescompneurolab/hnn-core/compare</a> to
+<li><p>Go to <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core/compare">jonescompneurolab/hnn-core</a> to
 open the pull request by selecting your feature branch. You should
 also see this link on the terminal when you make the push.</p></li>
 <li><p>After your pull request is reviewed, repeat steps 6-8 to update the
@@ -275,7 +585,7 @@ to the title.</p></li>
 guide on using git.</p>
 </section>
 <section id="installing-editable-hnn-core">
-<h2>Installing editable hnn-core<a class="headerlink" href="#installing-editable-hnn-core" title="Permalink to this heading">¶</a></h2>
+<h2>Installing editable hnn-core<a class="headerlink" href="#installing-editable-hnn-core" title="Permalink to this heading">#</a></h2>
 <p>For making changes to hnn-core, you will need to install an editable
 version of hnn-core. For that you need to have the git cloned <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>
 repository and use pip with the editable (<code class="docutils literal notranslate"><span class="pre">-e</span></code>) flag:</p>
@@ -298,7 +608,7 @@ them, they will need to be rebuilt using the command:</p>
 </div>
 </section>
 <section id="running-tests">
-<h2>Running tests<a class="headerlink" href="#running-tests" title="Permalink to this heading">¶</a></h2>
+<h2>Running tests<a class="headerlink" href="#running-tests" title="Permalink to this heading">#</a></h2>
 <p>Once you have the editable hnn-core, you should install the requirements
 for running the tests. Tests help ensure integrity of the package after
 your change has been made. We recommend developers to run tests locally
@@ -314,7 +624,7 @@ encourage contributors to follow the
 they can run the entire test suite locally on their computer.</p>
 </section>
 <section id="updating-documentation">
-<h2>Updating documentation<a class="headerlink" href="#updating-documentation" title="Permalink to this heading">¶</a></h2>
+<h2>Updating documentation<a class="headerlink" href="#updating-documentation" title="Permalink to this heading">#</a></h2>
 <p>When you update the documentation, it is recommended to build it locally
 to check whether the documentation renders correctly in HTML.</p>
 <p>Certain documentation files require explicit updates by the contributor
@@ -327,7 +637,7 @@ credited on the next release.</p></li>
 <p>Please update these documents once your pull request is ready to merge
 to avoid rebase conflicts with other pull requests.</p>
 <section id="building-the-documentation">
-<h3>Building the documentation<a class="headerlink" href="#building-the-documentation" title="Permalink to this heading">¶</a></h3>
+<h3>Building the documentation<a class="headerlink" href="#building-the-documentation" title="Permalink to this heading">#</a></h3>
 <p>The documentation can be built using sphinx.</p>
 <p>You can build the documentation locally using the command:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ cd doc/
@@ -345,7 +655,7 @@ examples, use the command:</p>
 </div>
 </section>
 <section id="writing-the-documentation">
-<h3>Writing the documentation<a class="headerlink" href="#writing-the-documentation" title="Permalink to this heading">¶</a></h3>
+<h3>Writing the documentation<a class="headerlink" href="#writing-the-documentation" title="Permalink to this heading">#</a></h3>
 <p>You are welcome to write documentation pages using
 <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#rst-primer">reStructuredText</a> (RST). However,
 you are also welcome to write using Sphinx’s support for <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/markdown.html#markdown">MyST
@@ -382,7 +692,7 @@ the readability of Markdown.</p>
 </li>
 </ul>
 </li>
-<li><p>For convenience, to quickly insert a link to any specific GitHub issue at <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core">https://github.com/jonescompneurolab/hnn-core</a>, like this: <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/705">#705</a>, then:</p>
+<li><p>For convenience, to quickly insert a link to any specific GitHub issue at <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core">jonescompneurolab/hnn-core</a>, like this: <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/705">#705</a>, then:</p>
 <ul>
 <li><p>In RST, write:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>:gh:`705`
@@ -400,7 +710,7 @@ the readability of Markdown.</p>
 </section>
 </section>
 <section id="how-to-rebase">
-<h2>How to rebase<a class="headerlink" href="#how-to-rebase" title="Permalink to this heading">¶</a></h2>
+<h2>How to rebase<a class="headerlink" href="#how-to-rebase" title="Permalink to this heading">#</a></h2>
 <p>Commits in hnn-core follow a linear history, therefore we use a
 “rebase” workflow instead of “merge” to resolve commits. See <a class="reference external" href="https://www.atlassian.com/git/tutorials/merging-vs-rebasing">this
 article</a>
@@ -443,7 +753,7 @@ easier to
 before rebasing.</p>
 </section>
 <section id="continuous-integration">
-<h2>Continuous Integration<a class="headerlink" href="#continuous-integration" title="Permalink to this heading">¶</a></h2>
+<h2>Continuous Integration<a class="headerlink" href="#continuous-integration" title="Permalink to this heading">#</a></h2>
 <p>The repository is tested via continuous integration with GitHub Actions
 and Circle. The automated tests run on GitHub Actions while the
 documentation is built on Circle.</p>
@@ -459,21 +769,120 @@ e.g., from “v2”-&gt;”v3”.</p>
 </section>
 
 
-    </div>
-      
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="whats_new.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">What’s new?</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-up-your-local-development-environment">Setting up your local development environment</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#configuring-git">Configuring git</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#making-your-first-pull-request">Making your first pull request</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-editable-hnn-core">Installing editable hnn-core</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-tests">Running tests</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#updating-documentation">Updating documentation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-documentation">Building the documentation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-the-documentation">Writing the documentation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-rebase">How to rebase</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#continuous-integration">Continuous Integration</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/contributing.md.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
   </div>
 </div>
-<footer class="footer">
-  <div class="container">
-    <p class="pull-right">
-      <a href="#">Back to top</a>
-      
-    </p>
-    <p>
-        &copy; Copyright 2024, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.1.2.<br/>
-    </p>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
   </div>
-</footer>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, HNN Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
   </body>
 </html>
