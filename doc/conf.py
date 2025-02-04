@@ -100,12 +100,9 @@ html_theme = "pydata_sphinx_theme"
 
 # versions
 #
-# TODO GH #969 Once we're ready to merge this into `master`, we need to switch
-# this to dev's version
-#
 # The actual, local version of `versions.json` that you should edit (if
 # necessary) is in `_static/versions.json`.
-json_versions_url = "https://jonescompneurolab.github.io/hnn-core/stable/_static/versions.json"
+json_versions_url = "https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json"
 switcher_version_match = "dev" if ".rc" in version else version
 
 # Theme options are theme-specific and customize the look and feel of a theme
