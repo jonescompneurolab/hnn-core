@@ -700,6 +700,26 @@ def test_gui_visualization(setup_gui):
             assert any(['_cbar-ax-' in attr
                         for attr in dir(gui.viz_manager.figs[figid])]) is False
             assert len(gui.viz_manager.figs[figid].axes) == 1
+            assert not gui.viz_manager.figs[figid].axes[0].has_data()
+
+            # Test that frequency inversion works
+            # First, test no inversion
+            gui._simulate_viz_action("edit_figure", figname, axname, 'default',
+                                     'spectrogram', {
+                                         'min_spectral_frequency': 10,
+                                         'max_spectral_frequency': 100,
+                                     }, 'plot')
+            assert gui.viz_manager.figs[figid].axes[0].has_data()
+            gui._simulate_viz_action("edit_figure", figname, axname, 'default',
+                                     'spectrogram', {}, 'clear')
+            assert not gui.viz_manager.figs[figid].axes[0].has_data()
+            # Next, test inversion
+            gui._simulate_viz_action("edit_figure", figname, axname, 'default',
+                                     'spectrogram', {
+                                         'min_spectral_frequency': 100,
+                                         'max_spectral_frequency': 10,
+                                     }, 'plot')
+            assert gui.viz_manager.figs[figid].axes[0].has_data()
 
         else:
             # Check if the correct number of axes are present
