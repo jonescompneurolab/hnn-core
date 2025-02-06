@@ -300,9 +300,8 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
         if len(dpls_copied) > 0:
             min_f = plot_config['min_spectral_frequency']
             max_f = plot_config['max_spectral_frequency']
-            if max_f > min_f:
-                step_f = 1
-            elif min_f > max_f:
+            step_f = 1.0
+            if min_f > max_f:
                 step_f = -1
             freqs = np.arange(min_f, max_f, step_f)
             n_cycles = freqs / 2.
