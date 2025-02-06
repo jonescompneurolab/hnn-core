@@ -796,10 +796,16 @@ class MPIBackend(object):
         this is passed to an option of the same name in
         `_determine_cores_hwthreading`; see that function for more details.
     sensible_default_cores : bool
-        Specifies whether to limit the number of CPU cores used based on a
-        "reasonable" heuristic. Defaults to 'False'. Note that this is passed
-        to an option of the same name in `_determine_cores_hwthreading`; see
-        that function for more details.
+        Whether to decrease the number of cores returned in a "reasonable
+        manner", such that it balances speed with the user
+        experience. Specifically, this means that if the number of available
+        cores is greater than some threshold (default 12), the threshold number
+        of cores will be used instead of the total. If the number of cores is
+        greater than 2 but less than the threshold (default 12), then the
+        number of cores used will be subtracted by 1, so that there is a core
+        left unused for the sake of the OS. Defaults to 'False'. Note that this
+        is passed to an option of the same name in
+        `_determine_cores_hwthreading`
     override_hwthreading_option : None | bool
         Force use of MPI's '--use-hwthread-cpus' support if changed from its
         default value of 'None'. By default, '--use-hwthread-cpus' is only
@@ -849,7 +855,7 @@ class MPIBackend(object):
         # Check of psutil and mpi4py import has been moved into this function,
         # since this function is called by GUI before MPIBackend()
         # instantiated.
-        [n_available_cores, hwthreading_available] = \
+        n_available_cores, hwthreading_available = \
             _determine_cores_hwthreading(
                 use_hwthreading_if_found=use_hwthreading_if_found,
                 sensible_default_cores=sensible_default_cores)
