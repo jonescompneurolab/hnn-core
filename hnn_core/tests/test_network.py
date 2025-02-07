@@ -1169,6 +1169,16 @@ class TestPickConnection:
 def test_rename_cell(base_network):
     """Tests renaming cell function"""
     net1, params = base_network
+
+    # Add MORE arbitrary drives to force spiking
+    net1.add_evoked_drive(name='evdist2', mu=5.0, sigma=1.0,
+                         numspikes=1, location='distal',
+                         weights_ampa={'L5_pyramidal': 0.1})
+    net1.add_evoked_drive(name='evprox2', mu=5.0, sigma=1.0,
+                         numspikes=1, location='proximal',
+                         weights_ampa={'L5_basket': 0.1,
+                                       'L5_pyramidal': 0.1})
+
     #
     # Make a new network, rename all the cell type names, then test it
     #
