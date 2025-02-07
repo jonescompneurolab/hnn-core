@@ -291,7 +291,7 @@ class CellResponse(object):
         return spike_rates
 
     def plot_spikes_raster(self, trial_idx=None, ax=None, show=True,
-                           colors=None):
+                           cell_types=None, colors=None):
         """Plot the aggregate spiking activity according to cell type.
 
         Parameters
@@ -312,7 +312,7 @@ class CellResponse(object):
         """
         return plot_spikes_raster(
             cell_response=self, trial_idx=trial_idx, ax=ax, show=show,
-            colors=colors)
+            cell_types=cell_types, colors=colors)
 
     def plot_spikes_hist(self, trial_idx=None, ax=None, spike_types=None,
                          color=None, invert_spike_types=None, show=True,
