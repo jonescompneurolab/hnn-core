@@ -435,7 +435,7 @@ def dict_to_network(net_data,
         start = net_data['gid_ranges'][key]['start']
         stop = net_data['gid_ranges'][key]['stop']
         gid_ranges_data[key] = range(start, stop)
-    net.gid_ranges = gid_ranges_data
+    net.gid_ranges = OrderedDict(gid_ranges_data)
     # Set pos_dict
     net.pos_dict = _read_pos_dict(net_data['pos_dict'])
     # Set cell_response
