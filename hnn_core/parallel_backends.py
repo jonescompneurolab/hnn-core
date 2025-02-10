@@ -573,7 +573,7 @@ class JoblibBackend(object):
 
 def _determine_cores_hwthreading(
         use_hwthreading_if_found: bool = True,
-        sensible_default_cores: bool = False,
+        sensible_default_cores: bool = True,
 ) -> [int, bool]:
     """Return the available core number and if hardware-threading is detected.
 
@@ -616,7 +616,7 @@ def _determine_cores_hwthreading(
         of cores will be used instead of the total. If the number of cores is
         greater than 2 but less than the threshold (default 12), then the
         number of cores used will be subtracted by 1, so that there is a core
-        left unused for the sake of the OS. Defaults to 'False'.
+        left unused for the sake of the OS. Defaults to 'True'.
 
     Returns
     -------
@@ -803,7 +803,7 @@ class MPIBackend(object):
         of cores will be used instead of the total. If the number of cores is
         greater than 2 but less than the threshold (default 12), then the
         number of cores used will be subtracted by 1, so that there is a core
-        left unused for the sake of the OS. Defaults to 'False'. Note that this
+        left unused for the sake of the OS. Defaults to 'True'. Note that this
         is passed to an option of the same name in
         `_determine_cores_hwthreading`
     override_hwthreading_option : None | bool
@@ -844,7 +844,7 @@ class MPIBackend(object):
         n_procs: Union[None, int] = None,
         mpi_cmd: str = "mpiexec",
         use_hwthreading_if_found: bool = True,
-        sensible_default_cores: bool = False,
+        sensible_default_cores: bool = True,
         override_hwthreading_option: Union[None, bool] = None,
         override_oversubscribe_option: Union[None, bool] = None,
     ) -> None:
