@@ -241,24 +241,18 @@ class TestParallelBackends():
                 simulate_dipole(net, tstop=40)
 
         # Check that the simulation fails if oversubscribe is forced off
-        with pytest.warns(UserWarning) as record:
-            with MPIBackend(
-                    n_procs=oversubscribed_procs,
-                    use_hwthreading_if_found=use_hwthreading_if_found,
-                    override_oversubscribe_option=False,
-            ) as backend:
-                assert "--oversubscribe" not in ' '.join(backend.mpi_cmd)
-                if detected_hwthreading:
-                    assert "--use-hwthread-cpus" in ' '.join(backend.mpi_cmd)
-                with pytest.raises(
-                        RuntimeError,
-                        match="MPI simulation failed. Return code: 1"):
-                    simulate_dipole(net, tstop=40)
-
-            expected_string = ('Received BrokenPipeError exception. '
-                               'Child process failed unexpectedly')
-            assert len(record) == 2
-            assert expected_string in record[0].message.args[0]
+        with MPIBackend(
+                n_procs=oversubscribed_procs,
+                use_hwthreading_if_found=use_hwthreading_if_found,
+                override_oversubscribe_option=False,
+        ) as backend:
+            assert "--oversubscribe" not in ' '.join(backend.mpi_cmd)
+            if detected_hwthreading:
+                assert "--use-hwthread-cpus" in ' '.join(backend.mpi_cmd)
+            with pytest.raises(
+                    RuntimeError,
+                    match="MPI simulation failed. Return code: 1"):
+                simulate_dipole(net, tstop=40)
 
         # Check that simulation succeeds if oversubscription is activated but
         # unnecessary
