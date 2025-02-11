@@ -1,6 +1,7 @@
 import os.path as op
 from os import environ
 import io
+import itertools
 from contextlib import redirect_stdout
 from threading import Thread, Event
 from time import sleep
@@ -185,8 +186,7 @@ class TestParallelBackends():
     @requires_mpi4py
     @requires_psutil
     @pytest.mark.parametrize("use_hwthreading_if_found", [True, False])
-    def test_run_mpibackend_oversubscribed(self, run_hnn_core_fixture,
-                                           use_hwthreading_if_found):
+    def test_run_mpibackend_oversubscribed(self, use_hwthreading_if_found):
         """Test running MPIBackend with oversubscribed number of procs"""
         hnn_core_root = op.dirname(hnn_core.__file__)
         params_fname = op.join(hnn_core_root, 'param', 'default.json')
@@ -224,62 +224,121 @@ class TestParallelBackends():
         net = jones_2009_model(params, add_drives_from_params=True,
                                mesh_shape=(n_grid_1d, n_grid_1d))
 
-        # Check that oversubscription turns on if needed, and provides a
-        # warning
+        # Case 1 (default): Check that oversubscription turns on if needed, and
+        # provides a warning
+        override_oversubscribe_option = None
         with pytest.warns(UserWarning,
                           match=("Number of requested MPI processes exceeds "
                                  "available cores. Enabling MPI "
                                  "oversubscription automatically.")):
             with MPIBackend(
                     n_procs=oversubscribed_procs,
-                    use_hwthreading_if_found=use_hwthreading_if_found
+                    use_hwthreading_if_found=use_hwthreading_if_found,
+                    override_oversubscribe_option=override_oversubscribe_option,
             ) as backend:
                 assert backend.n_procs == oversubscribed_procs
                 assert "--oversubscribe" in ' '.join(backend.mpi_cmd)
-                if detected_hwthreading:
-                    assert "--use-hwthread-cpus" in ' '.join(backend.mpi_cmd)
                 simulate_dipole(net, tstop=40)
 
-        # Check that the simulation fails if oversubscribe is forced off
+        # Case 2: Check that the simulation runs, but with no warning if
+        # oversubscription is forced on
+        override_oversubscribe_option = True
         with MPIBackend(
                 n_procs=oversubscribed_procs,
                 use_hwthreading_if_found=use_hwthreading_if_found,
-                override_oversubscribe_option=False,
+                override_oversubscribe_option=override_oversubscribe_option,
+        ) as backend:
+            assert "--oversubscribe" in ' '.join(backend.mpi_cmd)
+            simulate_dipole(net, tstop=40)
+
+        # Case 3: Check that the simulation fails if oversubscribe is forced
+        # off
+        override_oversubscribe_option = False
+        with MPIBackend(
+                n_procs=oversubscribed_procs,
+                use_hwthreading_if_found=use_hwthreading_if_found,
+                override_oversubscribe_option=override_oversubscribe_option,
         ) as backend:
             assert "--oversubscribe" not in ' '.join(backend.mpi_cmd)
-            if detected_hwthreading:
-                assert "--use-hwthread-cpus" in ' '.join(backend.mpi_cmd)
             with pytest.raises(
                     RuntimeError,
                     match="MPI simulation failed. Return code: 1"):
                 simulate_dipole(net, tstop=40)
 
-        # Check that simulation succeeds if oversubscription is activated but
-        # unnecessary
-        with MPIBackend(
-                n_procs=2,
+    @requires_mpi4py
+    @requires_psutil
+    @pytest.mark.parametrize("use_hwthreading_if_found," \
+                             "sensible_default_cores," \
+                             "override_oversubscribe_option",
+                             [x for x in itertools.product(
+                                 [True, False],
+                                 [True, False],
+                                 [None, True, False])])
+    def test_run_mpibackend_hwthreading(self,
+                                        use_hwthreading_if_found,
+                                        sensible_default_cores,
+                                        override_oversubscribe_option,
+                                        ):
+        """Test running MPIBackend with oversubscribed number of procs"""
+        hnn_core_root = op.dirname(hnn_core.__file__)
+        params_fname = op.join(hnn_core_root, 'param', 'default.json')
+        params = read_params(params_fname)
+        params.update({'t_evprox_1': 5,
+                       't_evdist_1': 10,
+                       't_evprox_2': 20,
+                       'N_trials': 2})
+        net = jones_2009_model(params, add_drives_from_params=True,
+                               mesh_shape=(3, 3))
+
+        n_procs = 2
+        # Test that the network runs at all
+        with MPIBackend(n_procs=n_procs) as backend:
+            simulate_dipole(net, tstop=40)
+
+        [_, detected_hwthreading] = \
+            _determine_cores_hwthreading(
                 use_hwthreading_if_found=use_hwthreading_if_found,
-                override_oversubscribe_option=True) as backend:
-            assert "--oversubscribe" in ' '.join(backend.mpi_cmd)
+                sensible_default_cores=sensible_default_cores,
+            )
+
+        # Case 1 (default): Check that hwthreading turns on if needed
+        override_hwthreading_option = None
+        with MPIBackend(
+                n_procs=n_procs,
+                use_hwthreading_if_found=use_hwthreading_if_found,
+                sensible_default_cores=sensible_default_cores,
+                override_oversubscribe_option=override_oversubscribe_option,
+                override_hwthreading_option=override_hwthreading_option,
+        ) as backend:
             if detected_hwthreading:
                 assert "--use-hwthread-cpus" in ' '.join(backend.mpi_cmd)
             simulate_dipole(net, tstop=40)
 
-        # Check that the hwthreading override works, regardless of if its
-        # detection is used or not
+        # Case 2: Check that hwthreading turns on if forced. Note that the
+        # simulation should NOT be run in this case, since the underlying
+        # hardware will NOT necessarily have hardware-threading available.
+        override_hwthreading_option = True
         with MPIBackend(
-                n_procs=2,
+                n_procs=n_procs,
                 use_hwthreading_if_found=use_hwthreading_if_found,
-                override_hwthreading_option=True) as backend:
+                sensible_default_cores=sensible_default_cores,
+                override_oversubscribe_option=override_oversubscribe_option,
+                override_hwthreading_option=override_hwthreading_option,
+        ) as backend:
             assert "--use-hwthread-cpus" in ' '.join(backend.mpi_cmd)
-            simulate_dipole(net, tstop=40)
 
+        # Case 3: Check that hwthreading turns off if forced off.
+        override_hwthreading_option = False
         with MPIBackend(
-                n_procs=2,
+                n_procs=n_procs,
                 use_hwthreading_if_found=use_hwthreading_if_found,
-                override_hwthreading_option=False) as backend:
+                sensible_default_cores=sensible_default_cores,
+                override_oversubscribe_option=override_oversubscribe_option,
+                override_hwthreading_option=override_hwthreading_option,
+        ) as backend:
             assert "--use-hwthread-cpus" not in ' '.join(backend.mpi_cmd)
             simulate_dipole(net, tstop=40)
+
 
     @pytest.mark.parametrize("backend", ['mpi', 'joblib'])
     def test_compare_hnn_core(self, run_hnn_core_fixture, backend, n_jobs=1):

@@ -893,6 +893,20 @@ class MPIBackend(object):
                 "cores. Enabling MPI oversubscription automatically."
             )
             self.mpi_cmd += " --oversubscribe"
+        elif (
+                (override_oversubscribe_option is False) and
+                (self.n_procs > n_available_cores)
+        ):
+            warn(
+                "Number of requested MPI processes exceeds available "
+                "cores. However, you have forced off MPI oversubscription. The"
+                "MPI simulation will almost certainly fail. If you see this"
+                "message, you should either decrease the number of 'n_procs'"
+                "used or re-enable oversubscription, unless you know what you"
+                "are doing and have made alternative changes. "
+            )
+            pass
+
 
         self.mpi_cmd += " -np " + str(self.n_procs)
 
