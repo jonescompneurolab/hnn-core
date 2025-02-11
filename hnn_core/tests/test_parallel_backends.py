@@ -240,8 +240,11 @@ class TestParallelBackends():
                 assert "--oversubscribe" in ' '.join(backend.mpi_cmd)
                 simulate_dipole(net, tstop=40)
 
-        # Case 2: Check that the simulation runs, but with no warning if
-        # oversubscription is forced on
+        # Case 2: Check that no warning, but option passed if oversubscription
+        # is forced on. No simulation since MacOS CI runners randomly (but not
+        # always) fail to run in the following case, even though the same
+        # simulation succeeds in Case 1 above. This is probably due to MPI
+        # instability with the MacOS CI runners (see #992 for an example).
         override_oversubscribe_option = True
         with MPIBackend(
                 n_procs=oversubscribed_procs,
@@ -249,7 +252,6 @@ class TestParallelBackends():
                 override_oversubscribe_option=override_oversubscribe_option,
         ) as backend:
             assert "--oversubscribe" in ' '.join(backend.mpi_cmd)
-            simulate_dipole(net, tstop=40)
 
         # Case 3: Check that the simulation fails if oversubscribe is forced
         # off
