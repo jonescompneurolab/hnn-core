@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_howto_optimize_rhythmic.py>`
-        to download the full example code or to run this example in your browser via Binder
+        to download the full example code. or to run this example in your browser via Binder
 
 .. rst-class:: sphx-glr-example-title
 
@@ -200,6 +200,10 @@ convergence plot.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: optimize_rhythmic.py <optimize_rhythmic.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: optimize_rhythmic.zip <optimize_rhythmic.zip>`
 
 
 .. only:: html

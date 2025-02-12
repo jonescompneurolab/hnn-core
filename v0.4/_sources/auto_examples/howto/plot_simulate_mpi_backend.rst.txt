@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_howto_plot_simulate_mpi_backend.py>`
-        to download the full example code or to run this example in your browser via Binder
+        to download the full example code. or to run this example in your browser via Binder
 
 .. rst-class:: sphx-glr-example-title
 
@@ -118,7 +118,7 @@ start the simulation across the number of processors (cores) specified by
 
 
 .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_simulate_mpi_backend_001.png
-   :alt: Aggregate (L2 + L5)
+   :alt: Aggregate (L2/3 + L5)
    :srcset: /auto_examples/howto/images/sphx_glr_plot_simulate_mpi_backend_001.png
    :class: sphx-glr-single-img
 
@@ -127,11 +127,15 @@ start the simulation across the number of processors (cores) specified by
 
  .. code-block:: none
 
-    /home/ntolley/jones_lab/hnn-core/hnn_core/parallel_backends.py:632: UserWarning: mpi4py not installed. Will run on single processor
-      warn(f'{packages} not installed. Will run on single processor')
-    MPIBackend is set to use 1 core: transferring the simulation to JoblibBackend....
-    Joblib will run 1 trial(s) in parallel by distributing trials over 1 jobs.
+    MPI will run 1 trial(s) sequentially by distributing network neurons over 2 processes.
+    /opt/anaconda3/envs/hc12/bin/nrniv:10: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
+      from pkg_resources import working_set
+    /opt/anaconda3/envs/hc12/bin/nrniv:10: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
+      from pkg_resources import working_set
+    numprocs=2
+    Loading custom mechanism files from /Users/austinsoplata/rep/brn/hnn-core/hnn_core/mod/arm64/.libs/libnrnmech.so
     Building the NEURON model
+    Loading custom mechanism files from /Users/austinsoplata/rep/brn/hnn-core/hnn_core/mod/arm64/.libs/libnrnmech.so
     [Done]
     Trial 1: 0.03 ms...
     Trial 1: 10.0 ms...
@@ -172,7 +176,7 @@ start the simulation across the number of processors (cores) specified by
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (2 minutes 55.762 seconds)
+   **Total running time of the script:** (0 minutes 9.573 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_simulate_mpi_backend.py:
@@ -195,6 +199,10 @@ start the simulation across the number of processors (cores) specified by
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_simulate_mpi_backend.py <plot_simulate_mpi_backend.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_simulate_mpi_backend.zip <plot_simulate_mpi_backend.zip>`
 
 
 .. only:: html

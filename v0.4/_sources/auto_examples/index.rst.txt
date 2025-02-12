@@ -7,6 +7,9 @@
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 
@@ -36,10 +39,11 @@ help users get started.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a threshold level tactile evoked response, as detaile...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.">
 
 .. only:: html
 
@@ -56,7 +60,7 @@ help users get started.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate alpha and beta frequency activity in the alpha/beta c...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate alpha and beta frequency activity in the alpha/beta complex of the SI mu-rhythm [1]_, as detailed in the HNN GUI alpha and beta tutorial, using HNN-Core.">
 
 .. only:: html
 
@@ -73,7 +77,7 @@ help users get started.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate gamma rhythms via the well established pyramidal-inte...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate gamma rhythms via the well established pyramidal-interneuron-gamma mechanisms [1]_, as detailed in the HNN GUI gamma tutorial, using HNN-Core.">
 
 .. only:: html
 
@@ -90,7 +94,7 @@ help users get started.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to calculate an inverse solution of the median nerve evoked respo...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to calculate an inverse solution of the median nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset, and then simulate a biophysical model network that reproduces the observed dynamics. Note that we do not expound on how we came up with the sequence of evoked drives used in this example, rather, we only demonstrate its implementation. For those who want more background on the HNN model and the process used to articulate the proximal and distal drives needed to simulate evoked responses, see the `HNN ERP tutorial`_. The sequence of evoked drives presented here is not part of a current publication but is motivated by prior studies [1]_, [2]_.">
 
 .. only:: html
 
@@ -107,7 +111,7 @@ help users get started.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how event related potentials (ERP) are modulated by prestimulus beta ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how event related potentials (ERP) are modulated by prestimulus beta events. Specifically, this example reproduces Figure 5 from Law et al. 2021 [1]_. To be consistent with the publication, the default network connectivity is altered. These modifications demonstrate a potential mechanism by which transient beta activity in the neocortex can suppress the perceptibility of sensory input. This suppression depends on the timing of the beta event, and the incoming sensory information.">
 
 .. only:: html
 
@@ -121,6 +125,8 @@ help users get started.
       <div class="sphx-glr-thumbnail-title">05. Simulate beta modulated ERP</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 
@@ -138,6 +144,7 @@ tasks.
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -158,7 +165,7 @@ tasks.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The main output of HNN simulations is the &#x27;dipole&#x27; waveform, i.e., the net intracellular curren...">
+    <div class="sphx-glr-thumbcontainer" tooltip="The main output of HNN simulations is the &#x27;dipole&#x27; waveform, i.e., the net intracellular current flowing in pyramidal cell apical dendrites. At the large distances between cells and M/EEG sensors, this &#x27;primary&#x27; current is the main contributor to the measured fields. Close to the cells, the local field potential (LFP) is the result of intracellular current leaking into the extracellular medium through active and passive membrane channels. Under some simplifying assumptions, we may approximate the LFP at virtual electrodes placed in and around the HNN network model.">
 
 .. only:: html
 
@@ -209,7 +216,7 @@ tasks.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to optimize the parameters of the model simulation to match an ex...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to optimize the parameters of the model simulation to match an experimental dipole waveform.">
 
 .. only:: html
 
@@ -243,7 +250,7 @@ tasks.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to do batch simulations in HNN-core, allowing users to efficiently run m...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to do batch simulations in HNN-core, allowing users to efficiently run multiple simulations with different parameters for comprehensive analysis.">
 
 .. only:: html
 
@@ -260,7 +267,7 @@ tasks.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to optimize the power spectral density (PSD) of a current dipole ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to optimize the power spectral density (PSD) of a current dipole signal with significant alpha and beta spectral components.">
 
 .. only:: html
 
@@ -274,6 +281,8 @@ tasks.
       <div class="sphx-glr-thumbnail-title">08. Optimize simulated rhythmic responses</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 

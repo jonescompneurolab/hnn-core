@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_workflows_plot_simulate_beta.py>`
-        to download the full example code or to run this example in your browser via Binder
+        to download the full example code. or to run this example in your browser via Binder
 
 .. rst-class:: sphx-glr-example-title
 
@@ -509,7 +509,7 @@ is an asymmetric beta event with a long positive tail.
 
 
 .. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_beta_001.png
-   :alt: Beta Event Generation, Aggregate (L2 + L5), Spike Raster
+   :alt: Beta Event Generation, Aggregate (L2/3 + L5), Spike Raster
    :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_beta_001.png
    :class: sphx-glr-single-img
 
@@ -623,7 +623,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (13 minutes 4.507 seconds)
+   **Total running time of the script:** (1 minutes 0.727 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_beta.py:
@@ -646,6 +646,10 @@ References
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_simulate_beta.py <plot_simulate_beta.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_simulate_beta.zip <plot_simulate_beta.zip>`
 
 
 .. only:: html

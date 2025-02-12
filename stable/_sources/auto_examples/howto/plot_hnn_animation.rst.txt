@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_howto_plot_hnn_animation.py>`
-        to download the full example code or to run this example in your browser via Binder
+        to download the full example code. or to run this example in your browser via Binder
 
 .. rst-class:: sphx-glr-example-title
 
@@ -219,14 +219,14 @@ can adjust the xyz limits of the plot to better visualize the network.
  .. code-block:: none
 
 
-    <matplotlib.animation.FuncAnimation object at 0x7f44f87221d0>
+    <matplotlib.animation.FuncAnimation object at 0x14500d6a0>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 46.583 seconds)
+   **Total running time of the script:** (0 minutes 39.034 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_hnn_animation.py:
@@ -249,6 +249,10 @@ can adjust the xyz limits of the plot to better visualize the network.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_hnn_animation.py <plot_hnn_animation.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_hnn_animation.zip <plot_hnn_animation.zip>`
 
 
 .. only:: html

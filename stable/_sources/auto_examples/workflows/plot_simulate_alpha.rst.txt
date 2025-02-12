@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_workflows_plot_simulate_alpha.py>`
-        to download the full example code or to run this example in your browser via Binder
+        to download the full example code. or to run this example in your browser via Binder
 
 .. rst-class:: sphx-glr-example-title
 
@@ -147,7 +147,7 @@ time with unique randomization. The drive is only connected to the
     Trial 1: 290.0 ms...
     Trial 1: 300.0 ms...
 
-    <hnn_core.dipole.Dipole object at 0x7f44f84928c0>
+    <hnn_core.dipole.Dipole object at 0x140b3dbb0>
 
 
 
@@ -187,7 +187,7 @@ indeed 10 Hz activity by plotting the power spectral density (PSD).
 
 
 .. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_alpha_001.png
-   :alt: Aggregate (L2 + L5)
+   :alt: Aggregate (L2/3 + L5)
    :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_alpha_001.png
    :class: sphx-glr-single-img
 
@@ -196,7 +196,7 @@ indeed 10 Hz activity by plotting the power spectral density (PSD).
 
  .. code-block:: none
 
-    /home/ntolley/jones_lab/hnn-core/examples/workflows/plot_simulate_alpha.py:83: UserWarning: The figure layout has changed to tight
+    /Users/austinsoplata/rep/brn/hnn-core/examples/workflows/plot_simulate_alpha.py:83: UserWarning: The figure layout has changed to tight
       plt.tight_layout()
 
 
@@ -300,7 +300,7 @@ smaller absolute values in the plots.
 
 
 .. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_alpha_002.png
-   :alt: Aggregate (L2 + L5)
+   :alt: Aggregate (L2/3 + L5)
    :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_alpha_002.png
    :class: sphx-glr-single-img
 
@@ -309,7 +309,7 @@ smaller absolute values in the plots.
 
  .. code-block:: none
 
-    /home/ntolley/jones_lab/hnn-core/examples/workflows/plot_simulate_alpha.py:118: UserWarning: The figure layout has changed to tight
+    /Users/austinsoplata/rep/brn/hnn-core/examples/workflows/plot_simulate_alpha.py:118: UserWarning: The figure layout has changed to tight
       plt.tight_layout()
 
 
@@ -326,7 +326,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (3 minutes 15.569 seconds)
+   **Total running time of the script:** (0 minutes 30.388 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_alpha.py:
@@ -349,6 +349,10 @@ References
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_simulate_alpha.py <plot_simulate_alpha.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_simulate_alpha.zip <plot_simulate_alpha.zip>`
 
 
 .. only:: html

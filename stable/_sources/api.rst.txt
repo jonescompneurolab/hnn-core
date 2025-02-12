@@ -1,5 +1,10 @@
 :orphan:
 
+..
+   This document is kept in RST instead of Markdown format due to its
+   importance, accessibility, and the potential for mistaken configuration in
+   adapting it to the MyST Markdown parser.
+
 .. _api_documentation:
 
 =================

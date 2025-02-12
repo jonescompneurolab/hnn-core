@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_howto_plot_connectivity.py>`
-        to download the full example code or to run this example in your browser via Binder
+        to download the full example code. or to run this example in your browser via Binder
 
 .. rst-class:: sphx-glr-example-title
 
@@ -461,7 +461,7 @@ the aggregate current dipole.
 
 
 .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_connectivity_008.png
-   :alt: Aggregate (L2 + L5)
+   :alt: Aggregate (L2/3 + L5)
    :srcset: /auto_examples/howto/images/sphx_glr_plot_connectivity_008.png
    :class: sphx-glr-single-img
 
@@ -478,7 +478,7 @@ the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (3 minutes 42.884 seconds)
+   **Total running time of the script:** (0 minutes 27.999 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_connectivity.py:
@@ -501,6 +501,10 @@ the aggregate current dipole.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_connectivity.py <plot_connectivity.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_connectivity.zip <plot_connectivity.zip>`
 
 
 .. only:: html

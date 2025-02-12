@@ -1,34 +1,66 @@
+
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="../../">
+
+<html lang="en" data-content_root="../../" >
+
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hnn_core.cell &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=9afac83c" />
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
     <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/hnn_core/cell';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 
-<meta charset='utf-8'>
-<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
-<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
-<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.4" />
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
 <script>
@@ -40,119 +72,400 @@
 </script>
 
 
-  </head><body>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
-    <div class="container">
-      <div class="navbar-header">
-        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="../../index.html">
-          hnn-core</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.4</b></span>
-      </div>
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
-        <div class="collapse navbar-collapse nav-collapse">
-          <ul class="nav navbar-nav">
-            
-                <li><a href="../../auto_examples/index.html">Examples</a></li>
-                <li><a href="../../api.html">API</a></li>
-                <li><a href="../../glossary.html">Glossary</a></li>
-                <li><a href="../../whats_new.html">What's new</a></li>
-                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
-            
-            
-              <li class="dropdown globaltoc-container">
-  <a role="button"
-     id="dLabelGlobalToc"
-     data-toggle="dropdown"
-     data-target="#"
-     href="../../index.html">Site <b class="caret"></b></a>
-  <ul class="dropdown-menu globaltoc"
-      role="menu"
-      aria-labelledby="dLabelGlobalToc"></ul>
-</li>
-              
-                <li class="dropdown">
-  <a role="button"
-     id="dLabelLocalToc"
-     data-toggle="dropdown"
-     data-target="#"
-     href="#">Page <b class="caret"></b></a>
-  <ul class="dropdown-menu localtoc"
-      role="menu"
-      aria-labelledby="dLabelLocalToc"></ul>
-</li>
-              
-            
-            
-            
-            
-            
-              <li class="hidden-sm"></li>
-            
-          </ul>
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
 
-          
-<div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
-  <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
-    v0.4
-    <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/index.html">Development</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.2/index.html">v0.2</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.3/index.html">v0.3</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.4/index.html">v0.4</a></li>
-  </ul>
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
 </div>
 
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
 
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core  documentation - Home"/>
+    <img src="../../_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core  documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../glossary.html">
+    Glossary
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
+                </ul>
+            </li>
             
-<form class="navbar-form navbar-right" action="../../search.html" method="get">
- <div class="form-group">
-  <input type="text" name="q" class="form-control" placeholder="Search" />
- </div>
-  <input type="hidden" name="check_keywords" value="yes" />
-  <input type="hidden" name="area" value="default" />
-</form>
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
           
 
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
     </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../glossary.html">
+    Glossary
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
 
-<div class="container">
-  <div class="row">
-    <div class="body col-md-12 content" role="main">
+
+      </div>
       
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">hnn_core.cell</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
   <h1>Source code for hnn_core.cell</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Establish class def for general cell features.&quot;&quot;&quot;</span>
 
 <span class="c1"># Authors: Mainak Jas &lt;mjas@mgh.harvard.edu&gt;</span>
 <span class="c1">#          Sam Neymotin &lt;samnemo@gmail.com&gt;</span>
 
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span class="n">norm</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">norm</span>
 
-<span class="kn">from</span> <span class="nn">neuron</span> <span class="kn">import</span> <span class="n">h</span><span class="p">,</span> <span class="n">nrn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">neuron</span><span class="w"> </span><span class="kn">import</span> <span class="n">h</span><span class="p">,</span> <span class="n">nrn</span>
 
-<span class="kn">from</span> <span class="nn">.viz</span> <span class="kn">import</span> <span class="n">plot_cell_morphology</span>
-<span class="kn">from</span> <span class="nn">.externals.mne</span> <span class="kn">import</span> <span class="n">_validate_type</span><span class="p">,</span> <span class="n">_check_option</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_cell_morphology</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.externals.mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">_validate_type</span><span class="p">,</span> <span class="n">_check_option</span>
 
 <span class="c1"># Units for e: mV</span>
 <span class="c1"># Units for gbar: S/cm^2</span>
 
 
-<span class="k">def</span> <span class="nf">_get_cos_theta</span><span class="p">(</span><span class="n">sections</span><span class="p">,</span> <span class="n">sec_name_apical</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_cos_theta</span><span class="p">(</span><span class="n">sections</span><span class="p">,</span> <span class="n">sec_name_apical</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get cos(theta) to compute dipole along the apical dendrite.&quot;&quot;&quot;</span>
     <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sections</span><span class="p">[</span><span class="n">sec_name_apical</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span>
          <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sections</span><span class="p">[</span><span class="n">sec_name_apical</span><span class="p">]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
@@ -163,7 +476,7 @@
     <span class="k">return</span> <span class="n">cos_thetas</span>
 
 
-<span class="k">def</span> <span class="nf">_calculate_gaussian</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_calculate_gaussian</span><span class="p">(</span><span class="n">x_val</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return height of gaussian at x_val.</span>
 
 <span class="sd">    Parameters</span>
@@ -190,7 +503,7 @@
     <span class="k">return</span> <span class="n">x_height</span>
 
 
-<span class="k">def</span> <span class="nf">_get_gaussian_connection</span><span class="p">(</span><span class="n">src_pos</span><span class="p">,</span> <span class="n">target_pos</span><span class="p">,</span> <span class="n">nc_dict</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_gaussian_connection</span><span class="p">(</span><span class="n">src_pos</span><span class="p">,</span> <span class="n">target_pos</span><span class="p">,</span> <span class="n">nc_dict</span><span class="p">,</span>
                              <span class="n">inplane_distance</span><span class="o">=</span><span class="mf">1.</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate distance dependent connection properties.</span>
 
@@ -230,11 +543,11 @@
     <span class="k">return</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span>
 
 
-<span class="k">def</span> <span class="nf">node_to_str</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">node_to_str</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
 
-<span class="k">class</span> <span class="nc">_ArtificialCell</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_ArtificialCell</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The ArtificialCell class for initializing a NEURON feed source.</span>
 
 <span class="sd">    Parameters</span>
@@ -262,7 +575,7 @@
 <span class="sd">    gid : int</span>
 <span class="sd">        GID of the cell in a network (or None if not yet assigned)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_times</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">gid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_times</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">gid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># Convert event times into nrn vector</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nrn_eventvec</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nrn_eventvec</span><span class="o">.</span><span class="n">from_python</span><span class="p">(</span><span class="n">event_times</span><span class="p">)</span>
@@ -280,11 +593,11 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">gid</span> <span class="o">=</span> <span class="n">gid</span>  <span class="c1"># use setter method to check input argument gid</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">gid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gid</span>
 
     <span class="nd">@gid</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">gid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;gid must be an integer&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -293,7 +606,7 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Global ID for this cell already assigned!&#39;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_nseg</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_nseg</span><span class="p">(</span><span class="n">L</span><span class="p">):</span>
     <span class="n">nseg</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="k">if</span> <span class="n">L</span> <span class="o">&gt;</span> <span class="mf">100.</span><span class="p">:</span>  <span class="c1"># 100 um</span>
         <span class="n">nseg</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">L</span> <span class="o">/</span> <span class="mf">50.</span><span class="p">)</span>
@@ -303,7 +616,7 @@
     <span class="k">return</span> <span class="n">nseg</span>
 
 
-<span class="k">class</span> <span class="nc">Section</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Section</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Section class.</span>
 
 <span class="sd">    Parameters</span>
@@ -340,7 +653,7 @@
 <span class="sd">    nseg : int</span>
 <span class="sd">        Number of segments in the section</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">diam</span><span class="p">,</span> <span class="n">Ra</span><span class="p">,</span> <span class="n">cm</span><span class="p">,</span> <span class="n">end_pts</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">diam</span><span class="p">,</span> <span class="n">Ra</span><span class="p">,</span> <span class="n">cm</span><span class="p">,</span> <span class="n">end_pts</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_L</span> <span class="o">=</span> <span class="n">L</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_diam</span> <span class="o">=</span> <span class="n">diam</span>
@@ -356,10 +669,10 @@
         <span class="c1"># For distance functionality</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nseg</span> <span class="o">=</span> <span class="n">_get_nseg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;L=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">L</span><span class="si">}</span><span class="s1">, diam=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">diam</span><span class="si">}</span><span class="s1">, cm=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cm</span><span class="si">}</span><span class="s1">, Ra=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Ra</span><span class="si">}</span><span class="s1">&#39;</span>
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Section</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
 
@@ -389,7 +702,7 @@
 
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts an object of Section class to a dictionary.</span>
 
 <span class="sd">        Returns</span>
@@ -410,29 +723,29 @@
         <span class="k">return</span> <span class="n">section_data</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">L</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">L</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_L</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">diam</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">diam</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_diam</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">cm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cm</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">Ra</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Ra</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Ra</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">end_pts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">end_pts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_end_pts</span>
 
 
 <div class="viewcode-block" id="Cell">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell">[docs]</a>
-<span class="k">class</span> <span class="nc">Cell</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Cell</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a cell object.</span>
 
 <span class="sd">    Parameters</span>
@@ -515,7 +828,7 @@
 <span class="sd">        )</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">sections</span><span class="p">,</span> <span class="n">synapses</span><span class="p">,</span> <span class="n">sect_loc</span><span class="p">,</span> <span class="n">cell_tree</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">sections</span><span class="p">,</span> <span class="n">synapses</span><span class="p">,</span> <span class="n">sect_loc</span><span class="p">,</span> <span class="n">cell_tree</span><span class="p">,</span>
                  <span class="n">gid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pos</span> <span class="o">=</span> <span class="n">pos</span>
@@ -548,12 +861,12 @@
 
 <div class="viewcode-block" id="Cell.__repr__">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.__repr__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">class_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&lt;</span><span class="si">{</span><span class="n">class_name</span><span class="si">}</span><span class="s1"> | gid=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_gid</span><span class="si">}</span><span class="s1">&gt;&#39;</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Cell</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
 
@@ -583,7 +896,7 @@
 
 <div class="viewcode-block" id="Cell.to_dict">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.to_dict">[docs]</a>
-    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts an object of Cell class to a dictionary.</span>
 
 <span class="sd">        Returns</span>
@@ -620,11 +933,11 @@
 
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">gid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gid</span>
 
     <span class="nd">@gid</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">gid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;gid must be an integer&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -634,7 +947,7 @@
 
 <div class="viewcode-block" id="Cell.distance_section">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.distance_section">[docs]</a>
-    <span class="k">def</span> <span class="nf">distance_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_sec_name</span><span class="p">,</span> <span class="n">curr_node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">distance_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_sec_name</span><span class="p">,</span> <span class="n">curr_node</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Find distance between the current node and the target section.</span>
 
 <span class="sd">        Parameters</span>
@@ -688,7 +1001,7 @@
         <span class="k">return</span> <span class="n">dist</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_set_biophysics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sections</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_biophysics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sections</span><span class="p">):</span>
         <span class="s2">&quot;Set the biophysics for the cell.&quot;</span>
 
         <span class="c1"># neuron syntax is used to set values for mechanisms</span>
@@ -715,7 +1028,7 @@
                     <span class="k">else</span><span class="p">:</span>
                         <span class="nb">setattr</span><span class="p">(</span><span class="n">sec</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_compute_section_mechs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute_section_mechs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">sections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span>
         <span class="k">for</span> <span class="n">sec_name</span><span class="p">,</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">sections</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">mech_name</span><span class="p">,</span> <span class="n">p_mech</span> <span class="ow">in</span> <span class="n">section</span><span class="o">.</span><span class="n">mechs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -737,7 +1050,7 @@
                         <span class="n">p_mech</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">seg_xs</span><span class="p">,</span> <span class="n">seg_vals</span><span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span>
 
-    <span class="k">def</span> <span class="nf">_create_synapses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sections</span><span class="p">,</span> <span class="n">synapses</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_synapses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sections</span><span class="p">,</span> <span class="n">synapses</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create synapses.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">sec_name</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">receptor</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span><span class="o">.</span><span class="n">syns</span><span class="p">:</span>
@@ -746,7 +1059,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_synapses</span><span class="p">[</span><span class="n">syn_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">syn_create</span><span class="p">(</span>
                     <span class="n">seg</span><span class="p">,</span> <span class="o">**</span><span class="n">synapses</span><span class="p">[</span><span class="n">receptor</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">_create_sections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sections</span><span class="p">,</span> <span class="n">cell_tree</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_sections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sections</span><span class="p">,</span> <span class="n">cell_tree</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create soma and set geometry.</span>
 
 <span class="sd">        Notes</span>
@@ -794,7 +1107,7 @@
 
 <div class="viewcode-block" id="Cell.build">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.build">[docs]</a>
-    <span class="k">def</span> <span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sec_name_apical</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sec_name_apical</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Build cell in Neuron and insert dipole if applicable.</span>
 
 <span class="sd">        Parameters</span>
@@ -817,7 +1130,7 @@
 
 <div class="viewcode-block" id="Cell.copy">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.copy">[docs]</a>
-    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return copy of instance.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
@@ -827,7 +1140,7 @@
     <span class="c1"># 2. a list needs to be created with a Dipole (Point Process) in each</span>
     <span class="c1">#    section at position 1</span>
     <span class="c1"># In Cell() and not Pyr() for future possibilities</span>
-    <span class="k">def</span> <span class="nf">_insert_dipole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sec_name_apical</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_insert_dipole</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sec_name_apical</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Insert dipole into each section of this cell.</span>
 
 <span class="sd">        Parameters</span>
@@ -882,8 +1195,9 @@
 
 <div class="viewcode-block" id="Cell.create_tonic_bias">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.create_tonic_bias">[docs]</a>
-    <span class="k">def</span> <span class="nf">create_tonic_bias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create tonic bias at the soma.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_tonic_bias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="s1">&#39;soma&#39;</span><span class="p">,</span>
+                          <span class="n">loc</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create tonic bias at defined section.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -893,10 +1207,13 @@
 <span class="sd">            The start time of tonic input (in ms).</span>
 <span class="sd">        tstop : float</span>
 <span class="sd">            The end time of tonic input (in ms).</span>
+<span class="sd">        section : str</span>
+<span class="sd">            Section tonic input is applied to.</span>
 <span class="sd">        loc : float (0 to 1)</span>
-<span class="sd">            The location of the input in the soma section.</span>
+<span class="sd">            The location of the input in the section.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">stim</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">IClamp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="s1">&#39;soma&#39;</span><span class="p">](</span><span class="n">loc</span><span class="p">))</span>
+
+        <span class="n">stim</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">IClamp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_sections</span><span class="p">[</span><span class="n">section</span><span class="p">](</span><span class="n">loc</span><span class="p">))</span>
         <span class="n">stim</span><span class="o">.</span><span class="n">delay</span> <span class="o">=</span> <span class="n">t0</span>
         <span class="n">stim</span><span class="o">.</span><span class="n">dur</span> <span class="o">=</span> <span class="n">tstop</span> <span class="o">-</span> <span class="n">t0</span>
         <span class="n">stim</span><span class="o">.</span><span class="n">amp</span> <span class="o">=</span> <span class="n">amplitude</span>
@@ -905,7 +1222,7 @@
 
 <div class="viewcode-block" id="Cell.record">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.record">[docs]</a>
-    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_vsec</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">record_isec</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">record_ca</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_vsec</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">record_isec</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">record_ca</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Record current and voltage from all sections</span>
 
 <span class="sd">        Parameters</span>
@@ -967,7 +1284,7 @@
 
 <div class="viewcode-block" id="Cell.syn_create">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.syn_create">[docs]</a>
-    <span class="k">def</span> <span class="nf">syn_create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secloc</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">tau1</span><span class="p">,</span> <span class="n">tau2</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">syn_create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secloc</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">tau1</span><span class="p">,</span> <span class="n">tau2</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create an h.Exp2Syn synapse.</span>
 
 <span class="sd">        Parameters</span>
@@ -998,7 +1315,7 @@
 
 <div class="viewcode-block" id="Cell.setup_source_netcon">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.setup_source_netcon">[docs]</a>
-    <span class="k">def</span> <span class="nf">setup_source_netcon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_source_netcon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Created for _PC.cell and specifies SOURCES of spikes.</span>
 
 <span class="sd">        Parameters</span>
@@ -1014,7 +1331,7 @@
 
 <div class="viewcode-block" id="Cell.parconnect_from_src">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.parconnect_from_src">[docs]</a>
-    <span class="k">def</span> <span class="nf">parconnect_from_src</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid_presyn</span><span class="p">,</span> <span class="n">nc_dict</span><span class="p">,</span> <span class="n">postsyn</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parconnect_from_src</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid_presyn</span><span class="p">,</span> <span class="n">nc_dict</span><span class="p">,</span> <span class="n">postsyn</span><span class="p">,</span>
                             <span class="n">inplane_distance</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parallel receptor-centric connect FROM presyn TO this cell,</span>
 <span class="sd">           based on GID.</span>
@@ -1037,7 +1354,7 @@
 <span class="sd">        nc : instance of h.NetCon</span>
 <span class="sd">            A network connection object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">.network_builder</span> <span class="kn">import</span> <span class="n">_PC</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.network_builder</span><span class="w"> </span><span class="kn">import</span> <span class="n">_PC</span>
 
         <span class="n">nc</span> <span class="o">=</span> <span class="n">_PC</span><span class="o">.</span><span class="n">gid_connect</span><span class="p">(</span><span class="n">gid_presyn</span><span class="p">,</span> <span class="n">postsyn</span><span class="p">)</span>
 
@@ -1052,7 +1369,7 @@
 
 <div class="viewcode-block" id="Cell.plot_morphology">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.plot_morphology">[docs]</a>
-    <span class="k">def</span> <span class="nf">plot_morphology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot_morphology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                         <span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">250</span><span class="p">,</span> <span class="mi">150</span><span class="p">),</span> <span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="n">zlim</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">1200</span><span class="p">),</span>
                         <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the cell morphology.</span>
@@ -1089,7 +1406,7 @@
                                     <span class="n">xlim</span><span class="o">=</span><span class="n">xlim</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="n">ylim</span><span class="p">,</span> <span class="n">zlim</span><span class="o">=</span><span class="n">zlim</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_update_section_end_pts_L</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">dpt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_section_end_pts_L</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">dpt</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_tree</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">end_pts</span><span class="p">[</span><span class="n">node</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span>
@@ -1109,7 +1426,7 @@
 
 <div class="viewcode-block" id="Cell.define_shape">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.define_shape">[docs]</a>
-    <span class="k">def</span> <span class="nf">define_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">define_shape</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Redefines end_pts according to section lengths.</span>
 
 <span class="sd">        Detects change in section lengths of the sections in the</span>
@@ -1166,7 +1483,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">define_shape</span><span class="p">(</span><span class="n">child_node</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_update_end_pts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_end_pts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update all end pts according to the length of the sections.</span>
 
 <span class="sd">        Can be used whenever length of any section is updated</span>
@@ -1205,7 +1522,7 @@
 
 <div class="viewcode-block" id="Cell.modify_section">
 <a class="viewcode-back" href="../../generated/hnn_core.Cell.html#hnn_core.Cell.modify_section">[docs]</a>
-    <span class="k">def</span> <span class="nf">modify_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sec_name</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">diam</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Ra</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">modify_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sec_name</span><span class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">diam</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Ra</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Change attributes of section specified by `sec_name`</span>
 
 <span class="sd">        Parameters</span>
@@ -1249,21 +1566,75 @@
 
 </pre></div>
 
-    </div>
-      
-  </div>
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
 </div>
-<footer class="footer">
-  <div class="container">
-    <p class="pull-right">
-      <a href="#">Back to top</a>
-      
-    </p>
-    <p>
-        &copy; Copyright 2024, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.2.6.<br/>
-    </p>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
   </div>
-</footer>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, HNN Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
   </body>
 </html>

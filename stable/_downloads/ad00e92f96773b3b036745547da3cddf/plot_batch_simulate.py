@@ -12,6 +12,8 @@ for comprehensive analysis.
 #          Nick Tolley <nicholas_tolley@brown.edu>
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
+#
+# This project was supported by Google Summer of Code (GSoC) 2024.
 
 ###############################################################################
 # Let us import ``hnn_core``.
@@ -22,13 +24,25 @@ from hnn_core.batch_simulate import BatchSimulate
 from hnn_core import jones_2009_model
 
 # The number of cores may need modifying depending on your current machine.
-n_jobs = 10
+n_jobs = 4
 ###############################################################################
+# The `add_evoked_drive` function simulates external input to the network,
+# mimicking sensory stimulation or other external events.
+#
+# - `evprox` indicates a proximal drive, targeting dendrites near the cell
+#   bodies.
+# - `mu=40` and `sigma=5` define the timing (mean and spread) of the input.
+# - `weights_ampa` and `synaptic_delays` control the strength and
+#   timing of the input.
+#
+# This evoked drive causes the initial positive deflection in the dipole
+# signal, triggering a cascade of activity through the network and
+# resulting in the complex waveforms observed.
 
 
 def set_params(param_values, net=None):
     """
-    Set parameters in the network drives.
+    Set parameters for the network drives.
 
     Parameters
     ----------
@@ -55,16 +69,16 @@ def set_params(param_values, net=None):
                          synaptic_delays=synaptic_delays)
 
 ###############################################################################
-# Define a parameter grid for the batch simulation.
+# Next, we define a parameter grid for the batch simulation.
 
 
 param_grid = {
-    'weight_basket': np.logspace(-4 - 1, 10),
-    'weight_pyr': np.logspace(-4, -1, 10)
+    'weight_basket': np.logspace(-4, -1, 20),
+    'weight_pyr': np.logspace(-4, -1, 20)
 }
 
 ###############################################################################
-# Define a function to calculate summary statistics
+# We then define a function to calculate summary statistics.
 
 
 def summary_func(results):
@@ -93,12 +107,8 @@ def summary_func(results):
 ###############################################################################
 # Run the batch simulation and collect the results.
 
-# Comment off this code, if dask and distributed Python packages are installed
-# from dask.distributed import Client
-# client = Client(threads_per_worker=1, n_workers=5, processes=False)
 
-
-# Run the batch simulation and collect the results.
+# Initialize the network model and run the batch simulation.
 net = jones_2009_model(mesh_shape=(3, 3))
 batch_simulation = BatchSimulate(net=net,
                                  set_params=set_params,
@@ -106,23 +116,45 @@ batch_simulation = BatchSimulate(net=net,
 simulation_results = batch_simulation.run(param_grid,
                                           n_jobs=n_jobs,
                                           combinations=False,
-                                          backend='multiprocessing')
-# backend='dask' if installed
+                                          backend='loky')
+
 print("Simulation results:", simulation_results)
 ###############################################################################
 # This plot shows an overlay of all smoothed dipole waveforms from the
-# batch simulation. Each line represents a different set of parameters,
-# allowing us to visualize the range of responses across the parameter space.
+# batch simulation. Each line represents a different set of synaptic strength
+# parameters (`weight_basket`), allowing us to visualize the range of responses
+# across the parameter space.
+# The colormap represents synaptic strengths, from weaker (purple)
+# to stronger (yellow).
+#
+# As drive strength increases, dipole responses show progressively larger
+# amplitudes and more distinct features, reflecting heightened network
+# activity. Weak drives (purple lines) produce smaller amplitude signals with
+# simpler waveforms, while stronger drives (yellow lines) generate
+# larger responses with more pronounced oscillatory features, indicating
+# more robust network activity.
+#
+# The y-axis represents dipole amplitude in nAm (nanoAmpere-meters), which is
+# the product of current flow and distance in the neural tissue.
+#
+# Stronger synaptic connections (yellow lines) generally show larger
+# amplitude responses and more pronounced features throughout the simulation.
 
-dpl_waveforms = []
+dpl_waveforms, param_values = [], []
 for data_list in simulation_results['simulated_data']:
     for data in data_list:
         dpl_smooth = data['dpl'][0].copy().smooth(window_len=30)
         dpl_waveforms.append(dpl_smooth.data['agg'])
+        param_values.append(data['param_values']['weight_basket'])
 
 plt.figure(figsize=(10, 6))
-for waveform in dpl_waveforms:
-    plt.plot(waveform, alpha=0.5, linewidth=3)
+cmap = plt.get_cmap('viridis')
+log_param_values = np.log10(param_values)
+norm = plt.Normalize(log_param_values.min(), log_param_values.max())
+
+for waveform, log_param in zip(dpl_waveforms, log_param_values):
+    color = cmap(norm(log_param))
+    plt.plot(waveform, color=color, alpha=0.7, linewidth=2)
 plt.title('Overlay of Dipole Waveforms')
 plt.xlabel('Time (ms)')
 plt.ylabel('Dipole Amplitude (nAm)')

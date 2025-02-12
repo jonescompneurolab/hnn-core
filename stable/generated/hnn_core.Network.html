@@ -1,35 +1,69 @@
+
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="../">
+
+<html lang="en" data-content_root="../" >
+
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>hnn_core.Network &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css?v=9afac83c" />
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/hnn_core.Network';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="hnn_core.Cell" href="hnn_core.Cell.html" />
+    <link rel="prev" title="hnn_core.simulate_dipole" href="hnn_core.simulate_dipole.html" />
 
-<meta charset='utf-8'>
-<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
-<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
-<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.4" />
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
 <script>
@@ -41,130 +75,386 @@
 </script>
 
 
-  </head><body>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
-    <div class="container">
-      <div class="navbar-header">
-        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="../index.html">
-          hnn-core</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.4</b></span>
-      </div>
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
-        <div class="collapse navbar-collapse nav-collapse">
-          <ul class="nav navbar-nav">
-            
-                <li><a href="../auto_examples/index.html">Examples</a></li>
-                <li><a href="../api.html">API</a></li>
-                <li><a href="../glossary.html">Glossary</a></li>
-                <li><a href="../whats_new.html">What's new</a></li>
-                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
-            
-            
-              <li class="dropdown globaltoc-container">
-  <a role="button"
-     id="dLabelGlobalToc"
-     data-toggle="dropdown"
-     data-target="#"
-     href="../index.html">Site <b class="caret"></b></a>
-  <ul class="dropdown-menu globaltoc"
-      role="menu"
-      aria-labelledby="dLabelGlobalToc"></ul>
-</li>
-              
-                <li class="dropdown">
-  <a role="button"
-     id="dLabelLocalToc"
-     data-toggle="dropdown"
-     data-target="#"
-     href="#">Page <b class="caret"></b></a>
-  <ul class="dropdown-menu localtoc"
-      role="menu"
-      aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#">hnn_core.Network</a><ul>
-<li><a class="reference internal" href="#hnn_core.Network"><code class="docutils literal notranslate"><span class="pre">Network</span></code></a><ul>
-<li><a class="reference internal" href="#hnn_core.Network.__repr__"><code class="docutils literal notranslate"><span class="pre">Network.__repr__()</span></code></a></li>
-<li><a class="reference internal" href="#hnn_core.Network.add_bursty_drive"><code class="docutils literal notranslate"><span class="pre">Network.add_bursty_drive()</span></code></a></li>
-<li><a class="reference internal" href="#hnn_core.Network.add_connection"><code class="docutils literal notranslate"><span class="pre">Network.add_connection()</span></code></a></li>
-<li><a class="reference internal" href="#hnn_core.Network.add_electrode_array"><code class="docutils literal notranslate"><span class="pre">Network.add_electrode_array()</span></code></a></li>
-<li><a class="reference internal" href="#hnn_core.Network.add_evoked_drive"><code class="docutils literal notranslate"><span class="pre">Network.add_evoked_drive()</span></code></a></li>
-<li><a class="reference internal" href="#hnn_core.Network.add_poisson_drive"><code class="docutils literal notranslate"><span class="pre">Network.add_poisson_drive()</span></code></a></li>
-<li><a class="reference internal" href="#hnn_core.Network.add_tonic_bias"><code class="docutils literal notranslate"><span class="pre">Network.add_tonic_bias()</span></code></a></li>
-<li><a class="reference internal" href="#hnn_core.Network.clear_connectivity"><code class="docutils literal notranslate"><span class="pre">Network.clear_connectivity()</span></code></a></li>
-<li><a class="reference internal" href="#hnn_core.Network.clear_drives"><code class="docutils literal notranslate"><span class="pre">Network.clear_drives()</span></code></a></li>
-<li><a class="reference internal" href="#hnn_core.Network.copy"><code class="docutils literal notranslate"><span class="pre">Network.copy()</span></code></a></li>
-<li><a class="reference internal" href="#hnn_core.Network.gid_to_type"><code class="docutils literal notranslate"><span class="pre">Network.gid_to_type()</span></code></a></li>
-<li><a class="reference internal" href="#hnn_core.Network.plot_cells"><code class="docutils literal notranslate"><span class="pre">Network.plot_cells()</span></code></a></li>
-<li><a class="reference internal" href="#hnn_core.Network.set_cell_positions"><code class="docutils literal notranslate"><span class="pre">Network.set_cell_positions()</span></code></a></li>
-<li><a class="reference internal" href="#hnn_core.Network.write_configuration"><code class="docutils literal notranslate"><span class="pre">Network.write_configuration()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#examples-using-hnn-core-network">Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.Network</span></code></a></li>
-</ul>
-</li>
-</ul>
-</ul>
-</li>
-              
-            
-            
-            
-            
-            
-              <li class="hidden-sm">
-<div id="sourcelink">
-  <a href="../_sources/generated/hnn_core.Network.rst.txt"
-     rel="nofollow">Source</a>
-</div></li>
-            
-          </ul>
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
 
-          
-<div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
-  <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
-    v0.4
-    <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/index.html">Development</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.2/index.html">v0.2</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.3/index.html">v0.3</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.4/index.html">v0.4</a></li>
-  </ul>
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
 </div>
 
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
 
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core  documentation - Home"/>
+    <img src="../_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core  documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../glossary.html">
+    Glossary
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
+                </ul>
+            </li>
             
-<form class="navbar-form navbar-right" action="../search.html" method="get">
- <div class="form-group">
-  <input type="text" name="q" class="form-control" placeholder="Search" />
- </div>
-  <input type="hidden" name="check_keywords" value="yes" />
-  <input type="hidden" name="area" value="default" />
-</form>
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
           
 
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
     </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../glossary.html">
+    Glossary
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
 
-<div class="container">
-  <div class="row">
-    <div class="body col-md-12 content" role="main">
+
+      </div>
       
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API Documentation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">hnn_core.Network</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
   <section id="hnn-core-network">
-<h1>hnn_core.Network<a class="headerlink" href="#hnn-core-network" title="Link to this heading">¶</a></h1>
+<h1>hnn_core.Network<a class="headerlink" href="#hnn-core-network" title="Link to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="hnn_core.Network">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">Network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_drives_from_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legacy_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">10)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">Network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_drives_from_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legacy_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">10)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network" title="Link to this definition">#</a></dt>
 <dd><p>The Network class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -182,15 +472,8 @@ are added suitably. Will be deprecated in a future release.</p>
 </dd>
 </dl>
 </dd>
-</dl>
-<p class="rubric">Notes</p>
-<p><code class="docutils literal notranslate"><span class="pre">net</span> <span class="pre">=</span> <span class="pre">jones_2009_model(params)</span></code> is the recommended path for creating a
-network. Instantiating the network as <code class="docutils literal notranslate"><span class="pre">net</span> <span class="pre">=</span> <span class="pre">Network(params)</span></code> will
-produce a network with no cell-to-cell connections. As such,
-connectivity information contained in <code class="docutils literal notranslate"><span class="pre">params</span></code> will be ignored.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Attributes<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
 <dt><strong>cell_types</strong><span class="classifier">dict</span></dt><dd><p>Dictionary containing names of real cell types in the network
 (e.g. ‘L2_basket’) as keys and corresponding Cell instances as values.
 The Cell instance associated with a given key is used as a template
@@ -232,7 +515,7 @@ instances of <a class="reference internal" href="hnn_core.extracellular.Extracel
 </dd>
 </dl>
 <p class="rubric">Methods</p>
-<table class="autosummary longtable docutils align-default">
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.add_bursty_drive" title="hnn_core.Network.add_bursty_drive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_bursty_drive</span></code></a>(name, *[, tstart, ...])</p></td>
 <td><p>Add a bursty (rhythmic) external drive to all cells of the network</p></td>
@@ -249,7 +532,7 @@ instances of <a class="reference internal" href="hnn_core.extracellular.Extracel
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.add_poisson_drive" title="hnn_core.Network.add_poisson_drive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_poisson_drive</span></code></a>(name, *[, tstart, tstop, ...])</p></td>
 <td><p>Add a Poisson-distributed external drive to the network</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.add_tonic_bias" title="hnn_core.Network.add_tonic_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_tonic_bias</span></code></a>(*[, cell_type, t0, tstop])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.add_tonic_bias" title="hnn_core.Network.add_tonic_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_tonic_bias</span></code></a>(*[, cell_type, section, ...])</p></td>
 <td><p>Attaches parameters of tonic bias input for given cell types</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.clear_connectivity" title="hnn_core.Network.clear_connectivity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_connectivity</span></code></a>()</p></td>
@@ -270,27 +553,37 @@ instances of <a class="reference internal" href="hnn_core.extracellular.Extracel
 <tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.set_cell_positions" title="hnn_core.Network.set_cell_positions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_cell_positions</span></code></a>(*[, inplane_distance, ...])</p></td>
 <td><p>Set relative positions of cells arranged in a square grid</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.write_configuration" title="hnn_core.Network.write_configuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_configuration</span></code></a>(fname[, overwrite])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.update_weights" title="hnn_core.Network.update_weights"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_weights</span></code></a>([e_e, e_i, i_e, i_i, copy])</p></td>
+<td><p>Update synaptic weights of the network.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.write_configuration" title="hnn_core.Network.write_configuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_configuration</span></code></a>(fname[, overwrite])</p></td>
 <td><p>Writes network configuration to a json file.</p></td>
 </tr>
 </tbody>
 </table>
-<table class="docutils align-default">
+</div>
+<div class="pst-scrollable-table-container"><table class="table">
 <tbody>
 <tr class="row-odd"><td><p><strong>to_dict</strong></p></td>
 <td></td>
 </tr>
 </tbody>
 </table>
+</div>
+<p class="rubric">Notes</p>
+<p><code class="docutils literal notranslate"><span class="pre">net</span> <span class="pre">=</span> <span class="pre">jones_2009_model(params)</span></code> is the recommended path for creating a
+network. Instantiating the network as <code class="docutils literal notranslate"><span class="pre">net</span> <span class="pre">=</span> <span class="pre">Network(params)</span></code> will
+produce a network with no cell-to-cell connections. As such,
+connectivity information contained in <code class="docutils literal notranslate"><span class="pre">params</span></code> will be ignored.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.__repr__">
-<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.__repr__" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__repr__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.__repr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.__repr__" title="Link to this definition">#</a></dt>
 <dd><p>Return repr(self).</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.add_bursty_drive">
-<span class="sig-name descname"><span class="pre">add_bursty_drive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstart_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">burst_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">burst_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numspikes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_isi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_drive_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_specific</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_ampa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_nmda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_delays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_bursty_drive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_bursty_drive" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_bursty_drive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstart_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">burst_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">burst_std</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numspikes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_isi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_drive_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_specific</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_ampa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_nmda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_delays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_bursty_drive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_bursty_drive" title="Link to this definition">#</a></dt>
 <dd><p>Add a bursty (rhythmic) external drive to all cells of the network</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -373,7 +666,7 @@ Used to randomly remove connections when probability &lt; 1.0.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.add_connection">
-<span class="sig-name descname"><span class="pre">add_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamtha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_autapses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_connection" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamtha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_autapses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_connection" title="Link to this definition">#</a></dt>
 <dd><p>Appends connections to connectivity list</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -424,7 +717,7 @@ all its targets.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.add_electrode_array">
-<span class="sig-name descname"><span class="pre">add_electrode_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">electrode_pos</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conductivity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'psa'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_electrode_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_electrode_array" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_electrode_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">electrode_pos</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conductivity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'psa'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_electrode_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_electrode_array" title="Link to this definition">#</a></dt>
 <dd><p>Specify coordinates of electrode array for extracellular recording.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -456,7 +749,7 @@ The default value of 0.5 um corresponds to 1 um diameter dendrites.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.add_evoked_drive">
-<span class="sig-name descname"><span class="pre">add_evoked_drive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numspikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_drive_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'n_cells'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_specific</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_ampa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_nmda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_delays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_evoked_drive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_evoked_drive" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_evoked_drive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">numspikes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_drive_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'n_cells'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_specific</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_ampa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_nmda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_delays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_evoked_drive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_evoked_drive" title="Link to this definition">#</a></dt>
 <dd><p>Add an ‘evoked’ external drive to the network</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -531,7 +824,7 @@ Fixed across trials (see Notes)</p>
 and conn_seed (n_trials &gt; 1 in simulate_dipole(…, n_trials):</p>
 <ul class="simple">
 <li><dl class="simple">
-<dt>event_seed</dt><dd><p>Across trials, the random seed is incremented leading such that
+<dt>event_seed</dt><dd><p>Across trials, the random seed is incremented such that
 the exact spike times are different</p>
 </dd>
 </dl>
@@ -547,7 +840,7 @@ probability &lt; 1.0, the random subset of gids targeted is the same.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.add_poisson_drive">
-<span class="sig-name descname"><span class="pre">add_poisson_drive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate_constant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_drive_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'n_cells'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_specific</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_ampa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_nmda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_delays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_poisson_drive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_poisson_drive" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_poisson_drive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate_constant</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_drive_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'n_cells'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_specific</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_ampa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_nmda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_delays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_poisson_drive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_poisson_drive" title="Link to this definition">#</a></dt>
 <dd><p>Add a Poisson-distributed external drive to the network</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -623,7 +916,7 @@ Used to randomly remove connections when probability &lt; 1.0.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.add_tonic_bias">
-<span class="sig-name descname"><span class="pre">add_tonic_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_tonic_bias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_tonic_bias" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_tonic_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'soma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tonic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_tonic_bias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_tonic_bias" title="Link to this definition">#</a></dt>
 <dd><p>Attaches parameters of tonic bias input for given cell types</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -631,6 +924,11 @@ Used to randomly remove connections when probability &lt; 1.0.</p>
 <dt><strong>cell_types</strong><span class="classifier">str | None</span></dt><dd><p>The name of the cell type to add a tonic input. When supplied,
 a float value must be provided with the <em class="xref py py-obj">amplitude</em> keyword.
 Valid inputs are those listed in  <em class="xref py py-obj">net.cell_types</em>.</p>
+</dd>
+<dt><strong>section</strong><span class="classifier">str</span></dt><dd><p>name of cell section the bias should be applied to.
+See net.cell_types[cell_type].sections.keys()</p>
+</dd>
+<dt><strong>bias_name</strong><span class="classifier">str</span></dt><dd><p>The name of the bias.</p>
 </dd>
 <dt><strong>amplitude: dict | float</strong></dt><dd><p>A dictionary of cell type keys (str) to amplitude values (float).
 Valid inputs for cell types are those listed in <em class="xref py py-obj">net.cell_types</em>.
@@ -653,19 +951,19 @@ multiple are specified with the <em class="xref py py-obj">amplitude</em> keywor
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.clear_connectivity">
-<span class="sig-name descname"><span class="pre">clear_connectivity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.clear_connectivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.clear_connectivity" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">clear_connectivity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.clear_connectivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.clear_connectivity" title="Link to this definition">#</a></dt>
 <dd><p>Remove all connections defined in Network.connectivity</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.clear_drives">
-<span class="sig-name descname"><span class="pre">clear_drives</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.clear_drives"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.clear_drives" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">clear_drives</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.clear_drives"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.clear_drives" title="Link to this definition">#</a></dt>
 <dd><p>Remove all drives defined in Network.connectivity</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.copy">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.copy" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.copy" title="Link to this definition">#</a></dt>
 <dd><p>Return a copy of the Network instance</p>
 <p>The returned copy retains the intrinsic connectivity between cells, as
 well as those of any external drives or biases added to the network.
@@ -687,13 +985,13 @@ the network, but cleared of existing data.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.gid_to_type">
-<span class="sig-name descname"><span class="pre">gid_to_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.gid_to_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.gid_to_type" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">gid_to_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.gid_to_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.gid_to_type" title="Link to this definition">#</a></dt>
 <dd><p>Reverse lookup of gid to type.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.plot_cells">
-<span class="sig-name descname"><span class="pre">plot_cells</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.plot_cells"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.plot_cells" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">plot_cells</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.plot_cells"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.plot_cells" title="Link to this definition">#</a></dt>
 <dd><p>Plot the cells using Network.pos_dict.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -716,7 +1014,7 @@ a new figure is created.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.set_cell_positions">
-<span class="sig-name descname"><span class="pre">set_cell_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplane_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_separation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.set_cell_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.set_cell_positions" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">set_cell_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplane_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_separation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.set_cell_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.set_cell_positions" title="Link to this definition">#</a></dt>
 <dd><p>Set relative positions of cells arranged in a square grid</p>
 <p>Note that it is possible to change only a subset of the parameters
 (the default value of each is None, which implies no change).</p>
@@ -736,8 +1034,46 @@ this parameter does not affect the amplitude of the dipole moment.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Network.update_weights">
+<span class="sig-name descname"><span class="pre">update_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e_e</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_e</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.update_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.update_weights" title="Link to this definition">#</a></dt>
+<dd><p>Update synaptic weights of the network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>e_e</strong><span class="classifier">float</span></dt><dd><p>Synaptic gain of excitatory to excitatory connections
+(default None)</p>
+</dd>
+<dt><strong>e_i</strong><span class="classifier">float</span></dt><dd><p>Synaptic gain of excitatory to inhibitory connections
+(default None)</p>
+</dd>
+<dt><strong>i_e</strong><span class="classifier">float</span></dt><dd><p>Synaptic gain of inhibitory to excitatory connections
+(default None)</p>
+</dd>
+<dt><strong>i_i</strong><span class="classifier">float</span></dt><dd><p>Synaptic gain of inhibitory to inhibitory connections
+(default None)</p>
+</dd>
+<dt><strong>copy</strong><span class="classifier">bool</span></dt><dd><p>If True, returns a copy of the network. If False,
+the network is updated in place with a return of None.
+(default False)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>net</strong><span class="classifier">instance of Network</span></dt><dd><p>A copy of the instance with updated synaptic gains if copy=True.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Synaptic gains must be non-negative. The synaptic gains will only be
+updated if a float value is provided. If None is provided
+(the default), the synapticgain will remain unchanged.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.write_configuration">
-<span class="sig-name descname"><span class="pre">write_configuration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.write_configuration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.write_configuration" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">write_configuration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.write_configuration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.write_configuration" title="Link to this definition">#</a></dt>
 <dd><p>Writes network configuration to a json file.</p>
 <p>Writes network configurations as a hierarchical json similar to the Network
 object’s structure. Outputs recorded during simulation such as currents and
@@ -764,26 +1100,26 @@ voltages are not saved due to size.</p>
 </dd></dl>
 
 <section id="examples-using-hnn-core-network">
-<span id="sphx-glr-backreferences-hnn-core-network"></span><h2>Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.Network</span></code><a class="headerlink" href="#examples-using-hnn-core-network" title="Link to this heading">¶</a></h2>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a threshold level tactile evoked response, as detaile..."><img alt="" src="../_images/sphx_glr_plot_simulate_evoked_thumb.png" />
+<span id="sphx-glr-backreferences-hnn-core-network"></span><h2>Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.Network</span></code><a class="headerlink" href="#examples-using-hnn-core-network" title="Link to this heading">#</a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial."><img alt="" src="../_images/sphx_glr_plot_simulate_evoked_thumb.png" />
 <p><a class="reference internal" href="../auto_examples/workflows/plot_simulate_evoked.html#sphx-glr-auto-examples-workflows-plot-simulate-evoked-py"><span class="std std-ref">01. Simulate Event Related Potentials (ERPs)</span></a></p>
   <div class="sphx-glr-thumbnail-title">01. Simulate Event Related Potentials (ERPs)</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate alpha and beta frequency activity in the alpha/beta c..."><img alt="" src="../_images/sphx_glr_plot_simulate_alpha_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate alpha and beta frequency activity in the alpha/beta complex of the SI mu-rhythm [1]_, as detailed in the HNN GUI alpha and beta tutorial, using HNN-Core."><img alt="" src="../_images/sphx_glr_plot_simulate_alpha_thumb.png" />
 <p><a class="reference internal" href="../auto_examples/workflows/plot_simulate_alpha.html#sphx-glr-auto-examples-workflows-plot-simulate-alpha-py"><span class="std std-ref">02. Simulate Alpha and Beta Rhythms</span></a></p>
   <div class="sphx-glr-thumbnail-title">02. Simulate Alpha and Beta Rhythms</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate gamma rhythms via the well established pyramidal-inte..."><img alt="" src="../_images/sphx_glr_plot_simulate_gamma_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate gamma rhythms via the well established pyramidal-interneuron-gamma mechanisms [1]_, as detailed in the HNN GUI gamma tutorial, using HNN-Core."><img alt="" src="../_images/sphx_glr_plot_simulate_gamma_thumb.png" />
 <p><a class="reference internal" href="../auto_examples/workflows/plot_simulate_gamma.html#sphx-glr-auto-examples-workflows-plot-simulate-gamma-py"><span class="std std-ref">03. Simulate Gamma Rhythms</span></a></p>
   <div class="sphx-glr-thumbnail-title">03. Simulate Gamma Rhythms</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to calculate an inverse solution of the median nerve evoked respo..."><img alt="" src="../_images/sphx_glr_plot_simulate_somato_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to calculate an inverse solution of the median nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset, and then simulate a biophysical model network that reproduces the observed dynamics. Note that we do not expound on how we came up with the sequence of evoked drives used in this example, rather, we only demonstrate its implementation. For those who want more background on the HNN model and the process used to articulate the proximal and distal drives needed to simulate evoked responses, see the `HNN ERP tutorial`_. The sequence of evoked drives presented here is not part of a current publication but is motivated by prior studies [1]_, [2]_."><img alt="" src="../_images/sphx_glr_plot_simulate_somato_thumb.png" />
 <p><a class="reference internal" href="../auto_examples/workflows/plot_simulate_somato.html#sphx-glr-auto-examples-workflows-plot-simulate-somato-py"><span class="std std-ref">04. From MEG sensor-space data to HNN simulation</span></a></p>
   <div class="sphx-glr-thumbnail-title">04. From MEG sensor-space data to HNN simulation</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how event related potentials (ERP) are modulated by prestimulus beta ..."><img alt="" src="../_images/sphx_glr_plot_simulate_beta_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how event related potentials (ERP) are modulated by prestimulus beta events. Specifically, this example reproduces Figure 5 from Law et al. 2021 [1]_. To be consistent with the publication, the default network connectivity is altered. These modifications demonstrate a potential mechanism by which transient beta activity in the neocortex can suppress the perceptibility of sensory input. This suppression depends on the timing of the beta event, and the incoming sensory information."><img alt="" src="../_images/sphx_glr_plot_simulate_beta_thumb.png" />
 <p><a class="reference internal" href="../auto_examples/workflows/plot_simulate_beta.html#sphx-glr-auto-examples-workflows-plot-simulate-beta-py"><span class="std std-ref">05. Simulate beta modulated ERP</span></a></p>
   <div class="sphx-glr-thumbnail-title">05. Simulate beta modulated ERP</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to inspect the firing pattern of cells in the HNN model."><img alt="" src="../_images/sphx_glr_plot_firing_pattern_thumb.png" />
 <p><a class="reference internal" href="../auto_examples/howto/plot_firing_pattern.html#sphx-glr-auto-examples-howto-plot-firing-pattern-py"><span class="std std-ref">01. Plot firing pattern</span></a></p>
   <div class="sphx-glr-thumbnail-title">01. Plot firing pattern</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="The main output of HNN simulations is the &#x27;dipole&#x27; waveform, i.e., the net intracellular curren..."><img alt="" src="../_images/sphx_glr_plot_record_extracellular_potentials_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="The main output of HNN simulations is the &#x27;dipole&#x27; waveform, i.e., the net intracellular current flowing in pyramidal cell apical dendrites. At the large distances between cells and M/EEG sensors, this &#x27;primary&#x27; current is the main contributor to the measured fields. Close to the cells, the local field potential (LFP) is the result of intracellular current leaking into the extracellular medium through active and passive membrane channels. Under some simplifying assumptions, we may approximate the LFP at virtual electrodes placed in and around the HNN network model."><img alt="" src="../_images/sphx_glr_plot_record_extracellular_potentials_thumb.png" />
 <p><a class="reference internal" href="../auto_examples/howto/plot_record_extracellular_potentials.html#sphx-glr-auto-examples-howto-plot-record-extracellular-potentials-py"><span class="std std-ref">02. Record extracellular potentials</span></a></p>
   <div class="sphx-glr-thumbnail-title">02. Record extracellular potentials</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to modify the network connectivity."><img alt="" src="../_images/sphx_glr_plot_connectivity_thumb.png" />
@@ -795,28 +1131,145 @@ voltages are not saved due to size.</p>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to animate HNN simulations"><img alt="" src="../_images/sphx_glr_plot_hnn_animation_thumb.png" />
 <p><a class="reference internal" href="../auto_examples/howto/plot_hnn_animation.html#sphx-glr-auto-examples-howto-plot-hnn-animation-py"><span class="std std-ref">06. Animating HNN simulations</span></a></p>
   <div class="sphx-glr-thumbnail-title">06. Animating HNN simulations</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example shows how to do batch simulations in HNN-core, allowing users to efficiently run m..."><img alt="" src="../_images/sphx_glr_plot_batch_simulate_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example shows how to do batch simulations in HNN-core, allowing users to efficiently run multiple simulations with different parameters for comprehensive analysis."><img alt="" src="../_images/sphx_glr_plot_batch_simulate_thumb.png" />
 <p><a class="reference internal" href="../auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py"><span class="std std-ref">07. Batch Simulation</span></a></p>
   <div class="sphx-glr-thumbnail-title">07. Batch Simulation</div>
 </div></div></section>
 </section>
 
 
-    </div>
-      
-  </div>
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="hnn_core.simulate_dipole.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">hnn_core.simulate_dipole</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="hnn_core.Cell.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">hnn_core.Cell</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
-<footer class="footer">
-  <div class="container">
-    <p class="pull-right">
-      <a href="#">Back to top</a>
-      
-    </p>
-    <p>
-        &copy; Copyright 2024, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.2.6.<br/>
-    </p>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
   </div>
-</footer>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network"><code class="docutils literal notranslate"><span class="pre">Network</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.__repr__"><code class="docutils literal notranslate"><span class="pre">Network.__repr__()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.add_bursty_drive"><code class="docutils literal notranslate"><span class="pre">Network.add_bursty_drive()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.add_connection"><code class="docutils literal notranslate"><span class="pre">Network.add_connection()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.add_electrode_array"><code class="docutils literal notranslate"><span class="pre">Network.add_electrode_array()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.add_evoked_drive"><code class="docutils literal notranslate"><span class="pre">Network.add_evoked_drive()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.add_poisson_drive"><code class="docutils literal notranslate"><span class="pre">Network.add_poisson_drive()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.add_tonic_bias"><code class="docutils literal notranslate"><span class="pre">Network.add_tonic_bias()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.clear_connectivity"><code class="docutils literal notranslate"><span class="pre">Network.clear_connectivity()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.clear_drives"><code class="docutils literal notranslate"><span class="pre">Network.clear_drives()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.copy"><code class="docutils literal notranslate"><span class="pre">Network.copy()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.gid_to_type"><code class="docutils literal notranslate"><span class="pre">Network.gid_to_type()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.plot_cells"><code class="docutils literal notranslate"><span class="pre">Network.plot_cells()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.set_cell_positions"><code class="docutils literal notranslate"><span class="pre">Network.set_cell_positions()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.update_weights"><code class="docutils literal notranslate"><span class="pre">Network.update_weights()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.write_configuration"><code class="docutils literal notranslate"><span class="pre">Network.write_configuration()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples-using-hnn-core-network">Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.Network</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/generated/hnn_core.Network.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, HNN Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
   </body>
 </html>

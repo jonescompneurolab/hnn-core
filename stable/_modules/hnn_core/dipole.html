@@ -1,34 +1,66 @@
+
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="../../">
+
+<html lang="en" data-content_root="../../" >
+
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hnn_core.dipole &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=9afac83c" />
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
     <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/hnn_core/dipole';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 
-<meta charset='utf-8'>
-<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
-<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
-<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.4" />
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
 <script>
@@ -40,119 +72,400 @@
 </script>
 
 
-  </head><body>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
-    <div class="container">
-      <div class="navbar-header">
-        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="../../index.html">
-          hnn-core</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.4</b></span>
-      </div>
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
-        <div class="collapse navbar-collapse nav-collapse">
-          <ul class="nav navbar-nav">
-            
-                <li><a href="../../auto_examples/index.html">Examples</a></li>
-                <li><a href="../../api.html">API</a></li>
-                <li><a href="../../glossary.html">Glossary</a></li>
-                <li><a href="../../whats_new.html">What's new</a></li>
-                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
-            
-            
-              <li class="dropdown globaltoc-container">
-  <a role="button"
-     id="dLabelGlobalToc"
-     data-toggle="dropdown"
-     data-target="#"
-     href="../../index.html">Site <b class="caret"></b></a>
-  <ul class="dropdown-menu globaltoc"
-      role="menu"
-      aria-labelledby="dLabelGlobalToc"></ul>
-</li>
-              
-                <li class="dropdown">
-  <a role="button"
-     id="dLabelLocalToc"
-     data-toggle="dropdown"
-     data-target="#"
-     href="#">Page <b class="caret"></b></a>
-  <ul class="dropdown-menu localtoc"
-      role="menu"
-      aria-labelledby="dLabelLocalToc"></ul>
-</li>
-              
-            
-            
-            
-            
-            
-              <li class="hidden-sm"></li>
-            
-          </ul>
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
 
-          
-<div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
-  <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
-    v0.4
-    <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/index.html">Development</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.2/index.html">v0.2</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.3/index.html">v0.3</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.4/index.html">v0.4</a></li>
-  </ul>
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
 </div>
 
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
 
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core  documentation - Home"/>
+    <img src="../../_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core  documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../glossary.html">
+    Glossary
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
+                </ul>
+            </li>
             
-<form class="navbar-form navbar-right" action="../../search.html" method="get">
- <div class="form-group">
-  <input type="text" name="q" class="form-control" placeholder="Search" />
- </div>
-  <input type="hidden" name="check_keywords" value="yes" />
-  <input type="hidden" name="area" value="default" />
-</form>
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
           
 
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
     </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../glossary.html">
+    Glossary
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
 
-<div class="container">
-  <div class="row">
-    <div class="body col-md-12 content" role="main">
+
+      </div>
       
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">hnn_core.dipole</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
   <h1>Source code for hnn_core.dipole</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Class to handle the dipoles.&quot;&quot;&quot;</span>
 
 <span class="c1"># Authors: Mainak Jas &lt;mjas@mgh.harvard.edu&gt;</span>
 <span class="c1">#          Sam Neymotin &lt;samnemo@gmail.com&gt;</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringIO</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">h5io</span> <span class="kn">import</span> <span class="n">write_hdf5</span><span class="p">,</span> <span class="n">read_hdf5</span>
-<span class="kn">from</span> <span class="nn">.externals.mne</span> <span class="kn">import</span> <span class="n">_check_option</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">h5io</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_hdf5</span><span class="p">,</span> <span class="n">read_hdf5</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.externals.mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">_check_option</span>
 
-<span class="kn">from</span> <span class="nn">.viz</span> <span class="kn">import</span> <span class="n">plot_dipole</span><span class="p">,</span> <span class="n">plot_psd</span><span class="p">,</span> <span class="n">plot_tfr_morlet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_dipole</span><span class="p">,</span> <span class="n">plot_psd</span><span class="p">,</span> <span class="n">plot_tfr_morlet</span>
 
 
 <div class="viewcode-block" id="simulate_dipole">
 <a class="viewcode-back" href="../../generated/hnn_core.simulate_dipole.html#hnn_core.dipole.simulate_dipole">[docs]</a>
-<span class="k">def</span> <span class="nf">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">record_vsec</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.025</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">record_vsec</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                     <span class="n">record_isec</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">record_ca</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">postproc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulate a dipole given the experiment parameters.</span>
 
@@ -192,7 +505,7 @@
 <span class="sd">        List of dipole objects for each trials</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="kn">from</span> <span class="nn">.parallel_backends</span> <span class="kn">import</span> <span class="n">_BACKEND</span><span class="p">,</span> <span class="n">JoblibBackend</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.parallel_backends</span><span class="w"> </span><span class="kn">import</span> <span class="n">_BACKEND</span><span class="p">,</span> <span class="n">JoblibBackend</span>
 
     <span class="k">if</span> <span class="n">_BACKEND</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_BACKEND</span> <span class="o">=</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -255,7 +568,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">_read_dipole_txt</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s1">&#39;.txt&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_dipole_txt</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="s1">&#39;.txt&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Read dipole values from a txt file and create a Dipole instance.</span>
 
 <span class="sd">    Parameters</span>
@@ -282,7 +595,7 @@
     <span class="k">return</span> <span class="n">dpl</span>
 
 
-<span class="k">def</span> <span class="nf">_read_dipole_hdf5</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_read_dipole_hdf5</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Read dipole values from a hdf5 file and create a Dipole instance.</span>
 
 <span class="sd">    Parameters</span>
@@ -315,7 +628,7 @@
 
 <div class="viewcode-block" id="read_dipole">
 <a class="viewcode-back" href="../../generated/hnn_core.read_dipole.html#hnn_core.dipole.read_dipole">[docs]</a>
-<span class="k">def</span> <span class="nf">read_dipole</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_dipole</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Read dipole values from a txt or hdf5 file and</span>
 <span class="sd">       create a Dipole instance.</span>
 
@@ -346,7 +659,7 @@
 
 <div class="viewcode-block" id="average_dipoles">
 <a class="viewcode-back" href="../../generated/hnn_core.dipole.average_dipoles.html#hnn_core.dipole.average_dipoles">[docs]</a>
-<span class="k">def</span> <span class="nf">average_dipoles</span><span class="p">(</span><span class="n">dpls</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">average_dipoles</span><span class="p">(</span><span class="n">dpls</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute dipole averages over a list of Dipole objects.</span>
 
 <span class="sd">    Parameters</span>
@@ -392,7 +705,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">_rmse</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">exp_dpl</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_rmse</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">exp_dpl</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Calculates RMSE between data in dpl and exp_dpl</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -415,7 +728,7 @@
 <span class="sd">    err : float</span>
 <span class="sd">        Weighted RMSE between data in dpl and exp_dpl</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">signal</span>
 
     <span class="n">exp_times</span> <span class="o">=</span> <span class="n">exp_dpl</span><span class="o">.</span><span class="n">times</span>
     <span class="n">sim_times</span> <span class="o">=</span> <span class="n">dpl</span><span class="o">.</span><span class="n">times</span>
@@ -461,7 +774,7 @@
 
 <div class="viewcode-block" id="Dipole">
 <a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole">[docs]</a>
-<span class="k">class</span> <span class="nc">Dipole</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Dipole</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Dipole class.</span>
 
 <span class="sd">    An instance of the ``Dipole``-class contains the simulated dipole moment</span>
@@ -496,7 +809,7 @@
 <span class="sd">        :meth:`~hnn_core.dipole.Dipole.scale`).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">nave</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>  <span class="c1"># noqa: D102</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">nave</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>  <span class="c1"># noqa: D102</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
@@ -516,7 +829,7 @@
 
 <div class="viewcode-block" id="Dipole.copy">
 <a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.copy">[docs]</a>
-    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a copy of the Dipole instance</span>
 
 <span class="sd">        Returns</span>
@@ -527,7 +840,7 @@
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_post_proc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window_len</span><span class="p">,</span> <span class="n">fctr</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_post_proc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window_len</span><span class="p">,</span> <span class="n">fctr</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply scaling and smoothing from param-files (DEPRECATE)</span>
 
 <span class="sd">        Parameters</span>
@@ -542,7 +855,7 @@
         <span class="k">if</span> <span class="n">window_len</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># this is to allow param-files with len==0</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">smooth</span><span class="p">(</span><span class="n">window_len</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_convert_fAm_to_nAm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_convert_fAm_to_nAm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The NEURON simulator output is in fAm, convert to nAm</span>
 
 <span class="sd">        NB! Must be run `after` :meth:`Dipole.baseline_renormalization`</span>
@@ -552,7 +865,7 @@
 
 <div class="viewcode-block" id="Dipole.scale">
 <a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.scale">[docs]</a>
-    <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Scale (multiply) the dipole moment by a fixed factor</span>
 
 <span class="sd">        The attribute ``Dipole.scale_applied`` is updated to reflect factors</span>
@@ -571,7 +884,7 @@
 
 <div class="viewcode-block" id="Dipole.smooth">
 <a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.smooth">[docs]</a>
-    <span class="k">def</span> <span class="nf">smooth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window_len</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">smooth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window_len</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Smooth the dipole waveform using Hamming-windowed convolution</span>
 
 <span class="sd">        Note that this method operates in-place, i.e., it will alter the data.</span>
@@ -589,7 +902,7 @@
 <span class="sd">        dpl_copy : instance of Dipole</span>
 <span class="sd">            A copy of the modified Dipole instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">smooth_waveform</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">smooth_waveform</span>
 
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">smooth_waveform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">window_len</span><span class="p">,</span>
@@ -600,7 +913,7 @@
 
 <div class="viewcode-block" id="Dipole.savgol_filter">
 <a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.savgol_filter">[docs]</a>
-    <span class="k">def</span> <span class="nf">savgol_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h_freq</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">savgol_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">h_freq</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Smooth the dipole waveform using Savitzky-Golay filtering</span>
 
 <span class="sd">        Note that this method operates in-place, i.e., it will alter the data.</span>
@@ -624,7 +937,7 @@
 <span class="sd">        dpl_copy : instance of Dipole</span>
 <span class="sd">            A copy of the modified Dipole instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">_savgol_filter</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_savgol_filter</span>
         <span class="k">if</span> <span class="n">h_freq</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;h_freq cannot be negative&#39;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">h_freq</span> <span class="o">&gt;</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfreq</span><span class="p">:</span>
@@ -639,7 +952,7 @@
 
 <div class="viewcode-block" id="Dipole.plot">
 <a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.plot">[docs]</a>
-    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
              <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Simple layer-specific plot function.</span>
 
@@ -668,7 +981,7 @@
 
 <div class="viewcode-block" id="Dipole.plot_psd">
 <a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.plot_psd">[docs]</a>
-    <span class="k">def</span> <span class="nf">plot_psd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot_psd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span>
                  <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot power spectral density (PSD) of dipole time course</span>
 
@@ -717,7 +1030,7 @@
 
 <div class="viewcode-block" id="Dipole.plot_tfr_morlet">
 <a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.plot_tfr_morlet">[docs]</a>
-    <span class="k">def</span> <span class="nf">plot_tfr_morlet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">n_cycles</span><span class="o">=</span><span class="mf">7.</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot_tfr_morlet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">freqs</span><span class="p">,</span> <span class="n">n_cycles</span><span class="o">=</span><span class="mf">7.</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;agg&#39;</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s1">&#39;zeros&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;inferno&#39;</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                         <span class="n">colorbar_inside</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -775,7 +1088,7 @@
             <span class="n">colorbar_inside</span><span class="o">=</span><span class="n">colorbar_inside</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_baseline_renormalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N_pyr_x</span><span class="p">,</span> <span class="n">N_pyr_y</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_baseline_renormalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">N_pyr_x</span><span class="p">,</span> <span class="n">N_pyr_y</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Only baseline renormalize if the units are fAm.</span>
 
 <span class="sd">        Parameters</span>
@@ -827,7 +1140,7 @@
         <span class="c1"># normalized ones</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;agg&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;L2&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;L5&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_write_txt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write_txt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Write dipole values to a file.</span>
 
 <span class="sd">        Parameters</span>
@@ -862,7 +1175,7 @@
 
         <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_write_hdf5</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write_hdf5</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Write dipole values to a hdf5 file.</span>
 
 <span class="sd">        Parameters</span>
@@ -885,7 +1198,7 @@
 
 <div class="viewcode-block" id="Dipole.write">
 <a class="viewcode-back" href="../../generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.write">[docs]</a>
-    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Write dipole values to a txt or hdf5 file.</span>
 
 <span class="sd">        Parameters</span>
@@ -924,21 +1237,75 @@
 
 </pre></div>
 
-    </div>
-      
-  </div>
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
 </div>
-<footer class="footer">
-  <div class="container">
-    <p class="pull-right">
-      <a href="#">Back to top</a>
-      
-    </p>
-    <p>
-        &copy; Copyright 2024, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.2.6.<br/>
-    </p>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
   </div>
-</footer>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, HNN Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
   </body>
 </html>

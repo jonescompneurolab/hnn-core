@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_workflows_plot_simulate_somato.py>`
-        to download the full example code or to run this example in your browser via Binder
+        to download the full example code. or to run this example in your browser via Binder
 
 .. rst-class:: sphx-glr-example-title
 
@@ -136,7 +136,7 @@ Then, we load the raw data and estimate the inverse operator.
 
  .. code-block:: none
 
-    Opening raw data file /home/ntolley/mne_data/MNE-somato-data/sub-01/meg/sub-01_task-somato_meg.fif...
+    Opening raw data file /Users/austinsoplata/mne_data/MNE-somato-data/sub-01/meg/sub-01_task-somato_meg.fif...
         Range : 237600 ... 506999 =    791.189 ...  1688.266 secs
     Ready.
     Reading 0 ... 269399  =      0.000 ...   897.077 secs...
@@ -155,9 +155,9 @@ Then, we load the raw data and estimate the inverse operator.
     - Filter length: 993 samples (3.307 s)
 
     [Parallel(n_jobs=1)]: Done  17 tasks      | elapsed:    0.1s
-    [Parallel(n_jobs=1)]: Done  71 tasks      | elapsed:    0.5s
-    [Parallel(n_jobs=1)]: Done 161 tasks      | elapsed:    1.2s
-    [Parallel(n_jobs=1)]: Done 287 tasks      | elapsed:    2.1s
+    [Parallel(n_jobs=1)]: Done  71 tasks      | elapsed:    0.2s
+    [Parallel(n_jobs=1)]: Done 161 tasks      | elapsed:    0.4s
+    [Parallel(n_jobs=1)]: Done 287 tasks      | elapsed:    0.7s
     111 events found on stim channel STI 014
     Event IDs: [1]
     Not setting metadata
@@ -166,20 +166,16 @@ Then, we load the raw data and estimate the inverse operator.
     0 projection items activated
     Using data from preloaded Raw for 111 events and 112 original time points ...
     0 bad epochs dropped
-    Reading forward solution from /home/ntolley/mne_data/MNE-somato-data/derivatives/sub-01/sub-01_task-somato-fwd.fif...
+    Reading forward solution from /Users/austinsoplata/mne_data/MNE-somato-data/derivatives/sub-01/sub-01_task-somato-fwd.fif...
         Reading a source space...
         [done]
         Reading a source space...
         [done]
         2 source spaces read
-        Desired named matrix (kind = 3523) not available
+        Desired named matrix (kind = 3523 (FIFF_MNE_FORWARD_SOLUTION_GRAD)) not available
         Read MEG forward solution (8155 sources, 306 channels, free orientations)
         Source spaces transformed to the forward solution coordinate frame
-    Computing rank from data with rank=None
-        Using tolerance 1.5e-08 (2.2e-16 eps * 306 dim * 2.2e+05  max singular value)
-        Estimated rank (mag + grad): 306
-        MEG: rank 306 computed from 306 data channels with 0 projectors
-    /home/ntolley/jones_lab/hnn-core/examples/workflows/plot_simulate_somato.py:66: RuntimeWarning: Something went wrong in the data-driven estimation of the data rank as it exceeds the theoretical rank from the info (306 > 64). Consider setting rank to "auto" or setting it explicitly as an integer.
+    /Users/austinsoplata/rep/brn/hnn-core/examples/workflows/plot_simulate_somato.py:66: RuntimeWarning: Something went wrong in the data-driven estimation of the data rank as it exceeds the theoretical rank from the info (306 > 64). Consider setting rank to "auto" or setting it explicitly as an integer.
       cov = mne.compute_covariance(epochs)
     Reducing data rank from 306 -> 306
     Estimating covariance using EMPIRICAL
@@ -283,7 +279,7 @@ create a label for the postcentral gyrus (S1) in source-space
  .. code-block:: none
 
     Reading labels from parcellation...
-       read 1 labels from /home/ntolley/mne_data/MNE-somato-data/derivatives/freesurfer/subjects/01/label/rh.aparc.a2009s.annot
+       read 1 labels from /Users/austinsoplata/mne_data/MNE-somato-data/derivatives/freesurfer/subjects/01/label/rh.aparc.a2009s.annot
 
 
 
@@ -564,7 +560,7 @@ nerve evoked response waveforms, and output spike histogram.
 
 
 .. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_somato_002.png
-   :alt: Aggregate (L2 + L5)
+   :alt: Aggregate (L2/3 + L5)
    :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_somato_002.png
    :class: sphx-glr-single-img
 
@@ -608,7 +604,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 45.085 seconds)
+   **Total running time of the script:** (0 minutes 12.374 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_somato.py:
@@ -631,6 +627,10 @@ References
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_simulate_somato.py <plot_simulate_somato.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_simulate_somato.zip <plot_simulate_somato.zip>`
 
 
 .. only:: html

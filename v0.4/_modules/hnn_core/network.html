@@ -1,34 +1,66 @@
+
 <!DOCTYPE html>
 
-<html lang="en" data-content_root="../../">
+
+<html lang="en" data-content_root="../../" >
+
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>hnn_core.network &#8212; hnn-core  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css?v=9afac83c" />
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
     <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/hnn_core/network';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 
-<meta charset='utf-8'>
-<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
-<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
-<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
-<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.4" />
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
 <script>
@@ -40,98 +72,379 @@
 </script>
 
 
-  </head><body>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
-    <div class="container">
-      <div class="navbar-header">
-        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="../../index.html">
-          hnn-core</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.4</b></span>
-      </div>
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
-        <div class="collapse navbar-collapse nav-collapse">
-          <ul class="nav navbar-nav">
-            
-                <li><a href="../../auto_examples/index.html">Examples</a></li>
-                <li><a href="../../api.html">API</a></li>
-                <li><a href="../../glossary.html">Glossary</a></li>
-                <li><a href="../../whats_new.html">What's new</a></li>
-                <li><a href="https://github.com/jonescompneurolab/hnn-core">GitHub</a></li>
-            
-            
-              <li class="dropdown globaltoc-container">
-  <a role="button"
-     id="dLabelGlobalToc"
-     data-toggle="dropdown"
-     data-target="#"
-     href="../../index.html">Site <b class="caret"></b></a>
-  <ul class="dropdown-menu globaltoc"
-      role="menu"
-      aria-labelledby="dLabelGlobalToc"></ul>
-</li>
-              
-                <li class="dropdown">
-  <a role="button"
-     id="dLabelLocalToc"
-     data-toggle="dropdown"
-     data-target="#"
-     href="#">Page <b class="caret"></b></a>
-  <ul class="dropdown-menu localtoc"
-      role="menu"
-      aria-labelledby="dLabelLocalToc"></ul>
-</li>
-              
-            
-            
-            
-            
-            
-              <li class="hidden-sm"></li>
-            
-          </ul>
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
 
-          
-<div class="navbar-form navbar-right navbar-btn dropdown btn-group-sm" style="margin-left: 20px; margin-top: 5px; margin-bottom: 5px">
-  <button type="button" class="btn btn-primary navbar-btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
-    v0.4
-    <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/dev/index.html">Development</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">Stable</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.1/index.html">v0.1</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.2/index.html">v0.2</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.3/index.html">v0.3</a></li>
-    <li><a href="https://jonescompneurolab.github.io/hnn-core/v0.4/index.html">v0.4</a></li>
-  </ul>
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
 </div>
 
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
 
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core  documentation - Home"/>
+    <img src="../../_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core  documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../glossary.html">
+    Glossary
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
+                </ul>
+            </li>
             
-<form class="navbar-form navbar-right" action="../../search.html" method="get">
- <div class="form-group">
-  <input type="text" name="q" class="form-control" placeholder="Search" />
- </div>
-  <input type="hidden" name="check_keywords" value="yes" />
-  <input type="hidden" name="area" value="default" />
-</form>
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
           
 
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
     </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../glossary.html">
+    Glossary
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
 
-<div class="container">
-  <div class="row">
-    <div class="body col-md-12 content" role="main">
+
+      </div>
       
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">hnn_core.network</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
   <h1>Source code for hnn_core.network</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Network class.&quot;&quot;&quot;</span>
 
@@ -142,28 +455,28 @@
 <span class="c1">#          Nick Tolley &lt;nicholas_tolley@brown.edu&gt;</span>
 <span class="c1">#          Ryan Thorpe &lt;ryan_thorpe@brown.edu&gt;</span>
 
-<span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">defaultdict</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">it</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">defaultdict</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
-<span class="kn">from</span> <span class="nn">.drives</span> <span class="kn">import</span> <span class="n">_drive_cell_event_times</span>
-<span class="kn">from</span> <span class="nn">.drives</span> <span class="kn">import</span> <span class="n">_get_target_properties</span><span class="p">,</span> <span class="n">_add_drives_from_params</span>
-<span class="kn">from</span> <span class="nn">.drives</span> <span class="kn">import</span> <span class="n">_check_drive_parameter_values</span><span class="p">,</span> <span class="n">_check_poisson_rates</span>
-<span class="kn">from</span> <span class="nn">.cells_default</span> <span class="kn">import</span> <span class="n">pyramidal</span><span class="p">,</span> <span class="n">basket</span>
-<span class="kn">from</span> <span class="nn">.params</span> <span class="kn">import</span> <span class="n">_long_name</span><span class="p">,</span> <span class="n">_short_name</span>
-<span class="kn">from</span> <span class="nn">.viz</span> <span class="kn">import</span> <span class="n">plot_cells</span>
-<span class="kn">from</span> <span class="nn">.externals.mne</span> <span class="kn">import</span> <span class="n">_validate_type</span><span class="p">,</span> <span class="n">_check_option</span>
-<span class="kn">from</span> <span class="nn">.extracellular</span> <span class="kn">import</span> <span class="n">ExtracellularArray</span>
-<span class="kn">from</span> <span class="nn">.check</span> <span class="kn">import</span> <span class="n">_check_gids</span><span class="p">,</span> <span class="n">_gid_to_type</span><span class="p">,</span> <span class="n">_string_input_to_list</span>
-<span class="kn">from</span> <span class="nn">.hnn_io</span> <span class="kn">import</span> <span class="n">write_network_configuration</span><span class="p">,</span> <span class="n">network_to_dict</span>
-<span class="kn">from</span> <span class="nn">.externals.mne</span> <span class="kn">import</span> <span class="n">copy_doc</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.drives</span><span class="w"> </span><span class="kn">import</span> <span class="n">_drive_cell_event_times</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.drives</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_target_properties</span><span class="p">,</span> <span class="n">_add_drives_from_params</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.drives</span><span class="w"> </span><span class="kn">import</span> <span class="n">_check_drive_parameter_values</span><span class="p">,</span> <span class="n">_check_poisson_rates</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cells_default</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyramidal</span><span class="p">,</span> <span class="n">basket</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.params</span><span class="w"> </span><span class="kn">import</span> <span class="n">_long_name</span><span class="p">,</span> <span class="n">_short_name</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_cells</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.externals.mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">_validate_type</span><span class="p">,</span> <span class="n">_check_option</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.extracellular</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExtracellularArray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.check</span><span class="w"> </span><span class="kn">import</span> <span class="n">_check_gids</span><span class="p">,</span> <span class="n">_gid_to_type</span><span class="p">,</span> <span class="n">_string_input_to_list</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.hnn_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_network_configuration</span><span class="p">,</span> <span class="n">network_to_dict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.externals.mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">copy_doc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span>
 
 
-<span class="k">def</span> <span class="nf">_create_cell_coords</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_create_cell_coords</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates coordinate grid and place cells in it.</span>
 
 <span class="sd">    Parameters</span>
@@ -195,11 +508,11 @@
 <span class="sd">    Common positions are all located at origin.</span>
 <span class="sd">    Sort of a hack because of redundancy.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">_calc_pyramidal_coord</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calc_pyramidal_coord</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">):</span>
         <span class="n">list_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">pos</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="p">[</span><span class="n">zdiff</span><span class="p">])]</span>
         <span class="k">return</span> <span class="n">list_coords</span>
 
-    <span class="k">def</span> <span class="nf">_calc_basket_coord</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calc_basket_coord</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
         <span class="n">xzero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_pyr_x</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
         <span class="n">xone</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_pyr_x</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
         <span class="c1"># split even and odd y vals</span>
@@ -216,7 +529,7 @@
 
         <span class="k">return</span> <span class="n">list_coords</span>
 
-    <span class="k">def</span> <span class="nf">_calc_origin</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calc_origin</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">):</span>
         <span class="c1"># origin&#39;s z component isn&#39;t used in calculating distance functions.</span>
         <span class="c1"># will be used for adding external drives.</span>
         <span class="n">origin_x</span> <span class="o">=</span> <span class="n">xxrange</span><span class="p">[</span><span class="nb">int</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">xxrange</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)]</span>
@@ -244,7 +557,7 @@
     <span class="k">return</span> <span class="n">pos_dict</span>
 
 
-<span class="k">def</span> <span class="nf">_compare_lists</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_compare_lists</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compares lists for equality</span>
 
@@ -259,7 +572,7 @@
     <span class="k">return</span> <span class="ow">not</span> <span class="n">t</span>
 
 
-<span class="k">def</span> <span class="nf">_connection_probability</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">probability</span><span class="p">,</span> <span class="n">conn_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_connection_probability</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">probability</span><span class="p">,</span> <span class="n">conn_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove/keep a random subset of connections.</span>
 
 <span class="sd">    Parameters</span>
@@ -320,7 +633,7 @@
 
 <div class="viewcode-block" id="pick_connection">
 <a class="viewcode-back" href="../../generated/hnn_core.pick_connection.html#hnn_core.pick_connection">[docs]</a>
-<span class="k">def</span> <span class="nf">pick_connection</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">src_gids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_gids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pick_connection</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">src_gids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_gids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="n">loc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">receptor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns indices of connections that match search parameters.</span>
 
@@ -439,7 +752,7 @@
 
 <div class="viewcode-block" id="Network">
 <a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network">[docs]</a>
-<span class="k">class</span> <span class="nc">Network</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Network</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The Network class.</span>
 
 <span class="sd">    Parameters</span>
@@ -505,7 +818,7 @@
 <span class="sd">    connectivity information contained in ``params`` will be ignored.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)):</span>
         <span class="c1"># Save the parameters used to create the Network</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="s1">&#39;params&#39;</span><span class="p">)</span>
@@ -588,7 +901,7 @@
 
 <div class="viewcode-block" id="Network.__repr__">
 <a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.__repr__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">class_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> x </span><span class="si">%d</span><span class="s2"> Pyramidal cells (L2, L5)&quot;</span>
              <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_N_pyr_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N_pyr_y</span><span class="p">))</span>
@@ -598,7 +911,7 @@
         <span class="k">return</span> <span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1"> | </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Network</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">NotImplemented</span>
 
@@ -608,26 +921,23 @@
             <span class="k">return</span> <span class="kc">False</span>
 
         <span class="c1"># Check all other attributes</span>
-        <span class="n">all_attrs</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">attrs_to_ignore</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_attrs</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)]</span>
-        <span class="n">attrs_to_ignore</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;add_bursty_drive&#39;</span><span class="p">,</span> <span class="s1">&#39;add_connection&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;add_electrode_array&#39;</span><span class="p">,</span> <span class="s1">&#39;add_evoked_drive&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;add_poisson_drive&#39;</span><span class="p">,</span> <span class="s1">&#39;add_tonic_bias&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;clear_connectivity&#39;</span><span class="p">,</span> <span class="s1">&#39;clear_drives&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;connectivity&#39;</span><span class="p">,</span> <span class="s1">&#39;copy&#39;</span><span class="p">,</span> <span class="s1">&#39;gid_to_type&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;plot_cells&#39;</span><span class="p">,</span> <span class="s1">&#39;set_cell_positions&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;to_dict&#39;</span><span class="p">,</span> <span class="s1">&#39;write_configuration&#39;</span><span class="p">])</span>
-        <span class="n">attrs_to_check</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_attrs</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attrs_to_ignore</span><span class="p">]</span>
+        <span class="n">attrs_to_ignore</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;connectivity&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">attr</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs_to_ignore</span><span class="p">:</span>
+                <span class="k">continue</span>
 
-        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs_to_check</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Does not have the same set of attributes</span>
                 <span class="k">return</span> <span class="kc">False</span>
 
         <span class="k">return</span> <span class="kc">True</span>
 
 <div class="viewcode-block" id="Network.set_cell_positions">
 <a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.set_cell_positions">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_cell_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_cell_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                            <span class="n">layer_separation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set relative positions of cells arranged in a square grid</span>
 
@@ -676,7 +986,7 @@
 
 <div class="viewcode-block" id="Network.copy">
 <a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.copy">[docs]</a>
-    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a copy of the Network instance</span>
 
 <span class="sd">        The returned copy retains the intrinsic connectivity between cells, as</span>
@@ -701,7 +1011,7 @@
 
 <div class="viewcode-block" id="Network.add_evoked_drive">
 <a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_evoked_drive">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_evoked_drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">numspikes</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_evoked_drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">numspikes</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span>
                          <span class="n">n_drive_cells</span><span class="o">=</span><span class="s1">&#39;n_cells&#39;</span><span class="p">,</span> <span class="n">cell_specific</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                          <span class="n">weights_ampa</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weights_nmda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                          <span class="n">space_constant</span><span class="o">=</span><span class="mf">3.</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
@@ -779,7 +1089,7 @@
 <span class="sd">        and conn_seed (n_trials &gt; 1 in simulate_dipole(..., n_trials):</span>
 
 <span class="sd">        - event_seed</span>
-<span class="sd">            Across trials, the random seed is incremented leading such that</span>
+<span class="sd">            Across trials, the random seed is incremented such that</span>
 <span class="sd">            the exact spike times are different</span>
 <span class="sd">        - conn_seed</span>
 <span class="sd">            The random seed does not change across trials. This means for</span>
@@ -811,7 +1121,7 @@
 
 <div class="viewcode-block" id="Network.add_poisson_drive">
 <a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_poisson_drive">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_poisson_drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rate_constant</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_poisson_drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rate_constant</span><span class="p">,</span>
                           <span class="n">location</span><span class="p">,</span> <span class="n">n_drive_cells</span><span class="o">=</span><span class="s1">&#39;n_cells&#39;</span><span class="p">,</span>
                           <span class="n">cell_specific</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">weights_ampa</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                           <span class="n">weights_nmda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">space_constant</span><span class="o">=</span><span class="mf">100.</span><span class="p">,</span>
@@ -929,7 +1239,7 @@
 
 <div class="viewcode-block" id="Network.add_bursty_drive">
 <a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_bursty_drive">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_bursty_drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstart_std</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_bursty_drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">tstart</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstart_std</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                          <span class="n">location</span><span class="p">,</span> <span class="n">burst_rate</span><span class="p">,</span> <span class="n">burst_std</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">numspikes</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
                          <span class="n">spike_isi</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">n_drive_cells</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cell_specific</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                          <span class="n">weights_ampa</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">weights_nmda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1041,7 +1351,7 @@
                            <span class="n">n_drive_cells</span><span class="p">,</span> <span class="n">cell_specific</span><span class="p">,</span> <span class="n">probability</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_attach_drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">drive</span><span class="p">,</span> <span class="n">weights_ampa</span><span class="p">,</span> <span class="n">weights_nmda</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_attach_drive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">drive</span><span class="p">,</span> <span class="n">weights_ampa</span><span class="p">,</span> <span class="n">weights_nmda</span><span class="p">,</span> <span class="n">location</span><span class="p">,</span>
                       <span class="n">space_constant</span><span class="p">,</span> <span class="n">synaptic_delays</span><span class="p">,</span> <span class="n">n_drive_cells</span><span class="p">,</span>
                       <span class="n">cell_specific</span><span class="p">,</span> <span class="n">probability</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Attach a drive to network based on connectivity information</span>
@@ -1225,17 +1535,17 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;src_gids&#39;</span><span class="p">]</span> <span class="o">=</span> \
                             <span class="bp">self</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">][</span><span class="s1">&#39;src_gids&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">_reset_drives</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reset_drives</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># reset every time called again, e.g., from dipole.py or in self.copy()</span>
         <span class="k">for</span> <span class="n">drive_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_drives</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">external_drives</span><span class="p">[</span><span class="n">drive_name</span><span class="p">][</span><span class="s1">&#39;events&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_reset_rec_arrays</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reset_rec_arrays</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># clear the data in rec_arrays</span>
         <span class="k">for</span> <span class="n">arr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rec_arrays</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">arr</span><span class="o">.</span><span class="n">_reset</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">_instantiate_drives</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_instantiate_drives</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates event time vectors for all drives across trials</span>
 
 <span class="sd">        Parameters</span>
@@ -1296,7 +1606,8 @@
 
 <div class="viewcode-block" id="Network.add_tonic_bias">
 <a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_tonic_bias">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_tonic_bias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">cell_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_tonic_bias</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">cell_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="s1">&#39;soma&#39;</span><span class="p">,</span>
+                       <span class="n">bias_name</span><span class="o">=</span><span class="s1">&#39;tonic&#39;</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">t0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Attaches parameters of tonic bias input for given cell types</span>
 
 <span class="sd">        Parameters</span>
@@ -1305,6 +1616,11 @@
 <span class="sd">            The name of the cell type to add a tonic input. When supplied,</span>
 <span class="sd">            a float value must be provided with the `amplitude` keyword.</span>
 <span class="sd">            Valid inputs are those listed in  `net.cell_types`.</span>
+<span class="sd">        section : str</span>
+<span class="sd">            name of cell section the bias should be applied to.</span>
+<span class="sd">            See net.cell_types[cell_type].sections.keys()</span>
+<span class="sd">        bias_name : str</span>
+<span class="sd">            The name of the bias.</span>
 <span class="sd">        amplitude: dict | float</span>
 <span class="sd">            A dictionary of cell type keys (str) to amplitude values (float).</span>
 <span class="sd">            Valid inputs for cell types are those listed in `net.cell_types`.</span>
@@ -1332,6 +1648,7 @@
             <span class="n">_validate_type</span><span class="p">(</span><span class="n">amplitude</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s1">&#39;amplitude&#39;</span><span class="p">)</span>
 
             <span class="n">_add_cell_type_bias</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_type</span><span class="o">=</span><span class="n">cell_type</span><span class="p">,</span>
+                                <span class="n">section</span><span class="o">=</span><span class="n">section</span><span class="p">,</span> <span class="n">bias_name</span><span class="o">=</span><span class="n">bias_name</span><span class="p">,</span>
                                 <span class="n">amplitude</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">amplitude</span><span class="p">),</span>
                                 <span class="n">t_0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">t_stop</span><span class="o">=</span><span class="n">tstop</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1343,11 +1660,12 @@
 
             <span class="k">for</span> <span class="n">_cell_type</span><span class="p">,</span> <span class="n">_amplitude</span> <span class="ow">in</span> <span class="n">amplitude</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">_add_cell_type_bias</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_type</span><span class="o">=</span><span class="n">_cell_type</span><span class="p">,</span>
+                                    <span class="n">section</span><span class="o">=</span><span class="n">section</span><span class="p">,</span> <span class="n">bias_name</span><span class="o">=</span><span class="n">bias_name</span><span class="p">,</span>
                                     <span class="n">amplitude</span><span class="o">=</span><span class="n">_amplitude</span><span class="p">,</span>
                                     <span class="n">t_0</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">t_stop</span><span class="o">=</span><span class="n">tstop</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_add_cell_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_name</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">cell_template</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_add_cell_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_name</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">cell_template</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add cell type by updating pos_dict and gid_ranges.&quot;&quot;&quot;</span>
         <span class="n">ll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_gids</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_n_gids</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
@@ -1360,14 +1678,14 @@
 
 <div class="viewcode-block" id="Network.gid_to_type">
 <a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.gid_to_type">[docs]</a>
-    <span class="k">def</span> <span class="nf">gid_to_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gid_to_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Reverse lookup of gid to type.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_gid_to_type</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Network.add_connection">
 <a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_connection">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_gids</span><span class="p">,</span> <span class="n">target_gids</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_gids</span><span class="p">,</span> <span class="n">target_gids</span><span class="p">,</span> <span class="n">loc</span><span class="p">,</span> <span class="n">receptor</span><span class="p">,</span>
                        <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">,</span> <span class="n">allow_autapses</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                        <span class="n">probability</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">conn_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Appends connections to connectivity list</span>
@@ -1524,6 +1842,8 @@
             <span class="n">_validate_type</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="n">arg_name</span><span class="p">,</span> <span class="s1">&#39;int or float&#39;</span><span class="p">)</span>
             <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;nc_dict&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
 
+        <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;nc_dict&#39;</span><span class="p">][</span><span class="s1">&#39;gain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
         <span class="c1"># Probabilistically define connections</span>
         <span class="k">if</span> <span class="n">probability</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
             <span class="n">_connection_probability</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">probability</span><span class="p">,</span> <span class="n">conn_seed</span><span class="p">)</span>
@@ -1536,7 +1856,7 @@
 
 <div class="viewcode-block" id="Network.clear_connectivity">
 <a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.clear_connectivity">[docs]</a>
-    <span class="k">def</span> <span class="nf">clear_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove all connections defined in Network.connectivity</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">connectivity</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -1548,7 +1868,7 @@
 
 <div class="viewcode-block" id="Network.clear_drives">
 <a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.clear_drives">[docs]</a>
-    <span class="k">def</span> <span class="nf">clear_drives</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_drives</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove all drives defined in Network.connectivity&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connectivity</span> <span class="o">=</span> <span class="p">[</span><span class="n">conn</span> <span class="k">for</span> <span class="n">conn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectivity</span> <span class="k">if</span>
                              <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;src_type&#39;</span><span class="p">]</span> <span class="ow">not</span>
@@ -1565,7 +1885,7 @@
 
 <div class="viewcode-block" id="Network.add_electrode_array">
 <a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_electrode_array">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_electrode_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">electrode_pos</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">conductivity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_electrode_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">electrode_pos</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">conductivity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
                             <span class="n">method</span><span class="o">=</span><span class="s1">&#39;psa&#39;</span><span class="p">,</span> <span class="n">min_distance</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Specify coordinates of electrode array for extracellular recording.</span>
 
@@ -1604,9 +1924,82 @@
                                      <span class="n">min_distance</span><span class="o">=</span><span class="n">min_distance</span><span class="p">)})</span></div>
 
 
+<div class="viewcode-block" id="Network.update_weights">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.update_weights">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e_e</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">e_i</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                       <span class="n">i_e</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">i_i</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update synaptic weights of the network.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        e_e : float</span>
+<span class="sd">            Synaptic gain of excitatory to excitatory connections</span>
+<span class="sd">            (default None)</span>
+<span class="sd">        e_i : float</span>
+<span class="sd">            Synaptic gain of excitatory to inhibitory connections</span>
+<span class="sd">            (default None)</span>
+<span class="sd">        i_e : float</span>
+<span class="sd">            Synaptic gain of inhibitory to excitatory connections</span>
+<span class="sd">            (default None)</span>
+<span class="sd">        i_i : float</span>
+<span class="sd">            Synaptic gain of inhibitory to inhibitory connections</span>
+<span class="sd">            (default None)</span>
+<span class="sd">        copy : bool</span>
+<span class="sd">            If True, returns a copy of the network. If False,</span>
+<span class="sd">            the network is updated in place with a return of None.</span>
+<span class="sd">            (default False)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        net : instance of Network</span>
+<span class="sd">            A copy of the instance with updated synaptic gains if copy=True.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Synaptic gains must be non-negative. The synaptic gains will only be</span>
+<span class="sd">        updated if a float value is provided. If None is provided</span>
+<span class="sd">        (the default), the synapticgain will remain unchanged.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">copy</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s1">&#39;copy&#39;</span><span class="p">)</span>
+
+        <span class="n">net</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="n">copy</span> <span class="k">else</span> <span class="bp">self</span>
+
+        <span class="n">e_conns</span> <span class="o">=</span> <span class="n">pick_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receptor</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ampa&#39;</span><span class="p">,</span> <span class="s1">&#39;nmda&#39;</span><span class="p">])</span>
+        <span class="n">e_cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span>
+            <span class="n">conn_idx</span><span class="p">][</span><span class="s1">&#39;src_gids&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">conn_idx</span> <span class="ow">in</span> <span class="n">e_conns</span><span class="p">])</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+
+        <span class="n">i_conns</span> <span class="o">=</span> <span class="n">pick_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">receptor</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gabaa&#39;</span><span class="p">,</span> <span class="s1">&#39;gabab&#39;</span><span class="p">])</span>
+        <span class="n">i_cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span>
+            <span class="n">conn_idx</span><span class="p">][</span><span class="s1">&#39;src_gids&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">conn_idx</span> <span class="ow">in</span> <span class="n">i_conns</span><span class="p">])</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">conn_types</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;e_e&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">e_e</span><span class="p">,</span> <span class="n">e_cells</span><span class="p">,</span> <span class="n">e_cells</span><span class="p">),</span>
+            <span class="s1">&#39;e_i&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">e_i</span><span class="p">,</span> <span class="n">e_cells</span><span class="p">,</span> <span class="n">i_cells</span><span class="p">),</span>
+            <span class="s1">&#39;i_e&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">i_e</span><span class="p">,</span> <span class="n">i_cells</span><span class="p">,</span> <span class="n">e_cells</span><span class="p">),</span>
+            <span class="s1">&#39;i_i&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">i_i</span><span class="p">,</span> <span class="n">i_cells</span><span class="p">,</span> <span class="n">i_cells</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">conn_type</span><span class="p">,</span> <span class="p">(</span><span class="n">gain</span><span class="p">,</span> <span class="n">e_vals</span><span class="p">,</span> <span class="n">i_vals</span><span class="p">)</span> <span class="ow">in</span> <span class="n">conn_types</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">gain</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">_validate_type</span><span class="p">(</span><span class="n">gain</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="n">conn_type</span><span class="p">,</span> <span class="s1">&#39;int or float&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">gain</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Synaptic gains must be non-negative.&quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">gain</span><span class="si">}</span><span class="s2"> for &#39;</span><span class="si">{</span><span class="n">conn_type</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+
+            <span class="n">conn_indices</span> <span class="o">=</span> <span class="n">pick_connection</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">src_gids</span><span class="o">=</span><span class="n">e_vals</span><span class="p">,</span>
+                                           <span class="n">target_gids</span><span class="o">=</span><span class="n">i_vals</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">conn_idx</span> <span class="ow">in</span> <span class="n">conn_indices</span><span class="p">:</span>
+                <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_idx</span><span class="p">][</span><span class="s1">&#39;nc_dict&#39;</span><span class="p">][</span><span class="s1">&#39;gain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gain</span>
+
+        <span class="k">if</span> <span class="n">copy</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">net</span></div>
+
+
 <div class="viewcode-block" id="Network.plot_cells">
 <a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.plot_cells">[docs]</a>
-    <span class="k">def</span> <span class="nf">plot_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the cells using Network.pos_dict.</span>
 
 <span class="sd">        Parameters</span>
@@ -1625,19 +2018,19 @@
         <span class="k">return</span> <span class="n">plot_cells</span><span class="p">(</span><span class="n">net</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write_output</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write_output</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">network_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write_output</span><span class="o">=</span><span class="n">write_output</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Network.write_configuration">
 <a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.write_configuration">[docs]</a>
     <span class="nd">@copy_doc</span><span class="p">(</span><span class="n">write_network_configuration</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">write_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">write_network_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">)</span></div>
 </div>
 
 
 
-<span class="k">class</span> <span class="nc">_Connectivity</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_Connectivity</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for containing the connectivity details of the network</span>
 
 <span class="sd">    Class instances are essentially dictionaries, with the keys described below</span>
@@ -1678,6 +2071,8 @@
 <span class="sd">            Synaptic delay in ms.</span>
 <span class="sd">        lamtha : float</span>
 <span class="sd">            Space constant.</span>
+<span class="sd">        gain : float</span>
+<span class="sd">            Multiplicative factor for synaptic weight.</span>
 <span class="sd">    probability : float</span>
 <span class="sd">        Probability of connection between any src-target pair.</span>
 <span class="sd">        Defaults to 1.0 producing an all-to-all pattern.</span>
@@ -1688,7 +2083,7 @@
 <span class="sd">    num_srcs and num_targets for probability &lt; 1.0.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">entr</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;src_type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">entr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">cell counts: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;num_srcs&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> srcs, &quot;</span>
         <span class="n">entr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;num_targets&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> targets&quot;</span>
@@ -1702,7 +2097,7 @@
         <span class="k">return</span> <span class="n">entr</span>
 
 
-<span class="k">class</span> <span class="nc">_NetworkDrive</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_NetworkDrive</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A class for containing the parameters of external drives</span>
 
 <span class="sd">    Class instances are essentially dictionaries, with keys described below</span>
@@ -1740,7 +2135,7 @@
 <span class="sd">        etc.). See the drive add-methods in Network for details.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">entr</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&lt;External drive &#39;</span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">entr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">drive class: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -1759,8 +2154,8 @@
         <span class="k">return</span> <span class="n">entr</span>
 
 
-<span class="k">def</span> <span class="nf">_add_cell_type_bias</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Network</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span>
-                        <span class="n">cell_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_add_cell_type_bias</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Network</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span>
+                        <span class="n">cell_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="s1">&#39;soma&#39;</span><span class="p">,</span> <span class="n">bias_name</span><span class="o">=</span><span class="s1">&#39;tonic&#39;</span><span class="p">,</span>
                         <span class="n">t_0</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">t_stop</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
     <span class="k">if</span> <span class="n">network</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1777,35 +2172,101 @@
                              <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s1">. &#39;</span>
                              <span class="sa">f</span><span class="s1">&#39;Got </span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="s1">&#39;tonic&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">network</span><span class="o">.</span><span class="n">external_biases</span><span class="p">:</span>
-            <span class="n">network</span><span class="o">.</span><span class="n">external_biases</span><span class="p">[</span><span class="s1">&#39;tonic&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">bias_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">network</span><span class="o">.</span><span class="n">external_biases</span><span class="p">:</span>
+            <span class="n">network</span><span class="o">.</span><span class="n">external_biases</span><span class="p">[</span><span class="n">bias_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">network</span><span class="o">.</span><span class="n">external_biases</span><span class="p">[</span><span class="s1">&#39;tonic&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Tonic bias already defined for </span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="n">network</span><span class="o">.</span><span class="n">external_biases</span><span class="p">[</span><span class="n">bias_name</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Bias named </span><span class="si">{</span><span class="n">bias_name</span><span class="si">}</span><span class="s1"> already defined &#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;for </span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="n">cell_type_bias</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;amplitude&#39;</span><span class="p">:</span> <span class="n">amplitude</span><span class="p">,</span>
             <span class="s1">&#39;t0&#39;</span><span class="p">:</span> <span class="n">t_0</span><span class="p">,</span>
-            <span class="s1">&#39;tstop&#39;</span><span class="p">:</span> <span class="n">t_stop</span>
+            <span class="s1">&#39;tstop&#39;</span><span class="p">:</span> <span class="n">t_stop</span><span class="p">,</span>
+            <span class="s1">&#39;section&#39;</span><span class="p">:</span> <span class="n">section</span>
         <span class="p">}</span>
-        <span class="n">network</span><span class="o">.</span><span class="n">external_biases</span><span class="p">[</span><span class="s1">&#39;tonic&#39;</span><span class="p">][</span><span class="n">cell_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_type_bias</span>
+
+        <span class="n">sections</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_type</span><span class="p">]</span><span class="o">.</span><span class="n">sections</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="c1"># error when section is defined that doesn&#39;t exist.</span>
+        <span class="k">if</span> <span class="n">section</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;section must be one of </span><span class="si">{</span><span class="n">sections</span><span class="si">}</span><span class="s2">. &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cell_type_bias</span><span class="p">[</span><span class="s1">&#39;section&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">section</span>
+
+        <span class="n">network</span><span class="o">.</span><span class="n">external_biases</span><span class="p">[</span><span class="n">bias_name</span><span class="p">][</span><span class="n">cell_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_type_bias</span>
 </pre></div>
 
-    </div>
-      
-  </div>
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
 </div>
-<footer class="footer">
-  <div class="container">
-    <p class="pull-right">
-      <a href="#">Back to top</a>
-      
-    </p>
-    <p>
-        &copy; Copyright 2024, HNN Developers.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 7.2.6.<br/>
-    </p>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
   </div>
-</footer>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, HNN Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
   </body>
 </html>

@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_howto_plot_firing_pattern.py>`
-        to download the full example code or to run this example in your browser via Binder
+        to download the full example code. or to run this example in your browser via Binder
 
 .. rst-class:: sphx-glr-example-title
 
@@ -216,7 +216,7 @@ object as a dictionary
 
  .. code-block:: none
 
-    OrderedDict([('L2_basket', range(0, 35)), ('L2_pyramidal', range(35, 135)), ('L5_basket', range(135, 170)), ('L5_pyramidal', range(170, 270)), ('evdist1', range(270, 505)), ('evprox1', range(505, 775)), ('evprox2', range(775, 1045))])
+    OrderedDict({'L2_basket': range(0, 35), 'L2_pyramidal': range(35, 135), 'L5_basket': range(135, 170), 'L5_pyramidal': range(170, 270), 'evdist1': range(270, 505), 'evprox1': range(505, 775), 'evprox2': range(775, 1045)})
 
 
 
@@ -319,10 +319,10 @@ read spikes back in, we can use wildcard expressions.
 
  .. code-block:: none
 
-    /home/ntolley/jones_lab/hnn-core/examples/howto/plot_firing_pattern.py:111: DeprecationWarning: Writing cell response to txt files is deprecated and will be removed in future versions. Please save cell response along with network
+    /Users/austinsoplata/rep/brn/hnn-core/examples/howto/plot_firing_pattern.py:111: DeprecationWarning: Writing cell response to txt files is deprecated and will be removed in future versions. Please save cell response along with network
       net.cell_response.write(op.join(tmp_dir_name, 'spk_%d.txt'))
-    Writing file /tmp/tmpm5dskfb7/spk_0.txt
-    /home/ntolley/jones_lab/hnn-core/examples/howto/plot_firing_pattern.py:112: DeprecationWarning: Reading cell response from txt files is deprecated and will be removed in future versions. Please load cell response along with simulated network
+    Writing file /var/folders/cs/5b2dq2192v52fd3j8ppbtcg80000gp/T/tmpdx7ts3v8/spk_0.txt
+    /Users/austinsoplata/rep/brn/hnn-core/examples/howto/plot_firing_pattern.py:112: DeprecationWarning: Reading cell response from txt files is deprecated and will be removed in future versions. Please load cell response along with simulated network
       cell_response = read_spikes(op.join(tmp_dir_name, 'spk_*.txt'))
 
     <Figure size 640x480 with 1 Axes>
@@ -407,7 +407,7 @@ raster plots and histograms for the pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 19.257 seconds)
+   **Total running time of the script:** (0 minutes 10.133 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_firing_pattern.py:
@@ -430,6 +430,10 @@ raster plots and histograms for the pyramidal cells.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_firing_pattern.py <plot_firing_pattern.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_firing_pattern.zip <plot_firing_pattern.zip>`
 
 
 .. only:: html

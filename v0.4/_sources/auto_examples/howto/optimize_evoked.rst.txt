@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_howto_optimize_evoked.py>`
-        to download the full example code or to run this example in your browser via Binder
+        to download the full example code. or to run this example in your browser via Binder
 
 .. rst-class:: sphx-glr-example-title
 
@@ -306,6 +306,10 @@ simulation dipole as well as the convergence plot.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: optimize_evoked.py <optimize_evoked.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: optimize_evoked.zip <optimize_evoked.zip>`
 
 
 .. only:: html
