@@ -9,6 +9,9 @@ orphan: true
 
 ### Changelog
 
+- Remove hardcoding of celltypes in :class:`~hnn_core.CellResponse` and add
+  {func}`~hnn_core.Network.rename_cell`, by [Mohamed W. ElSayed][] in {gh}`702` and {gh}`970`.
+
 - Add button to delete a single drive on GUI drive windows, by
   [George Dang][] in {gh}`890`
 
@@ -625,3 +628,4 @@ orphan: true
 [Tianqi Cheng]: https://github.com/tianqi-cheng
 [Carolina Fernandez Pujol]: https://github.com/carolinafernandezp
 [Austin Soplata]: https://github.com/asoplata
+[Mohamed W. ElSayed]: https://github.com/wagdy88
