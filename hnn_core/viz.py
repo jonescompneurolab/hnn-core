@@ -1172,25 +1172,26 @@ def plot_connectivity_matrix(net, conn_idx, ax=None, show_weight=True,
 
 
 def plot_drive_strength(net, show_weight=True, ax=None,
-                        colorbar=True, color_scale='linear',normalize=True, show=True):
+                        colorbar=True, color_scale='linear',
+                        normalize=True, show=True):
     """Plot the relative strength of drives to cell types.
 
     Parameters
     ----------
     net : Network
         Instance of a Network object.
-    ax : matplotlib.Axes | None
-        Matplotlib axes. If None, create a new figure.
-    show_weight : bool
+    show_weight : bool, default=True
         If True, visualize connectivity weights as gradient.
         If False, all weights set to constant value.
-    colorbar : bool
+    ax : matplotlib.Axes, optional
+        Matplotlib axes. If None, create a new figure.
+    colorbar : bool, default=True
         If True (default), adjust figure to include colorbar.
-    color_scale : str ('linear' or 'log')
+    color_scale : {'linear', 'log'}, default='linear'
         Color scaling for drive strength.
-    normalize : bool
+    normalize : bool, default=True
         If True, normalize the strength values to be between 0 and 1.
-    show : bool
+    show : bool, default=True
         If True, show the plot immediately.
 
     Returns
@@ -1198,8 +1199,8 @@ def plot_drive_strength(net, show_weight=True, ax=None,
     fig : matplotlib.figure.Figure
         The figure handle.
     """
-    import numpy as np  
-    import matplotlib.pyplot as plt 
+    import numpy as np
+    import matplotlib.pyplot as plt
     from .network import Network
     from .cell import _get_gaussian_connection
 
@@ -1210,7 +1211,7 @@ def plot_drive_strength(net, show_weight=True, ax=None,
     drive_names = list(net.external_drives.keys())
     cell_types = list(net.cell_types.keys())
 
-    strength_matrix = np.zeros((len(drive_names),len(cell_types)))
+    strength_matrix = np.zeros((len(drive_names), len(cell_types)))
 
     for conn in net.connectivity:
         src_type = conn['src_type']
@@ -1220,12 +1221,12 @@ def plot_drive_strength(net, show_weight=True, ax=None,
             drive_idx = drive_names.index(src_type)
             cell_idx = cell_types.index(target_type)
             src_type_pos = net.pos_dict[src_type]
-            target_type_pos = net.pos_dict[target_type] 
+            target_type_pos = net.pos_dict[target_type]
 
             src_range = np.array(net.gid_ranges[src_type])
             target_range = np.array(net.gid_ranges[target_type])
 
-            total_weight=0
+            total_weight = 0
             for src_gid, target_src_pair in conn['gid_pairs'].items():
                 src_idx = np.where(src_range == src_gid)[0][0]
                 target_indeces = np.where(np.isin(target_range, target_src_pair))[0]
@@ -1240,13 +1241,13 @@ def plot_drive_strength(net, show_weight=True, ax=None,
                     else:
                         weight = 1.0
 
-                    total_weight += sum(weight) 
+                    total_weight += sum(weight)
                 strength_matrix[drive_idx, cell_idx] = total_weight
 
     if normalize:
         min_val = np.min(strength_matrix)
         max_val = np.max(strength_matrix)
-        if max_val > min_val:  
+        if max_val > min_val:
             strength_matrix = (strength_matrix - min_val) / (max_val - min_val)
 
     if color_scale == 'log':
@@ -1260,7 +1261,7 @@ def plot_drive_strength(net, show_weight=True, ax=None,
     cax = ax.imshow(strength_matrix, cmap='viridis', aspect='auto', interpolation='nearest')
 
     if colorbar:
-        cbar =fig.colorbar(cax, ax=ax)
+        cbar = fig.colorbar(cax, ax=ax)
         cbar.ax.yaxis.set_ticks_position('right')
 
     ax.set_xticks(np.arange(len(cell_types)))
@@ -1268,9 +1269,10 @@ def plot_drive_strength(net, show_weight=True, ax=None,
     ax.set_xticklabels(cell_types)
     ax.set_yticklabels(drive_names)
     ax.set_xlabel('Cell Types')
-    ax.set_ylabel('Drive Names') 
+    ax.set_ylabel('Drive Names')
+    ax.set_title('External Drive Strengths')
 
-    # For addition of units information 
+    # For addition of units information
     unit_text = "Units: µS (microsiemens)" if not normalize else "Units: Relative Strength (0-1)"
     ax.text(0.98, 0.02, unit_text, transform=ax.transAxes, fontsize=12,
         verticalalignment='bottom', horizontalalignment='right',
@@ -1282,7 +1284,7 @@ def plot_drive_strength(net, show_weight=True, ax=None,
     for i in range(len(drive_names)):
         for j in range(len(cell_types)):
             value = strength_matrix[i, j]
-            color = "white" if value > strength_matrix.max() * 0.7 else "black" 
+            color = "black" if value > strength_matrix.max() * 0.7 else "white"
             ax.text(j, i, f"{value:.2f}", ha="center", va="center", color=color, fontsize=12, weight="bold")
 
     plt.tight_layout()
