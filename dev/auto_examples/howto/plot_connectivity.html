@@ -519,7 +519,7 @@ connection. The weights of these connections can be visualized with
 <a class="reference internal" href="../../generated/hnn_core.viz.plot_cell_connectivity.html#hnn_core.viz.plot_cell_connectivity" title="hnn_core.viz.plot_cell_connectivity"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_cell_connectivity()</span></code></a>. We can search for specific
 connections using <code class="docutils literal notranslate"><span class="pre">pick_connection</span></code> which returns the indices
 of <code class="docutils literal notranslate"><span class="pre">net.connectivity</span></code> that match the provided parameters.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core.viz</span><span class="w"> </span><span class="kn">import</span> <a href="../../generated/hnn_core.viz.plot_connectivity_matrix.html#hnn_core.viz.plot_connectivity_matrix" title="hnn_core.viz.plot_connectivity_matrix" class="sphx-glr-backref-module-hnn_core-viz sphx-glr-backref-type-py-function"><span class="n">plot_connectivity_matrix</span></a><span class="p">,</span> <a href="../../generated/hnn_core.viz.plot_cell_connectivity.html#hnn_core.viz.plot_cell_connectivity" title="hnn_core.viz.plot_cell_connectivity" class="sphx-glr-backref-module-hnn_core-viz sphx-glr-backref-type-py-function"><span class="n">plot_cell_connectivity</span></a>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core.viz</span><span class="w"> </span><span class="kn">import</span> <a href="../../generated/hnn_core.viz.plot_connectivity_matrix.html#hnn_core.viz.plot_connectivity_matrix" title="hnn_core.viz.plot_connectivity_matrix" class="sphx-glr-backref-module-hnn_core-viz sphx-glr-backref-type-py-function"><span class="n">plot_connectivity_matrix</span></a><span class="p">,</span> <a href="../../generated/hnn_core.viz.plot_cell_connectivity.html#hnn_core.viz.plot_cell_connectivity" title="hnn_core.viz.plot_cell_connectivity" class="sphx-glr-backref-module-hnn_core-viz sphx-glr-backref-type-py-function"><span class="n">plot_cell_connectivity</span></a><span class="p">,</span> <span class="n">plot_drive_strength</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core.network</span><span class="w"> </span><span class="kn">import</span> <a href="../../generated/hnn_core.pick_connection.html#hnn_core.pick_connection" title="hnn_core.pick_connection" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">pick_connection</span></a>
 
 <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_erp</span><span class="o">.</span><span class="n">connectivity</span></a><span class="p">))</span>
@@ -557,6 +557,7 @@ a simulation is using <code class="xref py py-meth docutils literal notranslate"
 </pre></div>
 </div>
 <img src="../../_images/sphx_glr_plot_connectivity_003.png" srcset="../../_images/sphx_glr_plot_connectivity_003.png" alt="plot connectivity" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Joblib will run 1 trial(s) in parallel by distributing trials over 1 jobs.
+Loading custom mechanism files from /home/circleci/miniconda/envs/testenv/lib/python3.8/site-packages/hnn_core/mod/x86_64/libnrnmech.so
 Building the NEURON model
 [Done]
 Trial 1: 0.03 ms...
@@ -706,6 +707,22 @@ from the source cell.</p>
 <img src="../../_images/sphx_glr_plot_connectivity_007.png" srcset="../../_images/sphx_glr_plot_connectivity_007.png" alt="L2_basket-> L2_basket (soma, gabaa)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 640x480 with 3 Axes&gt;
 </pre></div>
 </div>
+<p>We can plot the strengths of each external drive across each cell types.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># This can be done in a relative way, enabling you to compare the proportion</span>
+<span class="c1"># coming from each drive:</span>
+<span class="n">plot_drive_strength</span><span class="p">(</span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_erp</span></a><span class="p">)</span>
+
+<span class="c1"># Alternatively, you can compare the total amount of each drive in conductance:</span>
+<span class="n">plot_drive_strength</span><span class="p">(</span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_erp</span></a><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="sphx-glr-horizontal">
+<li><img src="../../_images/sphx_glr_plot_connectivity_008.png" srcset="../../_images/sphx_glr_plot_connectivity_008.png" alt="External Drive Strengths" class = "sphx-glr-multi-img"/></li>
+<li><img src="../../_images/sphx_glr_plot_connectivity_009.png" srcset="../../_images/sphx_glr_plot_connectivity_009.png" alt="External Drive Strengths" class = "sphx-glr-multi-img"/></li>
+</ul>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1200x600 with 2 Axes&gt;
+</pre></div>
+</div>
 <p>In the sparse network, there still appears to be some rhythmicity
 where the cells are firing synchronously with a smaller period of 4-5 ms.
 As a final step, we can see how this change in spiking activity impacts
@@ -727,10 +744,10 @@ the aggregate current dipole.</p>
     <span class="n">ax</span><span class="o">=</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">spike_types</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;evprox&#39;</span><span class="p">,</span> <span class="s1">&#39;evdist&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_connectivity_008.png" srcset="../../_images/sphx_glr_plot_connectivity_008.png" alt="Aggregate (L2/3 + L5)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 600x600 with 2 Axes&gt;
+<img src="../../_images/sphx_glr_plot_connectivity_010.png" srcset="../../_images/sphx_glr_plot_connectivity_010.png" alt="Aggregate (L2/3 + L5)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 600x600 with 2 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 59.031 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (2 minutes 11.587 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-connectivity-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=v0.4/notebooks/auto_examples/howto/plot_connectivity.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" width="150px" /></a>

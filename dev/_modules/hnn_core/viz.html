@@ -1651,6 +1651,128 @@ document.write(`
     <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_drive_strength</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">show_weight</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color_scale</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>
+                        <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the relative strength of drives to cell types.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    net : Network</span>
+<span class="sd">        Instance of a Network object.</span>
+<span class="sd">    show_weight : bool, default=True</span>
+<span class="sd">        If True, visualize connectivity weights as gradient.</span>
+<span class="sd">        If False, all weights set to constant value.</span>
+<span class="sd">    ax : matplotlib.Axes, optional</span>
+<span class="sd">        Matplotlib axes. If None, create a new figure.</span>
+<span class="sd">    colorbar : bool, default=True</span>
+<span class="sd">        If True (default), adjust figure to include colorbar.</span>
+<span class="sd">    color_scale : {&#39;linear&#39;, &#39;log&#39;}, default=&#39;linear&#39;</span>
+<span class="sd">        Color scaling for drive strength.</span>
+<span class="sd">    normalize : bool, default=True</span>
+<span class="sd">        If True, normalize the strength values to be between 0 and 1.</span>
+<span class="sd">    show : bool, default=True</span>
+<span class="sd">        If True, show the plot immediately.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig : matplotlib.figure.Figure</span>
+<span class="sd">        The figure handle.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.network</span><span class="w"> </span><span class="kn">import</span> <span class="n">Network</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.cell</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_gaussian_connection</span>
+
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">Network</span><span class="p">,</span> <span class="s1">&#39;net&#39;</span><span class="p">,</span> <span class="s1">&#39;Network&#39;</span><span class="p">)</span>
+    <span class="n">_validate_type</span><span class="p">(</span><span class="n">show_weight</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s1">&#39;show_weight&#39;</span><span class="p">,</span> <span class="s1">&#39;bool&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Get drive and cell type information</span>
+    <span class="n">drive_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">external_drives</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">cell_types</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="n">strength_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">drive_names</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell_types</span><span class="p">)))</span>
+
+    <span class="k">for</span> <span class="n">conn</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">:</span>
+        <span class="n">src_type</span> <span class="o">=</span> <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;src_type&#39;</span><span class="p">]</span>
+        <span class="n">target_type</span> <span class="o">=</span> <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">src_type</span> <span class="ow">in</span> <span class="n">drive_names</span> <span class="ow">and</span> <span class="n">target_type</span> <span class="ow">in</span> <span class="n">cell_types</span><span class="p">:</span>
+            <span class="n">nc_dict</span> <span class="o">=</span> <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;nc_dict&#39;</span><span class="p">]</span>
+            <span class="n">drive_idx</span> <span class="o">=</span> <span class="n">drive_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">src_type</span><span class="p">)</span>
+            <span class="n">cell_idx</span> <span class="o">=</span> <span class="n">cell_types</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">target_type</span><span class="p">)</span>
+            <span class="n">src_type_pos</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">src_type</span><span class="p">]</span>
+            <span class="n">target_type_pos</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">target_type</span><span class="p">]</span>
+
+            <span class="n">src_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">src_type</span><span class="p">])</span>
+            <span class="n">target_range</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">target_type</span><span class="p">])</span>
+
+            <span class="n">total_weight</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">src_gid</span><span class="p">,</span> <span class="n">target_src_pair</span> <span class="ow">in</span> <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;gid_pairs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">src_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">src_range</span> <span class="o">==</span> <span class="n">src_gid</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">target_indeces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">target_range</span><span class="p">,</span> <span class="n">target_src_pair</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">target_idx</span> <span class="ow">in</span> <span class="n">target_indeces</span><span class="p">:</span>
+                    <span class="n">src_pos</span> <span class="o">=</span> <span class="n">src_type_pos</span><span class="p">[</span><span class="n">src_idx</span><span class="p">]</span>
+                    <span class="n">target_pos</span> <span class="o">=</span> <span class="n">target_type_pos</span><span class="p">[</span><span class="n">target_idx</span><span class="p">]</span>
+
+                    <span class="k">if</span> <span class="n">show_weight</span><span class="p">:</span>
+                        <span class="n">weight</span> <span class="o">=</span> <span class="n">_get_gaussian_connection</span><span class="p">(</span>
+                            <span class="n">src_pos</span><span class="p">,</span> <span class="n">target_pos</span><span class="p">,</span> <span class="n">nc_dict</span><span class="p">,</span>
+                            <span class="n">inplane_distance</span><span class="o">=</span><span class="n">net</span><span class="o">.</span><span class="n">_inplane_distance</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">weight</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+                    <span class="n">total_weight</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
+                <span class="n">strength_matrix</span><span class="p">[</span><span class="n">drive_idx</span><span class="p">,</span> <span class="n">cell_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">total_weight</span>
+
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="n">min_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">strength_matrix</span><span class="p">)</span>
+        <span class="n">max_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">strength_matrix</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_val</span> <span class="o">&gt;</span> <span class="n">min_val</span><span class="p">:</span>
+            <span class="n">strength_matrix</span> <span class="o">=</span> <span class="p">(</span><span class="n">strength_matrix</span> <span class="o">-</span> <span class="n">min_val</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">max_val</span> <span class="o">-</span> <span class="n">min_val</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">color_scale</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
+        <span class="n">strength_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">strength_matrix</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">figure</span>
+
+    <span class="n">cax</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">strength_matrix</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">colorbar</span><span class="p">:</span>
+        <span class="n">cbar</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">cax</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+        <span class="n">cbar</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_ticks_position</span><span class="p">(</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cell_types</span><span class="p">)))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">drive_names</span><span class="p">)))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">cell_types</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">drive_names</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Cell Types&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Drive Names&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;External Drive Strengths&#39;</span><span class="p">)</span>
+
+    <span class="c1"># For addition of units information</span>
+    <span class="n">unit_text</span> <span class="o">=</span> <span class="s2">&quot;Units: µS (microsiemens)&quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">normalize</span> <span class="k">else</span> <span class="s2">&quot;Units: Relative Strength (0-1)&quot;</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.98</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="n">unit_text</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">ax</span><span class="o">.</span><span class="n">transAxes</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+        <span class="n">verticalalignment</span><span class="o">=</span><span class="s1">&#39;bottom&#39;</span><span class="p">,</span> <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">,</span>
+        <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">))</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">setp</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
+        <span class="n">rotation_mode</span><span class="o">=</span><span class="s2">&quot;anchor&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">drive_names</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cell_types</span><span class="p">)):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">strength_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;black&quot;</span> <span class="k">if</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="n">strength_matrix</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.7</span> <span class="k">else</span> <span class="s2">&quot;white&quot;</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_update_target_plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">conn</span><span class="p">,</span> <span class="n">src_gid</span><span class="p">,</span> <span class="n">src_type_pos</span><span class="p">,</span> <span class="n">target_type_pos</span><span class="p">,</span>
                         <span class="n">src_range</span><span class="p">,</span> <span class="n">target_range</span><span class="p">,</span> <span class="n">nc_dict</span><span class="p">,</span> <span class="n">colormap</span><span class="p">,</span>
                         <span class="n">inplane_distance</span><span class="p">):</span>
