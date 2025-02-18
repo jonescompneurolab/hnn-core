@@ -9,6 +9,9 @@ orphan: true
 
 ### Changelog
 
+- Add relative and absolute external drive strength plotting,
+  by [Dikshant Jha][] in {gh}`987`.
+
 - Add button to delete a single drive on GUI drive windows, by
   [George Dang][] in {gh}`890`
 
@@ -625,3 +628,4 @@ orphan: true
 [Tianqi Cheng]: https://github.com/tianqi-cheng
 [Carolina Fernandez Pujol]: https://github.com/carolinafernandezp
 [Austin Soplata]: https://github.com/asoplata
+[Dikshant Jha]: https://github.com/dikshant182004
