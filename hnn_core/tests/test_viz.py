@@ -13,7 +13,7 @@ import hnn_core
 from hnn_core import read_params, jones_2009_model
 from hnn_core.viz import (plot_cells, plot_dipole, plot_psd, plot_tfr_morlet,
                           plot_connectivity_matrix, plot_cell_connectivity,
-                          NetworkPlotter)
+                          plot_drive_strength, NetworkPlotter)
 from hnn_core.dipole import simulate_dipole
 
 matplotlib.use('agg')
@@ -253,6 +253,35 @@ def test_dipole_visualization(setup_net):
         net.cell_response.plot_spikes_hist(color={'beta_prox': 'r'})
     plt.close('all')
 
+def test_drive_strength(setup_net):
+    """Adds empty external drives to check there strength across each cell types"""
+    net=setup_net
+
+    weights_ampa = {'L2_pyramidal': 0.0, 'L5_pyramidal': 0.0,'L2_basket': 0.0}
+    synaptic_delays = {'L2_pyramidal': 0.0, 'L5_pyramidal': 0.0, 'L2_basket': 0.0}
+    rate_constant = {'L2_pyramidal': 140.0, 'L5_pyramidal': 40.0,'L2_basket': 100.0}
+
+    net.add_poisson_drive(
+        'poisson', rate_constant=rate_constant, weights_ampa=weights_ampa,
+        location='proximal', synaptic_delays=synaptic_delays,
+        event_seed=1349)
+    
+    net.add_bursty_drive(
+        'beta_dist', tstart=0., burst_rate=25, burst_std=5,
+        numspikes=1, spike_isi=0, n_drive_cells=11, location='distal',
+        weights_ampa=weights_ampa, synaptic_delays=synaptic_delays,
+        event_seed=14)
+    
+    figure = plot_drive_strength(net)
+
+    assert isinstance(figure, plt.Figure)
+    assert len(figure.axes) > 0    # if there are any axes in the figure
+
+    any_plot = any(ax.lines or ax.patches or ax.images for ax in figure.axes)
+    assert any_plot   # At least one axis contains graphical elements
+
+    plt.close('all') 
+
 
 class TestCellResponsePlotters:
     """Tests plotting methods of the CellResponse class"""
@@ -286,7 +315,7 @@ class TestCellResponsePlotters:
         dpls = simulate_dipole(net, tstop=100., n_trials=2, record_vsec='all')
 
         return net, dpls
-
+    
     def test_spikes_raster_trial_idx(self, base_simulation_spikes):
         """Plotting with different index arguments"""
         net, _ = base_simulation_spikes
