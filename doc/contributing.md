@@ -153,6 +153,16 @@ encourage contributors to follow the
 {doc}`parallel backend guide <parallel>` to install `mpi4py` so that
 they can run the entire test suite locally on their computer.
 
+As part of `make test`, your code is also "linted" (meaning checked for errors)
+and spell-checked. If you would like to perform these checks individually, you
+can do so by running the following command to lint with `ruff`:
+
+    $ make lint
+
+Or the following command to perform common spell-checking:
+
+    $ make spell
+
 ## Updating documentation
 
 When you update the documentation, it is recommended to build it locally
