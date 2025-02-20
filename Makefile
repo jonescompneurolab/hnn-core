@@ -17,10 +17,6 @@ clean :
 check-manifest:
 	check-manifest
 
-test: lint
-	pytest ./hnn_core/tests/ -m "not uses_mpi" -n auto
-	pytest ./hnn_core/tests/ -m "uses_mpi"
-
 lint:
 	@if command -v ruff > /dev/null; then \
 		echo "Running ruff check"; \
@@ -29,3 +25,16 @@ lint:
 		echo "ruff not found, please install it!"; \
 		exit 1; \
 	fi;
+
+spell:
+	@if command -v codespell > /dev/null; then \
+		echo "Running codespell"; \
+		codespell; \
+	else \
+		echo "codespell not found, please install it!"; \
+		exit 1; \
+	fi;
+
+test: lint spell
+	pytest ./hnn_core/tests/ -m "not uses_mpi" -n auto
+	pytest ./hnn_core/tests/ -m "uses_mpi"
