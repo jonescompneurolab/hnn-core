@@ -622,6 +622,16 @@ on their computers after making changes.</p>
 encourage contributors to follow the
 <a class="reference internal" href="parallel.html"><span class="doc">parallel backend guide</span></a> to install <code class="docutils literal notranslate"><span class="pre">mpi4py</span></code> so that
 they can run the entire test suite locally on their computer.</p>
+<p>As part of <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code>, your code is also “linted” (meaning checked for errors)
+and spell-checked. If you would like to perform these checks individually, you
+can do so by running the following command to lint with <code class="docutils literal notranslate"><span class="pre">ruff</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make lint
+</pre></div>
+</div>
+<p>Or the following command to perform common spell-checking:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make spell
+</pre></div>
+</div>
 </section>
 <section id="updating-documentation">
 <h2>Updating documentation<a class="headerlink" href="#updating-documentation" title="Permalink to this heading">#</a></h2>
