@@ -482,7 +482,6 @@ document.write(`
 <span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">mimetypes</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
@@ -510,6 +509,9 @@ document.write(`
                                      <span class="n">get_L5Pyr_params_default</span><span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core.hnn_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">dict_to_network</span><span class="p">,</span> <span class="n">write_network_configuration</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core.cells_default</span><span class="w"> </span><span class="kn">import</span> <span class="n">_exp_g_at_dist</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core.parallel_backends</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">_determine_cores_hwthreading</span><span class="p">,</span>
+                                        <span class="n">_has_mpi4py</span><span class="p">,</span>
+                                        <span class="n">_has_psutil</span><span class="p">)</span>
 
 <span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
 <span class="n">default_network_configuration</span> <span class="o">=</span> <span class="p">(</span><span class="n">hnn_core_root</span> <span class="o">/</span> <span class="s1">&#39;param&#39;</span> <span class="o">/</span>
@@ -819,6 +821,12 @@ document.write(`
         <span class="c1"># load default parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_parameters</span><span class="p">(</span><span class="n">network_configuration</span><span class="p">)</span>
 
+        <span class="c1"># Number of available cores</span>
+        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_cores</span><span class="p">,</span> <span class="n">_</span><span class="p">]</span> <span class="o">=</span> <span class="n">_determine_cores_hwthreading</span><span class="p">(</span>
+            <span class="n">use_hwthreading_if_found</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">sensible_default_cores</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
         <span class="c1"># In-memory storage of all simulation and visualization related data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">simulation_data</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="n">net</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dpls</span><span class="o">=</span><span class="nb">list</span><span class="p">()))</span>
 
@@ -869,15 +877,17 @@ document.write(`
                                            <span class="n">placeholder</span><span class="o">=</span><span class="s1">&#39;ID of your simulation&#39;</span><span class="p">,</span>
                                            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Name:&#39;</span><span class="p">,</span>
                                            <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span> <span class="o">=</span> <span class="n">Dropdown</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;Joblib&#39;</span><span class="p">,</span> <span class="s1">&#39;Joblib&#39;</span><span class="p">),</span>
-                                                          <span class="p">(</span><span class="s1">&#39;MPI&#39;</span><span class="p">,</span> <span class="s1">&#39;MPI&#39;</span><span class="p">)],</span>
-                                                 <span class="n">value</span><span class="o">=</span><span class="s1">&#39;Joblib&#39;</span><span class="p">,</span>
-                                                 <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Backend:&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">Dropdown</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[(</span><span class="s1">&#39;Joblib&#39;</span><span class="p">,</span> <span class="s1">&#39;Joblib&#39;</span><span class="p">),</span>
+                              <span class="p">(</span><span class="s1">&#39;MPI&#39;</span><span class="p">,</span> <span class="s1">&#39;MPI&#39;</span><span class="p">)],</span>
+                     <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_backend</span><span class="p">(),</span>
+                     <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Backend:&#39;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_mpi_cmd</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s1">&#39;mpiexec&#39;</span><span class="p">,</span>
                                    <span class="n">placeholder</span><span class="o">=</span><span class="s1">&#39;Fill if applies&#39;</span><span class="p">,</span>
                                    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;MPI cmd:&#39;</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">widget_n_jobs</span> <span class="o">=</span> <span class="n">BoundedIntText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                                            <span class="nb">max</span><span class="o">=</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(),</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_n_jobs</span> <span class="o">=</span> <span class="n">BoundedIntText</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                            <span class="nb">min</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                            <span class="nb">max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_cores</span><span class="p">,</span>
                                             <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Cores:&#39;</span><span class="p">,</span>
                                             <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_data_button</span> <span class="o">=</span> <span class="n">FileUpload</span><span class="p">(</span>
@@ -964,6 +974,14 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_ui_components</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_logging_window_logger</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_backend</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks for MPI and returns the default backend name&quot;&quot;&quot;</span>
+        <span class="n">default_backend</span> <span class="o">=</span> <span class="s1">&#39;Joblib&#39;</span>
+        <span class="k">if</span> <span class="n">_has_mpi4py</span><span class="p">()</span> <span class="ow">and</span> <span class="n">_has_psutil</span><span class="p">():</span>
+            <span class="n">default_backend</span> <span class="o">=</span> <span class="s1">&#39;MPI&#39;</span>
+        <span class="k">return</span> <span class="n">default_backend</span>
 
 <div class="viewcode-block" id="HNNGUI.get_cell_parameters_dict"><a class="viewcode-back" href="../../../generated/hnn_core.gui.HNNGUI.html#hnn_core.gui.HNNGUI.get_cell_parameters_dict">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_cell_parameters_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the number of elements in the</span>
@@ -1107,8 +1125,9 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">fig_default_params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_smoothing</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_min_frequency</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_max_frequency</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">widget_mpi_cmd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_n_jobs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_bar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_contents</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_mpi_cmd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_n_jobs</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_bar</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_contents</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz_manager</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span><span class="p">)</span>
 
@@ -1233,6 +1252,10 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_max_frequency</span><span class="p">,</span>
             <span class="p">])</span>
         <span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s1">&#39;config_box&#39;</span><span class="p">])</span>
+        <span class="c1"># Displays the default backend options</span>
+        <span class="n">handle_backend_change</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">_backend_config_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_mpi_cmd</span><span class="p">,</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">widget_n_jobs</span><span class="p">)</span>
 
         <span class="n">connectivity_configuration</span> <span class="o">=</span> <span class="n">Tab</span><span class="p">()</span>
 
@@ -2546,8 +2569,16 @@ document.write(`
 
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;start simulation&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">backend_selection</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;MPI&quot;</span><span class="p">:</span>
+            <span class="c1"># &#39;use_hwthreading_if_found&#39; and &#39;sensible_default_cores&#39; have</span>
+            <span class="c1"># already been set elsewhere, and do not need to be re-set here.</span>
+            <span class="c1"># Hardware-threading and oversubscription will always be disabled</span>
+            <span class="c1"># to prevent edge cases in the GUI.</span>
             <span class="n">backend</span> <span class="o">=</span> <span class="n">MPIBackend</span><span class="p">(</span>
-                <span class="n">n_procs</span><span class="o">=</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">mpi_cmd</span><span class="o">=</span><span class="n">mpi_cmd</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                <span class="n">n_procs</span><span class="o">=</span><span class="n">n_jobs</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">mpi_cmd</span><span class="o">=</span><span class="n">mpi_cmd</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">override_hwthreading_option</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">override_oversubscribe_option</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">backend</span> <span class="o">=</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="n">n_jobs</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using Joblib with </span><span class="si">{</span><span class="n">n_jobs</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> core(s).&quot;</span><span class="p">)</span>
@@ -2854,7 +2885,7 @@ document.write(`
     <span class="n">backend_config</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
     <span class="k">with</span> <span class="n">backend_config</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">backend_type</span> <span class="o">==</span> <span class="s2">&quot;MPI&quot;</span><span class="p">:</span>
-            <span class="n">display</span><span class="p">(</span><span class="n">mpi_cmd</span><span class="p">)</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">VBox</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">n_jobs</span><span class="p">,</span> <span class="n">mpi_cmd</span><span class="p">]))</span>
         <span class="k">elif</span> <span class="n">backend_type</span> <span class="o">==</span> <span class="s2">&quot;Joblib&quot;</span><span class="p">:</span>
             <span class="n">display</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">)</span>
 
