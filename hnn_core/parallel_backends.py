@@ -53,7 +53,6 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
         net.cell_response.update_types(net.gid_ranges)
         net.cell_response._vsec.append(sim_data[idx]['vsec'])
         net.cell_response._isec.append(sim_data[idx]['isec'])
-        net.cell_response._ca.append(sim_data[idx]['ca'])
 
         # extracellular array
         for arr_name, arr in net.rec_arrays.items():
@@ -65,8 +64,8 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
         dpl = Dipole(times=sim_data[idx]['times'],
                      data=sim_data[idx]['dpl_data'])
 
-        N_pyr_x = net._N_pyr_x
-        N_pyr_y = net._N_pyr_y
+        N_pyr_x = net._params['N_pyr_x']
+        N_pyr_y = net._params['N_pyr_y']
         dpl._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
         dpl._convert_fAm_to_nAm()  # always applied, cf. #264
         if postproc:
@@ -84,8 +83,7 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
 def _get_mpi_env():
     """Set some MPI environment variables."""
     my_env = os.environ.copy()
-    # For Linux systems
-    if sys.platform != 'win32':
+    if 'win' not in sys.platform:
         my_env["OMPI_MCA_btl_base_warn_component_unused"] = '0'
 
     if 'darwin' in sys.platform:
@@ -114,7 +112,7 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     """
     proc_data_bytes = b''
     # each loop while waiting will involve two Queue.get() timeouts, each
-    # 0.01s. This calculation will error on the side of a longer timeout
+    # 0.01s. This caclulation will error on the side of a longer timeout
     # than is specified because more is done each loop that just Queue.get()
     timeout_cycles = timeout / 0.02
 
@@ -167,7 +165,8 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
                     # child terminated early, and we already
                     # captured output left in queues
                     warn("Child process failed unexpectedly")
-                    kill_proc_name('nrniv')
+                    # not good on shared system
+                    #kill_proc_name('nrniv')
                     break
 
             if not sent_network:
@@ -196,7 +195,8 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
                     count_since_last_output > timeout_cycles:
                 warn("Timeout exceeded while waiting for child process output"
                      ". Terminating...")
-                kill_proc_name('nrniv')
+                # not good on shared system
+                #kill_proc_name('nrniv')
                 break
     except KeyboardInterrupt:
         warn("Received KeyboardInterrupt. Stopping simulation process...")
@@ -607,49 +607,63 @@ class MPIBackend(object):
         else:
             self.n_procs = n_procs
 
-        # did user try to force running on more cores than available?
-        oversubscribe = False
-        if self.n_procs > n_logical_cores:
-            oversubscribe = True
-
-        hyperthreading = False
-
-        if _has_mpi4py() and _has_psutil():
-            import psutil
-
-            n_physical_cores = psutil.cpu_count(logical=False)
-
-            # detect if we need to use hwthread-cpus with mpiexec
-            if self.n_procs > n_physical_cores:
-                hyperthreading = True
-
-        else:
-            packages = list()
-            if not _has_mpi4py():
-                packages += ['mpi4py']
-            if not _has_psutil():
-                packages += ['psutil']
-            packages = ' and '.join(packages)
-            warn(f'{packages} not installed. Will run on single processor')
-            self.n_procs = 1
-
         self.mpi_cmd = mpi_cmd
 
-        if hyperthreading:
-            self.mpi_cmd += ' --use-hwthread-cpus'
+        if not mpi_cmd == 'ALREADYMPI':
+            # did user try to force running on more cores than available?
+            oversubscribe = False
+            if self.n_procs > n_logical_cores:
+                oversubscribe = True
+    
+            hyperthreading = False
+    
+            if _has_mpi4py() and _has_psutil():
+                import psutil
+    
+                n_physical_cores = psutil.cpu_count(logical=False)
+    
+                # detect if we need to use hwthread-cpus with mpiexec
+                if self.n_procs > n_physical_cores:
+                    hyperthreading = True
+    
+            else:
+                packages = list()
+                if not _has_mpi4py():
+                    packages += ['mpi4py']
+                if not _has_psutil():
+                    packages += ['psutil']
+                packages = ' and '.join(packages)
+                warn(f'{packages} not installed. Will run on single processor')
+                self.n_procs = 1
+    
+            if hyperthreading:
+                self.mpi_cmd += ' --use-hwthread-cpus'
 
-        if oversubscribe:
-            self.mpi_cmd += ' --oversubscribe'
+            if oversubscribe:
+                self.mpi_cmd += ' --oversubscribe'
 
-        self.mpi_cmd += ' -np ' + str(self.n_procs)
+            self.mpi_cmd += ' -np ' + str(self.n_procs)
 
-        self.mpi_cmd += ' nrniv -python -mpi -nobanner ' + \
-            sys.executable + ' ' + \
-            os.path.join(os.path.dirname(sys.modules[__name__].__file__),
+            self.mpi_cmd += ' nrniv -python -mpi -nobanner ' + \
+                sys.executable + ' ' + \
+                os.path.join(os.path.dirname(sys.modules[__name__].__file__),
                          'mpi_child.py')
+            self.alreadympi = False
+        else:
+            from mpi4py import MPI
+            self.comm = MPI.COMM_WORLD
+            self.size = self.comm.Get_size()
+            self.rank = self.comm.Get_rank()
+            os.environ['MPLCONFIGDIR'] = '.config' + "{}".format(self.rank)
+            self.mpi_cmd = ''
+
+            self.alreadympi = True
 
         # Split the command into shell arguments for passing to Popen
-        use_posix = True if sys.platform != 'win32' else False
+        if 'win' in sys.platform:
+            use_posix = True
+        else:
+            use_posix = False
         self.mpi_cmd = shlex.split(self.mpi_cmd, posix=use_posix)
 
     def __enter__(self):
@@ -667,7 +681,9 @@ class MPIBackend(object):
 
         # always kill nrniv processes for good measure
         if self.n_procs > 1:
-            kill_proc_name('nrniv')
+            # not good on a shared system
+            #kill_proc_name('nrniv')
+            pass
 
     def simulate(self, net, tstop, dt, n_trials, postproc=False):
         """Simulate the HNN model in parallel on all cores
@@ -694,7 +710,7 @@ class MPIBackend(object):
 
         # just use the joblib backend for a single core
         if self.n_procs == 1:
-            print("MPIBackend is set to use 1 core: transferring the "
+            print("MPIBackend is set to use 1 core: tranferring the "
                   "simulation to JoblibBackend....")
             return JoblibBackend(n_jobs=1).simulate(net, tstop=tstop,
                                                     dt=dt,
@@ -713,11 +729,17 @@ class MPIBackend(object):
 
         env = _get_mpi_env()
 
-        self.proc, sim_data = run_subprocess(
-            command=self.mpi_cmd, obj=[net, tstop, dt, n_trials], timeout=30,
-            proc_queue=self.proc_queue, env=env, cwd=os.getcwd(),
-            universal_newlines=True)
-
+        if self.alreadympi == False:
+            self.proc, sim_data = run_subprocess(
+                command=self.mpi_cmd, obj=[net, tstop, dt, n_trials], timeout=30,
+                proc_queue=self.proc_queue, env=env, cwd=os.getcwd(),
+                universal_newlines=True)
+        else:
+            from .mpi_child import runit
+            sim_data = runit(net=net, dt=dt, tstop=tstop,n_trials=n_trials)
+        # each rank needs to send to rank 0?
+        # original mpi_child.py wrote encoded data to stderr,
+        # so, try catenating encoded data from each child and process.
         dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
         return dpls
 
