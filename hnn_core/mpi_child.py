@@ -52,8 +52,9 @@ class MPISimulation(object):
     rank : int
         The rank for each processor part of the MPI communicator
     """
-    def __init__(self, skip_mpi_import=False):
+    def __init__(self, skip_mpi_import=False, commandline=False):
         self.skip_mpi_import = skip_mpi_import
+        self.commandline = commandline
         if skip_mpi_import:
             self.rank = 0
         else:
@@ -68,8 +69,9 @@ class MPISimulation(object):
     def __exit__(self, type, value, traceback):
         # skip Finalize() if we didn't import MPI on __init__
         if hasattr(self, 'comm'):
-            from mpi4py import MPI
-            MPI.Finalize()
+            if self.commandline:
+                from mpi4py import MPI
+                MPI.Finalize()
 
     def _read_net(self):
         """Read net broadcasted to all ranks on stdin"""
@@ -140,23 +142,30 @@ class MPISimulation(object):
         return sim_data
 
 
-if __name__ == '__main__':
-    """This file is called on command-line from nrniv"""
+def runit(net=None, tstop=None, dt=None, n_trials=None, commandline=False):
 
-    import traceback
     rc = 0
 
+    import traceback
+
     try:
-        with MPISimulation() as mpi_sim:
+        with MPISimulation(commandline=commandline) as mpi_sim:
             # XXX: _read_net -> _read_obj, fix later
-            net, tstop, dt, n_trials = mpi_sim._read_net()
+            if commandline == True:
+                net, tstop, dt, n_trials = mpi_sim._read_net()
             sim_data = mpi_sim.run(net, tstop, dt, n_trials)
-            mpi_sim._write_data_stderr(sim_data)
-            mpi_sim._wait_for_exit_signal()
+            if commandline == True:
+                mpi_sim._write_data_stderr(sim_data)
+                # mpi_sim._wait_for_exit_signal()
+            return(sim_data)
     except Exception:
         # This can be useful to indicate the problem to the
         # caller (in parallel_backends.py)
         traceback.print_exc(file=sys.stdout)
         rc = 2
 
+if __name__ == '__main__':
+    """This file is called on command-line from nrniv"""
+    rc = 0
+    runit(commandline=True)
     sys.exit(rc)
