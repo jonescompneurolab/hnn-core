@@ -78,7 +78,7 @@ if __name__ == "__main__":
     extras = {
         'opt': ['scikit-learn'],
         'parallel': ['joblib', 'psutil'],
-        'test': ['pytest', 'pytest-cov', 'pytest-xdist', 'ruff'],
+        'test': ['codespell', 'pytest', 'pytest-cov', 'pytest-xdist', 'ruff'],
         'docs': ['mne', 'myst-parser', 'nibabel', 'numpydoc', 'pillow',
                  'pooch', 'pydata-sphinx-theme', 'sphinx', 'sphinx-gallery',
                  'sphinx-copybutton', 'tdqm'],
