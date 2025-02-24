@@ -8,7 +8,7 @@ import numpy as np
 import json
 
 from hnn_core import (simulate_dipole, read_params,
-                      jones_2009_model, calcium_model,
+                      calcium_model,
                       )
 
 from hnn_core.hnn_io import (_cell_response_to_dict, _rec_array_to_dict,
@@ -16,6 +16,8 @@ from hnn_core.hnn_io import (_cell_response_to_dict, _rec_array_to_dict,
                              _conn_to_dict, _order_drives,
                              read_network_configuration
                              )
+
+from regenerate_test_network import jones_2009_additional_features
 
 hnn_core_root = Path(__file__).parents[1]
 assets_path = Path(hnn_core_root, 'tests', 'assets')
@@ -32,49 +34,11 @@ def params():
 
 
 @pytest.fixture
-def jones_2009_network(params):
-
-    # Instantiating network along with drives
-    net = jones_2009_model(params=params, add_drives_from_params=True,
-                           mesh_shape=(3, 3))
-
-    # Adding bias
-    tonic_bias = {'L2_pyramidal': 1.0, 'L5_pyramidal': 0.0,
-                  'L2_basket': 0.0, 'L5_basket': 0.0}
-    net.add_tonic_bias(amplitude=tonic_bias)
-
-    # Add drives
-    location = 'proximal'
-    burst_std = 20
-    weights_ampa_p = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5,
-                      'L2_basket': 0.0, 'L5_basket': 0.0}
-    weights_nmda_p = {'L2_pyramidal': 0.0, 'L5_pyramidal': 0.0,
-                      'L2_basket': 0.0, 'L5_basket': 0.0}
-    syn_delays_p = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.,
-                    'L2_basket': 0.0, 'L5_basket': 0.0}
-    net.add_bursty_drive(
-        'alpha_prox', tstart=1., burst_rate=10, burst_std=burst_std,
-        numspikes=2, spike_isi=10, n_drive_cells=10, location=location,
-        weights_ampa=weights_ampa_p, weights_nmda=weights_nmda_p,
-        synaptic_delays=syn_delays_p, event_seed=284)
-
-    weights_ampa = {'L2_pyramidal': 0.0008, 'L5_pyramidal': 0.0075,
-                    'L2_basket': 0.0, 'L5_basket': 0.0}
-    synaptic_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0,
-                       'L2_basket': 0.0, 'L5_basket': 0.0}
-    rate_constant = {'L2_pyramidal': 140.0, 'L5_pyramidal': 40.0,
-                     'L2_basket': 40.0, 'L5_basket': 40.0}
-    net.add_poisson_drive(
-        'poisson', rate_constant=rate_constant,
-        weights_ampa=weights_ampa, weights_nmda=weights_nmda_p,
-        location='proximal', synaptic_delays=synaptic_delays,
-        event_seed=1349)
-
-    # Adding electrode arrays
-    electrode_pos = (1, 2, 3)
-    net.add_electrode_array('el1', electrode_pos)
-    electrode_pos = [(1, 2, 3), (-1, -2, -3)]
-    net.add_electrode_array('arr1', electrode_pos)
+def jones_2009_network():
+    # This allows us to define this test network once, but use it as both a
+    # fixture here in this file, or regenerate the network itself if used
+    # elsewhere.
+    net = jones_2009_additional_features()
 
     return net
 
@@ -98,12 +62,6 @@ def calcium_network(params):
     net.add_electrode_array('arr1', electrode_pos)
 
     return net
-
-
-def generate_test_files(jones_2009_network):
-    """ Generates files used in read-in tests """
-    net = jones_2009_network
-    net.write_configuration(Path('.', 'assets/jones2009_3x3_drives.json'))
 
 
 def test_eq(jones_2009_network, calcium_network):
