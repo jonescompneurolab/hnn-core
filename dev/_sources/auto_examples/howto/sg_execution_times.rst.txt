@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**01:55.963** total execution time for 8 files **from auto_examples/howto**:
+**01:22.342** total execution time for 8 files **from auto_examples/howto**:
 
 .. container::
 
@@ -33,7 +33,7 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_howto_plot_connectivity.py` (``plot_connectivity.py``)
-     - 01:55.963
+     - 01:22.342
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_optimize_evoked.py` (``optimize_evoked.py``)
      - 00:00.000
