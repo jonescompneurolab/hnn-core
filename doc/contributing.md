@@ -291,3 +291,11 @@ content in `.circleci/build_cache`, as CircleCI uses the MD5 of that
 file as the key for previously cached content. For consistency, we
 recommend you to monotonically increase the version number in that file,
 e.g., from "v2"->"v3".
+
+## Making changes to the default network
+
+If you ever need to make scientific or technical changes to the default network, you must "re-generate" the smaller network we use for testing, in `hnn_core/tests/assets/jones2009_3x3_drives.json`. This is easily done via the following:
+
+    $ make regenerate-test-network
+
+Once you do this, make sure to re-run all the tests using `make test` to ensure that numerical tests dependent on the network itself have not broken.

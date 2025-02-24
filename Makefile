@@ -3,12 +3,9 @@
 
 # make rules
 
-.PHONY: all modl clean check-manifest
+.PHONY: all clean check-manifest lint modl regenerate-test-network test
 
 all: modl
-
-modl:
-	cd hnn_core/mod/ && nrnivmodl
 
 clean :
 	rm -rf hnn_core/mod/x86_64/*
@@ -25,6 +22,12 @@ lint:
 		echo "ruff not found, please install it!"; \
 		exit 1; \
 	fi;
+
+modl:
+	cd hnn_core/mod/ && nrnivmodl
+
+regenerate-test-network:
+	python ./hnn_core/tests/regenerate_test_network.py
 
 spell:
 	@if command -v codespell > /dev/null; then \
