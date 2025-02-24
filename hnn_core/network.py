@@ -1658,7 +1658,40 @@ class _NetworkDrive(dict):
 def _add_cell_type_bias(network: Network, amplitude: Union[float, dict],
                         cell_type=None, section='soma', bias_name='tonic',
                         t_0=0, t_stop=None):
+    """Add a tonic bias to a specific cell type in the network.
 
+    Parameters
+    ----------
+    network : Network
+        The network to which the tonic bias is added.
+    amplitude : float or dict
+        The amplitude of the tonic input (in nA). If a float, it is applied to
+        the specified `cell_type`. If a dict, keys are cell type names and
+        values are the corresponding amplitudes for each type.
+    cell_type : str, optional
+        The cell type to which the bias is applied. If provided, `amplitude`
+        must be a float. If None, `amplitude` must be a dictionary. Default is
+        None.
+    section : str, default 'soma'
+        The section of the cell where the bias is applied (e.g., 'soma',
+        'apical_tuft').
+    bias_name : str, default 'tonic'
+        A name identifier for the bias configuration, allowing multiple biases
+        to be applied.
+    t_0 : float, default 0
+        The start time of the tonic input in milliseconds.
+    t_stop : float, optional
+        The end time of the tonic input in milliseconds. If None, the bias
+        continues until the end of the simulation.
+
+    Raises
+    ------
+    ValueError
+        If `network` or `amplitude` is not provided.
+        If `cell_type` is not a valid cell type in the network.
+        If `section` is not valid for the specified cell type.
+        If `bias_name` is already used for the given cell type.
+    """
     if network is None:
         raise ValueError('The "network" parameter is required '
                          'but was not provided')
@@ -1697,3 +1730,4 @@ def _add_cell_type_bias(network: Network, amplitude: Union[float, dict],
             cell_type_bias['section'] = section
 
         network.external_biases[bias_name][cell_type] = cell_type_bias
+        
