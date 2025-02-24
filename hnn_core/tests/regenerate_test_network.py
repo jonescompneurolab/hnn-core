@@ -10,6 +10,15 @@ assets_path = Path(hnn_core_root, 'tests', 'assets')
 
 def jones_2009_additional_features():
     """Instantiate default network with more features for testing purposes.
+
+    Note: Depending on differences between CPU architectures, OS, and other
+    system variables, this may produce a network for which there are small
+    floating-point differences in the value "end_pts" of instantiated cells. If
+    the differences are small in this case, then regenerating the network can
+    probably be done safely. In the event that there are small (decimal place)
+    differences in OTHER cell values, such as conductances, and you need to
+    regenerate the network, then please discuss with the HNN Development Team
+    before pushing your newly-regenerated test network.
     """
 
     params_path = Path(hnn_core_root, 'param', 'default.json')
