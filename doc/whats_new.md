@@ -9,13 +9,11 @@ orphan: true
 
 ### Changelog
 
-<<<<<<< HEAD
 - Add relative and absolute external drive strength plotting,
   by [Dikshant Jha][] in {gh}`987`.
-=======
+
 - Remove hardcoding of celltypes in :class:`~hnn_core.CellResponse` and add
   {func}`~hnn_core.Network.rename_cell`, by [Mohamed W. ElSayed][] in {gh}`702` and {gh}`970`.
->>>>>>> 1de66f3d (doc: add wagdy88 contribution)
 
 - Add button to delete a single drive on GUI drive windows, by
   [George Dang][] in {gh}`890`
