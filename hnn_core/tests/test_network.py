@@ -12,6 +12,7 @@ from hnn_core import jones_2009_model, law_2021_model, calcium_model
 from hnn_core.network_models import add_erp_drives_to_jones_model
 from hnn_core.network_builder import NetworkBuilder
 from hnn_core.network import pick_connection
+from hnn_core.viz import plot_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 params_fname = op.join(hnn_core_root, 'param', 'default.json')
@@ -379,7 +380,9 @@ def test_network_drives():
     # to CellResponse-constructor for storage (Network is agnostic of time)
     with pytest.raises(TypeError,
                        match="'times' is an np.ndarray of simulation times"):
-        _ = CellResponse(times='blah')
+        _ = CellResponse(cell_type_names=['L2_basket', 'L2_pyramidal',
+                                          'L5_basket', 'L5_pyramidal'],
+                         times='blah')
 
     # Check that all external drives are initialized with the expected amount
     # of artificial cells assuming legacy_mode=False (i.e., dependent on
@@ -553,7 +556,9 @@ def test_network_drives_legacy():
     # to CellResponse-constructor for storage (Network is agnostic of time)
     with pytest.raises(TypeError,
                        match="'times' is an np.ndarray of simulation times"):
-        _ = CellResponse(times='blah')
+        _ = CellResponse(cell_type_names=['L2_basket', 'L2_pyramidal',
+                                          'L5_basket', 'L5_pyramidal'],
+                         times='blah')
 
     # Assert that all external drives are initialized
     # Assumes legacy mode where cell-specific drives create artificial cells
@@ -725,6 +730,7 @@ def test_add_cell_type():
 
     new_cell = net.cell_types['L2_basket'].copy()
     net._add_cell_type('new_type', pos=pos, cell_template=new_cell)
+    assert 'new_type' in net.cell_types.keys()
     net.cell_types['new_type'].synapses['gabaa']['tau1'] = tau1
 
     n_new_type = len(net.gid_ranges['new_type'])
@@ -1158,3 +1164,90 @@ class TestPickConnection:
                                   target_gids=target_gids
                                   )
         assert len(indices) == expected
+
+
+def test_rename_cell(base_network):
+    """Tests renaming cell function"""
+    net1, params = base_network
+
+    # Add MORE arbitrary drives to force spiking
+    net1.add_evoked_drive(name='evdist2', mu=5.0, sigma=1.0,
+                         numspikes=1, location='distal',
+                         weights_ampa={'L5_pyramidal': 0.1})
+    net1.add_evoked_drive(name='evprox2', mu=5.0, sigma=1.0,
+                         numspikes=1, location='proximal',
+                         weights_ampa={'L5_basket': 0.1,
+                                       'L5_pyramidal': 0.1})
+
+    #
+    # Make a new network, rename all the cell type names, then test it
+    #
+    net2 = net1.copy()
+    assert net2.connectivity
+    # adding a list of new_names
+    new_names = ['L2_basket_test', 'L2_pyramidal_test',
+                 'L5_basket_test', 'L5_pyramidal_test']
+    # avoid iteration through net.cell_type.keys() by creating tuples of old and new names
+    rename_pairs = list(zip(net2.cell_types.keys(), new_names))
+    for original_name, new_name in rename_pairs:
+        net2.rename_cell_type(original_name, new_name)
+    for new_name in new_names:
+        assert new_name in net2.cell_types.keys()
+        assert new_name in net2.pos_dict.keys()
+        assert original_name not in net2.cell_types.keys()
+        assert original_name not in net2.pos_dict.keys()
+    # Tests for non-existent original_name
+    original_name = 'original_name'
+    with pytest.raises(ValueError,
+                       match=f"'{original_name}' is not in cell_types!"):
+        net2.rename_cell_type('original_name', 'L2_basket_2')
+
+    # Test for already existing new_name
+    new_name = 'L2_basket_test'
+    with pytest.raises(ValueError,
+                       match=f"'{new_name}' is already in cell_types!"):
+        net2.rename_cell_type('L2_basket_test', new_name)
+
+    # Tests for non-string new_name
+    new_name = 5
+    with pytest.raises(TypeError, match="new_name must be an instance of str"):
+        net2.rename_cell_type('L2_basket_test', 5)
+
+    #
+    # Make another new network, but rename all the celltypes back to their old
+    # names, then test that everything works the same
+    #
+    net3 = net2.copy()
+    old_names = ['L2_basket', 'L2_pyramidal',
+                 'L5_basket', 'L5_pyramidal']
+    rename_pairs = list(zip(net3.cell_types.keys(), old_names))
+    for new_name, old_name in rename_pairs:
+        net3.rename_cell_type(new_name, old_name)
+    for old_name in old_names:
+        assert old_name in net3.cell_types.keys()
+        assert old_name in net3.pos_dict.keys()
+        assert new_name not in net3.cell_types.keys()
+        assert new_name not in net3.pos_dict.keys()
+
+    assert net3 == net1
+
+    #
+    # Test that the networks actually run
+    #
+    dpls1 = simulate_dipole(net1, tstop=100., n_trials=1)
+    plot_dipole(dpls1, show=False)
+
+    dpls2 = simulate_dipole(net2, tstop=100., n_trials=1)
+    plot_dipole(dpls2, show=False)
+
+    dpls3 = simulate_dipole(net2, tstop=100., n_trials=1)
+    plot_dipole(dpls3, show=False)
+
+    # Test the other main network we use for testing
+    net4 = hnn_core.hnn_io.read_network_configuration(
+        op.join(hnn_core_root, 'tests', 'assets', 'jones2009_3x3_drives.json'))
+    rename_pairs = list(zip(net4.cell_types.keys(), new_names))
+    for original_name, new_name in rename_pairs:
+        net4.rename_cell_type(original_name, new_name)
+    dpls4 = simulate_dipole(net4, tstop=100., n_trials=1)
+    plot_dipole(dpls4, show=False)
