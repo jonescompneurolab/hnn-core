@@ -1,0 +1,42 @@
+
+
+Examples using ``hnn_core.dipole.smooth``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. start-sphx-glr-thumbnails
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate alpha and beta frequency activity in the alpha/beta complex of the SI mu-rhythm [1]_, as detailed in the HNN GUI alpha and beta tutorial, using HNN-Core.">
+
+.. only:: html
+
+  .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_alpha_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_workflows_plot_simulate_alpha.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">02. Simulate Alpha and Beta Rhythms</div>
+    </div>
+
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_examples_workflows_plot_simulate_alpha.py`
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+

@@ -1,0 +1,42 @@
+
+
+Examples using ``hnn_core.Network.copy``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. start-sphx-glr-thumbnails
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how event related potentials (ERP) are modulated by prestimulus beta events. Specifically, this example reproduces Figure 5 from Law et al. 2021 [1]_. To be consistent with the publication, the default network connectivity is altered. These modifications demonstrate a potential mechanism by which transient beta activity in the neocortex can suppress the perceptibility of sensory input. This suppression depends on the timing of the beta event, and the incoming sensory information.">
+
+.. only:: html
+
+  .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_beta_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_workflows_plot_simulate_beta.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">05. Simulate beta modulated ERP</div>
+    </div>
+
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_examples_workflows_plot_simulate_beta.py`
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+

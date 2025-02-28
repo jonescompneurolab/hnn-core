@@ -1,0 +1,63 @@
+
+
+Examples using ``hnn_core.Network.add_poisson_drive``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. start-sphx-glr-thumbnails
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.">
+
+.. only:: html
+
+  .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_evoked_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_workflows_plot_simulate_evoked.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">01. Simulate Event Related Potentials (ERPs)</div>
+    </div>
+
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_examples_workflows_plot_simulate_evoked.py`
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate gamma rhythms via the well established pyramidal-interneuron-gamma mechanisms [1]_, as detailed in the HNN GUI gamma tutorial, using HNN-Core.">
+
+.. only:: html
+
+  .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_gamma_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_workflows_plot_simulate_gamma.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">03. Simulate Gamma Rhythms</div>
+    </div>
+
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_examples_workflows_plot_simulate_gamma.py`
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+

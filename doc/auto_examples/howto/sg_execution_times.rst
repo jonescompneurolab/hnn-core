@@ -1,0 +1,58 @@
+
+:orphan:
+
+.. _sphx_glr_auto_examples_howto_sg_execution_times:
+
+
+Computation times
+=================
+**14:43.940** total execution time for 8 files **from auto_examples/howto**:
+
+.. container::
+
+  .. raw:: html
+
+    <style scoped>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script type="text/javascript" class="init">
+    $(document).ready( function () {
+        $('table.sg-datatable').DataTable({order: [[1, 'desc']]});
+    } );
+    </script>
+
+  .. list-table::
+   :header-rows: 1
+   :class: table table-striped sg-datatable
+
+   * - Example
+     - Time
+     - Mem (MB)
+   * - :ref:`sphx_glr_auto_examples_howto_plot_hnn_animation.py` (``plot_hnn_animation.py``)
+     - 05:20.424
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_howto_plot_connectivity.py` (``plot_connectivity.py``)
+     - 04:38.050
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py` (``plot_record_extracellular_potentials.py``)
+     - 01:59.634
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_howto_plot_firing_pattern.py` (``plot_firing_pattern.py``)
+     - 01:37.875
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_howto_plot_batch_simulate.py` (``plot_batch_simulate.py``)
+     - 01:07.774
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_howto_plot_simulate_mpi_backend.py` (``plot_simulate_mpi_backend.py``)
+     - 00:00.184
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_howto_optimize_evoked.py` (``optimize_evoked.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_howto_optimize_rhythmic.py` (``optimize_rhythmic.py``)
+     - 00:00.000
+     - 0.0

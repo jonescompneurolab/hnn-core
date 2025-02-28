@@ -1,0 +1,56 @@
+{
+ "MPIBackend": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "MPIBackend"
+  }
+ ],
+ "Optimizer": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.optimization",
+   "module_short": "hnn_core.optimization",
+   "name": "Optimizer"
+  }
+ ],
+ "jones_2009_model": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "jones_2009_model"
+  }
+ ],
+ "plot_psd": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.viz",
+   "module_short": "hnn_core.viz",
+   "name": "plot_psd"
+  }
+ ],
+ "plt.subplots": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.pyplot",
+   "module_short": "matplotlib.pyplot",
+   "name": "subplots"
+  }
+ ],
+ "simulate_dipole": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "simulate_dipole"
+  }
+ ]
+}

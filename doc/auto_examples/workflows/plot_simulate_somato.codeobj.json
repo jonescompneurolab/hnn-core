@@ -1,0 +1,2032 @@
+{
+ "JoblibBackend": [
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "hnn_core.parallel_backends",
+   "module_short": "hnn_core",
+   "name": "JoblibBackend"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "JoblibBackend"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "JoblibBackend"
+  }
+ ],
+ "apply_inverse": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.minimum_norm",
+   "module_short": "mne.minimum_norm",
+   "name": "apply_inverse"
+  }
+ ],
+ "average_dipoles": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "average_dipoles"
+  }
+ ],
+ "axes": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "numpy",
+   "module_short": "numpy",
+   "name": "ndarray"
+  }
+ ],
+ "baseline": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "NoneType"
+  }
+ ],
+ "cov": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.cov",
+   "module_short": "mne",
+   "name": "Covariance"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "Covariance"
+  }
+ ],
+ "data_path": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "pathlib",
+   "module_short": "pathlib",
+   "name": "PosixPath"
+  }
+ ],
+ "dipole_tc": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "numpy",
+   "module_short": "numpy",
+   "name": "ndarray"
+  }
+ ],
+ "dpl": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.dipole",
+   "module_short": "hnn_core",
+   "name": "Dipole"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Dipole"
+  }
+ ],
+ "dpl.scale": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.dipole",
+   "module_short": "hnn_core",
+   "name": "Dipole.scale"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Dipole.scale"
+  }
+ ],
+ "dpl.smooth": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.dipole",
+   "module_short": "hnn_core",
+   "name": "Dipole.smooth"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Dipole.smooth"
+  }
+ ],
+ "dpl_scalefctr": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ],
+ "dpl_smooth_win": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ],
+ "dpls": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "list"
+  }
+ ],
+ "epochs": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.epochs",
+   "module_short": "mne",
+   "name": "Epochs"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "Epochs"
+  }
+ ],
+ "epochs.average": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.epochs",
+   "module_short": "mne",
+   "name": "Epochs.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "Epochs.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.epochs",
+   "module_short": "mne",
+   "name": "BaseEpochs.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "BaseEpochs.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne._fiff.proj",
+   "module_short": "mne._fiff.proj",
+   "name": "ProjMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne._fiff",
+   "module_short": "mne._fiff",
+   "name": "ProjMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "ProjMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne._fiff.meas_info",
+   "module_short": "mne._fiff.meas_info",
+   "name": "ContainsMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne._fiff",
+   "module_short": "mne._fiff",
+   "name": "ContainsMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "ContainsMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.channels.channels",
+   "module_short": "mne.channels.channels",
+   "name": "UpdateChannelsMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.channels",
+   "module_short": "mne.channels",
+   "name": "UpdateChannelsMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "UpdateChannelsMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.channels.channels",
+   "module_short": "mne.channels.channels",
+   "name": "ReferenceMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.channels",
+   "module_short": "mne.channels",
+   "name": "ReferenceMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "ReferenceMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne._fiff.meas_info",
+   "module_short": "mne._fiff.meas_info",
+   "name": "SetChannelsMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne._fiff",
+   "module_short": "mne._fiff",
+   "name": "SetChannelsMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "SetChannelsMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.channels.channels",
+   "module_short": "mne.channels.channels",
+   "name": "InterpolationMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.channels",
+   "module_short": "mne.channels",
+   "name": "InterpolationMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "InterpolationMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.filter",
+   "module_short": "mne.filter",
+   "name": "FilterMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "FilterMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.utils.mixin",
+   "module_short": "mne.utils.mixin",
+   "name": "ExtendedTimeMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.utils",
+   "module_short": "mne.utils",
+   "name": "ExtendedTimeMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "ExtendedTimeMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.utils.mixin",
+   "module_short": "mne.utils.mixin",
+   "name": "SizeMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.utils",
+   "module_short": "mne.utils",
+   "name": "SizeMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "SizeMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.utils.mixin",
+   "module_short": "mne.utils.mixin",
+   "name": "GetEpochsMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.utils",
+   "module_short": "mne.utils",
+   "name": "GetEpochsMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "GetEpochsMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.annotations",
+   "module_short": "mne.annotations",
+   "name": "EpochAnnotationsMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "EpochAnnotationsMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.time_frequency.spectrum",
+   "module_short": "mne.time_frequency.spectrum",
+   "name": "SpectrumMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.time_frequency",
+   "module_short": "mne.time_frequency",
+   "name": "SpectrumMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "SpectrumMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne._fiff.meas_info",
+   "module_short": "mne._fiff.meas_info",
+   "name": "MontageMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne._fiff",
+   "module_short": "mne._fiff",
+   "name": "MontageMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "MontageMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.utils.mixin",
+   "module_short": "mne.utils.mixin",
+   "name": "TimeMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.utils",
+   "module_short": "mne.utils",
+   "name": "TimeMixin.average"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "TimeMixin.average"
+  }
+ ],
+ "epochs.info": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne._fiff.meas_info",
+   "module_short": "mne._fiff.meas_info",
+   "name": "Info"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne._fiff",
+   "module_short": "mne._fiff",
+   "name": "Info"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "Info"
+  }
+ ],
+ "event_id": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ],
+ "events": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "numpy",
+   "module_short": "numpy",
+   "name": "ndarray"
+  }
+ ],
+ "evoked": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.evoked",
+   "module_short": "mne",
+   "name": "EvokedArray"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "EvokedArray"
+  }
+ ],
+ "fig": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.figure",
+   "module_short": "matplotlib.figure",
+   "name": "Figure"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib",
+   "module_short": "matplotlib",
+   "name": "Figure"
+  }
+ ],
+ "flip_data": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "numpy",
+   "module_short": "numpy",
+   "name": "ndarray"
+  }
+ ],
+ "fwd": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.forward.forward",
+   "module_short": "mne",
+   "name": "Forward"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.forward",
+   "module_short": "mne",
+   "name": "Forward"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "Forward"
+  }
+ ],
+ "fwd_fname": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "str"
+  }
+ ],
+ "h_freq": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ],
+ "hemi": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "str"
+  }
+ ],
+ "hnn_core.__file__": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "str"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "__file__"
+  }
+ ],
+ "hnn_core_root": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "str"
+  }
+ ],
+ "inv": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.minimum_norm.inverse",
+   "module_short": "mne.minimum_norm",
+   "name": "InverseOperator"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.minimum_norm",
+   "module_short": "mne.minimum_norm",
+   "name": "InverseOperator"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "InverseOperator"
+  }
+ ],
+ "jones_2009_model": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "jones_2009_model"
+  }
+ ],
+ "l_freq": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ],
+ "label_s1": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.label",
+   "module_short": "mne",
+   "name": "Label"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "Label"
+  }
+ ],
+ "label_tag": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "str"
+  }
+ ],
+ "lambda2": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "float"
+  }
+ ],
+ "make_inverse_operator": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.minimum_norm",
+   "module_short": "mne.minimum_norm",
+   "name": "make_inverse_operator"
+  }
+ ],
+ "mne.Epochs": [
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.epochs",
+   "module_short": "mne",
+   "name": "Epochs"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "Epochs"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.epochs",
+   "module_short": "mne",
+   "name": "BaseEpochs"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "BaseEpochs"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne._fiff.proj",
+   "module_short": "mne._fiff.proj",
+   "name": "ProjMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne._fiff",
+   "module_short": "mne._fiff",
+   "name": "ProjMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "ProjMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne._fiff.meas_info",
+   "module_short": "mne._fiff.meas_info",
+   "name": "ContainsMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne._fiff",
+   "module_short": "mne._fiff",
+   "name": "ContainsMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "ContainsMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.channels.channels",
+   "module_short": "mne.channels.channels",
+   "name": "UpdateChannelsMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.channels",
+   "module_short": "mne.channels",
+   "name": "UpdateChannelsMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "UpdateChannelsMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.channels.channels",
+   "module_short": "mne.channels.channels",
+   "name": "ReferenceMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.channels",
+   "module_short": "mne.channels",
+   "name": "ReferenceMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "ReferenceMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne._fiff.meas_info",
+   "module_short": "mne._fiff.meas_info",
+   "name": "SetChannelsMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne._fiff",
+   "module_short": "mne._fiff",
+   "name": "SetChannelsMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "SetChannelsMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.channels.channels",
+   "module_short": "mne.channels.channels",
+   "name": "InterpolationMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.channels",
+   "module_short": "mne.channels",
+   "name": "InterpolationMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "InterpolationMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.filter",
+   "module_short": "mne.filter",
+   "name": "FilterMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "FilterMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.utils.mixin",
+   "module_short": "mne.utils",
+   "name": "ExtendedTimeMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.utils",
+   "module_short": "mne.utils",
+   "name": "ExtendedTimeMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "ExtendedTimeMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.utils.mixin",
+   "module_short": "mne.utils",
+   "name": "SizeMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.utils",
+   "module_short": "mne.utils",
+   "name": "SizeMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "SizeMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.utils.mixin",
+   "module_short": "mne.utils",
+   "name": "GetEpochsMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.utils",
+   "module_short": "mne.utils",
+   "name": "GetEpochsMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "GetEpochsMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.annotations",
+   "module_short": "mne.annotations",
+   "name": "EpochAnnotationsMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "EpochAnnotationsMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.time_frequency.spectrum",
+   "module_short": "mne.time_frequency.spectrum",
+   "name": "SpectrumMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.time_frequency",
+   "module_short": "mne.time_frequency",
+   "name": "SpectrumMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "SpectrumMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne._fiff.meas_info",
+   "module_short": "mne._fiff.meas_info",
+   "name": "MontageMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne._fiff",
+   "module_short": "mne._fiff",
+   "name": "MontageMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "MontageMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.utils.mixin",
+   "module_short": "mne.utils",
+   "name": "TimeMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne.utils",
+   "module_short": "mne.utils",
+   "name": "TimeMixin"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "TimeMixin"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "Epochs"
+  }
+ ],
+ "mne.compute_covariance": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "compute_covariance"
+  }
+ ],
+ "mne.find_events": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "find_events"
+  }
+ ],
+ "mne.io.read_raw_fif": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.io",
+   "module_short": "mne.io",
+   "name": "read_raw_fif"
+  }
+ ],
+ "mne.read_forward_solution": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "read_forward_solution"
+  }
+ ],
+ "mne.read_labels_from_annot": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "read_labels_from_annot"
+  }
+ ],
+ "n_trials": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ],
+ "net": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.network",
+   "module_short": "hnn_core",
+   "name": "Network"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Network"
+  }
+ ],
+ "net.add_evoked_drive": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.network",
+   "module_short": "hnn_core",
+   "name": "Network.add_evoked_drive"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Network.add_evoked_drive"
+  }
+ ],
+ "net.cell_response.plot_spikes_hist": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.cell_response",
+   "module_short": "hnn_core",
+   "name": "CellResponse.plot_spikes_hist"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "CellResponse.plot_spikes_hist"
+  }
+ ],
+ "net.cell_response.plot_spikes_raster": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.cell_response",
+   "module_short": "hnn_core",
+   "name": "CellResponse.plot_spikes_raster"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "CellResponse.plot_spikes_raster"
+  }
+ ],
+ "op.dirname": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "os.path",
+   "module_short": "os.path",
+   "name": "dirname"
+  }
+ ],
+ "op.join": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "os.path",
+   "module_short": "os.path",
+   "name": "join"
+  }
+ ],
+ "params_fname": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "str"
+  }
+ ],
+ "plt.axhline": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.pyplot",
+   "module_short": "matplotlib.pyplot",
+   "name": "axhline"
+  }
+ ],
+ "plt.figure": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.pyplot",
+   "module_short": "matplotlib.pyplot",
+   "name": "figure"
+  }
+ ],
+ "plt.plot": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.pyplot",
+   "module_short": "matplotlib.pyplot",
+   "name": "plot"
+  }
+ ],
+ "plt.show": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.pyplot",
+   "module_short": "matplotlib.pyplot",
+   "name": "show"
+  }
+ ],
+ "plt.subplots": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.pyplot",
+   "module_short": "matplotlib.pyplot",
+   "name": "subplots"
+  }
+ ],
+ "plt.xlabel": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.pyplot",
+   "module_short": "matplotlib.pyplot",
+   "name": "xlabel"
+  }
+ ],
+ "plt.xlim": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.pyplot",
+   "module_short": "matplotlib.pyplot",
+   "name": "xlim"
+  }
+ ],
+ "plt.ylabel": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.pyplot",
+   "module_short": "matplotlib.pyplot",
+   "name": "ylabel"
+  }
+ ],
+ "raw": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.io.fiff.raw",
+   "module_short": "mne.io",
+   "name": "Raw"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.io.fiff",
+   "module_short": "mne.io",
+   "name": "Raw"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.io",
+   "module_short": "mne.io",
+   "name": "Raw"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "Raw"
+  }
+ ],
+ "raw.filter": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.io.fiff.raw",
+   "module_short": "mne.io",
+   "name": "Raw.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.io.fiff",
+   "module_short": "mne.io",
+   "name": "Raw.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.io",
+   "module_short": "mne.io",
+   "name": "Raw.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "Raw.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.io.base",
+   "module_short": "mne.io",
+   "name": "BaseRaw.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.io",
+   "module_short": "mne.io",
+   "name": "BaseRaw.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "BaseRaw.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne._fiff.proj",
+   "module_short": "mne._fiff.proj",
+   "name": "ProjMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne._fiff",
+   "module_short": "mne._fiff",
+   "name": "ProjMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "ProjMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne._fiff.meas_info",
+   "module_short": "mne._fiff.meas_info",
+   "name": "ContainsMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne._fiff",
+   "module_short": "mne._fiff",
+   "name": "ContainsMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "ContainsMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.channels.channels",
+   "module_short": "mne.channels.channels",
+   "name": "UpdateChannelsMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.channels",
+   "module_short": "mne.channels",
+   "name": "UpdateChannelsMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "UpdateChannelsMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.channels.channels",
+   "module_short": "mne.channels.channels",
+   "name": "ReferenceMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.channels",
+   "module_short": "mne.channels",
+   "name": "ReferenceMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "ReferenceMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne._fiff.meas_info",
+   "module_short": "mne._fiff.meas_info",
+   "name": "SetChannelsMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne._fiff",
+   "module_short": "mne._fiff",
+   "name": "SetChannelsMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "SetChannelsMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.channels.channels",
+   "module_short": "mne.channels.channels",
+   "name": "InterpolationMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.channels",
+   "module_short": "mne.channels",
+   "name": "InterpolationMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "InterpolationMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.utils.mixin",
+   "module_short": "mne.utils.mixin",
+   "name": "TimeMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.utils",
+   "module_short": "mne.utils",
+   "name": "TimeMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "TimeMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.utils.mixin",
+   "module_short": "mne.utils.mixin",
+   "name": "SizeMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.utils",
+   "module_short": "mne.utils",
+   "name": "SizeMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "SizeMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.filter",
+   "module_short": "mne.filter",
+   "name": "FilterMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "FilterMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.time_frequency.spectrum",
+   "module_short": "mne.time_frequency.spectrum",
+   "name": "SpectrumMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.time_frequency",
+   "module_short": "mne.time_frequency",
+   "name": "SpectrumMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "SpectrumMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne._fiff.meas_info",
+   "module_short": "mne._fiff.meas_info",
+   "name": "MontageMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne._fiff",
+   "module_short": "mne._fiff",
+   "name": "MontageMixin.filter"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "MontageMixin.filter"
+  }
+ ],
+ "raw_fname": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "str"
+  }
+ ],
+ "simulate_dipole": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "simulate_dipole"
+  }
+ ],
+ "snr": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "float"
+  }
+ ],
+ "somato.data_path": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.datasets.somato",
+   "module_short": "mne.datasets.somato",
+   "name": "data_path"
+  }
+ ],
+ "stc": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.source_estimate",
+   "module_short": "mne",
+   "name": "SourceEstimate"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "SourceEstimate"
+  }
+ ],
+ "stc.extract_label_time_course": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.source_estimate",
+   "module_short": "mne",
+   "name": "SourceEstimate.extract_label_time_course"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "SourceEstimate.extract_label_time_course"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.source_estimate",
+   "module_short": "mne.source_estimate",
+   "name": "_BaseSurfaceSourceEstimate.extract_label_time_course"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "_BaseSurfaceSourceEstimate.extract_label_time_course"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.source_estimate",
+   "module_short": "mne.source_estimate",
+   "name": "_BaseSourceEstimate.extract_label_time_course"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "_BaseSourceEstimate.extract_label_time_course"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.utils.mixin",
+   "module_short": "mne.utils.mixin",
+   "name": "TimeMixin.extract_label_time_course"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.utils",
+   "module_short": "mne.utils",
+   "name": "TimeMixin.extract_label_time_course"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "TimeMixin.extract_label_time_course"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.filter",
+   "module_short": "mne.filter",
+   "name": "FilterMixin.extract_label_time_course"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "FilterMixin.extract_label_time_course"
+  }
+ ],
+ "stc.times": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.source_estimate",
+   "module_short": "mne",
+   "name": "SourceEstimate.times"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "SourceEstimate.times"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.source_estimate",
+   "module_short": "mne.source_estimate",
+   "name": "_BaseSurfaceSourceEstimate.times"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "_BaseSurfaceSourceEstimate.times"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.source_estimate",
+   "module_short": "mne.source_estimate",
+   "name": "_BaseSourceEstimate.times"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "_BaseSourceEstimate.times"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.utils.mixin",
+   "module_short": "mne.utils",
+   "name": "TimeMixin.times"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.utils",
+   "module_short": "mne.utils",
+   "name": "TimeMixin.times"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "TimeMixin.times"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne.filter",
+   "module_short": "mne.filter",
+   "name": "FilterMixin.times"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "mne",
+   "module_short": "mne",
+   "name": "FilterMixin.times"
+  }
+ ],
+ "subject": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "str"
+  }
+ ],
+ "subjects_dir": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "str"
+  }
+ ],
+ "synaptic_delays_d": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ],
+ "synaptic_delays_p": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ],
+ "task": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "str"
+  }
+ ],
+ "tmax": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "float"
+  }
+ ],
+ "tmin": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "float"
+  }
+ ],
+ "weights_ampa_d": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ],
+ "weights_ampa_p": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ],
+ "weights_nmda_d": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ],
+ "weights_nmda_p": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ]
+}

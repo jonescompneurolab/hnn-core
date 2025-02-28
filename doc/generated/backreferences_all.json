@@ -1,0 +1,114 @@
+{
+ "hnn_core.MPIBackend": [
+  [
+   "plot_simulate_mpi_backend.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to use the MPI backend for simulating dipoles using HNN-core.",
+   "04. Use MPI backend for parallelization"
+  ],
+  [
+   "optimize_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to optimize the parameters of the model simulation to match an experimental dipole waveform.",
+   "05. Optimize simulated evoked response parameters"
+  ],
+  [
+   "optimize_rhythmic.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to optimize the power spectral density (PSD) of a current dipole signal with significant alpha and beta spectral components.",
+   "08. Optimize simulated rhythmic responses"
+  ]
+ ],
+ "hnn_core.__file__": [
+  [
+   "optimize_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to optimize the parameters of the model simulation to match an experimental dipole waveform.",
+   "05. Optimize simulated evoked response parameters"
+  ]
+ ],
+ "hnn_core.jones_2009_model": [
+  [
+   "plot_simulate_mpi_backend.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to use the MPI backend for simulating dipoles using HNN-core.",
+   "04. Use MPI backend for parallelization"
+  ],
+  [
+   "optimize_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to optimize the parameters of the model simulation to match an experimental dipole waveform.",
+   "05. Optimize simulated evoked response parameters"
+  ],
+  [
+   "optimize_rhythmic.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to optimize the power spectral density (PSD) of a current dipole signal with significant alpha and beta spectral components.",
+   "08. Optimize simulated rhythmic responses"
+  ]
+ ],
+ "hnn_core.optimization.Optimizer": [
+  [
+   "optimize_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to optimize the parameters of the model simulation to match an experimental dipole waveform.",
+   "05. Optimize simulated evoked response parameters"
+  ],
+  [
+   "optimize_rhythmic.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to optimize the power spectral density (PSD) of a current dipole signal with significant alpha and beta spectral components.",
+   "08. Optimize simulated rhythmic responses"
+  ]
+ ],
+ "hnn_core.read_dipole": [
+  [
+   "optimize_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to optimize the parameters of the model simulation to match an experimental dipole waveform.",
+   "05. Optimize simulated evoked response parameters"
+  ]
+ ],
+ "hnn_core.simulate_dipole": [
+  [
+   "plot_simulate_mpi_backend.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to use the MPI backend for simulating dipoles using HNN-core.",
+   "04. Use MPI backend for parallelization"
+  ],
+  [
+   "optimize_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to optimize the parameters of the model simulation to match an experimental dipole waveform.",
+   "05. Optimize simulated evoked response parameters"
+  ],
+  [
+   "optimize_rhythmic.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to optimize the power spectral density (PSD) of a current dipole signal with significant alpha and beta spectral components.",
+   "08. Optimize simulated rhythmic responses"
+  ]
+ ],
+ "hnn_core.viz.plot_psd": [
+  [
+   "optimize_rhythmic.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to optimize the power spectral density (PSD) of a current dipole signal with significant alpha and beta spectral components.",
+   "08. Optimize simulated rhythmic responses"
+  ]
+ ]
+}

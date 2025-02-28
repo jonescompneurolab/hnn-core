@@ -1,0 +1,63 @@
+
+
+Examples using ``hnn_core.Network.plot_cells``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. start-sphx-glr-thumbnails
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.">
+
+.. only:: html
+
+  .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_evoked_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_workflows_plot_simulate_evoked.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">01. Simulate Event Related Potentials (ERPs)</div>
+    </div>
+
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_examples_workflows_plot_simulate_evoked.py`
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The main output of HNN simulations is the &#x27;dipole&#x27; waveform, i.e., the net intracellular current flowing in pyramidal cell apical dendrites. At the large distances between cells and M/EEG sensors, this &#x27;primary&#x27; current is the main contributor to the measured fields. Close to the cells, the local field potential (LFP) is the result of intracellular current leaking into the extracellular medium through active and passive membrane channels. Under some simplifying assumptions, we may approximate the LFP at virtual electrodes placed in and around the HNN network model.">
+
+.. only:: html
+
+  .. image:: /auto_examples/howto/images/thumb/sphx_glr_plot_record_extracellular_potentials_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">02. Record extracellular potentials</div>
+    </div>
+
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py`
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+

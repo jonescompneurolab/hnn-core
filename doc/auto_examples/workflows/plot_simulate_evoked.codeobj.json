@@ -1,0 +1,447 @@
+{
+ "JoblibBackend": [
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "hnn_core.parallel_backends",
+   "module_short": "hnn_core",
+   "name": "JoblibBackend"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "JoblibBackend"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "JoblibBackend"
+  }
+ ],
+ "axes": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "numpy",
+   "module_short": "numpy",
+   "name": "ndarray"
+  }
+ ],
+ "cell_specific": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "bool"
+  }
+ ],
+ "dpl": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.dipole",
+   "module_short": "hnn_core",
+   "name": "Dipole"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Dipole"
+  }
+ ],
+ "dpl.smooth": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.dipole",
+   "module_short": "hnn_core",
+   "name": "Dipole.smooth"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Dipole.smooth"
+  }
+ ],
+ "dpls": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "list"
+  }
+ ],
+ "dpls_sync": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "list"
+  }
+ ],
+ "fig": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.figure",
+   "module_short": "matplotlib.figure",
+   "name": "Figure"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib",
+   "module_short": "matplotlib",
+   "name": "Figure"
+  }
+ ],
+ "hnn_core.Network.add_bursty_drive": [
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "hnn_core.Network",
+   "module_short": "hnn_core.Network",
+   "name": "add_bursty_drive"
+  }
+ ],
+ "hnn_core.Network.add_evoked_drive": [
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "hnn_core.Network",
+   "module_short": "hnn_core.Network",
+   "name": "add_evoked_drive"
+  }
+ ],
+ "hnn_core.Network.add_poisson_drive": [
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "hnn_core.Network",
+   "module_short": "hnn_core.Network",
+   "name": "add_poisson_drive"
+  }
+ ],
+ "hnn_core.dipole.Dipole.scale": [
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "hnn_core.dipole.Dipole",
+   "module_short": "hnn_core.dipole.Dipole",
+   "name": "scale"
+  }
+ ],
+ "hnn_core.dipole.Dipole.smooth": [
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "hnn_core.dipole.Dipole",
+   "module_short": "hnn_core.dipole.Dipole",
+   "name": "smooth"
+  }
+ ],
+ "hnn_core.parallel_backends.Joblib": [
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "hnn_core.parallel_backends",
+   "module_short": "hnn_core.parallel_backends",
+   "name": "Joblib"
+  }
+ ],
+ "jones_2009_model": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "jones_2009_model"
+  }
+ ],
+ "n_drive_cells": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ],
+ "net": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.network",
+   "module_short": "hnn_core",
+   "name": "Network"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Network"
+  }
+ ],
+ "net.add_evoked_drive": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.network",
+   "module_short": "hnn_core",
+   "name": "Network.add_evoked_drive"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Network.add_evoked_drive"
+  }
+ ],
+ "net.cell_response.plot_spikes_hist": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.cell_response",
+   "module_short": "hnn_core",
+   "name": "CellResponse.plot_spikes_hist"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "CellResponse.plot_spikes_hist"
+  }
+ ],
+ "net.cell_types": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ],
+ "net.plot_cells": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.network",
+   "module_short": "hnn_core",
+   "name": "Network.plot_cells"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Network.plot_cells"
+  }
+ ],
+ "net_sync": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.network",
+   "module_short": "hnn_core",
+   "name": "Network"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Network"
+  }
+ ],
+ "net_sync.add_evoked_drive": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.network",
+   "module_short": "hnn_core",
+   "name": "Network.add_evoked_drive"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Network.add_evoked_drive"
+  }
+ ],
+ "net_sync.cell_response.plot_spikes_hist": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.cell_response",
+   "module_short": "hnn_core",
+   "name": "CellResponse.plot_spikes_hist"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "CellResponse.plot_spikes_hist"
+  }
+ ],
+ "net_sync.external_drives": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ],
+ "plot_dipole": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.viz",
+   "module_short": "hnn_core.viz",
+   "name": "plot_dipole"
+  }
+ ],
+ "plt.subplots": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.pyplot",
+   "module_short": "matplotlib.pyplot",
+   "name": "subplots"
+  }
+ ],
+ "scaling_factor": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ],
+ "simulate_dipole": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "simulate_dipole"
+  }
+ ],
+ "synaptic_delays_d1": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ],
+ "synaptic_delays_prox": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ],
+ "trial_idx": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ],
+ "weights_ampa_d1": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ],
+ "weights_ampa_p1": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ],
+ "weights_ampa_p2": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ],
+ "weights_nmda_d1": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ],
+ "window_len": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ]
+}

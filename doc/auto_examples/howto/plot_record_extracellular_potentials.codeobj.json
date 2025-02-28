@@ -1,0 +1,284 @@
+{
+ "add_erp_drives_to_jones_model": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.network_models",
+   "module_short": "hnn_core.network_models",
+   "name": "add_erp_drives_to_jones_model"
+  }
+ ],
+ "axs": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "numpy",
+   "module_short": "numpy",
+   "name": "ndarray"
+  }
+ ],
+ "decimate": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "list"
+  }
+ ],
+ "depths": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "list"
+  }
+ ],
+ "dpl": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "list"
+  }
+ ],
+ "electrode_pos": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "list"
+  }
+ ],
+ "fig": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.figure",
+   "module_short": "matplotlib.figure",
+   "name": "Figure"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib",
+   "module_short": "matplotlib",
+   "name": "Figure"
+  }
+ ],
+ "hnn_core.Network.add_electrode_array": [
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "hnn_core.Network",
+   "module_short": "hnn_core.Network",
+   "name": "add_electrode_array"
+  }
+ ],
+ "hnn_core.extracellular.ElectrodeArray": [
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "hnn_core.extracellular",
+   "module_short": "hnn_core.extracellular",
+   "name": "ElectrodeArray"
+  }
+ ],
+ "jones_2009_model": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "jones_2009_model"
+  }
+ ],
+ "net": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.network",
+   "module_short": "hnn_core",
+   "name": "Network"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Network"
+  }
+ ],
+ "net.add_electrode_array": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.network",
+   "module_short": "hnn_core",
+   "name": "Network.add_electrode_array"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Network.add_electrode_array"
+  }
+ ],
+ "net.cell_response.plot_spikes_raster": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.cell_response",
+   "module_short": "hnn_core",
+   "name": "CellResponse.plot_spikes_raster"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "CellResponse.plot_spikes_raster"
+  }
+ ],
+ "net.plot_cells": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.network",
+   "module_short": "hnn_core",
+   "name": "Network.plot_cells"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Network.plot_cells"
+  }
+ ],
+ "net.rec_arrays": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ],
+ "net.set_cell_positions": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.network",
+   "module_short": "hnn_core",
+   "name": "Network.set_cell_positions"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Network.set_cell_positions"
+  }
+ ],
+ "plt.show": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.pyplot",
+   "module_short": "matplotlib.pyplot",
+   "name": "show"
+  }
+ ],
+ "plt.subplots": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.pyplot",
+   "module_short": "matplotlib.pyplot",
+   "name": "subplots"
+  }
+ ],
+ "plt.tight_layout": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.pyplot",
+   "module_short": "matplotlib.pyplot",
+   "name": "tight_layout"
+  }
+ ],
+ "simulate_dipole": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "simulate_dipole"
+  }
+ ],
+ "trial_idx": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ],
+ "window_len": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ]
+}

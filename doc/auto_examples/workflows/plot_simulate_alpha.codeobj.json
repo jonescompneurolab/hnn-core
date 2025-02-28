@@ -1,0 +1,327 @@
+{
+ "axes": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "numpy",
+   "module_short": "numpy",
+   "name": "ndarray"
+  }
+ ],
+ "burst_std": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ],
+ "dpl": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "list"
+  }
+ ],
+ "dpl_smooth": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.dipole",
+   "module_short": "hnn_core",
+   "name": "Dipole"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Dipole"
+  }
+ ],
+ "dpl_smooth.plot": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.dipole",
+   "module_short": "hnn_core",
+   "name": "Dipole.plot"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Dipole.plot"
+  }
+ ],
+ "fig": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.figure",
+   "module_short": "matplotlib.figure",
+   "name": "Figure"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib",
+   "module_short": "matplotlib",
+   "name": "Figure"
+  }
+ ],
+ "hnn_core.dipole.smooth": [
+  {
+   "is_class": false,
+   "is_explicit": true,
+   "module": "hnn_core.dipole",
+   "module_short": "hnn_core.dipole",
+   "name": "smooth"
+  }
+ ],
+ "jones_2009_model": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "jones_2009_model"
+  }
+ ],
+ "location": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "str"
+  }
+ ],
+ "net": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.network",
+   "module_short": "hnn_core",
+   "name": "Network"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Network"
+  }
+ ],
+ "net.add_bursty_drive": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.network",
+   "module_short": "hnn_core",
+   "name": "Network.add_bursty_drive"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Network.add_bursty_drive"
+  }
+ ],
+ "net.cell_response.plot_spikes_hist": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.cell_response",
+   "module_short": "hnn_core",
+   "name": "CellResponse.plot_spikes_hist"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "CellResponse.plot_spikes_hist"
+  }
+ ],
+ "plot_psd": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.viz",
+   "module_short": "hnn_core.viz",
+   "name": "plot_psd"
+  }
+ ],
+ "plt.subplots": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.pyplot",
+   "module_short": "matplotlib.pyplot",
+   "name": "subplots"
+  }
+ ],
+ "plt.tight_layout": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "matplotlib.pyplot",
+   "module_short": "matplotlib.pyplot",
+   "name": "tight_layout"
+  }
+ ],
+ "simulate_dipole": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "function"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "simulate_dipole"
+  }
+ ],
+ "smooth_dpl": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.dipole",
+   "module_short": "hnn_core",
+   "name": "Dipole"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Dipole"
+  }
+ ],
+ "smooth_dpl.plot": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core.dipole",
+   "module_short": "hnn_core",
+   "name": "Dipole.plot"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "hnn_core",
+   "module_short": "hnn_core",
+   "name": "Dipole.plot"
+  }
+ ],
+ "syn_delays_d": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ],
+ "syn_delays_p": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ],
+ "tmax": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ],
+ "tmin": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ],
+ "trial_idx": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ],
+ "weights_ampa_d": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ],
+ "weights_ampa_p": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "dict"
+  }
+ ],
+ "window_len": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ]
+}

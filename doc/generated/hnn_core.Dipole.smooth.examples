@@ -1,0 +1,63 @@
+
+
+Examples using ``hnn_core.Dipole.smooth``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+.. start-sphx-glr-thumbnails
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.">
+
+.. only:: html
+
+  .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_evoked_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_workflows_plot_simulate_evoked.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">01. Simulate Event Related Potentials (ERPs)</div>
+    </div>
+
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_examples_workflows_plot_simulate_evoked.py`
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to calculate an inverse solution of the median nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset, and then simulate a biophysical model network that reproduces the observed dynamics. Note that we do not expound on how we came up with the sequence of evoked drives used in this example, rather, we only demonstrate its implementation. For those who want more background on the HNN model and the process used to articulate the proximal and distal drives needed to simulate evoked responses, see the `HNN ERP tutorial`_. The sequence of evoked drives presented here is not part of a current publication but is motivated by prior studies [1]_, [2]_.">
+
+.. only:: html
+
+  .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_somato_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_workflows_plot_simulate_somato.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">04. From MEG sensor-space data to HNN simulation</div>
+    </div>
+
+
+.. only:: not html
+
+ * :ref:`sphx_glr_auto_examples_workflows_plot_simulate_somato.py`
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
