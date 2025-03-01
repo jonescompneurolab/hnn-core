@@ -155,9 +155,9 @@ Then, we load the raw data and estimate the inverse operator.
     - Filter length: 993 samples (3.307 s)
 
     [Parallel(n_jobs=1)]: Done  17 tasks      | elapsed:    0.4s
-    [Parallel(n_jobs=1)]: Done  71 tasks      | elapsed:    1.4s
-    [Parallel(n_jobs=1)]: Done 161 tasks      | elapsed:    3.0s
-    [Parallel(n_jobs=1)]: Done 287 tasks      | elapsed:    5.0s
+    [Parallel(n_jobs=1)]: Done  71 tasks      | elapsed:    1.3s
+    [Parallel(n_jobs=1)]: Done 161 tasks      | elapsed:    3.3s
+    [Parallel(n_jobs=1)]: Done 287 tasks      | elapsed:    6.3s
     111 events found on stim channel STI 014
     Event IDs: [1]
     Not setting metadata
@@ -604,7 +604,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (4 minutes 9.413 seconds)
+   **Total running time of the script:** (4 minutes 14.699 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_somato.py:

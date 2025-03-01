@@ -524,7 +524,7 @@ the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (6 minutes 0.135 seconds)
+   **Total running time of the script:** (5 minutes 59.759 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_connectivity.py:

@@ -22,6 +22,15 @@
    "name": "MPIBackend"
   }
  ],
+ "dpls": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "list"
+  }
+ ],
  "hnn_core.parallel_backends.MPIBackend": [
   {
    "is_class": false,
@@ -93,6 +102,15 @@
    "module": "hnn_core",
    "module_short": "hnn_core",
    "name": "simulate_dipole"
+  }
+ ],
+ "trial_idx": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
   }
  ],
  "weights_ampa": [
