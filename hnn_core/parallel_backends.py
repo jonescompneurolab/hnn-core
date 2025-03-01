@@ -252,7 +252,7 @@ def _process_child_data(data_bytes, data_len):
 
     Parameters
     ----------
-    data_bytes : str
+    data_bytes : bytes
         The data bytes
 
     Returns
@@ -547,7 +547,7 @@ class JoblibBackend(object):
         dt : float
             The integration time step of h.CVode (ms)
         postproc : bool
-            If False, no postprocessing applied to the dipole
+            If True, apply postprocessing (smoothing/scaling) to the dipole.
 
         Returns
         -------
@@ -574,7 +574,7 @@ class JoblibBackend(object):
 def _determine_cores_hwthreading(
         use_hwthreading_if_found: bool = True,
         sensible_default_cores: bool = True,
-) -> [int, bool]:
+) -> tuple[int, bool]:
     """Return the available core number and if hardware-threading is detected.
 
     If the first argument 'use_hwthreading_if_found' is 'True', then the
@@ -632,10 +632,10 @@ def _determine_cores_hwthreading(
         import platform
         import psutil
         if platform.system() == "Darwin":
-            # In Macos' case here, the situation is relatively simple, and we
+            # In macOS' case here, the situation is relatively simple, and we
             # can determine all the information we need. We are never using
-            # Macos in an HPC environment, so even though we cannot use
-            # `psutil.Process().cpu_affinity()` in Macos, we do not need it.
+            # macOS in an HPC environment, so even though we cannot use
+            # `psutil.Process().cpu_affinity()` in macOS, we do not need it.
 
             # First, let's get both the "logical" and "physical" cores of the
             # system: 1. In the case of older Macs with Intel CPUs, this will
@@ -669,7 +669,7 @@ def _determine_cores_hwthreading(
             # In Linux's case here, the situation is more complex:
             #
             # 1. In the case of non-HPC Linux computers with Intel chips, the
-            #    situation will be similar to the above Macos Intel-CPU case:
+            #    situation will be similar to the above macOS Intel-CPU case:
             #    if there are Intel-Hyperthreaded cores, then the number of
             #    logical cores will be greater than the number of physical
             #    cores (but not necessarily double!). Additionally, in this
