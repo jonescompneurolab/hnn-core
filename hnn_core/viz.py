@@ -59,19 +59,27 @@ def _decimate_plot_data(decim, data, times, sfreq=None):
 
 
 def plt_show(show=True, fig=None, **kwargs):
-    """Show a figure while suppressing warnings.
+    """"Show a figure while suppressing warnings.
 
-    NB copied from :func:`mne.viz.utils.plt_show`.
+    Notes
+    -----
+    Copied from :func:`mne.viz.utils.plt_show`.
 
     Parameters
     ----------
-    show : bool
-        Show the figure.
-    fig : instance of Figure | None
-        If non-None, use fig.show().
-    **kwargs : dict
-        Extra arguments for :func:`matplotlib.pyplot.show`.
+    show : bool, default=True
+        Whether to display the figure.
+    fig : instance of Figure | None, optional
+        Figure instance to be shown. If provided, its ``show()`` method is called;
+        otherwise, :func:`matplotlib.pyplot.show` is used.
+    **kwargs : dict, optional
+        Additional keyword arguments passed to :func:`matplotlib.pyplot.show`.
+
+    Returns
+    -------
+    None
     """
+
     from matplotlib import get_backend
     import matplotlib.pyplot as plt
     if show and get_backend() != 'agg':
@@ -89,36 +97,37 @@ def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
         Sampling times (in ms).
     data : Two-dimensional Numpy array
         The extracellular voltages as an (n_contacts, n_times) array.
-    ax : instance of matplotlib figure | None
-        The matplotlib axis
-    decim : int | list of int | None (default)
-        Optional (integer) factor by which to decimate the raw dipole traces.
-        The SciPy function :func:`~scipy.signal.decimate` is used, which
-        recommends values <13. To achieve higher decimation factors, a list of
-        ints can be provided. These are applied successively.
-    color : str | array of floats | ``matplotlib.colors.ListedColormap``
-        The colormap to use for plotting. The usual Matplotlib standard
-        colormap strings may be used (e.g., 'jetblue'). A color can also be
-        defined as an RGBA-quadruplet, or an array of RGBA-values (one for each
-        electrode contact trace to plot). An instance of
-        :class:`~matplotlib.colors.ListedColormap` may also be provided.
-    voltage_offset : float | None (optional)
-        Amount to offset traces by on the voltage-axis. Useful for plotting
-        laminar arrays.
-    voltage_scalebar : float | None (optional)
-        Height, in units of uV, of a scale bar to plot in the top-left corner
-        of the plot.
     contact_labels : list
         Labels associated with the contacts to plot. Passed as-is to
         :func:`~matplotlib.axes.Axes.set_yticklabels`.
-    show : bool
-        If True, show the figure
+    tmin : float or None, optional, default=None
+        Start time (in ms) for plotting.
+    tmax : float or None, optional, default=None
+        End time (in ms) for plotting.
+    ax : instance of matplotlib figure | None, optional, default=None
+        The matplotlib axis on which to plot.
+    decim : int or list of int or None, optional, default=None
+        Optional factor by which to decimate the raw dipole traces. The SciPy function
+        :func:`~scipy.signal.decimate` is used, which recommends values <13. To achieve
+        higher decimation factors, a list of ints can be provided and applied successively.
+    color : str | array of floats | ``matplotlib.colors.ListedColormap``, default='cividis'
+        The colormap to use for plotting. The usual Matplotlib standard colormap strings may
+        be used (e.g., 'jetblue'). A color can also be defined as an RGBA-quadruplet, or an array
+        of RGBA-values (one for each electrode contact trace to plot). An instance of
+        :class:`~matplotlib.colors.ListedColormap` may also be provided.
+    voltage_offset : float | None, default=50
+        Amount to offset traces on the voltage-axis. Useful for plotting laminar arrays.
+    voltage_scalebar : float | None, default=200
+        Height, in units of uV, of a scale bar to plot in the top-left corner of the plot.
+    show : bool, default=True
+        If True, show the figure.
 
     Returns
     -------
     fig : instance of plt.fig
         The matplotlib figure handle into which time series were plotted.
     """
+
     import matplotlib.pyplot as plt
     from matplotlib.colors import ListedColormap
     _validate_type(times, (list, np.ndarray), 'times')
@@ -235,30 +244,33 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
     ----------
     dpl : instance of Dipole | list of Dipole instances
         The Dipole object.
-    ax : instance of matplotlib figure | None
-        The matplotlib axis
-    layer : str
-        The layer to plot. Can be one of
-        'agg', 'L2', and 'L5'
-    decim : int or list of int or None (default)
-        Optional (integer) factor by which to decimate the raw dipole traces.
-        The SciPy function :func:`~scipy.signal.decimate` is used, which
-        recommends values <13. To achieve higher decimation factors, a list of
-        ints can be provided. These are applied successively.
-    color : tuple of float | str
-        RGBA value to use for plotting. By default, 'k' (black)
-    label : str
-        Dipole label. Enabled when average=True
-    average : bool
+    tmin : float or None, optional, default=None
+        Start time (in ms) for plotting.
+    tmax : float or None, optional, default=None
+        End time (in ms) for plotting.
+    ax : instance of matplotlib figure | None, optional, default=None
+        The matplotlib axis.
+    layer : str, default='agg'
+        The layer to plot. Can be one of 'agg', 'L2', or 'L5'.
+    decim : int or list of int or None, optional, default=None
+        Optional factor by which to decimate the raw dipole traces. The SciPy function
+        :func:`~scipy.signal.decimate` is used, which recommends values <13. To achieve
+        higher decimation factors, a list of ints can be provided and applied successively.
+    color : tuple of float | str, default='k'
+        RGBA value to use for plotting. By default, 'k' (black).
+    label : str, default="average"
+        Dipole label. Enabled when average is True.
+    average : bool, default=False
         If True, render the average across all dpls.
-    show : bool
-        If True, show the figure
+    show : bool, default=True
+        If True, show the figure.
 
     Returns
     -------
     fig : instance of plt.fig
         The matplotlib figure handle.
     """
+
     import matplotlib.pyplot as plt
     from .dipole import Dipole, average_dipoles
 
