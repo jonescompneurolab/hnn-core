@@ -40,6 +40,12 @@ without the need to install and configure MPI.
     #          Blake Caldwell <blake_caldwell@brown.edu>
 
 
+
+
+
+
+
+
 .. GENERATED FROM PYTHON SOURCE LINES 20-21
 
 Let us import hnn_core
@@ -52,6 +58,12 @@ Let us import hnn_core
 
     import hnn_core
     from hnn_core import simulate_dipole, jones_2009_model
+
+
+
+
+
+
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 27-34
@@ -77,6 +89,12 @@ time with unique randomization.
         weights_ampa=weights_ampa, event_seed=278)
 
 
+
+
+
+
+
+
 .. GENERATED FROM PYTHON SOURCE LINES 43-48
 
 Finally, to simulate we use the
@@ -96,6 +114,33 @@ start the simulation across the number of processors (cores) specified by
 
     trial_idx = 0
     dpls[trial_idx].plot()
+
+
+.. rst-class:: sphx-glr-script-out
+
+.. code-block:: pytb
+
+    Traceback (most recent call last):
+      File "/home/shehroz/Desktop/gsoc/hnn-core/examples/howto/plot_simulate_mpi_backend.py", line 51, in <module>
+        dpls = simulate_dipole(net, tstop=310., n_trials=1)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/shehroz/Desktop/gsoc/hnn-core/hnn_core/dipole.py", line 115, in simulate_dipole
+        dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/shehroz/Desktop/gsoc/hnn-core/hnn_core/parallel_backends.py", line 987, in simulate
+        self.proc, sim_data = run_subprocess(
+                              ^^^^^^^^^^^^^^^
+      File "/home/shehroz/Desktop/gsoc/hnn-core/hnn_core/parallel_backends.py", line 236, in run_subprocess
+        raise RuntimeError("MPI simulation failed. Return code: %d" %
+    RuntimeError: MPI simulation failed. Return code: 1
+
+
+
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** (0 minutes 3.228 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_simulate_mpi_backend.py:

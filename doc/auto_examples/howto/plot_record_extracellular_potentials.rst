@@ -258,7 +258,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 59.634 seconds)
+   **Total running time of the script:** (2 minutes 46.999 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_record_extracellular_potentials.py:

@@ -321,7 +321,7 @@ read spikes back in, we can use wildcard expressions.
 
     /home/shehroz/Desktop/gsoc/hnn-core/examples/howto/plot_firing_pattern.py:111: DeprecationWarning: Writing cell response to txt files is deprecated and will be removed in future versions. Please save cell response along with network
       net.cell_response.write(op.join(tmp_dir_name, 'spk_%d.txt'))
-    Writing file /tmp/tmpsv872wlr/spk_0.txt
+    Writing file /tmp/tmpevsku7nj/spk_0.txt
     /home/shehroz/Desktop/gsoc/hnn-core/examples/howto/plot_firing_pattern.py:112: DeprecationWarning: Reading cell response from txt files is deprecated and will be removed in future versions. Please load cell response along with simulated network
       cell_response = read_spikes(op.join(tmp_dir_name, 'spk_*.txt'))
 
@@ -407,7 +407,7 @@ raster plots and histograms for the pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 37.875 seconds)
+   **Total running time of the script:** (2 minutes 18.403 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_firing_pattern.py:

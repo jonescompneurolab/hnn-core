@@ -1,4 +1,253 @@
 {
+ "hnn_core.BatchSimulate": [
+  [
+   "plot_batch_simulate.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example shows how to do batch simulations in HNN-core, allowing users to efficiently run multiple simulations with different parameters for comprehensive analysis.",
+   "07. Batch Simulation"
+  ]
+ ],
+ "hnn_core.BatchSimulate.run": [
+  [
+   "plot_batch_simulate.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example shows how to do batch simulations in HNN-core, allowing users to efficiently run multiple simulations with different parameters for comprehensive analysis.",
+   "07. Batch Simulation"
+  ]
+ ],
+ "hnn_core.CellResponse": [
+  [
+   "plot_firing_pattern.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to inspect the firing pattern of cells in the HNN model.",
+   "01. Plot firing pattern"
+  ]
+ ],
+ "hnn_core.CellResponse.mean_rates": [
+  [
+   "plot_firing_pattern.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to inspect the firing pattern of cells in the HNN model.",
+   "01. Plot firing pattern"
+  ]
+ ],
+ "hnn_core.CellResponse.plot_spikes_hist": [
+  [
+   "plot_simulate_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.",
+   "01. Simulate Event Related Potentials (ERPs)"
+  ],
+  [
+   "plot_simulate_alpha.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate alpha and beta frequency activity in the alpha/beta complex of the SI mu-rhythm [1]_, as detailed in the HNN GUI alpha and beta tutorial, using HNN-Core.",
+   "02. Simulate Alpha and Beta Rhythms"
+  ],
+  [
+   "plot_simulate_somato.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to calculate an inverse solution of the median nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset, and then simulate a biophysical model network that reproduces the observed dynamics. Note that we do not expound on how we came up with the sequence of evoked drives used in this example, rather, we only demonstrate its implementation. For those who want more background on the HNN model and the process used to articulate the proximal and distal drives needed to simulate evoked responses, see the `HNN ERP tutorial`_. The sequence of evoked drives presented here is not part of a current publication but is motivated by prior studies [1]_, [2]_.",
+   "04. From MEG sensor-space data to HNN simulation"
+  ],
+  [
+   "plot_simulate_beta.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how event related potentials (ERP) are modulated by prestimulus beta events. Specifically, this example reproduces Figure 5 from Law et al. 2021 [1]_. To be consistent with the publication, the default network connectivity is altered. These modifications demonstrate a potential mechanism by which transient beta activity in the neocortex can suppress the perceptibility of sensory input. This suppression depends on the timing of the beta event, and the incoming sensory information.",
+   "05. Simulate beta modulated ERP"
+  ],
+  [
+   "plot_firing_pattern.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to inspect the firing pattern of cells in the HNN model.",
+   "01. Plot firing pattern"
+  ],
+  [
+   "plot_connectivity.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to modify the network connectivity.",
+   "03. Modifying local connectivity"
+  ]
+ ],
+ "hnn_core.CellResponse.plot_spikes_raster": [
+  [
+   "plot_simulate_gamma.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate gamma rhythms via the well established pyramidal-interneuron-gamma mechanisms [1]_, as detailed in the HNN GUI gamma tutorial, using HNN-Core.",
+   "03. Simulate Gamma Rhythms"
+  ],
+  [
+   "plot_simulate_somato.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to calculate an inverse solution of the median nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset, and then simulate a biophysical model network that reproduces the observed dynamics. Note that we do not expound on how we came up with the sequence of evoked drives used in this example, rather, we only demonstrate its implementation. For those who want more background on the HNN model and the process used to articulate the proximal and distal drives needed to simulate evoked responses, see the `HNN ERP tutorial`_. The sequence of evoked drives presented here is not part of a current publication but is motivated by prior studies [1]_, [2]_.",
+   "04. From MEG sensor-space data to HNN simulation"
+  ],
+  [
+   "plot_simulate_beta.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how event related potentials (ERP) are modulated by prestimulus beta events. Specifically, this example reproduces Figure 5 from Law et al. 2021 [1]_. To be consistent with the publication, the default network connectivity is altered. These modifications demonstrate a potential mechanism by which transient beta activity in the neocortex can suppress the perceptibility of sensory input. This suppression depends on the timing of the beta event, and the incoming sensory information.",
+   "05. Simulate beta modulated ERP"
+  ],
+  [
+   "plot_firing_pattern.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to inspect the firing pattern of cells in the HNN model.",
+   "01. Plot firing pattern"
+  ],
+  [
+   "plot_record_extracellular_potentials.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "The main output of HNN simulations is the 'dipole' waveform, i.e., the net intracellular current flowing in pyramidal cell apical dendrites. At the large distances between cells and M/EEG sensors, this 'primary' current is the main contributor to the measured fields. Close to the cells, the local field potential (LFP) is the result of intracellular current leaking into the extracellular medium through active and passive membrane channels. Under some simplifying assumptions, we may approximate the LFP at virtual electrodes placed in and around the HNN network model.",
+   "02. Record extracellular potentials"
+  ],
+  [
+   "plot_connectivity.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to modify the network connectivity.",
+   "03. Modifying local connectivity"
+  ]
+ ],
+ "hnn_core.CellResponse.times": [
+  [
+   "plot_firing_pattern.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to inspect the firing pattern of cells in the HNN model.",
+   "01. Plot firing pattern"
+  ]
+ ],
+ "hnn_core.CellResponse.vsec": [
+  [
+   "plot_firing_pattern.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to inspect the firing pattern of cells in the HNN model.",
+   "01. Plot firing pattern"
+  ]
+ ],
+ "hnn_core.CellResponse.write": [
+  [
+   "plot_firing_pattern.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to inspect the firing pattern of cells in the HNN model.",
+   "01. Plot firing pattern"
+  ]
+ ],
+ "hnn_core.Cell_Response": [
+  [
+   "plot_connectivity.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to modify the network connectivity.",
+   "03. Modifying local connectivity"
+  ]
+ ],
+ "hnn_core.Cell_Response.plot_spikes_raster": [
+  [
+   "plot_connectivity.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to modify the network connectivity.",
+   "03. Modifying local connectivity"
+  ]
+ ],
+ "hnn_core.Dipole": [
+  [
+   "plot_simulate_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.",
+   "01. Simulate Event Related Potentials (ERPs)"
+  ],
+  [
+   "plot_simulate_alpha.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate alpha and beta frequency activity in the alpha/beta complex of the SI mu-rhythm [1]_, as detailed in the HNN GUI alpha and beta tutorial, using HNN-Core.",
+   "02. Simulate Alpha and Beta Rhythms"
+  ],
+  [
+   "plot_simulate_somato.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to calculate an inverse solution of the median nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset, and then simulate a biophysical model network that reproduces the observed dynamics. Note that we do not expound on how we came up with the sequence of evoked drives used in this example, rather, we only demonstrate its implementation. For those who want more background on the HNN model and the process used to articulate the proximal and distal drives needed to simulate evoked responses, see the `HNN ERP tutorial`_. The sequence of evoked drives presented here is not part of a current publication but is motivated by prior studies [1]_, [2]_.",
+   "04. From MEG sensor-space data to HNN simulation"
+  ],
+  [
+   "plot_batch_simulate.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example shows how to do batch simulations in HNN-core, allowing users to efficiently run multiple simulations with different parameters for comprehensive analysis.",
+   "07. Batch Simulation"
+  ]
+ ],
+ "hnn_core.Dipole.plot": [
+  [
+   "plot_simulate_alpha.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate alpha and beta frequency activity in the alpha/beta complex of the SI mu-rhythm [1]_, as detailed in the HNN GUI alpha and beta tutorial, using HNN-Core.",
+   "02. Simulate Alpha and Beta Rhythms"
+  ]
+ ],
+ "hnn_core.Dipole.scale": [
+  [
+   "plot_simulate_somato.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to calculate an inverse solution of the median nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset, and then simulate a biophysical model network that reproduces the observed dynamics. Note that we do not expound on how we came up with the sequence of evoked drives used in this example, rather, we only demonstrate its implementation. For those who want more background on the HNN model and the process used to articulate the proximal and distal drives needed to simulate evoked responses, see the `HNN ERP tutorial`_. The sequence of evoked drives presented here is not part of a current publication but is motivated by prior studies [1]_, [2]_.",
+   "04. From MEG sensor-space data to HNN simulation"
+  ]
+ ],
+ "hnn_core.Dipole.smooth": [
+  [
+   "plot_simulate_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.",
+   "01. Simulate Event Related Potentials (ERPs)"
+  ],
+  [
+   "plot_simulate_somato.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to calculate an inverse solution of the median nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset, and then simulate a biophysical model network that reproduces the observed dynamics. Note that we do not expound on how we came up with the sequence of evoked drives used in this example, rather, we only demonstrate its implementation. For those who want more background on the HNN model and the process used to articulate the proximal and distal drives needed to simulate evoked responses, see the `HNN ERP tutorial`_. The sequence of evoked drives presented here is not part of a current publication but is motivated by prior studies [1]_, [2]_.",
+   "04. From MEG sensor-space data to HNN simulation"
+  ]
+ ],
+ "hnn_core.JoblibBackend": [
+  [
+   "plot_simulate_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.",
+   "01. Simulate Event Related Potentials (ERPs)"
+  ],
+  [
+   "plot_simulate_somato.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to calculate an inverse solution of the median nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset, and then simulate a biophysical model network that reproduces the observed dynamics. Note that we do not expound on how we came up with the sequence of evoked drives used in this example, rather, we only demonstrate its implementation. For those who want more background on the HNN model and the process used to articulate the proximal and distal drives needed to simulate evoked responses, see the `HNN ERP tutorial`_. The sequence of evoked drives presented here is not part of a current publication but is motivated by prior studies [1]_, [2]_.",
+   "04. From MEG sensor-space data to HNN simulation"
+  ]
+ ],
  "hnn_core.MPIBackend": [
   [
    "plot_simulate_mpi_backend.py",
@@ -22,7 +271,332 @@
    "08. Optimize simulated rhythmic responses"
   ]
  ],
+ "hnn_core.Network": [
+  [
+   "plot_simulate_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.",
+   "01. Simulate Event Related Potentials (ERPs)"
+  ],
+  [
+   "plot_simulate_alpha.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate alpha and beta frequency activity in the alpha/beta complex of the SI mu-rhythm [1]_, as detailed in the HNN GUI alpha and beta tutorial, using HNN-Core.",
+   "02. Simulate Alpha and Beta Rhythms"
+  ],
+  [
+   "plot_simulate_gamma.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate gamma rhythms via the well established pyramidal-interneuron-gamma mechanisms [1]_, as detailed in the HNN GUI gamma tutorial, using HNN-Core.",
+   "03. Simulate Gamma Rhythms"
+  ],
+  [
+   "plot_simulate_somato.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to calculate an inverse solution of the median nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset, and then simulate a biophysical model network that reproduces the observed dynamics. Note that we do not expound on how we came up with the sequence of evoked drives used in this example, rather, we only demonstrate its implementation. For those who want more background on the HNN model and the process used to articulate the proximal and distal drives needed to simulate evoked responses, see the `HNN ERP tutorial`_. The sequence of evoked drives presented here is not part of a current publication but is motivated by prior studies [1]_, [2]_.",
+   "04. From MEG sensor-space data to HNN simulation"
+  ],
+  [
+   "plot_simulate_beta.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how event related potentials (ERP) are modulated by prestimulus beta events. Specifically, this example reproduces Figure 5 from Law et al. 2021 [1]_. To be consistent with the publication, the default network connectivity is altered. These modifications demonstrate a potential mechanism by which transient beta activity in the neocortex can suppress the perceptibility of sensory input. This suppression depends on the timing of the beta event, and the incoming sensory information.",
+   "05. Simulate beta modulated ERP"
+  ],
+  [
+   "plot_firing_pattern.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to inspect the firing pattern of cells in the HNN model.",
+   "01. Plot firing pattern"
+  ],
+  [
+   "plot_record_extracellular_potentials.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "The main output of HNN simulations is the 'dipole' waveform, i.e., the net intracellular current flowing in pyramidal cell apical dendrites. At the large distances between cells and M/EEG sensors, this 'primary' current is the main contributor to the measured fields. Close to the cells, the local field potential (LFP) is the result of intracellular current leaking into the extracellular medium through active and passive membrane channels. Under some simplifying assumptions, we may approximate the LFP at virtual electrodes placed in and around the HNN network model.",
+   "02. Record extracellular potentials"
+  ],
+  [
+   "plot_connectivity.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to modify the network connectivity.",
+   "03. Modifying local connectivity"
+  ],
+  [
+   "plot_simulate_mpi_backend.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to use the MPI backend for simulating dipoles using HNN-core.",
+   "04. Use MPI backend for parallelization"
+  ],
+  [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
+  ],
+  [
+   "plot_batch_simulate.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example shows how to do batch simulations in HNN-core, allowing users to efficiently run multiple simulations with different parameters for comprehensive analysis.",
+   "07. Batch Simulation"
+  ]
+ ],
+ "hnn_core.Network.add_bursty_drive": [
+  [
+   "plot_simulate_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.",
+   "01. Simulate Event Related Potentials (ERPs)"
+  ],
+  [
+   "plot_simulate_alpha.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate alpha and beta frequency activity in the alpha/beta complex of the SI mu-rhythm [1]_, as detailed in the HNN GUI alpha and beta tutorial, using HNN-Core.",
+   "02. Simulate Alpha and Beta Rhythms"
+  ],
+  [
+   "plot_simulate_beta.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how event related potentials (ERP) are modulated by prestimulus beta events. Specifically, this example reproduces Figure 5 from Law et al. 2021 [1]_. To be consistent with the publication, the default network connectivity is altered. These modifications demonstrate a potential mechanism by which transient beta activity in the neocortex can suppress the perceptibility of sensory input. This suppression depends on the timing of the beta event, and the incoming sensory information.",
+   "05. Simulate beta modulated ERP"
+  ],
+  [
+   "plot_simulate_mpi_backend.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to use the MPI backend for simulating dipoles using HNN-core.",
+   "04. Use MPI backend for parallelization"
+  ]
+ ],
+ "hnn_core.Network.add_connection": [
+  [
+   "plot_connectivity.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to modify the network connectivity.",
+   "03. Modifying local connectivity"
+  ]
+ ],
+ "hnn_core.Network.add_electrode_array": [
+  [
+   "plot_record_extracellular_potentials.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "The main output of HNN simulations is the 'dipole' waveform, i.e., the net intracellular current flowing in pyramidal cell apical dendrites. At the large distances between cells and M/EEG sensors, this 'primary' current is the main contributor to the measured fields. Close to the cells, the local field potential (LFP) is the result of intracellular current leaking into the extracellular medium through active and passive membrane channels. Under some simplifying assumptions, we may approximate the LFP at virtual electrodes placed in and around the HNN network model.",
+   "02. Record extracellular potentials"
+  ]
+ ],
+ "hnn_core.Network.add_evoked_drive": [
+  [
+   "plot_simulate_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.",
+   "01. Simulate Event Related Potentials (ERPs)"
+  ],
+  [
+   "plot_simulate_somato.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to calculate an inverse solution of the median nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset, and then simulate a biophysical model network that reproduces the observed dynamics. Note that we do not expound on how we came up with the sequence of evoked drives used in this example, rather, we only demonstrate its implementation. For those who want more background on the HNN model and the process used to articulate the proximal and distal drives needed to simulate evoked responses, see the `HNN ERP tutorial`_. The sequence of evoked drives presented here is not part of a current publication but is motivated by prior studies [1]_, [2]_.",
+   "04. From MEG sensor-space data to HNN simulation"
+  ],
+  [
+   "plot_simulate_beta.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how event related potentials (ERP) are modulated by prestimulus beta events. Specifically, this example reproduces Figure 5 from Law et al. 2021 [1]_. To be consistent with the publication, the default network connectivity is altered. These modifications demonstrate a potential mechanism by which transient beta activity in the neocortex can suppress the perceptibility of sensory input. This suppression depends on the timing of the beta event, and the incoming sensory information.",
+   "05. Simulate beta modulated ERP"
+  ],
+  [
+   "plot_firing_pattern.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to inspect the firing pattern of cells in the HNN model.",
+   "01. Plot firing pattern"
+  ],
+  [
+   "plot_batch_simulate.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example shows how to do batch simulations in HNN-core, allowing users to efficiently run multiple simulations with different parameters for comprehensive analysis.",
+   "07. Batch Simulation"
+  ]
+ ],
+ "hnn_core.Network.add_poisson_drive": [
+  [
+   "plot_simulate_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.",
+   "01. Simulate Event Related Potentials (ERPs)"
+  ],
+  [
+   "plot_simulate_gamma.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate gamma rhythms via the well established pyramidal-interneuron-gamma mechanisms [1]_, as detailed in the HNN GUI gamma tutorial, using HNN-Core.",
+   "03. Simulate Gamma Rhythms"
+  ]
+ ],
+ "hnn_core.Network.add_tonic_bias": [
+  [
+   "plot_simulate_gamma.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate gamma rhythms via the well established pyramidal-interneuron-gamma mechanisms [1]_, as detailed in the HNN GUI gamma tutorial, using HNN-Core.",
+   "03. Simulate Gamma Rhythms"
+  ]
+ ],
+ "hnn_core.Network.copy": [
+  [
+   "plot_simulate_beta.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how event related potentials (ERP) are modulated by prestimulus beta events. Specifically, this example reproduces Figure 5 from Law et al. 2021 [1]_. To be consistent with the publication, the default network connectivity is altered. These modifications demonstrate a potential mechanism by which transient beta activity in the neocortex can suppress the perceptibility of sensory input. This suppression depends on the timing of the beta event, and the incoming sensory information.",
+   "05. Simulate beta modulated ERP"
+  ]
+ ],
+ "hnn_core.Network.gid_to_type": [
+  [
+   "plot_firing_pattern.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to inspect the firing pattern of cells in the HNN model.",
+   "01. Plot firing pattern"
+  ]
+ ],
+ "hnn_core.Network.plot_cells": [
+  [
+   "plot_simulate_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.",
+   "01. Simulate Event Related Potentials (ERPs)"
+  ],
+  [
+   "plot_record_extracellular_potentials.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "The main output of HNN simulations is the 'dipole' waveform, i.e., the net intracellular current flowing in pyramidal cell apical dendrites. At the large distances between cells and M/EEG sensors, this 'primary' current is the main contributor to the measured fields. Close to the cells, the local field potential (LFP) is the result of intracellular current leaking into the extracellular medium through active and passive membrane channels. Under some simplifying assumptions, we may approximate the LFP at virtual electrodes placed in and around the HNN network model.",
+   "02. Record extracellular potentials"
+  ]
+ ],
+ "hnn_core.Network.set_cell_positions": [
+  [
+   "plot_record_extracellular_potentials.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "The main output of HNN simulations is the 'dipole' waveform, i.e., the net intracellular current flowing in pyramidal cell apical dendrites. At the large distances between cells and M/EEG sensors, this 'primary' current is the main contributor to the measured fields. Close to the cells, the local field potential (LFP) is the result of intracellular current leaking into the extracellular medium through active and passive membrane channels. Under some simplifying assumptions, we may approximate the LFP at virtual electrodes placed in and around the HNN network model.",
+   "02. Record extracellular potentials"
+  ],
+  [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
+  ]
+ ],
+ "hnn_core.NetworkPlotter": [
+  [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
+  ]
+ ],
+ "hnn_core.NetworkPlotter.azim": [
+  [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
+  ]
+ ],
+ "hnn_core.NetworkPlotter.elev": [
+  [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
+  ]
+ ],
+ "hnn_core.NetworkPlotter.export_movie": [
+  [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
+  ]
+ ],
+ "hnn_core.NetworkPlotter.xlim": [
+  [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
+  ]
+ ],
+ "hnn_core.NetworkPlotter.ylim": [
+  [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
+  ]
+ ],
+ "hnn_core.NetworkPlotter.zlim": [
+  [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
+  ]
+ ],
+ "hnn_core.Params": [
+  [
+   "plot_simulate_gamma.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate gamma rhythms via the well established pyramidal-interneuron-gamma mechanisms [1]_, as detailed in the HNN GUI gamma tutorial, using HNN-Core.",
+   "03. Simulate Gamma Rhythms"
+  ]
+ ],
  "hnn_core.__file__": [
+  [
+   "plot_simulate_gamma.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate gamma rhythms via the well established pyramidal-interneuron-gamma mechanisms [1]_, as detailed in the HNN GUI gamma tutorial, using HNN-Core.",
+   "03. Simulate Gamma Rhythms"
+  ],
+  [
+   "plot_simulate_somato.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to calculate an inverse solution of the median nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset, and then simulate a biophysical model network that reproduces the observed dynamics. Note that we do not expound on how we came up with the sequence of evoked drives used in this example, rather, we only demonstrate its implementation. For those who want more background on the HNN model and the process used to articulate the proximal and distal drives needed to simulate evoked responses, see the `HNN ERP tutorial`_. The sequence of evoked drives presented here is not part of a current publication but is motivated by prior studies [1]_, [2]_.",
+   "04. From MEG sensor-space data to HNN simulation"
+  ],
   [
    "optimize_evoked.py",
    "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
@@ -31,7 +605,126 @@
    "05. Optimize simulated evoked response parameters"
   ]
  ],
+ "hnn_core.average_dipoles": [
+  [
+   "plot_simulate_somato.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to calculate an inverse solution of the median nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset, and then simulate a biophysical model network that reproduces the observed dynamics. Note that we do not expound on how we came up with the sequence of evoked drives used in this example, rather, we only demonstrate its implementation. For those who want more background on the HNN model and the process used to articulate the proximal and distal drives needed to simulate evoked responses, see the `HNN ERP tutorial`_. The sequence of evoked drives presented here is not part of a current publication but is motivated by prior studies [1]_, [2]_.",
+   "04. From MEG sensor-space data to HNN simulation"
+  ]
+ ],
+ "hnn_core.batch_simulate.BatchSimulate": [
+  [
+   "plot_batch_simulate.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example shows how to do batch simulations in HNN-core, allowing users to efficiently run multiple simulations with different parameters for comprehensive analysis.",
+   "07. Batch Simulation"
+  ]
+ ],
+ "hnn_core.batch_simulate.BatchSimulate.run": [
+  [
+   "plot_batch_simulate.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example shows how to do batch simulations in HNN-core, allowing users to efficiently run multiple simulations with different parameters for comprehensive analysis.",
+   "07. Batch Simulation"
+  ]
+ ],
+ "hnn_core.dipole.Dipole.scale": [
+  [
+   "plot_simulate_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.",
+   "01. Simulate Event Related Potentials (ERPs)"
+  ]
+ ],
+ "hnn_core.dipole.Dipole.smooth": [
+  [
+   "plot_simulate_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.",
+   "01. Simulate Event Related Potentials (ERPs)"
+  ]
+ ],
+ "hnn_core.dipole.smooth": [
+  [
+   "plot_simulate_alpha.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate alpha and beta frequency activity in the alpha/beta complex of the SI mu-rhythm [1]_, as detailed in the HNN GUI alpha and beta tutorial, using HNN-Core.",
+   "02. Simulate Alpha and Beta Rhythms"
+  ]
+ ],
+ "hnn_core.extracellular.ElectrodeArray": [
+  [
+   "plot_record_extracellular_potentials.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "The main output of HNN simulations is the 'dipole' waveform, i.e., the net intracellular current flowing in pyramidal cell apical dendrites. At the large distances between cells and M/EEG sensors, this 'primary' current is the main contributor to the measured fields. Close to the cells, the local field potential (LFP) is the result of intracellular current leaking into the extracellular medium through active and passive membrane channels. Under some simplifying assumptions, we may approximate the LFP at virtual electrodes placed in and around the HNN network model.",
+   "02. Record extracellular potentials"
+  ]
+ ],
  "hnn_core.jones_2009_model": [
+  [
+   "plot_simulate_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.",
+   "01. Simulate Event Related Potentials (ERPs)"
+  ],
+  [
+   "plot_simulate_alpha.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate alpha and beta frequency activity in the alpha/beta complex of the SI mu-rhythm [1]_, as detailed in the HNN GUI alpha and beta tutorial, using HNN-Core.",
+   "02. Simulate Alpha and Beta Rhythms"
+  ],
+  [
+   "plot_simulate_gamma.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate gamma rhythms via the well established pyramidal-interneuron-gamma mechanisms [1]_, as detailed in the HNN GUI gamma tutorial, using HNN-Core.",
+   "03. Simulate Gamma Rhythms"
+  ],
+  [
+   "plot_simulate_somato.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to calculate an inverse solution of the median nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset, and then simulate a biophysical model network that reproduces the observed dynamics. Note that we do not expound on how we came up with the sequence of evoked drives used in this example, rather, we only demonstrate its implementation. For those who want more background on the HNN model and the process used to articulate the proximal and distal drives needed to simulate evoked responses, see the `HNN ERP tutorial`_. The sequence of evoked drives presented here is not part of a current publication but is motivated by prior studies [1]_, [2]_.",
+   "04. From MEG sensor-space data to HNN simulation"
+  ],
+  [
+   "plot_simulate_beta.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how event related potentials (ERP) are modulated by prestimulus beta events. Specifically, this example reproduces Figure 5 from Law et al. 2021 [1]_. To be consistent with the publication, the default network connectivity is altered. These modifications demonstrate a potential mechanism by which transient beta activity in the neocortex can suppress the perceptibility of sensory input. This suppression depends on the timing of the beta event, and the incoming sensory information.",
+   "05. Simulate beta modulated ERP"
+  ],
+  [
+   "plot_firing_pattern.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to inspect the firing pattern of cells in the HNN model.",
+   "01. Plot firing pattern"
+  ],
+  [
+   "plot_record_extracellular_potentials.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "The main output of HNN simulations is the 'dipole' waveform, i.e., the net intracellular current flowing in pyramidal cell apical dendrites. At the large distances between cells and M/EEG sensors, this 'primary' current is the main contributor to the measured fields. Close to the cells, the local field potential (LFP) is the result of intracellular current leaking into the extracellular medium through active and passive membrane channels. Under some simplifying assumptions, we may approximate the LFP at virtual electrodes placed in and around the HNN network model.",
+   "02. Record extracellular potentials"
+  ],
+  [
+   "plot_connectivity.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to modify the network connectivity.",
+   "03. Modifying local connectivity"
+  ],
   [
    "plot_simulate_mpi_backend.py",
    "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
@@ -47,11 +740,50 @@
    "05. Optimize simulated evoked response parameters"
   ],
   [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
+  ],
+  [
+   "plot_batch_simulate.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example shows how to do batch simulations in HNN-core, allowing users to efficiently run multiple simulations with different parameters for comprehensive analysis.",
+   "07. Batch Simulation"
+  ],
+  [
    "optimize_rhythmic.py",
    "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
    "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
    "This example demonstrates how to optimize the power spectral density (PSD) of a current dipole signal with significant alpha and beta spectral components.",
    "08. Optimize simulated rhythmic responses"
+  ]
+ ],
+ "hnn_core.law_2021_model": [
+  [
+   "plot_simulate_beta.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how event related potentials (ERP) are modulated by prestimulus beta events. Specifically, this example reproduces Figure 5 from Law et al. 2021 [1]_. To be consistent with the publication, the default network connectivity is altered. These modifications demonstrate a potential mechanism by which transient beta activity in the neocortex can suppress the perceptibility of sensory input. This suppression depends on the timing of the beta event, and the incoming sensory information.",
+   "05. Simulate beta modulated ERP"
+  ]
+ ],
+ "hnn_core.network_models.add_erp_drives_to_jones_model": [
+  [
+   "plot_record_extracellular_potentials.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "The main output of HNN simulations is the 'dipole' waveform, i.e., the net intracellular current flowing in pyramidal cell apical dendrites. At the large distances between cells and M/EEG sensors, this 'primary' current is the main contributor to the measured fields. Close to the cells, the local field potential (LFP) is the result of intracellular current leaking into the extracellular medium through active and passive membrane channels. Under some simplifying assumptions, we may approximate the LFP at virtual electrodes placed in and around the HNN network model.",
+   "02. Record extracellular potentials"
+  ],
+  [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
   ]
  ],
  "hnn_core.optimization.Optimizer": [
@@ -70,6 +802,24 @@
    "08. Optimize simulated rhythmic responses"
   ]
  ],
+ "hnn_core.parallel_backends.Joblib": [
+  [
+   "plot_simulate_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.",
+   "01. Simulate Event Related Potentials (ERPs)"
+  ]
+ ],
+ "hnn_core.pick_connection": [
+  [
+   "plot_connectivity.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to modify the network connectivity.",
+   "03. Modifying local connectivity"
+  ]
+ ],
  "hnn_core.read_dipole": [
   [
    "optimize_evoked.py",
@@ -79,7 +829,81 @@
    "05. Optimize simulated evoked response parameters"
   ]
  ],
+ "hnn_core.read_params": [
+  [
+   "plot_simulate_gamma.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate gamma rhythms via the well established pyramidal-interneuron-gamma mechanisms [1]_, as detailed in the HNN GUI gamma tutorial, using HNN-Core.",
+   "03. Simulate Gamma Rhythms"
+  ]
+ ],
+ "hnn_core.read_spikes": [
+  [
+   "plot_firing_pattern.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to inspect the firing pattern of cells in the HNN model.",
+   "01. Plot firing pattern"
+  ]
+ ],
  "hnn_core.simulate_dipole": [
+  [
+   "plot_simulate_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.",
+   "01. Simulate Event Related Potentials (ERPs)"
+  ],
+  [
+   "plot_simulate_alpha.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate alpha and beta frequency activity in the alpha/beta complex of the SI mu-rhythm [1]_, as detailed in the HNN GUI alpha and beta tutorial, using HNN-Core.",
+   "02. Simulate Alpha and Beta Rhythms"
+  ],
+  [
+   "plot_simulate_gamma.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate gamma rhythms via the well established pyramidal-interneuron-gamma mechanisms [1]_, as detailed in the HNN GUI gamma tutorial, using HNN-Core.",
+   "03. Simulate Gamma Rhythms"
+  ],
+  [
+   "plot_simulate_somato.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to calculate an inverse solution of the median nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset, and then simulate a biophysical model network that reproduces the observed dynamics. Note that we do not expound on how we came up with the sequence of evoked drives used in this example, rather, we only demonstrate its implementation. For those who want more background on the HNN model and the process used to articulate the proximal and distal drives needed to simulate evoked responses, see the `HNN ERP tutorial`_. The sequence of evoked drives presented here is not part of a current publication but is motivated by prior studies [1]_, [2]_.",
+   "04. From MEG sensor-space data to HNN simulation"
+  ],
+  [
+   "plot_simulate_beta.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how event related potentials (ERP) are modulated by prestimulus beta events. Specifically, this example reproduces Figure 5 from Law et al. 2021 [1]_. To be consistent with the publication, the default network connectivity is altered. These modifications demonstrate a potential mechanism by which transient beta activity in the neocortex can suppress the perceptibility of sensory input. This suppression depends on the timing of the beta event, and the incoming sensory information.",
+   "05. Simulate beta modulated ERP"
+  ],
+  [
+   "plot_firing_pattern.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to inspect the firing pattern of cells in the HNN model.",
+   "01. Plot firing pattern"
+  ],
+  [
+   "plot_record_extracellular_potentials.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "The main output of HNN simulations is the 'dipole' waveform, i.e., the net intracellular current flowing in pyramidal cell apical dendrites. At the large distances between cells and M/EEG sensors, this 'primary' current is the main contributor to the measured fields. Close to the cells, the local field potential (LFP) is the result of intracellular current leaking into the extracellular medium through active and passive membrane channels. Under some simplifying assumptions, we may approximate the LFP at virtual electrodes placed in and around the HNN network model.",
+   "02. Record extracellular potentials"
+  ],
+  [
+   "plot_connectivity.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to modify the network connectivity.",
+   "03. Modifying local connectivity"
+  ],
   [
    "plot_simulate_mpi_backend.py",
    "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
@@ -95,6 +919,13 @@
    "05. Optimize simulated evoked response parameters"
   ],
   [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
+  ],
+  [
    "optimize_rhythmic.py",
    "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
    "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
@@ -102,7 +933,143 @@
    "08. Optimize simulated rhythmic responses"
   ]
  ],
+ "hnn_core.viz.NetworkPlotter": [
+  [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
+  ]
+ ],
+ "hnn_core.viz.NetworkPlotter.azim": [
+  [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
+  ]
+ ],
+ "hnn_core.viz.NetworkPlotter.elev": [
+  [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
+  ]
+ ],
+ "hnn_core.viz.NetworkPlotter.export_movie": [
+  [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
+  ]
+ ],
+ "hnn_core.viz.NetworkPlotter.xlim": [
+  [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
+  ]
+ ],
+ "hnn_core.viz.NetworkPlotter.ylim": [
+  [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
+  ]
+ ],
+ "hnn_core.viz.NetworkPlotter.zlim": [
+  [
+   "plot_hnn_animation.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to animate HNN simulations",
+   "06. Animating HNN simulations"
+  ]
+ ],
+ "hnn_core.viz.plot_cell_connectivity": [
+  [
+   "plot_connectivity.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to modify the network connectivity.",
+   "03. Modifying local connectivity"
+  ]
+ ],
+ "hnn_core.viz.plot_connectivity_matrix": [
+  [
+   "plot_connectivity.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to modify the network connectivity.",
+   "03. Modifying local connectivity"
+  ]
+ ],
+ "hnn_core.viz.plot_connectivity_weights": [
+  [
+   "plot_connectivity.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to modify the network connectivity.",
+   "03. Modifying local connectivity"
+  ]
+ ],
+ "hnn_core.viz.plot_dipole": [
+  [
+   "plot_simulate_evoked.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate a threshold level tactile evoked response, as detailed in the HNN GUI ERP tutorial, using HNN-core. We recommend you first review the GUI tutorial.",
+   "01. Simulate Event Related Potentials (ERPs)"
+  ],
+  [
+   "plot_simulate_beta.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how event related potentials (ERP) are modulated by prestimulus beta events. Specifically, this example reproduces Figure 5 from Law et al. 2021 [1]_. To be consistent with the publication, the default network connectivity is altered. These modifications demonstrate a potential mechanism by which transient beta activity in the neocortex can suppress the perceptibility of sensory input. This suppression depends on the timing of the beta event, and the incoming sensory information.",
+   "05. Simulate beta modulated ERP"
+  ],
+  [
+   "plot_connectivity.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to modify the network connectivity.",
+   "03. Modifying local connectivity"
+  ]
+ ],
+ "hnn_core.viz.plot_drive_strength": [
+  [
+   "plot_connectivity.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/howto",
+   "This example demonstrates how to modify the network connectivity.",
+   "03. Modifying local connectivity"
+  ]
+ ],
  "hnn_core.viz.plot_psd": [
+  [
+   "plot_simulate_alpha.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate alpha and beta frequency activity in the alpha/beta complex of the SI mu-rhythm [1]_, as detailed in the HNN GUI alpha and beta tutorial, using HNN-Core.",
+   "02. Simulate Alpha and Beta Rhythms"
+  ],
+  [
+   "plot_simulate_gamma.py",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/workflows",
+   "/home/shehroz/Desktop/gsoc/hnn-core/doc/auto_examples/workflows",
+   "This example demonstrates how to simulate gamma rhythms via the well established pyramidal-interneuron-gamma mechanisms [1]_, as detailed in the HNN GUI gamma tutorial, using HNN-Core.",
+   "03. Simulate Gamma Rhythms"
+  ],
   [
    "optimize_rhythmic.py",
    "/home/shehroz/Desktop/gsoc/hnn-core/doc/../examples/howto",

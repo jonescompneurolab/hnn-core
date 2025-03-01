@@ -623,7 +623,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (11 minutes 0.600 seconds)
+   **Total running time of the script:** (14 minutes 35.081 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_beta.py:
