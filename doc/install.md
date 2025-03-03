@@ -5,6 +5,8 @@ If you have any questions or problems while installing `hnn_core`, feel free to
 ask for help [on our GitHub Discussions
 page](https://github.com/jonescompneurolab/hnn-core/discussions)!
 
+Please follow the instructions in Steps 1, 2, and 3, in that order.
+
 --------------
 
 # Step 1. Python Environment
@@ -53,7 +55,7 @@ resources here: <https://docs.anaconda.com/getting-started/>.
 
 # Step 3. `hnn_core` installation types
 
-Note that Step 1 and Step 2 above are required for **all installation types**.
+Note that Step 1 and Step 2 above are required for **all installation types**. Note that you can install multiple sets of HNN features below during the install process by combining them similar to `pip install "hnn_core[gui,parallel]"`.
 
 ## Basic Installation
 
