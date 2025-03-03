@@ -1,5 +1,5 @@
 (contributing)=
-# Contributions
+# Contributing Guide
 
 Please read the contribution guide **until the end** before beginning
 contributions.
@@ -14,7 +14,7 @@ To help developing `hnn-core`, you will need a few adjustments to your
 installation as shown below.
 
 If your contributions will make use of parallel backends for using more
-than one core, please see the additional installation steps in our {doc}`parallel backend guide <parallel>`.
+than one core, please see the additional installation steps for either Joblib or MPI in our {doc}`Installation Guide <install>`.
 
 ## Setting up your local development environment
 
@@ -149,8 +149,8 @@ To run the tests simply type into your terminal:
     $ make test
 
 MPI tests are skipped if the `mpi4py` module is not installed. We highly
-encourage contributors to follow the
-{doc}`parallel backend guide <parallel>` to install `mpi4py` so that
+encourage contributors to follow the MPI portion of the
+{doc}`Installation Guide <install>` so that
 they can run the entire test suite locally on their computer.
 
 As part of `make test`, your code is also "linted" (meaning checked for errors)
@@ -207,14 +207,14 @@ the readability of Markdown.
 
 If you want to take advantage of [Roles and Directives inside your Markdown files](https://myst-parser.readthedocs.io/en/latest/syntax/roles-and-directives.html#roles-directives), it is fairly straightforward to use them via ["MyST Markdown" syntax](https://myst-parser.readthedocs.io/en/latest/syntax/roles-and-directives.html#roles-directives). For example:
 
-- If you want to refer to another local document like this: {doc}`Parallel Backend Guide <parallel>`, then:
+- If you want to refer to another local document like this: {doc}`Installation Guide <install>`, then:
     - In RST, write:
        ```
-       :doc:`Parallel Backend Guide <parallel>`
+       :doc:`Installation Guide <install>`
        ```
     - In Markdown, write:
        ```
-       {doc}`Parallel Backend Guide <parallel>`
+       {doc}`Installation Guide <install>`
        ```
 - If you want to refer to a part of the HNN-Core API like this: {func}`~hnn_core.Network.add_electrode_array`, then:
     - In RST, write:
@@ -291,3 +291,58 @@ content in `.circleci/build_cache`, as CircleCI uses the MD5 of that
 file as the key for previously cached content. For consistency, we
 recommend you to monotonically increase the version number in that file,
 e.g., from "v2"->"v3".
+
+## Notes on MPI for contributors
+
+MPI parallelization with NEURON requires that the simulation be launched
+with the `nrniv` binary from the command-line. The `mpiexec` command is
+used to launch multiple `nrniv` processes which communicate via MPI.
+This is done using `subprocess.Popen()` in `MPIBackend.simulate()` to
+launch parallel child processes (`MPISimulation`) to carry out the
+simulation. The communication sequence between `MPIBackend` and
+`MPISimulation` is outlined below.
+
+1.  In order to pass the network to simulate from `MPIBackend`, the
+    child `MPISimulation` processes' `stdin` is used. The ready-to-use
+    {class}`~hnn_core.Network` object is base64 encoded and pickled before
+    being written to the child processes' `stdin` by way of a Queue in
+    a non-blocking way. See how it is [used in MNE-Python][].
+    The data is marked by start and end signals that are used to extract
+    the pickled net object. After being unpickled, the parallel
+    simulation begins.
+2.  Output from the simulation (either to `stdout` or `stderr`) is
+    communicated back to `MPIBackend`, where it will be printed to the
+    console. Typical output at this point would be simulation progress
+    messages as well as any MPI warnings/errors during the simulation.
+3.  Once the simulation has completed, the rank 0 of the child process
+    sends back the simulation data by base64 encoding and and pickling
+    the data object. It also adds markings for the start and end of the
+    encoded data, including the expected length of data (in bytes) in
+    the end of data marking. Finally rank 0 writes the whole string with
+    markings and encoded data to `stderr`.
+4.  `MPIBackend` will look for these markings to know that data is being
+    sent (and will not print this). It will verify the length of data it
+    receives, printing a `UserWarning` if the data length received
+    doesn't match the length part of the marking.
+5.  To signal that the child process should terminate, `MPIBackend`
+    sends a signal to the child proccesses' `stdin`. After sending the
+    simulation data, rank 0 waits for this completion signal before
+    continuing and letting all ranks of the MPI process exit
+    successfully.
+6.  At this point, `MPIBackend.simulate()` decodes and unpickles the
+    data, populates the network's CellResponse object, and returns the
+    simulation dipoles to the caller.
+
+It is important that `flush()` is used whenever data is written to stdin
+or stderr to ensure that the signal will immediately be available for
+reading by the other side.
+
+Tests for parallel backends utilize a special `@pytest.mark.incremental`
+decorator (defined in `conftest.py`) that causes a test failure to skip
+subsequent tests in the incremental block. For example, if a test
+running a simple MPI simulation fails, subsequent tests that compare
+simulation output between different backends will be skipped. These
+types of failures will be marked as a failure in CI.
+
+[used in MNE-Python]: https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#L124-L132
+
