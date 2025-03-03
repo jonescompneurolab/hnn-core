@@ -776,6 +776,14 @@ file as the key for previously cached content. For consistency, we
 recommend you to monotonically increase the version number in that file,
 e.g., from “v2”-&gt;”v3”.</p>
 </section>
+<section id="making-changes-to-the-default-network">
+<h2>Making changes to the default network<a class="headerlink" href="#making-changes-to-the-default-network" title="Permalink to this heading">#</a></h2>
+<p>If you ever need to make scientific or technical changes to the default network, you must “re-generate” the smaller network we use for testing, in <code class="docutils literal notranslate"><span class="pre">hnn_core/tests/assets/jones2009_3x3_drives.json</span></code>. This is easily done via the following:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make regenerate-test-network
+</pre></div>
+</div>
+<p>Once you do this, make sure to re-run all the tests using <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code> to ensure that numerical tests dependent on the network itself have not broken.</p>
+</section>
 </section>
 
 
@@ -827,6 +835,7 @@ e.g., from “v2”-&gt;”v3”.</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-rebase">How to rebase</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#continuous-integration">Continuous Integration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#making-changes-to-the-default-network">Making changes to the default network</a></li>
 </ul>
   </nav></div>
 
