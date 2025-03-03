@@ -25,7 +25,6 @@ from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
 from .hnn_io import write_network_configuration, network_to_dict
 from .externals.mne import copy_doc
-from typing import Union
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
@@ -1653,45 +1652,66 @@ class _NetworkDrive(dict):
         return entr
 
 
-def _add_cell_type_bias(network: Network, amplitude: Union[float, dict],
-                        cell_type=None, section='soma', bias_name='tonic',
-                        t_0=0, t_stop=None):
+def _add_cell_type_bias(
+        network: Network,
+        amplitude: float,
+        cell_type: str,
+        section='soma',
+        bias_name='tonic',
+        t_0=0,
+        t_stop=None
+):
+    """Add a tonic bias to a specific cell type in the network.
 
-    if network is None:
-        raise ValueError('The "network" parameter is required '
-                         'but was not provided')
-    if amplitude is None:
-        raise ValueError('The "amplitude" parameter is required '
-                         'but was not provided')
+    Parameters
+    ----------
+    network : Network
+        The network to which the tonic bias is added.
+    amplitude : float
+        The amplitude of the tonic input (in nA) applied to the specified
+        `cell_type`.
+    cell_type : str
+        The cell type to which the bias is applied.
+    section : str, default 'soma'
+        The section of the cell where the bias is applied (e.g., 'soma',
+        'apical_tuft').
+    bias_name : str, default 'tonic'
+        A name identifier for the bias configuration, allowing multiple biases
+        to be applied.
+    t_0 : float, default 0
+        The start time of the tonic input in milliseconds.
+    t_stop : float, optional
+        The end time of the tonic input in milliseconds. If None, the bias
+        continues until the end of the simulation.
+    """
+    # Validate cell_type value
+    if cell_type not in network.cell_types:
+        raise ValueError(f'cell_type must be one of '
+                         f'{list(network.cell_types.keys())}. '
+                         f'Got {cell_type}')
 
-    if cell_type is not None:
-        # Validate cell_type value
-        if cell_type not in network.cell_types:
-            raise ValueError(f'cell_type must be one of '
-                             f'{list(network.cell_types.keys())}. '
-                             f'Got {cell_type}')
+    if bias_name not in network.external_biases:
+        network.external_biases[bias_name] = dict()
 
-        if bias_name not in network.external_biases:
-            network.external_biases[bias_name] = dict()
+    if cell_type in network.external_biases[bias_name]:
+        raise ValueError(f'Bias named {bias_name} already defined '
+                         f'for {cell_type}')
 
-        if cell_type in network.external_biases[bias_name]:
-            raise ValueError(f'Bias named {bias_name} already defined '
-                             f'for {cell_type}')
+    cell_type_bias = {
+        'amplitude': amplitude,
+        't0': t_0,
+        'tstop': t_stop,
+        'section': section
+    }
 
-        cell_type_bias = {
-            'amplitude': amplitude,
-            't0': t_0,
-            'tstop': t_stop,
-            'section': section
-        }
+    sections = list(network.cell_types[cell_type].sections.keys())
 
-        sections = list(network.cell_types[cell_type].sections.keys())
+    # error when section is defined that doesn't exist.
+    if section not in sections:
+        raise ValueError(f"section must be one of {sections}. "
+                         f"Got {section}.")
+    else:
+        cell_type_bias['section'] = section
 
-        # error when section is defined that doesn't exist.
-        if section not in sections:
-            raise ValueError(f"section must be one of {sections}. "
-                             f"Got {section}.")
-        else:
-            cell_type_bias['section'] = section
+    network.external_biases[bias_name][cell_type] = cell_type_bias
 
-        network.external_biases[bias_name][cell_type] = cell_type_bias
