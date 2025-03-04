@@ -82,7 +82,7 @@ and it should not give any error messages.
 **Basic Usage**: For how to use the `hnn_core` API, which is available for every installation
 type, see our extensive {doc}`Examples page <auto_examples/index>`.
 
-## GUI Installation
+## Graphical User Interface (GUI) Installation
 
 To install `hnn_core` with both its API and GUI support, a simple tweak to the above command is
 needed (pay attention to the "quotes"):
