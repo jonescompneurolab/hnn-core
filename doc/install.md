@@ -60,7 +60,7 @@ Note that Step 1 and Step 2 above are required for **all installation types**. N
 ## Basic Installation
 
 To install just the `hnn_core` API, open a Terminal or Command Prompt using a fresh virtual
-environment, and simply run:
+environment, and enter:
 
     $ pip install hnn_core
 
