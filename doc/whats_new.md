@@ -9,173 +9,169 @@ orphan: true
 
 ### API changes
 
-- Add ability to manually define colors in spike histogram plots,
-  by [Nick Tolley][] in {gh}`640`
+- Add ability to manually define colors in spike histogram plots, by [Nick Tolley][] in
+  {gh}`640`
 
-- Connection `'src_gids'` and `'target_gids'` are now stored as set objects
-  instead of lists, by [Ryan Thorpe][] in {gh}`642`.
+- Connection `'src_gids'` and `'target_gids'` are now stored as set objects instead of
+  lists, by [Ryan Thorpe][] in {gh}`642`
 
 - {func}`~hnn_core.CellResponse.write` and {func}`~hnn_core.Cell_response.read_spikes`
-  now support hdf5 format for read/write Cell response object, by
-  [Rajat Partani][] in {gh}`644`
+  now support hdf5 format for read/write Cell response object, by [Rajat Partani][] in
+  {gh}`644`
 
 - Add ability to customize plot colors for each cell section in
   {func}`~hnn_core.Cell.plot_morphology`, by [Nick Tolley][] in {gh}`646`
 
-- {func}`~hnn_core.Dipole.write` and {func}`~hnn_core.Dipole.read_dipoles`
-  now support hdf5 format for read/write Dipole object, by
-  [Rajat Partani][] in {gh}`648`
+- {func}`~hnn_core.Dipole.write` and {func}`~hnn_core.Dipole.read_dipoles` now support
+  hdf5 format for read/write Dipole object, by [Rajat Partani][] in {gh}`648`
 
 - Added {class}`~hnn_core.viz.NetworkPlotter` to visualize and animate network
-  simulations, by [Nick Tolley][] in {gh}`649`.
+  simulations, by [Nick Tolley][] in {gh}`649`
 
 - Add ability to optimize parameters associated with evoked drives and plot
-  convergence. User can constrain parameter ranges and specify solver,
-  by [Carolina Fernandez Pujol][] in {gh}`652`
+  convergence. User can constrain parameter ranges and specify solver, by [Carolina
+  Fernandez Pujol][] in {gh}`652`
 
-- Add ability to optimize parameters associated with rhythmic drives,
-  by [Carolina Fernandez Pujol][] in {gh}`673`.
+- Add ability to optimize parameters associated with rhythmic drives, by [Carolina
+  Fernandez Pujol][] in {gh}`673`
 
-- Add ability to specify number of cells in {class}`~hnn_core.Network`,
-  by [Nick Tolley][] in {gh}`705`
+- Add ability to specify number of cells in {class}`~hnn_core.Network`, by [Nick
+  Tolley][] in {gh}`705`
 
-- Added kwargs options to `plot_spikes_hist` for adjusting the histogram plots
-  of spiking activity, by [Abdul Samad Siddiqui][] in {gh}`732`.
+- Added kwargs options to `plot_spikes_hist` for adjusting the histogram plots of
+  spiking activity, by [Abdul Samad Siddiqui][] in {gh}`732`
 
-- Updated `plot_spikes_raster` logic to include all neurons in network model.
-  Removed GUI exclusion from build, by [Abdul Samad Siddiqui][]  in {gh}`754`.
+- Updated `plot_spikes_raster` logic to include all neurons in network model.  Removed
+  GUI exclusion from build, by [Abdul Samad Siddiqui][] in {gh}`754`
 
-- Added feature to read/write {class}`~hnn_core.Network` configurations to
-  json, by [George Dang][] and [Rajat Partani][] in {gh}`757`
+- Added feature to read/write {class}`~hnn_core.Network` configurations to json, by
+  [George Dang][] and [Rajat Partani][] in {gh}`757`
 
-- {func}`network.add_tonic_bias` cell-specific tonic bias can now be provided using the argument
-  amplitude in {func}`network.add_tonic_bias`, by [Camilo Diaz][] in {gh}`766`
+- {func}`network.add_tonic_bias` cell-specific tonic bias can now be provided using the
+  argument amplitude in {func}`network.add_tonic_bias`, by [Camilo Diaz][] in {gh}`766`
 
-- {func}`~plot_lfp`, {func}`~plot_dipole`, {func}`~plot_spikes_hist`,
-  and {func}`~plot_spikes_raster` now plotted from 0 to tstop. Inputs tmin and tmax are deprecated,
-  by [Katharina Duecker][] in {gh}`769`
+- {func}`~plot_lfp`, {func}`~plot_dipole`, {func}`~plot_spikes_hist`, and
+  {func}`~plot_spikes_raster` now plotted from 0 to tstop. Inputs tmin and tmax are
+  deprecated, by [Katharina Duecker][] in {gh}`769`
 
-- Add function {func}`~hnn_core.params.convert_to_json` to convert legacy param
-  and json files to new json format, by [George Dang][] in {gh}`772`
+- Add function {func}`~hnn_core.params.convert_to_json` to convert legacy param and json
+  files to new json format, by [George Dang][] in {gh}`772`
 
-- Add {class}`~hnn_core.BatchSimulate` for batch simulation capability,
-  by [Abdul Samad Siddiqui][] in {gh}`782`.
+- Add {class}`~hnn_core.BatchSimulate` for batch simulation capability, by [Abdul Samad
+  Siddiqui][] in {gh}`782`
 
-- Added features to {func}`~plot_csd`: to set color of sinks and sources, range of the colormap,
-  and interpolation method to smoothen CSD plot, by [Katharina Duecker][] in {gh}`815`
+- Added features to {func}`~plot_csd`: to set color of sinks and sources, range of the
+  colormap, and interpolation method to smoothen CSD plot, by [Katharina Duecker][] in
+  {gh}`815`
 
-- Add argument to change colors of `plot_spikes_raster`, shortened line lengths
-  to prevent overlap, and added an argument for custom cell types, by
-  [George Dang][] in {gh}`895`
+- Add argument to change colors of `plot_spikes_raster`, shortened line lengths to
+  prevent overlap, and added an argument for custom cell types, by [George Dang][] in
+  {gh}`895`
 
-- Add method to {class}`~hnn_core.Network` to modify synaptic gains, by
-  [Nick Tolley][]  and [George Dang][] in {gh}`897`
+- Add method to {class}`~hnn_core.Network` to modify synaptic gains, by [Nick Tolley][]
+  and [George Dang][] in {gh}`897`
 
 - Add {func}`~hnn_core.CellResponse.spike_times_by_type` to get cell spiking times
-  organized by cell type, by [Mainak Jas][] in {gh}`916`.
+  organized by cell type, by [Mainak Jas][] in {gh}`916`
 
-- Add option to apply a tonic bias to any compartment of the cell, and option to
-  add multiple biases per simulation and cell {func}`hnn_core.network.add_tonic_bias`,
-  by [Katharina Duecker][] in {gh}`922`.
+- Add option to apply a tonic bias to any compartment of the cell, and option to add
+  multiple biases per simulation and cell {func}`hnn_core.network.add_tonic_bias`, by
+  [Katharina Duecker][] in {gh}`922`
 
-- Add plots to show relative and absolute external drive strength,
-  by [Dikshant Jha][] in {gh}`987`.
+- Add plots to show relative and absolute external drive strength, by [Dikshant Jha][]
+  in {gh}`987`
 
 ### Bug fixes
 
-- Fix inconsistent connection mapping from drive gids to cell gids, by
-  [Ryan Thorpe][] in {gh}`642`.
+- Fix inconsistent connection mapping from drive gids to cell gids, by [Ryan Thorpe][]
+  in {gh}`642`
 
-- Objective function called by {func}`~hnn_core.optimization.optimize_evoked`
-  now returns a scalar instead of tuple, by [Ryan Thorpe][] in {gh}`670`.
+- Objective function called by {func}`~hnn_core.optimization.optimize_evoked` now
+  returns a scalar instead of tuple, by [Ryan Thorpe][] in {gh}`670`
 
-- Fix GUI plotting bug due to deprecation of matplotlib color cycling method,
-  by [George Dang][] in {gh}`695`.
+- Fix GUI plotting bug due to deprecation of matplotlib color cycling method, by [George
+  Dang][] in {gh}`695`
 
-- Fix bug in {func}`~hnn_core.network.pick_connection` where connections are
-  returned for cases when there should be no valid matches, by [George Dang][]
-  in {gh}`739`
+- Fix bug in {func}`~hnn_core.network.pick_connection` where connections are returned
+  for cases when there should be no valid matches, by [George Dang][] in {gh}`739`
 
-- Fixed GUI figure annotation overlap in multiple sub-plots,
-  by [Camilo Diaz][] in {gh}`741`
+- Fixed GUI figure annotation overlap in multiple sub-plots, by [Camilo Diaz][] in
+  {gh}`741`
 
-- Fix loading of drives in the GUI: drives are now overwritten instead of updated,
-  by [Mainak Jas][] in {gh}`795`.
+- Fix loading of drives in the GUI: drives are now overwritten instead of updated, by
+  [Mainak Jas][] in {gh}`795`
 
-- Use `np.isin()` in place of `np.in1d()` to address numpy deprecation,
-  by [Nick Tolley][] in {gh}`799`.
+- Use `np.isin()` in place of `np.in1d()` to address numpy deprecation, by [Nick
+  Tolley][] in {gh}`799`
 
-- Fix drive seeding so that event times are unique across multiple trials,
-  by [Nick Tolley][] in {gh}`810`.
+- Fix drive seeding so that event times are unique across multiple trials, by [Nick
+  Tolley][] in {gh}`810`
 
 - Fix bug in {func}`~hnn_core.network.clear_drives` where network object are not
-  accurately updated, by [Nick Tolley][] in {gh}`812`.
+  accurately updated, by [Nick Tolley][] in {gh}`812`
 
-- Fix bug in {func}`~hnn_core.Network.add_poisson_drive` where an error is
-  thrown when passing a float for rate_constant when ``cell_specific=False``,
-  by [Dylan Daniels][] in {gh}`814`
+- Fix bug in {func}`~hnn_core.Network.add_poisson_drive` where an error is thrown when
+  passing a float for rate_constant when ``cell_specific=False``, by [Dylan Daniels][]
+  in {gh}`814`
 
-- Fix bug in {func}`~hnn_core.Network.add_poisson_drive` where an error is
-  thrown when passing an int for rate_constant when ``cell_specific=True``,
-  by [Dylan Daniels][] in {gh}`818`
+- Fix bug in {func}`~hnn_core.Network.add_poisson_drive` where an error is thrown when
+  passing an int for rate_constant when ``cell_specific=True``, by [Dylan Daniels][] in
+  {gh}`818`
 
-- Fix GUI over-plotting of loaded data where the app stalled and did not plot
-  RMSE, by [George Dang][] in {gh}`869`
+- Fix GUI over-plotting of loaded data where the app stalled and did not plot RMSE, by
+  [George Dang][] in {gh}`869`
 
-- Fix scaling and smoothing of loaded data dipoles to the GUI, by [George Dang][]
-  in {gh}`892`
+- Fix scaling and smoothing of loaded data dipoles to the GUI, by [George Dang][] in
+  {gh}`892`
 
 ### GUI changes
 
-- Update GUI to use ipywidgets v8.0.0+ API, by [George Dang][] in
-  {gh}`696`.
+- Update GUI to use ipywidgets v8.0.0+ API, by [George Dang][] in {gh}`696`
 
 - Added pre defined plot sets for simulated data in GUI, by [Camilo Diaz][] in {gh}`746`
 
-- Added GUI widget to enable/disable synchronous input in simulations,
-  by [Camilo Diaz][] in {gh}`750`
+- Added GUI widget to enable/disable synchronous input in simulations, by [Camilo
+  Diaz][] in {gh}`750`
 
-- Added GUI widgets to save simulation as csv and updated the file upload to support csv data,
-  by [Camilo Diaz][] in {gh}`753`
+- Added GUI widgets to save simulation as csv and updated the file upload to support csv
+  data, by [Camilo Diaz][] in {gh}`753`
 
-- Added GUI feature to include Tonic input drives in simulations,
-  by [Camilo Diaz][] {gh}`773`
+- Added GUI feature to include Tonic input drives in simulations, by [Camilo Diaz][]
+  {gh}`773`
 
-- Added GUI feature to read and modify cell parameters,
-  by [Camilo Diaz][]  in {gh}`806`.
+- Added GUI feature to read and modify cell parameters, by [Camilo Diaz][] in {gh}`806`
 
-- Changed the configuration/parameter file format support of the GUI. Loading
-  of connectivity and drives use a new multi-level json structure that mirrors
-  the structure of the Network object. Flat parameter and json configuration
-  files are no longer supported by the GUI, by [George Dang][] in {gh}`837`
+- Changed the configuration/parameter file format support of the GUI. Loading of
+  connectivity and drives use a new multi-level json structure that mirrors the
+  structure of the Network object. Flat parameter and json configuration files are no
+  longer supported by the GUI, by [George Dang][] in {gh}`837`
 
-- Updated the GUI load drive widget to be able to load tonic biases from a
-  network configuration file. [George Dang][] in {gh}`852`
+- Updated the GUI load drive widget to be able to load tonic biases from a network
+  configuration file. [George Dang][] in {gh}`852`
 
-- Added "No. Drive Cells" input widget to the GUI and changed the "Synchronous
-  Input" checkbox to "Cell-Specific" to align with the API [George Dang][] in {gh}`861`
+- Added "No. Drive Cells" input widget to the GUI and changed the "Synchronous Input"
+  checkbox to "Cell-Specific" to align with the API [George Dang][] in {gh}`861`
 
-- Add button to delete a single drive on GUI drive windows, by
-  [George Dang][] in {gh}`890`
+- Add button to delete a single drive on GUI drive windows, by [George Dang][] in
+  {gh}`890`
 
-- Add minimum spectral frequency widget to GUI for adjusting spectrogram
-  frequency axis, by [George Dang][] in {gh}`894`
+- Add minimum spectral frequency widget to GUI for adjusting spectrogram frequency axis,
+  by [George Dang][] in {gh}`894`
 
 - Update GUI to display "L2/3", by [Austin Soplata][] in {gh}`904`
 
 ### Other changes
 
-- Cleaned up internal logic in {class}`~hnn_core.CellResponse`,
-  by [Nick Tolley][] in {gh}`647`.
+- Cleaned up internal logic in {class}`~hnn_core.CellResponse`, by [Nick Tolley][] in
+  {gh}`647`
 
-- Update minimum supported version of Python to 3.8, by [Ryan Thorpe][] in
-  {gh}`678`.
+- Update minimum supported version of Python to 3.8, by [Ryan Thorpe][] in {gh}`678`
 
-- Add dependency groups to setup.py and update CI workflows to reference
-  dependency groups, by [George Dang][] in {gh}`703`.
+- Add dependency groups to setup.py and update CI workflows to reference dependency
+  groups, by [George Dang][] in {gh}`703`
 
-- Added check for invalid Axes object in {func}`~hnn_core.viz.plot_cells`
-  function, by [Abdul Samad Siddiqui][] in {gh}`744`.
+- Added check for invalid Axes object in {func}`~hnn_core.viz.plot_cells` function, by
+  [Abdul Samad Siddiqui][] in {gh}`744`
 
 ### People who contributed to this release (in alphabetical order):
 
@@ -200,7 +196,7 @@ orphan: true
 ### Changelog
 
 - Add option to select drives using argument 'which_drives' in
-  {func}`~hnn_core.optimization.optimize_evoked`, by [Mohamed A. Sherif][] in {gh}`478`.
+  {func}`~hnn_core.optimization.optimize_evoked`, by [Mohamed A. Sherif][] in {gh}`478`
 
 - Changed ``conn_seed`` default to ``None`` (from ``3``) in {func}`~hnn_core.network.add_connection`,
   by [Mattan Pelah][] in {gh}`492`.
