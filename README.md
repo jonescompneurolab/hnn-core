@@ -1,3 +1,8 @@
+
+<h1 align="center">
+<img src="https://hnn.brown.edu/wp-content/uploads/hnn-medium.png" width="300">
+</h1><br>
+
 # hnn-core
 
 [![tests](https://github.com/jonescompneurolab/hnn-core/actions/workflows/unix_unit_tests.yml/badge.svg?branch=master)](https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:master+event:push)
@@ -9,7 +14,7 @@
 
 ![HNN-GUI](https://raw.githubusercontent.com/jonescompneurolab/hnn-core/acbcc4a598610dc3be5d4b0b7c59f98251ea7690/.github/images/hnn_gui.png)
 
-## About
+# About
 
 This is a leaner and cleaner version of the code based off the [HNN
 repository](https://github.com/jonescompneurolab/hnn).
@@ -41,115 +46,28 @@ of HNN in studying the circuit-level origin of some of the most commonly
 measured MEG/EEG and ECoG signals: event related potentials (ERPs) and low
 frequency rhythms (alpha/beta/gamma).
 
-Contributors are very welcome. Please read our [contributing
-guide][] if you are interested.
+Contributors are very welcome! Please read our [Contributing Guide][] if you are interested.
 
-## Dependencies
-
-hnn-core requires Python (>=3.8) and the following packages:
-
--   numpy
--   scipy
--   matplotlib
--   Neuron (>=7.7)
-
-## Optional dependencies
-
-### GUI
-
--   ipywidgets
--   voila
--   ipympl
--   ipykernel
-
-*Note*: Please follow the **GUI installation** section to install the
-correct GUI dependency versions automatically.
-
-### Optimization
-
--   scikit-learn
-
-### Parallel processing
-
--   joblib (for simulating trials simultaneously)
--   mpi4py (for simulating the cells in parallel for a single trial).
-    Also depends on:
-    -   openmpi or other mpi platform installed on system
-    -   psutil
+Please consider supporting HNN development efforts by voluntarily [providing your demographic information here](https://docs.google.com/forms/d/e/1FAIpQLSfN2F4IkGATs6cy1QBO78C6QJqvm9y14TqsCUsuR4Rrkmr1Mg/viewform)! Note that any demographic information we collect is anonymized and aggregated for reporting on the grants that fund the continued development of HNN. All questions are voluntary.
 
 # Installation
 
-We recommend the [Anaconda Python
-distribution](https://www.anaconda.com/products/individual). To install
-`hnn-core`, simply do:
+See [Installation Guide][]. To install `hnn-core` with the minimum dependencies
+on Mac or Linux, simply do:
 
     $ pip install hnn_core
-
-and it will install `hnn-core` along with the dependencies which are not
-already installed.
-
-Note that if you installed Neuron using the traditional installer
-package, it is recommended to remove it first and unset `PYTHONPATH` and
-`PYTHONHOME` if they were set. This is because the pip installer works
-better with virtual environments such as the ones provided by `conda`.
 
 If you want to track the latest developments of `hnn-core`, you can
 install the current version of the code (nightly) with:
 
     $ pip install --upgrade https://api.github.com/repos/jonescompneurolab/hnn-core/zipball/master
 
-To check if everything worked fine, you can do:
-
-    $ python -c 'import hnn_core'
-
-and it should not give any error messages.
-
-**Installing optimization dependencies**
-
-If you are using bayesian optimization, then scikit-learn is required.
-Install hnn-core with scikit-learn using the following command:
-
-    $ pip install hnn_core[opt]
-
-**GUI installation**
-
-To install the GUI dependencies along with `hnn-core`, a simple tweak to
-the above command is needed:
-
-    $ pip install hnn_core[gui]
-
-Note if you are zsh in macOS the command is:
-
-    $ pip install hnn_core'[gui]'
-
-To start the GUI, please do:
-
-    $ hnn-gui
-
-**Parallel backends**
-
-For further instructions on installation and usage of parallel backends
-for using more than one CPU core, refer to our [parallel backend
-guide](https://jonescompneurolab.github.io/hnn-core/stable/parallel.html).
-
-**Note for Windows users**
-
-Install Neuron using the [precompiled
-installers](https://nrn.readthedocs.io/en/latest/) **before** installing
-`hnn-core`. Make sure that:
-
-    $ python -c 'import neuron;'
-
-does not throw any errors before running the install command. If you
-encounter errors, please get help from [NEURON
-forum](https://www.neuron.yale.edu/phpbb/). Finally, do:
-
-    $ pip install hnn_core[gui]
+If you are interested in features like GUI, Optimization, or Parallel support, or are on Windows, then please see our [Installation Guide][].
 
 # Documentation and examples
 
-Once you have tested that `hnn_core` and its dependencies were
-installed, we recommend downloading and executing the [example
+Once you have installed `hnn_core` and the dependencies for the features you
+want, we recommend downloading and executing the [example
 scripts](https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/index.html)
 provided on the [documentation
 pages](https://jonescompneurolab.github.io/hnn-core/) (as well as in the
@@ -174,7 +92,7 @@ recommend editors such as [VS Code](https://code.visualstudio.com) and
 
 # Bug reports
 
-Use the [github issue
+Use the [GitHub Issues
 tracker](https://github.com/jonescompneurolab/hnn-core/issues) to report
 bugs. For user questions and scientific discussions, please see our
 [GitHub Discussions
@@ -182,12 +100,11 @@ page](https://github.com/jonescompneurolab/hnn-core/discussions).
 
 # Interested in Contributing?
 
-Read our [contributing guide][].
+Please read our [Contributing Guide][] and make sure to abide by our [Code of Conduct](https://github.com/jonescompneurolab/hnn-core/blob/master/CODE_OF_CONDUCT.md).
 
 # Governance Structure
 
-Read our [governance
-structure](https://jonescompneurolab.github.io/hnn-core/stable/governance.html).
+Our [governance structure can be found here](https://jonescompneurolab.github.io/hnn-core/stable/governance.html).
 
 # Citing
 
@@ -198,4 +115,8 @@ JOSS](https://doi.org/10.21105/joss.05848):
 > circuit-level interpretation of human MEG/EEG. *Journal of Open Source
 > Software*, 8(92), 5848, <https://doi.org/10.21105/joss.05848>
 
-[contributing guide]: https://jonescompneurolab.github.io/hnn-core/stable/contributing.html
+[Contributing Guide]: https://jonescompneurolab.github.io/hnn-core/stable/contributing.html
+
+<!-- TODO: Once we have a "stable" version of the install webpage, need to update this link to it: -->
+<!-- TODO: Once the install page is merged into "dev", we need to update this link to it: -->
+[Installation Guide]: https://github.com/asoplata/hnn-core/blob/iss969-authoring/doc/install.md
