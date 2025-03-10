@@ -54,7 +54,7 @@
         </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Tutorials" href="auto_examples/index.html" />
+    <link rel="next" title="Installation Guide" href="install.html" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -167,6 +167,13 @@
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
+                      <a class="nav-link nav-internal" href="install.html">
+                        Install
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
                       <a class="nav-link nav-internal" href="auto_examples/index.html">
                         Examples
                       </a>
@@ -207,19 +214,19 @@
                   </a>
                 </li>
                 
-
-                <li class="nav-item">
-                  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
-                    PyPI
-                  </a>
-                </li>
-                
             <li class="nav-item dropdown">
                 <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
                     More
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+                <li class="nav-item">
+                  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
+                    PyPI
+                  </a>
+                </li>
+                
+
                 <li class="nav-item">
                   <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
                     HNN Frontpage
@@ -327,6 +334,13 @@ document.write(`
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
+                      <a class="nav-link nav-internal" href="install.html">
+                        Install
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
                       <a class="nav-link nav-internal" href="auto_examples/index.html">
                         Examples
                       </a>
@@ -367,19 +381,19 @@ document.write(`
                   </a>
                 </li>
                 
-
-                <li class="nav-item">
-                  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
-                    PyPI
-                  </a>
-                </li>
-                
             <li class="nav-item dropdown">
                 <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
                     More
                 </button>
                 <ul id="pst-nav-more-links-2" class="dropdown-menu">
                     
+                <li class="nav-item">
+                  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
+                    PyPI
+                  </a>
+                </li>
+                
+
                 <li class="nav-item">
                   <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
                     HNN Frontpage
@@ -452,6 +466,9 @@ document.write(`
   <!-- The below toctree is needed to populate the "navbar" at the top. -->
 <div class="toctree-wrapper compound">
 </div>
+<h1 align="center">
+<img src="https://hnn.brown.edu/wp-content/uploads/hnn-medium.png" width="300">
+</h1><br>
 <section id="hnn-core">
 <h1>hnn-core<a class="headerlink" href="#hnn-core" title="Permalink to this heading">#</a></h1>
 <p><a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:master+event:push"><img alt="tests" src="https://github.com/jonescompneurolab/hnn-core/actions/workflows/unix_unit_tests.yml/badge.svg?branch=master" /></a>
@@ -461,8 +478,9 @@ document.write(`
 <a class="reference external" href="https://gitter.im/jonescompneurolab/hnn-core?utm_source=badge&amp;amp;utm_medium=badge&amp;amp;utm_campaign=pr-badge"><img alt="Gitter" src="https://badges.gitter.im/jonescompneurolab/hnn_core.svg" /></a>
 <a class="reference external" href="https://doi.org/10.21105/joss.05848"><img alt="JOSS" src="https://joss.theoj.org/papers/10.21105/joss.05848/status.svg" /></a></p>
 <p><img alt="HNN-GUI" src="https://raw.githubusercontent.com/jonescompneurolab/hnn-core/acbcc4a598610dc3be5d4b0b7c59f98251ea7690/.github/images/hnn_gui.png" /></p>
+</section>
 <section id="about">
-<h2>About<a class="headerlink" href="#about" title="Permalink to this heading">#</a></h2>
+<h1>About<a class="headerlink" href="#about" title="Permalink to this heading">#</a></h1>
 <p>This is a leaner and cleaner version of the code based off the <a class="reference external" href="https://github.com/jonescompneurolab/hnn">HNN
 repository</a>.</p>
 <p>The <strong>Human Neocortical Neurosolver (HNN)</strong> is an open-source neural modeling
@@ -489,119 +507,27 @@ researchers with no formal computational neural modeling or coding experience.</
 of HNN in studying the circuit-level origin of some of the most commonly
 measured MEG/EEG and ECoG signals: event related potentials (ERPs) and low
 frequency rhythms (alpha/beta/gamma).</p>
-<p>Contributors are very welcome. Please read our <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/contributing.html">contributing
-guide</a> if you are interested.</p>
-</section>
-<section id="dependencies">
-<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this heading">#</a></h2>
-<p>hnn-core requires Python (&gt;=3.8) and the following packages:</p>
-<ul class="simple">
-<li><p>numpy</p></li>
-<li><p>scipy</p></li>
-<li><p>matplotlib</p></li>
-<li><p>Neuron (&gt;=7.7)</p></li>
-</ul>
-</section>
-<section id="optional-dependencies">
-<h2>Optional dependencies<a class="headerlink" href="#optional-dependencies" title="Permalink to this heading">#</a></h2>
-<section id="gui">
-<h3>GUI<a class="headerlink" href="#gui" title="Permalink to this heading">#</a></h3>
-<ul class="simple">
-<li><p>ipywidgets</p></li>
-<li><p>voila</p></li>
-<li><p>ipympl</p></li>
-<li><p>ipykernel</p></li>
-</ul>
-<p><em>Note</em>: Please follow the <strong>GUI installation</strong> section to install the
-correct GUI dependency versions automatically.</p>
-</section>
-<section id="optimization">
-<h3>Optimization<a class="headerlink" href="#optimization" title="Permalink to this heading">#</a></h3>
-<ul class="simple">
-<li><p>scikit-learn</p></li>
-</ul>
-</section>
-<section id="parallel-processing">
-<h3>Parallel processing<a class="headerlink" href="#parallel-processing" title="Permalink to this heading">#</a></h3>
-<ul class="simple">
-<li><p>joblib (for simulating trials simultaneously)</p></li>
-<li><p>mpi4py (for simulating the cells in parallel for a single trial).
-Also depends on:</p>
-<ul>
-<li><p>openmpi or other mpi platform installed on system</p></li>
-<li><p>psutil</p></li>
-</ul>
-</li>
-</ul>
-</section>
-</section>
+<p>Contributors are very welcome! Please read our <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/contributing.html">Contributing Guide</a> if you are interested.</p>
+<p>Please consider supporting HNN development efforts by voluntarily <a class="reference external" href="https://docs.google.com/forms/d/e/1FAIpQLSfN2F4IkGATs6cy1QBO78C6QJqvm9y14TqsCUsuR4Rrkmr1Mg/viewform">providing your demographic information here</a>! Note that any demographic information we collect is anonymized and aggregated for reporting on the grants that fund the continued development of HNN. All questions are voluntary.</p>
 </section>
 <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">#</a></h1>
-<p>We recommend the <a class="reference external" href="https://www.anaconda.com/products/individual">Anaconda Python
-distribution</a>. To install
-<code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>, simply do:</p>
+<p>See <a class="reference external" href="https://github.com/asoplata/hnn-core/blob/iss969-authoring/doc/install.md">Installation Guide</a>. To install <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> with the minimum dependencies
+on Mac or Linux, simply do:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pip install hnn_core
 </pre></div>
 </div>
-<p>and it will install <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> along with the dependencies which are not
-already installed.</p>
-<p>Note that if you installed Neuron using the traditional installer
-package, it is recommended to remove it first and unset <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code> and
-<code class="docutils literal notranslate"><span class="pre">PYTHONHOME</span></code> if they were set. This is because the pip installer works
-better with virtual environments such as the ones provided by <code class="docutils literal notranslate"><span class="pre">conda</span></code>.</p>
 <p>If you want to track the latest developments of <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>, you can
 install the current version of the code (nightly) with:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pip install --upgrade https://api.github.com/repos/jonescompneurolab/hnn-core/zipball/master
 </pre></div>
 </div>
-<p>To check if everything worked fine, you can do:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ python -c &#39;import hnn_core&#39;
-</pre></div>
-</div>
-<p>and it should not give any error messages.</p>
-<p><strong>Installing optimization dependencies</strong></p>
-<p>If you are using bayesian optimization, then scikit-learn is required.
-Install hnn-core with scikit-learn using the following command:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pip install hnn_core[opt]
-</pre></div>
-</div>
-<p><strong>GUI installation</strong></p>
-<p>To install the GUI dependencies along with <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>, a simple tweak to
-the above command is needed:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pip install hnn_core[gui]
-</pre></div>
-</div>
-<p>Note if you are zsh in macOS the command is:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pip install hnn_core&#39;[gui]&#39;
-</pre></div>
-</div>
-<p>To start the GUI, please do:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ hnn-gui
-</pre></div>
-</div>
-<p><strong>Parallel backends</strong></p>
-<p>For further instructions on installation and usage of parallel backends
-for using more than one CPU core, refer to our <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/parallel.html">parallel backend
-guide</a>.</p>
-<p><strong>Note for Windows users</strong></p>
-<p>Install Neuron using the <a class="reference external" href="https://nrn.readthedocs.io/en/latest/">precompiled
-installers</a> <strong>before</strong> installing
-<code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>. Make sure that:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ python -c &#39;import neuron;&#39;
-</pre></div>
-</div>
-<p>does not throw any errors before running the install command. If you
-encounter errors, please get help from <a class="reference external" href="https://www.neuron.yale.edu/phpbb/">NEURON
-forum</a>. Finally, do:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pip install hnn_core[gui]
-</pre></div>
-</div>
+<p>If you are interested in features like GUI, Optimization, or Parallel support, or are on Windows, then please see our <a class="reference external" href="https://github.com/asoplata/hnn-core/blob/iss969-authoring/doc/install.md">Installation Guide</a>.</p>
 </section>
 <section id="documentation-and-examples">
 <h1>Documentation and examples<a class="headerlink" href="#documentation-and-examples" title="Permalink to this heading">#</a></h1>
-<p>Once you have tested that <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> and its dependencies were
-installed, we recommend downloading and executing the <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/index.html">example
+<p>Once you have installed <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> and the dependencies for the features you
+want, we recommend downloading and executing the <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/index.html">example
 scripts</a>
 provided on the <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/">documentation
 pages</a> (as well as in the
@@ -625,7 +551,7 @@ recommend editors such as <a class="reference external" href="https://code.visua
 </section>
 <section id="bug-reports">
 <h1>Bug reports<a class="headerlink" href="#bug-reports" title="Permalink to this heading">#</a></h1>
-<p>Use the <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues">github issue
+<p>Use the <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues">GitHub Issues
 tracker</a> to report
 bugs. For user questions and scientific discussions, please see our
 <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/discussions">GitHub Discussions
@@ -633,12 +559,11 @@ page</a>.</p>
 </section>
 <section id="interested-in-contributing">
 <h1>Interested in Contributing?<a class="headerlink" href="#interested-in-contributing" title="Permalink to this heading">#</a></h1>
-<p>Read our <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/contributing.html">contributing guide</a>.</p>
+<p>Please read our <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/contributing.html">Contributing Guide</a> and make sure to abide by our <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/blob/master/CODE_OF_CONDUCT.md">Code of Conduct</a>.</p>
 </section>
 <section id="governance-structure">
 <h1>Governance Structure<a class="headerlink" href="#governance-structure" title="Permalink to this heading">#</a></h1>
-<p>Read our <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/governance.html">governance
-structure</a>.</p>
+<p>Our <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/governance.html">governance structure can be found here</a>.</p>
 </section>
 <section id="citing">
 <h1>Citing<a class="headerlink" href="#citing" title="Permalink to this heading">#</a></h1>
@@ -649,6 +574,8 @@ JOSS</a>:</p>
 circuit-level interpretation of human MEG/EEG. <em>Journal of Open Source
 Software</em>, 8(92), 5848, <a class="reference external" href="https://doi.org/10.21105/joss.05848">https://doi.org/10.21105/joss.05848</a></p>
 </div></blockquote>
+<!-- TODO: Once we have a "stable" version of the install webpage, need to update this link to it: -->
+<!-- TODO: Once the install page is merged into "dev", we need to update this link to it: -->
 </section>
 
 
@@ -662,11 +589,11 @@ Software</em>, 8(92), 5848, <a class="reference external" href="https://doi.org/
                   
 <div class="prev-next-area">
     <a class="right-next"
-       href="auto_examples/index.html"
+       href="install.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Tutorials</p>
+        <p class="prev-next-title">Installation Guide</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -686,17 +613,8 @@ Software</em>, 8(92), 5848, <a class="reference external" href="https://doi.org/
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">hnn-core</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#about">About</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies">Dependencies</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-dependencies">Optional dependencies</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gui">GUI</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optimization">Optimization</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parallel-processing">Parallel processing</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">hnn-core</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#about">About</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation-and-examples">Documentation and examples</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#bug-reports">Bug reports</a></li>

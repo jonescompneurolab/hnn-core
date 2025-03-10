@@ -27,7 +27,7 @@ simulating dipoles using HNN-core.
 
 The MPI backend allows running the simulation in parallel across neurons in the
 network even with a single trial. For this, you will
-need the :ref:`MPI related software <parallel>` installed. Note that if you
+need the :ref:`MPI related software <install>` installed. Note that if you
 want to simulate in parallel across trials, the Joblib backend allows this
 without the need to install and configure MPI.
 
@@ -172,7 +172,7 @@ start the simulation across the number of processors (cores) specified by
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 42.146 seconds)
+   **Total running time of the script:** (0 minutes 40.842 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_simulate_mpi_backend.py:

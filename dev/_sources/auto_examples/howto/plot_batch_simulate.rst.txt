@@ -220,62 +220,62 @@ Run the batch simulation and collect the results.
     [Parallel(n_jobs=4)]: Done   2 tasks      | elapsed:    3.3s
     [Parallel(n_jobs=4)]: Done   3 tasks      | elapsed:    3.3s
     [Parallel(n_jobs=4)]: Done   4 tasks      | elapsed:    3.3s
-    [Parallel(n_jobs=4)]: Done   5 tasks      | elapsed:    6.0s
-    [Parallel(n_jobs=4)]: Done   6 tasks      | elapsed:    6.0s
-    [Parallel(n_jobs=4)]: Done   7 tasks      | elapsed:    6.1s
-    [Parallel(n_jobs=4)]: Done   8 tasks      | elapsed:    6.1s
-    [Parallel(n_jobs=4)]: Done   9 tasks      | elapsed:    8.7s
-    [Parallel(n_jobs=4)]: Done  10 tasks      | elapsed:    8.8s
-    [Parallel(n_jobs=4)]: Done  11 tasks      | elapsed:    8.8s
-    [Parallel(n_jobs=4)]: Done  12 tasks      | elapsed:    8.9s
-    [Parallel(n_jobs=4)]: Done  13 tasks      | elapsed:   11.3s
-    [Parallel(n_jobs=4)]: Done  14 out of  20 | elapsed:   11.5s remaining:    4.9s
-    [Parallel(n_jobs=4)]: Done  15 out of  20 | elapsed:   11.6s remaining:    3.9s
-    [Parallel(n_jobs=4)]: Done  16 out of  20 | elapsed:   11.6s remaining:    2.9s
-    [Parallel(n_jobs=4)]: Done  17 out of  20 | elapsed:   14.0s remaining:    2.5s
-    [Parallel(n_jobs=4)]: Done  18 out of  20 | elapsed:   14.1s remaining:    1.6s
-    [Parallel(n_jobs=4)]: Done  20 out of  20 | elapsed:   14.3s finished
+    [Parallel(n_jobs=4)]: Done   5 tasks      | elapsed:    5.9s
+    [Parallel(n_jobs=4)]: Done   6 tasks      | elapsed:    5.9s
+    [Parallel(n_jobs=4)]: Done   7 tasks      | elapsed:    6.0s
+    [Parallel(n_jobs=4)]: Done   8 tasks      | elapsed:    6.0s
+    [Parallel(n_jobs=4)]: Done   9 tasks      | elapsed:    8.5s
+    [Parallel(n_jobs=4)]: Done  10 tasks      | elapsed:    8.7s
+    [Parallel(n_jobs=4)]: Done  11 tasks      | elapsed:    8.7s
+    [Parallel(n_jobs=4)]: Done  12 tasks      | elapsed:    8.7s
+    [Parallel(n_jobs=4)]: Done  13 tasks      | elapsed:   11.2s
+    [Parallel(n_jobs=4)]: Done  14 out of  20 | elapsed:   11.3s remaining:    4.8s
+    [Parallel(n_jobs=4)]: Done  15 out of  20 | elapsed:   11.3s remaining:    3.8s
+    [Parallel(n_jobs=4)]: Done  16 out of  20 | elapsed:   11.4s remaining:    2.8s
+    [Parallel(n_jobs=4)]: Done  17 out of  20 | elapsed:   13.9s remaining:    2.4s
+    [Parallel(n_jobs=4)]: Done  18 out of  20 | elapsed:   13.9s remaining:    1.5s
+    [Parallel(n_jobs=4)]: Done  20 out of  20 | elapsed:   14.0s finished
     Simulation results: {'summary_statistics': [[{'min_peak': -1.9487233699162363e-05, 'max_peak': 2.438299811172486e-05}, {'min_peak': -1.9487233699162363e-05, 'max_peak': 3.5625970074068246e-05}, {'min_peak': -1.9487233699162363e-05, 'max_peak': 5.187123572695809e-05}, {'min_peak': -1.9487233699162363e-05, 'max_peak': 7.53973769021331e-05}, {'min_peak': -1.9487233699162363e-05, 'max_peak': 0.00010962271639761121}, {'min_peak': -0.0008187098140745109, 'max_peak': 0.0011853731897260896}, {'min_peak': -0.0006900911098816427, 'max_peak': 0.001453236614203405}, {'min_peak': -7.443630674152117e-05, 'max_peak': 0.0006303483688791793}, {'min_peak': -0.0003831247250500206, 'max_peak': 0.0015588783545865902}, {'min_peak': -0.0005827286517536018, 'max_peak': 0.0014794795458269632}, {'min_peak': -0.0005759203533290847, 'max_peak': 0.0014539235295249087}, {'min_peak': -1.9487233699162363e-05, 'max_peak': 0.001326218239424397}, {'min_peak': -1.9487233699162363e-05, 'max_peak': 0.0013283313099600618}, {'min_peak': -1.9487233699162363e-05, 'max_peak': 0.0011853462053579688}, {'min_peak': -1.9487233699162363e-05, 'max_peak': 0.0011649633329457493}, {'min_peak': -1.9487233699162363e-05, 'max_peak': 0.0011845854148153823}, {'min_peak': -1.9487233699162363e-05, 'max_peak': 0.001231155285096076}, {'min_peak': -1.9487233699162363e-05, 'max_peak': 0.0013115554222262672}, {'min_peak': -1.9487233699162363e-05, 'max_peak': 0.0014314315232221652}, {'min_peak': -1.9487233699162363e-05, 'max_peak': 0.001512378997571943}]], 'simulated_data': [[{'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 9.999999999999999e-05, 'weight_pyr': 9.999999999999999e-05}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff71bcb8c40>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 9.999999999999999e-05, 'weight_pyr': 9.999999999999999e-05}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b682fd820>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.00014384498882876628, 'weight_pyr': 0.00014384498882876628}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff723a740d0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.00014384498882876628, 'weight_pyr': 0.00014384498882876628}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b5c5a7250>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.000206913808111479, 'weight_pyr': 0.000206913808111479}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff718c92d00>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.000206913808111479, 'weight_pyr': 0.000206913808111479}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b54a72c70>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.00029763514416313193, 'weight_pyr': 0.00029763514416313193}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff72192c4f0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.00029763514416313193, 'weight_pyr': 0.00029763514416313193}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b5562d160>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.00042813323987193956, 'weight_pyr': 0.00042813323987193956}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff718dce3d0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.00042813323987193956, 'weight_pyr': 0.00042813323987193956}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b4faeed00>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0006158482110660266, 'weight_pyr': 0.0006158482110660266}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff72081b1f0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0006158482110660266, 'weight_pyr': 0.0006158482110660266}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b4ca94d30>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0008858667904100822, 'weight_pyr': 0.0008858667904100822}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff734473e80>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0008858667904100822, 'weight_pyr': 0.0008858667904100822}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b570545b0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0012742749857031334, 'weight_pyr': 0.0012742749857031334}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff71bcfa790>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0012742749857031334, 'weight_pyr': 0.0012742749857031334}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b4fadc280>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0018329807108324356, 'weight_pyr': 0.0018329807108324356}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff72254c760>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0018329807108324356, 'weight_pyr': 0.0018329807108324356}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b54039430>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.002636650898730358, 'weight_pyr': 0.002636650898730358}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff720898850>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.002636650898730358, 'weight_pyr': 0.002636650898730358}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b5408e7c0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.00379269019073225, 'weight_pyr': 0.00379269019073225}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff7286af280>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.00379269019073225, 'weight_pyr': 0.00379269019073225}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b4fae64f0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.005455594781168514, 'weight_pyr': 0.005455594781168514}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff7288650d0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.005455594781168514, 'weight_pyr': 0.005455594781168514}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b4cac1130>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.007847599703514606, 'weight_pyr': 0.007847599703514606}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff720c2db50>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.007847599703514606, 'weight_pyr': 0.007847599703514606}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b5458a4f0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.011288378916846885, 'weight_pyr': 0.011288378916846885}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff7205c7880>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.011288378916846885, 'weight_pyr': 0.011288378916846885}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b54594670>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.01623776739188721, 'weight_pyr': 0.01623776739188721}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff72899ddf0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.01623776739188721, 'weight_pyr': 0.01623776739188721}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b5c69c520>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.023357214690901212, 'weight_pyr': 0.023357214690901212}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff72891c310>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.023357214690901212, 'weight_pyr': 0.023357214690901212}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b54569550>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.033598182862837805, 'weight_pyr': 0.033598182862837805}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff720053070>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.033598182862837805, 'weight_pyr': 0.033598182862837805}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b4ce33ee0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.04832930238571752, 'weight_pyr': 0.04832930238571752}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff7286ebbb0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.04832930238571752, 'weight_pyr': 0.04832930238571752}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b5798c2b0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.06951927961775606, 'weight_pyr': 0.06951927961775606}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff7288432b0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.06951927961775606, 'weight_pyr': 0.06951927961775606}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b5c30b730>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.09999999999999999, 'weight_pyr': 0.09999999999999999}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7ff723fd7670>]}]]}
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.09999999999999999, 'weight_pyr': 0.09999999999999999}, 'dpl': [<hnn_core.dipole.Dipole object at 0x7f2b4cab06d0>]}]]}
 
 
 
@@ -386,7 +386,7 @@ dipole activity changes as we vary the synaptic strength parameter.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 14.892 seconds)
+   **Total running time of the script:** (0 minutes 14.636 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_batch_simulate.py:
