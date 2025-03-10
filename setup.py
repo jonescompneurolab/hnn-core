@@ -102,6 +102,11 @@ if __name__ == "__main__":
               'Intended Audience :: Developers',
               'License :: OSI Approved',
               'Programming Language :: Python',
+              'Programming Language :: Python :: 3.8',
+              'Programming Language :: Python :: 3.9',
+              'Programming Language :: Python :: 3.10',
+              'Programming Language :: Python :: 3.11',
+              'Programming Language :: Python :: 3.12',
               'Topic :: Software Development',
               'Topic :: Scientific/Engineering',
               'Operating System :: Microsoft :: Windows',
@@ -118,7 +123,7 @@ if __name__ == "__main__":
               'h5io'
           ],
           extras_require=extras,
-          python_requires='>=3.8',
+          python_requires='>=3.8, <3.13',
           packages=find_packages(),
           package_data={'hnn_core': [
               'param/*.json',
