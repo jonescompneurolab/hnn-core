@@ -198,7 +198,7 @@ orphan: true
 - Fix statistical Poisson drive tests that were failing stochastically by [Austin
   E. Soplata][] in {gh}`978`
 
-- Fix typo of "leading" in docstring, by [Dan "pynmash"][] in {gh}`979`
+- Fix typo of "leading" in docstring, by [Dan Toms][] in {gh}`979`
 
 - Copy template for monthly metrics workflow, in the hope it will fix the unsuccessful
   runs by [Austin E. Soplata][] in {gh}`983`
@@ -380,7 +380,7 @@ orphan: true
 - [Shehroz Kashif][]
 - [Rajat Partani][]
 - [Carolina Fernandez Pujol][]
-- [Dan "pynmash"][]
+- [Dan Toms][]
 - [Abdul Samad Siddiqui][]
 - [Austin E. Soplata][]
 - [Ryan Thorpe][]
@@ -805,5 +805,5 @@ orphan: true
 [Carolina Fernandez Pujol]: https://github.com/carolinafernandezp
 [Austin E. Soplata]: https://github.com/asoplata
 [Dikshant Jha]: https://github.com/dikshant182004
-[Dan "pynmash"]: https://github.com/pynmash
+[Dan Toms]: https://github.com/pynmash
 [Shehroz Kashif]: https://github.com/Shehrozkashif
