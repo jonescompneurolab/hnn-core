@@ -59,7 +59,7 @@ INITIAL{
 
 PROCEDURE rates(){
   LOCAL qt
-  qt = 2.3^((34-21)/10)
+  qt = 2.3^((37-21)/10)
 
 	UNITSOFF
 		mInf = 1.0/(1+exp((v- -52.6)/-4.6))
