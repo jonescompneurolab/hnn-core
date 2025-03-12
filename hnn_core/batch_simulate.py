@@ -16,15 +16,14 @@ from .network_models import jones_2009_model
 
 
 class BatchSimulate(object):
-    def __init__(self, set_params, net=jones_2009_model(), tstop=170,
-                 dt=0.025, n_trials=1, record_vsec=False,
-                 record_isec=False, postproc=False, save_outputs=False,
+    def __init__(self, set_params, net=jones_2009_model(),
+                 tstop=170, dt=0.025, n_trials=1,
                  save_folder='./sim_results', batch_size=100,
-                 overwrite=True, summary_func=None,
-                 save_dpl=True, save_spiking=False,
-                 save_lfp=False, save_voltages=False,
-                 save_currents=False, save_calcium=False,
-                 clear_cache=False):
+                 overwrite=True, save_outputs=False, save_dpl=True,
+                 save_spiking=False, save_lfp=False, save_voltages=False,
+                 save_currents=False, save_calcium=False, record_vsec=False,
+                 record_isec=False, postproc=False, clear_cache=False,
+                 summary_func=None):
         """Initialize the BatchSimulate class.
 
         Parameters
@@ -37,34 +36,17 @@ class BatchSimulate(object):
             where ``net`` is a Network object and ``params`` is a dictionary
             of the parameters that will be set inside the function.
         net : Network object, optional
-            The network model to use for simulations. Must be an instance of
-            jones_2009_model, law_2021_model, or calcium_model.
-            Default is jones_2009_model().
+            The network model to use for simulations. Examples include:
+            - `jones_2009_model`: A network model based on Jones et al. (2009).
+            - `law_2021_model`: A network model based on Law et al. (2021).
+            - `calcium_model`: A network model incorporating calcium dynamics.
+            Default is `jones_2009_model()`
         tstop : float, optional
             The stop time for the simulation. Default is 170 ms.
         dt : float, optional
             The time step for the simulation. Default is 0.025 ms.
         n_trials : int, optional
             The number of trials for the simulation. Default is 1.
-        record_vsec : 'all' | 'soma' | False
-            Option to record voltages from all sections ('all'), or just
-            the soma ('soma'). Default: False.
-        record_isec : 'all' | 'soma' | False
-            Option to record voltages from all sections ('all'), or just
-            the soma ('soma'). Default: False.
-        postproc : bool
-            If True, smoothing (``dipole_smooth_win``) and scaling
-            (``dipole_scalefctr``) values are read from the parameter file, and
-            applied to the dipole objects before returning.
-            Note that this setting
-            only affects the dipole waveforms, and not somatic voltages,
-            possible extracellular recordings etc.
-            The preferred way is to use the
-            :meth:`~hnn_core.dipole.Dipole.smooth` and
-            :meth:`~hnn_core.dipole.Dipole.scale` methods instead.
-            Default: False.
-        save_outputs : bool, optional
-            Whether to save the simulation outputs to files. Default is False.
         save_folder : str, optional
             The path to save the simulation outputs.
             Default is './sim_results'.
@@ -74,9 +56,8 @@ class BatchSimulate(object):
         overwrite : bool, optional
             Whether to overwrite existing files and create file paths
             if they do not exist. Default is True.
-        summary_func : callable, optional
-            A function to calculate summary statistics from the simulation
-            results. Default is None.
+        save_outputs : bool, optional
+            Whether to save the simulation outputs to files. Default is False.
         save_dpl : bool
             If True, save dipole results. Note, `save_outputs` must be True.
             Default: True.
@@ -97,9 +78,23 @@ class BatchSimulate(object):
             If True, save calcium concentrations.
             Note, `save_outputs` must be True.
             Default: False.
+        record_vsec : 'all' | 'soma' | False
+            Option to record voltages from all sections ('all'), or just
+            the soma ('soma'). Default: False.
+        record_isec : 'all' | 'soma' | False
+            Option to record voltages from all sections ('all'), or just
+            the soma ('soma'). Default: False.
+        postproc : bool
+            If True, smoothing (``dipole_smooth_win``) and scaling
+            (``dipole_scalefctr``) values are read from the parameter file, and
+            applied to the dipole objects before returning.
+            Default: False.
         clear_cache : bool, optional
             Whether to clear the results cache after saving each batch.
             Default is False.
+        summary_func : callable, optional
+            A function to calculate summary statistics from the simulation
+            results. Default is None.
         Notes
         -----
         When `save_output=True`, the saved files will appear as
@@ -201,16 +196,13 @@ class BatchSimulate(object):
         param_combinations = self._generate_param_combinations(
             param_grid, combinations)
         total_sims = len(param_combinations)
-        num_sims_per_batch = max(total_sims // self.batch_size, 1)
         batch_size = min(self.batch_size, total_sims)
 
         results = []
         simulated_data = []
-        for i in range(batch_size):
-            start_idx = i * num_sims_per_batch
-            end_idx = start_idx + num_sims_per_batch
-            if i == batch_size - 1:
-                end_idx = len(param_combinations)
+        for i in range(0, total_sims, batch_size):
+            start_idx = i
+            end_idx = min(i + batch_size, total_sims)
             batch_results = self.simulate_batch(
                 param_combinations[start_idx:end_idx],
                 n_jobs=n_jobs,
@@ -387,6 +379,14 @@ class BatchSimulate(object):
         for attr in attributes_to_save:
             if getattr(self, f'save_{attr}') and attr in results[0]:
                 save_data[attr] = [result[attr] for result in results]
+
+        metadata = {
+            'batch_size': self.batch_size,
+            'n_trials': self.n_trials,
+            'tstop': self.tstop,
+            'dt': self.dt
+        }
+        save_data['metadata'] = metadata
 
         file_name = os.path.join(self.save_folder,
                                  f'sim_run_{start_idx}-{end_idx}.npz')

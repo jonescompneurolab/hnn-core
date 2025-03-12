@@ -345,6 +345,8 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
             min_f = plot_config['min_spectral_frequency']
             max_f = plot_config['max_spectral_frequency']
             step_f = 1.0
+            if min_f > max_f:
+                step_f = -1
             freqs = np.arange(min_f, max_f, step_f)
             n_cycles = freqs / 2.
 
@@ -610,6 +612,8 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
     simulation_names = tuple(data['simulations'].keys())
     sim_index = 0
     default_smoothing = fig_default_params['default_smoothing']
+    default_min_frequency = fig_default_params['default_min_frequency']
+    default_max_frequency = fig_default_params['default_max_frequency']
     if not simulation_names:
         simulation_names = ("None",)
     else:
@@ -694,7 +698,7 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
         style=analysis_style)
 
     min_spectral_frequency = BoundedFloatText(
-        value=10,
+        value=default_min_frequency,
         min=0.1,
         max=1000,
         description='Min Spectral Frequency (Hz):',
@@ -703,7 +707,7 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
         style=analysis_style)
 
     max_spectral_frequency = BoundedFloatText(
-        value=100,
+        value=default_max_frequency,
         min=0.1,
         max=1000,
         description='Max Spectral Frequency (Hz):',
@@ -817,12 +821,12 @@ def _close_figure(b, widgets, data, fig_idx):
                     display(Label(_fig_placeholder))
 
 
-def _add_axes_controls(widgets, data, fig_default_smoothing, fig, axd):
+def _add_axes_controls(widgets, data, fig_default_params, fig, axd):
     fig_idx = data['fig_idx']['idx']
 
     controls = Tab()
     children = [
-        _get_ax_control(widgets, data, fig_default_smoothing, fig_idx=fig_idx,
+        _get_ax_control(widgets, data, fig_default_params, fig_idx=fig_idx,
                         fig=fig, ax=ax)
         for ax_key, ax in axd.items()
     ]
@@ -843,7 +847,7 @@ def _add_axes_controls(widgets, data, fig_default_smoothing, fig, axd):
     widgets['axes_config_tabs'].set_title(n_tabs, _idx2figname(fig_idx))
 
 
-def _add_figure(b, widgets, data, fig_default_smoothing,
+def _add_figure(b, widgets, data, fig_default_params,
                 template_type, scale=0.95, dpi=96):
     fig_idx = data['fig_idx']['idx']
     viz_output_layout = data['visualization_output']
@@ -876,7 +880,7 @@ def _add_figure(b, widgets, data, fig_default_smoothing,
         else:
             display(fig.canvas)
 
-    _add_axes_controls(widgets, data, fig_default_smoothing, fig=fig, axd=axd)
+    _add_axes_controls(widgets, data, fig_default_params, fig=fig, axd=axd)
 
     data['figs'][fig_idx] = fig
     widgets['figs_tabs'].selected_index = n_tabs

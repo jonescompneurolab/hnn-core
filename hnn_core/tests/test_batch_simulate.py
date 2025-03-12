@@ -3,12 +3,17 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
+from pathlib import Path
+import time
 import pytest
 import numpy as np
 import os
 
 from hnn_core.batch_simulate import BatchSimulate
 from hnn_core import jones_2009_model
+
+hnn_core_root = Path(__file__).parents[1]
+assets_path = Path(hnn_core_root, 'tests', 'assets')
 
 
 @pytest.fixture
@@ -33,11 +38,12 @@ def batch_simulate_instance(tmp_path):
                              weights_ampa=weights_ampa,
                              synaptic_delays=synaptic_delays)
 
-    net = jones_2009_model()
+    net = jones_2009_model(mesh_shape=(3, 3))
     return BatchSimulate(net=net, set_params=set_params,
-                         tstop=1.,
+                         tstop=10,
                          save_folder=tmp_path,
-                         batch_size=3)
+                         batch_size=3,
+                         n_trials=3,)
 
 
 @pytest.fixture
@@ -74,6 +80,12 @@ def test_parameter_validation():
 
     with pytest.raises(TypeError, match="net must be"):
         BatchSimulate(net="invalid_network", set_params=lambda x: x)
+
+    with pytest.raises(ValueError, match="'record_vsec' parameter"):
+        BatchSimulate(set_params=lambda x: x, record_vsec="invalid")
+
+    with pytest.raises(ValueError, match="'record_isec' parameter"):
+        BatchSimulate(set_params=lambda x: x, record_isec="invalid")
 
 
 def test_generate_param_combinations(batch_simulate_instance, param_grid):
@@ -280,3 +292,27 @@ def test_load_results(batch_simulate_instance, param_grid, tmp_path):
     # Validation Tests
     with pytest.raises(TypeError, match='results must be'):
         batch_simulate_instance._save("invalid_results", start_idx, end_idx)
+
+
+def test_parallel_execution(batch_simulate_instance, param_grid):
+    """Test parallel execution of simulations and ensure speedup."""
+
+    param_combinations = batch_simulate_instance._generate_param_combinations(
+        param_grid)
+
+    start_time = time.perf_counter()
+    _ = batch_simulate_instance.simulate_batch(
+        param_combinations, n_jobs=1, backend='loky')
+    end_time = time.perf_counter()
+    serial_time = end_time - start_time
+
+    start_time = time.perf_counter()
+    _ = batch_simulate_instance.simulate_batch(
+        param_combinations,
+        n_jobs=2,
+        backend='loky')
+    end_time = time.perf_counter()
+    parallel_time = end_time - start_time
+
+    assert (serial_time > parallel_time
+            ), "Parallel execution is not faster than serial execution!"

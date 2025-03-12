@@ -39,14 +39,14 @@
           uses: actions/setup-python@v5
           with:
               python-version: ${{ matrix.python-version }}
-        
+
         - name: Install Python  dependencies
           shell: bash -el {0}
           run: |
             if [ ${{ matrix.os }} == 'macos-latest' ]; then
               python -m pip install --upgrade pip
-              conda install --yes -c conda-forge mpi4py openmpi
-            elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then 
+              conda install --yes -c conda-forge mpi4py "openmpi >5"
+            elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
               python -m pip install --upgrade pip
               python -m pip install mpi4py
             fi
@@ -54,14 +54,18 @@
           shell: bash -el {0}
           run: |
             pip install --verbose '.[opt, parallel, test, gui]'
-        - name: Lint with flake8
+        - name: Lint with ruff
           shell: bash -el {0}
           run: |
-            flake8 --count hnn_core
-        - name: Test with pytest
+            ruff check hnn_core
+        - name: Test non-MPI, embarrassingly parallel tests with pytest
           shell: bash -el {0}
           run: |
-            python -m pytest ./hnn_core/tests/  --cov=hnn_core --cov-report=xml
+            python -m pytest ./hnn_core/tests/ -m "not uses_mpi" -n auto --cov=hnn_core --cov-report=xml
+        - name: Test MPI-using parallel tests with pytest
+          shell: bash -el {0}
+          run: |
+            python -m pytest ./hnn_core/tests/ -m "uses_mpi" --cov=hnn_core --cov-report=xml --cov-append
         - name:  Upload coverage to Codecov
           shell: bash -el {0}
           run: |

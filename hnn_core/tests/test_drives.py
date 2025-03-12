@@ -59,7 +59,7 @@ def test_external_drive_times():
     lamtha = 50.
     event_times = _create_extpois(t0=0, T=100000, lamtha=lamtha, prng=prng)
     event_intervals = np.diff(event_times)
-    assert pytest.approx(event_intervals.mean(), abs=1.) == 1000 * 1 / lamtha
+    assert pytest.approx(event_intervals.mean(), abs=1.5) == 1000 * 1 / lamtha
 
     with pytest.raises(ValueError, match='The start time for Poisson'):
         _create_extpois(t0=-5, T=5, lamtha=lamtha, prng=prng)

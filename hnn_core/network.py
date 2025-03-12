@@ -25,7 +25,6 @@ from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
 from .hnn_io import write_network_configuration, network_to_dict
 from .externals.mne import copy_doc
-from typing import Union
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
@@ -625,7 +624,7 @@ class Network:
         and conn_seed (n_trials > 1 in simulate_dipole(..., n_trials):
 
         - event_seed
-            Across trials, the random seed is incremented leading such that
+            Across trials, the random seed is incremented such that
             the exact spike times are different
         - conn_seed
             The random seed does not change across trials. This means for
@@ -1133,7 +1132,8 @@ class Network:
                 self.external_drives[
                     drive['name']]['events'].append(event_times)
 
-    def add_tonic_bias(self, *, cell_type=None, amplitude, t0=0, tstop=None):
+    def add_tonic_bias(self, *, cell_type=None, section='soma',
+                       bias_name='tonic', amplitude, t0=0, tstop=None):
         """Attaches parameters of tonic bias input for given cell types
 
         Parameters
@@ -1142,6 +1142,11 @@ class Network:
             The name of the cell type to add a tonic input. When supplied,
             a float value must be provided with the `amplitude` keyword.
             Valid inputs are those listed in  `net.cell_types`.
+        section : str
+            name of cell section the bias should be applied to.
+            See net.cell_types[cell_type].sections.keys()
+        bias_name : str
+            The name of the bias.
         amplitude: dict | float
             A dictionary of cell type keys (str) to amplitude values (float).
             Valid inputs for cell types are those listed in `net.cell_types`.
@@ -1169,6 +1174,7 @@ class Network:
             _validate_type(amplitude, (float, int), 'amplitude')
 
             _add_cell_type_bias(network=self, cell_type=cell_type,
+                                section=section, bias_name=bias_name,
                                 amplitude=float(amplitude),
                                 t_0=t0, t_stop=tstop)
         else:
@@ -1180,6 +1186,7 @@ class Network:
 
             for _cell_type, _amplitude in amplitude.items():
                 _add_cell_type_bias(network=self, cell_type=_cell_type,
+                                    section=section, bias_name=bias_name,
                                     amplitude=_amplitude,
                                     t_0=t0, t_stop=tstop)
 
@@ -1647,33 +1654,66 @@ class _NetworkDrive(dict):
         return entr
 
 
-def _add_cell_type_bias(network: Network, amplitude: Union[float, dict],
-                        cell_type=None,
-                        t_0=0, t_stop=None):
+def _add_cell_type_bias(
+        network: Network,
+        amplitude: float,
+        cell_type: str,
+        section='soma',
+        bias_name='tonic',
+        t_0=0,
+        t_stop=None
+):
+    """Add a tonic bias to a specific cell type in the network.
 
-    if network is None:
-        raise ValueError('The "network" parameter is required '
-                         'but was not provided')
-    if amplitude is None:
-        raise ValueError('The "amplitude" parameter is required '
-                         'but was not provided')
+    Parameters
+    ----------
+    network : Network
+        The network to which the tonic bias is added.
+    amplitude : float
+        The amplitude of the tonic input (in nA) applied to the specified
+        `cell_type`.
+    cell_type : str
+        The cell type to which the bias is applied.
+    section : str, default 'soma'
+        The section of the cell where the bias is applied (e.g., 'soma',
+        'apical_tuft').
+    bias_name : str, default 'tonic'
+        A name identifier for the bias configuration, allowing multiple biases
+        to be applied.
+    t_0 : float, default 0
+        The start time of the tonic input in milliseconds.
+    t_stop : float, optional
+        The end time of the tonic input in milliseconds. If None, the bias
+        continues until the end of the simulation.
+    """
+    # Validate cell_type value
+    if cell_type not in network.cell_types:
+        raise ValueError(f'cell_type must be one of '
+                         f'{list(network.cell_types.keys())}. '
+                         f'Got {cell_type}')
 
-    if cell_type is not None:
-        # Validate cell_type value
-        if cell_type not in network.cell_types:
-            raise ValueError(f'cell_type must be one of '
-                             f'{list(network.cell_types.keys())}. '
-                             f'Got {cell_type}')
+    if bias_name not in network.external_biases:
+        network.external_biases[bias_name] = dict()
 
-        if 'tonic' not in network.external_biases:
-            network.external_biases['tonic'] = dict()
+    if cell_type in network.external_biases[bias_name]:
+        raise ValueError(f'Bias named {bias_name} already defined '
+                         f'for {cell_type}')
 
-        if cell_type in network.external_biases['tonic']:
-            raise ValueError(f'Tonic bias already defined for {cell_type}')
+    cell_type_bias = {
+        'amplitude': amplitude,
+        't0': t_0,
+        'tstop': t_stop,
+        'section': section
+    }
 
-        cell_type_bias = {
-            'amplitude': amplitude,
-            't0': t_0,
-            'tstop': t_stop
-        }
-        network.external_biases['tonic'][cell_type] = cell_type_bias
+    sections = list(network.cell_types[cell_type].sections.keys())
+
+    # error when section is defined that doesn't exist.
+    if section not in sections:
+        raise ValueError(f"section must be one of {sections}. "
+                         f"Got {section}.")
+    else:
+        cell_type_bias['section'] = section
+
+    network.external_biases[bias_name][cell_type] = cell_type_bias
+

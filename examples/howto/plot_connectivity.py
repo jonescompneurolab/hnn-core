@@ -36,7 +36,7 @@ net_erp = jones_2009_model(add_drives_from_params=True)
 # :func:`~hnn_core.viz.plot_cell_connectivity`. We can search for specific
 # connections using ``pick_connection`` which returns the indices
 # of ``net.connectivity`` that match the provided parameters.
-from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
+from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity, plot_drive_strength
 from hnn_core.network import pick_connection
 
 print(len(net_erp.connectivity))
@@ -128,6 +128,16 @@ plot_connectivity_matrix(net_sparse, conn_idx)
 # from the source cell.
 src_gid = net_sparse.connectivity[conn_idx]['src_gids'].copy().pop()
 plot_cell_connectivity(net_sparse, conn_idx, src_gid=src_gid)
+
+###############################################################################
+# We can plot the strengths of each external drive across each cell types.
+
+# This can be done in a relative way, enabling you to compare the proportion
+# coming from each drive:
+plot_drive_strength(net_erp)
+
+# Alternatively, you can compare the total amount of each drive in conductance:
+plot_drive_strength(net_erp, normalize=False)
 
 ###############################################################################
 # In the sparse network, there still appears to be some rhythmicity

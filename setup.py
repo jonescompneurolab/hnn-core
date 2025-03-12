@@ -31,6 +31,7 @@ if version is None:
 
 # test install with:
 # $ rm -rf hnn_core/mod/x86_64/
+# $ rm -rf hnn_core/mod/arm64/
 # $ python setup.py clean --all install
 #
 # to make sure there are no residual mod files
@@ -77,17 +78,14 @@ if __name__ == "__main__":
     extras = {
         'opt': ['scikit-learn'],
         'parallel': ['joblib', 'psutil'],
-        'test': ['flake8', 'pytest', 'pytest-cov', ],
-        'docs': ['mne', 'nibabel', 'pooch', 'tdqm',
-                 'sphinx', 'sphinx-gallery',
-                 'sphinx_bootstrap_theme', 'sphinx-copybutton',
-                 'pillow', 'numpydoc',
-                 ],
-        'gui': ['ipywidgets>=8.0.0', 'ipykernel', 'ipympl', 'voila', ],
+        'test': ['codespell', 'pytest', 'pytest-cov', 'pytest-xdist', 'ruff'],
+        'docs': ['mne', 'myst-parser', 'nibabel', 'numpydoc', 'pillow',
+                 'pooch', 'pydata-sphinx-theme', 'sphinx', 'sphinx-gallery',
+                 'sphinx-copybutton', 'tdqm'],
+        'gui': ['ipywidgets>=8.0.0', 'ipykernel', 'ipympl', 'voila'],
     }
     extras['dev'] = (extras['opt'] + extras['parallel'] + extras['test'] +
-                     extras['docs'] + extras['gui']
-                     )
+                     extras['docs'] + extras['gui'])
 
 
     setup(name=DISTNAME,
@@ -98,7 +96,7 @@ if __name__ == "__main__":
           url=URL,
           version=version,
           download_url=DOWNLOAD_URL,
-          long_description=open('README.rst').read(),
+          long_description=open('README.md').read(),
           classifiers=[
               'Intended Audience :: Science/Research',
               'Intended Audience :: Developers',
