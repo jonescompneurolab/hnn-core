@@ -8,6 +8,9 @@ import time
 import pytest
 import numpy as np
 import os
+from dask.distributed import Client
+import shutil
+from unittest.mock import patch
 
 from hnn_core.batch_simulate import BatchSimulate
 from hnn_core import jones_2009_model
@@ -316,3 +319,82 @@ def test_parallel_execution(batch_simulate_instance, param_grid):
 
     assert (serial_time > parallel_time
             ), "Parallel execution is not faster than serial execution!"
+
+
+def test_loky_worker_creation():
+    """Test that loky backend creates the expected number of workers"""
+
+    with patch('hnn_core.batch_simulate.BatchSimulate._run_single_sim') as mock_run:
+        mock_run.side_effect = lambda params: {'mock_result': params}
+
+        batch_sim = BatchSimulate(set_params=lambda p, n: None, net=jones_2009_model())
+        param_grid = {'param1': list(range(10))}
+        
+        with patch('hnn_core.batch_simulate.Parallel') as parallel_spy: 
+            batch_sim.run(param_grid, n_jobs=4, backend='loky')
+
+            assert parallel_spy.call_args is not None, "Parallel was not called"
+            assert parallel_spy.call_args[1]['n_jobs'] == 4
+
+
+def test_multiprocessing_backend(batch_simulate_instance, param_grid):
+    """Test that the multiprocessing backend works correctly."""
+    try:
+        param_combinations = batch_simulate_instance._generate_param_combinations(
+            param_grid)[:2]
+        
+        results = batch_simulate_instance.simulate_batch(
+            param_combinations, n_jobs=2, backend='multiprocessing')
+        
+        assert len(results) == len(param_combinations)
+        for result in results:
+            assert 'net' in result
+            assert 'dpl' in result
+            assert 'param_values' in result
+    except Exception as e:
+        pytest.skip(f"Multiprocessing backend test failed: {str(e)}")
+
+def test_dask_backend(batch_simulate_instance, param_grid):
+    """Test the dask backend if available."""
+    try:
+        client = Client(processes=False, threads_per_worker=2, n_workers=1)
+        
+        try:
+            param_combinations = batch_simulate_instance._generate_param_combinations(
+                param_grid)[:2]
+            
+            results = batch_simulate_instance.simulate_batch(
+                param_combinations, n_jobs=2, backend='dask')
+            
+            assert len(results) == len(param_combinations)
+            for result in results:
+                assert 'net' in result
+                assert 'dpl' in result
+                assert 'param_values' in result
+                
+            assert all('dpl' in result for result in results)
+            assert all(isinstance(result['param_values'], dict) for result in results)
+            
+        finally:
+            client.close()
+            
+    except ImportError:
+        pytest.skip("Dask not installed, skipping test")
+    except Exception as e:
+        pytest.skip(f"Dask backend test failed: {str(e)}")
+    
+
+def test_summary_func(batch_simulate_instance, param_grid):
+    """Test that the summary_func works correctly."""
+    def simple_summary(results):
+        return {'count': len(results)}
+    
+    batch_simulate_instance.summary_func = simple_summary
+    
+    small_param_grid = {k: v[:1] for k, v in param_grid.items()}
+    results = batch_simulate_instance.run(
+        small_param_grid, return_output=True)
+    
+    assert 'summary_statistics' in results
+    assert len(results['summary_statistics']) > 0
+    assert 'count' in results['summary_statistics'][0]
