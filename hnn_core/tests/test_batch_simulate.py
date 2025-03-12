@@ -9,7 +9,7 @@ import pytest
 import numpy as np
 import os
 from dask.distributed import Client
-import shutil
+
 from unittest.mock import patch
 
 from hnn_core.batch_simulate import BatchSimulate
