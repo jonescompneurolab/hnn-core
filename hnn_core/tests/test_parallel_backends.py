@@ -306,6 +306,11 @@ class TestParallelBackends():
 
         # Case 1 (default): Check that hwthreading turns on if needed
         override_hwthreading_option = None
+
+        # Possibly needed to prevent MPIBackend failures to exit processes
+        del net
+        net = jones_2009_model(params, add_drives_from_params=True,
+                               mesh_shape=(3, 3))
         with MPIBackend(
                 n_procs=n_procs,
                 use_hwthreading_if_found=use_hwthreading_if_found,
@@ -332,6 +337,11 @@ class TestParallelBackends():
 
         # Case 3: Check that hwthreading turns off if forced off.
         override_hwthreading_option = False
+
+        # Possibly needed to prevent MPIBackend failures to exit processes
+        del net
+        net = jones_2009_model(params, add_drives_from_params=True,
+                               mesh_shape=(3, 3))
         with MPIBackend(
                 n_procs=n_procs,
                 use_hwthreading_if_found=use_hwthreading_if_found,
