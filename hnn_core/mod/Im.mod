@@ -50,7 +50,7 @@ INITIAL{
 
 PROCEDURE rates(){
   LOCAL qt
-  qt = 2.3^((34-21)/10)
+  qt = 2.3^((37-21)/10)
 
 	UNITSOFF
 		mAlpha = 3.3e-3*exp(2.5*0.04*(v - -35))

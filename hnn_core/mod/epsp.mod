@@ -27,10 +27,11 @@ UNITS {
 	(umho) = (micromho)
 }
 
+
 PARAMETER {
 	onset=0  (ms)
-	tau0=0.2 (ms)
-	tau1=3.0 (ms)
+	tau0=0.5 (ms)
+	tau1=5.0 (ms)
 	imax=0 	 (nA)
 	v	 (mV)
 }

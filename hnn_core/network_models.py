@@ -7,9 +7,10 @@ import hnn_core
 from hnn_core import read_params
 from .network import Network, _create_cell_coords
 from .params import _short_name
-from .cells_default import pyramidal_ca, pyramidal_l5, pyramidal_l23, interneuron
+from .cells_default import basket, pyramidal, pyramidal_ca, pyramidal_l5ET, pyramidal_l23, interneuron
 from .externals.mne import _validate_type
 
+import random
 # ToDO -> direct _cell_L2Pyr calling
 
 
@@ -83,7 +84,7 @@ def jones_2009_model(
                 "electro_type": "inhibitory",
                 "layer": "2",
                 "measure_dipole": False,
-                "reference": "https://doi.org/10.7554/eLife.51214",
+                "reference": "https://doi.org/10.7554/eLife.51214"
             },
         },
         "L2_pyramidal": {
@@ -93,7 +94,7 @@ def jones_2009_model(
                 "electro_type": "excitatory",
                 "layer": "2",
                 "measure_dipole": True,
-                "reference": "https://doi.org/10.7554/eLife.51214",
+                "reference": "https://doi.org/10.7554/eLife.51214"
             },
         },
         "L5_basket": {
@@ -103,7 +104,7 @@ def jones_2009_model(
                 "electro_type": "inhibitory",
                 "layer": "5",
                 "measure_dipole": False,
-                "reference": "https://doi.org/10.7554/eLife.51214",
+                "reference": "https://doi.org/10.7554/eLife.51214"
             },
         },
         "L5_pyramidal": {
@@ -113,7 +114,7 @@ def jones_2009_model(
                 "electro_type": "excitatory",
                 "layer": "5",
                 "measure_dipole": True,
-                "reference": "https://doi.org/10.7554/eLife.51214",
+                "reference": "https://doi.org/10.7554/eLife.51214"
             },
         },
     }
@@ -394,6 +395,230 @@ def calcium_model(
     pos = net.cell_types[cell_name].pos
     net.cell_types[cell_name] = pyramidal_ca(
         cell_name=_short_name(cell_name), pos=pos)
+
+    return net
+
+def duecker_ET_model(params=None, add_drives_from_params=False,
+                  legacy_mode=False, mesh_shape=(10, 10)):
+
+
+    """"Initiate like old calcium model and then replace with new cells"""
+
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, 'param', 'default_human_ET.json')
+    if params is None:
+        params = read_params(params_fname)
+
+    cell_types = {
+        "L2_basket": {
+            "cell_object": interneuron(cell_name=_short_name("L2_basket"), layer=2),
+            "cell_metadata": {
+                "morpho_type": "interneuron",
+                "electro_type": "inhibitory",
+                "layer": "2",
+                "measure_dipole": False,
+                "reference": "https://doi.org/10.7554/eLife.51214"
+            },
+        },
+        "L2_pyramidal": {
+            "cell_object": pyramidal_l23(cell_name=_short_name("L2_pyramidal")),
+            "cell_metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "2",
+                "measure_dipole": True,
+                "reference": "https://doi.org/10.7554/eLife.51214"
+            },
+        },
+        "L5_basket": {
+            "cell_object": interneuron(cell_name=_short_name("L5_basket"), layer=5),
+            "cell_metadata": {
+                "morpho_type": "interneuron",
+                "electro_type": "inhibitory",
+                "layer": "5",
+                "measure_dipole": False,
+                "reference": "https://doi.org/10.7554/eLife.51214"
+            },
+        },
+        "L5_pyramidal": {
+            "cell_object": pyramidal_l5ET(cell_name=_short_name("L5_pyramidal")),
+            "cell_metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "5",
+                "measure_dipole": True,
+                "reference": "https://doi.org/10.7554/eLife.51214"
+            },
+        },
+    }
+
+    # Create layer positions
+    layer_dict = _create_cell_coords(
+        n_pyr_x=mesh_shape[0],
+        n_pyr_y=mesh_shape[1],
+        z_coord=1307.4,  # Default layer separation
+        inplane_distance=1.,  # in-plane distance appropriate for LFP recordings
+    )
+
+    # Map cell types to layer positions
+    pos_dict = {
+        "L5_pyramidal": layer_dict["L5_bottom"],
+        "L2_pyramidal": layer_dict["L2_bottom"],
+        "L5_basket": layer_dict["L5_mid"],
+        "L2_basket": layer_dict["L2_mid"],
+        "origin": layer_dict["origin"],
+    }
+
+    # Create network with cell types and positions
+    net = Network(
+        params,
+        add_drives_from_params=add_drives_from_params,
+        legacy_mode=legacy_mode,
+        mesh_shape=mesh_shape,
+        pos_dict=pos_dict,
+        cell_types=cell_types,
+    )
+    
+
+    delay = net.delay
+
+    # layer2 Pyr -> layer2 Pyr
+    # layer5 Pyr -> layer5 Pyr
+    lamtha = 6.125                 # calculated from human data Campganola et al. 2022
+    loc = 'proximal'
+    target_cell ='L2_pyramidal'
+    for receptor in ['nmda', 'ampa']:
+        key = f'gbar_{_short_name(target_cell)}_'\
+                f'{_short_name(target_cell)}_{receptor}'
+        weight = params[key]
+        net.add_connection(
+            target_cell, target_cell, loc, receptor, weight,
+            delay, lamtha, allow_autapses=False)
+    
+    target_cell ='L5_pyramidal'
+    for receptor in ['nmda', 'ampa']:
+        key = f'gbar_{_short_name(target_cell)}_'\
+                f'{_short_name(target_cell)}_{receptor}'
+        weight = params[key]
+
+        net.add_connection(
+            target_cell, target_cell, loc, receptor, weight,
+            delay, lamtha, allow_autapses=False)
+    
+
+    # reduce the gabab connection slightly because it has a longer time constant
+    # layer2 Basket -> layer2 Pyr
+    src_cell = 'L2_basket'
+    target_cell = 'L2_pyramidal'
+    lamtha = 6.125
+    loc = 'soma'
+    receptor='gabaa'
+    key = f'gbar_L2Basket_L2Pyr_{receptor}'
+    weight = params[key]
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+    
+    # loc = 'distal'
+    # receptor='gabab'
+    # key = f'gbar_L2Basket_L2Pyr_{receptor}'
+    # weight = params[key]
+    # net.add_connection(
+    #     src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+        
+
+    # layer5 Basket -> layer5 Pyr
+    src_cell = 'L5_basket'
+    target_cell = 'L5_pyramidal'
+    lamtha = 6.125
+    loc = 'soma'
+    receptor = 'gabaa'
+    key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
+    weight = params[key]
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+    
+    # loc = 'distal'
+    # receptor = 'gabab'
+    # key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
+    # weight = params[key]
+    # net.add_connection(
+    #     src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    # layer2 Pyr -> layer5 Pyr
+    src_cell = 'L2_pyramidal'
+    lamtha = 6.125
+    receptor = 'ampa'
+    for loc in ['proximal', 'distal']:
+        key = f'gbar_L2Pyr_{_short_name(target_cell)}'
+        weight = params[key]
+        net.add_connection(
+            src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    # layer2 Basket -> layer5 Pyr
+    src_cell = 'L2_basket'
+    lamtha = 6.125
+    key = f'gbar_L2Basket_{_short_name(target_cell)}'
+    weight = params[key]
+    loc = 'apical_tuft'
+    
+    receptor = 'gabab'
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+    
+    loc = 'apical_2'
+    receptor = 'gabaa'
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight*.01, delay, lamtha)
+
+    # xx -> layer2 Basket
+    src_cell = 'L2_pyramidal'
+    target_cell = 'L2_basket'
+    lamtha = 6.125
+    key = f'gbar_L2Pyr_{_short_name(target_cell)}'
+    weight = params[key]
+    loc = 'soma'
+    receptor = 'ampa'
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    src_cell = 'L2_basket'
+    lamtha = 6.125
+    key = f'gbar_L2Basket_{_short_name(target_cell)}'
+    weight = params[key]
+    loc = 'soma'
+    receptor = 'gabaa'
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    # xx -> layer5 Basket
+    src_cell = 'L5_basket'
+    target_cell = 'L5_basket'
+    lamtha = 6.125
+    loc = 'soma'
+    receptor = 'gabaa'
+    key = f'gbar_L5Basket_{_short_name(target_cell)}'
+    weight = params[key]
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha,
+        allow_autapses=False)
+
+    src_cell = 'L5_pyramidal'
+    lamtha = 6.125
+    key = f'gbar_L5Pyr_{_short_name(target_cell)}'
+    weight = params[key]
+    loc = 'soma'
+    receptor = 'ampa'
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+
+    src_cell = 'L2_pyramidal'
+    lamtha = 6.125
+    key = f'gbar_L2Pyr_{_short_name(target_cell)}'
+    weight = params[key]
+    loc = 'soma'
+    receptor = 'ampa'
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     return net
 

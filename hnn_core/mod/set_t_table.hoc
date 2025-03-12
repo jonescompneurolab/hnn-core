@@ -1,0 +1,100 @@
+// set_t_table.hoc
+// loads the t_table in exp2synNMDA.mod
+
+// Create a synapse to load the table?
+create dummy
+access dummy
+objref dummy_synapse
+dummy_synapse = new NMDA(0.5)
+print "Change tau1 and tau2 in the exp2synNMDA.mod file and "
+print "reload the table in its NMDA POINT_PROCESS if desired to change these:"
+print " tau1: ",dummy_synapse.tau1
+print " tau2: ",dummy_synapse.tau2
+
+// create the vectors that will load the table
+// Use same tau1, tau2 that are used in exp2synNMDA.mod
+// tau1 = 0.5 // Gidon, personal communication 20131010
+// tau2 = 44
+// It's OK to change tau1, tau2.  It is critical however
+// to make sure that the table that is loaded as generated
+// below and the values in the exp2synNMDA.mod file, i.e.
+// dummy_synapse.tau1 and .tau2 are set to the same tau1, tau2
+tau1 = dummy_synapse.tau1
+tau2 = dummy_synapse.tau2
+
+objref t_vec, g_vec
+objref g_g
+
+proc set_taus() {
+  tau1 = $1
+  tau2 = $2
+  // time of peak (found by setting derivative of g = 0)
+  tp = (tau1*tau2)/(tau2 - tau1) * log(tau2/tau1)
+  factor = -exp(-tp/tau1) + exp(-tp/tau2)
+  factor = 1/factor
+
+  // num_of_points = 100  // instead of choosing an arbitrary value like 100
+                          // make the number of points such that there is
+                          // is a point for each time step on the way to the
+                          // the peak.
+  t_vec = new Vector()
+
+  dt_tmp = 0.025 // make the time step at least as small as the default
+  // If dt happens to be smaller than the default use that as the table
+  // time step, unless it is even smaller than a hundred times smaller
+  // in which case just use a hundred times smaller as the table time step
+  if (dt < dt_tmp) {
+    dt_tmp = 0.0025
+    if (dt > 0.025e-2) {
+      dt_tmp = dt
+    }
+  }
+  t_vec.indgen(0, tp, dt_tmp) // make time step the interp table step
+                              // In ordinary cases this works well
+                              // however this could be optimized for
+                              // smaller tables if need be -
+                              // especially since the simulation would
+                              // likely run similarly at a lower
+                              // resolution
+
+  num_of_points = t_vec.size()
+  g_vec = new Vector(num_of_points)
+
+  for i = 0, num_of_points - 1 {
+    g_vec.x[i] = factor*(-exp(-t_vec.x[i]/tau1)+exp(-t_vec.x[i]/tau2))
+  }
+  // finally load the table and set the POINT PROCESS with new tau1, tau2
+
+  dummy_synapse.table_t_table(&t_vec.x[0], num_of_points, &g_vec.x[0])
+  dummy_synapse.tau1 = tau1
+  dummy_synapse.tau2 = tau2
+}
+set_taus(tau1, tau2)
+
+// note that since this is the inverse of conductance as a function of
+// time as conductance monotonically rises from 0 to the peak of conductance
+// the conductance becomes the independent variable.
+graph_cond=1
+  // graph the conductance (inverse function)
+proc graph_g() {
+  g_g = new Graph()
+  t_vec.line(g_g, g_vec)
+  // g_g.exec_menu("View = plot")
+}
+proc graph_new_g() {
+  t_vec.line(g_g, g_vec)
+  // g_g.exec_menu("View = plot")
+}
+
+shift_places=10
+xpanel("graph g")
+    xbutton("graph conductance","graph_g()")
+    xbutton("add new conductance to old graph","graph_new_g()")
+    xvalue("tau1")
+    xvalue("tau2")
+    xbutton("load NMDA receptor with above taus","set_taus(tau1, tau2)")
+xpanel()
+
+if (graph_cond) {
+  graph_g()
+}

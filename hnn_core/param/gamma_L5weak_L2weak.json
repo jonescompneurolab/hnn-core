@@ -131,7 +131,7 @@
     "gbar_L2Basket_L2Basket": 1e-2,
     "gbar_L2Pyr_L5Basket": 0.0,
     "gbar_L5Pyr_L5Basket": 9.1e-4,
-    "gbar_L5Basket_L5Basket": 7.5e-3,
+    "gbar_L5Basket_L5Basket": 3e-3,
     "t0_input_prox": 1000.0,
     "t0_input_stdev_prox": 0.0,
     "tstop_input_prox": 250.0,
