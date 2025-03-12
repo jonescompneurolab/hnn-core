@@ -1,9 +1,10 @@
 :Reference :Colbert and Pan 2002
+:comment: took the NaTa and shifted both activation/inactivation by 6 mv
 
 NEURON	{
-	SUFFIX NaTa_t
+	SUFFIX NaTs2_t_l23
 	USEION na READ ena WRITE ina
-	RANGE gbar, gNaTa_t, ina
+	RANGE gbar, gNaTs2_t, ina
 }
 
 UNITS	{
@@ -20,7 +21,7 @@ ASSIGNED	{
 	v	(mV)
 	ena	(mV)
 	ina	(mA/cm2)
-	gNaTa_t	(S/cm2)
+	gNaTs2_t	(S/cm2)
 	mInf
 	mTau    (ms)
 	mAlpha
@@ -38,8 +39,8 @@ STATE	{
 
 BREAKPOINT	{
 	SOLVE states METHOD cnexp
-	gNaTa_t = gbar*m*m*m*h
-	ina = gNaTa_t*(v-ena)
+	gNaTs2_t = gbar*m*m*m*h
+	ina = gNaTs2_t*(v-ena)
 }
 
 DERIVATIVE states	{
@@ -56,24 +57,23 @@ INITIAL{
 
 PROCEDURE rates(){
   LOCAL qt
-  qt = 2.3^((37-21)/10)
-	
-  UNITSOFF
-    if(v == -38){
+  qt = 2.3^((34-21)/10)
+
+	UNITSOFF
+    if(v == -32){
     	v = v+0.0001
     }
-		mAlpha = (0.182 * (v- -38))/(1-(exp(-(v- -38)/6)))
-		mBeta  = (0.124 * (-v -38))/(1-(exp(-(-v -38)/6)))
-		mTau = (1/(mAlpha + mBeta))/qt
+		mAlpha = (0.182 * (v- -32))/(1-(exp(-(v- -32)/6)))
+		mBeta  = (0.124 * (-v -32))/(1-(exp(-(-v -32)/6)))
 		mInf = mAlpha/(mAlpha + mBeta)
+		mTau = (1/(mAlpha + mBeta))/qt
 
-    if(v == -66){
+    if(v == -60){
       v = v + 0.0001
     }
-
-		hAlpha = (-0.015 * (v- -66))/(1-(exp((v- -66)/6)))
-		hBeta  = (-0.015 * (-v -66))/(1-(exp((-v -66)/6)))
-		hTau = (1/(hAlpha + hBeta))/qt
+		hAlpha = (-0.015 * (v- -60))/(1-(exp((v- -60)/6)))
+		hBeta  = (-0.015 * (-v -60))/(1-(exp((-v -60)/6)))
 		hInf = hAlpha/(hAlpha + hBeta)
+		hTau = (1/(hAlpha + hBeta))/qt
 	UNITSON
 }

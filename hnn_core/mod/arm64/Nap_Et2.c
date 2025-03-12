@@ -282,7 +282,7 @@ static int _ode_spec1(_threadargsproto_);
  
 static int  rates ( _threadargsproto_ ) {
    double _lqt ;
- _lqt = pow( 2.3 , ( ( 34.0 - 21.0 ) / 10.0 ) ) ;
+ _lqt = pow( 2.3 , ( ( 37.0 - 21.0 ) / 10.0 ) ) ;
     mInf = 1.0 / ( 1.0 + exp ( ( v - - 52.6 ) / - 4.6 ) ) ;
    if ( v  == - 38.0 ) {
      v = v + 0.0001 ;
@@ -580,7 +580,7 @@ static const char* nmodl_file_text =
   "\n"
   "PROCEDURE rates(){\n"
   "  LOCAL qt\n"
-  "  qt = 2.3^((34-21)/10)\n"
+  "  qt = 2.3^((37-21)/10)\n"
   "\n"
   "	UNITSOFF\n"
   "		mInf = 1.0/(1+exp((v- -52.6)/-4.6))\n"

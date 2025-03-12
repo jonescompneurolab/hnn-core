@@ -1,4 +1,4 @@
-#!/Users/katharinaduecker/miniconda3/envs/local_hnn/bin/python
+#!/Users/katharinaduecker/miniconda3/envs/neuron_env/bin/python
 """
 A generic wrapper to access nrn binaries from a python installation
 Please create a softlink with the binary name to be called.

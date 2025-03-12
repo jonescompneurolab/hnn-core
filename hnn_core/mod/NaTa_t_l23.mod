@@ -1,7 +1,7 @@
 :Reference :Colbert and Pan 2002
 
 NEURON	{
-	SUFFIX NaTa_t
+	SUFFIX NaTa_t_l23
 	USEION na READ ena WRITE ina
 	RANGE gbar, gNaTa_t, ina
 }
@@ -56,7 +56,7 @@ INITIAL{
 
 PROCEDURE rates(){
   LOCAL qt
-  qt = 2.3^((37-21)/10)
+  qt = 2.3^((34-21)/10)
 	
   UNITSOFF
     if(v == -38){
