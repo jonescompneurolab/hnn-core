@@ -1231,12 +1231,18 @@ def test_rename_cell_types(base_network):
     #
     dpls1 = simulate_dipole(net1, tstop=2., n_trials=1)
     plot_dipole(dpls1, show=False)
+    net1.cell_response.plot_spikes_raster(show=False)
+    net1.cell_response.plot_spikes_hist(show=False)
 
     dpls2 = simulate_dipole(net2, tstop=2., n_trials=1)
     plot_dipole(dpls2, show=False)
+    net2.cell_response.plot_spikes_raster(show=False)
+    net2.cell_response.plot_spikes_hist(show=False)
 
     dpls3 = simulate_dipole(net3, tstop=2., n_trials=1)
     plot_dipole(dpls3, show=False)
+    net3.cell_response.plot_spikes_raster(show=False)
+    net3.cell_response.plot_spikes_hist(show=False)
 
     # Test the other main network we use for testing
     net4 = hnn_core.hnn_io.read_network_configuration(
@@ -1244,3 +1250,6 @@ def test_rename_cell_types(base_network):
     net4._rename_cell_types(cell_type_rename_mapping)
     dpls4 = simulate_dipole(net4, tstop=2., n_trials=1)
     plot_dipole(dpls4, show=False)
+    net4.cell_response.plot_spikes_raster(show=False)
+    net4.cell_response.plot_spikes_hist(show=False)
+
