@@ -17,6 +17,8 @@ Distribution](https://www.anaconda.com/download/success). If you
 are new to Python or data science in Python, we recommend you review the
 resources here: <https://docs.anaconda.com/getting-started/>.
 
+Note that `hnn-core` currently only supports Python 3.8, 3.9, 3.10, 3.11, and 3.12, but *not* 3.13.
+
 --------------
 
 # Step 2. Platform-specific requirements
