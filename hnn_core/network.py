@@ -1202,7 +1202,7 @@ class Network:
             self.cell_types.update({cell_name: cell_template})
             self._n_cells += len(pos)
 
-    def rename_cell_type(self, original_name, new_name):
+    def _rename_cell_types(self, original_name, new_name):
         """Renames cell types in the network.
 
         Parameters
@@ -1233,7 +1233,7 @@ class Network:
                 if original_name in self.external_biases[bias_key].keys():
                     self.external_biases[bias_key][new_name] = \
                         self.external_biases[bias_key].pop(original_name)
-            
+
             # Update Network.external_drives
             for drive_key, drive_config in self.external_drives.items():
                 if original_name in drive_config['target_types']:

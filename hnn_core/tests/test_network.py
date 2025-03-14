@@ -1166,7 +1166,7 @@ class TestPickConnection:
         assert len(indices) == expected
 
 
-def test_rename_cell(base_network):
+def test_rename_cell_types(base_network):
     """Tests renaming cell function"""
     net1, params = base_network
 
@@ -1190,7 +1190,7 @@ def test_rename_cell(base_network):
     # avoid iteration through net.cell_type.keys() by creating tuples of old and new names
     rename_pairs = list(zip(net2.cell_types.keys(), new_names))
     for original_name, new_name in rename_pairs:
-        net2.rename_cell_type(original_name, new_name)
+        net2._rename_cell_types(original_name, new_name)
     for new_name in new_names:
         assert new_name in net2.cell_types.keys()
         assert new_name in net2.pos_dict.keys()
@@ -1200,18 +1200,18 @@ def test_rename_cell(base_network):
     original_name = 'original_name'
     with pytest.raises(ValueError,
                        match=f"'{original_name}' is not in cell_types!"):
-        net2.rename_cell_type('original_name', 'L2_basket_2')
+        net2._rename_cell_types('original_name', 'L2_basket_2')
 
     # Test for already existing new_name
     new_name = 'L2_basket_test'
     with pytest.raises(ValueError,
                        match=f"'{new_name}' is already in cell_types!"):
-        net2.rename_cell_type('L2_basket_test', new_name)
+        net2._rename_cell_types('L2_basket_test', new_name)
 
     # Tests for non-string new_name
     new_name = 5
     with pytest.raises(TypeError, match="new_name must be an instance of str"):
-        net2.rename_cell_type('L2_basket_test', 5)
+        net2._rename_cell_types('L2_basket_test', 5)
 
     #
     # Make another new network, but rename all the celltypes back to their old
@@ -1222,7 +1222,7 @@ def test_rename_cell(base_network):
                  'L5_basket', 'L5_pyramidal']
     rename_pairs = list(zip(net3.cell_types.keys(), old_names))
     for new_name, old_name in rename_pairs:
-        net3.rename_cell_type(new_name, old_name)
+        net3._rename_cell_types(new_name, old_name)
     for old_name in old_names:
         assert old_name in net3.cell_types.keys()
         assert old_name in net3.pos_dict.keys()
@@ -1248,6 +1248,6 @@ def test_rename_cell(base_network):
         op.join(hnn_core_root, 'tests', 'assets', 'jones2009_3x3_drives.json'))
     rename_pairs = list(zip(net4.cell_types.keys(), new_names))
     for original_name, new_name in rename_pairs:
-        net4.rename_cell_type(original_name, new_name)
+        net4._rename_cell_types(original_name, new_name)
     dpls4 = simulate_dipole(net4, tstop=100., n_trials=1)
     plot_dipole(dpls4, show=False)
