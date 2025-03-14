@@ -10,6 +10,7 @@
 import itertools as it
 from copy import deepcopy
 from collections import OrderedDict, defaultdict
+from typing import Dict
 
 import numpy as np
 import warnings
@@ -1202,7 +1203,7 @@ class Network:
             self.cell_types.update({cell_name: cell_template})
             self._n_cells += len(pos)
 
-    def _rename_cell_types(self, name_mapping: dict[str, str]):
+    def _rename_cell_types(self, name_mapping: Dict[str, str]):
         """Renames cell types in the network.
 
         Parameters
