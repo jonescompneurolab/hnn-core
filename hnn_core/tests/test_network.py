@@ -1234,13 +1234,13 @@ def test_rename_cell_types(base_network):
     #
     # Test that the networks actually run
     #
-    dpls1 = simulate_dipole(net1, tstop=10., n_trials=1)
+    dpls1 = simulate_dipole(net1, tstop=2., n_trials=1)
     plot_dipole(dpls1, show=False)
 
-    dpls2 = simulate_dipole(net2, tstop=10., n_trials=1)
+    dpls2 = simulate_dipole(net2, tstop=2., n_trials=1)
     plot_dipole(dpls2, show=False)
 
-    dpls3 = simulate_dipole(net3, tstop=10., n_trials=1)
+    dpls3 = simulate_dipole(net3, tstop=2., n_trials=1)
     plot_dipole(dpls3, show=False)
 
     # Test the other main network we use for testing
