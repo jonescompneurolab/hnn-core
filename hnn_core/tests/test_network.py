@@ -1240,7 +1240,7 @@ def test_rename_cell(base_network):
     dpls2 = simulate_dipole(net2, tstop=100., n_trials=1)
     plot_dipole(dpls2, show=False)
 
-    dpls3 = simulate_dipole(net2, tstop=100., n_trials=1)
+    dpls3 = simulate_dipole(net3, tstop=100., n_trials=1)
     plot_dipole(dpls3, show=False)
 
     # Test the other main network we use for testing
