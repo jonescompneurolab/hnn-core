@@ -1178,7 +1178,7 @@ def test_default_smoothing(setup_gui):
 
     _dipole_plot_types = [
         'current dipole',
-        'layer2 dipole',
+        'layer2/3 dipole',
         'layer5 dipole',
     ]
 

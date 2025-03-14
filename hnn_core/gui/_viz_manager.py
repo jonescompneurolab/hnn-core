@@ -21,13 +21,13 @@ _fig_placeholder = 'Run simulation to add figures here.'
 
 _plot_types = [
     'current dipole',
-    'layer2 dipole',
+    'layer2/3 dipole',
     'layer5 dipole',
     'input histogram',
     'spikes',
     'PSD',
-    'layer 2 PSD',
-    'layer 5 PSD',
+    'layer2/3 PSD',
+    'layer5 PSD',
     'spectrogram',
     'network',
 ]
@@ -95,7 +95,7 @@ data_templates = {
             "gridspec_kw": {"height_ratios": [1, 1, 1]}
         },
         "mosaic": "0\n1\n2",
-        "ax_plots": [("ax0", "layer2 dipole"), ("ax1", "layer5 dipole"),
+        "ax_plots": [("ax0", "layer2/3 dipole"), ("ax1", "layer5 dipole"),
                      ("ax2", "current dipole")]
     },
     "Drive-Spikes (2x1)": {
@@ -133,8 +133,8 @@ data_templates = {
         },
         "mosaic": "0\n1\n2",
         "ax_plots": [
-            ("ax0", "layer 2 PSD"),
-            ("ax1", "layer 5 PSD"),
+            ("ax0", "layer2/3 PSD"),
+            ("ax1", "layer5 PSD"),
             ("ax2", "PSD"),
         ]
     }
@@ -308,7 +308,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                 show=False
             )
 
-    elif plot_type == 'layer 2 PSD':
+    elif plot_type == 'layer2/3 PSD':
         if len(dpls_copied) > 0:
             min_f = plot_config['min_spectral_frequency']
             max_f = plot_config['max_spectral_frequency']
@@ -324,7 +324,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                 show=False
             )
 
-    elif plot_type == 'layer 5 PSD':
+    elif plot_type == 'layer5 PSD':
         if len(dpls_copied) > 0:
             min_f = plot_config['min_spectral_frequency']
             max_f = plot_config['max_spectral_frequency']
@@ -384,7 +384,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                             show=False)
             else:
                 layer_namemap = {
-                    "layer2": "L2",
+                    "layer2/3": "L2",
                     "layer5": "L5",
                 }
                 plot_dipole(dpls_copied,
