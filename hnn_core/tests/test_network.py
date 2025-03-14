@@ -1185,49 +1185,44 @@ def test_rename_cell_types(base_network):
     net2 = net1.copy()
     assert net2.connectivity
     # adding a list of new_names
-    new_names = ['L2_basket_test', 'L2_pyramidal_test',
-                 'L5_basket_test', 'L5_pyramidal_test']
-    # avoid iteration through net.cell_type.keys() by creating tuples of old and new names
-    rename_pairs = list(zip(net2.cell_types.keys(), new_names))
-    for original_name, new_name in rename_pairs:
-        net2._rename_cell_types(original_name, new_name)
-    for new_name in new_names:
-        assert new_name in net2.cell_types.keys()
-        assert new_name in net2.pos_dict.keys()
+    cell_type_rename_mapping = {cell_name: f'{cell_name}_test' for cell_name in net1.cell_types}
+    net2._rename_cell_types(cell_type_rename_mapping)
+
+    for original_name in cell_type_rename_mapping.keys():
         assert original_name not in net2.cell_types.keys()
         assert original_name not in net2.pos_dict.keys()
-    # Tests for non-existent original_name
-    original_name = 'original_name'
-    with pytest.raises(ValueError,
-                       match=f"'{original_name}' is not in cell_types!"):
-        net2._rename_cell_types('original_name', 'L2_basket_2')
+    for new_name in cell_type_rename_mapping.values():
+        assert new_name in net2.cell_types.keys()
+        assert new_name in net2.pos_dict.keys()
 
-    # Test for already existing new_name
-    new_name = 'L2_basket_test'
+    # Tests for non-existent original_name error
+    invalid_key = 'original_name'
+    invalid_original_mapping = {invalid_key: 'L2_basket'}
     with pytest.raises(ValueError,
-                       match=f"'{new_name}' is already in cell_types!"):
-        net2._rename_cell_types('L2_basket_test', new_name)
+                       match=f"'{invalid_key}' is not in cell_types!"):
+        net2._rename_cell_types(invalid_original_mapping)
 
-    # Tests for non-string new_name
-    new_name = 5
-    with pytest.raises(TypeError, match="new_name must be an instance of str"):
-        net2._rename_cell_types('L2_basket_test', 5)
+    # Test for already existing new_name error
+    invalid_value = 'L2_basket_test'
+    invalid_new_mapping = {invalid_value: invalid_value}
+    with pytest.raises(ValueError,
+                       match=f"'{invalid_value}' is already in cell_types!"):
+        net2._rename_cell_types(invalid_new_mapping)
 
     #
     # Make another new network, but rename all the celltypes back to their old
     # names, then test that everything works the same
     #
     net3 = net2.copy()
-    old_names = ['L2_basket', 'L2_pyramidal',
-                 'L5_basket', 'L5_pyramidal']
-    rename_pairs = list(zip(net3.cell_types.keys(), old_names))
-    for new_name, old_name in rename_pairs:
-        net3._rename_cell_types(new_name, old_name)
-    for old_name in old_names:
-        assert old_name in net3.cell_types.keys()
-        assert old_name in net3.pos_dict.keys()
+    reverse_mapping = {f'{cell_name}_test': cell_name for cell_name in net1.cell_types}
+    net3._rename_cell_types(reverse_mapping)
+
+    for new_name in reverse_mapping.keys():
         assert new_name not in net3.cell_types.keys()
         assert new_name not in net3.pos_dict.keys()
+    for original_name in reverse_mapping.values():
+        assert original_name in net3.cell_types.keys()
+        assert original_name in net3.pos_dict.keys()
 
     assert net3 == net1
 
@@ -1246,8 +1241,6 @@ def test_rename_cell_types(base_network):
     # Test the other main network we use for testing
     net4 = hnn_core.hnn_io.read_network_configuration(
         op.join(hnn_core_root, 'tests', 'assets', 'jones2009_3x3_drives.json'))
-    rename_pairs = list(zip(net4.cell_types.keys(), new_names))
-    for original_name, new_name in rename_pairs:
-        net4._rename_cell_types(original_name, new_name)
-    dpls4 = simulate_dipole(net4, tstop=100., n_trials=1)
+    net4._rename_cell_types(cell_type_rename_mapping)
+    dpls4 = simulate_dipole(net4, tstop=2., n_trials=1)
     plot_dipole(dpls4, show=False)

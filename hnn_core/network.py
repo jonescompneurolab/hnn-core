@@ -1202,76 +1202,77 @@ class Network:
             self.cell_types.update({cell_name: cell_template})
             self._n_cells += len(pos)
 
-    def _rename_cell_types(self, original_name, new_name):
+    def _rename_cell_types(self, name_mapping: dict[str, str]):
         """Renames cell types in the network.
 
         Parameters
         ----------
-        original_name: str
-            The original cell name in the network to be changed.
-        new_name: str
-            The desired new cell name in the network.
+        name_mapping: dict[str, str]
+            Dictionary of what cell type names to change, and what to change
+            them to. Keys are existing cell type name strings, and values are
+            what string to change each key to. Note that both elements must be
+            strings.
         """
-        _validate_type(original_name, str, 'original_name')
-        _validate_type(new_name, str, 'new_name')
-        if original_name not in self.cell_types.keys():
-            # Raises error if the original name is not in cell_types
-            raise ValueError(f"'{original_name}' is not in cell_types!")
-        elif new_name in self.cell_types.keys():
-            # Raises error if the new name is already in cell_types
-            raise ValueError(f"'{new_name}' is already in cell_types!")
-        elif original_name in self.cell_types.keys():
-            # Update cell name in dicts/etc. where order doesn't matter
-            # Update Network.cell_types
-            self.cell_types[new_name] = self.cell_types.pop(original_name)
-            # `Cell.name` does not currently provide a way to change its value,
-            # so we will leave that untouched for now.
-            # Update Network.pos_dict
-            self.pos_dict[new_name] = self.pos_dict.pop(original_name)
-            # Update Network.external_biases
-            for bias_key, bias_value in self.external_biases.items():
-                if original_name in self.external_biases[bias_key].keys():
-                    self.external_biases[bias_key][new_name] = \
-                        self.external_biases[bias_key].pop(original_name)
+        _validate_type(name_mapping, dict, 'name_mapping')
+        for original_name, new_name in name_mapping.items():
+            if original_name not in self.cell_types.keys():
+                # Raises error if the original name is not in cell_types
+                raise ValueError(f"'{original_name}' is not in cell_types!")
+            elif new_name in self.cell_types.keys():
+                # Raises error if the new name is already in cell_types
+                raise ValueError(f"'{new_name}' is already in cell_types!")
+            elif original_name in self.cell_types.keys():
+                # Update cell name in dicts/etc. where order doesn't matter
+                # Update Network.cell_types
+                self.cell_types[new_name] = self.cell_types.pop(original_name)
+                # `Cell.name` does not currently provide a way to change its value,
+                # so we will leave that untouched for now.
+                # Update Network.pos_dict
+                self.pos_dict[new_name] = self.pos_dict.pop(original_name)
+                # Update Network.external_biases
+                for bias_key, bias_value in self.external_biases.items():
+                    if original_name in self.external_biases[bias_key].keys():
+                        self.external_biases[bias_key][new_name] = \
+                            self.external_biases[bias_key].pop(original_name)
 
-            # Update Network.external_drives
-            for drive_key, drive_config in self.external_drives.items():
-                if original_name in drive_config['target_types']:
-                    drive_config['target_types'].remove(original_name)
-                    drive_config['target_types'].append(new_name)
-                    drive_config['target_types'].sort()
-                    for config_key, config_value in drive_config.items():
-                        if config_key == 'dynamics':
-                            if 'rate_constant' in config_value.keys():
-                                config_value['rate_constant'][new_name] = \
-                                    config_value['rate_constant'].pop(
-                                        original_name
-                                    )
-                        elif ((config_key == 'synaptic_delays')
-                             and (isinstance(config_value, dict))):
-                            drive_config[config_key][new_name] = \
-                                drive_config[config_key].pop(original_name)
-                        elif 'weights_' in config_key:
-                            if config_value is not None:
+                # Update Network.external_drives
+                for drive_key, drive_config in self.external_drives.items():
+                    if original_name in drive_config['target_types']:
+                        drive_config['target_types'].remove(original_name)
+                        drive_config['target_types'].append(new_name)
+                        drive_config['target_types'].sort()
+                        for config_key, config_value in drive_config.items():
+                            if config_key == 'dynamics':
+                                if 'rate_constant' in config_value.keys():
+                                    config_value['rate_constant'][new_name] = \
+                                        config_value['rate_constant'].pop(
+                                            original_name
+                                        )
+                            elif ((config_key == 'synaptic_delays')
+                                 and (isinstance(config_value, dict))):
                                 drive_config[config_key][new_name] = \
                                     drive_config[config_key].pop(original_name)
+                            elif 'weights_' in config_key:
+                                if config_value is not None:
+                                    drive_config[config_key][new_name] = \
+                                        drive_config[config_key].pop(original_name)
 
-            # Update Network.connectivity
-            for connection in self.connectivity:
-                if connection['src_type'] == original_name:
-                    connection['src_type'] = new_name
-                if connection['target_type'] == original_name:
-                    connection['target_type'] = new_name
+                # Update Network.connectivity
+                for connection in self.connectivity:
+                    if connection['src_type'] == original_name:
+                        connection['src_type'] = new_name
+                    if connection['target_type'] == original_name:
+                        connection['target_type'] = new_name
 
-            # Update Network.gid_ranges: order matters for consistency!
-            for _ in range(len(self.gid_ranges)):
-                name, gid_range = self.gid_ranges.popitem(last=False)
-                if name == original_name:
-                    # Insert the new name with the value of the original name
-                    self.gid_ranges[new_name] = gid_range
-                else:
-                    # Insert the value as it is
-                    self.gid_ranges[name] = gid_range
+                # Update Network.gid_ranges: order matters for consistency!
+                for _ in range(len(self.gid_ranges)):
+                    name, gid_range = self.gid_ranges.popitem(last=False)
+                    if name == original_name:
+                        # Insert the new name with the value of the original name
+                        self.gid_ranges[new_name] = gid_range
+                    else:
+                        # Insert the value as it is
+                        self.gid_ranges[name] = gid_range
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
