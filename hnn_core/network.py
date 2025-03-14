@@ -1233,6 +1233,7 @@ class Network:
                 if original_name in self.external_biases[bias_key].keys():
                     self.external_biases[bias_key][new_name] = \
                         self.external_biases[bias_key].pop(original_name)
+            
             # Update Network.external_drives
             for drive_key, drive_config in self.external_drives.items():
                 if original_name in drive_config['target_types']:
@@ -1240,7 +1241,7 @@ class Network:
                     drive_config['target_types'].append(new_name)
                     drive_config['target_types'].sort()
                     for config_key, config_value in drive_config.items():
-                        if (config_key == 'dynamics'):
+                        if config_key == 'dynamics':
                             if 'rate_constant' in config_value.keys():
                                 config_value['rate_constant'][new_name] = \
                                     config_value['rate_constant'].pop(
@@ -1250,7 +1251,7 @@ class Network:
                              and (isinstance(config_value, dict))):
                             drive_config[config_key][new_name] = \
                                 drive_config[config_key].pop(original_name)
-                        elif ('weights_' in config_key):
+                        elif 'weights_' in config_key:
                             if config_value is not None:
                                 drive_config[config_key][new_name] = \
                                     drive_config[config_key].pop(original_name)
