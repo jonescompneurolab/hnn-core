@@ -10,6 +10,7 @@
 import itertools as it
 from copy import deepcopy
 from collections import OrderedDict, defaultdict
+from typing import Dict
 
 import numpy as np
 import warnings
@@ -363,7 +364,6 @@ class Network:
     produce a network with no cell-to-cell connections. As such,
     connectivity information contained in ``params`` will be ignored.
     """
-
     def __init__(self, params, add_drives_from_params=False,
                  legacy_mode=False, mesh_shape=(10, 10)):
         # Save the parameters used to create the Network
@@ -447,12 +447,15 @@ class Network:
 
     def __repr__(self):
         class_name = self.__class__.__name__
-        s = ("%d x %d Pyramidal cells (L2, L5)"
-             % (self._N_pyr_x, self._N_pyr_y))
-        s += ("\n%d L2 basket cells\n%d L5 basket cells"
-              % (len(self.pos_dict['L2_basket']),
-                 len(self.pos_dict['L5_basket'])))
-        return '<%s | %s>' % (class_name, s)
+        # Dynamically create the description based on the current cell types
+        descriptions = list()
+        for cell_name in self.cell_types:
+            count = len(self.pos_dict.get(cell_name, []))
+            descriptions.append(f"{count} {cell_name} cells")
+
+        # Combine all descriptions into a single string
+        description_str = "\n".join(descriptions)
+        return f'<{class_name} | {description_str}>'
 
     def __eq__(self, other):
         if not isinstance(other, Network):
@@ -1195,11 +1198,82 @@ class Network:
         ll = self._n_gids
         self._n_gids += len(pos)
         self.gid_ranges[cell_name] = range(ll, self._n_gids)
-
         self.pos_dict[cell_name] = pos
         if cell_template is not None:
             self.cell_types.update({cell_name: cell_template})
             self._n_cells += len(pos)
+
+    def _rename_cell_types(self, name_mapping: Dict[str, str]):
+        """Renames cell types in the network.
+
+        Parameters
+        ----------
+        name_mapping: dict[str, str]
+            Dictionary of what cell type names to change, and what to change
+            them to. Keys are existing cell type name strings, and values are
+            what string to change each key to. Note that both elements must be
+            strings.
+        """
+        _validate_type(name_mapping, dict, 'name_mapping')
+        for original_name, new_name in name_mapping.items():
+            if original_name not in self.cell_types.keys():
+                # Raises error if the original name is not in cell_types
+                raise ValueError(f"'{original_name}' is not in cell_types!")
+            elif new_name in self.cell_types.keys():
+                # Raises error if the new name is already in cell_types
+                raise ValueError(f"'{new_name}' is already in cell_types!")
+            elif original_name in self.cell_types.keys():
+                # Update cell name in dicts/etc. where order doesn't matter
+                # Update Network.cell_types
+                self.cell_types[new_name] = self.cell_types.pop(original_name)
+                # `Cell.name` does not currently provide a way to change its value,
+                # so we will leave that untouched for now.
+                # Update Network.pos_dict
+                self.pos_dict[new_name] = self.pos_dict.pop(original_name)
+                # Update Network.external_biases
+                for bias_key, bias_value in self.external_biases.items():
+                    if original_name in self.external_biases[bias_key].keys():
+                        self.external_biases[bias_key][new_name] = \
+                            self.external_biases[bias_key].pop(original_name)
+
+                # Update Network.external_drives
+                for drive_key, drive_config in self.external_drives.items():
+                    if original_name in drive_config['target_types']:
+                        drive_config['target_types'].remove(original_name)
+                        drive_config['target_types'].append(new_name)
+                        drive_config['target_types'].sort()
+                        for config_key, config_value in drive_config.items():
+                            if config_key == 'dynamics':
+                                if 'rate_constant' in config_value.keys():
+                                    config_value['rate_constant'][new_name] = \
+                                        config_value['rate_constant'].pop(
+                                            original_name
+                                        )
+                            elif ((config_key == 'synaptic_delays')
+                                 and (isinstance(config_value, dict))):
+                                drive_config[config_key][new_name] = \
+                                    drive_config[config_key].pop(original_name)
+                            elif 'weights_' in config_key:
+                                if config_value is not None:
+                                    drive_config[config_key][new_name] = \
+                                        drive_config[config_key].pop(original_name)
+
+                # Update Network.connectivity
+                for connection in self.connectivity:
+                    if connection['src_type'] == original_name:
+                        connection['src_type'] = new_name
+                    if connection['target_type'] == original_name:
+                        connection['target_type'] = new_name
+
+                # Update Network.gid_ranges: order matters for consistency!
+                for _ in range(len(self.gid_ranges)):
+                    name, gid_range = self.gid_ranges.popitem(last=False)
+                    if name == original_name:
+                        # Insert the new name with the value of the original name
+                        self.gid_ranges[new_name] = gid_range
+                    else:
+                        # Insert the value as it is
+                        self.gid_ranges[name] = gid_range
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
