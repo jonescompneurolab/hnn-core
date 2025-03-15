@@ -15,11 +15,30 @@ from .cell import Cell, Section
 from .cell_response import CellResponse
 from .externals.mne import fill_doc
 
-def network_to_markdown(net, fname=None):
-    """converts network parameters to a markdown table."""
-    from datetime import datetime
+from datetime import datetime
+
+def write_network_markdown(net, fname, overwrite=True):
+    """Write network config to a markdown file.
     
-    md = []
+    Parameters
+    ----------
+    net : instance of Network
+        The Network object.
+    fname : str
+        Full path to the output file (.md).
+    overwrite : bool
+        If True, overwrite the output file if it exists.
+        
+    Returns
+    -------
+    markdown_text : str
+        The markdown representation of the network.
+    """
+    if overwrite is False and os.path.exists(fname):
+        raise FileExistsError(f'File already exists at path {fname}. Rename '
+                             f'the file or set overwrite=True.')
+    
+    md = list()
     md.append("# HNN Network Configuration")
     md.append("")
     md.append(f"*Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*")
@@ -86,10 +105,10 @@ def network_to_markdown(net, fname=None):
             
             md.append("| Parameter | Value |")
             md.append("|-----------|-------|")
-            if drive['location'] is not None:  # Tonic drives don't have location
+            if drive['location'] is not None: 
                 md.append(f"| Location | {drive['location']} |")
             md.append(f"| Number of drive cells | {drive['n_drive_cells']} |")
-            if 'cell_specific' in drive:  # Not all drive types have this
+            if 'cell_specific' in drive: 
                 md.append(f"| Cell specific | {drive['cell_specific']} |")
             
             for param_name, param_value in drive['dynamics'].items():
@@ -246,13 +265,15 @@ def network_to_markdown(net, fname=None):
     
     markdown_text = "\n".join(md)
     
-    # if md file is required
     if fname is not None:
+        dirname = os.path.dirname(fname)
+        if dirname and not os.path.exists(dirname):
+            os.makedirs(dirname)
+            
         with open(fname, 'w', encoding='utf-8') as f:
             f.write(markdown_text)
     
     return markdown_text
-
 
 def _convert_np_array_to_list(obj):
     """Returns object with np.arrays converted to lists
