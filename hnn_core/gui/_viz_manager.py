@@ -249,10 +249,13 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
     ax.get_xaxis().set_visible(True)
     if plot_type == 'spikes':
         if net_copied.cell_response:
+            hide_spike_legend = plot_config['hide_spike_legend']
+            show_legend = True if hide_spike_legend == 'False' else False
             net_copied.cell_response.plot_spikes_raster(
                 ax=ax,
                 show=False,
-
+                show_legend=show_legend,
+                marker_size=10,
             )
 
     elif plot_type == 'input histogram':
