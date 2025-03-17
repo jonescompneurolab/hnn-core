@@ -573,9 +573,16 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     return ax.get_figure()
 
 
-def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
-                       cell_types=None, colors=None,
-                       ):
+def plot_spikes_raster(
+        cell_response,
+        trial_idx=None,
+        ax=None,
+        show=True,
+        cell_types=None,
+        colors=None,
+        show_legend=True,
+        marker_size=1.0,
+        ):
     """Plot the aggregate spiking activity according to cell type.
 
     Parameters
@@ -588,10 +595,16 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
         An axis object from matplotlib. If None, a new figure is created.
     show : bool
         If True, show the figure.
-    cell_types: list of str
+    cell_types : list of str
         List of cell types to plot
-    colors: list of str | None
+    colors : list of str | None
         Optional custom colors to plot. Default will use the color cycler.
+    show_legend : bool
+        If True, show the legend with colors for cell types
+    marker_size : float
+        Optional marker size to use when plotting spikes. Uses
+        "linelengths" argument of ax.eventplot, which accepts positive
+        numeric values only
 
     Returns
     -------
@@ -649,6 +662,26 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
                                  f"Got {colors.keys()}")
             cell_colors.update(colors)
 
+    # validate show_legend argument
+    _validate_type(
+        show_legend,
+        bool,
+        'show_legend',
+        'bool'
+    )
+
+    # validate marker_size
+    _validate_type(
+        marker_size,
+        (float, int),
+        'marker_size',
+        'float or int'
+    )
+
+    # if marker_size is <= 0, set it to the default value of 1.0
+    if marker_size <= 0:
+        marker_size = 1.0
+
     # Extract desired trials
     spike_times = np.concatenate(
         np.array(cell_response._spike_times, dtype=object)[trial_idx])
@@ -672,9 +705,14 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
 
         if cell_type_times:
             events.append(
-                ax.eventplot(cell_type_times, lineoffsets=cell_type_ypos,
-                             color=color,
-                             label=cell_type, linelengths=1))
+                ax.eventplot(
+                    cell_type_times,
+                    lineoffsets=cell_type_ypos,
+                    color=color,
+                    label=cell_type,
+                    linelengths=marker_size
+                )
+            )
         else:
             # Blank plot for no spiking
             events.append(
@@ -682,9 +720,18 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
                              color=color,
                              label=cell_type, linelengths=1))
 
+    # set legend
     ax.legend(handles=[e[0] for e in events], loc=1)
+    if not show_legend:
+        ax.get_legend().remove()
+
+    # set axis labels
     ax.set_xlabel('Time (ms)')
-    ax.get_yaxis().set_visible(False)
+    ax.set_ylabel('Cell ID')
+
+    # hide y-axis ticks and tick labels
+    ax.set_yticklabels([])
+    ax.tick_params(axis='y', length=0)
 
     if len(cell_response.times) > 0:
         ax.set_xlim(left=0, right=cell_response.times[-1])
