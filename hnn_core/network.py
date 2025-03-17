@@ -1237,32 +1237,37 @@ class Network:
                 # Update Network.pos_dict
                 self.pos_dict[new_name] = self.pos_dict.pop(original_name)
                 # Update Network.external_biases
+                # A good idea in the future is to add a recursive method to
+                # `utils` that replaces any strings in values (and/or,
+                # keys) that match a regex with a second string, then use that in the below cases.
+                new_biases_dict = deepcopy(self.external_biases)
                 for bias_key, bias_value in self.external_biases.items():
-                    if original_name in self.external_biases[bias_key].keys():
-                        self.external_biases[bias_key][new_name] = \
-                            self.external_biases[bias_key].pop(original_name)
+                    if original_name in new_biases_dict[bias_key].keys():
+                        new_biases_dict[bias_key][new_name] = \
+                            new_biases_dict[bias_key].pop(original_name)
+                self.external_biases = new_biases_dict
 
                 # Update Network.external_drives
+                new_drives_dict = deepcopy(self.external_drives)
                 for drive_key, drive_config in self.external_drives.items():
                     if original_name in drive_config['target_types']:
-                        drive_config['target_types'].remove(original_name)
-                        drive_config['target_types'].append(new_name)
-                        drive_config['target_types'].sort()
+                        new_drives_dict[drive_key]['target_types'].remove(original_name)
+                        new_drives_dict[drive_key]['target_types'].append(new_name)
+                        new_drives_dict[drive_key]['target_types'].sort()
                         for config_key, config_value in drive_config.items():
                             if config_key == 'dynamics':
                                 if 'rate_constant' in config_value.keys():
-                                    config_value['rate_constant'][new_name] = \
-                                        config_value['rate_constant'].pop(
-                                            original_name
-                                        )
+                                    new_drives_dict[drive_key][config_key]['rate_constant'][new_name] = \
+                                        new_drives_dict[drive_key][config_key]['rate_constant'].pop(original_name)
                             elif ((config_key == 'synaptic_delays')
                                  and (isinstance(config_value, dict))):
-                                drive_config[config_key][new_name] = \
-                                    drive_config[config_key].pop(original_name)
+                                new_drives_dict[drive_key][config_key][new_name] = \
+                                    new_drives_dict[drive_key][config_key].pop(original_name)
                             elif 'weights_' in config_key:
                                 if config_value is not None:
-                                    drive_config[config_key][new_name] = \
-                                        drive_config[config_key].pop(original_name)
+                                    new_drives_dict[drive_key][config_key][new_name] = \
+                                        new_drives_dict[drive_key][config_key].pop(original_name)
+                self.external_drives = new_drives_dict
 
                 # Update Network.connectivity
                 for connection in self.connectivity:
@@ -1272,14 +1277,16 @@ class Network:
                         connection['target_type'] = new_name
 
                 # Update Network.gid_ranges: order matters for consistency!
+                new_gid_ranges = deepcopy(self.gid_ranges)
                 for _ in range(len(self.gid_ranges)):
-                    name, gid_range = self.gid_ranges.popitem(last=False)
+                    name, gid_range = new_gid_ranges.popitem(last=False)
                     if name == original_name:
                         # Insert the new name with the value of the original name
-                        self.gid_ranges[new_name] = gid_range
+                        new_gid_ranges[new_name] = gid_range
                     else:
                         # Insert the value as it is
-                        self.gid_ranges[name] = gid_range
+                        new_gid_ranges[name] = gid_range
+                self.gid_ranges = new_gid_ranges
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
