@@ -1229,17 +1229,23 @@ def test_rename_cell_types(base_network):
     #
     # Test that the networks actually run
     #
-    dpls1 = simulate_dipole(net1, tstop=2., n_trials=1)
+    dpls1 = simulate_dipole(net1, tstop=10., n_trials=1)
     plot_dipole(dpls1, show=False)
     net1.cell_response.plot_spikes_raster(show=False)
     net1.cell_response.plot_spikes_hist(show=False)
 
-    dpls2 = simulate_dipole(net2, tstop=2., n_trials=1)
+    dpls2 = simulate_dipole(net2, tstop=10., n_trials=1)
     plot_dipole(dpls2, show=False)
-    net2.cell_response.plot_spikes_raster(show=False)
+    # Currently, `CellResponse` plotters only auto-display cell-types if they
+    # are the canonical four; if we are using different cell-type names, like
+    # here, we have to pass in their new names manually.
+    net2.cell_response.plot_spikes_raster(show=False,
+                                          cell_types=list(cell_type_rename_mapping.values()))
+    # Unlike `plot_spikes_raster()`, if we use different cell-type names,
+    # `plot_spikes_hist()` does work.
     net2.cell_response.plot_spikes_hist(show=False)
 
-    dpls3 = simulate_dipole(net3, tstop=2., n_trials=1)
+    dpls3 = simulate_dipole(net3, tstop=10., n_trials=1)
     plot_dipole(dpls3, show=False)
     net3.cell_response.plot_spikes_raster(show=False)
     net3.cell_response.plot_spikes_hist(show=False)
@@ -1248,8 +1254,9 @@ def test_rename_cell_types(base_network):
     net4 = hnn_core.hnn_io.read_network_configuration(
         op.join(hnn_core_root, 'tests', 'assets', 'jones2009_3x3_drives.json'))
     net4._rename_cell_types(cell_type_rename_mapping)
-    dpls4 = simulate_dipole(net4, tstop=2., n_trials=1)
+    dpls4 = simulate_dipole(net4, tstop=10., n_trials=1)
     plot_dipole(dpls4, show=False)
-    net4.cell_response.plot_spikes_raster(show=False)
+    net4.cell_response.plot_spikes_raster(show=False,
+                                          cell_types=list(cell_type_rename_mapping.values()))
     net4.cell_response.plot_spikes_hist(show=False)
 
