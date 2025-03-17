@@ -111,6 +111,7 @@ Input and Output:
    read_params
    read_dipole
    read_spikes
+   write_network_markdown
 
 GUI (:py:mod:`hnn_core.gui`):
 -----------------------------
