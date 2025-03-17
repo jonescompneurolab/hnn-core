@@ -1206,6 +1206,12 @@ class Network:
     def _rename_cell_types(self, name_mapping: Dict[str, str]):
         """Renames cell types in the network.
 
+        NOTE (Important): Currently, not all of HNN's functionality supports
+        cell-type names different from the default 4, including Dipole
+        calculation. This means use of this function will NOT result in a
+        completely usable Network! We are working to support variable cell-type
+        names.
+
         Parameters
         ----------
         name_mapping: dict[str, str]
