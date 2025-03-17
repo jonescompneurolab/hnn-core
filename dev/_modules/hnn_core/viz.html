@@ -1062,9 +1062,16 @@ document.write(`
     <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="plot_spikes_raster"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_spikes_raster.html#hnn_core.viz.plot_spikes_raster">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">plot_spikes_raster</span><span class="p">(</span><span class="n">cell_response</span><span class="p">,</span> <span class="n">trial_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                       <span class="n">cell_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                       <span class="p">):</span>
+<div class="viewcode-block" id="plot_spikes_raster"><a class="viewcode-back" href="../../generated/hnn_core.viz.plot_spikes_raster.html#hnn_core.viz.plot_spikes_raster">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">plot_spikes_raster</span><span class="p">(</span>
+        <span class="n">cell_response</span><span class="p">,</span>
+        <span class="n">trial_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">cell_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">marker_size</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the aggregate spiking activity according to cell type.</span>
 
 <span class="sd">    Parameters</span>
@@ -1077,10 +1084,16 @@ document.write(`
 <span class="sd">        An axis object from matplotlib. If None, a new figure is created.</span>
 <span class="sd">    show : bool</span>
 <span class="sd">        If True, show the figure.</span>
-<span class="sd">    cell_types: list of str</span>
+<span class="sd">    cell_types : list of str</span>
 <span class="sd">        List of cell types to plot</span>
-<span class="sd">    colors: list of str | None</span>
+<span class="sd">    colors : list of str | None</span>
 <span class="sd">        Optional custom colors to plot. Default will use the color cycler.</span>
+<span class="sd">    show_legend : bool</span>
+<span class="sd">        If True, show the legend with colors for cell types</span>
+<span class="sd">    marker_size : float</span>
+<span class="sd">        Optional marker size to use when plotting spikes. Uses</span>
+<span class="sd">        &quot;linelengths&quot; argument of ax.eventplot, which accepts positive</span>
+<span class="sd">        numeric values only</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1138,6 +1151,26 @@ document.write(`
                                  <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">colors</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">cell_colors</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
 
+    <span class="c1"># validate show_legend argument</span>
+    <span class="n">_validate_type</span><span class="p">(</span>
+        <span class="n">show_legend</span><span class="p">,</span>
+        <span class="nb">bool</span><span class="p">,</span>
+        <span class="s1">&#39;show_legend&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;bool&#39;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># validate marker_size</span>
+    <span class="n">_validate_type</span><span class="p">(</span>
+        <span class="n">marker_size</span><span class="p">,</span>
+        <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+        <span class="s1">&#39;marker_size&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;float or int&#39;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># if marker_size is &lt;= 0, set it to the default value of 1.0</span>
+    <span class="k">if</span> <span class="n">marker_size</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">marker_size</span> <span class="o">=</span> <span class="mf">1.0</span>
+
     <span class="c1"># Extract desired trials</span>
     <span class="n">spike_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cell_response</span><span class="o">.</span><span class="n">_spike_times</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)[</span><span class="n">trial_idx</span><span class="p">])</span>
@@ -1161,9 +1194,14 @@ document.write(`
 
         <span class="k">if</span> <span class="n">cell_type_times</span><span class="p">:</span>
             <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">ax</span><span class="o">.</span><span class="n">eventplot</span><span class="p">(</span><span class="n">cell_type_times</span><span class="p">,</span> <span class="n">lineoffsets</span><span class="o">=</span><span class="n">cell_type_ypos</span><span class="p">,</span>
-                             <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
-                             <span class="n">label</span><span class="o">=</span><span class="n">cell_type</span><span class="p">,</span> <span class="n">linelengths</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">eventplot</span><span class="p">(</span>
+                    <span class="n">cell_type_times</span><span class="p">,</span>
+                    <span class="n">lineoffsets</span><span class="o">=</span><span class="n">cell_type_ypos</span><span class="p">,</span>
+                    <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                    <span class="n">label</span><span class="o">=</span><span class="n">cell_type</span><span class="p">,</span>
+                    <span class="n">linelengths</span><span class="o">=</span><span class="n">marker_size</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Blank plot for no spiking</span>
             <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
@@ -1171,9 +1209,18 @@ document.write(`
                              <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
                              <span class="n">label</span><span class="o">=</span><span class="n">cell_type</span><span class="p">,</span> <span class="n">linelengths</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
 
+    <span class="c1"># set legend</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="o">=</span><span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">events</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">show_legend</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">get_legend</span><span class="p">()</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+
+    <span class="c1"># set axis labels</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Cell ID&#39;</span><span class="p">)</span>
+
+    <span class="c1"># hide y-axis ticks and tick labels</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell_response</span><span class="o">.</span><span class="n">times</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">cell_response</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
