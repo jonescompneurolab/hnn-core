@@ -653,7 +653,7 @@ document.write(`
             <span class="s1">&#39;output_type&#39;</span><span class="p">:</span> <span class="s1">&#39;stream&#39;</span><span class="p">,</span>
             <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">formatted_record</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">outputs</span> <span class="o">+</span> <span class="p">(</span><span class="n">new_output</span><span class="p">,</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">outputs</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_output</span><span class="p">,</span> <span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="o">.</span><span class="n">outputs</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_GUI_PrintToLogger</span><span class="p">:</span>
