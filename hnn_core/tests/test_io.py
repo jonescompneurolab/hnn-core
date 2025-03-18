@@ -14,7 +14,8 @@ from hnn_core import (simulate_dipole, read_params,
 from hnn_core.hnn_io import (_cell_response_to_dict, _rec_array_to_dict,
                              _external_drive_to_dict, _str_to_node,
                              _conn_to_dict, _order_drives,
-                             read_network_configuration
+                             read_network_configuration,
+                             write_network_markdown
                              )
 
 from regenerate_test_network import jones_2009_additional_features
@@ -62,6 +63,64 @@ def calcium_network(params):
     net.add_electrode_array('arr1', electrode_pos)
 
     return net
+
+
+def test_write_network_markdown(tmp_path, jones_2009_network, calcium_network):
+    """Tests markdown file writing and content generation"""
+    # Check no file is already written
+    path_out = tmp_path / 'net.md'
+    assert not path_out.is_file()
+    
+    # Write network check
+    md_text = write_network_markdown(jones_2009_network, path_out)
+    assert path_out.is_file()
+    
+    # Check markdown includes expected sections
+    assert "# HNN Network Configuration" in md_text
+    assert "## Simulation Parameters" in md_text
+    assert "## Network Structure" in md_text
+    assert "## Network Connectivity" in md_text
+    assert "## External Drives" in md_text
+    assert "## Cell Parameters" in md_text
+    
+    # Checking network shapes
+    assert f"| Mesh shape | {jones_2009_network._N_pyr_x} × {jones_2009_network._N_pyr_y} |" in md_text
+    assert f"| Firing threshold | {jones_2009_network.threshold} mV |" in md_text
+    
+    # Check table formatting
+    assert "| Parameter | Value |" in md_text
+    assert "|-----------|-------|" in md_text
+    
+    # Verify file content matches returned string
+    with open(path_out, 'r', encoding='utf-8') as f:
+        file_content = f.read()
+    assert file_content == md_text
+    
+    # Overwrite network check
+    last_mod_time1 = path_out.stat().st_mtime
+    sleep(0.05)
+    write_network_markdown(jones_2009_network, path_out)
+    last_mod_time2 = path_out.stat().st_mtime
+    assert last_mod_time1 < last_mod_time2
+    
+    # No overwrite check
+    with pytest.raises(FileExistsError,
+                       match="File already exists at path "):
+        write_network_markdown(jones_2009_network, path_out, overwrite=False)
+    
+    # When no file is specified
+    md_text_only = write_network_markdown(jones_2009_network, None)
+    assert isinstance(md_text_only, str)
+    
+    # Test with nonexistent directory path
+    nested_path = tmp_path / 'subdir' / 'deeper' / 'network.md'
+    assert not nested_path.parent.exists()
+    write_network_markdown(jones_2009_network, nested_path)
+    assert nested_path.is_file()  # Confirms directory was created
+
+    # Test drive representation
+    for drive_name in jones_2009_network.external_drives:
+        assert f"### {drive_name}" in md_text
 
 
 def test_eq(jones_2009_network, calcium_network):
