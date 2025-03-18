@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:42.180** total execution time for 8 files **from auto_examples/howto**:
+**01:02.952** total execution time for 8 files **from auto_examples/howto**:
 
 .. container::
 
@@ -33,7 +33,7 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_howto_plot_simulate_mpi_backend.py` (``plot_simulate_mpi_backend.py``)
-     - 00:42.180
+     - 01:02.952
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_optimize_evoked.py` (``optimize_evoked.py``)
      - 00:00.000
