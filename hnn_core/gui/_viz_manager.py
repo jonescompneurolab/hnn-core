@@ -249,7 +249,15 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
     ax.get_xaxis().set_visible(True)
     if plot_type == 'spikes':
         if net_copied.cell_response:
-            net_copied.cell_response.plot_spikes_raster(ax=ax, show=False)
+            marker_size = plot_config['marker_size']
+            hide_spike_legend = plot_config['hide_spike_legend']
+            show_legend = True if hide_spike_legend == 'False' else False
+            net_copied.cell_response.plot_spikes_raster(
+                ax=ax,
+                show=False,
+                show_legend=show_legend,
+                marker_size=marker_size,
+            )
 
     elif plot_type == 'input histogram':
         if net_copied.cell_response:
@@ -455,6 +463,8 @@ def _avg_dipole_check(dpls):
 def _plot_on_axes(b, simulations_widget, widgets_plot_type,
                   data_widget,
                   spectrogram_colormap_selection,
+                  hide_spike_legend,
+                  marker_size,
                   min_spectral_frequency, max_spectral_frequency,
                   dipole_smooth, dipole_scaling, data_smooth, data_scaling,
                   widgets, data, fig_idx, fig, ax, existing_plots):
@@ -474,6 +484,11 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
         The target data we want to compare with. Note that this could be 'None'
     spectrogram_colormap_selection : ipywidgets.Dropdown
         A dropdown widget that contains all the colormaps for spectrogram.
+    hide_spike_legend : ipywidgets.Dropdown
+        A dropdown widget that specifies whether to hide the legend for
+        the spikes raster plot.
+    marker_size : ipywidgets.BoundedFloatText
+        A widget that specifies the marker size for the raster plot.
     dipole_smooth : ipywidgets.FloatText
         A textfield widget that specifies the smoothing window size.
     min_spectral_frequency : ipywidgets.FloatText
@@ -511,7 +526,9 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
         "dipole_smooth": dipole_smooth.value,
         "min_spectral_frequency": min_spectral_frequency.value,
         "max_spectral_frequency": max_spectral_frequency.value,
-        "spectrogram_cm": spectrogram_colormap_selection.value
+        "spectrogram_cm": spectrogram_colormap_selection.value,
+        "hide_spike_legend": hide_spike_legend.value,
+        "marker_size": marker_size.value,
     }
 
     dpls_processed = _update_ax(fig, ax, single_simulation, sim_name,
@@ -529,7 +546,9 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
             "dipole_smooth": data_smooth.value,
             "min_spectral_frequency": min_spectral_frequency.value,
             "max_spectral_frequency": max_spectral_frequency.value,
-            "spectrogram_cm": spectrogram_colormap_selection.value
+            "spectrogram_cm": spectrogram_colormap_selection.value,
+            "hide_spike_legend": hide_spike_legend.value,
+            "marker_size": marker_size.value,
         }
 
         # plot the target dipole.
@@ -715,6 +734,23 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
         layout=layout,
         style=analysis_style)
 
+    hide_spike_legend = Dropdown(
+        description='Hide Raster Plot Legend:',
+        options=['True', 'False'],
+        value='False',
+        layout=layout,
+        style=analysis_style,
+    )
+
+    marker_size = BoundedFloatText(
+        value=1,
+        min=0.01,
+        max=15,
+        description='Raster Plot Marker Size:',
+        layout=layout,
+        style=analysis_style,
+    )
+
     existing_plots = VBox([])
 
     plot_button = Button(description='Add plot')
@@ -756,6 +792,8 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
             widgets_plot_type=plot_type_selection,
             data_widget=target_data_selection,
             spectrogram_colormap_selection=spectrogram_colormap_selection,
+            hide_spike_legend=hide_spike_legend,
+            marker_size=marker_size,
             min_spectral_frequency=min_spectral_frequency,
             max_spectral_frequency=max_spectral_frequency,
             dipole_smooth=simulation_dipole_smooth,
@@ -775,6 +813,8 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
         simulation_dipole_scaling, target_data_selection, data_dipole_smooth,
         data_dipole_scaling, min_spectral_frequency, max_spectral_frequency,
         spectrogram_colormap_selection,
+        hide_spike_legend,
+        marker_size,
         HBox(
             [plot_button, clear_button],
             layout=Layout(justify_content='space-between'),
@@ -1157,7 +1197,8 @@ class _VizManager:
                 `dipole_smooth`, `dipole_scaling`,
                 `data_to_compare`, `data_smooth`, `data_scaling`
                 `min_spectral_frequency`, `max_spectral_frequency`,
-                `spectrogram_colormap_selection`.
+                `spectrogram_colormap_selection`, `hide_spike_legend,
+                `marker_size`.
                 config could be empty: `{}`.
             operation : str
                 `"plot"` if you want to plot and `"clear"` if you want to
@@ -1199,6 +1240,8 @@ class _VizManager:
             "min_spectral_frequency": 7,
             "max_spectral_frequency": 8,
             "spectrogram_colormap_selection": 9,
+            "hide_spike_legend": 10,
+            "marker_size": 11,
         }
         for conf_key, conf_val in preprocessing_config.items():
             assert conf_key in config_name_idx.keys()
