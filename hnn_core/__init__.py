@@ -6,5 +6,6 @@ from .cell import Cell
 from .cell_response import CellResponse, read_spikes
 from .cells_default import pyramidal, basket
 from .parallel_backends import MPIBackend, JoblibBackend
+from .batch_simulate import BatchSimulate
 
 __version__ = '0.4rc4'
