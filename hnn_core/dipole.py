@@ -4,19 +4,22 @@
 #          Sam Neymotin <samnemo@gmail.com>
 
 import os
+import os.path as op
 import warnings
 from io import StringIO
+import json
 
 import numpy as np
 from copy import deepcopy
 from h5io import write_hdf5, read_hdf5
 from .externals.mne import _check_option
 
+import hnn_core
 from .viz import plot_dipole, plot_psd, plot_tfr_morlet
 
 
 def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
-                    record_isec=False, record_ca=False, postproc=False):
+                    record_isec=False, record_ca=False, postproc=False, bsl_cor='jones'):
     """Simulate a dipole given the experiment parameters.
 
     Parameters
@@ -48,6 +51,10 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
         extracellular recordings etc. The preferred way is to use the
         :meth:`~hnn_core.dipole.Dipole.smooth` and
         :meth:`~hnn_core.dipole.Dipole.scale` methods instead. Default: False.
+    bsl_cor : str
+        Baseline correction method. Default: 'jones'
+        For jones_2009_model and law_2021_model, use method 'jones' (manual correction).
+        For new_calcium_model, use method 'calcium'.
 
     Returns
     -------
@@ -59,7 +66,7 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
 
     if _BACKEND is None:
         _BACKEND = JoblibBackend(n_jobs=1)
-
+        
     if n_trials is None:
         n_trials = net._params['N_trials']
     if n_trials < 1:
@@ -78,10 +85,12 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
         if 'tstop' in drive['dynamics']:
             if drive['dynamics']['tstop'] is None:
                 drive['dynamics']['tstop'] = tstop
+
     for bias_name, bias in net.external_biases.items():
         for cell_type, bias_cell_type in bias.items():
             if bias_cell_type['tstop'] is None:
                 bias_cell_type['tstop'] = tstop
+
             if bias_cell_type['tstop'] < 0.:
                 raise ValueError('End time of tonic input cannot be negative')
             duration = bias_cell_type['tstop'] - bias_cell_type['t0']
@@ -112,7 +121,7 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
                       ' in a future release of hnn-core. Please define '
                       'smoothing and scaling explicitly using Dipole methods.',
                       DeprecationWarning)
-    dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc)
+    dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc, bsl_cor)
 
     return dpls
 
@@ -607,6 +616,23 @@ class Dipole(object):
             layer=layer, decim=decim, padding=padding, ax=ax,
             colormap=colormap, colorbar=colorbar,
             colorbar_inside=colorbar_inside, show=show)
+    
+    def _baseline_renormalize_ca(self):
+        """Baseline correction based on calcium model without drives"""
+
+        hnn_core_root = op.dirname(hnn_core.__file__)
+
+        # load the baseline dipole
+        with open(op.join(hnn_core_root, 'param', 'bsl_dipole_ca.json'), 'r') as f:
+            bsl_dpl = json.load(f)
+
+        # subtract baseline dipole from the current dipole
+        for i,t in enumerate(self.times):
+            bsl_idx = np.argmin(np.abs(bsl_dpl['times'] - t))
+            self.data['L2'][i] -= bsl_dpl['L2'][bsl_idx]
+            self.data['L5'][i] -= bsl_dpl['L5'][bsl_idx]
+        
+        self.data['agg'] = self.data['L2'] + self.data['L5']
 
     def _baseline_renormalize(self, N_pyr_x, N_pyr_y):
         """Only baseline renormalize if the units are fAm.

@@ -202,15 +202,18 @@ class Section:
         membrane capacitance in micro-Farads.
     Ra : float
         axial resistivity in ohm-cm.
+    v : float
+        start value for membrane potential.
     nseg : int
         Number of segments in the section
     """
-    def __init__(self, L, diam, Ra, cm, end_pts=None):
+    def __init__(self, L, diam, Ra, cm, v=-65, end_pts=None):
 
         self._L = L
         self._diam = diam
         self._Ra = Ra
         self._cm = cm
+        self._v = v             # initial voltage for each section
         if end_pts is None:
             end_pts = list()
         self._end_pts = end_pts
@@ -222,7 +225,7 @@ class Section:
         self.nseg = _get_nseg(self.L)
 
     def __repr__(self):
-        return f'L={self.L}, diam={self.diam}, cm={self.cm}, Ra={self.Ra}'
+        return f'L={self.L}, diam={self.diam}, cm={self.cm}, Ra={self.Ra}, v={self.v}'
 
     def __eq__(self, other):
         if not isinstance(other, Section):
@@ -268,6 +271,7 @@ class Section:
         section_data['Ra'] = self.Ra
         section_data['end_pts'] = self.end_pts
         section_data['nseg'] = self.nseg
+        section_data['v'] = self._v
         # Need to solve the partial function problem
         # in mechs
         section_data['mechs'] = self.mechs
@@ -289,6 +293,10 @@ class Section:
     @property
     def Ra(self):
         return self._Ra
+    
+    @property
+    def v(self):
+        return self._v
 
     @property
     def end_pts(self):
@@ -558,16 +566,18 @@ class Cell:
         # SECTION!!!
         h.distance(sec=self._nrn_sections['soma'])
         for sec_name, section in sections.items():
-            sec = self._nrn_sections[sec_name]
+            sec = self._nrn_sections[sec_name]    
+
             for mech_name, p_mech in section.mechs.items():
                 sec.insert(mech_name)
+                setattr(sec, 'v', section.v)
                 for attr, val in p_mech.items():
                     if isinstance(val, list):
                         seg_xs, seg_vals = val[0], val[1]
                         for seg, seg_x, seg_val in zip(sec, seg_xs, seg_vals):
                             setattr(seg, attr, seg_val)
                     else:
-                        setattr(sec, attr, val)
+                        setattr(sec, attr, val)       
 
     def _compute_section_mechs(self):
         sections = self.sections
@@ -597,8 +607,13 @@ class Cell:
             for receptor in sections[sec_name].syns:
                 syn_key = f'{sec_name}_{receptor}'
                 seg = self._nrn_sections[sec_name](0.5)
-                self._nrn_synapses[syn_key] = self.syn_create(
-                    seg, **synapses[receptor])
+
+                if receptor == 'gabab':
+                    self._nrn_synapses[syn_key] = self.syn_create(
+                        seg, **synapses[receptor])
+                else:
+                    self._nrn_synapses[syn_key] = self.syn_create(
+                        seg, **synapses[receptor])
 
     def _create_sections(self, sections, cell_tree):
         """Create soma and set geometry.
@@ -626,6 +641,7 @@ class Cell:
             sec.Ra = sections[sec_name].Ra
             sec.cm = sections[sec_name].cm
             sec.nseg = sections[sec_name].nseg
+            sec.v = sections[sec_name].v
 
         if cell_tree is None:
             cell_tree = dict()
@@ -838,6 +854,18 @@ class Cell:
         syn.tau1 = tau1
         syn.tau2 = tau2
         return syn
+    
+    # GABAB synapse
+    def syn_create_gabab(self, secloc, e, tau1, tau2):
+        if not isinstance(secloc, nrn.Segment):
+            raise TypeError(f'secloc must be instance of'
+                            f'nrn.Segment. Got {type(secloc)}')
+        syn = h.GABAB(secloc)
+        syn.e = e
+        syn.tau1 = tau1
+        syn.tau2 = tau2
+
+        return syn
 
     def setup_source_netcon(self, threshold):
         """Created for _PC.cell and specifies SOURCES of spikes.
@@ -1034,7 +1062,7 @@ class Cell:
         # of sections.
         self.define_shape(('soma', 0))
 
-    def modify_section(self, sec_name, L=None, diam=None, cm=None, Ra=None):
+    def modify_section(self, sec_name, L=None, diam=None, cm=None, Ra=None, v=None):
         """Change attributes of section specified by `sec_name`
 
         Parameters
@@ -1072,5 +1100,9 @@ class Cell:
         if Ra is not None:
             _validate_type(Ra, (float, int), 'Ra')
             self.sections[sec_name]._Ra = Ra
+        
+        if v is not None:
+            _validate_type(v, (float, int), 'v')
+            self.sections[sec_name]._v = v
 
         self._update_end_pts()
