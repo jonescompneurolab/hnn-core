@@ -12,6 +12,22 @@ from .externals.mne import _validate_type
 
 
 def _lighten_color(color, amount=0.5):
+    """
+    Lighten the given color by blending it with white.
+
+    Parameters
+    ----------
+    color : str or tuple
+        A Matplotlib color name or RGB tuple.
+    amount : float, default=0.5
+        Amount to lighten the color. 0 returns original color,
+        1 returns white.
+
+    Returns
+    -------
+    tuple
+        Lightened RGB color as a tuple.
+    """
     import matplotlib.colors as mc
     try:
         c = mc.cnames[color]
@@ -22,7 +38,27 @@ def _lighten_color(color, amount=0.5):
 
 
 def _get_plot_data_trange(times, data, tmin=None, tmax=None):
-    """Get slices of times and data based on tmin and tmax"""
+    """
+    Slice time and data arrays based on time range.
+
+    Parameters
+    ----------
+    times : array-like
+        Array of time points.
+    data : array-like
+        Data values corresponding to each time point.
+    tmin : float or None, optional
+        Minimum time to include. If None, starts from first time point.
+    tmax : float or None, optional
+        Maximum time to include. If None, ends at last time point.
+
+    Returns
+    -------
+    data_slice : ndarray
+        Data values within the specified time range.
+    time_slice : ndarray
+        Time values within the specified time range.
+    """
     if isinstance(times, list):
         times = np.array(times)
     if isinstance(data, list):
@@ -40,6 +76,29 @@ def _get_plot_data_trange(times, data, tmin=None, tmax=None):
 
 
 def _decimate_plot_data(decim, data, times, sfreq=None):
+    """
+    Downsample data and time arrays using decimation.
+
+    Parameters
+    ----------
+    decim : int or list of int
+        Decimation factor(s) to apply.
+    data : array-like
+        Signal data to decimate.
+    times : array-like
+        Time points corresponding to the data.
+    sfreq : float or None, optional
+        Sampling frequency. If given, it will be updated after decimation.
+
+    Returns
+    -------
+    data : ndarray
+        Decimated data.
+    times : ndarray
+        Decimated time points.
+    sfreq : float, optional
+        Updated sampling frequency if input `sfreq` was given.
+    """
     from scipy.signal import decimate
     if not isinstance(decim, list):
         decim = [decim]
@@ -59,18 +118,18 @@ def _decimate_plot_data(decim, data, times, sfreq=None):
 
 
 def plt_show(show=True, fig=None, **kwargs):
-    """Show a figure while suppressing warnings.
-
-    NB copied from :func:`mne.viz.utils.plt_show`.
-
+    """
+    Show a figure while suppressing warnings.
+    NB: Copied from :func:`mne.viz.utils.plt_show`.
+    
     Parameters
     ----------
-    show : bool
-        Show the figure.
-    fig : instance of Figure | None
-        If non-None, use fig.show().
+    show : bool, default=True
+        Whether to show the figure.
+    fig : instance of Figure | None, optional
+        If not None, use fig.show().
     **kwargs : dict
-        Extra arguments for :func:`matplotlib.pyplot.show`.
+    Extra arguments for :func:`matplotlib.pyplot.show`.
     """
     from matplotlib import get_backend
     import matplotlib.pyplot as plt
@@ -81,44 +140,40 @@ def plt_show(show=True, fig=None, **kwargs):
 def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
                      ax=None, decim=None, color='cividis',
                      voltage_offset=50, voltage_scalebar=200, show=True):
-    """Plot laminar extracellular electrode array voltage time series.
+    """
+    Plot laminar extracellular electrode array voltage time series.
 
     Parameters
     ----------
     times : array-like, shape (n_times,)
-        Sampling times (in ms).
-    data : Two-dimensional Numpy array
-        The extracellular voltages as an (n_contacts, n_times) array.
-    ax : instance of matplotlib figure | None
-        The matplotlib axis
-    decim : int | list of int | None (default)
-        Optional (integer) factor by which to decimate the raw dipole traces.
-        The SciPy function :func:`~scipy.signal.decimate` is used, which
-        recommends values <13. To achieve higher decimation factors, a list of
-        ints can be provided. These are applied successively.
-    color : str | array of floats | ``matplotlib.colors.ListedColormap``
-        The colormap to use for plotting. The usual Matplotlib standard
-        colormap strings may be used (e.g., 'jetblue'). A color can also be
-        defined as an RGBA-quadruplet, or an array of RGBA-values (one for each
-        electrode contact trace to plot). An instance of
-        :class:`~matplotlib.colors.ListedColormap` may also be provided.
-    voltage_offset : float | None (optional)
-        Amount to offset traces by on the voltage-axis. Useful for plotting
-        laminar arrays.
-    voltage_scalebar : float | None (optional)
-        Height, in units of uV, of a scale bar to plot in the top-left corner
-        of the plot.
-    contact_labels : list
-        Labels associated with the contacts to plot. Passed as-is to
-        :func:`~matplotlib.axes.Axes.set_yticklabels`.
-    show : bool
-        If True, show the figure
+        Sampling times in milliseconds.
+    data : array, shape (n_contacts, n_times)
+        Extracellular voltages to plot.
+    contact_labels : list of str
+        Labels for each electrode contact.
+    tmin : float or None, optional
+        Minimum time (ms) to display. Deprecated.
+    tmax : float or None, optional
+        Maximum time (ms) to display. Deprecated.
+    ax : matplotlib axis, optional
+        Axis to plot on. If None, a new figure is created.
+    decim : int or list of int, optional
+        Factor(s) to decimate the data.
+    color : str or array or ListedColormap, default='cividis'
+        Colormap or color values for traces.
+    voltage_offset : float, default=50
+        Offset for spacing between contact traces.
+    voltage_scalebar : float or None, default=200
+        Size of vertical scalebar in microvolts.
+    show : bool, default=True
+        Whether to display the figure.
 
     Returns
     -------
-    fig : instance of plt.fig
-        The matplotlib figure handle into which time series were plotted.
+    fig : matplotlib.figure.Figure
+        The matplotlib figure handle.
     """
+
     import matplotlib.pyplot as plt
     from matplotlib.colors import ListedColormap
     _validate_type(times, (list, np.ndarray), 'times')
@@ -229,36 +284,38 @@ def plot_laminar_lfp(times, data, contact_labels, tmin=None, tmax=None,
 
 def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
                 color='k', label="average", average=False, show=True):
-    """Simple layer-specific plot function.
+    """
+    Simple layer-specific dipole plot function.
 
     Parameters
     ----------
-    dpl : instance of Dipole | list of Dipole instances
-        The Dipole object.
-    ax : instance of matplotlib figure | None
-        The matplotlib axis
-    layer : str
-        The layer to plot. Can be one of
-        'agg', 'L2', and 'L5'
-    decim : int or list of int or None (default)
-        Optional (integer) factor by which to decimate the raw dipole traces.
-        The SciPy function :func:`~scipy.signal.decimate` is used, which
-        recommends values <13. To achieve higher decimation factors, a list of
-        ints can be provided. These are applied successively.
-    color : tuple of float | str
-        RGBA value to use for plotting. By default, 'k' (black)
-    label : str
-        Dipole label. Enabled when average=True
-    average : bool
-        If True, render the average across all dpls.
-    show : bool
-        If True, show the figure
+    dpl : instance of Dipole or list of Dipole
+        The Dipole object(s) to plot.
+    tmin : float or None, optional
+        Minimum time to show (in ms). Deprecated.
+    tmax : float or None, optional
+        Maximum time to show (in ms). Deprecated.
+    ax : matplotlib axis or list of axes, optional
+        Axis to plot on. If None, a new figure is created.
+    layer : str or list of str, default='agg'
+        Layer(s) to plot. Can be 'agg', 'L2', or 'L5'.
+    decim : int or list of int, optional
+        Factor(s) to decimate the dipole data.
+    color : tuple of float or str, default='k'
+        Color to use for plotting.
+    label : str, default='average'
+        Label for average dipole (if average=True).
+    average : bool, default=False
+        If True, add and plot the average across dipoles.
+    show : bool, default=True
+        Whether to display the figure.
 
     Returns
     -------
-    fig : instance of plt.fig
+    fig : matplotlib.figure.Figure
         The matplotlib figure handle.
     """
+
     import matplotlib.pyplot as plt
     from .dipole import Dipole, average_dipoles
 
@@ -341,236 +398,195 @@ def plot_dipole(dpl, tmin=None, tmax=None, ax=None, layer='agg', decim=None,
 def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
                      color=None, invert_spike_types=None, show=True,
                      **kwargs_hist):
-    """Plot the histogram of spiking activity across trials.
+        """
+    Plot the histogram of spiking activity across trials.
 
     Parameters
     ----------
     cell_response : instance of CellResponse
-        The CellResponse object from net.cell_response
-    trial_idx : int | list of int | None
-        Index of trials to be plotted. If None, all trials plotted.
-    ax : instance of matplotlib axis | None
-        An axis object from matplotlib. If None,
-        a new figure is created.
-    spike_types: string | list | dictionary | None
-        String input of a valid spike type is plotted individually.
-
-        | Ex: ``'poisson'``, ``'evdist'``, ``'evprox'``, ...
-
-        List of valid string inputs will plot each spike type individually.
-
-        | Ex: ``['poisson', 'evdist']``
-
-        Dictionary of valid lists will plot list elements as a group.
-
-        | Ex: ``{'Evoked': ['evdist', 'evprox'], 'Tonic': ['poisson']}``
-
-        If None, all input spike types are plotted individually if any
-        are present. Otherwise spikes from all cells are plotted.
-        Valid strings also include leading characters of spike types
-
-        | Ex: ``'ev'`` is equivalent to ``['evdist', 'evprox']``
-    invert_spike_types: string | list | None
-        String input of a valid spike type to be mirrored about the y axis
-
-        | Ex: ``'evdist'``, ``'evprox'``, ...
-
-        List of valid spike types to be mirrored about the y axis
-
-        | Ex: ``['evdist', 'evprox']``
-
-        If None, all input spike types are plotted on the same y axis
-    color : str | list of str | dict | None
-        Input defining colors of plotted histograms. If str, all
-        histograms plotted with same color. If list of str provided,
-        histograms for each spike type will be plotted by cycling
-        through colors in the list.
-
-        If dict, colors must be specified for all spike_types as a key.
-        If a group of spike types is defined by the `spike_types`
-        parameter (see dictionary example for `spike_types`),
-        the name of this group must be used to specify the colors.
-
-        | Ex: ``{'evdist': 'g', 'evprox': 'r'}``, ``{'Tonic': 'b'}``
-
-        If None, default color cycle used.
-    show : bool
-        If True, show the figure.
+        The CellResponse object from net.cell_response.
+    trial_idx : int or list of int, optional
+        Index of trials to plot. If None, all trials are plotted.
+    ax : matplotlib.axes.Axes, optional
+        Axis to plot on. If None, a new figure is created.
+    spike_types : str or list or dict, optional
+        Spike types to plot. Can be a string (e.g., 'poisson'),
+        a list of types, or a dictionary grouping types.
+    invert_spike_types : str or list, optional
+        Spike types to mirror about the y-axis.
+    color : str or list or dict, optional
+        Color(s) for histograms. Format can be string, list, or dict.
+    show : bool, default=True
+        Whether to show the figure.
     **kwargs_hist : dict
-        Additional keyword arguments to pass to ax.hist.
+        Additional keyword arguments passed to ax.hist.
 
     Returns
     -------
-    fig : instance of matplotlib Figure
-        The matplotlib figure handle.
+    fig : matplotlib.figure.Figure
+        The matplotlib figure object.
     """
-    import matplotlib.pyplot as plt
-    n_trials = len(cell_response.spike_times)
-    if trial_idx is None:
-        trial_idx = list(range(n_trials))
-
-    if isinstance(trial_idx, int):
-        trial_idx = [trial_idx]
-    _validate_type(trial_idx, list, 'trial_idx', 'int, list of int')
-
-    # Extract desired trials
-    if len(cell_response._spike_times[0]) > 0:
-        spike_times = np.concatenate(
-            np.array(cell_response._spike_times, dtype=object)[trial_idx])
-        spike_types_data = np.concatenate(
-            np.array(cell_response._spike_types, dtype=object)[trial_idx])
-    else:
-        spike_times = np.array([])
-        spike_types_data = np.array([])
-
-    unique_types = np.unique(spike_types_data)
-    spike_types_mask = {s_type: np.isin(spike_types_data, s_type)
-                        for s_type in unique_types}
-    cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
-    input_types = np.setdiff1d(unique_types, cell_types)
-
-    if isinstance(spike_types, str):
-        spike_types = {spike_types: [spike_types]}
-
-    if spike_types is None:
-        if any(input_types):
-            spike_types = input_types.tolist()
+        import matplotlib.pyplot as plt
+        from itertools import cycle
+        
+        n_trials = len(cell_response.spike_times)
+        if trial_idx is None:
+            trial_idx = list(range(n_trials))
+            
+        if isinstance(trial_idx, int):
+            trial_idx = [trial_idx]
+            
+            _validate_type(trial_idx, list, 'trial_idx', 'int, list of int')
+            
+        if len(cell_response._spike_times[0]) > 0:
+            spike_times = np.concatenate(np.array(cell_response._spike_times, dtype=object)[trial_idx])
+            spike_types_data = np.concatenate(np.array(cell_response._spike_types, dtype=object)[trial_idx])
         else:
-            spike_types = unique_types.tolist()
-    if isinstance(spike_types, list):
-        spike_types = {s_type: [s_type] for s_type in spike_types}
-    if isinstance(spike_types, dict):
-        for spike_label in spike_types:
-            if not isinstance(spike_types[spike_label], list):
-                raise TypeError(f'spike_types[{spike_label}] must be a list. '
-                                f'Got '
-                                f'{type(spike_types[spike_label]).__name__}.')
+            spike_times = np.array([])
+            spike_types_data = np.array([])
+            
+        unique_types = np.unique(spike_types_data)
+        spike_types_mask = {s_type: np.isin(spike_types_data, s_type) for s_type in unique_types}
+        cell_types = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
+        input_types = np.setdiff1d(unique_types, cell_types)
 
-    if not isinstance(spike_types, dict):
-        raise TypeError('spike_types should be str, list, dict, or None')
+        if isinstance(spike_types, str):
+            spike_types = {spike_types: [spike_types]}
 
-    spike_labels = dict()
-    for spike_label, spike_type_list in spike_types.items():
-        for spike_type in spike_type_list:
-            n_found = 0
-            for unique_type in unique_types:
-                if unique_type.startswith(spike_type):
-                    if unique_type in spike_labels:
-                        raise ValueError(f'Elements of spike_types must map to'
-                                         f' mutually exclusive input types.'
-                                         f' {unique_type} is found more than'
-                                         f' once.')
-                    spike_labels[unique_type] = spike_label
-                    n_found += 1
-            if n_found == 0:
-                raise ValueError(f'No input types found for {spike_type}')
+        if spike_types is None:
+            spike_types = input_types.tolist() if any(input_types) else unique_types.tolist()
+        if isinstance(spike_types, list):
+            spike_types = {s_type: [s_type] for s_type in spike_types}
+        if isinstance(spike_types, dict):
+            for spike_label in spike_types:
+                if not isinstance(spike_types[spike_label], list):
+                    raise TypeError(f'spike_types[{spike_label}] must be a list.')
 
-    if ax is None:
-        _, ax = plt.subplots(1, 1, constrained_layout=True)
+        if not isinstance(spike_types, dict):
+            raise TypeError('spike_types should be str, list, dict, or None')
 
-    _validate_type(color, (str, list, dict, None),
-                   'color', 'str, list of str, or dict')
+        spike_labels = dict()
+        for spike_label, spike_type_list in spike_types.items():
+            for spike_type in spike_type_list:
+                n_found = 0
+                for unique_type in unique_types:
+                    if unique_type.startswith(spike_type):
+                        if unique_type in spike_labels:
+                            raise ValueError(f'Elements of spike_types must map to'
+                                             f' mutually exclusive input types.'
+                                             f' {unique_type} is found more than'
+                                             f' once.')
+                        spike_labels[unique_type] = spike_label
+                        n_found += 1
+                if n_found == 0:
+                    raise ValueError(f'No input types found for {spike_type}')
 
-    if color is None:
-        color_cycle = cycle(['r', 'g', 'b', 'y', 'm', 'c'])
-    elif isinstance(color, str):
-        color_cycle = cycle([color])
-    elif isinstance(color, list):
-        color_cycle = cycle(color)
+        if ax is None:
+            _, ax = plt.subplots(1, 1, constrained_layout=True)
 
-    if len(cell_response.times) > 0:
-        bins = np.linspace(0, cell_response.times[-1], 50)
-    else:
-        bins = np.linspace(0, spike_times[-1], 50)
+        _validate_type(color, (str, list, dict, None),
+                       'color', 'str, list of str, or dict')
 
-    # Create dictionary to aggregate spike times that have the same spike_label
-    spike_type_times = {spike_label: list() for
-                        spike_label in np.unique(list(spike_labels.values()))}
-    spike_color = dict()  # Store colors specified for each spike_label
-    for spike_type, spike_label in spike_labels.items():
-        if spike_label not in spike_color:
-            if isinstance(color, dict):
-                if spike_label not in color:
-                    raise ValueError(
-                        f"'{spike_label}' must be defined in color dictionary")
-                _validate_type(color[spike_label], str,
-                               'Dictionary values of color', 'str')
-                spike_color[spike_label] = color[spike_label]
-            else:
-                spike_color[spike_label] = next(color_cycle)
-        spike_type_times[spike_label].extend(
-            spike_times[spike_types_mask[spike_type]])
+        if color is None:
+            color_cycle = cycle(['r', 'g', 'b', 'y', 'm', 'c'])
+        elif isinstance(color, str):
+            color_cycle = cycle([color])
+        elif isinstance(color, list):
+            color_cycle = cycle(color)
 
-    if invert_spike_types is None:
-        invert_spike_types = list()
-    else:
-        if not isinstance(invert_spike_types, (str, list)):
-            raise TypeError(
-                "'invert_spike_types' must be a string or a list of strings")
-        if isinstance(invert_spike_types, str):
-            invert_spike_types = [invert_spike_types]
+        if len(cell_response.times) > 0:
+            bins = np.linspace(0, cell_response.times[-1], 50)
+        else:
+            bins = np.linspace(0, spike_times[-1], 50)
 
-        # Check that spike types to invert are correctly specified
-        unique_inputs = set(spike_labels.values())
-        unique_invert_inputs = set(invert_spike_types)
-        check_intersection = unique_invert_inputs.intersection(unique_inputs)
-        if not check_intersection == unique_invert_inputs:
-            raise ValueError(
-                "Elements of 'invert_spike_types' must"
-                "map to valid input types"
-            )
+        # Create dictionary to aggregate spike times that have the same spike_label
+        spike_type_times = {spike_label: list() for
+                            spike_label in np.unique(list(spike_labels.values()))}
+        spike_color = dict()  # Store colors specified for each spike_label
+        for spike_type, spike_label in spike_labels.items():
+            if spike_label not in spike_color:
+                if isinstance(color, dict):
+                    if spike_label not in color:
+                        raise ValueError(
+                            f"'{spike_label}' must be defined in color dictionary")
+                    _validate_type(color[spike_label], str,
+                                   'Dictionary values of color', 'str')
+                    spike_color[spike_label] = color[spike_label]
+                else:
+                    spike_color[spike_label] = next(color_cycle)
+            spike_type_times[spike_label].extend(
+                spike_times[spike_types_mask[spike_type]])
+
+        if invert_spike_types is None:
+            invert_spike_types = list()
+        else:
+            if not isinstance(invert_spike_types, (str, list)):
+                raise TypeError(
+                    "'invert_spike_types' must be a string or a list of strings")
+            if isinstance(invert_spike_types, str):
+                invert_spike_types = [invert_spike_types]
+
+            # Check that spike types to invert are correctly specified
+            unique_inputs = set(spike_labels.values())
+            unique_invert_inputs = set(invert_spike_types)
+            check_intersection = unique_invert_inputs.intersection(unique_inputs)
+            if not check_intersection == unique_invert_inputs:
+                raise ValueError(
+                    "Elements of 'invert_spike_types' must"
+                    "map to valid input types"
+                )
 
     # Initialize secondary axis
-    ax1 = None
+        ax1 = None
 
     # Plot aggregated spike_times
-    for spike_label, plot_data in spike_type_times.items():
-        hist_color = spike_color[spike_label]
+        for spike_label, plot_data in spike_type_times.items():
+            hist_color = spike_color[spike_label]
 
         # Plot on the primary y-axis
-        if spike_label not in invert_spike_types:
-            ax.hist(plot_data, bins,
-                    label=spike_label, color=hist_color, **kwargs_hist)
+            if spike_label not in invert_spike_types:
+                ax.hist(plot_data, bins,
+                        label=spike_label, color=hist_color, **kwargs_hist)
         # Plot on secondary y-axis
-        else:
-            if ax1 is None:
-                ax1 = ax.twinx()
-            ax1.hist(plot_data, bins,
-                     label=spike_label, color=hist_color, **kwargs_hist)
+            else:
+                if ax1 is None:
+                    ax1 = ax.twinx()
+                ax1.hist(plot_data, bins,
+                         label=spike_label, color=hist_color, **kwargs_hist)
             # Need to add label for easy removal later
 
     # Set the y-limits based on the maximum across both axes
-    if ax1 is not None:
-        ax_ylim = ax.get_ylim()[1]
-        ax1_ylim = ax1.get_ylim()[1]
+        if ax1 is not None:
+            ax_ylim = ax.get_ylim()[1]
+            ax1_ylim = ax1.get_ylim()[1]
 
-        y_max = max(ax_ylim, ax1_ylim)
-        ax.set_ylim(0, y_max)
-        ax1.set_ylim(0, y_max)
-        ax1.invert_yaxis()
-        ax1.set_label("Inverted spike histogram")
+            y_max = max(ax_ylim, ax1_ylim)
+            ax.set_ylim(0, y_max)
+            ax1.set_ylim(0, y_max)
+            ax1.invert_yaxis()
+            ax1.set_label("Inverted spike histogram")
 
-    if len(cell_response.times) > 0:
-        ax.set_xlim(left=0, right=cell_response.times[-1])
-    else:
-        ax.set_xlim(left=0)
+        if len(cell_response.times) > 0:
+            ax.set_xlim(left=0, right=cell_response.times[-1])
+        else:
+            ax.set_xlim(left=0)
 
-    ax.set_ylabel("Counts")
-    ax.set_label("Spike histogram")
+        ax.set_ylabel("Counts")
+        ax.set_label("Spike histogram")
 
-    if ax1 is not None:
-        # Combine legends
-        handles, labels = ax.get_legend_handles_labels()
-        handles1, labels1 = ax1.get_legend_handles_labels()
-        handles.extend(handles1)
-        labels.extend(labels1)
+        if ax1 is not None:
+            # Combine legends
+            handles, labels = ax.get_legend_handles_labels()
+            handles1, labels1 = ax1.get_legend_handles_labels()
+            handles.extend(handles1)
+            labels.extend(labels1)
 
-        ax1.legend(handles, labels, loc='upper left')
-    else:
-        ax.legend()
+            ax1.legend(handles, labels, loc='upper left')
+        else:
+            ax.legend()
 
-    plt_show(show)
-    return ax.get_figure()
+        plt_show(show)
+        return ax.get_figure()
 
 
 def plot_spikes_raster(
@@ -583,34 +599,35 @@ def plot_spikes_raster(
         show_legend=True,
         marker_size=1.0,
         ):
-    """Plot the aggregate spiking activity according to cell type.
+
+    """
+    Plot the aggregate spiking activity according to cell type.
 
     Parameters
     ----------
     cell_response : instance of CellResponse
-        The CellResponse object from net.cell_response
-    trial_idx : int | list of int | None
-        Index of trials to be plotted. If None, all trials plotted
-    ax : instance of matplotlib axis | None
-        An axis object from matplotlib. If None, a new figure is created.
-    show : bool
-        If True, show the figure.
-    cell_types : list of str
-        List of cell types to plot
-    colors : list of str | None
-        Optional custom colors to plot. Default will use the color cycler.
-    show_legend : bool
-        If True, show the legend with colors for cell types
-    marker_size : float
-        Optional marker size to use when plotting spikes. Uses
-        "linelengths" argument of ax.eventplot, which accepts positive
-        numeric values only
+        The CellResponse object from net.cell_response.
+    trial_idx : int or list of int, optional
+        Index of trials to be plotted. If None, all trials are plotted.
+    ax : matplotlib.axes.Axes, optional
+        Axis object to plot on. If None, a new figure is created.
+    show : bool, default=True
+        If True, display the figure.
+    cell_types : list of str, optional
+        List of cell types to plot. If None, uses default set.
+    colors : list of str or dict, optional
+        Colors to use for each cell type.
+    show_legend : bool, default=True
+        Whether to display the legend.
+    marker_size : float, default=1.0
+        Marker size used in the spike raster plot.
 
     Returns
     -------
-    fig : instance of matplotlib Figure
+    fig : matplotlib.figure.Figure
         The matplotlib figure object.
     """
+
 
     import matplotlib.pyplot as plt
     n_trials = len(cell_response.spike_times)
@@ -744,23 +761,24 @@ def plot_spikes_raster(
 
 
 def plot_cells(net, ax=None, show=True):
-    """Plot the cells using Network.pos_dict.
+    """
+    Plot the cells using Network.pos_dict.
 
     Parameters
     ----------
     net : instance of Network
         The Network object.
-    ax : instance of matplotlib Axes3D | None
-        An axis object from matplotlib. If None,
-        a new figure is created.
-    show : bool
-        If True, show the figure.
+    ax : matplotlib.axes._subplots.Axes3D, optional
+        A 3D axis object to plot on. If None, a new figure is created.
+    show : bool, default=True
+        If True, display the figure.
 
     Returns
     -------
-    fig : instance of matplotlib Figure
+    fig : matplotlib.figure.Figure
         The matplotlib figure handle.
     """
+
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
 
@@ -949,42 +967,47 @@ def plot_tfr_morlet(dpl, freqs, *, n_cycles=7., tmin=None, tmax=None,
 
 def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
              color=None, label=None, ax=None, show=True):
-    """Plot power spectral density (PSD) of dipole time course
-
-    Applies `~scipy.signal.periodogram` from SciPy with ``window='hamming'``.
-    Note that no spectral averaging is applied across time, as most
-    ``hnn_core`` simulations are short-duration. However, passing a list of
-    `Dipole` instances will plot their average (Hamming-windowed) power, which
-    resembles the `Welch`-method applied over time.
-
-    Parameters
-    ----------
-    dpl : instance of Dipole | list of Dipole instances
-        The Dipole object.
-    fmin : float
-        Minimum frequency to plot (in Hz). Default: 0 Hz
-    fmax : float
-        Maximum frequency to plot (in Hz). Default: None (plot up to Nyquist)
-    tmin : float or None
-        Start time of data to include (in ms). If None, use entire simulation.
-    tmax : float or None
-        End time of data to include (in ms). If None, use entire simulation.
-    layer : str, default 'agg'
-        The layer to plot. Can be one of 'agg', 'L2', and 'L5'
-    color : str or tuple or None
-        The line color of PSD
-    label : str or None
-        Line label for PSD
-    ax : instance of matplotlib figure | None
-        The matplotlib axis.
-    show : bool
-        If True, show the figure
-
-    Returns
-    -------
-    fig : instance of matplotlib Figure
-        The matplotlib figure handle.
     """
+Plot the power spectral density (PSD) of a dipole time series.
+
+This function uses `scipy.signal.periodogram` with a Hamming window to compute
+the PSD of the dipole data. If a list of `Dipole` instances is passed, their
+individual PSDs are averaged to provide a group-level estimate, mimicking the
+Welch method.
+
+Note: No temporal averaging is applied for a single Dipole, assuming that
+`hnn_core` simulations are typically short in duration.
+
+Parameters
+----------
+dpl : Dipole or list of Dipole
+    Instance(s) of `hnn_core.Dipole`. Each Dipole must have the same sampling
+    rate and scaling factor.
+fmin : float, default=0
+    Minimum frequency to display (Hz).
+fmax : float or None, default=None
+    Maximum frequency to display (Hz). If None, plots up to the Nyquist limit.
+tmin : float or None, default=None
+    Start time for PSD calculation (in ms). If None, includes from start.
+tmax : float or None, default=None
+    End time for PSD calculation (in ms). If None, includes until end.
+layer : {'agg', 'L2', 'L5'}, default='agg'
+    The dipole layer to analyze.
+color : str, tuple, or None, default=None
+    Line color for the plot.
+label : str or None, default=None
+    Label for the plot (used in the legend).
+ax : matplotlib.axes.Axes or None, default=None
+    Axis object to draw the PSD plot on. If None, creates a new figure.
+show : bool, default=True
+    Whether to show the figure after plotting.
+
+Returns
+-------
+fig : matplotlib.figure.Figure
+    The matplotlib figure containing the PSD plot.
+"""
+
     import matplotlib.pyplot as plt
     from scipy.signal import periodogram
     from .dipole import Dipole
@@ -1044,40 +1067,51 @@ def _linewidth_from_data_units(ax, linewidth):
 def plot_cell_morphology(
         cell, ax, color=None, pos=(0, 0, 0), xlim=(-250, 150),
         ylim=(-100, 100), zlim=(-100, 1200), show=True):
-    """Plot the cell morphology.
-
-    Parameters
-    ----------
-    cell : instance of Cell
-        The cell object
-    ax : instance of Axes3D
-        Matplotlib 3D axis
-    show : bool
-        If True, show the plot
-    color : str | dict | None
-        Color of cell. If str, entire cell plotted with
-        color indicated by str. If dict, colors of individual sections
-        can be specified. Must have a key for every section in cell as
-        defined in the `Cell.sections` attribute.
-
-        | Ex: ``{'apical_trunk': 'r', 'soma': 'b', ...}``
-    pos : tuple of int or float | None
-        Position of cell soma. Must be a tuple of 3 elements for the
-        (x, y, z) position of the soma in 3D space. Default: (0, 0, 0)
-    xlim : tuple of int | tuple of float
-        x limits of plot window. Default (-250, 150)
-    ylim : tuple of int | tuple of float
-        y limits of plot window. Default (-100, 100)
-    zlim : tuple of int | tuple of float
-        z limits of plot window. Default (-100, 1200)
-    show : bool
-        If True, show the plot
-
-    Returns
-    -------
-    axes : list of instance of Axes3D
-        The matplotlib 3D axis handle.
     """
+Visualize the 3D morphology of a neuron.
+
+Plots the sections of a given cell in 3D using Matplotlib, with optional
+section-specific coloring and coordinate adjustment.
+
+Parameters
+----------
+cell : instance of Cell
+    The cell object containing section geometries and endpoints.
+ax : instance of Axes3D or None
+    A Matplotlib 3D axis object. If None, a new 3D figure and axis will be created.
+color : str | dict | None, optional
+    Color for the cell plot:
+        - If str: all sections are drawn with this color.
+        - If dict: must contain keys matching all section names in `cell.sections`.
+          Example: {'apical_trunk': 'r', 'soma': 'b'}
+        - If None: defaults to blue ('b') for all sections.
+pos : tuple of 3 floats, default (0, 0, 0)
+    The (x, y, z) position to center the soma in 3D space.
+xlim : tuple of 2 floats, default (-250, 150)
+    The x-axis limits of the plot.
+ylim : tuple of 2 floats, default (-100, 100)
+    The y-axis limits of the plot.
+zlim : tuple of 2 floats, default (-100, 1200)
+    The z-axis limits of the plot.
+show : bool, default True
+    Whether to display the plot immediately using `plt.show()`.
+
+Returns
+-------
+ax : instance of Axes3D
+    The Matplotlib 3D axis with the plotted cell morphology.
+
+Raises
+------
+ValueError
+    If `pos` is not a tuple of three numerical values.
+
+Notes
+-----
+- This function assumes that the neuron lies primarily in the XZ plane.
+- Section linewidths are scaled according to section diameters in data units.
+"""
+
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D  # noqa
 
@@ -1348,6 +1382,43 @@ def plot_drive_strength(net, show_weight=True, ax=None,
 def _update_target_plot(ax, conn, src_gid, src_type_pos, target_type_pos,
                         src_range, target_range, nc_dict, colormap,
                         inplane_distance):
+    
+    """
+    Update a matplotlib Axes to visualize target cells connected to a specific source cell.
+
+    This function plots the spatial locations of target cells that receive input
+    from a specific source cell (`src_gid`) and color-codes them by connection weight.
+    It also marks the position of the source cell and overlays all potential target cells.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        The axes to update with the new plot.
+    conn : dict
+        Dictionary containing connection information, typically from `net.connectivity`.
+    src_gid : int
+        GID of the source cell.
+    src_type_pos : np.ndarray
+        Array of source cell positions, shape (n_src, 2).
+    target_type_pos : np.ndarray
+        Array of target cell positions, shape (n_tgt, 2).
+    src_range : np.ndarray
+        Array of GIDs corresponding to the source cell type.
+    target_range : np.ndarray
+        Array of GIDs corresponding to the target cell type.
+    nc_dict : dict
+        Dictionary containing synaptic parameters used for calculating weights.
+    colormap : str or matplotlib Colormap
+        The colormap to use for scatter plot of weights.
+    inplane_distance : callable
+        A function to compute the in-plane distance between two points.
+
+    Returns
+    -------
+    im : matplotlib.collections.PathCollection
+        The scatter plot object representing target cells colored by weight.
+    """
+
     from .cell import _get_gaussian_connection
 
     # Extract indices to get position in network
@@ -1382,46 +1453,45 @@ def _update_target_plot(ax, conn, src_gid, src_type_pos, target_type_pos,
 
 def plot_cell_connectivity(net, conn_idx, src_gid=None, axes=None,
                            colorbar=True, colormap='viridis', show=True):
-    """Plot synaptic weight of connections.
+    """
+    Visualize the synaptic weight distribution from a selected source cell
+    to all its connected target cells in an interactive plot.
 
-    This is an interactive plot with source cells shown in the left
-    subplot and connectivity from a source cell to all the target cells
-    in the right subplot. Click on the cells in the left subplot to
-    explore how the connectivity pattern changes for different source cells.
+    The plot has two panels:
+    - Left: Source cells (clickable to explore different connectivity patterns).
+    - Right: Target cells colored by synaptic weight, as received from the selected source cell.
+
+    Clicking on a different source cell dynamically updates the right plot
+    to show new connectivity weights.
 
     Parameters
     ----------
-    net : Instance of Network object
-        The Network object
+    net : instance of Network
+        The Network object containing connectivity, positions, and metadata.
     conn_idx : int
-        Index of connection to be visualized from net.connectivity
+        Index of the connectivity entry to visualize (from `net.connectivity`).
     src_gid : int | None
-        The cell ID of the source cell. It must be an element of
-        net.connectivity[conn_idx]['gid_pairs'].keys()
-        If None, the first cell from the list of valid src_gids is selected.
-    axes : instance of Axes3D
-        Matplotlib 3D axis
-    colormap : str
-        The name of a matplotlib colormap. Default: 'viridis'
+        GID of the source cell to visualize. Must be in `conn['gid_pairs'].keys()`.
+        If None, the first valid source GID is used by default.
+    axes : list of matplotlib.axes.Axes | None
+        Axes to use for the plots. If None, new subplots are created.
     colorbar : bool
-        If True (default), adjust figure to include colorbar.
+        Whether to include a colorbar indicating weight intensity (default: True).
+    colormap : str
+        Name of matplotlib colormap used for visualizing synaptic weights (default: 'viridis').
     show : bool
-        If True, show the plot
+        Whether to show the plot immediately (default: True).
 
     Returns
     -------
-    fig : instance of matplotlib Figure
-        The matplotlib figure handle.
+    fig : matplotlib.figure.Figure
+        Handle to the created or updated matplotlib Figure.
 
     Notes
     -----
-    Target cells will be determined by the connections in
-    net.connectivity[conn_idx].
-    If the target cell is not connected to the source cell,
-    it will appear as a smaller black cross.
-    Source cell is plotted as a red square. Source cell will not be plotted if
-    the connection corresponds to a drive, ex: poisson, bursty, etc.
-
+    - Target cells that are **not connected** to the selected source cell appear as black crosses.
+    - The selected source cell is highlighted as a red square.
+    - If the connection is from an external drive (e.g., 'poisson'), source cell positions may not be plotted.
     """
     import matplotlib.pyplot as plt
     from .network import Network
@@ -1523,38 +1593,34 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
 
     Parameters
     ----------
-    times : Numpy array, shape (n_times,)
+    times : array-like, shape (n_times,)
         Sampling times (in ms).
     data : array-like, shape (n_channels, n_times)
-        CSD data, channels x time.
-    ax : instance of matplotlib figure | None
-        The matplotlib axis.
+        CSD data matrix: channels x time.
+    contact_labels : list of float
+        Labels for electrode depths. Passed to y-axis ticks.
+    ax : instance of matplotlib.axes._axes.Axes | None
+        The matplotlib axis to plot on. If None, creates a new one.
     colorbar : bool
-        If True (default), adjust figure to include colorbar.
-    contact_labels : list
-        Labels associated with the contacts to plot. Passed as-is to
-        :func:`~matplotlib.axes.Axes.set_yticklabels`.
-    vmin: float, optional
-        lower bound of the color axis.
-        Will be set automatically of None.
-    vmax: float, optional
-        upper bound of the color axis.
-        Will be set automatically of None.
-    sink : str
-        If set to 'blue' or 'b', plots sinks in blue and sources in red,
-        if set to 'red' or 'r', sinks plotted in red and sources blue.
-    interpolation : str | None
-        If 'spline', will smoothen the CSD using spline method,
-        if None, no smoothing will be applied.
-
+        If True (default), includes a colorbar beside the plot.
+    vmin : float | None
+        Lower bound for the color scale. Auto-calculated if None.
+    vmax : float | None
+        Upper bound for the color scale. Auto-calculated if None.
+    sink : {'b', 'r', 'blue', 'red'}
+        Determines color scheme: 'b' (or 'blue') for blue sinks / red sources,
+        'r' (or 'red') for red sinks / blue sources.
+    interpolation : {'spline', None}
+        If 'spline', applies vertical interpolation using splines.
     show : bool
-        If True, show the plot.
+        If True, displays the plot.
 
     Returns
     -------
-    fig : instance of matplotlib Figure
-        The matplotlib figure handle.
+    fig : instance of matplotlib.figure.Figure
+        Handle to the created matplotlib figure.
     """
+
     import matplotlib.pyplot as plt
     from scipy.interpolate import RectBivariateSpline
 
@@ -1642,6 +1708,41 @@ class NetworkPlotter:
                  colorbar=True, voltage_colormap='viridis', elev=10, azim=-500,
                  xlim=(-200, 3100), ylim=(-200, 3100), zlim=(-300, 2200),
                  trial_idx=0, time_idx=0):
+        """
+        Initialize the 3D voltage visualization for a neural network simulation.
+
+        Parameters
+        ----------
+        net : Network
+            Simulated Network object containing recorded voltage data.
+        ax : matplotlib.axes._subplots.Axes3DSubplot | None
+            3D axis to plot on. If None, a new figure and axis will be created.
+        vmin : float
+            Minimum voltage value for colormap scaling.
+        vmax : float
+            Maximum voltage value for colormap scaling.
+        bg_color : str
+            Background color of the 3D plot.
+        colorbar : bool
+            Whether to display the voltage colorbar (default: True).
+        voltage_colormap : str
+            Name of the matplotlib colormap to use (default: 'viridis').
+        elev : float
+            Elevation angle for 3D view (default: 10).
+        azim : float
+            Azimuth angle for 3D view (default: -500).
+        xlim : tuple
+            Limits for the x-axis (default: (-200, 3100)).
+        ylim : tuple
+            Limits for the y-axis (default: (-200, 3100)).
+        zlim : tuple
+            Limits for the z-axis (default: (-300, 2200)).
+        trial_idx : int
+            Trial index to visualize from the simulation (default: 0).
+        time_idx : int
+            Time index within the trial to visualize (default: 0).
+        """
+
         from matplotlib import colormaps
 
         self._validate_parameters(vmin, vmax, bg_color, voltage_colormap,
@@ -1683,6 +1784,11 @@ class NetworkPlotter:
     def _validate_parameters(self, vmin, vmax, bg_color, voltage_colormap,
                              colorbar, elev, azim, xlim, ylim, zlim, trial_idx,
                              time_idx):
+        """
+        Validate input parameters for voltage visualization.
+
+        Ensures each argument is of the correct type before plotting.
+        """
         _validate_type(vmin, (int, float), 'vmin')
         _validate_type(vmax, (int, float), 'vmax')
         _validate_type(bg_color, str, 'bg_color')
@@ -1697,6 +1803,16 @@ class NetworkPlotter:
         _validate_type(time_idx, int, 'time_idx')
 
     def _check_network_simulation(self):
+        """
+        Check if the network was simulated and if voltages were recorded.
+
+        Returns
+        -------
+        times : list or array
+            Simulation time points from the network.
+        vsec_recorded : bool
+            True if voltages were recorded for all sections.
+        """
         times = None
         vsec_recorded = False
         # Check if network simulated
@@ -1709,6 +1825,12 @@ class NetworkPlotter:
         return times, vsec_recorded
 
     def _initialize_plots(self):
+        """
+        Initialize the 3D plot for visualizing the network.
+
+        This creates a new figure and axis if not already provided, sets the
+        background color, and calls methods to draw the network and update axes.
+        """
         import matplotlib.pyplot as plt
         # Create figure
         if self.ax is None:
@@ -1720,6 +1842,14 @@ class NetworkPlotter:
         self._update_axes()
 
     def _get_voltages(self):
+        """
+        Collect and normalize voltage recordings for each section of all cells.
+
+        Returns
+        -------
+        vsec_array : numpy.ndarray
+            Normalized voltage values for each section.
+        """
         vsec_list = list()
         for cell_type in self.net.cell_types:
             gid_range = self.net.gid_ranges[cell_type]
@@ -1738,6 +1868,14 @@ class NetworkPlotter:
         return vsec_array
 
     def _update_section_voltages(self, t_idx):
+        """
+        Update the section colors based on voltage at a given time index.
+
+        Parameters
+        ----------
+        t_idx : int
+            Index of the time point to update voltages from.
+        """
         if not self._vsec_recorded:
             raise RuntimeError("Network must be simulated with"
                                "`simulate_dipole(record_vsec='all')` before"
@@ -1747,6 +1885,10 @@ class NetworkPlotter:
             line.set_color(color)
 
     def _init_network_plot(self):
+        """
+        Initialize and plot the morphology of all cells in the network.
+        """
+
         for cell_type in self.net.cell_types:
             gid_range = self.net.gid_ranges[cell_type]
             for gid_idx, gid in enumerate(gid_range):
@@ -1761,6 +1903,9 @@ class NetworkPlotter:
                                      ylim=self.ylim, zlim=self.zlim)
 
     def _update_axes(self):
+        """
+        Update the 3D plot axes limits and viewing angle.
+        """
         self.ax.set_xlim(self._xlim)
         self.ax.set_ylim(self._ylim)
         self.ax.set_zlim(self._zlim)
@@ -1768,6 +1913,9 @@ class NetworkPlotter:
         self.ax.view_init(self._elev, self._azim)
 
     def _update_colorbar(self):
+        """
+        Create and add a colorbar to the 3D voltage plot.
+        """
         import matplotlib.pyplot as plt
         import matplotlib.colors as mc
 
@@ -1780,29 +1928,32 @@ class NetworkPlotter:
     def export_movie(self, fname, fps=30, dpi=300, decim=10,
                      interval=30, frame_start=0, frame_stop=None,
                      writer='pillow'):
-        """Export movie of network activity
+        """
+        Export a movie showing network voltage activity over time.
 
         Parameters
         ----------
         fname : str
-            Filename of exported movie
-        fps : int
-            Frames per second, default: 30
-        dpi : int
-            Dots per inch, default: 300
-        decim : int
-            Decimation factor for frames, default: 10
-        interval : int
-            Delay between frames, default: 30
-        frame_start : int
-            Index of first frame, default: 0
-        frame_stop : int | None
-            Index of last frame, default: None
-            If None, entire simulation is animated
-        writer : str
-            Movie writer, default: 'pillow'.
-            Alternative movie writers can be found at
-            https://matplotlib.org/stable/api/animation_api.html
+            Output filename for the movie.
+        fps : int, optional
+            Frames per second. Default is 30.
+        dpi : int, optional
+            Resolution of the video. Default is 300.
+        decim : int, optional
+            Skip every n frames. Default is 10.
+        interval : int, optional
+            Time delay between frames in milliseconds. Default is 30.
+        frame_start : int, optional
+            Index of the first frame. Default is 0.
+        frame_stop : int or None, optional
+            Index of the last frame. If None, animate to the end. Default is None.
+        writer : str, optional
+            Animation writer backend (e.g., 'pillow', 'ffmpeg'). Default is 'pillow'.
+
+        Returns
+        -------
+        ani : matplotlib.animation.FuncAnimation
+            The animation object.
         """
         import matplotlib.animation as animation
 
@@ -1880,6 +2031,7 @@ class NetworkPlotter:
 
     @vmin.setter
     def vmin(self, vmin):
+        """Set the minimum voltage for the color scale."""
         _validate_type(vmin, (int, float), 'vmin')
         self._vmin = vmin
         self.vsec_array = self._get_voltages()
@@ -1894,6 +2046,7 @@ class NetworkPlotter:
 
     @vmax.setter
     def vmax(self, vmax):
+        """Set the maximum voltage for the color scale."""
         _validate_type(vmax, (int, float), 'vmax')
         self._vmax = vmax
         self.vsec_array = self._get_voltages()
@@ -1909,6 +2062,7 @@ class NetworkPlotter:
 
     @trial_idx.setter
     def trial_idx(self, trial_idx):
+        """Set the index of the trial to visualize."""
         _validate_type(trial_idx, int, 'trial_idx')
         if not self._vsec_recorded:
             raise RuntimeError("Network must be simulated with"
@@ -1953,6 +2107,7 @@ class NetworkPlotter:
 
     @voltage_colormap.setter
     def voltage_colormap(self, voltage_colormap):
+        """Set the colormap used for voltage visualization."""
         self._voltage_colormap = voltage_colormap
         self._colormap = self._colormaps[self._voltage_colormap]
         self.color_array = self._colormap(self.vsec_array)
@@ -1966,6 +2121,7 @@ class NetworkPlotter:
 
     @colorbar.setter
     def colorbar(self, colorbar):
+        """Enable or disable the colorbar in the voltage visualization."""
         _validate_type(colorbar, bool, 'colorbar')
         self._colorbar = colorbar
         if self._colorbar:
