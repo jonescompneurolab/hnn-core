@@ -365,35 +365,35 @@ def get_L2Pyr_params_new():
         'L2Pyr_gabab_tau2': 20.,
 
         # Biophysics soma
-        'L2Pyr_soma_gbar_NaTs2_t': 0.926705*.65,
-        'L2Pyr_soma_gbar_SKv3_1': 0.102517*1.2,
-        'L2Pyr_soma_gbar_Nap_Et2': 0,
-        'L2Pyr_soma_gbar_SK_E2': 0.099433,
-        'L2Pyr_soma_gbar_Ca_HVA': 0.000374,
-        'L2Pyr_soma_gbar_Ca_LVAst': 0.000778*.5,
-        'L2Pyr_soma_gbar_Ih': 0.000080,
-        'L2Pyr_soma_gbar_Im': 0.000740*2,
-        'L2Pyr_soma_g_pas': 1.0 / 12000.0 * 1.2,
-        'L2Pyr_soma_e_pas': -75,
+        'L2Pyr_soma_gbar_NaTs2_t_32d': 20_400e-4,
+        'L2Pyr_soma_gbar_SKv3_1': 6_930e-4,
+        'L2Pyr_soma_gbar_Nap_Et2': 1e-4/2,
+        'L2Pyr_soma_gbar_SK_E2': 0.099433/2*0.001,
+        'L2Pyr_soma_gbar_Ca_HVA': 9.92e-04/2,
+        'L2Pyr_soma_gbar_Ca_LVAst': 34.3e-4/2*1.5,
+        'L2Pyr_soma_gbar_Ih': 0.000080/2*3,
+        'L2Pyr_soma_gbar_Im': 8e-3/2,
+        'L2Pyr_soma_g_pas': 1.0 / 12000.0,
+        'L2Pyr_soma_e_pas': -85,
         'L2Pyr_soma_decay_CaDynamics_E2' : 342.544232,
         'L2Pyr_soma_gamma_CaDynamics_E2' : 0.000533,
 
         # Biophysics basal
-        'L2Pyr_basal_gbar_NaTs2_t': 0.926705*.65*.1,
-        'L2Pyr_basal_gbar_SKv3_1': 0.102517*1.2*.1,
+        'L2Pyr_basal_gbar_NaTa_t_32d': 0.008009/2,
+        'L2Pyr_basal_gbar_SKv3_1': 6_930e-4*0.1,
         'L2Pyr_basal_gbar_Ih': 0.000080,
         'L2Pyr_basal_g_pas': 8.333333333333333e-05,           # default read out from neuron
-        'L2Pyr_basal_e_pas': -75, 
+        'L2Pyr_basal_e_pas': -85, 
 
         # Biophysics dends
-        'L2Pyr_dend_gbar_NaTs2_t': 0.008009,
-        'L2Pyr_dend_gbar_SKv3_1': 0.000513,
-        'L2Pyr_dend_gbar_Ca_HVA': 0.000374e-2,
-        'L2Pyr_dend_gbar_Ca_LVAst': 0.000778e-2,
-        'L2Pyr_dend_gbar_Ih': 0.000080,
-        'L2Pyr_dend_gbar_Im': 0.000740,
-        'L2Pyr_dend_g_pas': 1.0 / 12000.0 * 15,
-        'L2Pyr_dend_e_pas': -75}
+        'L2Pyr_dend_gbar_NaTa_t_32d': 0.008009/2,
+        'L2Pyr_dend_gbar_SKv3_1': 0.000513/2,
+        'L2Pyr_dend_gbar_Ca_HVA': 0.000374e-2/2,
+        'L2Pyr_dend_gbar_Ca_LVAst': 0.000778e-2/2,
+        'L2Pyr_dend_gbar_Ih': 0.000080*5/2,
+        'L2Pyr_dend_gbar_Im': 8e-3/2,
+        'L2Pyr_dend_g_pas': 1.0 / 12000.0/2,
+        'L2Pyr_dend_e_pas': -85}
 
 def get_L5Pyr_params_new():
 
@@ -446,21 +446,21 @@ def get_L5Pyr_params_new():
         'L5Pyr_gabaa_tau2': 5.,
 
         'L5Pyr_gabab_e': -80.,
-        'L5Pyr_gabab_tau1': 1.,
-        'L5Pyr_gabab_tau2': 20.,
+        'L5Pyr_gabab_tau1': 45,
+        'L5Pyr_gabab_tau2': 200.,
 
         # Biophysics soma
-        'L5Pyr_soma_gbar_NaTs2_t': 20_400e-4,
-        'L5Pyr_soma_gbar_SKv3_1': 6_930e-4,
-        'L5Pyr_soma_gbar_Nap_Et2': 17.2e-4,
-        'L5Pyr_soma_gbar_SK_E2': 441e-4,
-        'L5Pyr_soma_gbar_Ca_HVA': 9.92e-04*.75,
-        'L5Pyr_soma_gbar_Ca_LVAst': 34.3e-4*.75,
-        'L5Pyr_soma_gbar_Ih': 1e-4*1.1,
-        'L5Pyr_soma_gbar_Im': 0,
-        'L5Pyr_soma_gbar_K_Pst': 22.3e-4,
-        'L5Pyr_soma_gbar_K_Tst': 812e-4,
-        'L5Pyr_soma_g_pas': .338e-4,
+        'L5Pyr_soma_gbar_NaTs2_t': 20_400e-4/2,
+        'L5Pyr_soma_gbar_SKv3_1': 6_930e-4/2,
+        'L5Pyr_soma_gbar_Nap_Et2': 17.2e-4/2,
+        'L5Pyr_soma_gbar_SK_E2': 441e-4*3,
+        'L5Pyr_soma_gbar_Ca_HVA': 9.92e-04/2,
+        'L5Pyr_soma_gbar_Ca_LVAst': 34.3e-4/2,
+        'L5Pyr_soma_gbar_Ih': 1e-4/2,
+        'L5Pyr_soma_gbar_Im': 1e-4,
+        'L5Pyr_soma_gbar_K_Pst': 22.3e-4/2,
+        'L5Pyr_soma_gbar_K_Tst': 812e-4/2,
+        'L5Pyr_soma_g_pas': .338e-4/2,
         'L5Pyr_soma_e_pas': -90,
         'L5Pyr_soma_decay_CaDynamics_E2' : 460,
         'L5Pyr_soma_gamma_CaDynamics_E2' : .000501,
@@ -468,31 +468,31 @@ def get_L5Pyr_params_new():
         # Biophysics basal
         'L5Pyr_basal_gbar_NaTs2_t': 20_400e-4*.1,
         'L5Pyr_basal_gbar_SKv3_1': 6_930e-4*.1,
-        'L5Pyr_basal_gbar_Ih': 1e-4*1.1,
+        'L5Pyr_basal_gbar_Ih': 5.14e-5,
         'L5Pyr_basal_g_pas': 1.75e-5,
         'L5Pyr_basal_e_pas': -90,
 
         # Biophysics dends
-        'L5Pyr_dend_gbar_NaTa_t': 0.0213,
-        'L5Pyr_dend_gbar_SKv3_1': 0.000261,
-        'L5Pyr_dend_gbar_SK_E2': 0.0012,
-        'L5Pyr_dend_gbar_Ca_HVA': 2.78e-5,
-        'L5Pyr_dend_gbar_Ca_LVAst': 93.5e-6,
-        'L5Pyr_dend_gbar_Ih': 1e-4,
-        'L5Pyr_dend_gbar_Im': 0.0000675,
+        'L5Pyr_dend_gbar_NaTa_t': 0.0213/2,
+        'L5Pyr_dend_gbar_SKv3_1': 0.000261/2,
+        'L5Pyr_dend_gbar_SK_E2': 0.0012/2,
+        'L5Pyr_dend_gbar_Ca_HVA': 2.78e-5/2,
+        'L5Pyr_dend_gbar_Ca_LVAst': 93.5e-6/2,
+        'L5Pyr_dend_gbar_Ih': 1e-4/2,
+        'L5Pyr_dend_gbar_Im': 0.0000675/2,
         'L5Pyr_dend_gbar_K_Pst': 0,
         'L5Pyr_dend_gbar_K_Tst': 0,
-        'L5Pyr_dend_g_pas': 0.0000589*1.5,
+        'L5Pyr_dend_g_pas':  0.0000589/2,
         'L5Pyr_dend_e_pas': -85,
         'L5Pyr_dend_decay_CaDynamics_E2' : 122,
-        'L5Pyr_dend_gamma_CaDynamics_E2' : .000509
+        'L5Pyr_dend_gamma_CaDynamics_E2' : .0005096*.8
     }
 
 def get_Int_params():
 
-    return {'Int_gbar_nas': 0.1125*1.5, 
-            'Int_gbar_kdr': 0.225*.75,
+    return {'Int_gbar_nas': 0.1125*1.2,
+            'Int_gbar_kdr': 0.225,
             'Int_gbar_kd':  0.00039*10,
             'Int_gbar_Ih':  2e-3,
-            'Int_g_pas': .001,
+            'Int_g_pas': .0001,
             'Int_e_pas': -70}

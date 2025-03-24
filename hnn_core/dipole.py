@@ -4,14 +4,17 @@
 #          Sam Neymotin <samnemo@gmail.com>
 
 import os
+import os.path as op
 import warnings
 from io import StringIO
+import json
 
 import numpy as np
 from copy import deepcopy
 from h5io import write_hdf5, read_hdf5
 from .externals.mne import _check_option
 
+import hnn_core
 from .viz import plot_dipole, plot_psd, plot_tfr_morlet
 
 
@@ -23,7 +26,7 @@ def simulate_dipole(
     record_vsec=False,
     record_isec=False,
     record_ca=False,
-    postproc=False,
+    postproc=False, bsl_cor='jones',
 ):
     """Simulate a dipole given the experiment parameters.
 
@@ -56,6 +59,10 @@ def simulate_dipole(
         extracellular recordings etc. The preferred way is to use the
         :meth:`~hnn_core.dipole.Dipole.smooth` and
         :meth:`~hnn_core.dipole.Dipole.scale` methods instead. Default: False.
+    bsl_cor : str
+        Baseline correction method. Default: 'jones'
+        For jones_2009_model and law_2021_model, use method 'jones' (manual correction).
+        For new_calcium_model, use method 'calcium'.
 
     Returns
     -------
@@ -67,7 +74,7 @@ def simulate_dipole(
 
     if _BACKEND is None:
         _BACKEND = JoblibBackend(n_jobs=1)
-
+        
     if n_trials is None:
         n_trials = net._params["N_trials"]
     if n_trials < 1:
