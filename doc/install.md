@@ -112,7 +112,7 @@ echo "export DYLD_FALLBACK_LIBRARY_PATH=\$OLD_DYLD_FALLBACK_LIBRARY_PATH" >> $CO
 echo "unset OLD_DYLD_FALLBACK_LIBRARY_PATH" >> $CONDA_PREFIX/etc/conda/deactivate.d/env_vars.sh
 export OLD_DYLD_FALLBACK_LIBRARY_PATH=$DYLD_FALLBACK_LIBRARY_PATH
 export DYLD_FALLBACK_LIBRARY_PATH=$LD_LIBRARY_PATH:${CONDA_PREFIX}/lib
-conda install -y -q "conda-forge::openmpi>5" conda-forge::mpi4py
+conda install -y -q "openmpi>5" mpi4py -c conda-forge
 pip install "hnn_core[gui,opt,parallel] @ git+https://github.com/jonescompneurolab/hnn-core.git"
 ```
 - TODO: pip install "hnn_core[gui,opt,parallel]"
@@ -139,7 +139,7 @@ echo "export LD_LIBRARY_PATH=\$OLD_LD_LIBRARY_PATH" >> $CONDA_PREFIX/etc/conda/d
 echo "unset OLD_LD_LIBRARY_PATH" >> $CONDA_PREFIX/etc/conda/deactivate.d/env_vars.sh
 export OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CONDA_PREFIX}/lib
-conda install -y -q "conda-forge::openmpi>5" conda-forge::mpi4py
+conda install -y -q "openmpi>5" mpi4py -c conda-forge
 pip install "hnn_core[gui,opt,parallel] @ git+https://github.com/jonescompneurolab/hnn-core.git"
 ```
 - TODO: pip install "hnn_core[gui,opt,parallel]"
@@ -269,7 +269,7 @@ be able to help.
 1. First, create and activate your `conda` environment (but do not install `hnn_core` yet).
 2. Inside your `conda` environment, install the `conda-forge` versions of [OpenMPI](https://anaconda.org/conda-forge/openmpi) and [`mpi4py`](https://anaconda.org/conda-forge/mpi4py) using the following command:
     ```
-    $ conda install -y conda-forge::openmpi conda-forge::mpi4py
+    $ conda install -y openmpi mpi4py -c conda-forge
     ```
 3. Next, copy, paste, and run the following commands to set some environment variables for your `conda` environment:
     ```
@@ -319,7 +319,7 @@ unsure or run into problems; we should be able to help you get it working.
 1. First, create and activate your `conda` environment (but do not install `hnn_core` yet).
 2. Inside your `conda` environment, install the `conda-forge` versions of [OpenMPI](https://anaconda.org/conda-forge/openmpi) and [`mpi4py`](https://anaconda.org/conda-forge/mpi4py) using the following command:
     ```
-    $ conda install -y conda-forge::openmpi conda-forge::mpi4py
+    $ conda install -y openmpi mpi4py -c conda-forge
     ```
 3. Next, copy, paste, and run the following commands to set some environment variables for your `conda` environment:
     ```
