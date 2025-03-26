@@ -400,6 +400,52 @@ class TestCellResponsePlotters:
             net.cell_response.plot_spikes_raster(trial_idx=0, show=False,
                                                  colors=dict_mapping)
 
+    def test_spikes_raster_dipole_overlay(self, base_simulation_spikes):
+        net, dpls = base_simulation_spikes
+
+        # Missing dipole argument raises error
+        # --------------------------------------------------
+        with pytest.raises(
+            ValueError,
+            match="Dipole object must be provided"
+        ):
+            net.cell_response.plot_spikes_raster(
+                overlay_dipoles=True,
+                dpl=None,
+            )
+
+        # Confirm dipoles are scaled correctly
+        # --------------------------------------------------
+        # Get initial y-axis ticks for raster plot without dipole
+        fig = net.cell_response.plot_spikes_raster()
+        initial_raster_yrange = fig.axes[0].get_yticks()
+
+        # Get initial y-axis range, including a small allowance for a single
+        # increment expansion on either end of the axis
+        increment = abs(initial_raster_yrange[1] - initial_raster_yrange[0])
+        initial_raster_yrange = abs(
+            max(initial_raster_yrange) -
+            min(initial_raster_yrange)
+        ) + increment*2
+
+        # Ensure dipoles are initially out of the bounds of the raster plot
+        for dipole in dpls:
+            for layer in ['L2', 'L5']:
+                dipole.data[layer] = dipole.data[layer] * initial_raster_yrange
+
+        # Get y-axis range of raster plot with overlayed dipoles
+        fig = net.cell_response.plot_spikes_raster(
+            overlay_dipoles=True,
+            dpl=dpls,
+        )
+        updated_raster_yrange = fig.axes[0].get_yticks()
+        updated_raster_yrange = abs(
+            max(updated_raster_yrange) -
+            min(updated_raster_yrange)
+        )
+
+        assert updated_raster_yrange <= initial_raster_yrange
+
 
 def test_network_plotter_init(setup_net):
     """Test init keywords of NetworkPlotter class."""
