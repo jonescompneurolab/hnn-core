@@ -300,7 +300,7 @@ class CellResponse(object):
             show=True,
             colors=None,
             show_legend=True,
-            marker_size=1.0,
+            marker_size=5.0,
             dpl=None,
             overlay_dipoles=False,
             ):
