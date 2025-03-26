@@ -433,7 +433,7 @@ class TestCellResponsePlotters:
             for layer in ['L2', 'L5']:
                 dipole.data[layer] = dipole.data[layer] * initial_raster_yrange
 
-        # Get y-axis range of raster plot with overlayed dipoles
+        # Get y-axis range of raster plot with overlaid dipoles
         fig = net.cell_response.plot_spikes_raster(
             overlay_dipoles=True,
             dpl=dpls,
