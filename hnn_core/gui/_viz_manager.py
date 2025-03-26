@@ -941,7 +941,7 @@ def _postprocess_template(template_name, fig, idx,
         return
 
     if template_name == 'Dipole Layers (3x1)':
-        # Make the L2 and L5 plots the same y-range
+        # Make the L2, L5, and aggregate plots use the same y-range
         y_lims_list = [ax.get_ylim() for ax in fig.axes]
         y_lims = (np.min(y_lims_list), np.max(y_lims_list))
         [ax.set_ylim(y_lims) for ax in fig.axes]
