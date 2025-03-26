@@ -37,10 +37,16 @@ _no_overlay_plot_types = [
     'network',
     'spectrogram',
     'spikes',
+    'spikes with dipoles'
     'input histogram',
 ]
 
-_ext_data_disabled_plot_types = ['spikes', 'input histogram', 'network']
+_ext_data_disabled_plot_types = [
+    'spikes',
+    'spikes with dipoles',
+    'input histogram',
+    'network'
+    ]
 
 _spectrogram_color_maps = [
     "viridis",
