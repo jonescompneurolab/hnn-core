@@ -37,7 +37,7 @@ _no_overlay_plot_types = [
     'network',
     'spectrogram',
     'spikes',
-    'spikes with dipoles'
+    'spikes with dipoles',
     'input histogram',
 ]
 
