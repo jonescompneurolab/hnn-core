@@ -5,7 +5,7 @@ If you have any questions or problems while installing `hnn_core`, feel free to
 ask for help [on our GitHub Discussions
 page](https://github.com/jonescompneurolab/hnn-core/discussions)!
 
-Note that `hnn_core` currently only supports Python 3.8, 3.9, 3.10, 3.11, and 3.12, but *not* 3.13.
+Note that `hnn_core` currently only supports Python 3.8, 3.9, 3.10, 3.11, and 3.12, **but *not* 3.13**.
 
 --------------
 
@@ -33,13 +33,13 @@ lines which mention NEURON in the files located at `~/.bashrc` and `~/.zshrc`.
 ### Part 2: MacOS Comprehensive HNN Install steps:
 
 - Recommended for new users: To do a "comprehensive" install of HNN, including all features
-  available for your platform (for MacOS: GUI, Optimization, and Parallelism via both Joblib and
-  MPI), use the following instructions in this section.
+  available for your platform (for MacOS: API, GUI, Optimization, and Parallelism via both Joblib
+  and MPI), use the following instructions in this section.
     - Alternatively, if you instead want a "minimal" installation with only specific features, see
       the [Minimal Installation instructions](#minimal-installation-instructions) section below.
 
 1. Start the program called "Terminal". If you have recently installed Anaconda like in
-  Step 1, then make sure to start a **new** window of the "Terminal" program. You should
+  Part 1, then make sure to start a **new** window of the "Terminal" program. You should
   see `(base)` somewhere in text that is displayed.
 2. Copy and paste the following text directly into your Terminal:
 ```
@@ -84,13 +84,13 @@ package alongside `hnn_core`.
 ### Part 2: Linux Comprehensive HNN Install steps:
 
 - Recommended for new users: To do a "comprehensive" install of HNN, including all features
-  available for your platform (for Linux: GUI, Optimization, and Parallelism via both Joblib and
+  available for your platform (for Linux: API, GUI, Optimization, and Parallelism via both Joblib and
   MPI), use the following instructions in this section.
     - Alternatively, if you instead want a "minimal" installation with only specific features, see the [Minimal
       Installation instructions](#minimal-installation-instructions) section below.
 
 1. Start your favorite terminal emulator. If you have recently installed Anaconda like in
-  Step 1, then make sure to start a **new** window of your terminal. You should
+  Part 1, then make sure to start a **new** window of your terminal. You should
   see `(base)` somewhere in text that is displayed.
 2. Copy and paste the following text directly into your terminal:
 ```
@@ -138,7 +138,7 @@ you see a security warning, please run the program anyway.
 ### Part 2: Windows Comprehensive HNN Install steps:
 
 - Recommended for new users: To do a "comprehensive" install of HNN, including all features
-  available for your platform (for Windows: GUI and Optimization, but not Parallelism), use the
+  available for your platform (for Windows: APi, GUI, and Optimization, but not Parallelism), use the
   following instructions in this section.
     - Alternatively, if you instead want a "minimal" installation with only specific features, see
       the [Minimal Installation instructions](#minimal-installation-instructions) section below.
