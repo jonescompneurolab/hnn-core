@@ -160,6 +160,7 @@ conda env create --file=https://raw.githubusercontent.com/asoplata/gh-testbench/
 > ...
 
 then congratulations! HNN installed successfully. Now let's walk through how to start it.
+
 6. Close the "Command Prompt" window.
 7. In Anaconda Navigator, under `base (root)`, there should be a new entry that looks like `hnn-core-env`. Any time you want to use HNN, you should select this environment. Click on it.
 8. Again, click on the "play" symbol button, and select "Open Terminal". Another "Command Prompt" window should appear.
