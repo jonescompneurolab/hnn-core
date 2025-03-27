@@ -529,7 +529,7 @@ def test_gui_add_data_dependent_figure(setup_gui):
                       ('Dipole Layers (3x1)', 3),
                       ('Drive-Spikes (2x1)', 2),
                       ('Dipole-Spectrogram (2x1)', 2),
-                      ("Dipole-Spikes (2x1)", 2),
+                      ("Dipole Layers-Spikes (1x1)", 1),
                       ('Drive-Dipole-Spectrogram (3x1)', 3),
                       ('PSD Layers (3x1)', 3)]
 

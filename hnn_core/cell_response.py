@@ -300,7 +300,9 @@ class CellResponse(object):
             show=True,
             colors=None,
             show_legend=True,
-            marker_size=1.0,
+            marker_size=5.0,
+            dpl=None,
+            overlay_dipoles=False,
             ):
         """Plot the aggregate spiking activity according to cell type.
 
@@ -327,6 +329,8 @@ class CellResponse(object):
             colors=colors,
             show_legend=show_legend,
             marker_size=marker_size,
+            dpl=dpl,
+            overlay_dipoles=overlay_dipoles,
         )
 
     def plot_spikes_hist(self, trial_idx=None, ax=None, spike_types=None,
