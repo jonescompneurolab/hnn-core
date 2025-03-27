@@ -1071,6 +1071,8 @@ document.write(`
         <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">marker_size</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">dpl</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">overlay_dipoles</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot the aggregate spiking activity according to cell type.</span>
 
@@ -1094,6 +1096,12 @@ document.write(`
 <span class="sd">        Optional marker size to use when plotting spikes. Uses</span>
 <span class="sd">        &quot;linelengths&quot; argument of ax.eventplot, which accepts positive</span>
 <span class="sd">        numeric values only</span>
+<span class="sd">    dpl : instance of Dipole | list</span>
+<span class="sd">        The Dipole object containing layer-specific dipole data</span>
+<span class="sd">        to overlay on the raster plot</span>
+<span class="sd">    overlay_dipoles : bool</span>
+<span class="sd">        If True, overlay the layer-specific dipole data on the</span>
+<span class="sd">        raster plot</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1102,6 +1110,8 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.dipole</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dipole</span><span class="p">,</span> <span class="n">average_dipoles</span>
+
     <span class="n">n_trials</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell_response</span><span class="o">.</span><span class="n">spike_times</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">trial_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">trial_idx</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">))</span>
@@ -1209,10 +1219,83 @@ document.write(`
                              <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
                              <span class="n">label</span><span class="o">=</span><span class="n">cell_type</span><span class="p">,</span> <span class="n">linelengths</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
 
+    <span class="c1"># Overlay dipoles on raster plot</span>
+    <span class="k">if</span> <span class="n">overlay_dipoles</span><span class="p">:</span>
+        <span class="c1"># Confirm that the dpl is not None</span>
+        <span class="k">if</span> <span class="n">dpl</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Dipole object must be provided to overlay dipoles&quot;</span>
+            <span class="p">)</span>
+        <span class="c1"># In the case that a single Dipole object is provided, cast to a list</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dpl</span><span class="p">,</span> <span class="n">Dipole</span><span class="p">):</span>
+            <span class="n">dpl</span> <span class="o">=</span> <span class="p">[</span><span class="n">dpl</span><span class="p">]</span>
+        <span class="c1"># Validate that all list elements are Dipole objects</span>
+        <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="n">dpl</span><span class="p">:</span>
+            <span class="n">_validate_type</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">Dipole</span><span class="p">,</span> <span class="s1">&#39;dpl&#39;</span><span class="p">,</span> <span class="s1">&#39;Dipole, list of Dipole&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Get (average) layer-sepcific dipole data</span>
+        <span class="n">avgs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">avgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">average_dipoles</span><span class="p">(</span><span class="n">dpl</span><span class="p">))</span>
+        <span class="n">l2_dipole</span> <span class="o">=</span> <span class="n">avgs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;L2&#39;</span><span class="p">]</span>
+        <span class="n">l5_dipole</span> <span class="o">=</span> <span class="n">avgs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;L5&#39;</span><span class="p">]</span>
+        <span class="n">dipole_times</span> <span class="o">=</span> <span class="n">dpl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">times</span>
+
+        <span class="c1"># Scale dipole to fit the spike raster plot</span>
+        <span class="n">raster_yrange</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_yticks</span><span class="p">()</span>
+        <span class="n">raster_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">raster_yrange</span><span class="p">)</span>
+        <span class="n">raster_midpoint</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">raster_min</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">raster_quarterpoint</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">raster_min</span> <span class="o">/</span> <span class="mi">4</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Scale down by .95 until the dipoles fit within the appropriate area</span>
+        <span class="k">while</span> <span class="p">(</span>
+            <span class="nb">max</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">l5_dipole</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">l2_dipole</span><span class="p">))</span> <span class="o">-</span>
+            <span class="nb">min</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">l5_dipole</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">l2_dipole</span><span class="p">))</span>
+        <span class="p">)</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">raster_midpoint</span><span class="p">):</span>
+            <span class="n">l5_dipole</span> <span class="o">=</span> <span class="n">l5_dipole</span><span class="o">*</span><span class="mf">0.95</span>
+            <span class="n">l2_dipole</span> <span class="o">=</span> <span class="n">l2_dipole</span><span class="o">*</span><span class="mf">0.95</span>
+
+        <span class="c1"># Shift the dipole positions to overlay the correct cell types</span>
+        <span class="n">l2_dipole</span> <span class="o">=</span> <span class="n">l2_dipole</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">raster_midpoint</span><span class="p">)</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">raster_quarterpoint</span><span class="p">)</span>
+        <span class="n">l5_dipole</span> <span class="o">=</span> <span class="n">l5_dipole</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">raster_midpoint</span><span class="p">)</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">raster_quarterpoint</span><span class="p">)</span>
+
+        <span class="c1"># Draw the dipole plots</span>
+        <span class="n">l2_line</span><span class="p">,</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">dipole_times</span><span class="p">,</span>
+            <span class="n">l2_dipole</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span>
+            <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;L2 Dipole&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">l5_line</span><span class="p">,</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">dipole_times</span><span class="p">,</span>
+            <span class="n">l5_dipole</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span>
+            <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;L5 Dipole&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+
     <span class="c1"># set legend</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="o">=</span><span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">events</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">handles</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">events</span><span class="p">]</span>
+
+    <span class="c1"># Add labels for the spike events</span>
+    <span class="k">for</span> <span class="n">handle</span> <span class="ow">in</span> <span class="n">handles</span><span class="p">:</span>
+        <span class="n">handle</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">get_label</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; Spikes&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">overlay_dipoles</span><span class="p">:</span>
+        <span class="n">handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l2_line</span><span class="p">)</span>
+        <span class="n">handles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l5_line</span><span class="p">)</span>
+
+    <span class="n">spike_legend</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span>
+        <span class="n">handles</span><span class="o">=</span><span class="n">handles</span><span class="p">,</span>
+        <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;lower left&#39;</span><span class="p">,</span>
+        <span class="n">framealpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">show_legend</span><span class="p">:</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">get_legend</span><span class="p">()</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">spike_legend</span><span class="p">)</span>
 
     <span class="c1"># set axis labels</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
@@ -1221,6 +1304,9 @@ document.write(`
     <span class="c1"># hide y-axis ticks and tick labels</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([])</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># add title</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Raster Plot with Layer-Specific Dipole Overlays&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell_response</span><span class="o">.</span><span class="n">times</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="n">cell_response</span><span class="o">.</span><span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>

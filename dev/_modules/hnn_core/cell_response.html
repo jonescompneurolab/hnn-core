@@ -789,7 +789,9 @@ document.write(`
             <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">marker_size</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+            <span class="n">marker_size</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
+            <span class="n">dpl</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">overlay_dipoles</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the aggregate spiking activity according to cell type.</span>
 
@@ -816,6 +818,8 @@ document.write(`
             <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
             <span class="n">show_legend</span><span class="o">=</span><span class="n">show_legend</span><span class="p">,</span>
             <span class="n">marker_size</span><span class="o">=</span><span class="n">marker_size</span><span class="p">,</span>
+            <span class="n">dpl</span><span class="o">=</span><span class="n">dpl</span><span class="p">,</span>
+            <span class="n">overlay_dipoles</span><span class="o">=</span><span class="n">overlay_dipoles</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="CellResponse.plot_spikes_hist"><a class="viewcode-back" href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_hist">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">plot_spikes_hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">spike_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
