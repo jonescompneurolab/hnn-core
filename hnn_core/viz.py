@@ -794,8 +794,9 @@ def plot_spikes_raster(
     for handle in handles:
         handle.set_label(handle.get_label() + ' Spikes')
 
-    handles.append(l2_line)
-    handles.append(l5_line)
+    if overlay_dipoles:
+        handles.append(l2_line)
+        handles.append(l5_line)
 
     spike_legend = ax.legend(
         handles=handles,
