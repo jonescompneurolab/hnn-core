@@ -34,9 +34,9 @@ lines which mention NEURON in the files located at `~/.bashrc` and `~/.zshrc`.
 
 - Recommended for new users: To do a "comprehensive" install of HNN, including all features
   available for your platform (for MacOS: GUI, Optimization, and Parallelism via both Joblib and
-  MPI), use the following instructions.
-    - If you instead want a "minimal" installation with only specific features, see the [Minimal
-      Installation instructions](#minimal-installation-instructions) section below.
+  MPI), use the following instructions in this section.
+    - Alternatively, if you instead want a "minimal" installation with only specific features, see
+      the [Minimal Installation instructions](#minimal-installation-instructions) section below.
 
 1. Start the program called "Terminal". If you have recently installed Anaconda like in
   Step 1, then make sure to start a **new** window of the "Terminal" program. You should
@@ -85,8 +85,8 @@ package alongside `hnn_core`.
 
 - Recommended for new users: To do a "comprehensive" install of HNN, including all features
   available for your platform (for Linux: GUI, Optimization, and Parallelism via both Joblib and
-  MPI), use the following instructions.
-    - If you instead want a "minimal" installation with only specific features, see the [Minimal
+  MPI), use the following instructions in this section.
+    - Alternatively, if you instead want a "minimal" installation with only specific features, see the [Minimal
       Installation instructions](#minimal-installation-instructions) section below.
 
 1. Start your favorite terminal emulator. If you have recently installed Anaconda like in
@@ -139,9 +139,9 @@ you see a security warning, please run the program anyway.
 
 - Recommended for new users: To do a "comprehensive" install of HNN, including all features
   available for your platform (for Windows: GUI and Optimization, but not Parallelism), use the
-  following instructions.
-    - If you instead want a "minimal" installation with only specific features, see the [Minimal
-      Installation instructions](#minimal-installation-instructions) section below.
+  following instructions in this section.
+    - Alternatively, if you instead want a "minimal" installation with only specific features, see
+      the [Minimal Installation instructions](#minimal-installation-instructions) section below.
 
 1. Start the program "Anaconda Navigator".
 2. On the left, click the button labeled "Environments".
