@@ -25,6 +25,7 @@ _plot_types = [
     'layer5 dipole',
     'input histogram',
     'spikes',
+    'spikes with dipoles',
     'PSD',
     'layer2/3 PSD',
     'layer5 PSD',
@@ -36,10 +37,16 @@ _no_overlay_plot_types = [
     'network',
     'spectrogram',
     'spikes',
+    'spikes with dipoles',
     'input histogram',
 ]
 
-_ext_data_disabled_plot_types = ['spikes', 'input histogram', 'network']
+_ext_data_disabled_plot_types = [
+    'spikes',
+    'spikes with dipoles',
+    'input histogram',
+    'network'
+    ]
 
 _spectrogram_color_maps = [
     "viridis",
@@ -112,12 +119,12 @@ data_templates = {
         "mosaic": "00\n11",
         "ax_plots": [("ax0", "current dipole"), ("ax1", "spectrogram")]
     },
-    "Dipole-Spikes (2x1)": {
+    "Dipole Layers-Spikes (1x1)": {
         "kwargs": {
-            "gridspec_kw": {"height_ratios": [1, 1]}
+            "gridspec_kw": ""
         },
-        "mosaic": "00\n11",
-        "ax_plots": [("ax0", "current dipole"), ("ax1", "spikes")]
+        "mosaic": "00\n00",
+        "ax_plots": [("ax0", "spikes with dipoles")]
     },
     "Drive-Dipole-Spectrogram (3x1)": {
         "kwargs": {
@@ -257,6 +264,20 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                 show=False,
                 show_legend=show_legend,
                 marker_size=marker_size,
+            )
+
+    if plot_type == "spikes with dipoles":
+        if net_copied.cell_response:
+            marker_size = plot_config['marker_size']
+            hide_spike_legend = plot_config['hide_spike_legend']
+            show_legend = True if hide_spike_legend == 'False' else False
+            net_copied.cell_response.plot_spikes_raster(
+                ax=ax,
+                show=False,
+                show_legend=show_legend,
+                marker_size=marker_size,
+                overlay_dipoles=True,
+                dpl=dpls_copied,
             )
 
     elif plot_type == 'input histogram':
@@ -743,7 +764,7 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
     )
 
     marker_size = BoundedFloatText(
-        value=1,
+        value=5,
         min=0.01,
         max=15,
         description='Raster Plot Marker Size:',
