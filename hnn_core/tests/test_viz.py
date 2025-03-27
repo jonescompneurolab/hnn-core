@@ -379,8 +379,12 @@ class TestCellResponsePlotters:
                                                      colors=colors)
 
         # Colors as dict mapping
-        dict_mapping = {'L2_basket': '#daf7a6', 'L2_pyramidal': '#ffc300',
-                        'L5_basket': '#ff5733', 'L5_pyramidal': '#c70039'}
+        dict_mapping = {
+            'L2_basket': '#daf7a6',
+            'L2_pyramidal': '#ffc300',
+            'L5_basket': '#ff5733',
+            'L5_pyramidal': '#c70039'
+        }
         fig = net.cell_response.plot_spikes_raster(trial_idx=0, show=False,
                                                    colors=dict_mapping)
         colors, _ = _get_line_hex_colors(fig)
@@ -391,7 +395,7 @@ class TestCellResponsePlotters:
         fig = net.cell_response.plot_spikes_raster(trial_idx=0, show=False,
                                                    colors=dict_mapping)
         colors, cell_types = _get_line_hex_colors(fig)
-        assert colors[cell_types.index('L2_pyramidal')] == '#daf7a6'
+        assert colors[cell_types.index('L2_pyramidal Spikes')] == '#daf7a6'
 
         # Invalid key in dict mapping
         dict_mapping = {'bad_cell_type': '#daf7a6'}
