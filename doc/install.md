@@ -58,7 +58,7 @@ pip install "hnn_core[gui,opt,parallel] @ git+https://github.com/jonescompneurol
 ```
 - [TODO: after v0.4 publication, change the above to pip install "hnn_core[gui,opt,parallel]"]
 3. Congratulations, HNN should be installed! From here, you can either:
-    - Start the GUI by running the command `hnn-gui` in the new "Command Prompt" window, then follow
+    - Start the GUI by running the command `hnn-gui` in the the Terminal window, then follow
       along with a [GUI tutorial like our Textbook ERP GUI tutorial
       here](https://dylansdaniels.github.io/website_redesign/content/05_erps/erps_in_gui.html).
     - Similarly, start using the API by running Python code uses the HNN API, such as [in our
@@ -109,7 +109,7 @@ pip install "hnn_core[gui,opt,parallel] @ git+https://github.com/jonescompneurol
 ```
 - [TODO: after v0.4 publication, change the above to pip install "hnn_core[gui,opt,parallel]"]
 3. Congratulations, HNN should be installed! From here, you can either:
-    - Start the GUI by running the command `hnn-gui` in the new "Command Prompt" window, then follow
+    - Start the GUI by running the command `hnn-gui` in the terminal window, then follow
       along with a [GUI tutorial like our Textbook ERP GUI tutorial
       here](https://dylansdaniels.github.io/website_redesign/content/05_erps/erps_in_gui.html).
     - Similarly, start using the API by running Python code uses the HNN API, such as [in our
@@ -145,18 +145,20 @@ you see a security warning, please run the program anyway.
 
 1. Start the program "Anaconda Navigator".
 2. On the left, click the button labeled "Environments".
-3. In the center-left column, there should be an entry that says `base (root)`. Click the "play" symbol button, and then select "Open Terminal".
+3. In the center-left column, there should be an entry that says `base (root)`. Click the "play" symbol button near it, and then select "Open Terminal".
 4. In the new "Command Prompt" window which should open, paste and run the following command:
 ```
 conda env create --file=https://raw.githubusercontent.com/asoplata/gh-testbench/refs/heads/main/comprehensive-environments/environment-windows.yml
 ```
 - [TODO: move the environment files out of testbench!]
 5. After a couple of minutes, if you see output similar to the following:
+
 > ...
 > # To activate this environment, use
 > #
 > #     $ conda activate hnn-core-env
 > ...
+
 then congratulations! HNN installed successfully. Now let's walk through how to start it.
 6. Close the "Command Prompt" window.
 7. In Anaconda Navigator, under `base (root)`, there should be a new entry that looks like `hnn-core-env`. Any time you want to use HNN, you should select this environment. Click on it.
