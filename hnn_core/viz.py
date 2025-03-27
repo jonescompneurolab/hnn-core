@@ -770,23 +770,42 @@ def plot_spikes_raster(
         l5_dipole = l5_dipole - abs(raster_midpoint) - abs(raster_quarterpoint)
 
         # Draw the dipole plots
-        ax.plot(
+        l2_line, = ax.plot(
             dipole_times,
             l2_dipole,
             color='grey',
             linewidth=1,
+            linestyle='--',
+            label='L2 Dipole',
         )
-        ax.plot(
+        l5_line, = ax.plot(
             dipole_times,
             l5_dipole,
             color='grey',
             linewidth=1,
+            linestyle='-',
+            label='L5 Dipole',
         )
 
     # set legend
-    ax.legend(handles=[e[0] for e in events], loc=1)
+    handles = [e[0]for e in events]
+
+    # Add labels for the spike events
+    for handle in handles:
+        handle.set_label(handle.get_label() + ' Spikes')
+
+    handles.append(l2_line)
+    handles.append(l5_line)
+
+    spike_legend = ax.legend(
+        handles=handles,
+        loc='lower left',
+        framealpha=0.25,
+    )
     if not show_legend:
         ax.get_legend().remove()
+    else:
+        ax.add_artist(spike_legend)
 
     # set axis labels
     ax.set_xlabel('Time (ms)')
@@ -795,6 +814,9 @@ def plot_spikes_raster(
     # hide y-axis ticks and tick labels
     ax.set_yticklabels([])
     ax.tick_params(axis='y', length=0)
+
+    # add title
+    ax.set_title('Raster Plot with Layer-Specific Dipole Overlays')
 
     if len(cell_response.times) > 0:
         ax.set_xlim(left=0, right=cell_response.times[-1])
