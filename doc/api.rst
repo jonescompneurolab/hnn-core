@@ -88,6 +88,7 @@ Visualization (:py:mod:`hnn_core.viz`):
    plot_connectivity_matrix
    plot_laminar_lfp
    plot_laminar_csd
+   plot_drive_strength
    NetworkPlotter
 
 Parallel backends (:py:mod:`hnn_core.parallel_backends`):
