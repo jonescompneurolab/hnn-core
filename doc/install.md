@@ -78,7 +78,7 @@ The Comprehensive installation method will install **all** available features on
 - [AES TODO: move the environment files out of testbench!]
 - In the new "Command Prompt" window which should open, paste and run the following command:
 ```
-conda env create --file=https://raw.githubusercontent.com/asoplata/gh-testbench/refs/heads/main/environment-windows.yml
+conda env create --file=https://raw.githubusercontent.com/asoplata/gh-testbench/refs/heads/main/comprehensive-environments/environment-windows.yml
 ```
 - After a couple of minutes, if you see output similar to the following:
 > ...
