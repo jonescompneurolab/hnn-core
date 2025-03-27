@@ -5,102 +5,43 @@ If you have any questions or problems while installing `hnn_core`, feel free to
 ask for help [on our GitHub Discussions
 page](https://github.com/jonescompneurolab/hnn-core/discussions)!
 
-Please follow the instructions in Step 1 *before* proceeding to Step 2.
-
 Note that `hnn_core` currently only supports Python 3.8, 3.9, 3.10, 3.11, and 3.12, but *not* 3.13.
 
 --------------
 
-# Step 1. Platform-specific pre-requisites
+# MacOS
 
-## Windows
+### Part 1: MacOS Pre-requisite steps:
 
-- First, we **strongly* recommend you install the [Anaconda Python
-Distribution](https://www.anaconda.com/download/success). Use the default settings
-during the installation process. If you are new to Python, virtual environments in
-Python, or data science in Python, we recommend you review the resources here:
+1. First, we **strongly** recommend you install the [Anaconda Python
+Distribution](https://www.anaconda.com/download/success). Use the default settings during the
+installation process. If you are new to Python, virtual environments in Python, or data science
+in Python, we recommend you review the resources here:
 <https://docs.anaconda.com/getting-started/>.
-- Secondly, it is important that you install the [NEURON][] software system-wide
-  using its [Windows-specific
-  binaries](https://github.com/neuronsimulator/nrn/releases/tag/8.2.6). Specifically,
-  [you can click here to download the file you need to
-  install](https://github.com/neuronsimulator/nrn/releases/download/8.2.6/nrn-8.2.6.w64-mingw-py-38-39-310-311-312-setup.exe). If you see a security warning, please run the program anyway.
-- Proceed to Step 2 below.
-
-## MacOS
-
-- First, we **strongly* recommend you install the [Anaconda Python
-Distribution](https://www.anaconda.com/download/success). Use the default settings
-during the installation process. If you are new to Python, virtual environments in
-Python, or data science in Python, we recommend you review the resources here:
-<https://docs.anaconda.com/getting-started/>.
-- Secondly, it is important that you install "Xcode Command-Line Tools". This can be done
-  easily by opening a "Terminal" application and running the following command (followed
-  by clicking through the prompts):
-    ```
-    $ xcode-select --install
-    ```
-- Thirdly, If you already installed the [NEURON][] software system-wide using its
-  traditional installer package, it is recommended to **remove it** first. We
-  will be installing NEURON using its PyPI package alongside `hnn_core`. If you
-  installed this using the default settings, then to uninstall it, you should delete the
-  files located at `/Applications/NEURON`, and remove any lines which mention NEURON
-  in the files located at `~/.bashrc` and `~/.zshrc`.
-- Proceed to Step 2 below.
-
-## Linux
-
-- First, we **strongly* recommend you install the [Anaconda Python
-Distribution](https://www.anaconda.com/download/success). Use the default settings
-during the installation process. If you are new to Python, virtual environments in
-Python, or data science in Python, we recommend you review the resources here:
-<https://docs.anaconda.com/getting-started/>.
-- If you already installed the [NEURON][] software system-wide using its
-  traditional installer package, it is recommended to **remove it** first. We
-  will be installing NEURON using its PyPI package alongside `hnn_core`.
-
---------------
-
-# Step 2. `hnn_core` installation types
-
-Note that the platform-specific instructions in Step 1 are required for **all installation types**.
-
-## Comprehensive Installation
-
-The Comprehensive installation method will install **all** available features on your platform, and is the recommended install method for new users.
-
-### Windows
-
-- (This will install HNN with the GUI and Optimization features available for Windows.)
-- Once you have followed the instructions in Step 1 for Windows, start the program "Anaconda Navigator".
-- On the left, click the button labeled "Environments".
-- In the center-left column, there should be an entry that says `base (root)`. Click the "play" symbol button, and then select "Open Terminal".
-- [AES TODO: move the environment files out of testbench!]
-- In the new "Command Prompt" window which should open, paste and run the following command:
+2. Secondly, it is important that you install "Xcode Command-Line Tools". This can be done
+easily by opening a "Terminal" application and running the following command (followed by clicking
+through the prompts):
 ```
-conda env create --file=https://raw.githubusercontent.com/asoplata/gh-testbench/refs/heads/main/comprehensive-environments/environment-windows.yml
+xcode-select --install
 ```
-- After a couple of minutes, if you see output similar to the following:
-> ...
-> # To activate this environment, use
-> #
-> #     $ conda activate hnn-core-env
-> ...
-then congratulations! HNN installed successfully. Now let's walk through how to start it.
-- Close the "Command Prompt" window.
-- In Anaconda Navigator, under `base (root)`, there should be a new entry that looks like `hnn-core-env`. Any time you want to use HNN, you should select this environment. Click on it.
-- Again, click on the "play" symbol button, and select "Open Terminal". Another "Command Prompt" window should appear.
-- From here, you can either:
-    - Start the GUI by running the command `hnn-gui` in the new "Command Prompt" window, then follow along with a [GUI tutorial like our Textbook ERP GUI tutorial here](https://dylansdaniels.github.io/website_redesign/content/05_erps/erps_in_gui.html).
-    - Similarly, start using the API by running Python code uses the HNN API, such as [in our Textbook ERP API tutorial here](https://dylansdaniels.github.io/website_redesign/content/05_erps/hnn_core.html).
+3. Thirdly, If you already installed the [NEURON][] software system-wide using its traditional
+installer package, it is recommended to **remove it** first. We will be installing NEURON using
+its PyPI package alongside `hnn_core`. If you installed this using the default settings, then to
+uninstall it, you should delete the files located at `/Applications/NEURON`, and remove any
+lines which mention NEURON in the files located at `~/.bashrc` and `~/.zshrc`.
 
-### MacOS
+### Part 2: MacOS Comprehensive HNN Install steps:
 
-- (This will install HNN with the GUI, Optimization, and Parallelism (Joblib and MPI) features available for MacOS.)
-- Start the program called "Terminal". If you have recently installed Anaconda like in
+- Recommended for new users: To do a "comprehensive" install of HNN, including all features
+  available for your platform (for MacOS: GUI, Optimization, and Parallelism via both Joblib and
+  MPI), use the following instructions.
+    - If you instead want a "minimal" installation with only specific features, see the [Minimal
+      Installation instructions](#minimal-installation-instructions) section below.
+
+1. Start the program called "Terminal". If you have recently installed Anaconda like in
   Step 1, then make sure to start a **new** window of the "Terminal" program. You should
   see `(base)` somewhere in text that is displayed.
-- Copy and paste the following text directly into your Terminal:
+2. Copy and paste the following text directly into your Terminal:
 ```
 conda activate base
 conda create -y -q -n hnn-core-env python=3.12
@@ -115,19 +56,43 @@ export DYLD_FALLBACK_LIBRARY_PATH=$LD_LIBRARY_PATH:${CONDA_PREFIX}/lib
 conda install -y -q "openmpi>5" mpi4py -c conda-forge
 pip install "hnn_core[gui,opt,parallel] @ git+https://github.com/jonescompneurolab/hnn-core.git"
 ```
-- TODO: pip install "hnn_core[gui,opt,parallel]"
-- Congratulations, HNN should be installed! From here, you can either:
-    - Start the GUI by running the command `hnn-gui` in the new "Command Prompt" window, then follow along with a [GUI tutorial like our Textbook ERP GUI tutorial here](https://dylansdaniels.github.io/website_redesign/content/05_erps/erps_in_gui.html).
-    - Similarly, start using the API by running Python code uses the HNN API, such as [in our Textbook ERP API tutorial here](https://dylansdaniels.github.io/website_redesign/content/05_erps/hnn_core.html).
-    - Whenever you want to use HNN in the future, you should make sure to use the newly-created Anaconda environment named `hnn-core-env`. You can do this in the Terminal by running `conda activate hnn-core-env` or by using Anaconda Navigator if you have it installed.
+- [TODO: after v0.4 publication, change the above to pip install "hnn_core[gui,opt,parallel]"]
+3. Congratulations, HNN should be installed! From here, you can either:
+    - Start the GUI by running the command `hnn-gui` in the new "Command Prompt" window, then follow
+      along with a [GUI tutorial like our Textbook ERP GUI tutorial
+      here](https://dylansdaniels.github.io/website_redesign/content/05_erps/erps_in_gui.html).
+    - Similarly, start using the API by running Python code uses the HNN API, such as [in our
+      Textbook ERP API tutorial
+      here](https://dylansdaniels.github.io/website_redesign/content/05_erps/hnn_core.html).
+    - Whenever you want to use HNN in the future, you should make sure to use the newly-created
+      Anaconda environment named `hnn-core-env`. You can do this in the Terminal by running `conda
+      activate hnn-core-env` or by using Anaconda Navigator if you have it installed.
 
-### Linux
+# Linux
 
-- (This will install HNN with the GUI, Optimization, and Parallelism (Joblib and MPI) features available for Linux.)
-- Start your favorite terminal emulator. If you have recently installed Anaconda like in
+### Part 1: Linux Pre-requisite steps:
+
+1. First, we **strongly** recommend you install the [Anaconda Python
+Distribution](https://www.anaconda.com/download/success). Use the default settings during the
+installation process. If you are new to Python, virtual environments in Python, or data science
+in Python, we recommend you review the resources here:
+<https://docs.anaconda.com/getting-started/>.
+2. If you already installed the [NEURON][] software system-wide using its traditional installer
+package, it is recommended to **remove it** first. We will be installing NEURON using its PyPI
+package alongside `hnn_core`.
+
+### Part 2: Linux Comprehensive HNN Install steps:
+
+- Recommended for new users: To do a "comprehensive" install of HNN, including all features
+  available for your platform (for Linux: GUI, Optimization, and Parallelism via both Joblib and
+  MPI), use the following instructions.
+    - If you instead want a "minimal" installation with only specific features, see the [Minimal
+      Installation instructions](#minimal-installation-instructions) section below.
+
+1. Start your favorite terminal emulator. If you have recently installed Anaconda like in
   Step 1, then make sure to start a **new** window of your terminal. You should
   see `(base)` somewhere in text that is displayed.
-- Copy and paste the following text directly into your terminal:
+2. Copy and paste the following text directly into your terminal:
 ```
 conda activate base
 conda create -y -q -n hnn-core-env python=3.12
@@ -142,55 +107,108 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CONDA_PREFIX}/lib
 conda install -y -q "openmpi>5" mpi4py -c conda-forge
 pip install "hnn_core[gui,opt,parallel] @ git+https://github.com/jonescompneurolab/hnn-core.git"
 ```
-- TODO: pip install "hnn_core[gui,opt,parallel]"
-- Congratulations, HNN should be installed! From here, you can either:
-    - Start the GUI by running the command `hnn-gui` in the new "Command Prompt" window, then follow along with a [GUI tutorial like our Textbook ERP GUI tutorial here](https://dylansdaniels.github.io/website_redesign/content/05_erps/erps_in_gui.html).
-    - Similarly, start using the API by running Python code uses the HNN API, such as [in our Textbook ERP API tutorial here](https://dylansdaniels.github.io/website_redesign/content/05_erps/hnn_core.html).
-    - Whenever you want to use HNN in the future, you should make sure to use the newly-created Anaconda environment named `hnn-core-env`. You can do this in the Terminal by running `conda activate hnn-core-env` or by using Anaconda Navigator if you have it installed.
+- [TODO: after v0.4 publication, change the above to pip install "hnn_core[gui,opt,parallel]"]
+3. Congratulations, HNN should be installed! From here, you can either:
+    - Start the GUI by running the command `hnn-gui` in the new "Command Prompt" window, then follow
+      along with a [GUI tutorial like our Textbook ERP GUI tutorial
+      here](https://dylansdaniels.github.io/website_redesign/content/05_erps/erps_in_gui.html).
+    - Similarly, start using the API by running Python code uses the HNN API, such as [in our
+      Textbook ERP API tutorial
+      here](https://dylansdaniels.github.io/website_redesign/content/05_erps/hnn_core.html).
+    - Whenever you want to use HNN in the future, you should make sure to use the newly-created
+      Anaconda environment named `hnn-core-env`. You can do this in the Terminal by running `conda
+      activate hnn-core-env` or by using Anaconda Navigator if you have it installed.
+
+# Windows
+
+### Part 1: Windows Pre-requisite steps:
+
+1. First, we **strongly** recommend you install the [Anaconda Python
+Distribution](https://www.anaconda.com/download/success). Use the default settings
+during the installation process. If you are new to Python, virtual environments in
+Python, or data science in Python, we recommend you review the resources here:
+<https://docs.anaconda.com/getting-started/>.
+2. Secondly, it is important that you install the [NEURON][] software system-wide using its
+[Windows-specific
+binaries](https://github.com/neuronsimulator/nrn/releases/tag/8.2.6). Specifically, [you can
+click here to download the file you need to
+install](https://github.com/neuronsimulator/nrn/releases/download/8.2.6/nrn-8.2.6.w64-mingw-py-38-39-310-311-312-setup.exe). If
+you see a security warning, please run the program anyway.
+
+### Part 2: Windows Comprehensive HNN Install steps:
+
+- Recommended for new users: To do a "comprehensive" install of HNN, including all features
+  available for your platform (for Windows: GUI and Optimization, but not Parallelism), use the
+  following instructions.
+    - If you instead want a "minimal" installation with only specific features, see the [Minimal
+      Installation instructions](#minimal-installation-instructions) section below.
+
+1. Start the program "Anaconda Navigator".
+2. On the left, click the button labeled "Environments".
+3. In the center-left column, there should be an entry that says `base (root)`. Click the "play" symbol button, and then select "Open Terminal".
+4. In the new "Command Prompt" window which should open, paste and run the following command:
+```
+conda env create --file=https://raw.githubusercontent.com/asoplata/gh-testbench/refs/heads/main/comprehensive-environments/environment-windows.yml
+```
+- [TODO: move the environment files out of testbench!]
+5. After a couple of minutes, if you see output similar to the following:
+> ...
+> # To activate this environment, use
+> #
+> #     $ conda activate hnn-core-env
+> ...
+then congratulations! HNN installed successfully. Now let's walk through how to start it.
+6. Close the "Command Prompt" window.
+7. In Anaconda Navigator, under `base (root)`, there should be a new entry that looks like `hnn-core-env`. Any time you want to use HNN, you should select this environment. Click on it.
+8. Again, click on the "play" symbol button, and select "Open Terminal". Another "Command Prompt" window should appear.
+9. From here, you can either:
+    - Start the GUI by running the command `hnn-gui` in the new "Command Prompt" window, then follow
+      along with a [GUI tutorial like our Textbook ERP GUI tutorial
+      here](https://dylansdaniels.github.io/website_redesign/content/05_erps/erps_in_gui.html).
+    - Similarly, start using the API by running Python code uses the HNN API, such as [in our
+      Textbook ERP API tutorial
+      here](https://dylansdaniels.github.io/website_redesign/content/05_erps/hnn_core.html).
+
+--------------
+
+# Minimal Installations
 
 ## API-only Installation
 
 To install just the `hnn_core` API, open a Terminal or Command Prompt using a fresh virtual
 environment, and enter:
 
-    $ pip install hnn_core
+```
+pip install hnn_core
+```
 
-This will install only the `hnn_core` API along with its required
-dependencies, which include:
-
-- [NumPy](https://numpy.org/)
-- [SciPy](https://scipy.org/)
-- [Matplotlib](https://matplotlib.org/)
-- [NEURON][] (>=7.7)
-- [h5io](https://github.com/h5io/h5io)
-
-To check if everything worked fine, you can run:
-
-    $ python -c "import hnn_core"
-
-and it should not give any error messages.
+This will install only the `hnn_core` API along with its required dependencies, including
+[NumPy](https://numpy.org/), [SciPy](https://scipy.org/), [Matplotlib](https://matplotlib.org/),
+[NEURON][] (>=7.7), and [h5io](https://github.com/h5io/h5io).
 
 **Basic Usage**: For how to use the `hnn_core` API, which is available for every installation
 type, see our extensive {doc}`Examples page <auto_examples/index>`.
 
-## API plus Graphical User Interface (GUI) Installation
+## API plus GUI Installation
 
 To install `hnn_core` with both its API and GUI support, a simple tweak to the above command is
 needed (pay attention to the "quotes"):
 
-    $ pip install "hnn_core[gui]"
+```
+pip install "hnn_core[gui]"
+```
 
 This will install `hnn_core`, its API dependencies, and the additional GUI dependencies, which
-include:
-
-- [ipykernel](https://ipykernel.readthedocs.io/en/stable/)
-- [ipympl](https://matplotlib.org/ipympl/)
-- [ipywidgets](https://github.com/jupyter-widgets/ipywidgets) >=8.0.0
-- [voila](https://github.com/voila-dashboards/voila)
+include [ipykernel](https://ipykernel.readthedocs.io/en/stable/),
+[ipympl](https://matplotlib.org/ipympl/),
+[ipywidgets](https://github.com/jupyter-widgets/ipywidgets) >=8.0.0, and
+[voila](https://github.com/voila-dashboards/voila).
 
 **GUI Usage**: To start the GUI, simply run:
 
-    $ hnn-gui
+```
+hnn-gui
+```
 
 ## API plus Optimization Installation
 
@@ -199,7 +217,9 @@ If you would like to use Bayesian optimization, then
 can easily install `hnn_core`, its API dependencies, and its optimization
 dependencies using the following command (pay attention to the "quotes"):
 
-    $ pip install "hnn_core[opt]"
+```
+pip install "hnn_core[opt]"
+```
 
 If you are planning to use Optimization, it is strongly recommended to also
 install [support for Parallelism, which can be found
@@ -230,12 +250,11 @@ Windows](#parallelism-mpi-windows).
 You can easily install the `hnn_core` API, its API dependencies, and its additional Joblib parallelism
 dependencies using the following command (pay attention to the "quotes"):
 
-    $ pip install "hnn_core[parallel]"
+```
+pip install "hnn_core[parallel]"
+```
 
-This automatically installs the following dependencies:
-
-- [Joblib](https://joblib.readthedocs.io/en/stable/)
-- [psutil](https://github.com/giampaolo/psutil)
+This automatically installs the following dependencies:[Joblib](https://joblib.readthedocs.io/en/stable/) and [psutil](https://github.com/giampaolo/psutil).
 
 **Parallelism: Joblib Usage**:
 - Once installed, you can run multiple trials simultaneously with only a small modification to your code, like this:
@@ -353,19 +372,7 @@ unsure or run into problems; we should be able to help you get it working.
     Hello from proc 1
     ```
 
-### Parallelism: MPI: Usage
-
-- Once installed, you can run any simulation using multiple CPU processors with only a small modification to your code, like this:
-    ```
-    from hnn_core import MPIBackend
-
-    # Set n_procs to the number of processors MPI can use (up to
-    # number of cores on system). A different launch command can be
-    # specified for MPI distributions other than openmpi.
-    with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
-        dpls = simulate_dipole(net, n_trials=1)
-    ```
-- An in-depth example of MPI usage is available in the {doc}`Example found here <auto_examples/howto/plot_simulate_mpi_backend>`.
+6.  An in-depth example of MPI usage is available in the {doc}`Example found here <auto_examples/howto/plot_simulate_mpi_backend>`.
 
 ### Multiple Option types
 
