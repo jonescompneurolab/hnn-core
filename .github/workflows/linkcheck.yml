@@ -25,8 +25,7 @@ jobs:
         shell: bash -el {0}
         run: |
           python -m pip install --upgrade pip
-          pip install numpy matplotlib scipy NEURON
-          pip install '.[gui, docs]'
+          pip install '.[docs, gui, parallel]'
 
       - name: Linkcheck
         shell: bash -el {0}

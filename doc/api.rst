@@ -24,6 +24,7 @@ Simulation (:py:mod:`hnn_core`):
    Cell
    CellResponse
    pick_connection
+   BatchSimulate
 
 Network Models (:py:mod:`hnn_core`):
 ------------------------------------
