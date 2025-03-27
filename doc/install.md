@@ -24,7 +24,8 @@ through the prompts):
 ```
 xcode-select --install
 ```
-3. Thirdly, If you already installed the [NEURON][] software system-wide using its traditional
+3. Thirdly, after installing "Xcode Command-Line Tools" above, restart your computer.
+4. Fourthly, If you already installed the [NEURON][] software system-wide using its traditional
 installer package, it is recommended to **remove it** first. We will be installing NEURON using
 its PyPI package alongside `hnn_core`. If you installed this using the default settings, then to
 uninstall it, you should delete the files located at `/Applications/NEURON`, and remove any
