@@ -1,5 +1,4 @@
 import os.path as op
-from urllib.request import urlretrieve
 from pathlib import Path
 
 import matplotlib
@@ -12,6 +11,7 @@ import pytest
 import hnn_core
 from hnn_core import read_params, read_dipole, average_dipoles
 from hnn_core import Network, jones_2009_model
+from hnn_core.tests.test_params import get_test_asset_path
 from hnn_core.viz import plot_dipole
 from hnn_core.dipole import Dipole, simulate_dipole, _rmse
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
@@ -280,11 +280,8 @@ def test_cell_response_backends(run_hnn_core_fixture):
 
 def test_rmse():
     """Test to check RMSE calculation"""
-    data_url = ('https://raw.githubusercontent.com/jonescompneurolab/hnn/'
-                'master/data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt')
-    if not op.exists('yes_trial_S1_ERP_all_avg.txt'):
-        urlretrieve(data_url, 'yes_trial_S1_ERP_all_avg.txt')
-    extdata = np.loadtxt('yes_trial_S1_ERP_all_avg.txt')
+    fname = get_test_asset_path('yes_trial_S1_ERP_all_avg.txt')
+    extdata = np.loadtxt(fname, skiprows=6)
 
     exp_dpl = Dipole(times=extdata[:, 0],
                      data=np.c_[extdata[:, 1], extdata[:, 1], extdata[:, 1]])
