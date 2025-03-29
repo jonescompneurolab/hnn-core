@@ -5,7 +5,7 @@ import itertools
 from contextlib import redirect_stdout
 from threading import Thread, Event
 from time import sleep
-from urllib.request import urlretrieve
+
 
 import numpy as np
 from numpy import loadtxt
@@ -22,6 +22,7 @@ from hnn_core.parallel_backends import (
     _determine_cores_hwthreading,
 )
 from hnn_core.network_builder import NetworkBuilder
+from hnn_core.tests.test_params import get_test_asset_path
 
 
 def _terminate_mpibackend(event, backend):
@@ -359,11 +360,9 @@ class TestParallelBackends():
         # small snippet of data on data branch for now. To be deleted
         # later. Data branch should have only commit so it does not
         # pollute the history.
-        data_url = ('https://raw.githubusercontent.com/jonescompneurolab/'
-                    'hnn-core/test_data/dpl.txt')
-        if not op.exists('dpl.txt'):
-            urlretrieve(data_url, 'dpl.txt')
-        dpl_master = loadtxt('dpl.txt')
+
+        dpl_txt_fname = get_test_asset_path('dpl.txt')
+        dpl_master = loadtxt(dpl_txt_fname)
 
         dpls, net = run_hnn_core_fixture(backend=backend)
         dpl = dpls[0].smooth(30).scale(3000)
