@@ -442,8 +442,14 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                 io_buf.close()
                 _ = ax.imshow(img_arr)
 
-    # set up alignment
-    if plot_type not in ['network', 'PSD']:
+    # set up alignment of plots which do NOT use dipole's time as their x-axis
+    custom_x_axes = [
+        'network',
+        'PSD',
+        'layer2/3 PSD',
+        'layer5 PSD',
+    ]
+    if plot_type not in custom_x_axes:
         margin_x = 0
         max_x = max([dpl.times[-1] for dpl in dpls_copied])
         ax.set_xlim(left=-margin_x, right=max_x + margin_x)
