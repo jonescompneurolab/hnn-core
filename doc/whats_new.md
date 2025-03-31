@@ -38,8 +38,6 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 - {class}`~hnn_core.Network`'s argument of `legacy_mode` for importing old param files will be removed in the future.
 - {func}`~hnn_core.Network.add_tonic_bias`'s argument of `cell_type`, along with setting the argument `amplitude` to a single float, will be removed in the future. Instead, set the `amplitude` argument to a dictionary as described in the docstring.
 - {func}`~hnn_core.simulate_dipole`'s argument of `postproc` for post-processing will be removed in the future. Instead, use explicit smoothing and scaling via {class}`~hnn_core.Dipole` methods.
-- Writing {class}`~hnn_core.Dipole` objects to `txt` files using the `txt` extension in {func}`~hnn_core.Dipole.write` will be removed in the future. Instead, either save dipole data to HDF5 or ??? [TODO @Nick What are we recommending instead of writing dipoles to txt? Are they saved as part of Network export like CellResponses are?].
-- Direct reading ({func}`~hnn_core.read_spikes`) and writing ({func}`~hnn_core.CellResponse.write` ) of spike `txt` files will be removed in the future. Instead, you should write your {class}`~hnn_core.CellResponse` data as part of the {class}`~hnn_core.Network` using {func}`~hnn_core.Network.write_network_configuration`, and read your {class}`~hnn_core.CellResponse` spikes via loading {class}`~hnn_core.Network` json files that contain them [TODO @Nick is this correct? Should update the DeprecationWarning itself to be clearer too].
 
 ### API Changes
 
