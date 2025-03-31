@@ -17,8 +17,8 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 
 - Significant improvements to the API, documentation, and pedagogical examples [especially for Optimization](https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/howto/optimize_evoked.html#sphx-glr-auto-examples-howto-optimize-evoked-py), among others.
 
-- Calcium concentration can now be recorded: recorded calcium concentration from the soma, as well
-  as all sections, are enabled by setting `record_ca` to `soma` or `all` in
+- Calcium concentration can now be recorded: recorded calcium concentration from either the soma,
+  or all sections, are enabled by setting `record_ca` to `soma` or `all` in
   {func}`~hnn_core.simulate_dipole`. Recordings are accessed through
   {class}`~hnn_core.CellResponse.ca`.
 
