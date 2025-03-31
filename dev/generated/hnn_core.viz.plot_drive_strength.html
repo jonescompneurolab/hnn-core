@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Computation times &#8212; hnn-core  documentation</title>
+    <title>hnn_core.viz.plot_drive_strength &#8212; hnn-core  documentation</title>
   
   
   
@@ -18,42 +18,44 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
 
   
-  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=b3ba4146"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
-    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="../../_static/copybutton.js?v=fd10adb8"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/howto/sg_execution_times';</script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/hnn_core.viz.plot_drive_strength';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.14.4';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="hnn_core.viz.NetworkPlotter" href="hnn_core.viz.NetworkPlotter.html" />
+    <link rel="prev" title="hnn_core.viz.plot_laminar_csd" href="hnn_core.viz.plot_laminar_csd.html" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -102,7 +104,7 @@
     <div class="search-button__overlay"></div>
     <div class="search-button__search-container">
 <form class="bd-search d-flex align-items-center"
-      action="../../search.html"
+      action="../search.html"
       method="get">
   <i class="fa-solid fa-magnifying-glass"></i>
   <input type="search"
@@ -132,7 +134,7 @@
 
   
 
-<a class="navbar-brand logo" href="../../index.html">
+<a class="navbar-brand logo" href="../index.html">
   
   
   
@@ -143,8 +145,8 @@
       
     
     
-    <img src="../../_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core  documentation - Home"/>
-    <script>document.write(`<img src="../../_static/hnn-medium.png" class="logo__image only-dark" alt="hnn-core  documentation - Home"/>`);</script>
+    <img src="../_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core  documentation - Home"/>
+    <script>document.write(`<img src="../_static/hnn-medium.png" class="logo__image only-dark" alt="hnn-core  documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -166,42 +168,42 @@
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../install.html">
+                      <a class="nav-link nav-internal" href="../install.html">
                         Install
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../index.html">
+                      <a class="nav-link nav-internal" href="../auto_examples/index.html">
                         Examples
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../api.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../api.html">
                         API
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../glossary.html">
+                      <a class="nav-link nav-internal" href="../glossary.html">
                         Glossary
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../whats_new.html">
+                      <a class="nav-link nav-internal" href="../whats_new.html">
                         What’s new?
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../contributing.html">
+                      <a class="nav-link nav-internal" href="../contributing.html">
                         Contributing
                       </a>
                     </li>
@@ -333,42 +335,42 @@ document.write(`
   <ul class="bd-navbar-elements navbar-nav">
     
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../install.html">
+                      <a class="nav-link nav-internal" href="../install.html">
                         Install
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../index.html">
+                      <a class="nav-link nav-internal" href="../auto_examples/index.html">
                         Examples
                       </a>
                     </li>
                 
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../api.html">
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../api.html">
                         API
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../glossary.html">
+                      <a class="nav-link nav-internal" href="../glossary.html">
                         Glossary
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../whats_new.html">
+                      <a class="nav-link nav-internal" href="../whats_new.html">
                         What’s new?
                       </a>
                     </li>
                 
 
                     <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../contributing.html">
+                      <a class="nav-link nav-internal" href="../contributing.html">
                         Contributing
                       </a>
                     </li>
@@ -467,11 +469,14 @@ document.write(`
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
-      <a href="../../index.html" class="nav-link" aria-label="Home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page">Computation times</li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API Documentation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">hnn_core.viz...</li>
   </ul>
 </nav>
 </div>
@@ -488,65 +493,42 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="computation-times">
-<span id="sphx-glr-auto-examples-howto-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this heading">#</a></h1>
-<p><strong>00:15.000</strong> total execution time for 8 files <strong>from auto_examples/howto</strong>:</p>
-<div class="docutils container">
-<style scoped>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
-<link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
-</style>
-<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-<script type="text/javascript" class="init">
-$(document).ready( function () {
-    $('table.sg-datatable').DataTable({order: [[1, 'desc']]});
-} );
-</script><table class="table table-striped sg-datatable">
-<thead>
-<tr class="row-odd"><th class="head"><p>Example</p></th>
-<th class="head"><p>Time</p></th>
-<th class="head"><p>Mem (MB)</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py"><span class="std std-ref">07. Batch Simulation</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_batch_simulate.py</span></code>)</p></td>
-<td><p>00:15.000</p></td>
-<td><p>0.0</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="optimize_evoked.html#sphx-glr-auto-examples-howto-optimize-evoked-py"><span class="std std-ref">05. Optimize simulated evoked response parameters</span></a> (<code class="docutils literal notranslate"><span class="pre">optimize_evoked.py</span></code>)</p></td>
-<td><p>00:00.000</p></td>
-<td><p>0.0</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="optimize_rhythmic.html#sphx-glr-auto-examples-howto-optimize-rhythmic-py"><span class="std std-ref">08. Optimize simulated rhythmic responses</span></a> (<code class="docutils literal notranslate"><span class="pre">optimize_rhythmic.py</span></code>)</p></td>
-<td><p>00:00.000</p></td>
-<td><p>0.0</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_connectivity.html#sphx-glr-auto-examples-howto-plot-connectivity-py"><span class="std std-ref">03. Modifying local connectivity</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_connectivity.py</span></code>)</p></td>
-<td><p>00:00.000</p></td>
-<td><p>0.0</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_firing_pattern.html#sphx-glr-auto-examples-howto-plot-firing-pattern-py"><span class="std std-ref">01. Plot firing pattern</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_firing_pattern.py</span></code>)</p></td>
-<td><p>00:00.000</p></td>
-<td><p>0.0</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_hnn_animation.html#sphx-glr-auto-examples-howto-plot-hnn-animation-py"><span class="std std-ref">06. Animating HNN simulations</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_hnn_animation.py</span></code>)</p></td>
-<td><p>00:00.000</p></td>
-<td><p>0.0</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_record_extracellular_potentials.html#sphx-glr-auto-examples-howto-plot-record-extracellular-potentials-py"><span class="std std-ref">02. Record extracellular potentials</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_record_extracellular_potentials.py</span></code>)</p></td>
-<td><p>00:00.000</p></td>
-<td><p>0.0</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_simulate_mpi_backend.html#sphx-glr-auto-examples-howto-plot-simulate-mpi-backend-py"><span class="std std-ref">04. Use MPI backend for parallelization</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_simulate_mpi_backend.py</span></code>)</p></td>
-<td><p>00:00.000</p></td>
-<td><p>0.0</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
+  <section id="hnn-core-viz-plot-drive-strength">
+<h1>hnn_core.viz.plot_drive_strength<a class="headerlink" href="#hnn-core-viz-plot-drive-strength" title="Permalink to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="hnn_core.viz.plot_drive_strength">
+<span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">plot_drive_strength</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#plot_drive_strength"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.plot_drive_strength" title="Permalink to this definition">#</a></dt>
+<dd><p>Plot the relative strength of drives to cell types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>net</strong><span class="classifier">Network</span></dt><dd><p>Instance of a Network object.</p>
+</dd>
+<dt><strong>show_weight</strong><span class="classifier">bool, default=True</span></dt><dd><p>If True, visualize connectivity weights as gradient.
+If False, all weights set to constant value.</p>
+</dd>
+<dt><strong>ax</strong><span class="classifier">matplotlib.Axes, optional</span></dt><dd><p>Matplotlib axes. If None, create a new figure.</p>
+</dd>
+<dt><strong>colorbar</strong><span class="classifier">bool, default=True</span></dt><dd><p>If True (default), adjust figure to include colorbar.</p>
+</dd>
+<dt><strong>color_scale</strong><span class="classifier">{‘linear’, ‘log’}, default=’linear’</span></dt><dd><p>Color scaling for drive strength.</p>
+</dd>
+<dt><strong>normalize</strong><span class="classifier">bool, default=True</span></dt><dd><p>If True, normalize the strength values to be between 0 and 1.</p>
+</dd>
+<dt><strong>show</strong><span class="classifier">bool, default=True</span></dt><dd><p>If True, show the plot immediately.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>fig</strong><span class="classifier">matplotlib.figure.Figure</span></dt><dd><p>The figure handle.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="sphx-glr-backreferences-hnn-core-viz-plot-drive-strength"></span></section>
 
 
                 </article>
@@ -558,6 +540,24 @@ $(document).ready( function () {
                 <footer class="prev-next-footer">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="hnn_core.viz.plot_laminar_csd.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">hnn_core.viz.plot_laminar_csd</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="hnn_core.viz.NetworkPlotter.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">hnn_core.viz.NetworkPlotter</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
 </div>
                 </footer>
               
@@ -569,8 +569,19 @@ $(document).ready( function () {
 
   <div class="sidebar-secondary-item">
 
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.viz.plot_drive_strength"><code class="docutils literal notranslate"><span class="pre">plot_drive_strength()</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
   <div class="tocsection sourcelink">
-    <a href="../../_sources/auto_examples/howto/sg_execution_times.rst.txt">
+    <a href="../_sources/generated/hnn_core.viz.plot_drive_strength.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
@@ -589,8 +600,8 @@ $(document).ready( function () {
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">

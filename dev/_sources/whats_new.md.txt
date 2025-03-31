@@ -5,9 +5,75 @@ orphan: true
 (whats_new)=
 # What's new?
 
-## Current (v0.4 release candidate) Changelog
+## v0.4 Release Notes
 
-### API changes
+v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosystem as a whole. v0.4 includes over *two years* of active development work by many people (>800 commits!), and brings with it many new and exciting features, including significant improvements to robustness, testing, and bug-fixing.
+
+### New Features
+
+- `hnn_core` now includes a fully-tested and robust GUI of its own. The `hnn_core` GUI was present as a prototype in v0.3, but it is now ready for production. New features and visual improvements will still be coming to it in the future, such as the ability to use optimization. See our new [Install page](https://jonescompneurolab.github.io/hnn-core/dev/install.html) for ways to install it, and we have already begun incorporating it into a new, fresh series of tutorials for our upcoming revamp of the HNN website. If you have installed it, you can start the GUI using `hnn-gui` in your terminal/command prompt window.
+
+- The `BatchSimulate` class: Thanks to [Abdul Samad Siddiqui][] and Google Summer of Code 2024, there is now the capability to run "batches" of simulations across multiple parameter sets, enabling easy analysis and simulation of behavior across parameter sweeps. See our [example for more details](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py). Note that currently, only its `loky` backend is supported.
+
+- Significant improvements to the API, documentation, and pedagogical examples [especially for Optimization](https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/howto/optimize_evoked.html#sphx-glr-auto-examples-howto-optimize-evoked-py), among others.
+
+- Calcium concentration can now be recorded: recorded calcium concentration from either the soma,
+  or all sections, are enabled by setting `record_ca` to `soma` or `all` in
+  {func}`~hnn_core.simulate_dipole`. Recordings are accessed through
+  {class}`~hnn_core.CellResponse.ca`.
+
+- There is now a new class {class}`~hnn_core.viz.NetworkPlotter` which can be used to visualize an entire network in 3D, including firing animations; [see our example of how to use it here](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_hnn_animation.html#sphx-glr-auto-examples-howto-plot-hnn-animation-py).
+
+- There is now a new function {func}`~hnn_core.viz.plot_drive_strength` for illustrating the absolute or relative amount of strength that a particular drive provides to different cell types.
+
+- A very large amount of polishing, bug fixes, general improvements, etc.
+
+### Deprecations
+
+- The new Python 3.13 is **not** supported by `hnn_core` at this time, due to [NEURON](https://nrn.readthedocs.io/en/8.2.6/)'s current lack of support for it. This will change in the near future. We still support 3.8 through 3.12 (inclusively).
+
+### Upcoming Deprecations
+
+- Both {func}`~hnn_core.viz.plot_laminar_lfp` and {func}`~hnn_core.viz.plot_dipole` will have their `tmin` and `tmax` arguments removed in the future. Please set the x-axis limits using methods called directly on the existing `matplotlib` objects, or using [`matplotlib.pyplot.xlim`](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.xlim.html#matplotlib.pyplot.xlim).
+- {class}`~hnn_core.Network`'s argument of `legacy_mode` for importing old param files will be removed in the future.
+- {func}`~hnn_core.Network.add_tonic_bias`'s argument of `cell_type`, along with setting the argument `amplitude` to a single float, will be removed in the future. Instead, set the `amplitude` argument to a dictionary as described in the docstring.
+- {func}`~hnn_core.simulate_dipole`'s argument of `postproc` for post-processing will be removed in the future. Instead, use explicit smoothing and scaling via {class}`~hnn_core.Dipole` methods.
+
+### API Changes
+
+- New argument to {class}`~hnn_core.Network` initialization: you can now set `mesh_shape` to easily make a grid of different sizes of `Network`s.
+- {class}`~hnn_core.Cell` initialization argument `topology` has had both its name changed to `cell_tree` and its data type significantly changed; see [the API docs of `Cell` for details](https://jonescompneurolab.github.io/hnn-core/dev/generated/hnn_core.Cell.html#hnn_core.Cell).
+- {func}`~hnn_core.jones_2009_model` and other built-in Network Models including {func}`~hnn_core.law_2021_model` and {func}`~hnn_core.calcium_model` all accept the aforementioned `mesh_shape` argument like {class}`~hnn_core.Network`.
+- The API for optimization has changed significantly. Instead of running the function `optimize_evoked` obtained using `from hnn_core.optimization import optimize_evoked`, you should use the new {class}`~hnn_core.Optimizer` class and its methods; [see our example of evoked-response optimization here](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/optimize_evoked.html#sphx-glr-auto-examples-howto-optimize-evoked-py).
+- {func}`~hnn_core.viz.plot_spikes_hist` now accepts more arguments, including `invert_spike_types`, `color`, and any `**kwargs_hist` which can be applied to `matplotlib.axes.Axes.hist`. See the docstring for details.
+- {func}`~hnn_core.viz.plot_spikes_raster` now accepts many more arguments, including `cell_types`, `colors`, `show_legend`, `marker_size`, `dpl`, and `overlay_dipoles`. See the docstring for details.
+- {func}`~hnn_core.viz.plot_cell_morphology` now accepts more arguments, including `color` and several arguments related to its position and viewing window, including `pos`, `xlim`, `ylim`, and `zlim`. See the docstring for details.
+- {func}`~hnn_core.viz.plot_laminar_csd` now accepts more arguments, including `vmin`, `vmax`, `sink`, and `interpolation`. See the docstring for details.
+- {class}`~hnn_core.parallel_backends.MPIBackend` now accepts many more arguments, including `use_hwthreading_if_found`, `sensible_default_cores`, `override_hwthreading_option`, and `override_oversubscribe_option`. See the docstring for details; the ability to customize it has been greatly increased.
+- {func}`~hnn_core.read_params` now accepts a new argument `file_contents` which lets you pass in network configuration contents using a string.
+
+### People who contributed to this release (in alphabetical order of family name):
+
+- [Huzi Cheng][]
+- [Tianqi Cheng][]
+- [George Dang][]
+- [Dylan Daniels][]
+- [Camilo Diaz][]
+- [Katharina Duecker][]
+- [Yaroslav Halchenko][]
+- [Mainak Jas][]
+- [Dikshant Jha][]
+- [Stephanie R. Jones][]
+- [Shehroz Kashif][]
+- [Rajat Partani][]
+- [Carolina Fernandez Pujol][]
+- [Dan Toms][]
+- [Abdul Samad Siddiqui][]
+- [Austin E. Soplata][]
+- [Ryan Thorpe][]
+- [Nick Tolley][]
+
+### PRs merged (API)
 
 - Add ability to manually define colors in spike histogram plots, by [Nick Tolley][] in
   {gh}`640`
@@ -66,7 +132,7 @@ orphan: true
 - Add {class}`~hnn_core.BatchSimulate` for batch simulation capability, by [Abdul Samad
   Siddiqui][] in {gh}`782`
 
-- Recorded calcium conncetration from the soma, as well as all sections, are enabled by
+- Recorded calcium concentration from the soma, as well as all sections, are enabled by
   setting `record_ca` to `soma` or `all` in {func}`~hnn_core.simulate_dipole`.
   Recordings are accessed through {class}`~hnn_core.CellResponse.ca`, by [Katharina
   Duecker][] in {gh}`804`
@@ -95,7 +161,13 @@ orphan: true
 - Add plots to show relative and absolute external drive strength, by [Dikshant Jha][]
   in {gh}`987`
 
-### Bug fixes and corrections
+- Make re-generation of our testing network usable and explicit, by [Austin E. Soplata][]
+  in {gh}`988`
+
+- Improvements to raster plotting, by [Dylan Daniels][] in
+  {gh}`1017` and {gh}`1018`
+
+### PRs merged (Bug fixes and corrections)
 
 - Objective function called by {func}`~hnn_core.optimization.optimize_evoked` now
   returns a scalar instead of tuple, by [Ryan Thorpe][] in {gh}`670`
@@ -205,7 +277,10 @@ orphan: true
 
 - Hotfix of MPI install on MacOS CI runners by [Austin E. Soplata][] in {gh}`994`
 
-### GUI changes
+- Fix MPI test failures probably due to incomplete Network destruction by [Austin E. Soplata][] in
+  {gh}`1010`
+
+### PRs merged (GUI changes)
 
 - Add RMSE calculation and plotting to GUI, by [Huzi Cheng][] in {gh}`636`
 
@@ -286,7 +361,13 @@ orphan: true
 
 - Capture printed messages to logger in GUI by [Dylan Daniels][] in {gh}`956`
 
-### Other changes
+- Correctly set layer-specific dipole axes limits in GUI, by [Dylan Daniels][] in
+  {gh}`1022`
+
+- Improve spike raster plot by overlaying dipoles, by [Dylan Daniels][] in
+  {gh}`1026`
+
+### PRs merged (Other)
 
 - Add Github Discussions installation template, by [Mainak Jas][] in {gh}`630`
 
@@ -360,31 +441,13 @@ orphan: true
 - Add install and run of `codespell` to local testing by [Austin E. Soplata][] in
   {gh}`977`
 
+- Separate Installation to its own page, also other small authoring changes by [Austin E. Soplata][]
+  in {gh}`980`
+
 - Update Sphinx `versions.json` link to point to `dev` version, by [Austin E. Soplata][]
   in {gh}`991`
 
 - Add docstring to `_add_cell_type_bias` by [Shehroz Kashif][] in {gh}`1001`
-
-### People who contributed to this release (in alphabetical order of family name):
-
-- [Huzi Cheng][]
-- [Tianqi Cheng][]
-- [George Dang][]
-- [Dylan Daniels][]
-- [Camilo Diaz][]
-- [Katharina Duecker][]
-- [Yaroslav Halchenko][]
-- [Mainak Jas][]
-- [Dikshant Jha][]
-- [Stephanie R. Jones][]
-- [Shehroz Kashif][]
-- [Rajat Partani][]
-- [Carolina Fernandez Pujol][]
-- [Dan Toms][]
-- [Abdul Samad Siddiqui][]
-- [Austin E. Soplata][]
-- [Ryan Thorpe][]
-- [Nick Tolley][]
 
 ## 0.3
 

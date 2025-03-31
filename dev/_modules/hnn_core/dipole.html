@@ -1167,10 +1167,6 @@ document.write(`
 <span class="sd">            4) L5 current dipole (scaled nAm)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Writing dipole to txt file is deprecated &#39;</span>
-                      <span class="s1">&#39;and will be removed in future versions. &#39;</span>
-                      <span class="s1">&#39;Please use hdf5&#39;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nave</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Saving Dipole to file that is an average of </span><span class="si">%d</span><span class="s2">&quot;</span>
                           <span class="s2">&quot; trials&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">nave</span><span class="p">)</span>

@@ -492,10 +492,79 @@ document.write(`
                   
   <section id="what-s-new">
 <span id="whats-new"></span><h1>What’s new?<a class="headerlink" href="#what-s-new" title="Permalink to this heading">#</a></h1>
-<section id="current-v0-4-release-candidate-changelog">
-<h2>Current (v0.4 release candidate) Changelog<a class="headerlink" href="#current-v0-4-release-candidate-changelog" title="Permalink to this heading">#</a></h2>
+<section id="v0-4-release-notes">
+<h2>v0.4 Release Notes<a class="headerlink" href="#v0-4-release-notes" title="Permalink to this heading">#</a></h2>
+<p>v0.4 represents a major milestone in development of <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> and the HNN ecosystem as a whole. v0.4 includes over <em>two years</em> of active development work by many people (&gt;800 commits!), and brings with it many new and exciting features, including significant improvements to robustness, testing, and bug-fixing.</p>
+<section id="new-features">
+<h3>New Features<a class="headerlink" href="#new-features" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> now includes a fully-tested and robust GUI of its own. The <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> GUI was present as a prototype in v0.3, but it is now ready for production. New features and visual improvements will still be coming to it in the future, such as the ability to use optimization. See our new <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/install.html">Install page</a> for ways to install it, and we have already begun incorporating it into a new, fresh series of tutorials for our upcoming revamp of the HNN website. If you have installed it, you can start the GUI using <code class="docutils literal notranslate"><span class="pre">hnn-gui</span></code> in your terminal/command prompt window.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">BatchSimulate</span></code> class: Thanks to <a class="reference external" href="https://github.com/samadpls">Abdul Samad Siddiqui</a> and Google Summer of Code 2024, there is now the capability to run “batches” of simulations across multiple parameter sets, enabling easy analysis and simulation of behavior across parameter sweeps. See our <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py">example for more details</a>. Note that currently, only its <code class="docutils literal notranslate"><span class="pre">loky</span></code> backend is supported.</p></li>
+<li><p>Significant improvements to the API, documentation, and pedagogical examples <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/howto/optimize_evoked.html#sphx-glr-auto-examples-howto-optimize-evoked-py">especially for Optimization</a>, among others.</p></li>
+<li><p>Calcium concentration can now be recorded: recorded calcium concentration from either the soma,
+or all sections, are enabled by setting <code class="docutils literal notranslate"><span class="pre">record_ca</span></code> to <code class="docutils literal notranslate"><span class="pre">soma</span></code> or <code class="docutils literal notranslate"><span class="pre">all</span></code> in
+<a class="reference internal" href="generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole"><code class="xref py py-func docutils literal notranslate"><span class="pre">simulate_dipole()</span></code></a>. Recordings are accessed through
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ca</span></code>.</p></li>
+<li><p>There is now a new class <a class="reference internal" href="generated/hnn_core.viz.NetworkPlotter.html#hnn_core.viz.NetworkPlotter" title="hnn_core.viz.NetworkPlotter"><code class="xref py py-class docutils literal notranslate"><span class="pre">NetworkPlotter</span></code></a> which can be used to visualize an entire network in 3D, including firing animations; <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_hnn_animation.html#sphx-glr-auto-examples-howto-plot-hnn-animation-py">see our example of how to use it here</a>.</p></li>
+<li><p>There is now a new function <a class="reference internal" href="generated/hnn_core.viz.plot_drive_strength.html#hnn_core.viz.plot_drive_strength" title="hnn_core.viz.plot_drive_strength"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_drive_strength()</span></code></a> for illustrating the absolute or relative amount of strength that a particular drive provides to different cell types.</p></li>
+<li><p>A very large amount of polishing, bug fixes, general improvements, etc.</p></li>
+</ul>
+</section>
+<section id="deprecations">
+<h3>Deprecations<a class="headerlink" href="#deprecations" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>The new Python 3.13 is <strong>not</strong> supported by <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> at this time, due to <a class="reference external" href="https://nrn.readthedocs.io/en/8.2.6/">NEURON</a>’s current lack of support for it. This will change in the near future. We still support 3.8 through 3.12 (inclusively).</p></li>
+</ul>
+</section>
+<section id="upcoming-deprecations">
+<h3>Upcoming Deprecations<a class="headerlink" href="#upcoming-deprecations" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Both <a class="reference internal" href="generated/hnn_core.viz.plot_laminar_lfp.html#hnn_core.viz.plot_laminar_lfp" title="hnn_core.viz.plot_laminar_lfp"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_laminar_lfp()</span></code></a> and <a class="reference internal" href="generated/hnn_core.viz.plot_dipole.html#hnn_core.viz.plot_dipole" title="hnn_core.viz.plot_dipole"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_dipole()</span></code></a> will have their <code class="docutils literal notranslate"><span class="pre">tmin</span></code> and <code class="docutils literal notranslate"><span class="pre">tmax</span></code> arguments removed in the future. Please set the x-axis limits using methods called directly on the existing <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> objects, or using <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.xlim.html#matplotlib.pyplot.xlim"><code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.xlim</span></code></a>.</p></li>
+<li><p><a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a>’s argument of <code class="docutils literal notranslate"><span class="pre">legacy_mode</span></code> for importing old param files will be removed in the future.</p></li>
+<li><p><a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network.add_tonic_bias" title="hnn_core.Network.add_tonic_bias"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_tonic_bias()</span></code></a>’s argument of <code class="docutils literal notranslate"><span class="pre">cell_type</span></code>, along with setting the argument <code class="docutils literal notranslate"><span class="pre">amplitude</span></code> to a single float, will be removed in the future. Instead, set the <code class="docutils literal notranslate"><span class="pre">amplitude</span></code> argument to a dictionary as described in the docstring.</p></li>
+<li><p><a class="reference internal" href="generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole"><code class="xref py py-func docutils literal notranslate"><span class="pre">simulate_dipole()</span></code></a>’s argument of <code class="docutils literal notranslate"><span class="pre">postproc</span></code> for post-processing will be removed in the future. Instead, use explicit smoothing and scaling via <code class="xref py py-class docutils literal notranslate"><span class="pre">Dipole</span></code> methods.</p></li>
+</ul>
+</section>
 <section id="api-changes">
-<h3>API changes<a class="headerlink" href="#api-changes" title="Permalink to this heading">#</a></h3>
+<h3>API Changes<a class="headerlink" href="#api-changes" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>New argument to <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> initialization: you can now set <code class="docutils literal notranslate"><span class="pre">mesh_shape</span></code> to easily make a grid of different sizes of <code class="docutils literal notranslate"><span class="pre">Network</span></code>s.</p></li>
+<li><p><a class="reference internal" href="generated/hnn_core.Cell.html#hnn_core.Cell" title="hnn_core.Cell"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cell</span></code></a> initialization argument <code class="docutils literal notranslate"><span class="pre">topology</span></code> has had both its name changed to <code class="docutils literal notranslate"><span class="pre">cell_tree</span></code> and its data type significantly changed; see <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/generated/hnn_core.Cell.html#hnn_core.Cell">the API docs of <code class="docutils literal notranslate"><span class="pre">Cell</span></code> for details</a>.</p></li>
+<li><p><a class="reference internal" href="generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">jones_2009_model()</span></code></a> and other built-in Network Models including <a class="reference internal" href="generated/hnn_core.law_2021_model.html#hnn_core.law_2021_model" title="hnn_core.law_2021_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">law_2021_model()</span></code></a> and <a class="reference internal" href="generated/hnn_core.calcium_model.html#hnn_core.calcium_model" title="hnn_core.calcium_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">calcium_model()</span></code></a> all accept the aforementioned <code class="docutils literal notranslate"><span class="pre">mesh_shape</span></code> argument like <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a>.</p></li>
+<li><p>The API for optimization has changed significantly. Instead of running the function <code class="docutils literal notranslate"><span class="pre">optimize_evoked</span></code> obtained using <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">hnn_core.optimization</span> <span class="pre">import</span> <span class="pre">optimize_evoked</span></code>, you should use the new <code class="xref py py-class docutils literal notranslate"><span class="pre">Optimizer</span></code> class and its methods; <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/optimize_evoked.html#sphx-glr-auto-examples-howto-optimize-evoked-py">see our example of evoked-response optimization here</a>.</p></li>
+<li><p><a class="reference internal" href="generated/hnn_core.viz.plot_spikes_hist.html#hnn_core.viz.plot_spikes_hist" title="hnn_core.viz.plot_spikes_hist"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_spikes_hist()</span></code></a> now accepts more arguments, including <code class="docutils literal notranslate"><span class="pre">invert_spike_types</span></code>, <code class="docutils literal notranslate"><span class="pre">color</span></code>, and any <code class="docutils literal notranslate"><span class="pre">**kwargs_hist</span></code> which can be applied to <code class="docutils literal notranslate"><span class="pre">matplotlib.axes.Axes.hist</span></code>. See the docstring for details.</p></li>
+<li><p><a class="reference internal" href="generated/hnn_core.viz.plot_spikes_raster.html#hnn_core.viz.plot_spikes_raster" title="hnn_core.viz.plot_spikes_raster"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_spikes_raster()</span></code></a> now accepts many more arguments, including <code class="docutils literal notranslate"><span class="pre">cell_types</span></code>, <code class="docutils literal notranslate"><span class="pre">colors</span></code>, <code class="docutils literal notranslate"><span class="pre">show_legend</span></code>, <code class="docutils literal notranslate"><span class="pre">marker_size</span></code>, <code class="docutils literal notranslate"><span class="pre">dpl</span></code>, and <code class="docutils literal notranslate"><span class="pre">overlay_dipoles</span></code>. See the docstring for details.</p></li>
+<li><p><a class="reference internal" href="generated/hnn_core.viz.plot_cell_morphology.html#hnn_core.viz.plot_cell_morphology" title="hnn_core.viz.plot_cell_morphology"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_cell_morphology()</span></code></a> now accepts more arguments, including <code class="docutils literal notranslate"><span class="pre">color</span></code> and several arguments related to its position and viewing window, including <code class="docutils literal notranslate"><span class="pre">pos</span></code>, <code class="docutils literal notranslate"><span class="pre">xlim</span></code>, <code class="docutils literal notranslate"><span class="pre">ylim</span></code>, and <code class="docutils literal notranslate"><span class="pre">zlim</span></code>. See the docstring for details.</p></li>
+<li><p><a class="reference internal" href="generated/hnn_core.viz.plot_laminar_csd.html#hnn_core.viz.plot_laminar_csd" title="hnn_core.viz.plot_laminar_csd"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_laminar_csd()</span></code></a> now accepts more arguments, including <code class="docutils literal notranslate"><span class="pre">vmin</span></code>, <code class="docutils literal notranslate"><span class="pre">vmax</span></code>, <code class="docutils literal notranslate"><span class="pre">sink</span></code>, and <code class="docutils literal notranslate"><span class="pre">interpolation</span></code>. See the docstring for details.</p></li>
+<li><p><a class="reference internal" href="generated/hnn_core.parallel_backends.MPIBackend.html#hnn_core.parallel_backends.MPIBackend" title="hnn_core.parallel_backends.MPIBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">MPIBackend</span></code></a> now accepts many more arguments, including <code class="docutils literal notranslate"><span class="pre">use_hwthreading_if_found</span></code>, <code class="docutils literal notranslate"><span class="pre">sensible_default_cores</span></code>, <code class="docutils literal notranslate"><span class="pre">override_hwthreading_option</span></code>, and <code class="docutils literal notranslate"><span class="pre">override_oversubscribe_option</span></code>. See the docstring for details; the ability to customize it has been greatly increased.</p></li>
+<li><p><a class="reference internal" href="generated/hnn_core.read_params.html#hnn_core.read_params" title="hnn_core.read_params"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_params()</span></code></a> now accepts a new argument <code class="docutils literal notranslate"><span class="pre">file_contents</span></code> which lets you pass in network configuration contents using a string.</p></li>
+</ul>
+</section>
+<section id="people-who-contributed-to-this-release-in-alphabetical-order-of-family-name">
+<h3>People who contributed to this release (in alphabetical order of family name):<a class="headerlink" href="#people-who-contributed-to-this-release-in-alphabetical-order-of-family-name" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/chenghuzi">Huzi Cheng</a></p></li>
+<li><p><a class="reference external" href="https://github.com/tianqi-cheng">Tianqi Cheng</a></p></li>
+<li><p><a class="reference external" href="https://github.com/gtdang">George Dang</a></p></li>
+<li><p><a class="reference external" href="https://github.com/dylansdaniels">Dylan Daniels</a></p></li>
+<li><p><a class="reference external" href="https://github.com/kmilo9999">Camilo Diaz</a></p></li>
+<li><p><a class="reference external" href="https://github.com/katduecker">Katharina Duecker</a></p></li>
+<li><p><a class="reference external" href="https://github.com/yarikoptic">Yaroslav Halchenko</a></p></li>
+<li><p><a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a></p></li>
+<li><p><a class="reference external" href="https://github.com/dikshant182004">Dikshant Jha</a></p></li>
+<li><p><a class="reference external" href="https://github.com/stephanie-r-jones">Stephanie R. Jones</a></p></li>
+<li><p><a class="reference external" href="https://github.com/Shehrozkashif">Shehroz Kashif</a></p></li>
+<li><p><a class="reference external" href="https://github.com/raj1701">Rajat Partani</a></p></li>
+<li><p><a class="reference external" href="https://github.com/carolinafernandezp">Carolina Fernandez Pujol</a></p></li>
+<li><p><a class="reference external" href="https://github.com/pynmash">Dan Toms</a></p></li>
+<li><p><a class="reference external" href="https://github.com/samadpls">Abdul Samad Siddiqui</a></p></li>
+<li><p><a class="reference external" href="https://github.com/asoplata">Austin E. Soplata</a></p></li>
+<li><p><a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a></p></li>
+<li><p><a class="reference external" href="https://github.com/ntolley">Nick Tolley</a></p></li>
+</ul>
+</section>
+<section id="prs-merged-api">
+<h3>PRs merged (API)<a class="headerlink" href="#prs-merged-api" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Add ability to manually define colors in spike histogram plots, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in
 <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/640">#640</a></p></li>
@@ -536,7 +605,7 @@ deprecated, by <a class="reference external" href="https://github.com/katduecker
 files to new json format, by <a class="reference external" href="https://github.com/gtdang">George Dang</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/772">#772</a></p></li>
 <li><p>Add <a class="reference internal" href="generated/hnn_core.BatchSimulate.html#hnn_core.BatchSimulate" title="hnn_core.BatchSimulate"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchSimulate</span></code></a> for batch simulation capability, by <a class="reference external" href="https://github.com/samadpls">Abdul Samad
 Siddiqui</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/782">#782</a></p></li>
-<li><p>Recorded calcium conncetration from the soma, as well as all sections, are enabled by
+<li><p>Recorded calcium concentration from the soma, as well as all sections, are enabled by
 setting <code class="docutils literal notranslate"><span class="pre">record_ca</span></code> to <code class="docutils literal notranslate"><span class="pre">soma</span></code> or <code class="docutils literal notranslate"><span class="pre">all</span></code> in <a class="reference internal" href="generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole"><code class="xref py py-func docutils literal notranslate"><span class="pre">simulate_dipole()</span></code></a>.
 Recordings are accessed through <code class="xref py py-class docutils literal notranslate"><span class="pre">ca</span></code>, by <a class="reference external" href="https://github.com/katduecker">Katharina
 Duecker</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/804">#804</a></p></li>
@@ -557,10 +626,14 @@ multiple biases per simulation and cell <code class="xref py py-func docutils li
 <a class="reference external" href="https://github.com/katduecker">Katharina Duecker</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/922">#922</a></p></li>
 <li><p>Add plots to show relative and absolute external drive strength, by <a class="reference external" href="https://github.com/dikshant182004">Dikshant Jha</a>
 in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/987">#987</a></p></li>
+<li><p>Make re-generation of our testing network usable and explicit, by <a class="reference external" href="https://github.com/asoplata">Austin E. Soplata</a>
+in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/988">#988</a></p></li>
+<li><p>Improvements to raster plotting, by <a class="reference external" href="https://github.com/dylansdaniels">Dylan Daniels</a> in
+<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1017">#1017</a> and <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1018">#1018</a></p></li>
 </ul>
 </section>
-<section id="bug-fixes-and-corrections">
-<h3>Bug fixes and corrections<a class="headerlink" href="#bug-fixes-and-corrections" title="Permalink to this heading">#</a></h3>
+<section id="prs-merged-bug-fixes-and-corrections">
+<h3>PRs merged (Bug fixes and corrections)<a class="headerlink" href="#prs-merged-bug-fixes-and-corrections" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Objective function called by <code class="xref py py-func docutils literal notranslate"><span class="pre">optimize_evoked()</span></code> now
 returns a scalar instead of tuple, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/670">#670</a></p></li>
@@ -626,10 +699,12 @@ E. Soplata</a> in <a class="reference external" href="https://github.com/jonesco
 <li><p>Copy template for monthly metrics workflow, in the hope it will fix the unsuccessful
 runs by <a class="reference external" href="https://github.com/asoplata">Austin E. Soplata</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/983">#983</a></p></li>
 <li><p>Hotfix of MPI install on MacOS CI runners by <a class="reference external" href="https://github.com/asoplata">Austin E. Soplata</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/994">#994</a></p></li>
+<li><p>Fix MPI test failures probably due to incomplete Network destruction by <a class="reference external" href="https://github.com/asoplata">Austin E. Soplata</a> in
+<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1010">#1010</a></p></li>
 </ul>
 </section>
-<section id="gui-changes">
-<h3>GUI changes<a class="headerlink" href="#gui-changes" title="Permalink to this heading">#</a></h3>
+<section id="prs-merged-gui-changes">
+<h3>PRs merged (GUI changes)<a class="headerlink" href="#prs-merged-gui-changes" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Add RMSE calculation and plotting to GUI, by <a class="reference external" href="https://github.com/chenghuzi">Huzi Cheng</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/636">#636</a></p></li>
 <li><p>Update GUI to use ipywidgets v8.0.0+ API, by <a class="reference external" href="https://github.com/gtdang">George Dang</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/696">#696</a></p></li>
@@ -678,10 +753,14 @@ in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-
 <li><p>Add GUI frequency default visualization parameters and many other smaller visual
 changes by <a class="reference external" href="https://github.com/dylansdaniels">Dylan Daniels</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/952">#952</a></p></li>
 <li><p>Capture printed messages to logger in GUI by <a class="reference external" href="https://github.com/dylansdaniels">Dylan Daniels</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/956">#956</a></p></li>
+<li><p>Correctly set layer-specific dipole axes limits in GUI, by <a class="reference external" href="https://github.com/dylansdaniels">Dylan Daniels</a> in
+<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1022">#1022</a></p></li>
+<li><p>Improve spike raster plot by overlaying dipoles, by <a class="reference external" href="https://github.com/dylansdaniels">Dylan Daniels</a> in
+<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1026">#1026</a></p></li>
 </ul>
 </section>
-<section id="other-changes">
-<h3>Other changes<a class="headerlink" href="#other-changes" title="Permalink to this heading">#</a></h3>
+<section id="prs-merged-other">
+<h3>PRs merged (Other)<a class="headerlink" href="#prs-merged-other" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Add Github Discussions installation template, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/630">#630</a></p></li>
 <li><p>Replace NEURON functions like <code class="docutils literal notranslate"><span class="pre">define_shape()</span></code> and <code class="docutils literal notranslate"><span class="pre">distance()</span></code> with Python
@@ -726,32 +805,11 @@ typos by <a class="reference external" href="https://github.com/asoplata">Austin
 in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/973">#973</a></p></li>
 <li><p>Add install and run of <code class="docutils literal notranslate"><span class="pre">codespell</span></code> to local testing by <a class="reference external" href="https://github.com/asoplata">Austin E. Soplata</a> in
 <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/977">#977</a></p></li>
+<li><p>Separate Installation to its own page, also other small authoring changes by <a class="reference external" href="https://github.com/asoplata">Austin E. Soplata</a>
+in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/980">#980</a></p></li>
 <li><p>Update Sphinx <code class="docutils literal notranslate"><span class="pre">versions.json</span></code> link to point to <code class="docutils literal notranslate"><span class="pre">dev</span></code> version, by <a class="reference external" href="https://github.com/asoplata">Austin E. Soplata</a>
 in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/991">#991</a></p></li>
 <li><p>Add docstring to <code class="docutils literal notranslate"><span class="pre">_add_cell_type_bias</span></code> by <a class="reference external" href="https://github.com/Shehrozkashif">Shehroz Kashif</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1001">#1001</a></p></li>
-</ul>
-</section>
-<section id="people-who-contributed-to-this-release-in-alphabetical-order-of-family-name">
-<h3>People who contributed to this release (in alphabetical order of family name):<a class="headerlink" href="#people-who-contributed-to-this-release-in-alphabetical-order-of-family-name" title="Permalink to this heading">#</a></h3>
-<ul class="simple">
-<li><p><a class="reference external" href="https://github.com/chenghuzi">Huzi Cheng</a></p></li>
-<li><p><a class="reference external" href="https://github.com/tianqi-cheng">Tianqi Cheng</a></p></li>
-<li><p><a class="reference external" href="https://github.com/gtdang">George Dang</a></p></li>
-<li><p><a class="reference external" href="https://github.com/dylansdaniels">Dylan Daniels</a></p></li>
-<li><p><a class="reference external" href="https://github.com/kmilo9999">Camilo Diaz</a></p></li>
-<li><p><a class="reference external" href="https://github.com/katduecker">Katharina Duecker</a></p></li>
-<li><p><a class="reference external" href="https://github.com/yarikoptic">Yaroslav Halchenko</a></p></li>
-<li><p><a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a></p></li>
-<li><p><a class="reference external" href="https://github.com/dikshant182004">Dikshant Jha</a></p></li>
-<li><p><a class="reference external" href="https://github.com/stephanie-r-jones">Stephanie R. Jones</a></p></li>
-<li><p><a class="reference external" href="https://github.com/Shehrozkashif">Shehroz Kashif</a></p></li>
-<li><p><a class="reference external" href="https://github.com/raj1701">Rajat Partani</a></p></li>
-<li><p><a class="reference external" href="https://github.com/carolinafernandezp">Carolina Fernandez Pujol</a></p></li>
-<li><p><a class="reference external" href="https://github.com/pynmash">Dan Toms</a></p></li>
-<li><p><a class="reference external" href="https://github.com/samadpls">Abdul Samad Siddiqui</a></p></li>
-<li><p><a class="reference external" href="https://github.com/asoplata">Austin E. Soplata</a></p></li>
-<li><p><a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a></p></li>
-<li><p><a class="reference external" href="https://github.com/ntolley">Nick Tolley</a></p></li>
 </ul>
 </section>
 </section>
@@ -1124,12 +1182,16 @@ scaling, by <a class="reference external" href="https://github.com/cjayb">Christ
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#current-v0-4-release-candidate-changelog">Current (v0.4 release candidate) Changelog</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#api-changes">API changes</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bug-fixes-and-corrections">Bug fixes and corrections</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gui-changes">GUI changes</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#other-changes">Other changes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-4-release-notes">v0.4 Release Notes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#new-features">New Features</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deprecations">Deprecations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#upcoming-deprecations">Upcoming Deprecations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#api-changes">API Changes</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#people-who-contributed-to-this-release-in-alphabetical-order-of-family-name">People who contributed to this release (in alphabetical order of family name):</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prs-merged-api">PRs merged (API)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prs-merged-bug-fixes-and-corrections">PRs merged (Bug fixes and corrections)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prs-merged-gui-changes">PRs merged (GUI changes)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prs-merged-other">PRs merged (Other)</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">0.3</a><ul class="nav section-nav flex-column">
