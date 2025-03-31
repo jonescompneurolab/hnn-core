@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:14.719** total execution time for 13 files **from all galleries**:
+**00:15.138** total execution time for 13 files **from all galleries**:
 
 .. container::
 
@@ -33,7 +33,7 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_howto_plot_batch_simulate.py` (``../examples/howto/plot_batch_simulate.py``)
-     - 00:14.719
+     - 00:15.138
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_optimize_evoked.py` (``../examples/howto/optimize_evoked.py``)
      - 00:00.000

@@ -508,7 +508,7 @@ document.write(`
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="kn">import</span> <span class="n">IFrame</span><span class="p">,</span> <span class="n">display</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">HTML</span><span class="p">,</span> <span class="n">Accordion</span><span class="p">,</span> <span class="n">AppLayout</span><span class="p">,</span> <span class="n">BoundedFloatText</span><span class="p">,</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ipywidgets</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">HTML</span><span class="p">,</span> <span class="n">Accordion</span><span class="p">,</span> <span class="n">AppLayout</span><span class="p">,</span> <span class="n">FloatText</span><span class="p">,</span> <span class="n">BoundedFloatText</span><span class="p">,</span>
                         <span class="n">BoundedIntText</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">Dropdown</span><span class="p">,</span> <span class="n">FileUpload</span><span class="p">,</span> <span class="n">VBox</span><span class="p">,</span>
                         <span class="n">HBox</span><span class="p">,</span> <span class="n">IntText</span><span class="p">,</span> <span class="n">Layout</span><span class="p">,</span> <span class="n">Output</span><span class="p">,</span> <span class="n">RadioButtons</span><span class="p">,</span> <span class="n">Tab</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span>
                         <span class="n">Checkbox</span><span class="p">,</span> <span class="n">Box</span><span class="p">)</span>
@@ -849,9 +849,23 @@ document.write(`
         <span class="n">layout</span> <span class="o">=</span> <span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;300px&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_smoothing</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
-            <span class="n">value</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Smoothing:&#39;</span><span class="p">,</span>
-            <span class="nb">min</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">analysis_style</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Dipole Smoothing:&#39;</span><span class="p">,</span>
+            <span class="nb">min</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+            <span class="nb">max</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
+            <span class="n">step</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+            <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">analysis_style</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_scaling</span> <span class="o">=</span> <span class="n">FloatText</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="mf">3000.0</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Dipole Scaling:&#39;</span><span class="p">,</span>
+            <span class="n">step</span><span class="o">=</span><span class="mf">100.0</span><span class="p">,</span>
+            <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">analysis_style</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">widget_min_frequency</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
@@ -874,6 +888,7 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">fig_default_params</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;default_smoothing&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_smoothing</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s1">&#39;default_scaling&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_scaling</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
             <span class="s1">&#39;default_min_frequency&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_min_frequency</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
             <span class="s1">&#39;default_max_frequency&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_max_frequency</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
         <span class="p">}</span>
@@ -1134,16 +1149,29 @@ document.write(`
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_run_button_clicked</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">run_button_clicked</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fig_default_params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_smoothing</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">widget_min_frequency</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_max_frequency</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">widget_mpi_cmd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">widget_n_jobs</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_bar</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_simulation_name</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">drive_widgets</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_dt</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_tstop</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fig_default_params</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_smoothing</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_scaling</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_min_frequency</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_max_frequency</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_ntrials</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_backend_selection</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_mpi_cmd</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_n_jobs</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_bar</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_simulation_status_contents</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">viz_manager</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">viz_manager</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span>
+            <span class="p">)</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_simulation_list_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="c1"># Simulation Data</span>
@@ -1262,6 +1290,7 @@ document.write(`
             <span class="p">),</span>
             <span class="n">VBox</span><span class="p">([</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_smoothing</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">widget_default_scaling</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_min_frequency</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">widget_max_frequency</span><span class="p">,</span>
             <span class="p">])</span>
@@ -2552,15 +2581,30 @@ document.write(`
                     <span class="o">**</span><span class="n">sync_inputs_kwargs</span><span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">run_button_clicked</span><span class="p">(</span><span class="n">widget_simulation_name</span><span class="p">,</span> <span class="n">log_out</span><span class="p">,</span> <span class="n">drive_widgets</span><span class="p">,</span>
-                       <span class="n">all_data</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span>
-                       <span class="n">fig_default_params</span><span class="p">,</span> <span class="n">widget_default_smoothing</span><span class="p">,</span>
-                       <span class="n">widget_min_frequency</span><span class="p">,</span> <span class="n">widget_max_frequency</span><span class="p">,</span>
-                       <span class="n">ntrials</span><span class="p">,</span> <span class="n">backend_selection</span><span class="p">,</span>
-                       <span class="n">mpi_cmd</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">simulation_status_bar</span><span class="p">,</span>
-                       <span class="n">simulation_status_contents</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">,</span>
-                       <span class="n">viz_manager</span><span class="p">,</span> <span class="n">simulations_list_widget</span><span class="p">,</span>
-                       <span class="n">cell_pameters_widgets</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_button_clicked</span><span class="p">(</span>
+        <span class="n">widget_simulation_name</span><span class="p">,</span> 
+        <span class="n">log_out</span><span class="p">,</span>
+        <span class="n">drive_widgets</span><span class="p">,</span>
+        <span class="n">all_data</span><span class="p">,</span>
+        <span class="n">dt</span><span class="p">,</span>
+        <span class="n">tstop</span><span class="p">,</span>
+        <span class="n">fig_default_params</span><span class="p">,</span>
+        <span class="n">widget_default_smoothing</span><span class="p">,</span>
+        <span class="n">widget_default_scaling</span><span class="p">,</span>
+        <span class="n">widget_min_frequency</span><span class="p">,</span>
+        <span class="n">widget_max_frequency</span><span class="p">,</span>
+        <span class="n">ntrials</span><span class="p">,</span>
+        <span class="n">backend_selection</span><span class="p">,</span>
+        <span class="n">mpi_cmd</span><span class="p">,</span>
+        <span class="n">n_jobs</span><span class="p">,</span>
+        <span class="n">params</span><span class="p">,</span>
+        <span class="n">simulation_status_bar</span><span class="p">,</span>
+        <span class="n">simulation_status_contents</span><span class="p">,</span>
+        <span class="n">connectivity_textfields</span><span class="p">,</span>
+        <span class="n">viz_manager</span><span class="p">,</span>
+        <span class="n">simulations_list_widget</span><span class="p">,</span>
+        <span class="n">cell_pameters_widgets</span>
+    <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the simulation and plot outputs.&quot;&quot;&quot;</span>
     <span class="n">simulation_data</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[</span><span class="s2">&quot;simulation_data&quot;</span><span class="p">]</span>
     <span class="k">with</span> <span class="n">log_out</span><span class="p">:</span>
@@ -2617,6 +2661,7 @@ document.write(`
 
     <span class="c1"># update default visualization params in gui based on widget</span>
     <span class="n">fig_default_params</span><span class="p">[</span><span class="s1">&#39;default_smoothing&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_default_smoothing</span><span class="o">.</span><span class="n">value</span>
+    <span class="n">fig_default_params</span><span class="p">[</span><span class="s1">&#39;default_scaling&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_default_scaling</span><span class="o">.</span><span class="n">value</span>
     <span class="n">fig_default_params</span><span class="p">[</span><span class="s1">&#39;default_min_frequency&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_min_frequency</span><span class="o">.</span><span class="n">value</span>
     <span class="n">fig_default_params</span><span class="p">[</span><span class="s1">&#39;default_max_frequency&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget_max_frequency</span><span class="o">.</span><span class="n">value</span>
 
