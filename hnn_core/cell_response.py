@@ -442,10 +442,6 @@ class CellResponse(object):
             2) spike gid, and
             3) gid type
         """
-        warn('Writing cell response to txt files is deprecated '
-             'and will be removed in future versions. Please save '
-             'cell response along with network',
-             DeprecationWarning, stacklevel=2)
         fname = str(fname)
         old_style = True
         try:
