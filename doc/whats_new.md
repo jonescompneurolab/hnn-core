@@ -24,7 +24,7 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 
 - There is now a new class {class}`~hnn_core.viz.NetworkPlotter` which can be used to visualize an entire network in 3D, including firing animations; [see our example of how to use it here](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_hnn_animation.html#sphx-glr-auto-examples-howto-plot-hnn-animation-py).
 
-- There is now a new function {func}`~hnn_core.viz.plot_drive_strength` for illustrating the absolute or relative amount of strength that a particular drive has to different celltypes.
+- There is now a new function {func}`~hnn_core.viz.plot_drive_strength` for illustrating the absolute or relative amount of strength that a particular drive provides to different cell types.
 
 - A very large amount of polishing, bug fixes, general improvements, etc.
 
