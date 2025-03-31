@@ -652,6 +652,7 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
     simulation_names = tuple(data['simulations'].keys())
     sim_index = 0
     default_smoothing = fig_default_params['default_smoothing']
+    default_scaling = fig_default_params['default_scaling']
     default_min_frequency = fig_default_params['default_min_frequency']
     default_max_frequency = fig_default_params['default_max_frequency']
     if not simulation_names:
@@ -717,7 +718,7 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
         style=analysis_style)
 
     simulation_dipole_scaling = FloatText(
-        value=3000,
+        value=default_scaling,
         description='Simulation Dipole Scaling:',
         disabled=False,
         layout=layout,
