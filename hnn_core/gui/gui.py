@@ -19,7 +19,7 @@ from pathlib import Path
 from datetime import datetime
 from functools import partial
 from IPython.display import IFrame, display
-from ipywidgets import (HTML, Accordion, AppLayout, BoundedFloatText,
+from ipywidgets import (HTML, Accordion, AppLayout, FloatText, BoundedFloatText,
                         BoundedIntText, Button, Dropdown, FileUpload, VBox,
                         HBox, IntText, Layout, Output, RadioButtons, Tab, Text,
                         Checkbox, Box)
@@ -360,9 +360,23 @@ class HNNGUI:
         layout = Layout(width="300px")
 
         self.widget_default_smoothing = BoundedFloatText(
-            value=30.0, description='Smoothing:',
-            min=0.0, max=100.0, step=1.0, disabled=False,
-            layout=layout, style=analysis_style,
+            value=30.0,
+            description='Dipole Smoothing:',
+            min=0.0,
+            max=100.0,
+            step=1.0,
+            disabled=False,
+            layout=layout,
+            style=analysis_style,
+        )
+
+        self.widget_default_scaling = FloatText(
+            value=3000.0,
+            description='Dipole Scaling:',
+            step=100.0,
+            disabled=False,
+            layout=layout,
+            style=analysis_style,
         )
 
         self.widget_min_frequency = BoundedFloatText(
@@ -385,6 +399,7 @@ class HNNGUI:
 
         self.fig_default_params = {
             'default_smoothing': self.widget_default_smoothing.value,
+            'default_scaling': self.widget_default_scaling.value,
             'default_min_frequency': self.widget_min_frequency.value,
             'default_max_frequency': self.widget_max_frequency.value,
         }
@@ -645,16 +660,29 @@ class HNNGUI:
 
         def _run_button_clicked(b):
             return run_button_clicked(
-                self.widget_simulation_name, self._log_out, self.drive_widgets,
-                self.data, self.widget_dt, self.widget_tstop,
-                self.fig_default_params, self.widget_default_smoothing,
-                self.widget_min_frequency, self.widget_max_frequency,
-                self.widget_ntrials, self.widget_backend_selection,
-                self.widget_mpi_cmd, self.widget_n_jobs,
-                self.params, self._simulation_status_bar,
+                self.widget_simulation_name,
+                self._log_out,
+                self.drive_widgets,
+                self.data,
+                self.widget_dt,
+                self.widget_tstop,
+                self.fig_default_params,
+                self.widget_default_smoothing,
+                self.widget_default_scaling,
+                self.widget_min_frequency,
+                self.widget_max_frequency,
+                self.widget_ntrials,
+                self.widget_backend_selection,
+                self.widget_mpi_cmd,
+                self.widget_n_jobs,
+                self.params,
+                self._simulation_status_bar,
                 self._simulation_status_contents,
-                self.connectivity_widgets, self.viz_manager,
-                self.simulation_list_widget, self.cell_pameters_widgets)
+                self.connectivity_widgets,
+                self.viz_manager,
+                self.simulation_list_widget,
+                self.cell_pameters_widgets
+            )
 
         def _simulation_list_change(value):
             # Simulation Data
@@ -773,6 +801,7 @@ class HNNGUI:
             ),
             VBox([
                 self.widget_default_smoothing,
+                self.widget_default_scaling,
                 self.widget_min_frequency,
                 self.widget_max_frequency,
             ])
@@ -2063,15 +2092,30 @@ def _init_network_from_widgets(params, dt, tstop, single_simulation_data,
                     **sync_inputs_kwargs)
 
 
-def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
-                       all_data, dt, tstop,
-                       fig_default_params, widget_default_smoothing,
-                       widget_min_frequency, widget_max_frequency,
-                       ntrials, backend_selection,
-                       mpi_cmd, n_jobs, params, simulation_status_bar,
-                       simulation_status_contents, connectivity_textfields,
-                       viz_manager, simulations_list_widget,
-                       cell_pameters_widgets):
+def run_button_clicked(
+        widget_simulation_name, 
+        log_out,
+        drive_widgets,
+        all_data,
+        dt,
+        tstop,
+        fig_default_params,
+        widget_default_smoothing,
+        widget_default_scaling,
+        widget_min_frequency,
+        widget_max_frequency,
+        ntrials,
+        backend_selection,
+        mpi_cmd,
+        n_jobs,
+        params,
+        simulation_status_bar,
+        simulation_status_contents,
+        connectivity_textfields,
+        viz_manager,
+        simulations_list_widget,
+        cell_pameters_widgets
+    ):
     """Run the simulation and plot outputs."""
     simulation_data = all_data["simulation_data"]
     with log_out:
@@ -2128,6 +2172,7 @@ def run_button_clicked(widget_simulation_name, log_out, drive_widgets,
 
     # update default visualization params in gui based on widget
     fig_default_params['default_smoothing'] = widget_default_smoothing.value
+    fig_default_params['default_scaling'] = widget_default_scaling.value
     fig_default_params['default_min_frequency'] = widget_min_frequency.value
     fig_default_params['default_max_frequency'] = widget_max_frequency.value
 
