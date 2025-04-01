@@ -24,7 +24,6 @@ Simulation (:py:mod:`hnn_core`):
    Cell
    CellResponse
    pick_connection
-   BatchSimulate
 
 Network Models (:py:mod:`hnn_core`):
 ------------------------------------
@@ -100,7 +99,6 @@ Parallel backends (:py:mod:`hnn_core.parallel_backends`):
 
    MPIBackend
    JoblibBackend
-
 
 Input and Output:
 -----------------
