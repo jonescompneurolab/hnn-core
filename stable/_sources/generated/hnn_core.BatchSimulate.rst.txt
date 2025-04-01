@@ -1,0 +1,16 @@
+﻿hnn_core.BatchSimulate
+======================
+
+.. currentmodule:: hnn_core
+
+.. autoclass:: BatchSimulate
+   :inherited-members:
+   :special-members: __getitem__, __repr__
+   :members:
+
+.. _sphx_glr_backreferences_hnn_core.BatchSimulate:
+.. minigallery:: hnn_core.BatchSimulate
+   :add-heading:
+
+   
+   

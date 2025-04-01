@@ -20,7 +20,8 @@ for comprehensive analysis.
 
 import matplotlib.pyplot as plt
 import numpy as np
-from hnn_core.batch_simulate import BatchSimulate
+
+from hnn_core import BatchSimulate
 from hnn_core import jones_2009_model
 
 # The number of cores may need modifying depending on your current machine.

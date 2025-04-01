@@ -1,0 +1,912 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Installation Guide &#8212; hnn-core  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'install';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tutorials" href="auto_examples/index.html" />
+    <link rel="prev" title="hnn-core" href="index.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.4" />
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-199741045-1');
+</script>
+
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core  documentation - Home"/>
+    <img src="_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core  documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Install
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="glossary.html">
+    Glossary
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Install
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="glossary.html">
+    Glossary
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Installation Guide</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="installation-guide">
+<span id="install"></span><h1>Installation Guide<a class="headerlink" href="#installation-guide" title="Link to this heading">#</a></h1>
+<p>If you have any questions or problems while installing <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code>, feel free to
+ask for help <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/discussions">on our GitHub Discussions
+page</a>!</p>
+<p>Please follow the instructions in Steps 1, 2, and 3, in that order.</p>
+</section>
+<hr class="docutils" />
+<section id="step-1-python-environment">
+<h1>Step 1. Python Environment<a class="headerlink" href="#step-1-python-environment" title="Link to this heading">#</a></h1>
+<p>We strongly recommend that you install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> inside a “virtual
+environment” using software like the <a class="reference external" href="https://www.anaconda.com/download/success">Anaconda Python
+Distribution</a>. If you
+are new to Python or data science in Python, we recommend you review the
+resources here: <a class="reference external" href="https://docs.anaconda.com/getting-started/">https://docs.anaconda.com/getting-started/</a>.</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> currently only supports Python 3.8, 3.9, 3.10, 3.11, and 3.12, but <em>not</em> 3.13.</p>
+</section>
+<hr class="docutils" />
+<section id="step-2-platform-specific-requirements">
+<h1>Step 2. Platform-specific requirements<a class="headerlink" href="#step-2-platform-specific-requirements" title="Link to this heading">#</a></h1>
+<section id="windows">
+<h2>Windows<a class="headerlink" href="#windows" title="Link to this heading">#</a></h2>
+<ul>
+<li><p>Before you install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code>, it is important that you <strong>install</strong> the
+<a class="reference external" href="https://nrn.readthedocs.io/">NEURON</a> software system-wide using its <a class="reference external" href="https://nrn.readthedocs.io/en/latest/install/install_instructions.html#windows">Windows-specific
+binaries</a>. You
+can test that NEURON was installed correctly by opening a Command Prompt (or
+similar) via your Anaconda install, and running the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -c &quot;import neuron;&quot;
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="macos">
+<h2>MacOS<a class="headerlink" href="#macos" title="Link to this heading">#</a></h2>
+<ul>
+<li><p>If you already installed the <a class="reference external" href="https://nrn.readthedocs.io/">NEURON</a> software system-wide using its
+traditional installer package, it is recommended to <strong>remove it</strong> first. We
+will be installing NEURON using its PyPI package alongside <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code>.</p></li>
+<li><p>Before you install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code>, it is important that you install “Xcode
+Command-Line Tools”.  This can be done easily by opening a Terminal and
+running the following command (followed by clicking through the prompts):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ xcode-select --install
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="linux">
+<h2>Linux<a class="headerlink" href="#linux" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>If you already installed the <a class="reference external" href="https://nrn.readthedocs.io/">NEURON</a> software system-wide using its
+traditional installer package, it is recommended to <strong>remove it</strong> first. We
+will be installing NEURON using its PyPI package alongside <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="step-3-hnn-core-installation-types">
+<h1>Step 3. <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> installation types<a class="headerlink" href="#step-3-hnn-core-installation-types" title="Link to this heading">#</a></h1>
+<p>Note that Step 1 and Step 2 above are required for <strong>all installation types</strong>. Note that you can install multiple sets of HNN features below during the install process by combining them similar to <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;hnn_core[gui,parallel]&quot;</span></code>.</p>
+<section id="basic-installation">
+<h2>Basic Installation<a class="headerlink" href="#basic-installation" title="Link to this heading">#</a></h2>
+<p>To install just the <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> API, open a Terminal or Command Prompt using a fresh virtual
+environment, and enter:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pip install hnn_core
+</pre></div>
+</div>
+<p>This will install only the <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> API along with its required
+dependencies, which include:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://numpy.org/">NumPy</a></p></li>
+<li><p><a class="reference external" href="https://scipy.org/">SciPy</a></p></li>
+<li><p><a class="reference external" href="https://matplotlib.org/">Matplotlib</a></p></li>
+<li><p><a class="reference external" href="https://nrn.readthedocs.io/">NEURON</a> (&gt;=7.7)</p></li>
+<li><p><a class="reference external" href="https://github.com/h5io/h5io">h5io</a></p></li>
+</ul>
+<p>To check if everything worked fine, you can run:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ python -c &quot;import hnn_core&quot;
+</pre></div>
+</div>
+<p>and it should not give any error messages.</p>
+<p><strong>Basic Usage</strong>: For how to use the <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> API, which is available for every installation
+type, see our extensive <a class="reference internal" href="auto_examples/index.html"><span class="doc">Examples page</span></a>.</p>
+</section>
+<section id="graphical-user-interface-gui-installation">
+<h2>Graphical User Interface (GUI) Installation<a class="headerlink" href="#graphical-user-interface-gui-installation" title="Link to this heading">#</a></h2>
+<p>To install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> with both its API and GUI support, a simple tweak to the above command is
+needed (pay attention to the “quotes”):</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pip install &quot;hnn_core[gui]&quot;
+</pre></div>
+</div>
+<p>This will install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code>, its API dependencies, and the additional GUI dependencies, which
+include:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://ipykernel.readthedocs.io/en/stable/">ipykernel</a></p></li>
+<li><p><a class="reference external" href="https://matplotlib.org/ipympl/">ipympl</a></p></li>
+<li><p><a class="reference external" href="https://github.com/jupyter-widgets/ipywidgets">ipywidgets</a> &gt;=8.0.0</p></li>
+<li><p><a class="reference external" href="https://github.com/voila-dashboards/voila">voila</a></p></li>
+</ul>
+<p><strong>GUI Usage</strong>: To start the GUI, simply run:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ hnn-gui
+</pre></div>
+</div>
+</section>
+<section id="optimization-installation">
+<h2>Optimization Installation<a class="headerlink" href="#optimization-installation" title="Link to this heading">#</a></h2>
+<p>If you would like to use Bayesian optimization, then
+<a class="reference external" href="https://scikit-learn.org/stable/index.html"><code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code></a> is required. You
+can easily install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code>, its API dependencies, and its optimization
+dependencies using the following command (pay attention to the “quotes”):</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pip install &quot;hnn_core[opt]&quot;
+</pre></div>
+</div>
+<p>If you are planning to use Optimization, it is strongly recommended to also
+install <a class="reference internal" href="#parallelism"><span class="xref myst">support for Parallelism, which can be found
+below</span></a>.</p>
+<p><strong>Optimization Usage</strong>: An example of how to use our Optimization support can be found <span class="xref std std-doc">in the Example here</span>.</p>
+</section>
+<section id="parallelism">
+<h2>Parallelism<a class="headerlink" href="#parallelism" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> supports two kinds of parallelism:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#parallelism-joblib-installation"><span class="xref myst">Joblib parallelism</span></a>: <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> can take advantage of <a class="reference external" href="https://joblib.readthedocs.io/en/stable/">the Joblib
+library</a> in order to run multiple
+independent simulations simultaneously across multiple CPU processors (also called <a class="reference external" href="https://en.wikipedia.org/wiki/Embarrassingly_parallel">“embarrassingly parallel”
+jobs</a>).</p></li>
+<li><p><a class="reference internal" href="#parallelism-mpi-installation"><span class="xref myst">MPI parallelism</span></a>: <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> can take
+advantage of NEURON’s use of <a class="reference external" href="https://en.wikipedia.org/wiki/Message_Passing_Interface">the MPI
+protocol</a> to split
+neurons across CPU processors, greatly reducing simulation time as more cores
+are used. This is more complex than other installation methods, but offers the
+best single-simulation speed. Note that <a class="reference internal" href="#parallelism-mpi-windows"><span class="xref myst">we do not support MPI on
+Windows</span></a>.</p></li>
+</ul>
+</section>
+<section id="parallelism-joblib-installation">
+<h2>Parallelism: Joblib Installation<a class="headerlink" href="#parallelism-joblib-installation" title="Link to this heading">#</a></h2>
+<p>You can easily install the <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> API, its API dependencies, and its additional Joblib parallelism
+dependencies using the following command (pay attention to the “quotes”):</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pip install &quot;hnn_core[parallel]&quot;
+</pre></div>
+</div>
+<p>This automatically installs the following dependencies:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://joblib.readthedocs.io/en/stable/">Joblib</a></p></li>
+<li><p><a class="reference external" href="https://github.com/giampaolo/psutil">psutil</a></p></li>
+</ul>
+<p><strong>Parallelism: Joblib Usage</strong>:</p>
+<ul>
+<li><p>Once installed, you can run multiple trials simultaneously with only a small modification to your code, like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <span class="n">JoblibBackend</span>
+
+<span class="c1"># set n_jobs to the number of trials to run in parallel with</span>
+<span class="c1"># Joblib (up to number of cores on system)</span>
+<span class="k">with</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="n">dpls</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>Some in-depth examples of Joblib usage for trials are available in the Examples <a class="reference internal" href="auto_examples/workflows/plot_simulate_alpha.html"><span class="doc">found here</span></a> and <a class="reference internal" href="auto_examples/workflows/plot_simulate_somato.html"><span class="doc">also here</span></a>.</p></li>
+<li><p>Joblib can also be used to simultaneously run multiple simulations across “batches” of simulation parameters, illustrated <a class="reference internal" href="auto_examples/howto/plot_batch_simulate.html"><span class="doc">in our Batch Simulation example</span></a>.</p></li>
+</ul>
+</section>
+<section id="parallelism-mpi-installation">
+<h2>Parallelism: MPI Installation<a class="headerlink" href="#parallelism-mpi-installation" title="Link to this heading">#</a></h2>
+<p>For MPI installation, we <strong>strongly</strong> recommend you use the <a class="reference external" href="https://www.anaconda.com/download/success">Anaconda Python
+Distribution</a> specifically, since Anaconda is the easiest way to download <a class="reference external" href="https://anaconda.org/conda-forge/openmpi">OpenMPI</a> binaries, which are <em>not</em> Python code.</p>
+<section id="parallelism-mpi-windows">
+<h3>Parallelism: MPI: Windows<a class="headerlink" href="#parallelism-mpi-windows" title="Link to this heading">#</a></h3>
+<p>Unfortunately, we do not officially support MPI usage on Windows due to the
+complexity required. If this is a necessity for you and you do not have access
+to Linux/etc.-based HPC resources, please <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/discussions">get in touch via our GitHub
+Discussions
+page</a>. We may still
+be able to help.</p>
+</section>
+<section id="parallelism-mpi-macos">
+<h3>Parallelism: MPI: MacOS<a class="headerlink" href="#parallelism-mpi-macos" title="Link to this heading">#</a></h3>
+<ol class="arabic">
+<li><p>First, create and activate your <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment (but do not install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> yet).</p></li>
+<li><p>Inside your <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment, install the <code class="docutils literal notranslate"><span class="pre">conda-forge</span></code> versions of <a class="reference external" href="https://anaconda.org/conda-forge/openmpi">OpenMPI</a> and <a class="reference external" href="https://anaconda.org/conda-forge/mpi4py"><code class="docutils literal notranslate"><span class="pre">mpi4py</span></code></a> using the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install -y conda-forge::openmpi conda-forge::mpi4py
+</pre></div>
+</div>
+</li>
+<li><p>Next, copy, paste, and run the following commands to set some environment variables for your <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd ${CONDA_PREFIX}
+$ mkdir -p etc/conda/activate.d etc/conda/deactivate.d
+$ echo &quot;export OLD_DYLD_FALLBACK_LIBRARY_PATH=\$DYLD_FALLBACK_LIBRARY_PATH&quot; &gt;&gt; etc/conda/activate.d/env_vars.sh
+$ echo &quot;export DYLD_FALLBACK_LIBRARY_PATH=\$DYLD_FALLBACK_LIBRARY_PATH:\${CONDA_PREFIX}/lib&quot; &gt;&gt; etc/conda/activate.d/env_vars.sh
+$ echo &quot;export DYLD_FALLBACK_LIBRARY_PATH=\$OLD_DYLD_FALLBACK_LIBRARY_PATH&quot; &gt;&gt; etc/conda/deactivate.d/env_vars.sh
+$ echo &quot;unset OLD_DYLD_FALLBACK_LIBRARY_PATH&quot; &gt;&gt; etc/conda/deactivate.d/env_vars.sh
+$ export OLD_DYLD_FALLBACK_LIBRARY_PATH=$DYLD_FALLBACK_LIBRARY_PATH
+$ export DYLD_FALLBACK_LIBRARY_PATH=$DYLD_FALLBACK_LIBRARY_PATH:${CONDA_PREFIX}/lib
+</pre></div>
+</div>
+</li>
+<li><p>Next, install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> with parallel support (pay attention to the “quotes”):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install &quot;hnn_core[parallel]&quot;
+</pre></div>
+</div>
+</li>
+<li><p>Finally, test that the install worked. Run the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mpiexec -np 2 nrniv -mpi -python -c &#39;from neuron import h; from mpi4py import MPI; \
+                                   print(f&quot;Hello from proc {MPI.COMM_WORLD.Get_rank()}&quot;); \
+                                   h.quit()&#39;
+</pre></div>
+</div>
+<p>You should see output the looks like the following; this verifies that MPI, NEURON, and Python are all working together.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">numprocs</span><span class="o">=</span><span class="mi">2</span>
+<span class="n">NEURON</span> <span class="o">--</span> <span class="n">VERSION</span> <span class="mf">7.7.2</span> <span class="mf">7.7</span> <span class="p">(</span><span class="mi">2</span><span class="n">b7985ba</span><span class="p">)</span> <span class="mi">2019</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">20</span>
+<span class="n">Duke</span><span class="p">,</span> <span class="n">Yale</span><span class="p">,</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">BlueBrain</span> <span class="n">Project</span> <span class="o">--</span> <span class="n">Copyright</span> <span class="mi">1984</span><span class="o">-</span><span class="mi">2018</span>
+<span class="n">See</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">neuron</span><span class="o">.</span><span class="n">yale</span><span class="o">.</span><span class="n">edu</span><span class="o">/</span><span class="n">neuron</span><span class="o">/</span><span class="n">credits</span>
+
+<span class="n">Hello</span> <span class="kn">from</span><span class="w"> </span><span class="nn">proc</span> <span class="mi">0</span>
+<span class="n">Hello</span> <span class="kn">from</span><span class="w"> </span><span class="nn">proc</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="parallelism-mpi-linux">
+<h3>Parallelism: MPI: Linux<a class="headerlink" href="#parallelism-mpi-linux" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Note: these instructions are for installing <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> with MPI support on
+a <em>personal</em> Linux computer, not a High-Performance Computing (HPC) environment (also
+called a computing cluster or supercomputer). If you are on an HPC, then you
+should refer to your local HPC environment’s documentation on how to load the
+necessary MPI libraries/executables before installing <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code>. Feel free
+to reach out to us <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/discussions">via our GitHub Discussions
+page</a> if you are
+unsure or run into problems; we should be able to help you get it working.</p></li>
+</ul>
+<ol class="arabic">
+<li><p>First, create and activate your <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment (but do not install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> yet).</p></li>
+<li><p>Inside your <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment, install the <code class="docutils literal notranslate"><span class="pre">conda-forge</span></code> versions of <a class="reference external" href="https://anaconda.org/conda-forge/openmpi">OpenMPI</a> and <a class="reference external" href="https://anaconda.org/conda-forge/mpi4py"><code class="docutils literal notranslate"><span class="pre">mpi4py</span></code></a> using the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install -y conda-forge::openmpi conda-forge::mpi4py
+</pre></div>
+</div>
+</li>
+<li><p>Next, copy, paste, and run the following commands to set some environment variables for your <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd ${CONDA_PREFIX}
+$ mkdir -p etc/conda/activate.d etc/conda/deactivate.d
+$ echo &quot;export OLD_LD_LIBRARY_PATH=\$LD_LIBRARY_PATH&quot; &gt;&gt; etc/conda/activate.d/env_vars.sh
+$ echo &quot;export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:\${CONDA_PREFIX}/lib&quot; &gt;&gt; etc/conda/activate.d/env_vars.sh
+$ echo &quot;export LD_LIBRARY_PATH=\$OLD_LD_LIBRARY_PATH&quot; &gt;&gt; etc/conda/deactivate.d/env_vars.sh
+$ echo &quot;unset OLD_LD_LIBRARY_PATH&quot; &gt;&gt; etc/conda/deactivate.d/env_vars.sh
+$ export OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CONDA_PREFIX}/lib
+</pre></div>
+</div>
+</li>
+<li><p>Next, install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> with parallel support (pay attention to the “quotes”):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install &quot;hnn_core[parallel]&quot;
+</pre></div>
+</div>
+</li>
+<li><p>Finally, test that the install worked. Run the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mpiexec -np 2 nrniv -mpi -python -c &#39;from neuron import h; from mpi4py import MPI; \
+                                   print(f&quot;Hello from proc {MPI.COMM_WORLD.Get_rank()}&quot;); \
+                                   h.quit()&#39;
+</pre></div>
+</div>
+<p>You should see output the looks like the following; this verifies that MPI, NEURON, and Python are all working together.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">numprocs</span><span class="o">=</span><span class="mi">2</span>
+<span class="n">NEURON</span> <span class="o">--</span> <span class="n">VERSION</span> <span class="mf">7.7.2</span> <span class="mf">7.7</span> <span class="p">(</span><span class="mi">2</span><span class="n">b7985ba</span><span class="p">)</span> <span class="mi">2019</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">20</span>
+<span class="n">Duke</span><span class="p">,</span> <span class="n">Yale</span><span class="p">,</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">BlueBrain</span> <span class="n">Project</span> <span class="o">--</span> <span class="n">Copyright</span> <span class="mi">1984</span><span class="o">-</span><span class="mi">2018</span>
+<span class="n">See</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">neuron</span><span class="o">.</span><span class="n">yale</span><span class="o">.</span><span class="n">edu</span><span class="o">/</span><span class="n">neuron</span><span class="o">/</span><span class="n">credits</span>
+
+<span class="n">Hello</span> <span class="kn">from</span><span class="w"> </span><span class="nn">proc</span> <span class="mi">0</span>
+<span class="n">Hello</span> <span class="kn">from</span><span class="w"> </span><span class="nn">proc</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="parallelism-mpi-usage">
+<h3>Parallelism: MPI: Usage<a class="headerlink" href="#parallelism-mpi-usage" title="Link to this heading">#</a></h3>
+<ul>
+<li><p>Once installed, you can run any simulation using multiple CPU processors with only a small modification to your code, like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPIBackend</span>
+
+<span class="c1"># Set n_procs to the number of processors MPI can use (up to</span>
+<span class="c1"># number of cores on system). A different launch command can be</span>
+<span class="c1"># specified for MPI distributions other than openmpi.</span>
+<span class="k">with</span> <span class="n">MPIBackend</span><span class="p">(</span><span class="n">n_procs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">mpi_cmd</span><span class="o">=</span><span class="s1">&#39;mpiexec&#39;</span><span class="p">):</span>
+    <span class="n">dpls</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>An in-depth example of MPI usage is available in the <a class="reference internal" href="auto_examples/howto/plot_simulate_mpi_backend.html"><span class="doc">Example found here</span></a>.</p></li>
+</ul>
+</section>
+</section>
+<section id="installing-multiple-optional-hnn-core-features">
+<h2>Installing multiple optional <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> features<a class="headerlink" href="#installing-multiple-optional-hnn-core-features" title="Link to this heading">#</a></h2>
+<p>Note that you easily install multiple groups of optional features. For example,
+if you want to install both GUI support and Optimization support, then simply
+run the following:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pip install &quot;hnn_core[gui,opt]&quot;
+</pre></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">hnn-core</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="auto_examples/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Tutorials</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Installation Guide</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-python-environment">Step 1. Python Environment</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-platform-specific-requirements">Step 2. Platform-specific requirements</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#windows">Windows</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#macos">MacOS</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linux">Linux</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#step-3-hnn-core-installation-types">Step 3. <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> installation types</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-installation">Basic Installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#graphical-user-interface-gui-installation">Graphical User Interface (GUI) Installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimization-installation">Optimization Installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parallelism">Parallelism</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parallelism-joblib-installation">Parallelism: Joblib Installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parallelism-mpi-installation">Parallelism: MPI Installation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parallelism-mpi-windows">Parallelism: MPI: Windows</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parallelism-mpi-macos">Parallelism: MPI: MacOS</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parallelism-mpi-linux">Parallelism: MPI: Linux</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parallelism-mpi-usage">Parallelism: MPI: Usage</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-multiple-optional-hnn-core-features">Installing multiple optional <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> features</a></li>
+</ul>
+</li>
+</ul>
+
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/install.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, HNN Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

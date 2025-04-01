@@ -154,6 +154,13 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Install
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../auto_examples/index.html">
     Examples
   </a>
@@ -194,13 +201,6 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
-    PyPI
-  </a>
-</li>
-
             <li class="nav-item dropdown">
                 <button class="btn dropdown-toggle nav-item" type="button"
                 data-bs-toggle="dropdown" aria-expanded="false"
@@ -209,6 +209,13 @@
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
+
+
 <li class=" ">
   <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
     HNN Frontpage
@@ -301,6 +308,13 @@
 <nav>
   <ul class="bd-navbar-elements navbar-nav">
     
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Install
+  </a>
+</li>
+
+
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../auto_examples/index.html">
     Examples
@@ -454,7 +468,6 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">multiprocessing</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">shlex</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
@@ -463,6 +476,8 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">binascii</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">queue</span><span class="w"> </span><span class="kn">import</span> <span class="n">Queue</span><span class="p">,</span> <span class="n">Empty</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">threading</span><span class="w"> </span><span class="kn">import</span> <span class="n">Thread</span><span class="p">,</span> <span class="n">Event</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.cell_response</span><span class="w"> </span><span class="kn">import</span> <span class="n">CellResponse</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.dipole</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dipole</span>
@@ -1006,18 +1021,228 @@
 <span class="sd">            The Dipole results from each simulation trial</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Joblib will run </span><span class="si">{</span><span class="n">n_trials</span><span class="si">}</span><span class="s2"> trial(s) in parallel by &quot;</span>
-              <span class="sa">f</span><span class="s2">&quot;distributing trials over </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="si">}</span><span class="s2"> jobs.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Joblib will run </span><span class="si">{</span><span class="n">n_trials</span><span class="si">}</span><span class="s2"> trial(s) in parallel by &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;distributing trials over </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="si">}</span><span class="s2"> jobs.&quot;</span>
+        <span class="p">)</span>
         <span class="n">parallel</span><span class="p">,</span> <span class="n">myfunc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parallel_func</span><span class="p">(</span><span class="n">_simulate_single_trial</span><span class="p">)</span>
-        <span class="n">sim_data</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">(</span><span class="n">myfunc</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">trial_idx</span><span class="p">)</span> <span class="k">for</span>
-                            <span class="n">trial_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">))</span>
+        <span class="n">sim_data</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">(</span>
+            <span class="n">myfunc</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">trial_idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">trial_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">)</span>
+        <span class="p">)</span>
 
-        <span class="n">dpls</span> <span class="o">=</span> <span class="n">_gather_trial_data</span><span class="p">(</span><span class="n">sim_data</span><span class="p">,</span> <span class="n">net</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="n">n_trials</span><span class="p">,</span>
-                                  <span class="n">postproc</span><span class="o">=</span><span class="n">postproc</span><span class="p">)</span>
+        <span class="n">dpls</span> <span class="o">=</span> <span class="n">_gather_trial_data</span><span class="p">(</span>
+            <span class="n">sim_data</span><span class="p">,</span> <span class="n">net</span><span class="o">=</span><span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="n">n_trials</span><span class="p">,</span> <span class="n">postproc</span><span class="o">=</span><span class="n">postproc</span>
+        <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">dpls</span></div>
 </div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_determine_cores_hwthreading</span><span class="p">(</span>
+        <span class="n">use_hwthreading_if_found</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">sensible_default_cores</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the available core number and if hardware-threading is detected.</span>
+
+<span class="sd">    If the first argument &#39;use_hwthreading_if_found&#39; is &#39;True&#39;, then the</span>
+<span class="sd">    function will attempt to detect if hardware-threading is present via</span>
+<span class="sd">    comparing the logical vs physical number of cores. In this case, one of the</span>
+<span class="sd">    two following outcomes happens:</span>
+
+<span class="sd">    Outcome 1. If hardware-threading is detected, the returned &#39;core_count&#39;</span>
+<span class="sd">        will return the number of available cores assuming that each physical</span>
+<span class="sd">        core provides 2 threaded &#39;logical&#39; cores. The returned</span>
+<span class="sd">        &#39;hwthreading_present&#39; will return &#39;True&#39;.</span>
+<span class="sd">    Outcome 2. If hardware-threading is not detected, the returned &#39;core_count&#39;</span>
+<span class="sd">        will return the number of available cores, and each available physical</span>
+<span class="sd">        core will only be counted once. The returned &#39;hwthreading_present&#39; will</span>
+<span class="sd">        return &#39;False&#39;.</span>
+
+<span class="sd">    If the first argument &#39;use_hwthreading_if_found&#39; is &#39;False&#39;, then the</span>
+<span class="sd">    function always returns the same behavior as Outcome 2 above, regardless of</span>
+<span class="sd">    whether hardware-threading is detected or not.</span>
+
+<span class="sd">    This is important for systems where the number of available cores is</span>
+<span class="sd">    partitioned such as on HPC systems, but is also important for determining</span>
+<span class="sd">    hardware support for hardware-threading. Hardware-threading (&quot;hwthread&quot; in</span>
+<span class="sd">    OpenMPI parlance), simultaneous multi-threading (SMT,</span>
+<span class="sd">    https://en.wikipedia.org/wiki/Simultaneous_multithreading ), and [Intel]</span>
+<span class="sd">    Hyperthreading are all terms used interchangeably, and are essentially</span>
+<span class="sd">    equivalent.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    use_hwthreading_if_found : bool</span>
+<span class="sd">        Whether to detect support for hardware-threading. Defaults to</span>
+<span class="sd">        &#39;True&#39;. See above for description of behavior.</span>
+<span class="sd">    sensible_default_cores : bool</span>
+<span class="sd">        Whether to decrease the number of cores returned in a &quot;reasonable</span>
+<span class="sd">        manner&quot;, such that it balances speed with the user</span>
+<span class="sd">        experience. Specifically, this means that if the number of available</span>
+<span class="sd">        cores is greater than some threshold (default 12), the threshold number</span>
+<span class="sd">        of cores will be used instead of the total. If the number of cores is</span>
+<span class="sd">        greater than 2 but less than the threshold (default 12), then the</span>
+<span class="sd">        number of cores used will be subtracted by 1, so that there is a core</span>
+<span class="sd">        left unused for the sake of the OS. Defaults to &#39;True&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    core_count : int</span>
+<span class="sd">        Number of CPU cores available for use by a process.</span>
+<span class="sd">    hwthreading_present : bool</span>
+<span class="sd">        Whether or not hardware-threading is present on some or all of the</span>
+<span class="sd">        logical CPU cores.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Needs its own import checks since it may be called by the GUI before</span>
+    <span class="c1"># MPIBackend()</span>
+    <span class="k">if</span> <span class="n">_has_mpi4py</span><span class="p">()</span> <span class="ow">and</span> <span class="n">_has_psutil</span><span class="p">():</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Darwin&quot;</span><span class="p">:</span>
+            <span class="c1"># In Macos&#39; case here, the situation is relatively simple, and we</span>
+            <span class="c1"># can determine all the information we need. We are never using</span>
+            <span class="c1"># Macos in an HPC environment, so even though we cannot use</span>
+            <span class="c1"># `psutil.Process().cpu_affinity()` in Macos, we do not need it.</span>
+
+            <span class="c1"># First, let&#39;s get both the &quot;logical&quot; and &quot;physical&quot; cores of the</span>
+            <span class="c1"># system: 1. In the case of older Macs with Intel CPUs, this will</span>
+            <span class="c1"># detect each *single* Intel-Hyperthreaded physical-CPU as *two*</span>
+            <span class="c1"># distinct logical-CPUs. Similarly, the number of physical-CPUs</span>
+            <span class="c1"># detected will be less than the number of logical-CPUs (though not</span>
+            <span class="c1"># necessarily half!).  2. In the case of newer Macs with Apple</span>
+            <span class="c1"># Silicon CPUs, the logical-CPUs will be equal to the</span>
+            <span class="c1"># physical-CPUs, since these CPUs do not tell the system that they</span>
+            <span class="c1"># have hardware-threading.</span>
+            <span class="n">logical_core_count</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(</span><span class="n">logical</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">physical_core_count</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(</span><span class="n">logical</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="c1"># We can compare these numbers to automatically determine which CPU</span>
+            <span class="c1"># architecture is present, and therefore if hardware-threading is</span>
+            <span class="c1"># present too:</span>
+            <span class="n">hwthreading_detected</span> <span class="o">=</span> <span class="n">logical_core_count</span> <span class="o">!=</span> <span class="n">physical_core_count</span>
+
+            <span class="c1"># By default, return logical core number and, if present,</span>
+            <span class="c1"># hardware-threading. If the user informs us that they don&#39;t want</span>
+            <span class="c1"># hardware-threading, return physical core number and no</span>
+            <span class="c1"># hwthreading_present flag.</span>
+            <span class="k">if</span> <span class="n">use_hwthreading_if_found</span><span class="p">:</span>
+                <span class="n">core_count</span> <span class="o">=</span> <span class="n">logical_core_count</span>
+                <span class="n">hwthreading_present</span> <span class="o">=</span> <span class="n">hwthreading_detected</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">core_count</span> <span class="o">=</span> <span class="n">physical_core_count</span>
+                <span class="n">hwthreading_present</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">elif</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Linux&quot;</span><span class="p">:</span>
+            <span class="c1"># In Linux&#39;s case here, the situation is more complex:</span>
+            <span class="c1">#</span>
+            <span class="c1"># 1. In the case of non-HPC Linux computers with Intel chips, the</span>
+            <span class="c1">#    situation will be similar to the above Macos Intel-CPU case:</span>
+            <span class="c1">#    if there are Intel-Hyperthreaded cores, then the number of</span>
+            <span class="c1">#    logical cores will be greater than the number of physical</span>
+            <span class="c1">#    cores (but not necessarily double!). Additionally, in this</span>
+            <span class="c1">#    case, the number of &quot;affinity&quot; cores (which are the cores</span>
+            <span class="c1">#    actually able to be used by new Processes) will be equal to</span>
+            <span class="c1">#    the number of logical cores. Pretty simple.</span>
+            <span class="c1">#</span>
+            <span class="c1"># 2. In the case of non-HPC Linux computers with AMD chips, I do</span>
+            <span class="c1">#    not know what will happen. I suspect that, for AMD chips with</span>
+            <span class="c1">#    their &quot;SMT&quot; feature (&quot;Simultaneous Multi-Threading&quot;,</span>
+            <span class="c1">#    equivalent to Intel&#39;s trademarked Hyperthreading), they will</span>
+            <span class="c1">#    probably behave identically to the Intel Linux case, and</span>
+            <span class="c1">#    should work the same.</span>
+            <span class="c1">#</span>
+            <span class="c1"># 3. In the case of HPC Linux computers such as allocations on</span>
+            <span class="c1">#    OSCAR, however, it&#39;s different:</span>
+            <span class="c1">#</span>
+            <span class="c1">#    A. Hardware-Threading: The number of logical and physical</span>
+            <span class="c1">#    cores reported are always equal to each other. It is not clear</span>
+            <span class="c1">#    to me if you can enable true hardware-threading on OSCAR, nor</span>
+            <span class="c1">#    if you can even detect it. The closest that OSCAR has to</span>
+            <span class="c1">#    documentation about requesting multiple threads is here:</span>
+            <span class="c1">#    https://docs.ccv.brown.edu/oscar/submitting-jobs/</span>
+            <span class="c1">#    mpi-jobs#hybrid-mpiopenmp</span>
+            <span class="c1">#    which discusses using `--cpus-per-task` and then setting a</span>
+            <span class="c1">#    custom OpenMP environment variable. (Note that OpenMP is a</span>
+            <span class="c1">#    very, very different technology than OpenMPI!) Similarly, I</span>
+            <span class="c1">#    cannot get a successful allocation using the option</span>
+            <span class="c1">#    `--threads-per-core` (see</span>
+            <span class="c1">#    https://slurm.schedmd.com/sbatch.html ) when using any value</span>
+            <span class="c1">#    except one. Fortunately, since the logical CPU number appears</span>
+            <span class="c1">#    to always match the physical number, OSCAR should always fail</span>
+            <span class="c1">#    our hardware-threading detection &quot;test&quot;.</span>
+            <span class="c1">#</span>
+            <span class="c1">#    B. Cores: Depending on your OSCAR allocation, the number of</span>
+            <span class="c1">#    cores you are allowed to use will change, but it appears it</span>
+            <span class="c1">#    will always be reflected by the affinity CPU count. In</span>
+            <span class="c1">#    contrast, the logical or physical CPU counts are those of the</span>
+            <span class="c1">#    node as a whole, which you do NOT necessarily have access to,</span>
+            <span class="c1">#    depending on your allocation. For a single node, the number of</span>
+            <span class="c1">#    physical and logical cores appears to always be equal. The</span>
+            <span class="c1">#    affinity core number will always be less than or equal to the</span>
+            <span class="c1">#    number of physical (or logical) cores.</span>
+            <span class="n">logical_core_count</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(</span><span class="n">logical</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">physical_core_count</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(</span><span class="n">logical</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">affinity_core_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">psutil</span><span class="o">.</span><span class="n">Process</span><span class="p">()</span><span class="o">.</span><span class="n">cpu_affinity</span><span class="p">())</span>
+
+            <span class="n">hwthreading_detected</span> <span class="o">=</span> <span class="n">logical_core_count</span> <span class="o">!=</span> <span class="n">physical_core_count</span>
+
+            <span class="k">if</span> <span class="n">use_hwthreading_if_found</span><span class="p">:</span>
+                <span class="c1"># If we want to use hardware-threading if it&#39;s detected, then</span>
+                <span class="c1"># in all three of the above cases, we can simply use the CPU</span>
+                <span class="c1"># affinity count for our number of cores, and pass the result</span>
+                <span class="c1"># of our hardware-threading detection check.</span>
+                <span class="n">core_count</span> <span class="o">=</span> <span class="n">affinity_core_count</span>
+                <span class="n">hwthreading_present</span> <span class="o">=</span> <span class="n">hwthreading_detected</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># If the user informs us they don&#39;t want hardware-threading,</span>
+                <span class="c1"># then:</span>
+                <span class="c1"># 1. In the Linux-laptop case, affinity core number is the same</span>
+                <span class="c1">#    as logical core number (i.e. including hardware-threaded</span>
+                <span class="c1">#    cores). We should use the physical core number, which will</span>
+                <span class="c1">#    always be less than or equal to the affinity core number.</span>
+                <span class="c1"># 2. In the OSCAR/HPC case, physical core number is the same as</span>
+                <span class="c1">#    logical core number. We should use the affinity core</span>
+                <span class="c1">#    number, which, in a single node, will always be less than</span>
+                <span class="c1">#    or equal to the physical core number.</span>
+                <span class="n">core_count</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">physical_core_count</span><span class="p">,</span> <span class="n">affinity_core_count</span><span class="p">)</span>
+                <span class="n">hwthreading_present</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># In Windows&#39; and all other cases here, &quot;all bets are off&quot;. We do</span>
+            <span class="c1"># not currently officially support MPIBackend() usage on Windows</span>
+            <span class="c1"># due to the difficulty of its install, and there are outstanding</span>
+            <span class="c1"># issues with trying to use hardware-threads in particular: see</span>
+            <span class="c1"># https://github.com/jonescompneurolab/hnn-core/issues/589 .</span>
+            <span class="c1">#</span>
+            <span class="c1"># Therefore, we also do not support hardware-threading in this</span>
+            <span class="c1"># case, and it is disabled by default here. The cores reported are</span>
+            <span class="c1"># the non-hardware-threaded physical cores.</span>
+            <span class="n">physical_core_count</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(</span><span class="n">logical</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">core_count</span> <span class="o">=</span> <span class="n">physical_core_count</span>
+            <span class="n">hwthreading_present</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">default_threshold</span> <span class="o">=</span> <span class="mi">12</span>
+        <span class="k">if</span> <span class="n">sensible_default_cores</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">core_count</span> <span class="o">&gt;</span> <span class="n">default_threshold</span><span class="p">:</span>
+                <span class="n">core_count</span> <span class="o">=</span> <span class="n">default_threshold</span>
+            <span class="k">elif</span> <span class="n">core_count</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="c1"># This way, sensible defaults still always returns multiple</span>
+                <span class="c1"># cores if multiple are available.</span>
+                <span class="n">core_count</span> <span class="o">=</span> <span class="n">core_count</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">missing_packages</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_has_mpi4py</span><span class="p">():</span>
+            <span class="n">missing_packages</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;mpi4py&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_has_psutil</span><span class="p">():</span>
+            <span class="n">missing_packages</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;psutil&quot;</span><span class="p">]</span>
+        <span class="n">missing_packages</span> <span class="o">=</span> <span class="s2">&quot; and &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing_packages</span><span class="p">)</span>
+        <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">missing_packages</span><span class="si">}</span><span class="s2"> not installed. Will run on single &quot;</span>
+             <span class="s2">&quot;processor, with no hardware-threading.&quot;</span><span class="p">)</span>
+        <span class="n">core_count</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">hwthreading_present</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">core_count</span><span class="p">,</span> <span class="n">hwthreading_present</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="MPIBackend">
@@ -1027,17 +1252,48 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    n_procs : int | None</span>
-<span class="sd">        The number of MPI processes requested by the user. If None, then will</span>
-<span class="sd">        attempt to detect number of cores (including hyperthreads) and start</span>
-<span class="sd">        parallel simulation over all of them.</span>
+<span class="sd">    n_procs : None | int</span>
+<span class="sd">        The number of MPI processes requested by the user. Defaults to &#39;None&#39;,</span>
+<span class="sd">        in which case it will attempt to detect the number of cores (including</span>
+<span class="sd">        hardware-threads) and start parallel simulation over all of them.</span>
 <span class="sd">    mpi_cmd : str</span>
-<span class="sd">        The name of the mpi launcher executable. Will use &#39;mpiexec&#39;</span>
-<span class="sd">        (openmpi) by default.</span>
+<span class="sd">        The name of the mpi launcher executable. Will use &#39;mpiexec&#39; (openmpi)</span>
+<span class="sd">        by default.</span>
+<span class="sd">    use_hwthreading_if_found : bool</span>
+<span class="sd">        Specifies whether the class should try to detect hardware-threading,</span>
+<span class="sd">        and, if it is found, then both use MPI&#39;s &#39;--use-hwthread-cpus&#39; option</span>
+<span class="sd">        and change the number of CPU cores used. Defaults to &#39;True&#39;. Note that</span>
+<span class="sd">        this is passed to an option of the same name in</span>
+<span class="sd">        `_determine_cores_hwthreading`; see that function for more details.</span>
+<span class="sd">    sensible_default_cores : bool</span>
+<span class="sd">        Whether to decrease the number of cores returned in a &quot;reasonable</span>
+<span class="sd">        manner&quot;, such that it balances speed with the user</span>
+<span class="sd">        experience. Specifically, this means that if the number of available</span>
+<span class="sd">        cores is greater than some threshold (default 12), the threshold number</span>
+<span class="sd">        of cores will be used instead of the total. If the number of cores is</span>
+<span class="sd">        greater than 2 but less than the threshold (default 12), then the</span>
+<span class="sd">        number of cores used will be subtracted by 1, so that there is a core</span>
+<span class="sd">        left unused for the sake of the OS. Defaults to &#39;True&#39;. Note that this</span>
+<span class="sd">        is passed to an option of the same name in</span>
+<span class="sd">        `_determine_cores_hwthreading`</span>
+<span class="sd">    override_hwthreading_option : None | bool</span>
+<span class="sd">        Force use of MPI&#39;s &#39;--use-hwthread-cpus&#39; support if changed from its</span>
+<span class="sd">        default value of &#39;None&#39;. By default, &#39;--use-hwthread-cpus&#39; is only</span>
+<span class="sd">        passed if the above argument &#39;use_hwthreading_if_found&#39; is &#39;True&#39; and</span>
+<span class="sd">        if hardware-threading is detected. If this argument is set to &#39;True&#39;,</span>
+<span class="sd">        then &#39;--use-hwthread-cpus&#39; will always be used, regardless of</span>
+<span class="sd">        hardware-threading detection. If &#39;False&#39;, then &#39;--use-hwthread-cpus&#39;</span>
+<span class="sd">        will never be used.</span>
+<span class="sd">    override_oversubscribe_option : None | bool</span>
+<span class="sd">        Force use of MPI&#39;s &#39;--oversubscribe&#39; support if changed from its</span>
+<span class="sd">        default value of &#39;None&#39;. By default, &#39;--oversubscribe&#39; is only passed</span>
+<span class="sd">        if the user specifies a custom number of cores via &#39;n_procs&#39; and if</span>
+<span class="sd">        that number exceeds the number of detected available cores. If this</span>
+<span class="sd">        argument is set to &#39;True&#39;, then &#39;--oversubscribe&#39; will always be</span>
+<span class="sd">        used. If &#39;False&#39;, then &#39;--oversubscribe&#39; will never be used.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-
 <span class="sd">    n_procs : int</span>
 <span class="sd">        The number of processes MPI will actually use (spread over cores). If 1</span>
 <span class="sd">        is specified or mpi4py could not be loaded, the simulation will be run</span>
@@ -1050,59 +1306,88 @@
 <span class="sd">    proc_queue : threading.Queue</span>
 <span class="sd">        A Queue object to hold process handles from Popen in a thread-safe way.</span>
 <span class="sd">        There will be a valid process handle present the queue when a MPI</span>
-<span class="sd">        åsimulation is running.</span>
+<span class="sd">        simulation is running.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_procs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mpi_cmd</span><span class="o">=</span><span class="s1">&#39;mpiexec&#39;</span><span class="p">):</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">n_procs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">mpi_cmd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mpiexec&quot;</span><span class="p">,</span>
+        <span class="n">use_hwthreading_if_found</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">sensible_default_cores</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">override_hwthreading_option</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">override_oversubscribe_option</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">expected_data_length</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">proc</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">proc_queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
 
-        <span class="n">n_logical_cores</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">n_procs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">=</span> <span class="n">n_logical_cores</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">=</span> <span class="n">n_procs</span>
+        <span class="c1"># Check of psutil and mpi4py import has been moved into this function,</span>
+        <span class="c1"># since this function is called by GUI before MPIBackend()</span>
+        <span class="c1"># instantiated.</span>
+        <span class="n">n_available_cores</span><span class="p">,</span> <span class="n">hwthreading_available</span> <span class="o">=</span> \
+            <span class="n">_determine_cores_hwthreading</span><span class="p">(</span>
+                <span class="n">use_hwthreading_if_found</span><span class="o">=</span><span class="n">use_hwthreading_if_found</span><span class="p">,</span>
+                <span class="n">sensible_default_cores</span><span class="o">=</span><span class="n">sensible_default_cores</span><span class="p">)</span>
 
-        <span class="c1"># did user try to force running on more cores than available?</span>
-        <span class="n">oversubscribe</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">&gt;</span> <span class="n">n_logical_cores</span><span class="p">:</span>
-            <span class="n">oversubscribe</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">=</span> <span class="n">n_available_cores</span> <span class="k">if</span> <span class="p">(</span><span class="n">n_procs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="k">else</span> <span class="n">n_procs</span>
 
-        <span class="n">hyperthreading</span> <span class="o">=</span> <span class="kc">False</span>
-
-        <span class="k">if</span> <span class="n">_has_mpi4py</span><span class="p">()</span> <span class="ow">and</span> <span class="n">_has_psutil</span><span class="p">():</span>
-            <span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>
-
-            <span class="n">n_physical_cores</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(</span><span class="n">logical</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-            <span class="c1"># detect if we need to use hwthread-cpus with mpiexec</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">&gt;</span> <span class="n">n_physical_cores</span><span class="p">:</span>
-                <span class="n">hyperthreading</span> <span class="o">=</span> <span class="kc">True</span>
-
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">packages</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">_has_mpi4py</span><span class="p">():</span>
-                <span class="n">packages</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;mpi4py&#39;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">_has_psutil</span><span class="p">():</span>
-                <span class="n">packages</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;psutil&#39;</span><span class="p">]</span>
-            <span class="n">packages</span> <span class="o">=</span> <span class="s1">&#39; and &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">packages</span><span class="p">)</span>
-            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">packages</span><span class="si">}</span><span class="s1"> not installed. Will run on single processor&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">=</span> <span class="mi">1</span>
-
+        <span class="c1"># Begin constructing the main command.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span> <span class="o">=</span> <span class="n">mpi_cmd</span>
 
-        <span class="k">if</span> <span class="n">hyperthreading</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span> <span class="o">+=</span> <span class="s1">&#39; --use-hwthread-cpus&#39;</span>
+        <span class="c1"># Use the hwthread option if the user wants to force it. Otherwise, use</span>
+        <span class="c1"># hardware-threading if:</span>
+        <span class="c1"># 1. the user has not changed &#39;override_hwthreading_option&#39;,</span>
+        <span class="c1"># 2. if the user wants to use hardware-threading, and</span>
+        <span class="c1"># 3. hardware-threading is detected.</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">override_hwthreading_option</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">or</span>
+            <span class="p">(</span>
+                <span class="p">(</span><span class="n">override_hwthreading_option</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="n">use_hwthreading_if_found</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="n">hwthreading_available</span>
+        <span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span> <span class="o">+=</span> <span class="s2">&quot; --use-hwthread-cpus&quot;</span>
 
-        <span class="k">if</span> <span class="n">oversubscribe</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span> <span class="o">+=</span> <span class="s1">&#39; --oversubscribe&#39;</span>
+        <span class="c1"># Use the oversubscribe option if the user wants to force</span>
+        <span class="c1"># it. Otherwise, if the user has not changed</span>
+        <span class="c1"># &#39;override_oversubscribe_option&#39;, use our original heuristic: did user</span>
+        <span class="c1"># specify the number of cores (see `n_procs` logic above), AND did they</span>
+        <span class="c1"># specify more cores than are available?</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">override_oversubscribe_option</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">or</span>
+            <span class="p">(</span>
+                <span class="p">(</span><span class="n">override_oversubscribe_option</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">&gt;</span> <span class="n">n_available_cores</span><span class="p">)</span>
+        <span class="p">)):</span>
+            <span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Number of requested MPI processes exceeds available &quot;</span>
+                <span class="s2">&quot;cores. Enabling MPI oversubscription automatically.&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span> <span class="o">+=</span> <span class="s2">&quot; --oversubscribe&quot;</span>
+        <span class="k">elif</span> <span class="p">(</span>
+                <span class="p">(</span><span class="n">override_oversubscribe_option</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span> <span class="o">&gt;</span> <span class="n">n_available_cores</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Number of requested MPI processes exceeds available &quot;</span>
+                <span class="s2">&quot;cores. However, you have forced off MPI oversubscription. The&quot;</span>
+                <span class="s2">&quot;MPI simulation will almost certainly fail. If you see this&quot;</span>
+                <span class="s2">&quot;message, you should either decrease the number of &#39;n_procs&#39;&quot;</span>
+                <span class="s2">&quot;used or re-enable oversubscription, unless you know what you&quot;</span>
+                <span class="s2">&quot;are doing and have made alternative changes. &quot;</span>
+            <span class="p">)</span>
+            <span class="k">pass</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span> <span class="o">+=</span> <span class="s1">&#39; -np &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span> <span class="o">+=</span> <span class="s1">&#39; nrniv -python -mpi -nobanner &#39;</span> <span class="o">+</span> \
-            <span class="n">sys</span><span class="o">.</span><span class="n">executable</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> \
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">]</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span>
-                         <span class="s1">&#39;mpi_child.py&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span> <span class="o">+=</span> <span class="s2">&quot; -np &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_procs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="s2">&quot; nrniv -python -mpi -nobanner &quot;</span> <span class="o">+</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">executable</span> <span class="o">+</span>
+            <span class="s2">&quot; &quot;</span> <span class="o">+</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="vm">__name__</span><span class="p">]</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;mpi_child.py&quot;</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
 
         <span class="c1"># Split the command into shell arguments for passing to Popen</span>
         <span class="n">use_posix</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">!=</span> <span class="s1">&#39;win32&#39;</span> <span class="k">else</span> <span class="kc">False</span>
@@ -1253,7 +1538,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>

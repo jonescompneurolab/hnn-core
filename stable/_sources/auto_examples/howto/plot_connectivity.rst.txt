@@ -98,7 +98,7 @@ of ``net.connectivity`` that match the provided parameters.
 
 .. code-block:: Python
 
-    from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity
+    from hnn_core.viz import plot_connectivity_matrix, plot_cell_connectivity, plot_drive_strength
     from hnn_core.network import pick_connection
 
     print(len(net_erp.connectivity))
@@ -168,7 +168,7 @@ a simulation is using :meth:`~hnn_core.Cell_Response.plot_spikes_raster`
 
 
 .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_connectivity_003.png
-   :alt: plot connectivity
+   :alt: Raster Plot with Layer-Specific Dipole Overlays
    :srcset: /auto_examples/howto/images/sphx_glr_plot_connectivity_003.png
    :class: sphx-glr-single-img
 
@@ -347,14 +347,14 @@ the L5 pyramidal cells.
     *
 
       .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_connectivity_004.png
-         :alt: plot connectivity
+         :alt: Raster Plot with Layer-Specific Dipole Overlays
          :srcset: /auto_examples/howto/images/sphx_glr_plot_connectivity_004.png
          :class: sphx-glr-multi-img
 
     *
 
       .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_connectivity_005.png
-         :alt: plot connectivity
+         :alt: Raster Plot with Layer-Specific Dipole Overlays
          :srcset: /auto_examples/howto/images/sphx_glr_plot_connectivity_005.png
          :class: sphx-glr-multi-img
 
@@ -431,14 +431,60 @@ from the source cell.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-137
+.. GENERATED FROM PYTHON SOURCE LINES 133-134
+
+We can plot the strengths of each external drive across each cell types.
+
+.. GENERATED FROM PYTHON SOURCE LINES 134-142
+
+.. code-block:: Python
+
+
+    # This can be done in a relative way, enabling you to compare the proportion
+    # coming from each drive:
+    plot_drive_strength(net_erp)
+
+    # Alternatively, you can compare the total amount of each drive in conductance:
+    plot_drive_strength(net_erp, normalize=False)
+
+
+
+
+.. rst-class:: sphx-glr-horizontal
+
+
+    *
+
+      .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_connectivity_008.png
+         :alt: External Drive Strengths
+         :srcset: /auto_examples/howto/images/sphx_glr_plot_connectivity_008.png
+         :class: sphx-glr-multi-img
+
+    *
+
+      .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_connectivity_009.png
+         :alt: External Drive Strengths
+         :srcset: /auto_examples/howto/images/sphx_glr_plot_connectivity_009.png
+         :class: sphx-glr-multi-img
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+
+    <Figure size 1200x600 with 2 Axes>
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 143-147
 
 In the sparse network, there still appears to be some rhythmicity
 where the cells are firing synchronously with a smaller period of 4-5 ms.
 As a final step, we can see how this change in spiking activity impacts
 the aggregate current dipole.
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-152
+.. GENERATED FROM PYTHON SOURCE LINES 147-162
 
 .. code-block:: Python
 
@@ -460,9 +506,9 @@ the aggregate current dipole.
 
 
 
-.. image-sg:: /auto_examples/howto/images/sphx_glr_plot_connectivity_008.png
+.. image-sg:: /auto_examples/howto/images/sphx_glr_plot_connectivity_010.png
    :alt: Aggregate (L2/3 + L5)
-   :srcset: /auto_examples/howto/images/sphx_glr_plot_connectivity_008.png
+   :srcset: /auto_examples/howto/images/sphx_glr_plot_connectivity_010.png
    :class: sphx-glr-single-img
 
 
@@ -478,7 +524,7 @@ the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 27.999 seconds)
+   **Total running time of the script:** (0 minutes 28.177 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_connectivity.py:

@@ -154,7 +154,7 @@ Then, we load the raw data and estimate the inverse operator.
     - Upper transition bandwidth: 10.00 Hz (-6 dB cutoff frequency: 45.00 Hz)
     - Filter length: 993 samples (3.307 s)
 
-    [Parallel(n_jobs=1)]: Done  17 tasks      | elapsed:    0.1s
+    [Parallel(n_jobs=1)]: Done  17 tasks      | elapsed:    0.0s
     [Parallel(n_jobs=1)]: Done  71 tasks      | elapsed:    0.2s
     [Parallel(n_jobs=1)]: Done 161 tasks      | elapsed:    0.4s
     [Parallel(n_jobs=1)]: Done 287 tasks      | elapsed:    0.7s
@@ -560,7 +560,7 @@ nerve evoked response waveforms, and output spike histogram.
 
 
 .. image-sg:: /auto_examples/workflows/images/sphx_glr_plot_simulate_somato_002.png
-   :alt: Aggregate (L2/3 + L5)
+   :alt: Aggregate (L2/3 + L5), Raster Plot with Layer-Specific Dipole Overlays
    :srcset: /auto_examples/workflows/images/sphx_glr_plot_simulate_somato_002.png
    :class: sphx-glr-single-img
 
@@ -604,7 +604,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 12.374 seconds)
+   **Total running time of the script:** (0 minutes 12.518 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_somato.py:

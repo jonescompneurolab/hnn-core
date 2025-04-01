@@ -27,7 +27,7 @@ simulating dipoles using HNN-core.
 
 The MPI backend allows running the simulation in parallel across neurons in the
 network even with a single trial. For this, you will
-need the :ref:`MPI related software <parallel>` installed. Note that if you
+need the :ref:`MPI related software <install>` installed. Note that if you
 want to simulate in parallel across trials, the Joblib backend allows this
 without the need to install and configure MPI.
 
@@ -133,9 +133,9 @@ start the simulation across the number of processors (cores) specified by
     /opt/anaconda3/envs/hc12/bin/nrniv:10: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
       from pkg_resources import working_set
     numprocs=2
-    Loading custom mechanism files from /Users/austinsoplata/rep/brn/hnn-core/hnn_core/mod/arm64/.libs/libnrnmech.so
+    Loading custom mechanism files from /opt/anaconda3/envs/hc12/lib/python3.12/site-packages/hnn_core/mod/arm64/.libs/libnrnmech.so
+    Loading custom mechanism files from /opt/anaconda3/envs/hc12/lib/python3.12/site-packages/hnn_core/mod/arm64/.libs/libnrnmech.so
     Building the NEURON model
-    Loading custom mechanism files from /Users/austinsoplata/rep/brn/hnn-core/hnn_core/mod/arm64/.libs/libnrnmech.so
     [Done]
     Trial 1: 0.03 ms...
     Trial 1: 10.0 ms...
@@ -176,7 +176,7 @@ start the simulation across the number of processors (cores) specified by
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 9.573 seconds)
+   **Total running time of the script:** (0 minutes 9.677 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_simulate_mpi_backend.py:

@@ -303,14 +303,14 @@ read spikes back in, we can use wildcard expressions.
     *
 
       .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_002.png
-         :alt: plot firing pattern
+         :alt: Raster Plot with Layer-Specific Dipole Overlays
          :srcset: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_002.png
          :class: sphx-glr-multi-img
 
     *
 
       .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_003.png
-         :alt: plot firing pattern
+         :alt: Raster Plot with Layer-Specific Dipole Overlays
          :srcset: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_003.png
          :class: sphx-glr-multi-img
 
@@ -319,9 +319,7 @@ read spikes back in, we can use wildcard expressions.
 
  .. code-block:: none
 
-    /Users/austinsoplata/rep/brn/hnn-core/examples/howto/plot_firing_pattern.py:111: DeprecationWarning: Writing cell response to txt files is deprecated and will be removed in future versions. Please save cell response along with network
-      net.cell_response.write(op.join(tmp_dir_name, 'spk_%d.txt'))
-    Writing file /var/folders/cs/5b2dq2192v52fd3j8ppbtcg80000gp/T/tmpdx7ts3v8/spk_0.txt
+    Writing file /var/folders/cs/5b2dq2192v52fd3j8ppbtcg80000gp/T/tmpay5jvgxb/spk_0.txt
     /Users/austinsoplata/rep/brn/hnn-core/examples/howto/plot_firing_pattern.py:112: DeprecationWarning: Reading cell response from txt files is deprecated and will be removed in future versions. Please load cell response along with simulated network
       cell_response = read_spikes(op.join(tmp_dir_name, 'spk_*.txt'))
 
@@ -390,7 +388,7 @@ raster plots and histograms for the pyramidal cells.
 
 
 .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_004.png
-   :alt: plot firing pattern
+   :alt: Raster Plot with Layer-Specific Dipole Overlays
    :srcset: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_004.png
    :class: sphx-glr-single-img
 
@@ -407,7 +405,7 @@ raster plots and histograms for the pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 10.133 seconds)
+   **Total running time of the script:** (0 minutes 10.201 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_firing_pattern.py:
