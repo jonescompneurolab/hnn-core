@@ -26,9 +26,16 @@ This example shows how to do batch simulations in HNN-core, allowing users to
 efficiently run multiple simulations with different parameters
 for comprehensive analysis.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-18
+.. GENERATED FROM PYTHON SOURCE LINES 12-15
+
+Note that batch simulation requires you to install HNN-core with Joblib
+parallel support, which you can do by installing it with
+``pip install "hnn_core[parallel]"``
+
+.. GENERATED FROM PYTHON SOURCE LINES 15-24
 
 .. code-block:: Python
+
 
 
     # Authors: Abdul Samad Siddiqui <abdulsamadsid1@gmail.com>
@@ -45,11 +52,11 @@ for comprehensive analysis.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 19-20
+.. GENERATED FROM PYTHON SOURCE LINES 25-26
 
 Let us import ``hnn_core``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-29
+.. GENERATED FROM PYTHON SOURCE LINES 26-35
 
 .. code-block:: Python
 
@@ -57,7 +64,7 @@ Let us import ``hnn_core``.
     import matplotlib.pyplot as plt
     import numpy as np
 
-    from hnn_core import BatchSimulate
+    from hnn_core.batch_simulate import BatchSimulate
     from hnn_core import jones_2009_model
 
     # The number of cores may need modifying depending on your current machine.
@@ -69,7 +76,7 @@ Let us import ``hnn_core``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-42
+.. GENERATED FROM PYTHON SOURCE LINES 36-48
 
 The `add_evoked_drive` function simulates external input to the network,
 mimicking sensory stimulation or other external events.
@@ -84,7 +91,7 @@ This evoked drive causes the initial positive deflection in the dipole
 signal, triggering a cascade of activity through the network and
 resulting in the complex waveforms observed.
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-72
+.. GENERATED FROM PYTHON SOURCE LINES 48-78
 
 .. code-block:: Python
 
@@ -125,11 +132,11 @@ resulting in the complex waveforms observed.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-74
+.. GENERATED FROM PYTHON SOURCE LINES 79-80
 
 Next, we define a parameter grid for the batch simulation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-81
+.. GENERATED FROM PYTHON SOURCE LINES 80-87
 
 .. code-block:: Python
 
@@ -147,11 +154,11 @@ Next, we define a parameter grid for the batch simulation.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-83
+.. GENERATED FROM PYTHON SOURCE LINES 88-89
 
 We then define a function to calculate summary statistics.
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-108
+.. GENERATED FROM PYTHON SOURCE LINES 89-114
 
 .. code-block:: Python
 
@@ -187,11 +194,11 @@ We then define a function to calculate summary statistics.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-110
+.. GENERATED FROM PYTHON SOURCE LINES 115-116
 
 Run the batch simulation and collect the results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-123
+.. GENERATED FROM PYTHON SOURCE LINES 116-129
 
 .. code-block:: Python
 
@@ -219,69 +226,69 @@ Run the batch simulation and collect the results.
     [Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
     [Parallel(n_jobs=4)]: Done   1 tasks      | elapsed:    1.2s
     [Parallel(n_jobs=4)]: Done   2 tasks      | elapsed:    1.2s
-    [Parallel(n_jobs=4)]: Done   3 tasks      | elapsed:    1.2s
-    [Parallel(n_jobs=4)]: Done   4 tasks      | elapsed:    1.2s
+    [Parallel(n_jobs=4)]: Done   3 tasks      | elapsed:    1.3s
+    [Parallel(n_jobs=4)]: Done   4 tasks      | elapsed:    1.3s
     [Parallel(n_jobs=4)]: Done   5 tasks      | elapsed:    1.9s
     [Parallel(n_jobs=4)]: Done   6 tasks      | elapsed:    1.9s
     [Parallel(n_jobs=4)]: Done   7 tasks      | elapsed:    1.9s
-    [Parallel(n_jobs=4)]: Done   8 tasks      | elapsed:    1.9s
+    [Parallel(n_jobs=4)]: Done   8 tasks      | elapsed:    2.0s
     [Parallel(n_jobs=4)]: Done   9 tasks      | elapsed:    2.6s
     [Parallel(n_jobs=4)]: Done  10 tasks      | elapsed:    2.6s
     [Parallel(n_jobs=4)]: Done  11 tasks      | elapsed:    2.6s
     [Parallel(n_jobs=4)]: Done  12 tasks      | elapsed:    2.6s
-    [Parallel(n_jobs=4)]: Done  13 tasks      | elapsed:    3.2s
+    [Parallel(n_jobs=4)]: Done  13 tasks      | elapsed:    3.3s
     [Parallel(n_jobs=4)]: Done  14 out of  20 | elapsed:    3.3s remaining:    1.4s
     [Parallel(n_jobs=4)]: Done  15 out of  20 | elapsed:    3.3s remaining:    1.1s
     [Parallel(n_jobs=4)]: Done  16 out of  20 | elapsed:    3.3s remaining:    0.8s
-    [Parallel(n_jobs=4)]: Done  17 out of  20 | elapsed:    3.9s remaining:    0.7s
+    [Parallel(n_jobs=4)]: Done  17 out of  20 | elapsed:    4.0s remaining:    0.7s
     [Parallel(n_jobs=4)]: Done  18 out of  20 | elapsed:    4.0s remaining:    0.4s
     [Parallel(n_jobs=4)]: Done  20 out of  20 | elapsed:    4.0s finished
     Simulation results: {'summary_statistics': [[{'min_peak': -1.9487233699163027e-05, 'max_peak': 2.438299811172476e-05}, {'min_peak': -1.9487233699163027e-05, 'max_peak': 3.5625970074068226e-05}, {'min_peak': -1.9487233699163027e-05, 'max_peak': 5.187123572695806e-05}, {'min_peak': -1.9487233699163027e-05, 'max_peak': 7.53973769021332e-05}, {'min_peak': -1.9487233699163027e-05, 'max_peak': 0.00010962271639761108}, {'min_peak': -0.000818709814074504, 'max_peak': 0.0011853731897260855}, {'min_peak': -0.0006900911098816319, 'max_peak': 0.001453236614203411}, {'min_peak': -7.443630674152589e-05, 'max_peak': 0.0006303483688791772}, {'min_peak': -0.0003831247250500106, 'max_peak': 0.0015588783545865915}, {'min_peak': -0.0005827286517535978, 'max_peak': 0.0014794795458269567}, {'min_peak': -0.0005759203533290788, 'max_peak': 0.0014539235295249035}, {'min_peak': -1.9487233699163027e-05, 'max_peak': 0.0013262182394243836}, {'min_peak': -1.9487233699163027e-05, 'max_peak': 0.001328331309960044}, {'min_peak': -1.9487233699163027e-05, 'max_peak': 0.0011853462053579697}, {'min_peak': -1.9487233699163027e-05, 'max_peak': 0.001164963332945789}, {'min_peak': -1.9487233699163027e-05, 'max_peak': 0.001184585414815396}, {'min_peak': -1.9487233699163027e-05, 'max_peak': 0.001231155285096099}, {'min_peak': -1.9487233699163027e-05, 'max_peak': 0.0013115554222262646}, {'min_peak': -1.9487233699163027e-05, 'max_peak': 0.0014314315232221647}, {'min_peak': -1.9487233699163027e-05, 'max_peak': 0.001512378997571946}]], 'simulated_data': [[{'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0001, 'weight_pyr': 0.0001}, 'dpl': [<hnn_core.dipole.Dipole object at 0x3679f0500>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0001, 'weight_pyr': 0.0001}, 'dpl': [<hnn_core.dipole.Dipole object at 0x147ed3230>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0001438449888287663, 'weight_pyr': 0.0001438449888287663}, 'dpl': [<hnn_core.dipole.Dipole object at 0x31b1b4170>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0001438449888287663, 'weight_pyr': 0.0001438449888287663}, 'dpl': [<hnn_core.dipole.Dipole object at 0x134de92b0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.00020691380811147902, 'weight_pyr': 0.00020691380811147902}, 'dpl': [<hnn_core.dipole.Dipole object at 0x31165fe30>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.00020691380811147902, 'weight_pyr': 0.00020691380811147902}, 'dpl': [<hnn_core.dipole.Dipole object at 0x1370f1ee0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.00029763514416313193, 'weight_pyr': 0.00029763514416313193}, 'dpl': [<hnn_core.dipole.Dipole object at 0x36b5e6b70>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.00029763514416313193, 'weight_pyr': 0.00029763514416313193}, 'dpl': [<hnn_core.dipole.Dipole object at 0x147ed3b60>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.00042813323987193956, 'weight_pyr': 0.00042813323987193956}, 'dpl': [<hnn_core.dipole.Dipole object at 0x31b652300>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.00042813323987193956, 'weight_pyr': 0.00042813323987193956}, 'dpl': [<hnn_core.dipole.Dipole object at 0x1373d87a0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0006158482110660267, 'weight_pyr': 0.0006158482110660267}, 'dpl': [<hnn_core.dipole.Dipole object at 0x31165ea20>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0006158482110660267, 'weight_pyr': 0.0006158482110660267}, 'dpl': [<hnn_core.dipole.Dipole object at 0x1370f0e60>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0008858667904100823, 'weight_pyr': 0.0008858667904100823}, 'dpl': [<hnn_core.dipole.Dipole object at 0x36b5e5640>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0008858667904100823, 'weight_pyr': 0.0008858667904100823}, 'dpl': [<hnn_core.dipole.Dipole object at 0x1571dd880>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0012742749857031334, 'weight_pyr': 0.0012742749857031334}, 'dpl': [<hnn_core.dipole.Dipole object at 0x16fa2f770>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0012742749857031334, 'weight_pyr': 0.0012742749857031334}, 'dpl': [<hnn_core.dipole.Dipole object at 0x16b76c8f0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0018329807108324356, 'weight_pyr': 0.0018329807108324356}, 'dpl': [<hnn_core.dipole.Dipole object at 0x3103e0cb0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0018329807108324356, 'weight_pyr': 0.0018329807108324356}, 'dpl': [<hnn_core.dipole.Dipole object at 0x1571df4a0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0026366508987303583, 'weight_pyr': 0.0026366508987303583}, 'dpl': [<hnn_core.dipole.Dipole object at 0x3679f12e0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.0026366508987303583, 'weight_pyr': 0.0026366508987303583}, 'dpl': [<hnn_core.dipole.Dipole object at 0x1373d9af0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.00379269019073225, 'weight_pyr': 0.00379269019073225}, 'dpl': [<hnn_core.dipole.Dipole object at 0x327be2c00>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.00379269019073225, 'weight_pyr': 0.00379269019073225}, 'dpl': [<hnn_core.dipole.Dipole object at 0x1361d2450>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.005455594781168515, 'weight_pyr': 0.005455594781168515}, 'dpl': [<hnn_core.dipole.Dipole object at 0x34771c680>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.005455594781168515, 'weight_pyr': 0.005455594781168515}, 'dpl': [<hnn_core.dipole.Dipole object at 0x1373daf00>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.007847599703514606, 'weight_pyr': 0.007847599703514606}, 'dpl': [<hnn_core.dipole.Dipole object at 0x31089d160>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.007847599703514606, 'weight_pyr': 0.007847599703514606}, 'dpl': [<hnn_core.dipole.Dipole object at 0x1470db4d0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.011288378916846883, 'weight_pyr': 0.011288378916846883}, 'dpl': [<hnn_core.dipole.Dipole object at 0x327be3740>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.011288378916846883, 'weight_pyr': 0.011288378916846883}, 'dpl': [<hnn_core.dipole.Dipole object at 0x1365cdcd0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.01623776739188721, 'weight_pyr': 0.01623776739188721}, 'dpl': [<hnn_core.dipole.Dipole object at 0x31b6510d0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.01623776739188721, 'weight_pyr': 0.01623776739188721}, 'dpl': [<hnn_core.dipole.Dipole object at 0x1571afa10>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.023357214690901212, 'weight_pyr': 0.023357214690901212}, 'dpl': [<hnn_core.dipole.Dipole object at 0x36b5fa810>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.023357214690901212, 'weight_pyr': 0.023357214690901212}, 'dpl': [<hnn_core.dipole.Dipole object at 0x16b76c530>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.03359818286283781, 'weight_pyr': 0.03359818286283781}, 'dpl': [<hnn_core.dipole.Dipole object at 0x3103e2030>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.03359818286283781, 'weight_pyr': 0.03359818286283781}, 'dpl': [<hnn_core.dipole.Dipole object at 0x1412b9dc0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.04832930238571752, 'weight_pyr': 0.04832930238571752}, 'dpl': [<hnn_core.dipole.Dipole object at 0x327b3ecf0>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.04832930238571752, 'weight_pyr': 0.04832930238571752}, 'dpl': [<hnn_core.dipole.Dipole object at 0x147eb0740>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.06951927961775606, 'weight_pyr': 0.06951927961775606}, 'dpl': [<hnn_core.dipole.Dipole object at 0x16fa2cf50>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.06951927961775606, 'weight_pyr': 0.06951927961775606}, 'dpl': [<hnn_core.dipole.Dipole object at 0x1421f9d00>]}, {'net': <Network | 3 x 3 Pyramidal cells (L2, L5)
     3 L2 basket cells
-    3 L5 basket cells>, 'param_values': {'weight_basket': 0.1, 'weight_pyr': 0.1}, 'dpl': [<hnn_core.dipole.Dipole object at 0x31165d4c0>]}]]}
+    3 L5 basket cells>, 'param_values': {'weight_basket': 0.1, 'weight_pyr': 0.1}, 'dpl': [<hnn_core.dipole.Dipole object at 0x1412b8f50>]}]]}
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-143
+.. GENERATED FROM PYTHON SOURCE LINES 130-149
 
 This plot shows an overlay of all smoothed dipole waveforms from the
 batch simulation. Each line represents a different set of synaptic strength
@@ -303,7 +310,7 @@ the product of current flow and distance in the neural tissue.
 Stronger synaptic connections (yellow lines) generally show larger
 amplitude responses and more pronounced features throughout the simulation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-165
+.. GENERATED FROM PYTHON SOURCE LINES 149-171
 
 .. code-block:: Python
 
@@ -341,13 +348,13 @@ amplitude responses and more pronounced features throughout the simulation.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 166-169
+.. GENERATED FROM PYTHON SOURCE LINES 172-175
 
 This plot displays the minimum and maximum dipole peaks across
 different synaptic strengths. This allows us to see how the range of
 dipole activity changes as we vary the synaptic strength parameter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 169-190
+.. GENERATED FROM PYTHON SOURCE LINES 175-196
 
 .. code-block:: Python
 
@@ -387,7 +394,7 @@ dipole activity changes as we vary the synaptic strength parameter.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 4.395 seconds)
+   **Total running time of the script:** (0 minutes 4.478 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_batch_simulate.py:
