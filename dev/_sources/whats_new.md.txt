@@ -13,7 +13,7 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 
 - `hnn_core` now includes a fully-tested and robust GUI of its own. The `hnn_core` GUI was present as a prototype in v0.3, but it is now ready for production. New features and visual improvements will still be coming to it in the future, such as the ability to use optimization. See our new [Install page](https://jonescompneurolab.github.io/hnn-core/dev/install.html) for ways to install it, and we have already begun incorporating it into a new, fresh series of tutorials for our upcoming revamp of the HNN website. If you have installed it, you can start the GUI using `hnn-gui` in your terminal/command prompt window.
 
-- The `BatchSimulate` class: Thanks to [Abdul Samad Siddiqui][] and Google Summer of Code 2024, there is now the capability to run "batches" of simulations across multiple parameter sets, enabling easy analysis and simulation of behavior across parameter sweeps. See our [example for more details](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py). Note that currently, only its `loky` backend is supported.
+- The `BatchSimulate` class: Thanks to [Abdul Samad Siddiqui][] and Google Summer of Code 2024, there is now the capability to run "batches" of simulations across multiple parameter sets, enabling easy analysis and simulation of behavior across parameter sweeps. See our [example for more details](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py). Note that currently, only its `loky` backend is supported, and the `"hnn-core[parallel]"` dependencies must be installed for it to be used.
 
 - Significant improvements to the API, documentation, and pedagogical examples [especially for Optimization](https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/howto/optimize_evoked.html#sphx-glr-auto-examples-howto-optimize-evoked-py), among others.
 
@@ -129,8 +129,10 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 - Add function {func}`~hnn_core.params.convert_to_json` to convert legacy param and json
   files to new json format, by [George Dang][] in {gh}`772`
 
-- Add {class}`~hnn_core.BatchSimulate` for batch simulation capability, by [Abdul Samad
-  Siddiqui][] in {gh}`782`
+- Add
+  [`BatchSimulate`](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py)
+  class for batch simulation capability, by [Abdul Samad Siddiqui][]
+  in {gh}`782`
 
 - Recorded calcium concentration from the soma, as well as all sections, are enabled by
   setting `record_ca` to `soma` or `all` in {func}`~hnn_core.simulate_dipole`.
@@ -141,8 +143,9 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
   colormap, and interpolation method to smoothen CSD plot, by [Katharina Duecker][] in
   {gh}`815`
 
-- Refactor and improve documentation for {class}`~hnn_core.BatchSimulate`, by [Abdul
-  Samad Siddiqui][] in {gh}`830` and {gh}`857`
+- Refactor and improve documentation for
+  [`BatchSimulate`](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py), by [Abdul Samad Siddiqui][]
+  in {gh}`830` and {gh}`857`
 
 - Add argument to change colors of `plot_spikes_raster`, shortened line lengths to
   prevent overlap, and added an argument for custom cell types, by [George Dang][] in
