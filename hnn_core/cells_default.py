@@ -48,6 +48,37 @@ def _get_dends(params, cell_type, section_names, v_init = {'all': -65}):
                                          v = v)
     return sections
 
+def _get_basal(params, cell_type, section_names, v_init = {'all': -65}):
+    """Convert a flat dictionary to a nested dictionary.
+
+    Returns
+    -------
+    sections : dict
+        Dictionary of sections. Keys are section names
+    """
+    prop_names = ['L', 'diam', 'Ra', 'cm']
+    sections = dict()
+    for section_name in section_names:
+        dend_prop = dict()
+        middle = section_name.replace('_', '')
+        for key in prop_names:
+            if key == 'Ra':
+                dend_prop[key] = params[f'{cell_type}_dend_{key}']*2
+            elif key=='cm':
+                dend_prop[key] = params[f'{cell_type}_dend_{key}']
+            else:
+                dend_prop[key] = params[f'{cell_type}_{middle}_{key}']
+            if len(v_init) == 1:
+                v = v_init['all']
+            else:
+                v = v_init[section_name]
+        sections[section_name] = Section(L=dend_prop['L'],
+                                         diam=dend_prop['diam'],
+                                         Ra=dend_prop['Ra'],
+                                         cm=dend_prop['cm'],
+                                         v = v)
+    return sections
+
 
 def _get_pyr_soma(p_all, cell_type, v_init = -65):
     """Get somatic properties."""
@@ -444,6 +475,7 @@ def _linear_g_at_dist(x, gsoma, gdend, xkink, hotzone_factor=1):
 
     return gbar
 
+
 def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
     """Calcium dynamics."""
 
@@ -476,16 +508,23 @@ def pyramidal_l5(cell_name,pos, gid=None):
     p_all = get_L5Pyr_params_new()
 
     # override params according to function
-
-    # THIS NEEDS TO BE UPDATED SOMEHOW SO THAT I CAN OPTIMIZE THE FUNCTION
-    gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_HVA'], gdend=p_all['L5Pyr_dend_gbar_Ca_HVA']*9, xkink=1500, hotzone_factor=3.9)
-    gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_LVAst'], gdend=p_all['L5Pyr_dend_gbar_Ca_LVAst']*2.5, xkink=1500, hotzone_factor=3)
+    gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_HVA']*1.5, gdend=p_all['L5Pyr_dend_gbar_Ca_HVA']*6.6, xkink=1500, hotzone_factor=3.9)
+    gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_LVAst'], gdend=p_all['L5Pyr_dend_gbar_Ca_LVAst']*2.75, xkink=1500, hotzone_factor=3)
     gbar_Ih = partial(_exp_g_at_dist, zero_val=p_all['L5Pyr_dend_gbar_Ih'],exp_term = 1./323, slope=2.087, offset=-.8696)
+    
+    # basal dendrites
+    gbar_NaTs2_t = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_basal_gbar_NaTs2_t']*0.01, gdend=0, xkink=255)
+    gbar_SKv3_1 = partial(_linear_g_at_dist, gsoma=0, gdend=p_all['L5Pyr_basal_gbar_SKv3_1'], xkink=255)
+
 
     override_params = dict()
     override_params['L5Pyr_dend_gbar_Ca_HVA'] = gbar_Ca_HVA
     override_params['L5Pyr_dend_gbar_Ca_LVAst'] = gbar_Ca_LVA
     override_params['L5Pyr_dend_gbar_Ih'] = gbar_Ih
+    override_params['L5Pyr_basal_gbar_NaTs2_t'] = gbar_NaTs2_t
+    override_params['L5Pyr_basal_gbar_SKv3_1'] = gbar_SKv3_1
+
+
 
     p_all = compare_dictionaries(p_all, override_params)
 
@@ -533,7 +572,11 @@ def pyramidal_l5(cell_name,pos, gid=None):
                 'apical_2': -60,
                 'apical_tuft': -58}
 
-    sections = _get_dends(p_all, 'L5Pyr', section_names, v_init=v_init)
+    sections_apcl = _get_dends(p_all, 'L5Pyr', section_names=['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft'], v_init=v_init)
+    sections_basal = _get_basal(p_all, 'L5Pyr', section_names=['basal_1', 'basal_2', 'basal_3', 'apical_oblique'], v_init=v_init)
+
+    sections = {**sections_apcl, **sections_basal}
+
     sections['soma'] = _get_pyr_soma(p_all, 'L5Pyr', v_init=v_init['soma'])
 
     # Soma and apical mechanisms
@@ -621,10 +664,14 @@ def pyramidal_l23(cell_name,pos, gid=None):
 
     p_all = get_L2Pyr_params_new()
 
-    gbar_Ih = partial(_exp_g_at_dist, zero_val=p_all['L2Pyr_dend_gbar_Ih'],exp_term = 1/110, slope=4, offset=-0.869600)
+    gbar_Ih = partial(_exp_g_at_dist, zero_val=p_all['L2Pyr_dend_gbar_Ih'],exp_term = 1/110, slope=2, offset=-0.869600)
+    # gbar_NaTs2_t_32d = partial(_linear_g_at_dist, gsoma=p_all['L2Pyr_soma_gbar_NaTs2_t_32d'], gdend=p_all['L2Pyr_soma_gbar_NaTs2_t_32d']*0.1, xkink=1500)
+    # gbar_SKv3_1 = partial(_linear_g_at_dist, gsoma=p_all['L2Pyr_soma_gbar_SKv3_1']*0.5, gdend=p_all['L2Pyr_soma_gbar_SKv3_1'], xkink=1500)
 
     override_params = dict()
     override_params['L2Pyr_dend_gbar_Ih'] = gbar_Ih
+    # override_params['L2Pyr_basal_gbar_NaTs2_t_32d'] = gbar_NaTs2_t_32d
+    # override_params['L2Pyr_basal_gbar_SKv3_1'] = gbar_SKv3_1
 
     p_all = compare_dictionaries(p_all, override_params)
 
@@ -670,7 +717,7 @@ def pyramidal_l23(cell_name,pos, gid=None):
     sections['soma'] = _get_pyr_soma(p_all, 'L2Pyr', v_init=-72.5)
 
 
-    mechanisms = {'NaTs2_t_34d': ['gbar_NaTs2_t_34d'], 
+    mechanisms = {'NaTs2_t_32d': ['gbar_NaTs2_t_32d'], 
                     'SKv3_1': ['gbar_SKv3_1'],
                     'Nap_Et2': ['gbar_Nap_Et2'],
                     'Ca_HVA': ['gbar_Ca_HVA'],
@@ -685,7 +732,7 @@ def pyramidal_l23(cell_name,pos, gid=None):
     p_mech_soma = _get_mechanisms(p_all, 'L2Pyr', ['soma'], mechanisms)
 
     # apical sections
-    mechanisms = {'NaTa_t_34d': ['gbar_NaTa_t_34d'],  
+    mechanisms = {'NaTa_t_32d': ['gbar_NaTa_t_32d'],  
                     'SKv3_1': ['gbar_SKv3_1'],
                     'Ca_HVA': ['gbar_Ca_HVA'],
                     'Ca_LVAst': ['gbar_Ca_LVAst'],
@@ -697,7 +744,7 @@ def pyramidal_l23(cell_name,pos, gid=None):
     p_mech_apical = _get_mechanisms(p_all, 'L2Pyr', section_names, mechanisms)
 
     # basal sections - super hacky because I can't mess with _get_mechanisms
-    mechanisms = {'NaTa_t_34d': ['gbar_NaTa_t_34d'], 
+    mechanisms = {'NaTs2_t_32d': ['gbar_NaTs2_t_32d'], 
                     'SKv3_1': ['gbar_SKv3_1'],
                     'pas': ['g_pas', 'e_pas'],
                     'Ih': ['gbar_Ih']}
