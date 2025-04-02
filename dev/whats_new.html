@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>What’s new? &#8212; hnn-core  documentation</title>
+    <title>What’s new? &#8212; hnn-core 0.4.1 documentation</title>
   
   
   
@@ -40,7 +40,7 @@
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
   <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
 
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=ea00750a"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -49,7 +49,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.14.4';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.1';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -145,8 +145,8 @@
       
     
     
-    <img src="_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core  documentation - Home"/>
-    <script>document.write(`<img src="_static/hnn-medium.png" class="logo__image only-dark" alt="hnn-core  documentation - Home"/>`);</script>
+    <img src="_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core 0.4.1 documentation - Home"/>
+    <script>document.write(`<img src="_static/hnn-medium.png" class="logo__image only-dark" alt="hnn-core 0.4.1 documentation - Home"/>`);</script>
   
   
 </a></div>
@@ -492,8 +492,14 @@ document.write(`
                   
   <section id="what-s-new">
 <span id="whats-new"></span><h1>What’s new?<a class="headerlink" href="#what-s-new" title="Permalink to this heading">#</a></h1>
-<section id="v0-4-release-notes">
-<h2>v0.4 Release Notes<a class="headerlink" href="#v0-4-release-notes" title="Permalink to this heading">#</a></h2>
+<section id="patch-notes">
+<h2>0.4.1 Patch notes<a class="headerlink" href="#patch-notes" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Version 0.4.1 is a bug-fixing patch release for version 0.4. This includes changes to importing of <code class="docutils literal notranslate"><span class="pre">BatchSimulate</span></code> due to previously-undetected install/import issues (<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1034">#1034</a>), configuration of packaging metadata format (same PR), and elimination of a discrepancy in our method of cleaning local compiled files that led to architecture-specific files being included in the Pypi 0.4 release, which caused simulations on some platforms to fail (<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1035">#1035</a>). The public Pypi version has already been updated to 0.4.1.</p></li>
+</ul>
+</section>
+<section id="release-notes">
+<h2>0.4 Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this heading">#</a></h2>
 <p>v0.4 represents a major milestone in development of <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> and the HNN ecosystem as a whole. v0.4 includes over <em>two years</em> of active development work by many people (&gt;800 commits!), and brings with it many new and exciting features, including significant improvements to robustness, testing, and bug-fixing.</p>
 <section id="new-features">
 <h3>New Features<a class="headerlink" href="#new-features" title="Permalink to this heading">#</a></h3>
@@ -1185,7 +1191,8 @@ scaling, by <a class="reference external" href="https://github.com/cjayb">Christ
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#v0-4-release-notes">v0.4 Release Notes</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#patch-notes">0.4.1 Patch notes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-notes">0.4 Release Notes</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#new-features">New Features</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deprecations">Deprecations</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#upcoming-deprecations">Upcoming Deprecations</a></li>
