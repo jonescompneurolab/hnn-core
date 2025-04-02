@@ -5,6 +5,10 @@ orphan: true
 (whats_new)=
 # What's new?
 
+## Current development version
+
+### Changelog
+
 ## 0.4.1 Patch notes
 
 - Version 0.4.1 is a bug-fixing patch release for version 0.4. This includes changes to importing of `BatchSimulate` due to previously-undetected install/import issues ({gh}`1034`), configuration of packaging metadata format (same PR), and elimination of a discrepancy in our method of cleaning local compiled files that led to architecture-specific files being included in the Pypi 0.4 release, which caused simulations on some platforms to fail ({gh}`1035`). The public Pypi version has already been updated to 0.4.1.
