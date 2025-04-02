@@ -1,0 +1,27 @@
+[
+    {
+        "name": "Development",
+        "version": "dev",
+        "url": "https://jonescompneurolab.github.io/hnn-core/dev/index.html"
+    },
+    {
+        "name": "Stable (v0.4)",
+        "version": "stable",
+        "url": "https://jonescompneurolab.github.io/hnn-core/stable/index.html"
+    },
+    {
+        "name": "v0.3",
+        "version": "0.3",
+        "url": "https://jonescompneurolab.github.io/hnn-core/v0.3/index.html"
+    },
+    {
+        "name": "v0.2",
+        "version": "0.2",
+        "url": "https://jonescompneurolab.github.io/hnn-core/v0.2/index.html"
+    },
+    {
+        "name": "v0.1",
+        "version": "0.1",
+        "url": "https://jonescompneurolab.github.io/hnn-core/v0.1/index.html"
+    }
+]

@@ -1,0 +1,1287 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>hnn_core.extracellular &#8212; hnn-core  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/hnn_core/extracellular';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.4" />
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-199741045-1');
+</script>
+
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core  documentation - Home"/>
+    <img src="../../_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core  documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Install
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../glossary.html">
+    Glossary
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Install
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../glossary.html">
+    Glossary
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">hnn_core.extracellular</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for hnn_core.extracellular</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Handler classes to calculate extracellular electric potentials, such as the</span>
+<span class="sd">Local Field Potential (LFP), at ideal (point-like) electrodes based on net</span>
+<span class="sd">transmembrane currents of all neurons in the network.</span>
+
+<span class="sd">The code is inspired by [1], but important modifications were made to comply</span>
+<span class="sd">with the original derivation [2] of the &#39;line source approximation method&#39;.</span>
+
+<span class="sd">References</span>
+<span class="sd">----------</span>
+<span class="sd">1 . Parasuram H, Nair B, D&#39;Angelo E, Hines M, Naldi G, Diwakar S (2016)</span>
+<span class="sd">Computational Modeling of Single Neuron Extracellular Electric Potentials and</span>
+<span class="sd">Network Local Field Potentials using LFPsim. Front Comput Neurosci 10:65.</span>
+<span class="sd">2. Holt, G. R. (1998) A critical reexamination of some assumptions and</span>
+<span class="sd">   implications of cable theory in neurobiology. CalTech, PhD Thesis.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># Authors: Mainak Jas &lt;mjas@mgh.harvard.edu&gt;</span>
+<span class="c1">#          Nick Tolley &lt;nicholas_tolley@brown.edu&gt;</span>
+<span class="c1">#          Sam Neymotin &lt;samnemo@gmail.com&gt;</span>
+<span class="c1">#          Christopher Bailey &lt;cjb@cfin.au.dk&gt;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="n">norm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">neuron</span><span class="w"> </span><span class="kn">import</span> <span class="n">h</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.externals.mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">_validate_type</span><span class="p">,</span> <span class="n">_check_option</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_csd2d</span><span class="p">(</span><span class="n">lfp_data</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Current source density (CSD) estimation</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lfp_data : array, shape (n_channels, n_times)</span>
+<span class="sd">        LFP data.</span>
+<span class="sd">    delta : int</span>
+<span class="sd">        Spacing between channels (um), scales the CSD.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    csd2d : array, shape (n_channels, n_times)</span>
+<span class="sd">        The 2nd derivative current source density estimate (csd2d)</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The three-point finite-difference approximation of the</span>
+<span class="sd">    second spatial derivative for computing 1-dimensional CSD</span>
+<span class="sd">    with border electrode interpolation</span>
+<span class="sd">    csd[electrode] = -(LFP[electrode - 1] - 2*LFP[electrode] +</span>
+<span class="sd">                       LFP[electrode + 1]) / spacing ** 2</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">csd2d</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">lfp_data</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">delta</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="n">bottom_border</span> <span class="o">=</span> <span class="n">csd2d</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">csd2d</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">top_border</span> <span class="o">=</span> <span class="n">csd2d</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">csd2d</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">csd2d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">top_border</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">csd2d</span><span class="p">,</span>
+                            <span class="n">bottom_border</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">csd2d</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_laminar_z_coords</span><span class="p">(</span><span class="n">electrode_positions</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get equispaced, colinear electrode coordinates along z-axis.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    electrode_positions : list of tuple</span>
+<span class="sd">        The (x, y, z) coordinates (in um) of the extracellular electrodes.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    z_coordinates : array, shape (n_contacts,)</span>
+<span class="sd">        Z-coordinates of the electrode contacts.</span>
+<span class="sd">    z_delta : float</span>
+<span class="sd">        Magnitude of change in the z-direction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_contacts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">electrode_positions</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">n_contacts</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;Electrode array positions must contain more than 1 contact to be &#39;</span>
+            <span class="s1">&#39;compatible with laminar profiling in a neocortical column. Got &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">n_contacts</span><span class="si">}</span><span class="s1"> electrode contact positions.&#39;</span><span class="p">)</span>
+    <span class="n">displacements</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">electrode_positions</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">z_delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">displacements</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="n">magnitudes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">displacements</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">cross_prods</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">displacements</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">displacements</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">magnitudes</span><span class="p">,</span> <span class="n">magnitudes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span>  <span class="c1"># equally spaced</span>
+            <span class="n">z_delta</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span>  <span class="c1"># changes in z-direction</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">cross_prods</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>  <span class="c1"># colinear</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s1">&#39;Electrode contacts are incompatible with laminar profiling &#39;</span>
+            <span class="s1">&#39;in a neocortical column. Make sure the &#39;</span>
+            <span class="s1">&#39;electrode positions are equispaced, colinear, and projecting &#39;</span>
+            <span class="s1">&#39;along the z-axis.&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">electrode_positions</span><span class="p">)[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">z_delta</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_transfer_resistance</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">electrode_pos</span><span class="p">,</span> <span class="n">conductivity</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span>
+                         <span class="n">min_distance</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Transfer resistance between section and electrode position.</span>
+
+<span class="sd">    To arrive at the extracellular potential, the value returned by this</span>
+<span class="sd">    function is multiplied by the net transmembrane current flowing through all</span>
+<span class="sd">    segments of the section. Hence the term &quot;resistance&quot; (voltage equals</span>
+<span class="sd">    current times resistance).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    section : h.Section()</span>
+<span class="sd">        The NEURON section.</span>
+<span class="sd">    electrode_pos : list (x, y, z)</span>
+<span class="sd">        The x, y, z coordinates of the electrode (in um)</span>
+<span class="sd">    conductivity : float</span>
+<span class="sd">        Extracellular conductivity (in S/m)</span>
+<span class="sd">    method : str</span>
+<span class="sd">        Approximation to use. ``&#39;psa&#39;`` (point source approximation) treats</span>
+<span class="sd">        each segment junction as a point extracellular current source.</span>
+<span class="sd">        ``&#39;lsa&#39;`` (line source approximation) treats each segment as a line</span>
+<span class="sd">        source of current, which extends from the previous to the next segment</span>
+<span class="sd">        center point: |---x---|, where x is the current segment flanked by |.</span>
+<span class="sd">    min_distance : float (default: 0.5)</span>
+<span class="sd">        To avoid numerical errors in the 1/R calculation, we&#39;ll by default</span>
+<span class="sd">        limit the distance to 0.5 um, corresponding to 1 um diameter dendrites.</span>
+<span class="sd">        NB: LFPy uses section.diam / 2.0, i.e., whatever the closest section</span>
+<span class="sd">        radius happens to be. This may not make sense for HNN model neurons, in</span>
+<span class="sd">        which dendrite diameters have been adjusted to represent the entire</span>
+<span class="sd">        tree (Bush &amp; Sejnowski, 1993).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vres : list</span>
+<span class="sd">        The transfer resistance at each segment of the section.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">electrode_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">electrode_pos</span><span class="p">)</span>  <span class="c1"># electrode position to Numpy</span>
+
+    <span class="n">sec_start</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">section</span><span class="o">.</span><span class="n">x3d</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">section</span><span class="o">.</span><span class="n">y3d</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">section</span><span class="o">.</span><span class="n">z3d</span><span class="p">(</span><span class="mi">0</span><span class="p">)])</span>
+    <span class="n">sec_end</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">section</span><span class="o">.</span><span class="n">x3d</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">section</span><span class="o">.</span><span class="n">y3d</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">section</span><span class="o">.</span><span class="n">z3d</span><span class="p">(</span><span class="mi">1</span><span class="p">)])</span>
+    <span class="n">sec_vec</span> <span class="o">=</span> <span class="n">sec_end</span> <span class="o">-</span> <span class="n">sec_start</span>
+
+    <span class="c1"># NB segment lengths aren&#39;t equal! First/last segment center point is</span>
+    <span class="c1"># closer to respective end point than to next/previous segment!</span>
+    <span class="c1"># for nseg == 5, the segment centers are: [0.1, 0.3, 0.5, 0.7, 0.9]</span>
+    <span class="n">seg_ctr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">section</span><span class="o">.</span><span class="n">nseg</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">line_lens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">section</span><span class="o">.</span><span class="n">nseg</span> <span class="o">+</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">seg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">section</span><span class="p">):</span>
+        <span class="n">seg_ctr</span><span class="p">[</span><span class="n">ii</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">sec_start</span> <span class="o">+</span> <span class="n">seg</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">sec_vec</span>
+        <span class="n">line_lens</span><span class="p">[</span><span class="n">ii</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">section</span><span class="o">.</span><span class="n">L</span>
+    <span class="n">line_lens</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">section</span><span class="o">.</span><span class="n">L</span>
+    <span class="n">line_lens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">line_lens</span><span class="p">)</span>
+    <span class="n">first_len</span> <span class="o">=</span> <span class="n">line_lens</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">line_lens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">first_len</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">line_lens</span><span class="p">[</span><span class="mi">2</span><span class="p">:]))</span>
+
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;psa&#39;</span><span class="p">:</span>
+
+        <span class="c1"># distance from segment midpoints to electrode</span>
+        <span class="n">dis</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">electrode_pos</span><span class="p">,</span> <span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">nseg</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">-</span> <span class="n">seg_ctr</span><span class="p">,</span>
+                   <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># To avoid very large values when electrode is placed close to a</span>
+        <span class="c1"># segment junction, enforce minimal radial distance</span>
+        <span class="n">dis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">dis</span><span class="p">,</span> <span class="n">min_distance</span><span class="p">)</span>
+
+        <span class="n">phi</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">dis</span>
+
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;lsa&#39;</span><span class="p">:</span>
+        <span class="c1"># From: Appendix C (pp. 137) in Holt, G. R. A critical reexamination of</span>
+        <span class="c1"># some assumptions and implications of cable theory in neurobiology.</span>
+        <span class="c1"># CalTech, PhD Thesis (1998).</span>
+        <span class="c1">#</span>
+        <span class="c1">#                      Electrode position</span>
+        <span class="c1">#   |------ L --------*</span>
+        <span class="c1">#                 b / | R</span>
+        <span class="c1">#                 /   |</span>
+        <span class="c1">#   0==== a ====1- H -+</span>
+        <span class="c1">#</span>
+        <span class="c1"># a: vector oriented along the section</span>
+        <span class="c1"># b: position vector of electrode with respect to section end (1)</span>
+        <span class="c1"># H: parallel distance from section end to electrode</span>
+        <span class="c1"># R: radial distance from section end to electrode</span>
+        <span class="c1"># L: parallel distance from section start to electrode</span>
+        <span class="c1"># Note that there are three distinct regimes to this approximation,</span>
+        <span class="c1"># depending on the electrode position along the section axis.</span>
+        <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">seg_ctr</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">ctr</span><span class="p">,</span> <span class="n">line_len</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">seg_ctr</span><span class="p">,</span> <span class="n">line_lens</span><span class="p">)):</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">ctr</span> <span class="o">-</span> <span class="n">line_len</span> <span class="o">*</span> <span class="n">sec_vec</span> <span class="o">/</span> <span class="n">norm</span><span class="p">(</span><span class="n">sec_vec</span><span class="p">)</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">ctr</span> <span class="o">+</span> <span class="n">line_len</span> <span class="o">*</span> <span class="n">sec_vec</span> <span class="o">/</span> <span class="n">norm</span><span class="p">(</span><span class="n">sec_vec</span><span class="p">)</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
+            <span class="n">norm_a</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">electrode_pos</span> <span class="o">-</span> <span class="n">end</span>
+            <span class="c1"># projection: H = a.cos(theta) = a.dot(b) / |a|</span>
+            <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="n">norm_a</span>  <span class="c1"># NB can be negative</span>
+            <span class="n">L</span> <span class="o">=</span> <span class="n">H</span> <span class="o">+</span> <span class="n">norm_a</span>
+            <span class="n">R2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">-</span> <span class="n">H</span> <span class="o">**</span> <span class="mi">2</span>  <span class="c1"># NB squares</span>
+
+            <span class="c1"># To avoid very large values when electrode is placed (anywhere) on</span>
+            <span class="c1"># the section axis, enforce minimal perpendicular distance</span>
+            <span class="n">R2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">R2</span><span class="p">,</span> <span class="n">min_distance</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">L</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">H</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># electrode is &quot;behind&quot; line segment</span>
+                <span class="n">num</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">H</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">R2</span><span class="p">)</span> <span class="o">-</span> <span class="n">H</span>  <span class="c1"># == norm(b) - H</span>
+                <span class="n">denom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">L</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">R2</span><span class="p">)</span> <span class="o">-</span> <span class="n">L</span>
+            <span class="k">elif</span> <span class="n">L</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">H</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># electrode is &quot;on top of&quot; line segment</span>
+                <span class="n">num</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">H</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">R2</span><span class="p">)</span> <span class="o">-</span> <span class="n">H</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">L</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">L</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">R2</span><span class="p">))</span>
+                <span class="n">denom</span> <span class="o">=</span> <span class="n">R2</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># electrode is &quot;ahead of&quot; line segment</span>
+                <span class="n">num</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">L</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">R2</span><span class="p">)</span> <span class="o">+</span> <span class="n">L</span>
+                <span class="n">denom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">H</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">R2</span><span class="p">)</span> <span class="o">+</span> <span class="n">H</span>  <span class="c1"># == norm(b) + H</span>
+
+            <span class="n">phi</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">num</span> <span class="o">/</span> <span class="n">denom</span><span class="p">)</span> <span class="o">/</span> <span class="n">norm_a</span>
+
+    <span class="c1"># [dis]: um; [conductivity]: S / m</span>
+    <span class="c1"># [phi / conductivity] = [1/dis] / [conductivity] = 1 / [dis] x [conduct&#39;y]</span>
+    <span class="c1"># [dis] x [conductivity] = um x (S / m) = 1e-6 S</span>
+    <span class="c1"># transmembrane current returned by _ref_i_membrane_ is in [nA]</span>
+    <span class="c1"># ==&gt; 1e-9 A x (1 / 1e-6 S) = 1e-3 V = mV</span>
+    <span class="c1"># ===&gt; multiply by 1e3 to get uV</span>
+    <span class="k">return</span> <span class="mf">1000.0</span> <span class="o">*</span> <span class="n">phi</span> <span class="o">/</span> <span class="p">(</span><span class="mf">4.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">conductivity</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ExtracellularArray">
+<a class="viewcode-back" href="../../generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExtracellularArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for recording extracellular potential fields with electrode array</span>
+
+<span class="sd">    Note that to add an electrode array to a simulation, you should use the</span>
+<span class="sd">    :meth:`hnn_core.Network.add_electrode_array`-method. After simulation,</span>
+<span class="sd">    the network will contain a dictionary of `ExtracellularArray`-objects</span>
+<span class="sd">    in ``net.rec_arrays`` (each array must be added with a unique name). An</span>
+<span class="sd">    `ExtracellularArray` contains the voltages at each electrode contact,</span>
+<span class="sd">    along with the time points at which the voltages were sampled.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    positions : tuple | list of tuple</span>
+<span class="sd">        The (x, y, z) coordinates (in um) of the extracellular electrodes.</span>
+<span class="sd">    conductivity : float</span>
+<span class="sd">        Extracellular conductivity, in S/m, of the assumed infinite,</span>
+<span class="sd">        homogeneous volume conductor that the cell and electrode are in.</span>
+<span class="sd">    method : str</span>
+<span class="sd">        Approximation to use. ``&#39;psa&#39;`` (point source approximation) treats</span>
+<span class="sd">        each segment junction as a point extracellular current source.</span>
+<span class="sd">        ``&#39;lsa&#39;`` (line source approximation) treats each segment as a line</span>
+<span class="sd">        source of current, which extends from the previous to the next segment</span>
+<span class="sd">        center point: /---x---/, where x is the current segment flanked by /.</span>
+<span class="sd">    min_distance : float (default: 0.5; unit: um)</span>
+<span class="sd">        To avoid numerical errors in calculating potentials, apply a minimum</span>
+<span class="sd">        distance limit between the electrode contacts and the active neuronal</span>
+<span class="sd">        membrane elements that act as sources of current. The default value of</span>
+<span class="sd">        0.5 um corresponds to 1 um diameter dendrites.</span>
+<span class="sd">    times : array-like, shape (n_times,) | None</span>
+<span class="sd">        Optionally, provide precomputed voltage sampling times for electrodes</span>
+<span class="sd">        at `positions`.</span>
+<span class="sd">    voltages : array-like, shape (n_trials, n_electrodes, n_times) | None</span>
+<span class="sd">        Optionally, provide precomputed voltages for electrodes at</span>
+<span class="sd">        ``positions``.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    times : array, shape (n_times,)</span>
+<span class="sd">        The time points the extracellular voltages are sampled at (ms)</span>
+<span class="sd">    voltages : array, shape (n_trials, n_electrodes, n_times)</span>
+<span class="sd">        The measured extracellular voltages</span>
+<span class="sd">    sfreq : float</span>
+<span class="sd">        Sampling rate of the extracellular data (Hz).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The length of an ``ExtracellularArray`` is equal to the number of trials of</span>
+<span class="sd">    data it contains. Slicing an ``ExtracellularArray`` returns a `copy` of the</span>
+<span class="sd">    corresponding trials: ``array[:5]`` returns a new array of length 5, etc.</span>
+
+<span class="sd">    See Table 5 in https://doi.org/10.1152/jn.00122.2010 for</span>
+<span class="sd">    measured values of conductivity in rat cortex (note units there are mS/cm)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">conductivity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;psa&#39;</span><span class="p">,</span>
+                 <span class="n">min_distance</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">times</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">voltages</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="s1">&#39;positions&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">3</span><span class="p">,):</span>  <span class="c1"># a single coordinate given</span>
+            <span class="n">positions</span> <span class="o">=</span> <span class="p">[</span><span class="n">positions</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">:</span>
+            <span class="n">_validate_type</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="s1">&#39;positions&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;positions should be provided as xyz &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;coordinate triplets, got: </span><span class="si">{</span><span class="n">positions</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">conductivity</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;conductivity&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">conductivity</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;conductivity must be a positive number&#39;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">min_distance</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;min_distance&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">min_distance</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;min_distance must be a positive number&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># method allowed to be None for testing</span>
+            <span class="n">_validate_type</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;method&#39;</span><span class="p">)</span>
+            <span class="n">_check_option</span><span class="p">(</span><span class="s1">&#39;method&#39;</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;psa&#39;</span><span class="p">,</span> <span class="s1">&#39;lsa&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">times</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+        <span class="k">if</span> <span class="n">voltages</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">voltages</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+
+        <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+        <span class="n">voltages</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">voltages</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">voltages</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># voltages is not None</span>
+            <span class="n">n_trials</span><span class="p">,</span> <span class="n">n_electrodes</span><span class="p">,</span> <span class="n">n_times</span> <span class="o">=</span> <span class="n">voltages</span><span class="o">.</span><span class="n">shape</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_electrodes</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;number of voltage traces must match number&#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39; of channels, got </span><span class="si">{</span><span class="n">n_electrodes</span><span class="si">}</span><span class="s1"> and &#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_times</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;length of times and voltages must match,&#39;</span>
+                                 <span class="sa">f</span><span class="s1">&#39; got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span><span class="si">}</span><span class="s1"> and </span><span class="si">{</span><span class="n">n_times</span><span class="si">}</span><span class="s1"> &#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">positions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conductivity</span> <span class="o">=</span> <span class="n">conductivity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_distance</span> <span class="o">=</span> <span class="n">min_distance</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_times</span> <span class="o">=</span> <span class="n">times</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">voltages</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial_no</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trial_no</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">return_data</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">trial_no</span><span class="p">]]</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trial_no</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+                <span class="n">return_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">trial_no</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trial_no</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="n">return_data</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span> <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="n">trial_no</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;trial index must be int, slice or list-like,&#39;</span>
+                                <span class="sa">f</span><span class="s1">&#39; got: </span><span class="si">{</span><span class="n">trial_no</span><span class="si">}</span><span class="s1"> which is </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">trial_no</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;the data contain </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s1"> trials, the &#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39;indices provided are out of range: </span><span class="si">{</span><span class="n">trial_no</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ExtracellularArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span>
+                                  <span class="n">conductivity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conductivity</span><span class="p">,</span>
+                                  <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+                                  <span class="n">times</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">,</span>
+                                  <span class="n">voltages</span><span class="o">=</span><span class="n">return_data</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ExtracellularArray.__repr__">
+<a class="viewcode-back" href="../../generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray.__repr__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">class_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="si">}</span><span class="s1"> electrodes, &#39;</span>
+               <span class="sa">f</span><span class="s1">&#39;conductivity=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">conductivity</span><span class="si">}</span><span class="s1">, method=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; | </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span><span class="si">}</span><span class="s1"> trials, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">)</span><span class="si">}</span><span class="s1"> times&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39; (no data recorded yet)&#39;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&lt;</span><span class="si">{</span><span class="n">class_name</span><span class="si">}</span><span class="s1"> | </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s1">&gt;&#39;</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>  <span class="c1"># length == number of trials</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ExtracellularArray</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+
+        <span class="n">all_attrs</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">attrs_to_ignore</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_attrs</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)]</span>
+        <span class="n">attrs_to_ignore</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;conductivity&#39;</span><span class="p">,</span> <span class="s1">&#39;copy&#39;</span><span class="p">,</span> <span class="s1">&#39;n_contacts&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;plot_csd&#39;</span><span class="p">,</span> <span class="s1">&#39;plot_lfp&#39;</span><span class="p">,</span> <span class="s1">&#39;sfreq&#39;</span><span class="p">,</span> <span class="s1">&#39;smooth&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;voltages&#39;</span><span class="p">,</span> <span class="s1">&#39;to_dict&#39;</span><span class="p">,</span> <span class="s1">&#39;times&#39;</span><span class="p">,</span> <span class="s1">&#39;voltages&#39;</span><span class="p">])</span>
+        <span class="n">attrs_to_check</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_attrs</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attrs_to_ignore</span><span class="p">]</span>
+
+        <span class="c1"># Check all other attributes</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs_to_check</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">times</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voltages</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">voltages</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="ExtracellularArray.copy">
+<a class="viewcode-back" href="../../generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray.copy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a copy of the ExtracellularArray instance</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        array_copy : instance of ExtracellularArray</span>
+<span class="sd">            A copy of the array instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_times</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">voltages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sfreq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the sampling rate of the extracellular data.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Sampling rate is not defined for one sample&#39;</span><span class="p">)</span>
+
+        <span class="n">dT</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">)</span>
+        <span class="n">Tsamp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">dT</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dT</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">Tsamp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-3</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dT</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="n">Tsamp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s1">&#39;Extracellular sampling times vary by more than 1 us. Check &#39;</span>
+                <span class="s1">&#39;times-attribute for errors.&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="mf">1000.</span> <span class="o">/</span> <span class="n">Tsamp</span>  <span class="c1"># times are in in ms</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_times</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ExtracellularArray.smooth">
+<a class="viewcode-back" href="../../generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray.smooth">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">smooth</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window_len</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Smooth extracellular waveforms using Hamming-windowed convolution</span>
+
+<span class="sd">        Note that this method operates in-place, i.e., it will alter the data.</span>
+<span class="sd">        If you prefer a filtered copy, consider using the</span>
+<span class="sd">        :meth:`~hnn_core.extracellular.ExtracellularArray.copy`-method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        window_len : float</span>
+<span class="sd">            The length (in ms) of a `~numpy.hamming` window to convolve the</span>
+<span class="sd">            data with.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        extracellular_copy : instance of ExtraCellularArray</span>
+<span class="sd">            The modified ExtraCellularArray instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">smooth_waveform</span>
+
+        <span class="k">for</span> <span class="n">n_trial</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">n_contact</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">n_trial</span><span class="p">][</span><span class="n">n_contact</span><span class="p">]</span> <span class="o">=</span> <span class="n">smooth_waveform</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">n_trial</span><span class="p">][</span><span class="n">n_contact</span><span class="p">],</span> <span class="n">window_len</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sfreq</span><span class="p">)</span>  <span class="c1"># XXX smooth_waveform returns ndarray</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="ExtracellularArray.plot_lfp">
+<a class="viewcode-back" href="../../generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray.plot_lfp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot_lfp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">trial_no</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contact_no</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;cividis&#39;</span><span class="p">,</span> <span class="n">voltage_offset</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+                 <span class="n">voltage_scalebar</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot laminar local field potential time series.</span>
+
+<span class="sd">        One plot is created for each trial. Multiple trials can be overlaid</span>
+<span class="sd">        with or without (default) and offset.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        trial_no : int | list of int | slice</span>
+<span class="sd">            Trial number(s) to plot</span>
+<span class="sd">        contact_no : int | list of int | slice</span>
+<span class="sd">            Electrode contact number(s) to plot</span>
+<span class="sd">        ax : instance of matplotlib figure | None</span>
+<span class="sd">            The matplotlib axis</span>
+<span class="sd">        decim : int | list of int | None (default)</span>
+<span class="sd">            Optional (integer) factor by which to decimate the raw dipole</span>
+<span class="sd">            traces. The SciPy function :func:`~scipy.signal.decimate` is used,</span>
+<span class="sd">            which recommends values &lt;13. To achieve higher decimation factors,</span>
+<span class="sd">            a list of ints can be provided. These are applied successively.</span>
+<span class="sd">        color : string | array of floats | matplotlib.colors.ListedColormap</span>
+<span class="sd">            The color to use for plotting (optional). The usual Matplotlib</span>
+<span class="sd">            standard color strings may be used (e.g., &#39;b&#39; for blue). A color</span>
+<span class="sd">            can also be defined as an RGBA-quadruplet, or an array of</span>
+<span class="sd">            RGBA-values (one for each electrode contact trace to plot). An</span>
+<span class="sd">            instance of :class:`~matplotlib.colors.ListedColormap` may also be</span>
+<span class="sd">            provided.</span>
+<span class="sd">        voltage_offset : float | None (optional)</span>
+<span class="sd">            Amount to offset traces by on the voltage-axis. Useful for plotting</span>
+<span class="sd">            laminar arrays.</span>
+<span class="sd">        voltage_scalebar : float | None (optional)</span>
+<span class="sd">            Height, in units of uV, of a scale bar to plot in the top-left</span>
+<span class="sd">            corner of the plot.</span>
+<span class="sd">        show : bool</span>
+<span class="sd">            If True, show the figure</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fig : instance of plt.fig</span>
+<span class="sd">            The matplotlib figure handle into which time series were plotted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_laminar_lfp</span>
+
+        <span class="k">if</span> <span class="n">trial_no</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">plot_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltages</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trial_no</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">slice</span><span class="p">)):</span>
+            <span class="n">plot_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltages</span><span class="p">[</span><span class="n">trial_no</span><span class="p">,</span> <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;unknown trial number type, got </span><span class="si">{</span><span class="n">trial_no</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">contact_no</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">slice</span><span class="p">)):</span>
+            <span class="n">plot_data</span> <span class="o">=</span> <span class="n">plot_data</span><span class="p">[:,</span> <span class="n">contact_no</span><span class="p">,</span> <span class="p">]</span>
+        <span class="k">elif</span> <span class="n">contact_no</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;unknown contact number type, got </span><span class="si">{</span><span class="n">contact_no</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">contact_labels</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_get_laminar_z_coords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">trial_data</span> <span class="ow">in</span> <span class="n">plot_data</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_laminar_lfp</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="n">trial_data</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="n">tmax</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                <span class="n">decim</span><span class="o">=</span><span class="n">decim</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                <span class="n">voltage_offset</span><span class="o">=</span><span class="n">voltage_offset</span><span class="p">,</span>
+                <span class="n">voltage_scalebar</span><span class="o">=</span><span class="n">voltage_scalebar</span><span class="p">,</span>
+                <span class="n">contact_labels</span><span class="o">=</span><span class="n">contact_labels</span><span class="p">,</span>
+                <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="ExtracellularArray.plot_csd">
+<a class="viewcode-back" href="../../generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray.plot_csd">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot_csd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;spline&#39;</span><span class="p">,</span>
+                 <span class="n">sink</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot laminar current source density (CSD) estimation</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        vmin: float, optional</span>
+<span class="sd">            lower bound of the color axis.</span>
+<span class="sd">            Will be set automatically of None.</span>
+<span class="sd">        vmax: float, optional</span>
+<span class="sd">            upper bound of the color axis.</span>
+<span class="sd">            Will be set automatically of None.</span>
+<span class="sd">        sink : str</span>
+<span class="sd">            If set to &#39;blue&#39; or &#39;b&#39;, plots sinks in blue and sources in red,</span>
+<span class="sd">            if set to &#39;red&#39; or &#39;r&#39;, sinks plotted in red and sources blue.</span>
+<span class="sd">        interpolation : str | None</span>
+<span class="sd">            If &#39;spline&#39;, will smoothen the CSD using spline method,</span>
+<span class="sd">            if None, no smoothing will be applied.</span>
+<span class="sd">        colorbar : bool</span>
+<span class="sd">            If the colorbar is presented.</span>
+<span class="sd">        ax : instance of matplotlib figure | None</span>
+<span class="sd">            The matplotlib axis.</span>
+<span class="sd">        show : bool</span>
+<span class="sd">            If True, show the plot.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fig : instance of matplotlib Figure</span>
+<span class="sd">            The matplotlib figure handle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_laminar_csd</span>
+        <span class="n">lfp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">contact_labels</span><span class="p">,</span> <span class="n">delta</span> <span class="o">=</span> <span class="n">_get_laminar_z_coords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
+
+        <span class="n">csd_data</span> <span class="o">=</span> <span class="n">calculate_csd2d</span><span class="p">(</span><span class="n">lfp_data</span><span class="o">=</span><span class="n">lfp</span><span class="p">,</span>
+                                   <span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">)</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_laminar_csd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="n">csd_data</span><span class="p">,</span>
+                               <span class="n">contact_labels</span><span class="o">=</span><span class="n">contact_labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                               <span class="n">colorbar</span><span class="o">=</span><span class="n">colorbar</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span>
+                               <span class="n">interpolation</span><span class="o">=</span><span class="n">interpolation</span><span class="p">,</span> <span class="n">sink</span><span class="o">=</span><span class="n">sink</span><span class="p">,</span>
+                               <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="ExtracellularArray.to_dict">
+<a class="viewcode-back" href="../../generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts an object of ExtracellularArray class to a</span>
+<span class="sd">        dictionary.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dictionary form of an object of ExtracellularArray class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rec_array_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">rec_array_data</span><span class="p">[</span><span class="s1">&#39;positions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions</span>
+        <span class="n">rec_array_data</span><span class="p">[</span><span class="s1">&#39;conductivity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conductivity</span>
+        <span class="n">rec_array_data</span><span class="p">[</span><span class="s1">&#39;method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span>
+        <span class="n">rec_array_data</span><span class="p">[</span><span class="s1">&#39;min_distance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_distance</span>
+        <span class="n">rec_array_data</span><span class="p">[</span><span class="s1">&#39;times&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">times</span>
+        <span class="n">rec_array_data</span><span class="p">[</span><span class="s1">&#39;voltages&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltages</span>
+
+        <span class="k">return</span> <span class="n">rec_array_data</span></div>
+</div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_ExtracellularArrayBuilder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The _ExtracellularArrayBuilder class</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    array : ExtracellularArray object</span>
+<span class="sd">        The instance of :class:`hnn_core.extracellular.ExtracellularArray` to</span>
+<span class="sd">        build in NEURON-Python</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">array</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">n_contacts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_ptrvec</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_vec</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_r_transfer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_times</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recording_callback</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cvode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_celltypes</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assemble NEURON objects for calculating extracellular potentials.</span>
+
+<span class="sd">        The handler is set up to maintain a vector of membrane currents at at</span>
+<span class="sd">        every inner segment of every section of every cell on each CVODE</span>
+<span class="sd">        integration step. In addition, it records a time vector of sample</span>
+<span class="sd">        times.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cvode : instance of h.CVode</span>
+<span class="sd">            Multi order variable time step integration method.</span>
+<span class="sd">        include_celltypes : str</span>
+<span class="sd">            String to match against the cell type of each section. Defaults to</span>
+<span class="sd">            ``&#39;all&#39;``: calculate extracellular potential generated by all</span>
+<span class="sd">            cells. To restrict this to include only pyramidal cells, use</span>
+<span class="sd">            ``&#39;Pyr&#39;``. For basket cells, use ``&#39;Basket&#39;``. NB This argument is</span>
+<span class="sd">            currently not exposed in the API.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">secs_on_rank</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">allsec</span><span class="p">()</span>  <span class="c1"># get all h.Sections known to this MPI rank</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">include_celltypes</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="n">_check_option</span><span class="p">(</span><span class="s1">&#39;include_celltypes&#39;</span><span class="p">,</span> <span class="n">include_celltypes</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="s1">&#39;Pyr&#39;</span><span class="p">,</span>
+                                                               <span class="s1">&#39;Basket&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">include_celltypes</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+            <span class="n">secs_on_rank</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">secs_on_rank</span> <span class="k">if</span>
+                            <span class="n">include_celltypes</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">()]</span>
+
+        <span class="n">segment_counts</span> <span class="o">=</span> <span class="p">[</span><span class="n">sec</span><span class="o">.</span><span class="n">nseg</span> <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="n">secs_on_rank</span><span class="p">]</span>
+        <span class="n">n_total_segments</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">segment_counts</span><span class="p">)</span>
+
+        <span class="c1"># pointers assigned to _ref_i_membrane_ at each EACH internal segment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_ptrvec</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">PtrVector</span><span class="p">(</span><span class="n">n_total_segments</span><span class="p">)</span>
+        <span class="c1"># placeholder into which pointer values are read on each sim time step</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_vec</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">n_total_segments</span><span class="p">)</span>
+
+        <span class="n">ptr_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="n">secs_on_rank</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">sec</span><span class="p">:</span>  <span class="c1"># section end points (0, 1) not included</span>
+                <span class="c1"># set Nth pointer to the net membrane current at this segment</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_ptrvec</span><span class="o">.</span><span class="n">pset</span><span class="p">(</span>
+                    <span class="n">ptr_idx</span><span class="p">,</span> <span class="n">sec</span><span class="p">(</span><span class="n">seg</span><span class="o">.</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">_ref_i_membrane_</span><span class="p">)</span>
+                <span class="n">ptr_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">ptr_idx</span> <span class="o">!=</span> <span class="n">n_total_segments</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expected </span><span class="si">{</span><span class="n">n_total_segments</span><span class="si">}</span><span class="s1"> imem pointers, &#39;</span>
+                               <span class="sa">f</span><span class="s1">&#39;got </span><span class="si">{</span><span class="n">ptr_idx</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># transfer resistances for each segment (keep in Neuron Matrix object)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_r_transfer</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="p">,</span> <span class="n">n_total_segments</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">pos</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">positions</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">method</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">transfer_resistance</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="n">secs_on_rank</span><span class="p">:</span>
+                    <span class="n">this_xfer_r</span> <span class="o">=</span> <span class="n">_transfer_resistance</span><span class="p">(</span>
+                        <span class="n">sec</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">conductivity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">conductivity</span><span class="p">,</span>
+                        <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+                        <span class="n">min_distance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">min_distance</span><span class="p">)</span>
+                    <span class="n">transfer_resistance</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">this_xfer_r</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_r_transfer</span><span class="o">.</span><span class="n">setrow</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">transfer_resistance</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># for testing, make a matrix of ones</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_r_transfer</span><span class="o">.</span><span class="n">setrow</span><span class="p">(</span><span class="n">row</span><span class="p">,</span>
+                                            <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">n_total_segments</span><span class="p">,</span> <span class="mf">1.</span><span class="p">))</span>
+
+        <span class="c1"># record time for each array</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_times</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">_ref_t</span><span class="p">)</span>
+
+        <span class="c1"># contributions of all segments on this rank to total calculated</span>
+        <span class="c1"># potential at electrode (_PC.allreduce called in _simulate_dipole)</span>
+        <span class="c1"># NB voltages of all contacts are initialised to 0 mV, i.e., the</span>
+        <span class="c1"># potential at time 0.0 ms is defined to be zero.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
+
+        <span class="c1"># NB we must make a copy of the function reference, and keep it for</span>
+        <span class="c1"># later decoupling using extra_scatter_gather_remove</span>
+        <span class="c1"># (instead of a new function reference)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recording_callback</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gather_nrn_voltages</span>
+        <span class="c1"># Nb extra_scatter_gather is called _after_ the solver takes a step,</span>
+        <span class="c1"># so the initial state is not recorded (initialised to zero above)</span>
+        <span class="n">cvode</span><span class="o">.</span><span class="n">extra_scatter_gather</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recording_callback</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_gather_nrn_voltages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Callback function for _CVODE.extra_scatter_gather</span>
+
+<span class="sd">        Enables fast calculation of transmembrane current (nA) at each</span>
+<span class="sd">        segment. Note that this will run on each rank, so it is safe to use</span>
+<span class="sd">        the extra_scatter_gather-method, which docs say doesn&#39;t support</span>
+<span class="sd">        &#39;multiple threads&#39;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># keep all data in Neuron objects for efficiency</span>
+
+        <span class="c1"># &#39;gather&#39; the values of seg.i_membrane_ into self.imem_vec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_ptrvec</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_vec</span><span class="p">)</span>
+
+        <span class="c1"># Calculate potentials by multiplying the _nrn_imem_vec by the matrix</span>
+        <span class="c1"># _nrn_r_transfer. This is equivalent to a row-by-row dot-product:</span>
+        <span class="c1"># V_i(t) = SUM_j ( R_i,j x I_j (t) )</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_r_transfer</span><span class="o">.</span><span class="n">mulv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_vec</span><span class="p">))</span>
+        <span class="c1"># NB all values appended to the h.Vector _nrn_voltages at current time</span>
+        <span class="c1"># step. The vector will have size (n_contacts x n_samples, 1), which</span>
+        <span class="c1"># will be reshaped later to (n_contacts, n_samples).</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_nrn_n_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the length (in samples) of the extracellular data.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Something went wrong: have </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="si">}</span><span class="s1">&#39;</span>
+                               <span class="sa">f</span><span class="s1">&#39;, but </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s1"> samples&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_nrn_voltages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The extracellular data (n_contacts x n_samples).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_n_samples</span><span class="p">)</span>
+
+            <span class="c1"># first reshape to a Neuron Matrix object</span>
+            <span class="n">extmat</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_n_samples</span><span class="p">)</span>
+            <span class="n">extmat</span><span class="o">.</span><span class="n">from_vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="p">)</span>
+
+            <span class="c1"># then unpack into 2D python list and return</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">extmat</span><span class="o">.</span><span class="n">getrow</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span><span class="o">.</span><span class="n">to_python</span><span class="p">()</span> <span class="k">for</span>
+                    <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">extmat</span><span class="o">.</span><span class="n">nrow</span><span class="p">())]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Simulation not yet run!&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_nrn_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The sampling time points.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_times</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_times</span><span class="o">.</span><span class="n">to_python</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Simulation not yet run!&#39;</span><span class="p">)</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, HNN Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
