@@ -515,7 +515,7 @@ def new_calcium_model(params=None, add_drives_from_params=False,
     src_cell = 'L5_pyramidal'
     lamtha = 3.
     key = f'gbar_L5Pyr_{_short_name(target_cell)}'
-    weight = net._params[key]/2
+    weight = net._params[key]/8
     loc = 'soma'
     receptor = 'ampa'
     net.add_connection(
@@ -524,7 +524,7 @@ def new_calcium_model(params=None, add_drives_from_params=False,
     src_cell = 'L2_pyramidal'
     lamtha = 3.
     key = f'gbar_L2Pyr_{_short_name(target_cell)}'
-    weight = net._params[key]/2
+    weight = net._params[key]/8
     loc = 'soma'
     receptor = 'ampa'
     net.add_connection(
