@@ -349,27 +349,40 @@ def new_calcium_model(params=None, add_drives_from_params=False,
             delay, lamtha, allow_autapses=False)
     
 
+    # reduce the gabab connection slightly because it has a longer time constant
     # layer2 Basket -> layer2 Pyr
     src_cell = 'L2_basket'
     target_cell = 'L2_pyramidal'
     lamtha = 50.
     loc = 'soma'
-    for receptor in ['gabaa', 'gabab']:
-        key = f'gbar_L2Basket_L2Pyr_{receptor}'
-        weight = net._params[key]*0.5
-        net.add_connection(
-            src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+    receptor='gabaa'
+    key = f'gbar_L2Basket_L2Pyr_{receptor}'
+    weight = net._params[key]
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+    
+    receptor='gabab'
+    key = f'gbar_L2Basket_L2Pyr_{receptor}'
+    weight = net._params[key]*0.5
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+        
 
     # layer5 Basket -> layer5 Pyr
     src_cell = 'L5_basket'
     target_cell = 'L5_pyramidal'
     lamtha = 70.
     loc = 'soma'
-    for receptor in ['gabaa', 'gabab']:
-        key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
-        weight = net._params[key]*.8
-        net.add_connection(
-            src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+    receptor = 'gabaa'
+    key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
+    weight = net._params[key]
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+    receptor = 'gabab'
+    key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
+    weight = net._params[key]*0.5
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # layer2 Pyr -> layer5 Pyr
     src_cell = 'L2_pyramidal'
@@ -426,7 +439,7 @@ def new_calcium_model(params=None, add_drives_from_params=False,
     src_cell = 'L5_pyramidal'
     lamtha = 3.
     key = f'gbar_L5Pyr_{_short_name(target_cell)}'
-    weight = net._params[key]/8
+    weight = net._params[key]/3
     loc = 'soma'
     receptor = 'ampa'
     net.add_connection(
@@ -435,7 +448,7 @@ def new_calcium_model(params=None, add_drives_from_params=False,
     src_cell = 'L2_pyramidal'
     lamtha = 3.
     key = f'gbar_L2Pyr_{_short_name(target_cell)}'
-    weight = net._params[key]/8
+    weight = net._params[key]/3
     loc = 'soma'
     receptor = 'ampa'
     net.add_connection(
