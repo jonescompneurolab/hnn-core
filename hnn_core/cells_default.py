@@ -286,10 +286,10 @@ def _get_basket_soma(cell_name, v_init=-64.9737):
 
 # values from Chamberland et al 2023
 def _get_interneuron_soma(cell_name, v_init=-75):
-    end_pts = [[0, 0, 0], [0, 0, 10.]]
+    end_pts = [[0, 0, 0], [0, 0, 20.]]
     return Section(
-        L=10.,
-        diam=10.,
+        L=20.,
+        diam=20.,
         cm=1,
         Ra=200.,
         end_pts=end_pts
@@ -515,7 +515,7 @@ def pyramidal_l5(cell_name,pos, gid=None):
     p_all = get_L5Pyr_params_new()
 
     # override params according to function
-    gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_HVA']*1.5, gdend=p_all['L5Pyr_dend_gbar_Ca_HVA']*6.6, xkink=1500, hotzone_factor=3.9)
+    gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_HVA']*1.5, gdend=p_all['L5Pyr_dend_gbar_Ca_HVA']*6.7, xkink=1500, hotzone_factor=3.9)
     gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_LVAst'], gdend=p_all['L5Pyr_dend_gbar_Ca_LVAst']*2.75, xkink=1500, hotzone_factor=3)
     gbar_Ih = partial(_exp_g_at_dist, zero_val=p_all['L5Pyr_dend_gbar_Ih'],exp_term = 1./323, slope=2.087, offset=-.8696)
     
