@@ -124,6 +124,37 @@ def _compare_lists(s, t):
     return not t
 
 
+def _update_dict_keys(input_dict, old_key, new_key):
+    """Recursively update keys and values in a dictionary.
+
+    Parameters
+    ----------
+    input_dict : dict
+        The dictionary to update.
+    old_key : str
+        The key or value to replace.
+    new_key : str
+        The new key or value to replace with.
+
+    Returns
+    -------
+    updated_dict : dict
+        The updated dictionary with keys and values replaced.
+    """
+    updated_dict = dict()
+    for key, value in input_dict.items():
+        # Update the key if it matches old_key
+        new_key_name = new_key if key == old_key else key
+        # Recursively update values if they are dictionaries
+        if isinstance(value, dict):
+            updated_dict[new_key_name] = _update_dict_keys(
+                value, old_key, new_key)
+        else:
+            # Update the value if it matches old_key
+            updated_dict[new_key_name] = new_key if value == old_key else value
+    return updated_dict
+
+
 def _connection_probability(conn, probability, conn_seed=None):
     """Remove/keep a random subset of connections.
 
@@ -1206,11 +1237,7 @@ class Network:
     def _rename_cell_types(self, name_mapping: Dict[str, str]):
         """Renames cell types in the network.
 
-        NOTE (Important): Currently, not all of HNN's functionality supports
-        cell-type names different from the default 4, including Dipole
-        calculation. This means use of this function will NOT result in a
-        completely usable Network! We are working to support variable cell-type
-        names.
+        XXX: All HNN functionality is not supported, such as Dipole calculation
 
         Parameters
         ----------
@@ -1223,51 +1250,16 @@ class Network:
         _validate_type(name_mapping, dict, 'name_mapping')
         for original_name, new_name in name_mapping.items():
             if original_name not in self.cell_types.keys():
-                # Raises error if the original name is not in cell_types
                 raise ValueError(f"'{original_name}' is not in cell_types!")
             elif new_name in self.cell_types.keys():
-                # Raises error if the new name is already in cell_types
                 raise ValueError(f"'{new_name}' is already in cell_types!")
             elif original_name in self.cell_types.keys():
-                # Update cell name in dicts/etc. where order doesn't matter
-                # Update Network.cell_types
-                self.cell_types[new_name] = self.cell_types.pop(original_name)
-                # `Cell.name` does not currently provide a way to change its value,
-                # so we will leave that untouched for now.
-                # Update Network.pos_dict
-                self.pos_dict[new_name] = self.pos_dict.pop(original_name)
-                # Update Network.external_biases
-                # A good idea in the future is to add a recursive method to
-                # `utils` that replaces any strings in values (and/or,
-                # keys) that match a regex with a second string, then use that in the below cases.
-                new_biases_dict = deepcopy(self.external_biases)
-                for bias_key, bias_value in self.external_biases.items():
-                    if original_name in new_biases_dict[bias_key].keys():
-                        new_biases_dict[bias_key][new_name] = \
-                            new_biases_dict[bias_key].pop(original_name)
-                self.external_biases = new_biases_dict
-
-                # Update Network.external_drives
-                new_drives_dict = deepcopy(self.external_drives)
-                for drive_key, drive_config in self.external_drives.items():
-                    if original_name in drive_config['target_types']:
-                        new_drives_dict[drive_key]['target_types'].remove(original_name)
-                        new_drives_dict[drive_key]['target_types'].append(new_name)
-                        new_drives_dict[drive_key]['target_types'].sort()
-                        for config_key, config_value in drive_config.items():
-                            if config_key == 'dynamics':
-                                if 'rate_constant' in config_value.keys():
-                                    new_drives_dict[drive_key][config_key]['rate_constant'][new_name] = \
-                                        new_drives_dict[drive_key][config_key]['rate_constant'].pop(original_name)
-                            elif ((config_key == 'synaptic_delays')
-                                 and (isinstance(config_value, dict))):
-                                new_drives_dict[drive_key][config_key][new_name] = \
-                                    new_drives_dict[drive_key][config_key].pop(original_name)
-                            elif 'weights_' in config_key:
-                                if config_value is not None:
-                                    new_drives_dict[drive_key][config_key][new_name] = \
-                                        new_drives_dict[drive_key][config_key].pop(original_name)
-                self.external_drives = new_drives_dict
+                for attr_name in ['cell_types', 'pos_dict', 'external_biases', 'external_drives',
+                                  'gid_ranges']:
+                    attr = getattr(self, attr_name)
+                    if isinstance(attr, dict):
+                        updated_attr = _update_dict_keys(attr, original_name, new_name)
+                        setattr(self, attr_name, updated_attr)
 
                 # Update Network.connectivity
                 for connection in self.connectivity:
@@ -1276,17 +1268,6 @@ class Network:
                     if connection['target_type'] == original_name:
                         connection['target_type'] = new_name
 
-                # Update Network.gid_ranges: order matters for consistency!
-                new_gid_ranges = deepcopy(self.gid_ranges)
-                for _ in range(len(self.gid_ranges)):
-                    name, gid_range = new_gid_ranges.popitem(last=False)
-                    if name == original_name:
-                        # Insert the new name with the value of the original name
-                        new_gid_ranges[new_name] = gid_range
-                    else:
-                        # Insert the value as it is
-                        new_gid_ranges[name] = gid_range
-                self.gid_ranges = new_gid_ranges
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
