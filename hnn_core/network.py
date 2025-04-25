@@ -26,6 +26,7 @@ from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
 from .hnn_io import write_network_configuration, network_to_dict
 from .externals.mne import copy_doc
+from .utils import _replace_dict_identifier
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
@@ -122,40 +123,6 @@ def _compare_lists(s, t):
     except ValueError:
         return False
     return not t
-
-
-def _replace_dict_identifier(input_dict, old_identifier, new_identifier):
-    """Recursively replace keys and values in a dict that match an identifier.
-
-    This takes an `old_identifier` (anything that can compared to any keys or
-    values with an equivalence relation), recurses through a dictionary, and
-    replaces all instances of `old_identifier` with `new_identifier`,
-    regardless of if they are keys or values.
-
-    Parameters
-    ----------
-    input_dict : dict
-        The dictionary to update.
-    old_identifier : str
-        The key or value to replace.
-    new_identifier : str
-        The new key or value to replace with.
-
-    Returns
-    -------
-    updated_dict : dict
-        The updated dictionary with keys and values replaced.
-    """
-    updated_dict = dict()
-    for key, value in input_dict.items():
-        new_key_name = new_identifier if key == old_identifier else key
-        # Recursively update values if they are dictionaries
-        if isinstance(value, dict):
-            updated_dict[new_key_name] = _replace_dict_identifier(
-                value, old_identifier, new_identifier)
-        else:
-            updated_dict[new_key_name] = new_identifier if value == old_identifier else value
-    return updated_dict
 
 
 def _connection_probability(conn, probability, conn_seed=None):
