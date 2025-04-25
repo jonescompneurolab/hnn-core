@@ -124,16 +124,21 @@ def _compare_lists(s, t):
     return not t
 
 
-def _update_dict_keys(input_dict, old_key, new_key):
-    """Recursively update keys and values in a dictionary.
+def _replace_dict_identifier(input_dict, old_identifier, new_identifier):
+    """Recursively replace keys and values in a dict that match an identifier.
+
+    This takes an `old_identifier` (anything that can compared to any keys or
+    values with an equivalence relation), recurses through a dictionary, and
+    replaces all instances of `old_identifier` with `new_identifier`,
+    regardless of if they are keys or values.
 
     Parameters
     ----------
     input_dict : dict
         The dictionary to update.
-    old_key : str
+    old_identifier : str
         The key or value to replace.
-    new_key : str
+    new_identifier : str
         The new key or value to replace with.
 
     Returns
@@ -143,15 +148,13 @@ def _update_dict_keys(input_dict, old_key, new_key):
     """
     updated_dict = dict()
     for key, value in input_dict.items():
-        # Update the key if it matches old_key
-        new_key_name = new_key if key == old_key else key
+        new_key_name = new_identifier if key == old_identifier else key
         # Recursively update values if they are dictionaries
         if isinstance(value, dict):
-            updated_dict[new_key_name] = _update_dict_keys(
-                value, old_key, new_key)
+            updated_dict[new_key_name] = _replace_dict_identifier(
+                value, old_identifier, new_identifier)
         else:
-            # Update the value if it matches old_key
-            updated_dict[new_key_name] = new_key if value == old_key else value
+            updated_dict[new_key_name] = new_identifier if value == old_identifier else value
     return updated_dict
 
 
@@ -1258,7 +1261,7 @@ class Network:
                                   'gid_ranges']:
                     attr = getattr(self, attr_name)
                     if isinstance(attr, dict):
-                        updated_attr = _update_dict_keys(attr, original_name, new_name)
+                        updated_attr = _replace_dict_identifier(attr, original_name, new_name)
                         setattr(self, attr_name, updated_attr)
 
                 # Update Network.connectivity
