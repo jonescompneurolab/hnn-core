@@ -7,6 +7,10 @@ orphan: true
 
 ## Current development version
 
+### API Changes
+
+- :class:`~hnn_core.CellResponse` now requires a `cell_type_names` argument, whereas before the argument was optional.
+
 ### Changelog
 
 - Remove hardcoding of celltypes in :class:`~hnn_core.CellResponse` and add
