@@ -1191,9 +1191,13 @@ def test_rename_cell_types(base_network):
     for original_name in cell_type_rename_mapping.keys():
         assert original_name not in net2.cell_types.keys()
         assert original_name not in net2.pos_dict.keys()
+        # We should refrain from checking that original names are not in net2,
+        # since the original cell_type names are valid substrings of the new
+        # cell_type names.
     for new_name in cell_type_rename_mapping.values():
         assert new_name in net2.cell_types.keys()
         assert new_name in net2.pos_dict.keys()
+        assert new_name in net2.__repr__()
 
     # Tests for non-existent original_name error
     invalid_key = 'original_name'
@@ -1220,6 +1224,7 @@ def test_rename_cell_types(base_network):
     for new_name in reverse_mapping.keys():
         assert new_name not in net3.cell_types.keys()
         assert new_name not in net3.pos_dict.keys()
+        assert new_name not in net3.__repr__()
     for original_name in reverse_mapping.values():
         assert original_name in net3.cell_types.keys()
         assert original_name in net3.pos_dict.keys()
