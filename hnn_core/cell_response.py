@@ -290,8 +290,19 @@ class CellResponse(object):
 
         return spike_rates
 
-    def plot_spikes_raster(self, trial_idx=None, ax=None, show=True,
-                           cell_types=None, colors=None):
+
+    def plot_spikes_raster(
+            self,
+            trial_idx=None,
+            ax=None,
+            show=True,
+            cell_types=None,
+            colors=None,
+            show_legend=True,
+            marker_size=5.0,
+            dpl=None,
+            overlay_dipoles=False,
+            ):
         """Plot the aggregate spiking activity according to cell type.
 
         Parameters
@@ -311,8 +322,17 @@ class CellResponse(object):
             The matplotlib figure object.
         """
         return plot_spikes_raster(
-            cell_response=self, trial_idx=trial_idx, ax=ax, show=show,
-            cell_types=cell_types, colors=colors)
+            cell_response=self,
+            trial_idx=trial_idx,
+            ax=ax,
+            show=show,
+            cell_types=cell_types,
+            colors=colors,
+            show_legend=show_legend,
+            marker_size=marker_size,
+            dpl=dpl,
+            overlay_dipoles=overlay_dipoles,
+        )
 
     def plot_spikes_hist(self, trial_idx=None, ax=None, spike_types=None,
                          color=None, invert_spike_types=None, show=True,
@@ -423,10 +443,6 @@ class CellResponse(object):
             2) spike gid, and
             3) gid type
         """
-        warn('Writing cell response to txt files is deprecated '
-             'and will be removed in future versions. Please save '
-             'cell response along with network',
-             DeprecationWarning, stacklevel=2)
         fname = str(fname)
         old_style = True
         try:

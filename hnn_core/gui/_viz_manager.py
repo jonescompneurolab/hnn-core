@@ -21,11 +21,14 @@ _fig_placeholder = 'Run simulation to add figures here.'
 
 _plot_types = [
     'current dipole',
-    'layer2 dipole',
+    'layer2/3 dipole',
     'layer5 dipole',
     'input histogram',
     'spikes',
+    'spikes with dipoles',
     'PSD',
+    'layer2/3 PSD',
+    'layer5 PSD',
     'spectrogram',
     'network',
 ]
@@ -34,10 +37,16 @@ _no_overlay_plot_types = [
     'network',
     'spectrogram',
     'spikes',
+    'spikes with dipoles',
     'input histogram',
 ]
 
-_ext_data_disabled_plot_types = ['spikes', 'input histogram', 'network']
+_ext_data_disabled_plot_types = [
+    'spikes',
+    'spikes with dipoles',
+    'input histogram',
+    'network'
+    ]
 
 _spectrogram_color_maps = [
     "viridis",
@@ -93,7 +102,7 @@ data_templates = {
             "gridspec_kw": {"height_ratios": [1, 1, 1]}
         },
         "mosaic": "0\n1\n2",
-        "ax_plots": [("ax0", "layer2 dipole"), ("ax1", "layer5 dipole"),
+        "ax_plots": [("ax0", "layer2/3 dipole"), ("ax1", "layer5 dipole"),
                      ("ax2", "current dipole")]
     },
     "Drive-Spikes (2x1)": {
@@ -110,12 +119,12 @@ data_templates = {
         "mosaic": "00\n11",
         "ax_plots": [("ax0", "current dipole"), ("ax1", "spectrogram")]
     },
-    "Dipole-Spikes (2x1)": {
+    "Dipole Layers-Spikes (1x1)": {
         "kwargs": {
-            "gridspec_kw": {"height_ratios": [1, 1]}
+            "gridspec_kw": ""
         },
-        "mosaic": "00\n11",
-        "ax_plots": [("ax0", "current dipole"), ("ax1", "spikes")]
+        "mosaic": "00\n00",
+        "ax_plots": [("ax0", "spikes with dipoles")]
     },
     "Drive-Dipole-Spectrogram (3x1)": {
         "kwargs": {
@@ -130,8 +139,11 @@ data_templates = {
             "gridspec_kw": {"height_ratios": [1, 1, 1]}
         },
         "mosaic": "0\n1\n2",
-        "ax_plots": [("ax0", "layer2 dipole"), ("ax1", "layer5 dipole"),
-                     ("ax2", "PSD")]
+        "ax_plots": [
+            ("ax0", "layer2/3 PSD"),
+            ("ax1", "layer5 PSD"),
+            ("ax2", "PSD"),
+        ]
     }
 }
 
@@ -244,7 +256,29 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
     ax.get_xaxis().set_visible(True)
     if plot_type == 'spikes':
         if net_copied.cell_response:
-            net_copied.cell_response.plot_spikes_raster(ax=ax, show=False)
+            marker_size = plot_config['marker_size']
+            hide_spike_legend = plot_config['hide_spike_legend']
+            show_legend = True if hide_spike_legend == 'False' else False
+            net_copied.cell_response.plot_spikes_raster(
+                ax=ax,
+                show=False,
+                show_legend=show_legend,
+                marker_size=marker_size,
+            )
+
+    if plot_type == "spikes with dipoles":
+        if net_copied.cell_response:
+            marker_size = plot_config['marker_size']
+            hide_spike_legend = plot_config['hide_spike_legend']
+            show_legend = True if hide_spike_legend == 'False' else False
+            net_copied.cell_response.plot_spikes_raster(
+                ax=ax,
+                show=False,
+                show_legend=show_legend,
+                marker_size=marker_size,
+                overlay_dipoles=True,
+                dpl=dpls_copied,
+            )
 
     elif plot_type == 'input histogram':
         if net_copied.cell_response:
@@ -293,8 +327,47 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
             min_f = plot_config['min_spectral_frequency']
             max_f = plot_config['max_spectral_frequency']
             color = ax._get_lines.get_next_color()
-            dpls_copied[0].plot_psd(fmin=min_f, fmax=max_f, ax=ax, color=color,
-                                    label=sim_name, show=False)
+            label = sim_name + " (Aggregate)"
+            dpls_copied[0].plot_psd(
+                fmin=min_f,
+                fmax=max_f,
+                color=color,
+                label=label,
+                ax=ax,
+                show=False
+            )
+
+    elif plot_type == 'layer2/3 PSD':
+        if len(dpls_copied) > 0:
+            min_f = plot_config['min_spectral_frequency']
+            max_f = plot_config['max_spectral_frequency']
+            color = ax._get_lines.get_next_color()
+            label = sim_name + " (Layer 2/3)"
+            dpls_copied[0].plot_psd(
+                fmin=min_f,
+                fmax=max_f,
+                layer='L2',
+                color=color,
+                label=label,
+                ax=ax,
+                show=False
+            )
+
+    elif plot_type == 'layer5 PSD':
+        if len(dpls_copied) > 0:
+            min_f = plot_config['min_spectral_frequency']
+            max_f = plot_config['max_spectral_frequency']
+            color = ax._get_lines.get_next_color()
+            label = sim_name + " (Layer 5)"
+            dpls_copied[0].plot_psd(
+                fmin=min_f,
+                fmax=max_f,
+                layer='L5',
+                color=color,
+                label=label,
+                ax=ax,
+                show=False
+            )
 
     elif plot_type == 'spectrogram':
         if len(dpls_copied) > 0:
@@ -340,7 +413,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                             show=False)
             else:
                 layer_namemap = {
-                    "layer2": "L2",
+                    "layer2/3": "L2",
                     "layer5": "L5",
                 }
                 plot_dipole(dpls_copied,
@@ -369,8 +442,14 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                 io_buf.close()
                 _ = ax.imshow(img_arr)
 
-    # set up alignment
-    if plot_type not in ['network', 'PSD']:
+    # set up alignment of plots which do NOT use dipole's time as their x-axis
+    custom_x_axes = [
+        'network',
+        'PSD',
+        'layer2/3 PSD',
+        'layer5 PSD',
+    ]
+    if plot_type not in custom_x_axes:
         margin_x = 0
         max_x = max([dpl.times[-1] for dpl in dpls_copied])
         ax.set_xlim(left=-margin_x, right=max_x + margin_x)
@@ -411,6 +490,8 @@ def _avg_dipole_check(dpls):
 def _plot_on_axes(b, simulations_widget, widgets_plot_type,
                   data_widget,
                   spectrogram_colormap_selection,
+                  hide_spike_legend,
+                  marker_size,
                   min_spectral_frequency, max_spectral_frequency,
                   dipole_smooth, dipole_scaling, data_smooth, data_scaling,
                   widgets, data, fig_idx, fig, ax, existing_plots):
@@ -430,6 +511,11 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
         The target data we want to compare with. Note that this could be 'None'
     spectrogram_colormap_selection : ipywidgets.Dropdown
         A dropdown widget that contains all the colormaps for spectrogram.
+    hide_spike_legend : ipywidgets.Dropdown
+        A dropdown widget that specifies whether to hide the legend for
+        the spikes raster plot.
+    marker_size : ipywidgets.BoundedFloatText
+        A widget that specifies the marker size for the raster plot.
     dipole_smooth : ipywidgets.FloatText
         A textfield widget that specifies the smoothing window size.
     min_spectral_frequency : ipywidgets.FloatText
@@ -467,7 +553,9 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
         "dipole_smooth": dipole_smooth.value,
         "min_spectral_frequency": min_spectral_frequency.value,
         "max_spectral_frequency": max_spectral_frequency.value,
-        "spectrogram_cm": spectrogram_colormap_selection.value
+        "spectrogram_cm": spectrogram_colormap_selection.value,
+        "hide_spike_legend": hide_spike_legend.value,
+        "marker_size": marker_size.value,
     }
 
     dpls_processed = _update_ax(fig, ax, single_simulation, sim_name,
@@ -485,7 +573,9 @@ def _plot_on_axes(b, simulations_widget, widgets_plot_type,
             "dipole_smooth": data_smooth.value,
             "min_spectral_frequency": min_spectral_frequency.value,
             "max_spectral_frequency": max_spectral_frequency.value,
-            "spectrogram_cm": spectrogram_colormap_selection.value
+            "spectrogram_cm": spectrogram_colormap_selection.value,
+            "hide_spike_legend": hide_spike_legend.value,
+            "marker_size": marker_size.value,
         }
 
         # plot the target dipole.
@@ -568,6 +658,7 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
     simulation_names = tuple(data['simulations'].keys())
     sim_index = 0
     default_smoothing = fig_default_params['default_smoothing']
+    default_scaling = fig_default_params['default_scaling']
     default_min_frequency = fig_default_params['default_min_frequency']
     default_max_frequency = fig_default_params['default_max_frequency']
     if not simulation_names:
@@ -633,7 +724,7 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
         style=analysis_style)
 
     simulation_dipole_scaling = FloatText(
-        value=3000,
+        value=default_scaling,
         description='Simulation Dipole Scaling:',
         disabled=False,
         layout=layout,
@@ -670,6 +761,23 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
         disabled=False,
         layout=layout,
         style=analysis_style)
+
+    hide_spike_legend = Dropdown(
+        description='Hide Raster Plot Legend:',
+        options=['True', 'False'],
+        value='False',
+        layout=layout,
+        style=analysis_style,
+    )
+
+    marker_size = BoundedFloatText(
+        value=5,
+        min=0.01,
+        max=15,
+        description='Raster Plot Marker Size:',
+        layout=layout,
+        style=analysis_style,
+    )
 
     existing_plots = VBox([])
 
@@ -712,6 +820,8 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
             widgets_plot_type=plot_type_selection,
             data_widget=target_data_selection,
             spectrogram_colormap_selection=spectrogram_colormap_selection,
+            hide_spike_legend=hide_spike_legend,
+            marker_size=marker_size,
             min_spectral_frequency=min_spectral_frequency,
             max_spectral_frequency=max_spectral_frequency,
             dipole_smooth=simulation_dipole_smooth,
@@ -731,6 +841,8 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
         simulation_dipole_scaling, target_data_selection, data_dipole_smooth,
         data_dipole_scaling, min_spectral_frequency, max_spectral_frequency,
         spectrogram_colormap_selection,
+        hide_spike_legend,
+        marker_size,
         HBox(
             [plot_button, clear_button],
             layout=Layout(justify_content='space-between'),
@@ -857,10 +969,10 @@ def _postprocess_template(template_name, fig, idx,
         return
 
     if template_name == 'Dipole Layers (3x1)':
-        # Make the L2 and L5 plots the same y-range
-        y_lims_list = [ax.get_ylim() for ax in fig.axes[0:2]]
+        # Make the L2, L5, and aggregate plots use the same y-range
+        y_lims_list = [ax.get_ylim() for ax in fig.axes]
         y_lims = (np.min(y_lims_list), np.max(y_lims_list))
-        [ax.set_ylim(y_lims) for ax in fig.axes[0:2]]
+        [ax.set_ylim(y_lims) for ax in fig.axes]
 
     # Re-render
     if not use_ipympl:
@@ -1113,7 +1225,8 @@ class _VizManager:
                 `dipole_smooth`, `dipole_scaling`,
                 `data_to_compare`, `data_smooth`, `data_scaling`
                 `min_spectral_frequency`, `max_spectral_frequency`,
-                `spectrogram_colormap_selection`.
+                `spectrogram_colormap_selection`, `hide_spike_legend,
+                `marker_size`.
                 config could be empty: `{}`.
             operation : str
                 `"plot"` if you want to plot and `"clear"` if you want to
@@ -1155,6 +1268,8 @@ class _VizManager:
             "min_spectral_frequency": 7,
             "max_spectral_frequency": 8,
             "spectrogram_colormap_selection": 9,
+            "hide_spike_legend": 10,
+            "marker_size": 11,
         }
         for conf_key, conf_val in preprocessing_config.items():
             assert conf_key in config_name_idx.keys()

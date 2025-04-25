@@ -39,16 +39,10 @@ def test_cell_response(tmp_path):
                ), "Alpha value not applied to all patches"
 
     # Testing writing using txt files
-    with pytest.warns(DeprecationWarning,
-                      match="Writing cell response to txt files is "
-                      "deprecated"):
-        cell_response.write(tmp_path / 'spk_%d.txt')
+    cell_response.write(tmp_path / 'spk_%d.txt')
 
     # Testing reading from txt files
-    with pytest.warns(DeprecationWarning,
-                      match="Reading cell response from txt files is "
-                      "deprecated"):
-        assert cell_response == read_spikes(tmp_path / 'spk_*.txt')
+    assert cell_response == read_spikes(tmp_path / 'spk_*.txt')
 
     assert ("CellResponse | 2 simulation trials" in repr(cell_response))
 

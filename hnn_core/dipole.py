@@ -678,10 +678,6 @@ class Dipole(object):
             4) L5 current dipole (scaled nAm)
         """
 
-        warnings.warn('Writing dipole to txt file is deprecated '
-                      'and will be removed in future versions. '
-                      'Please use hdf5', DeprecationWarning, stacklevel=2)
-
         if self.nave > 1:
             warnings.warn("Saving Dipole to file that is an average of %d"
                           " trials" % self.nave)

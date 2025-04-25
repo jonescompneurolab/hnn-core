@@ -573,8 +573,18 @@ def plot_spikes_hist(cell_response, trial_idx=None, ax=None, spike_types=None,
     return ax.get_figure()
 
 
-def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
-                       cell_types=None, colors=None):
+def plot_spikes_raster(
+        cell_response,
+        trial_idx=None,
+        ax=None,
+        show=True,
+        cell_types=None,
+        colors=None,
+        show_legend=True,
+        marker_size=1.0,
+        dpl=None,
+        overlay_dipoles=False,
+        ):
     """Plot the aggregate spiking activity according to cell type.
 
     Parameters
@@ -587,10 +597,22 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
         An axis object from matplotlib. If None, a new figure is created.
     show : bool
         If True, show the figure.
-    cell_types: list of str
+    cell_types : list of str
         List of cell types to plot
-    colors: list of str | None
+    colors : list of str | None
         Optional custom colors to plot. Default will use the color cycler.
+    show_legend : bool
+        If True, show the legend with colors for cell types
+    marker_size : float
+        Optional marker size to use when plotting spikes. Uses
+        "linelengths" argument of ax.eventplot, which accepts positive
+        numeric values only
+    dpl : instance of Dipole | list
+        The Dipole object containing layer-specific dipole data
+        to overlay on the raster plot
+    overlay_dipoles : bool
+        If True, overlay the layer-specific dipole data on the
+        raster plot
 
     Returns
     -------
@@ -599,6 +621,8 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
     """
 
     import matplotlib.pyplot as plt
+    from .dipole import Dipole, average_dipoles
+
     n_trials = len(cell_response.spike_times)
     if trial_idx is None:
         trial_idx = list(range(n_trials))
@@ -648,6 +672,26 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
                                  f"Got {colors.keys()}")
             cell_colors.update(colors)
 
+    # validate show_legend argument
+    _validate_type(
+        show_legend,
+        bool,
+        'show_legend',
+        'bool'
+    )
+
+    # validate marker_size
+    _validate_type(
+        marker_size,
+        (float, int),
+        'marker_size',
+        'float or int'
+    )
+
+    # if marker_size is <= 0, set it to the default value of 1.0
+    if marker_size <= 0:
+        marker_size = 1.0
+
     # Extract desired trials
     spike_times = np.concatenate(
         np.array(cell_response._spike_times, dtype=object)[trial_idx])
@@ -671,9 +715,14 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
 
         if cell_type_times:
             events.append(
-                ax.eventplot(cell_type_times, lineoffsets=cell_type_ypos,
-                             color=color,
-                             label=cell_type, linelengths=1))
+                ax.eventplot(
+                    cell_type_times,
+                    lineoffsets=cell_type_ypos,
+                    color=color,
+                    label=cell_type,
+                    linelengths=marker_size
+                )
+            )
         else:
             # Blank plot for no spiking
             events.append(
@@ -681,9 +730,94 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
                              color=color,
                              label=cell_type, linelengths=1))
 
-    ax.legend(handles=[e[0] for e in events], loc=1)
+    # Overlay dipoles on raster plot
+    if overlay_dipoles:
+        # Confirm that the dpl is not None
+        if dpl is None:
+            raise ValueError(
+                "Dipole object must be provided to overlay dipoles"
+            )
+        # In the case that a single Dipole object is provided, cast to a list
+        if isinstance(dpl, Dipole):
+            dpl = [dpl]
+        # Validate that all list elements are Dipole objects
+        for trial in dpl:
+            _validate_type(trial, Dipole, 'dpl', 'Dipole, list of Dipole')
+
+        # Get (average) layer-sepcific dipole data
+        avgs = []
+        avgs.append(average_dipoles(dpl))
+        l2_dipole = avgs[0].data['L2']
+        l5_dipole = avgs[0].data['L5']
+        dipole_times = dpl[0].times
+
+        # Scale dipole to fit the spike raster plot
+        raster_yrange = ax.get_yticks()
+        raster_min = min(raster_yrange)
+        raster_midpoint = round((raster_min / 2), 0)
+        raster_quarterpoint = round((raster_min / 4), 0)
+
+        # Scale down by .95 until the dipoles fit within the appropriate area
+        while (
+            max(max(l5_dipole), max(l2_dipole)) -
+            min(min(l5_dipole), min(l2_dipole))
+        ) > abs(raster_midpoint):
+            l5_dipole = l5_dipole*0.95
+            l2_dipole = l2_dipole*0.95
+
+        # Shift the dipole positions to overlay the correct cell types
+        l2_dipole = l2_dipole - abs(raster_midpoint) + abs(raster_quarterpoint)
+        l5_dipole = l5_dipole - abs(raster_midpoint) - abs(raster_quarterpoint)
+
+        # Draw the dipole plots
+        l2_line, = ax.plot(
+            dipole_times,
+            l2_dipole,
+            color='grey',
+            linewidth=1,
+            linestyle='--',
+            label='L2 Dipole',
+        )
+        l5_line, = ax.plot(
+            dipole_times,
+            l5_dipole,
+            color='grey',
+            linewidth=1,
+            linestyle='-',
+            label='L5 Dipole',
+        )
+
+    # set legend
+    handles = [e[0]for e in events]
+
+    # Add labels for the spike events
+    for handle in handles:
+        handle.set_label(handle.get_label() + ' Spikes')
+
+    if overlay_dipoles:
+        handles.append(l2_line)
+        handles.append(l5_line)
+
+    spike_legend = ax.legend(
+        handles=handles,
+        loc='lower left',
+        framealpha=0.25,
+    )
+    if not show_legend:
+        ax.get_legend().remove()
+    else:
+        ax.add_artist(spike_legend)
+
+    # set axis labels
     ax.set_xlabel('Time (ms)')
-    ax.get_yaxis().set_visible(False)
+    ax.set_ylabel('Cell ID')
+
+    # hide y-axis ticks and tick labels
+    ax.set_yticklabels([])
+    ax.tick_params(axis='y', length=0)
+
+    # add title
+    ax.set_title('Raster Plot with Layer-Specific Dipole Overlays')
 
     if len(cell_response.times) > 0:
         ax.set_xlim(left=0, right=cell_response.times[-1])

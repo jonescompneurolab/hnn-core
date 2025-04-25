@@ -57,6 +57,8 @@ on Mac or Linux, simply do:
 
     $ pip install hnn_core
 
+Note that `hnn-core` currently only supports Python 3.8, 3.9, 3.10, 3.11, and 3.12, but *not* 3.13.
+
 If you want to track the latest developments of `hnn-core`, you can
 install the current version of the code (nightly) with:
 
@@ -116,7 +118,4 @@ JOSS](https://doi.org/10.21105/joss.05848):
 > Software*, 8(92), 5848, <https://doi.org/10.21105/joss.05848>
 
 [Contributing Guide]: https://jonescompneurolab.github.io/hnn-core/stable/contributing.html
-
-<!-- TODO: Once we have a "stable" version of the install webpage, need to update this link to it: -->
-<!-- TODO: Once the install page is merged into "dev", we need to update this link to it: -->
-[Installation Guide]: https://github.com/asoplata/hnn-core/blob/iss969-authoring/doc/install.md
+[Installation Guide]: https://jonescompneurolab.github.io/hnn-core/stable/install.html

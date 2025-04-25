@@ -529,7 +529,7 @@ def test_gui_add_data_dependent_figure(setup_gui):
                       ('Dipole Layers (3x1)', 3),
                       ('Drive-Spikes (2x1)', 2),
                       ('Dipole-Spectrogram (2x1)', 2),
-                      ("Dipole-Spikes (2x1)", 2),
+                      ("Dipole Layers-Spikes (1x1)", 1),
                       ('Drive-Dipole-Spectrogram (3x1)', 3),
                       ('PSD Layers (3x1)', 3)]
 
@@ -1141,6 +1141,63 @@ def test_delete_single_drive(setup_gui):
                                           'tonic')
 
 
+def test_default_scaling(setup_gui):
+    """Tests default scaling is inherited correctly"""
+
+    gui = setup_gui
+    gui.run_button.click()
+
+    # check that the unadjusted default scaling is the same everywhere
+    gui_scaling_value = gui.fig_default_params['default_scaling']
+    viz_scaling_value = gui.viz_manager.fig_default_params['default_scaling']
+
+    assert gui_scaling_value == viz_scaling_value
+
+    # update simulation name
+    gui.widget_simulation_name.value = 'no_scaling'
+
+    # change value of default scaling in the widget
+    new_scaling = 1000
+    gui.widget_default_scaling.value = new_scaling
+
+    gui.run_button.click()
+
+    # check that the new default scaling value is set everywhere
+    gui_scaling_value = gui.fig_default_params['default_scaling']
+    viz_scaling_value = gui.viz_manager.fig_default_params['default_scaling']
+
+    assert gui_scaling_value == new_scaling
+    assert viz_scaling_value == new_scaling
+
+    # check that dipole plots have data
+    gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
+    gui._simulate_viz_action("add_fig")
+    figid = 2
+    figname = f'Figure {figid}'
+    axname = 'ax0'
+
+    _dipole_plot_types = [
+        'current dipole',
+        'layer2/3 dipole',
+        'layer5 dipole',
+    ]
+
+    for viz_type in _dipole_plot_types:
+        gui._simulate_viz_action(
+            "edit_figure", figname,
+            axname, 'no_scaling', viz_type, {}, 'clear'
+        )
+
+        gui._simulate_viz_action(
+            "edit_figure", figname,
+            axname, 'no_scaling', viz_type, {}, 'plot')
+
+        # Check if data is plotted on the axes
+        assert gui.viz_manager.figs[figid].axes[0].has_data()
+
+    plt.close('all')
+
+
 def test_default_smoothing(setup_gui):
     """Tests default smoothing is inherited correctly"""
 
@@ -1178,7 +1235,7 @@ def test_default_smoothing(setup_gui):
 
     _dipole_plot_types = [
         'current dipole',
-        'layer2 dipole',
+        'layer2/3 dipole',
         'layer5 dipole',
     ]
 
@@ -1224,7 +1281,7 @@ def test_default_frequencies(setup_gui):
     gui.widget_simulation_name.value = 'new_defaults'
     gui.run_button.click()
 
-    # check that the new default smoothing value is set everywhere
+    # check that the new default values are set everywhere
     gui_min = gui.fig_default_params['default_min_frequency']
     viz_min = gui.viz_manager.fig_default_params['default_min_frequency']
     gui_max = gui.fig_default_params['default_max_frequency']

@@ -53,10 +53,7 @@ def test_dipole(tmp_path, run_hnn_core_fixture):
         plot_dipole(np.array([dipole, dipole]), average=True, show=False)
 
     # Test IO for txt files
-    with pytest.warns(DeprecationWarning,
-                      match="Writing dipole to txt file is "
-                      "deprecated"):
-        dipole.write(dpl_out_fname)
+    dipole.write(dpl_out_fname)
     dipole_read = read_dipole(dpl_out_fname)
     assert_allclose(dipole_read.times, dipole.times, rtol=0, atol=0.00051)
     for dpl_key in dipole.data.keys():
