@@ -6,7 +6,6 @@
 
 from glob import glob
 from warnings import warn
-
 import numpy as np
 
 from .viz import plot_spikes_hist, plot_spikes_raster
@@ -17,6 +16,9 @@ class CellResponse(object):
 
     Parameters
     ----------
+    cell_type_names : list
+        List of unique cell type names that are explicitly modeled in the
+        network.
     spike_times : list (n_trials,) of list (n_spikes,) of float | None
         Each element of the outer list is a trial.
         The inner list contains the time stamps of spikes.
@@ -25,16 +27,14 @@ class CellResponse(object):
         The inner list contains the cell IDs of neurons that
         spiked.
     spike_types : list (n_trials,) of list (n_spikes,) of float | None
-        Each element of the outer list is a trial.
-        The inner list contains the type of spike (e.g., evprox1
-        or L2_pyramidal) that occurred at the corresponding time stamp.
-        Each gid corresponds to a type via Network().gid_ranges.
+        Each element of the outer list is a trial. The inner list contains the
+        type of spike (e.g., evprox1 or L2_pyramidal) that occurred at the
+        corresponding time stamp.  Each gid corresponds to a type via
+        Network().gid_ranges. Note that the type of spike can be from a
+        cell type or a drive.
     times : numpy array | None
         Array of time points for samples in continuous data.
         This includes vsoma and isoma.
-    cell_type_names : list
-        List of unique cell type names that are explicitly modeled in the
-        network
 
     Attributes
     ----------
@@ -46,10 +46,11 @@ class CellResponse(object):
         The inner list contains the cell IDs of neurons that
         spiked.
     spike_types : list (n_trials,) of list (n_spikes,) of float
-        Each element of the outer list is a trial.
-        The inner list contains the type of spike (e.g., evprox1
-        or L2_pyramidal) that occurred at the corresponding time stamp.
-        Each gid corresponds to a type via Network::gid_ranges.
+        Each element of the outer list is a trial. The inner list contains the
+        type of spike (e.g., evprox1 or L2_pyramidal) that occurred at the
+        corresponding time stamp.  Each gid corresponds to a type via
+        Network().gid_ranges. Note that the type of spike can be from a
+        cell type or a drive.
     vsec : list (n_trials,) of dict
         Each element of the outer list is a trial.
         Dictionary indexed by gids containing voltages for cell sections.
@@ -80,8 +81,8 @@ class CellResponse(object):
         Write spiking activity to a collection of spike trial files.
     """
 
-    def __init__(self, spike_times=None, spike_gids=None, spike_types=None,
-                 times=None, cell_type_names=None):
+    def __init__(self, cell_type_names, spike_times=None,
+                 spike_gids=None, spike_types=None, times=None):
         if spike_times is None:
             spike_times = list()
         if spike_gids is None:
@@ -90,10 +91,6 @@ class CellResponse(object):
             spike_types = list()
         if times is None:
             times = list()
-
-        if cell_type_names is None:
-            cell_type_names = ['L2_basket', 'L2_pyramidal',
-                               'L5_basket', 'L5_pyramidal']
 
         # Validate arguments
         arg_names = ['spike_times', 'spike_gids', 'spike_types']
@@ -293,11 +290,13 @@ class CellResponse(object):
 
         return spike_rates
 
+
     def plot_spikes_raster(
             self,
             trial_idx=None,
             ax=None,
             show=True,
+            cell_types=None,
             colors=None,
             show_legend=True,
             marker_size=5.0,
@@ -325,7 +324,9 @@ class CellResponse(object):
         return plot_spikes_raster(
             cell_response=self,
             trial_idx=trial_idx,
-            ax=ax, show=show,
+            ax=ax,
+            show=show,
+            cell_types=cell_types,
             colors=colors,
             show_legend=show_legend,
             marker_size=marker_size,
@@ -514,7 +515,12 @@ def read_spikes(fname, gid_ranges=None):
             spike_gids += [list()]
             spike_types += [list()]
 
-    cell_response = CellResponse(spike_times=spike_times,
+    network_cell_names = ['L2_basket', 'L2_pyramidal',
+                          'L5_basket', 'L5_pyramidal']
+    cell_type_names = list(cell_name for cell_name in
+                           network_cell_names if cell_name in spike_types)
+    cell_response = CellResponse(cell_type_names=cell_type_names,
+                                 spike_times=spike_times,
                                  spike_gids=spike_gids,
                                  spike_types=spike_types)
     if gid_ranges is not None:

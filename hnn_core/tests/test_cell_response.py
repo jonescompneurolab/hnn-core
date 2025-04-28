@@ -20,7 +20,10 @@ def test_cell_response(tmp_path):
     sim_times = np.arange(tstart, tstop, 1 / fs)
     gid_ranges = {'L2_pyramidal': range(1, 2), 'L2_basket': range(3, 4),
                   'L5_pyramidal': range(5, 6), 'L5_basket': range(7, 8)}
-    cell_response = CellResponse(spike_times=spike_times,
+    default_cell_type_names = ['L2_basket', 'L2_pyramidal', 'L5_basket',
+                               'L5_pyramidal']
+    cell_response = CellResponse(cell_type_names=default_cell_type_names,
+                                 spike_times=spike_times,
                                  spike_gids=spike_gids,
                                  spike_types=spike_types,
                                  times=sim_times)
@@ -51,11 +54,12 @@ def test_cell_response(tmp_path):
     # creates these check that we always know which response attributes are
     # simulated see #291 for discussion; objective is to keep cell_response
     # size small
-    assert list(cell_response.__dict__.keys()) == \
-        sim_attributes + net_attributes
+    assert sorted(list(cell_response.__dict__.keys())) == \
+        sorted(sim_attributes + net_attributes)
 
     # Test recovery of empty spike files
-    empty_spike = CellResponse(spike_times=[[], []], spike_gids=[[], []],
+    empty_spike = CellResponse(cell_type_names=default_cell_type_names,
+                               spike_times=[[], []], spike_gids=[[], []],
                                spike_types=[[], []])
     empty_spike.write(tmp_path / 'empty_spk_%d.txt')
     empty_spike.write(tmp_path / 'empty_spk.txt')
@@ -66,23 +70,27 @@ def test_cell_response(tmp_path):
 
     with pytest.raises(TypeError,
                        match="spike_times should be a list of lists"):
-        cell_response = CellResponse(spike_times=([2.3456, 7.89],
+        cell_response = CellResponse(cell_type_names=default_cell_type_names,
+                                     spike_times=([2.3456, 7.89],
                                      [4.2812, 93.2]),
                                      spike_gids=spike_gids,
                                      spike_types=spike_types)
 
     with pytest.raises(TypeError,
                        match="spike_times should be a list of lists"):
-        cell_response = CellResponse(spike_times=[1, 2], spike_gids=spike_gids,
+        cell_response = CellResponse(cell_type_names=default_cell_type_names,
+                                     spike_times=[1, 2], spike_gids=spike_gids,
                                      spike_types=spike_types)
 
     with pytest.raises(ValueError, match="spike times, gids, and types should "
                        "be lists of the same length"):
-        cell_response = CellResponse(spike_times=[[2.3456, 7.89]],
+        cell_response = CellResponse(cell_type_names=default_cell_type_names,
+                                     spike_times=[[2.3456, 7.89]],
                                      spike_gids=spike_gids,
                                      spike_types=spike_types)
 
-    cell_response = CellResponse(spike_times=spike_times,
+    cell_response = CellResponse(cell_type_names=default_cell_type_names,
+                                 spike_times=spike_times,
                                  spike_gids=spike_gids,
                                  spike_types=spike_types)
 

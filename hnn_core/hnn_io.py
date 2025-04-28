@@ -140,9 +140,12 @@ def _read_cell_response(cell_response_data, read_output):
     """Returns CellResponse from json encoded data"""
     if (not cell_response_data) or (not read_output):
         return None
-    cell_response = CellResponse(spike_times=cell_response_data['spike_times'],
-                                 spike_gids=cell_response_data['spike_gids'],
-                                 spike_types=cell_response_data['spike_types'])
+    cell_response = CellResponse(
+        cell_type_names=cell_response_data['cell_type_names'],
+        spike_times=cell_response_data['spike_times'],
+        spike_gids=cell_response_data['spike_gids'],
+        spike_types=cell_response_data['spike_types'],
+    )
 
     cell_response._times = cell_response_data['times']
     cell_response._vsec = list()
@@ -432,7 +435,7 @@ def dict_to_network(net_data,
         start = net_data['gid_ranges'][key]['start']
         stop = net_data['gid_ranges'][key]['stop']
         gid_ranges_data[key] = range(start, stop)
-    net.gid_ranges = gid_ranges_data
+    net.gid_ranges = OrderedDict(gid_ranges_data)
     # Set pos_dict
     net.pos_dict = _read_pos_dict(net_data['pos_dict'])
     # Set cell_response
