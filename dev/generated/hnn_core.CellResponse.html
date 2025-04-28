@@ -497,11 +497,14 @@ document.write(`
 <h1>hnn_core.CellResponse<a class="headerlink" href="#hnn-core-cellresponse" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="hnn_core.CellResponse">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">CellResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spike_times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_gids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hnn_core.</span></span><span class="sig-name descname"><span class="pre">CellResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_type_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_gids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">times</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse" title="Permalink to this definition">#</a></dt>
 <dd><p>The CellResponse class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
+<dt><strong>cell_type_names</strong><span class="classifier">list</span></dt><dd><p>List of unique cell type names that are explicitly modeled in the
+network.</p>
+</dd>
 <dt><strong>spike_times</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float | None</span></dt><dd><p>Each element of the outer list is a trial.
 The inner list contains the time stamps of spikes.</p>
 </dd>
@@ -509,16 +512,14 @@ The inner list contains the time stamps of spikes.</p>
 The inner list contains the cell IDs of neurons that
 spiked.</p>
 </dd>
-<dt><strong>spike_types</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float | None</span></dt><dd><p>Each element of the outer list is a trial.
-The inner list contains the type of spike (e.g., evprox1
-or L2_pyramidal) that occurred at the corresponding time stamp.
-Each gid corresponds to a type via Network().gid_ranges.</p>
+<dt><strong>spike_types</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float | None</span></dt><dd><p>Each element of the outer list is a trial. The inner list contains the
+type of spike (e.g., evprox1 or L2_pyramidal) that occurred at the
+corresponding time stamp.  Each gid corresponds to a type via
+Network().gid_ranges. Note that the type of spike can be from a
+cell type or a drive.</p>
 </dd>
 <dt><strong>times</strong><span class="classifier">numpy array | None</span></dt><dd><p>Array of time points for samples in continuous data.
 This includes vsoma and isoma.</p>
-</dd>
-<dt><strong>cell_type_names</strong><span class="classifier">list</span></dt><dd><p>List of unique cell type names that are explicitly modeled in the
-network</p>
 </dd>
 </dl>
 </dd>
@@ -531,10 +532,11 @@ The inner list contains the time stamps of spikes.</p>
 The inner list contains the cell IDs of neurons that
 spiked.</p>
 </dd>
-<dt><strong>spike_types</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float</span></dt><dd><p>Each element of the outer list is a trial.
-The inner list contains the type of spike (e.g., evprox1
-or L2_pyramidal) that occurred at the corresponding time stamp.
-Each gid corresponds to a type via Network::gid_ranges.</p>
+<dt><strong>spike_types</strong><span class="classifier">list (n_trials,) of list (n_spikes,) of float</span></dt><dd><p>Each element of the outer list is a trial. The inner list contains the
+type of spike (e.g., evprox1 or L2_pyramidal) that occurred at the
+corresponding time stamp.  Each gid corresponds to a type via
+Network().gid_ranges. Note that the type of spike can be from a
+cell type or a drive.</p>
 </dd>
 <dt><strong>vsec</strong><span class="classifier">list (n_trials,) of dict</span></dt><dd><p>Each element of the outer list is a trial.
 Dictionary indexed by gids containing voltages for cell sections.</p>
@@ -679,7 +681,7 @@ the name of this group must be used to specify the colors.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.CellResponse.plot_spikes_raster">
-<span class="sig-name descname"><span class="pre">plot_spikes_raster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trial_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlay_dipoles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse.plot_spikes_raster"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse.plot_spikes_raster" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">plot_spikes_raster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trial_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlay_dipoles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell_response.html#CellResponse.plot_spikes_raster"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.CellResponse.plot_spikes_raster" title="Permalink to this definition">#</a></dt>
 <dd><p>Plot the aggregate spiking activity according to cell type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

@@ -110,7 +110,7 @@ the 3D structure of the network.
 
  .. code-block:: none
 
-    /home/circleci/miniconda/envs/testenv/lib/python3.8/site-packages/hnn_core/viz.py:1125: UserWarning: The figure layout has changed to tight
+    /home/circleci/miniconda/envs/testenv/lib/python3.8/site-packages/hnn_core/viz.py:1211: UserWarning: The figure layout has changed to tight
       plt.tight_layout()
 
     <Figure size 640x480 with 2 Axes>
@@ -221,14 +221,14 @@ can adjust the xyz limits of the plot to better visualize the network.
  .. code-block:: none
 
 
-    <matplotlib.animation.FuncAnimation object at 0x7fb4d9347520>
+    <matplotlib.animation.FuncAnimation object at 0x7f0cf87f6cd0>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 55.194 seconds)
+   **Total running time of the script:** (1 minutes 3.005 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_hnn_animation.py:
@@ -240,7 +240,7 @@ can adjust the xyz limits of the plot to better visualize the network.
     .. container:: binder-badge
 
       .. image:: images/binder_badge_logo.svg
-        :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=v0.4/notebooks/auto_examples/howto/plot_hnn_animation.ipynb
+        :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_hnn_animation.ipynb
         :alt: Launch binder
         :width: 150 px
 

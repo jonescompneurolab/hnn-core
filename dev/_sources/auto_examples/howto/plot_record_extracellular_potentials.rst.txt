@@ -237,7 +237,7 @@ steps). Decimation speeds up plotting significantly.
 
 
 .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_record_extracellular_potentials_003.png
-   :alt: Aggregate (L2/3 + L5)
+   :alt: Aggregate (L2/3 + L5), Raster Plot with Layer-Specific Dipole Overlays
    :srcset: /auto_examples/howto/images/sphx_glr_plot_record_extracellular_potentials_003.png
    :class: sphx-glr-single-img
 
@@ -265,7 +265,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 36.329 seconds)
+   **Total running time of the script:** (0 minutes 41.824 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_record_extracellular_potentials.py:
@@ -277,7 +277,7 @@ References
     .. container:: binder-badge
 
       .. image:: images/binder_badge_logo.svg
-        :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=v0.4/notebooks/auto_examples/howto/plot_record_extracellular_potentials.ipynb
+        :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_record_extracellular_potentials.ipynb
         :alt: Launch binder
         :width: 150 px
 

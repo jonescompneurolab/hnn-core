@@ -499,6 +499,7 @@ document.write(`
 <span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">it</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
@@ -514,6 +515,7 @@ document.write(`
 <span class="kn">from</span><span class="w"> </span><span class="nn">.check</span><span class="w"> </span><span class="kn">import</span> <span class="n">_check_gids</span><span class="p">,</span> <span class="n">_gid_to_type</span><span class="p">,</span> <span class="n">_string_input_to_list</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.hnn_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_network_configuration</span><span class="p">,</span> <span class="n">network_to_dict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.externals.mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">copy_doc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_replace_dict_identifier</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_create_cell_coords</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="p">):</span>
@@ -852,7 +854,6 @@ document.write(`
 <span class="sd">    produce a network with no cell-to-cell connections. As such,</span>
 <span class="sd">    connectivity information contained in ``params`` will be ignored.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)):</span>
         <span class="c1"># Save the parameters used to create the Network</span>
@@ -936,12 +937,15 @@ document.write(`
 
 <div class="viewcode-block" id="Network.__repr__"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.__repr__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">class_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> x </span><span class="si">%d</span><span class="s2"> Pyramidal cells (L2, L5)&quot;</span>
-             <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_N_pyr_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_N_pyr_y</span><span class="p">))</span>
-        <span class="n">s</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">%d</span><span class="s2"> L2 basket cells</span><span class="se">\n</span><span class="si">%d</span><span class="s2"> L5 basket cells&quot;</span>
-              <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">]),</span>
-                 <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="s1">&#39;L5_basket&#39;</span><span class="p">])))</span>
-        <span class="k">return</span> <span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1"> | </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span></div>
+        <span class="c1"># Dynamically create the description based on the current cell types</span>
+        <span class="n">descriptions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">cell_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="p">:</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cell_name</span><span class="p">,</span> <span class="p">[]))</span>
+            <span class="n">descriptions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">cell_name</span><span class="si">}</span><span class="s2"> cells&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Combine all descriptions into a single string</span>
+        <span class="n">description_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">descriptions</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&lt;</span><span class="si">{</span><span class="n">class_name</span><span class="si">}</span><span class="s1"> | </span><span class="si">{</span><span class="n">description_str</span><span class="si">}</span><span class="s1">&gt;&#39;</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Network</span><span class="p">):</span>
@@ -1684,11 +1688,45 @@ document.write(`
         <span class="n">ll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_gids</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_n_gids</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">cell_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">ll</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_gids</span><span class="p">)</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">cell_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span>
         <span class="k">if</span> <span class="n">cell_template</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">cell_name</span><span class="p">:</span> <span class="n">cell_template</span><span class="p">})</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_n_cells</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_rename_cell_types</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_mapping</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Renames cell types in the network.</span>
+
+<span class="sd">        XXX: All HNN functionality is not supported, such as Dipole calculation</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name_mapping: dict[str, str]</span>
+<span class="sd">            Dictionary of what cell type names to change, and what to change</span>
+<span class="sd">            them to. Keys are existing cell type name strings, and values are</span>
+<span class="sd">            what string to change each key to. Note that both elements must be</span>
+<span class="sd">            strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">name_mapping</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="s1">&#39;name_mapping&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">original_name</span><span class="p">,</span> <span class="n">new_name</span> <span class="ow">in</span> <span class="n">name_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">original_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">original_name</span><span class="si">}</span><span class="s2">&#39; is not in cell_types!&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">new_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">new_name</span><span class="si">}</span><span class="s2">&#39; is already in cell_types!&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">original_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;cell_types&#39;</span><span class="p">,</span> <span class="s1">&#39;pos_dict&#39;</span><span class="p">,</span> <span class="s1">&#39;external_biases&#39;</span><span class="p">,</span> <span class="s1">&#39;external_drives&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;gid_ranges&#39;</span><span class="p">]:</span>
+                    <span class="n">attr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                        <span class="n">updated_attr</span> <span class="o">=</span> <span class="n">_replace_dict_identifier</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">original_name</span><span class="p">,</span> <span class="n">new_name</span><span class="p">)</span>
+                        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">updated_attr</span><span class="p">)</span>
+
+                <span class="c1"># Update Network.connectivity</span>
+                <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectivity</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">connection</span><span class="p">[</span><span class="s1">&#39;src_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">original_name</span><span class="p">:</span>
+                        <span class="n">connection</span><span class="p">[</span><span class="s1">&#39;src_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_name</span>
+                    <span class="k">if</span> <span class="n">connection</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">original_name</span><span class="p">:</span>
+                        <span class="n">connection</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_name</span>
+
 
 <div class="viewcode-block" id="Network.gid_to_type"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.gid_to_type">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">gid_to_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Reverse lookup of gid to type.&quot;&quot;&quot;</span>

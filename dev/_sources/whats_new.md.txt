@@ -7,7 +7,14 @@ orphan: true
 
 ## Current development version
 
+### API Changes
+
+- :class:`~hnn_core.CellResponse` now requires a `cell_type_names` argument, whereas before the argument was optional.
+
 ### Changelog
+
+- Remove hardcoding of celltypes in :class:`~hnn_core.CellResponse` and add
+  {func}`~hnn_core.Network.rename_cell`, by [Mohamed W. ElSayed][] in {gh}`702` and {gh}`970`.
 
 ## 0.4.1 Patch notes
 
@@ -881,3 +888,4 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Dikshant Jha]: https://github.com/dikshant182004
 [Dan Toms]: https://github.com/pynmash
 [Shehroz Kashif]: https://github.com/Shehrozkashif
+[Mohamed W. ElSayed]: https://github.com/wagdy88

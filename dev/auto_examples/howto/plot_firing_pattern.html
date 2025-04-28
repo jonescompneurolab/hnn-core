@@ -638,12 +638,10 @@ read spikes back in, we can use wildcard expressions.</p>
 </pre></div>
 </div>
 <ul class="sphx-glr-horizontal">
-<li><img src="../../_images/sphx_glr_plot_firing_pattern_002.png" srcset="../../_images/sphx_glr_plot_firing_pattern_002.png" alt="plot firing pattern" class = "sphx-glr-multi-img"/></li>
-<li><img src="../../_images/sphx_glr_plot_firing_pattern_003.png" srcset="../../_images/sphx_glr_plot_firing_pattern_003.png" alt="plot firing pattern" class = "sphx-glr-multi-img"/></li>
+<li><img src="../../_images/sphx_glr_plot_firing_pattern_002.png" srcset="../../_images/sphx_glr_plot_firing_pattern_002.png" alt="Raster Plot with Layer-Specific Dipole Overlays" class = "sphx-glr-multi-img"/></li>
+<li><img src="../../_images/sphx_glr_plot_firing_pattern_003.png" srcset="../../_images/sphx_glr_plot_firing_pattern_003.png" alt="Raster Plot with Layer-Specific Dipole Overlays" class = "sphx-glr-multi-img"/></li>
 </ul>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/circleci/project/examples/howto/plot_firing_pattern.py:111: DeprecationWarning: Writing cell response to txt files is deprecated and will be removed in future versions. Please save cell response along with network
-  net.cell_response.write(op.join(tmp_dir_name, &#39;spk_%d.txt&#39;))
-Writing file /tmp/tmpbzqv3k7t/spk_0.txt
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Writing file /tmp/tmpkwbx_qpq/spk_0.txt
 /home/circleci/project/examples/howto/plot_firing_pattern.py:112: DeprecationWarning: Reading cell response from txt files is deprecated and will be removed in future versions. Please load cell response along with simulated network
   cell_response = read_spikes(op.join(tmp_dir_name, &#39;spk_*.txt&#39;))
 
@@ -665,9 +663,9 @@ specifying a time window with <code class="docutils literal notranslate"><span c
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Mean spike rates across trials:
-{&#39;L2_basket&#39;: 9.243697478991596, &#39;L2_pyramidal&#39;: 6.705882352941176, &#39;L5_basket&#39;: 15.126050420168063, &#39;L5_pyramidal&#39;: 23.176470588235297}
+{}
 Mean spike rates for individual trials:
-{&#39;L2_basket&#39;: [9.243697478991596], &#39;L2_pyramidal&#39;: [6.705882352941176], &#39;L5_basket&#39;: [15.126050420168063], &#39;L5_pyramidal&#39;: [23.176470588235297]}
+{}
 </pre></div>
 </div>
 <p>Finally, we can plot the soma voltage along with the spiking activity with
@@ -685,13 +683,13 @@ raster plots and histograms for the pyramidal cells.</p>
                                                 <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_firing_pattern_004.png" srcset="../../_images/sphx_glr_plot_firing_pattern_004.png" alt="plot firing pattern" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 500x700 with 3 Axes&gt;
+<img src="../../_images/sphx_glr_plot_firing_pattern_004.png" srcset="../../_images/sphx_glr_plot_firing_pattern_004.png" alt="Raster Plot with Layer-Specific Dipole Overlays" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 500x700 with 3 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 28.038 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 30.458 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-firing-pattern-py">
 <div class="binder-badge docutils container">
-<a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=v0.4/notebooks/auto_examples/howto/plot_firing_pattern.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" width="150px" /></a>
+<a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_firing_pattern.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" width="150px" /></a>
 </div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/1d5e89fac4992660f401256dcccfc8a6/plot_firing_pattern.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_firing_pattern.ipynb</span></code></a></p>

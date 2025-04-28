@@ -303,14 +303,14 @@ read spikes back in, we can use wildcard expressions.
     *
 
       .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_002.png
-         :alt: plot firing pattern
+         :alt: Raster Plot with Layer-Specific Dipole Overlays
          :srcset: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_002.png
          :class: sphx-glr-multi-img
 
     *
 
       .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_003.png
-         :alt: plot firing pattern
+         :alt: Raster Plot with Layer-Specific Dipole Overlays
          :srcset: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_003.png
          :class: sphx-glr-multi-img
 
@@ -319,9 +319,7 @@ read spikes back in, we can use wildcard expressions.
 
  .. code-block:: none
 
-    /home/circleci/project/examples/howto/plot_firing_pattern.py:111: DeprecationWarning: Writing cell response to txt files is deprecated and will be removed in future versions. Please save cell response along with network
-      net.cell_response.write(op.join(tmp_dir_name, 'spk_%d.txt'))
-    Writing file /tmp/tmpbzqv3k7t/spk_0.txt
+    Writing file /tmp/tmpkwbx_qpq/spk_0.txt
     /home/circleci/project/examples/howto/plot_firing_pattern.py:112: DeprecationWarning: Reading cell response from txt files is deprecated and will be removed in future versions. Please load cell response along with simulated network
       cell_response = read_spikes(op.join(tmp_dir_name, 'spk_*.txt'))
 
@@ -358,9 +356,9 @@ specifying a time window with ``tstart`` and ``tstop``.
  .. code-block:: none
 
     Mean spike rates across trials:
-    {'L2_basket': 9.243697478991596, 'L2_pyramidal': 6.705882352941176, 'L5_basket': 15.126050420168063, 'L5_pyramidal': 23.176470588235297}
+    {}
     Mean spike rates for individual trials:
-    {'L2_basket': [9.243697478991596], 'L2_pyramidal': [6.705882352941176], 'L5_basket': [15.126050420168063], 'L5_pyramidal': [23.176470588235297]}
+    {}
 
 
 
@@ -390,7 +388,7 @@ raster plots and histograms for the pyramidal cells.
 
 
 .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_004.png
-   :alt: plot firing pattern
+   :alt: Raster Plot with Layer-Specific Dipole Overlays
    :srcset: /auto_examples/howto/images/sphx_glr_plot_firing_pattern_004.png
    :class: sphx-glr-single-img
 
@@ -407,7 +405,7 @@ raster plots and histograms for the pyramidal cells.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 28.038 seconds)
+   **Total running time of the script:** (0 minutes 30.458 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_firing_pattern.py:
@@ -419,7 +417,7 @@ raster plots and histograms for the pyramidal cells.
     .. container:: binder-badge
 
       .. image:: images/binder_badge_logo.svg
-        :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=v0.4/notebooks/auto_examples/howto/plot_firing_pattern.ipynb
+        :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_firing_pattern.ipynb
         :alt: Launch binder
         :width: 150 px
 
