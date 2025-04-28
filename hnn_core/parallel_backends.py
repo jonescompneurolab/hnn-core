@@ -42,8 +42,8 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
 
     # Create array of equally sampled time points for simulating currents
     cell_type_names = list(net.cell_types.keys())
-    cell_response = CellResponse(times=sim_data[0]['times'],
-                                 cell_type_names=cell_type_names)
+    cell_response = CellResponse(cell_type_names=cell_type_names,
+                                 times=sim_data[0]['times'])
     net.cell_response = cell_response
 
     for idx in range(n_trials):

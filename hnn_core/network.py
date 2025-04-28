@@ -10,6 +10,7 @@
 import itertools as it
 from copy import deepcopy
 from collections import OrderedDict, defaultdict
+from typing import Dict
 
 import numpy as np
 import warnings
@@ -25,6 +26,7 @@ from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
 from .hnn_io import write_network_configuration, network_to_dict
 from .externals.mne import copy_doc
+from .utils import _replace_dict_identifier
 
 
 def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
@@ -361,7 +363,6 @@ class Network:
     produce a network with no cell-to-cell connections. As such,
     connectivity information contained in ``params`` will be ignored.
     """
-
     def __init__(self, params, add_drives_from_params=False,
                  legacy_mode=False, mesh_shape=(10, 10)):
         # Save the parameters used to create the Network
@@ -445,12 +446,15 @@ class Network:
 
     def __repr__(self):
         class_name = self.__class__.__name__
-        s = ("%d x %d Pyramidal cells (L2, L5)"
-             % (self._N_pyr_x, self._N_pyr_y))
-        s += ("\n%d L2 basket cells\n%d L5 basket cells"
-              % (len(self.pos_dict['L2_basket']),
-                 len(self.pos_dict['L5_basket'])))
-        return '<%s | %s>' % (class_name, s)
+        # Dynamically create the description based on the current cell types
+        descriptions = list()
+        for cell_name in self.cell_types:
+            count = len(self.pos_dict.get(cell_name, []))
+            descriptions.append(f"{count} {cell_name} cells")
+
+        # Combine all descriptions into a single string
+        description_str = "\n".join(descriptions)
+        return f'<{class_name} | {description_str}>'
 
     def __eq__(self, other):
         if not isinstance(other, Network):
@@ -1193,11 +1197,45 @@ class Network:
         ll = self._n_gids
         self._n_gids += len(pos)
         self.gid_ranges[cell_name] = range(ll, self._n_gids)
-
         self.pos_dict[cell_name] = pos
         if cell_template is not None:
             self.cell_types.update({cell_name: cell_template})
             self._n_cells += len(pos)
+
+    def _rename_cell_types(self, name_mapping: Dict[str, str]):
+        """Renames cell types in the network.
+
+        XXX: All HNN functionality is not supported, such as Dipole calculation
+
+        Parameters
+        ----------
+        name_mapping: dict[str, str]
+            Dictionary of what cell type names to change, and what to change
+            them to. Keys are existing cell type name strings, and values are
+            what string to change each key to. Note that both elements must be
+            strings.
+        """
+        _validate_type(name_mapping, dict, 'name_mapping')
+        for original_name, new_name in name_mapping.items():
+            if original_name not in self.cell_types.keys():
+                raise ValueError(f"'{original_name}' is not in cell_types!")
+            elif new_name in self.cell_types.keys():
+                raise ValueError(f"'{new_name}' is already in cell_types!")
+            elif original_name in self.cell_types.keys():
+                for attr_name in ['cell_types', 'pos_dict', 'external_biases', 'external_drives',
+                                  'gid_ranges']:
+                    attr = getattr(self, attr_name)
+                    if isinstance(attr, dict):
+                        updated_attr = _replace_dict_identifier(attr, original_name, new_name)
+                        setattr(self, attr_name, updated_attr)
+
+                # Update Network.connectivity
+                for connection in self.connectivity:
+                    if connection['src_type'] == original_name:
+                        connection['src_type'] = new_name
+                    if connection['target_type'] == original_name:
+                        connection['target_type'] = new_name
+
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""

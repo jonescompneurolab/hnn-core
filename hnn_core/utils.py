@@ -16,6 +16,43 @@ def _hammfilt(x, winsz):
     return np.convolve(x, win, 'same')
 
 
+def _replace_dict_identifier(input_dict, old_identifier, new_identifier):
+    """Recursively replace keys and values in a dict that match an identifier.
+
+    This takes an `old_identifier` (anything that can compared to any keys or
+    values with an equivalence relation), recurses through a dictionary
+    (including any nested lists or dicts), and replaces all instances of
+    `old_identifier` with `new_identifier`, regardless of if they are keys or
+    values.
+
+    Parameters
+    ----------
+    input_dict : dict
+        The dictionary to update.
+    old_identifier : str
+        The key or value to replace.
+    new_identifier : str
+        The new key or value to replace with.
+
+    Returns
+    -------
+    updated_dict : dict
+        The updated dictionary with keys and values replaced.
+    """
+    if isinstance(input_dict, dict):
+        updated_dict = dict()
+        for key, value in input_dict.items():
+            new_key_name = new_identifier if key == old_identifier else key
+            updated_dict[new_key_name] = _replace_dict_identifier(
+                value, old_identifier, new_identifier)
+        return updated_dict
+    elif isinstance(input_dict, list):
+        return [_replace_dict_identifier(
+            element, old_identifier, new_identifier) for element in input_dict]
+    else:
+        return new_identifier if input_dict == old_identifier else input_dict
+
+
 # Savitzky-Golay filtering, lifted and adapted from mne-python (0.22)
 def _savgol_filter(data, h_freq, sfreq):
     """Filter the data using Savitzky-Golay polynomial method.
