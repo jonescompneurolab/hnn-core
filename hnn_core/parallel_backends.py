@@ -168,7 +168,8 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
                     # child terminated early, and we already
                     # captured output left in queues
                     warn("Child process failed unexpectedly")
-                    kill_proc_name('nrniv')
+                    # not good on shared system
+                    #kill_proc_name('nrniv')
                     break
 
             if not sent_network:
@@ -197,7 +198,8 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
                     count_since_last_output > timeout_cycles:
                 warn("Timeout exceeded while waiting for child process output"
                      ". Terminating...")
-                kill_proc_name('nrniv')
+                # not good on shared system
+                #kill_proc_name('nrniv')
                 break
     except KeyboardInterrupt:
         warn("Received KeyboardInterrupt. Stopping simulation process...")
@@ -865,59 +867,69 @@ class MPIBackend(object):
         # Begin constructing the main command.
         self.mpi_cmd = mpi_cmd
 
-        # Use the hwthread option if the user wants to force it. Otherwise, use
-        # hardware-threading if:
-        # 1. the user has not changed 'override_hwthreading_option',
-        # 2. if the user wants to use hardware-threading, and
-        # 3. hardware-threading is detected.
-        if ((override_hwthreading_option is True) or
-            (
-                (override_hwthreading_option is None) and
-                (use_hwthreading_if_found is True) and
-                hwthreading_available
-        )):
-            self.mpi_cmd += " --use-hwthread-cpus"
+        if not mpi_cmd == 'ALREADYMPI':
+            # Use the hwthread option if the user wants to force it. Otherwise, use
+            # hardware-threading if:
+            # 1. the user has not changed 'override_hwthreading_option',
+            # 2. if the user wants to use hardware-threading, and
+            # 3. hardware-threading is detected.
+            if ((override_hwthreading_option is True) or
+                (
+                    (override_hwthreading_option is None) and
+                    (use_hwthreading_if_found is True) and
+                    hwthreading_available
+            )):
+                self.mpi_cmd += " --use-hwthread-cpus"
 
-        # Use the oversubscribe option if the user wants to force
-        # it. Otherwise, if the user has not changed
-        # 'override_oversubscribe_option', use our original heuristic: did user
-        # specify the number of cores (see `n_procs` logic above), AND did they
-        # specify more cores than are available?
-        if ((override_oversubscribe_option is True) or
-            (
-                (override_oversubscribe_option is None) and
-                (self.n_procs > n_available_cores)
-        )):
-            warn(
-                "Number of requested MPI processes exceeds available "
-                "cores. Enabling MPI oversubscription automatically."
+            # Use the oversubscribe option if the user wants to force
+            # it. Otherwise, if the user has not changed
+            # 'override_oversubscribe_option', use our original heuristic: did user
+            # specify the number of cores (see `n_procs` logic above), AND did they
+            # specify more cores than are available?
+            if ((override_oversubscribe_option is True) or
+                (
+                    (override_oversubscribe_option is None) and
+                    (self.n_procs > n_available_cores)
+            )):
+                warn(
+                    "Number of requested MPI processes exceeds available "
+                    "cores. Enabling MPI oversubscription automatically."
+                )
+                self.mpi_cmd += " --oversubscribe"
+            elif (
+                    (override_oversubscribe_option is False) and
+                    (self.n_procs > n_available_cores)
+            ):
+                warn(
+                    "Number of requested MPI processes exceeds available "
+                    "cores. However, you have forced off MPI oversubscription. The"
+                    "MPI simulation will almost certainly fail. If you see this"
+                    "message, you should either decrease the number of 'n_procs'"
+                    "used or re-enable oversubscription, unless you know what you"
+                    "are doing and have made alternative changes. "
+                )
+                pass
+
+            self.mpi_cmd += " -np " + str(self.n_procs)
+
+            self.mpi_cmd += (
+                " nrniv -python -mpi -nobanner " +
+                sys.executable +
+                " " +
+                os.path.join(
+                    os.path.dirname(sys.modules[__name__].__file__), "mpi_child.py"
+                )
             )
-            self.mpi_cmd += " --oversubscribe"
-        elif (
-                (override_oversubscribe_option is False) and
-                (self.n_procs > n_available_cores)
-        ):
-            warn(
-                "Number of requested MPI processes exceeds available "
-                "cores. However, you have forced off MPI oversubscription. The"
-                "MPI simulation will almost certainly fail. If you see this"
-                "message, you should either decrease the number of 'n_procs'"
-                "used or re-enable oversubscription, unless you know what you"
-                "are doing and have made alternative changes. "
-            )
-            pass
+            self.alreadympi = False
+        else:
+            from mpi4py import MPI
+            self.comm = MPI.COMM_WORLD
+            self.size = self.comm.Get_size()
+            self.rank = self.comm.Get_rank()
+            os.environ['MPLCONFIGDIR'] = '.config' + "{}".format(self.rank)
+            self.mpi_cmd = ''
 
-
-        self.mpi_cmd += " -np " + str(self.n_procs)
-
-        self.mpi_cmd += (
-            " nrniv -python -mpi -nobanner " +
-            sys.executable +
-            " " +
-            os.path.join(
-                os.path.dirname(sys.modules[__name__].__file__), "mpi_child.py"
-            )
-        )
+            self.alreadympi = True
 
         # Split the command into shell arguments for passing to Popen
         use_posix = True if sys.platform != 'win32' else False
@@ -938,7 +950,9 @@ class MPIBackend(object):
 
         # always kill nrniv processes for good measure
         if self.n_procs > 1:
-            kill_proc_name('nrniv')
+            # not good on a shared system
+            #kill_proc_name('nrniv')
+            pass
 
     def simulate(self, net, tstop, dt, n_trials, postproc=False):
         """Simulate the HNN model in parallel on all cores
@@ -984,11 +998,17 @@ class MPIBackend(object):
 
         env = _get_mpi_env()
 
-        self.proc, sim_data = run_subprocess(
-            command=self.mpi_cmd, obj=[net, tstop, dt, n_trials], timeout=30,
-            proc_queue=self.proc_queue, env=env, cwd=os.getcwd(),
-            universal_newlines=True)
-
+        if self.alreadympi == False:
+            self.proc, sim_data = run_subprocess(
+                command=self.mpi_cmd, obj=[net, tstop, dt, n_trials], timeout=30,
+                proc_queue=self.proc_queue, env=env, cwd=os.getcwd(),
+                universal_newlines=True)
+        else:
+            from .mpi_child import runit
+            sim_data = runit(net=net, dt=dt, tstop=tstop,n_trials=n_trials)
+        # each rank needs to send to rank 0?
+        # original mpi_child.py wrote encoded data to stderr,
+        # so, try catenating encoded data from each child and process.
         dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
         return dpls
 
