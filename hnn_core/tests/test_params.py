@@ -4,7 +4,6 @@
 import os.path as op
 import json
 from pathlib import Path
-from urllib.request import urlretrieve
 
 import pytest
 
@@ -16,6 +15,9 @@ from hnn_core.params import remove_nulled_drives
 
 hnn_core_root = Path(__file__).parents[1]
 
+def get_test_asset_path(filename):
+    """Return the path to a test asset file."""
+    return op.join(op.dirname(__file__), 'assets', filename)
 
 def test_read_params():
     """Test reading of params object."""
@@ -43,12 +45,7 @@ def test_read_params():
 
 def test_read_legacy_params():
     """Test reading of legacy .param file."""
-    param_url = ('https://raw.githubusercontent.com/hnnsolver/'
-                 'hnn-core/test_data/default.param')
-    params_legacy_fname = op.join(hnn_core_root, 'param', 'default.param')
-    if not op.exists(params_legacy_fname):
-        urlretrieve(param_url, params_legacy_fname)
-
+    params_legacy_fname = get_test_asset_path('default.param')
     params_new_fname = op.join(hnn_core_root, 'param', 'default.json')
     params_legacy = read_params(params_legacy_fname)
     params_new = read_params(params_new_fname)
@@ -63,12 +60,7 @@ def test_read_legacy_params():
 
 def test_base_params():
     """Test default params object matches base params"""
-    param_url = ('https://raw.githubusercontent.com/jonescompneurolab/'
-                 'hnn-core/test_data/base.json')
-    params_base_fname = op.join(hnn_core_root, 'param', 'base.json')
-    if not op.exists(params_base_fname):
-        urlretrieve(param_url, params_base_fname)
-
+    params_base_fname = get_test_asset_path('base.json')
     params_base = read_params(params_base_fname)
     params = Params()
     assert params == params_base
@@ -79,11 +71,7 @@ def test_base_params():
 
 
 def test_remove_nulled_drives(tmp_path):
-    param_url = ("https://raw.githubusercontent.com/jonescompneurolab/hnn/"
-                 "master/param/ERPYes100Trials.param")
-    params_fname = Path(hnn_core_root, 'param', 'ERPYes100Trials.param')
-    if not op.exists(params_fname):
-        urlretrieve(param_url, params_fname)
+    params_fname = get_test_asset_path('ERPYes100Trials.param')
 
     net = jones_2009_model(params=read_params(params_fname),
                            add_drives_from_params=True,
@@ -151,12 +139,7 @@ class TestConvertToJson:
     def test_convert_to_json_legacy(self, tmp_path):
         """Tests conversion of a param legacy file to json"""
 
-        # Download params
-        param_url = ('https://raw.githubusercontent.com/hnnsolver/'
-                     'hnn-core/test_data/default.param')
-        params_base_fname = Path(hnn_core_root, 'param', 'default.param')
-        if not op.exists(params_base_fname):
-            urlretrieve(param_url, params_base_fname)
+        params_base_fname = get_test_asset_path('default.param')
         net_params = jones_2009_model(read_params(params_base_fname),
                                       add_drives_from_params=True,
                                       legacy_mode=True
