@@ -11,7 +11,7 @@ from .params import compare_dictionaries
 from .params_default import (get_L2Pyr_params_default,
                              get_L5Pyr_params_default,
                              get_L2Pyr_params_new,
-                             get_L5Pyr_params_new,
+                             get_L5PyrET_params,
                              get_Int_params)
 # Units for e: mV
 # Units for gbar: S/cm^2 unless otherwise noted
@@ -503,12 +503,12 @@ def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
 
     return cell
 
-def pyramidal_l5(cell_name,pos, gid=None):
+def pyramidal_l5ET(cell_name,pos, gid=None):
         
-    p_all = get_L5Pyr_params_new()
+    p_all = get_L5PyrET_params()
 
     # override params according to function
-    gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_HVA']*1.5, gdend=p_all['L5Pyr_dend_gbar_Ca_HVA']*6.7, xkink=1500, hotzone_factor=3.9)
+    gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_HVA']*1., gdend=p_all['L5Pyr_dend_gbar_Ca_HVA']*6.6, xkink=1500, hotzone_factor=3.9)
     gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_LVAst'], gdend=p_all['L5Pyr_dend_gbar_Ca_LVAst']*2.75, xkink=1500, hotzone_factor=3)
     gbar_Ih = partial(_exp_g_at_dist, zero_val=p_all['L5Pyr_dend_gbar_Ih'],exp_term = 1./323, slope=2.087, offset=-.8696)
     
@@ -578,6 +578,157 @@ def pyramidal_l5(cell_name,pos, gid=None):
     sections = {**sections_apcl, **sections_basal}
 
     sections['soma'] = _get_pyr_soma(p_all, 'L5Pyr', v_init=v_init['soma'])
+
+    # Soma and apical mechanisms
+    mechanisms = {'NaTs2_t':['gbar_NaTs2_t'], 
+                    'SKv3_1': ['gbar_SKv3_1'],
+                    'Nap_Et2': ['gbar_Nap_Et2'],
+                    'Ca_HVA': ['gbar_Ca_HVA'],
+                    'Ca_LVAst': ['gbar_Ca_LVAst'],
+                    'SK_E2': ['gbar_SK_E2'],
+                    'pas': ['g_pas', 'e_pas'],
+                    'Ih': ['gbar_Ih'],
+                    'Im': ['gbar_Im'],
+                    'K_Pst': ['gbar_K_Pst'],
+                    'K_Tst': ['gbar_K_Tst'],
+                    'CaDynamics_E2': ['decay_CaDynamics_E2', 'gamma_CaDynamics_E2']}
+
+    p_mech_soma = _get_mechanisms(p_all, 'L5Pyr', ['soma'], mechanisms)
+
+    section_names = ['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft']
+
+    mechanisms = {'NaTa_t':['gbar_NaTa_t'], 
+                    'SKv3_1': ['gbar_SKv3_1'],
+                    'Ca_HVA': ['gbar_Ca_HVA'],
+                    'Ca_LVAst': ['gbar_Ca_LVAst'],
+                    'SK_E2': ['gbar_SK_E2'],
+                    'pas': ['g_pas', 'e_pas'],
+                    'Ih': ['gbar_Ih'],
+                    'Im': ['gbar_Im'],
+                    'K_Pst': ['gbar_K_Pst'],
+                    'K_Tst': ['gbar_K_Tst'],
+                    'CaDynamics_E2': ['decay_CaDynamics_E2', 'gamma_CaDynamics_E2']}
+    
+    p_mech_apical = _get_mechanisms(p_all, 'L5Pyr', section_names, mechanisms)
+
+
+    # basal sections - super hacky because I can't mess with _get_mechanisms
+    mechanisms = {'NaTs2_t': ['gbar_NaTs2_t'], 
+                    'SKv3_1': ['gbar_SKv3_1'],
+                    'pas': ['g_pas', 'e_pas'],
+                    'Ih': ['gbar_Ih']}
+
+    section_names = ['basal_1', 'basal_2', 'basal_3', 'apical_oblique']
+
+    p_mech_basal = dict()
+    for sec_name in section_names:
+        this_sec_prop = dict()
+        
+        for mech_name in mechanisms:
+            this_mech_prop = dict()
+            for mech_attr in mechanisms[mech_name]:
+                key = f'{cell_name}_basal_{mech_attr}'
+                this_mech_prop[mech_attr] = p_all[key]
+            this_sec_prop[mech_name] = this_mech_prop
+        p_mech_basal[sec_name] = this_sec_prop
+
+
+    p_mech = {**p_mech_soma, **p_mech_basal, **p_mech_apical}
+
+
+    for sec_name, section in sections.items():
+            section._end_pts = end_pts[sec_name]
+
+            if sec_name == 'soma':
+                section.syns = ['gabaa', 'gabab']
+            else:
+                section.syns = ['ampa', 'nmda', 'gabaa', 'gabab']
+
+            section.mechs = p_mech[sec_name]
+
+    sect_loc = {'proximal': ['apical_oblique', 'basal_2', 'basal_3'],
+                    'distal': ['apical_tuft']}
+
+    synapses = _get_pyr_syn_props(p_all, 'L5Pyr')
+
+    cell = Cell(cell_name, pos,
+                    sections=sections,
+                    synapses=synapses,
+                    sect_loc=sect_loc,
+                    cell_tree=cell_tree,
+                    gid=gid)
+    
+    return cell
+
+def pyramidal_l5IT(cell_name,pos, gid=None):
+        
+    p_all = get_L5PyrIT_params()
+
+   
+    # basal dendrites
+    gbar_NaTs2_t = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_basal_gbar_NaTs2_t']*0.5, gdend=0, xkink=255)
+    gbar_SKv3_1 = partial(_linear_g_at_dist, gsoma=0, gdend=p_all['L5Pyr_basal_gbar_SKv3_1']*0.5, xkink=255)
+
+
+    override_params = dict()
+
+    override_params['L5Pyr_basal_gbar_NaTs2_t'] = gbar_NaTs2_t
+    override_params['L5Pyr_basal_gbar_SKv3_1'] = gbar_SKv3_1
+
+
+
+    p_all = compare_dictionaries(p_all, override_params)
+
+    end_pts = {
+            'soma': [[0, 0, 0], [0, 0, 23]],
+            'apical_trunk': [[0, 0, 23], [0, 0, 83]],
+            'apical_oblique': [[0, 0, 83], [-150, 0, 83]],
+            'apical_1': [[0, 0, 83], [0, 0, 483]],
+            'apical_2': [[0, 0, 483], [0, 0, 883]],
+            'apical_tuft': [[0, 0, 883], [0, 0, 1133]],
+            'basal_1': [[0, 0, 0], [0, 0, -50]],
+            'basal_2': [[0, 0, -50], [-106, 0, -156]],
+            'basal_3': [[0, 0, -50], [106, 0, -156]]
+        }
+
+    cell_tree = {
+            ('apical_trunk', 0): [('apical_trunk', 1)],
+            ('apical_1', 0): [('apical_1', 1)],
+            ('apical_2', 0): [('apical_2', 1)],
+            ('apical_tuft', 0): [('apical_tuft', 1)],
+            ('apical_oblique', 0): [('apical_oblique', 1)],
+            ('basal_1', 0): [('basal_1', 1)],
+            ('basal_2', 0): [('basal_2', 1)],
+            ('basal_3', 0): [('basal_3', 1)],
+            # Different sections connected
+            ('soma', 0): [('soma', 1), ('basal_1', 0)],
+            ('soma', 1): [('apical_trunk', 0)],
+            ('apical_trunk', 1): [('apical_1', 0), ('apical_oblique', 0)],
+            ('apical_1', 1): [('apical_2', 0)],
+            ('apical_2', 1): [('apical_tuft', 0)],
+            ('basal_1', 1): [('basal_2', 0), ('basal_3', 0)]
+            }
+
+    # build sections
+    section_names = list(end_pts.keys())
+
+    # initialize section voltage
+    v_init = {'soma': -64,
+                'basal_1': -64,
+                'basal_2': -64,
+                'basal_3': -64,
+                'apical_oblique': -64,
+                'apical_trunk': -64,
+                'apical_1': -64,
+                'apical_2': -60,
+                'apical_tuft': -58}
+
+    sections_apcl = _get_dends(p_all, 'L5Pyr', section_names=['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft'], v_init={'all':-68})
+    sections_basal = _get_basal(p_all, 'L5Pyr', section_names=['basal_1', 'basal_2', 'basal_3', 'apical_oblique'], v_init={'all':-68})
+
+    sections = {**sections_apcl, **sections_basal}
+
+    sections['soma'] = _get_pyr_soma(p_all, 'L5Pyr', v_init=-68)
 
     # Soma and apical mechanisms
     mechanisms = {'NaTs2_t':['gbar_NaTs2_t'], 
