@@ -7,9 +7,10 @@ import hnn_core
 from hnn_core import read_params
 from .network import Network, _create_cell_coords
 from .params import _short_name
-from .cells_default import pyramidal_ca, pyramidal_l5, pyramidal_l23, interneuron
+from .cells_default import pyramidal_ca, pyramidal_l5ET, pyramidal_l23, interneuron
 from .externals.mne import _validate_type
 
+import random
 # ToDO -> direct _cell_L2Pyr calling
 
 
@@ -549,9 +550,9 @@ def new_calcium_model(params=None, add_drives_from_params=False,
     # L5
     cell_name = 'L5_pyramidal'
     pos = net.cell_types[cell_name].pos
-    net.cell_types[cell_name] = pyramidal_l5(
+    net.cell_types[cell_name] = pyramidal_l5ET(
         cell_name=_short_name(cell_name), pos=pos)
-    
+
     cell_name = 'L5_basket'
     pos = net.cell_types[cell_name].pos
     net.cell_types[cell_name] = interneuron(
@@ -569,6 +570,7 @@ def new_calcium_model(params=None, add_drives_from_params=False,
         cell_name=_short_name(cell_name), pos=pos)
     
     return net
+
 
 def add_erp_drives_to_jones_model(net, tstart=0.0):
     """Add drives necessary for an event related potential (ERP)
