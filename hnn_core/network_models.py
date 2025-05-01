@@ -423,7 +423,7 @@ def new_calcium_model(params=None, add_drives_from_params=False,
     for receptor in ['nmda', 'ampa']:
         key = f'gbar_{_short_name(target_cell)}_'\
                 f'{_short_name(target_cell)}_{receptor}'
-        weight = net._params[key]*2
+        weight = net._params[key]*2.5
         net.add_connection(
             target_cell, target_cell, loc, receptor, weight,
             delay, lamtha, allow_autapses=False)
@@ -453,7 +453,7 @@ def new_calcium_model(params=None, add_drives_from_params=False,
     
     receptor='gabab'
     key = f'gbar_L2Basket_L2Pyr_{receptor}'
-    weight = net._params[key]*0.5
+    weight = net._params[key]*0.75
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
         
