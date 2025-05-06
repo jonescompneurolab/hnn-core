@@ -1,28 +1,11 @@
 (install)=
-# Using HNN in the cloud (no installation necessary)
-
-If you want to try out HNN *without installing it locally* on your computer first, there are several methods:
-
-### NSG cloud method
-
-HNN is installed for your use on the [Neuroscience Gateway (NSG) Portal](https://nsgprod.sdsc.edu:8443/portal2/login!input.action). To use HNN on this free resource, you should:
-
-1. Login at [https://nsgprod.sdsc.edu:8443/portal2/login!input.action](https://nsgprod.sdsc.edu:8443/portal2/login!input.action) or follow the link on that page to create a new account.
-2. Follow the instructions at [https://users.sdsc.edu/~kenneth/hnn/index.html](https://users.sdsc.edu/~kenneth/hnn/index.html). Note that you must right-click and save the provided files like `benchmark_hnn_core_runtime.py` directly from the webpage if you want to use them.
-
-Please note that currently, HNN on NSG is using the previous version (v0.3), and only CORE functionality (not GUI) is supported. We will be updating NSG to use the most recent HNN version very soon.
-
-### Google CoLab cloud method
-
-[You can click here to open our Google CoLab notebook](https://colab.research.google.com/drive/1yyjuEBimIu_f7_0Nf3YLwUiVOO7ZrKK3?usp=sharing) which will run the HNN GUI in your browser. This is the simplest way to use HNN, but the simulations will take notably longer. This method does require a Google account, but the resources are **free** and allow you to run HNN GUI **at no charge**. To run the notebook, click "Runtime" then "Run all", and follow the instructions carefully.
-
---------------
-
 # Installation Guide
 
 If you have any questions or problems while installing `hnn_core`, feel free to
 ask for help [on our GitHub Discussions
 page](https://github.com/jonescompneurolab/hnn-core/discussions)!
+
+If you wish to try out HNN in the cloud without installing it locally, see the [Installation page at the HNN Textbook](https://dylansdaniels.github.io/website_redesign/content/01_getting_started/installation.html).
 
 Please follow the instructions in Steps 1, 2, and 3, in that order.
 
