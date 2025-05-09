@@ -423,7 +423,7 @@ def new_calcium_model(params=None, add_drives_from_params=False,
     for receptor in ['nmda', 'ampa']:
         key = f'gbar_{_short_name(target_cell)}_'\
                 f'{_short_name(target_cell)}_{receptor}'
-        weight = net._params[key]*2.
+        weight = net._params[key]*2
         net.add_connection(
             target_cell, target_cell, loc, receptor, weight,
             delay, lamtha, allow_autapses=False)
@@ -432,7 +432,7 @@ def new_calcium_model(params=None, add_drives_from_params=False,
     for receptor in ['nmda', 'ampa']:
         key = f'gbar_{_short_name(target_cell)}_'\
                 f'{_short_name(target_cell)}_{receptor}'
-        weight = 0.0005
+        weight = net._params[key]
 
         net.add_connection(
             target_cell, target_cell, loc, receptor, weight,
@@ -480,7 +480,7 @@ def new_calcium_model(params=None, add_drives_from_params=False,
     receptor = 'ampa'
     for loc in ['proximal', 'distal']:
         key = f'gbar_L2Pyr_{_short_name(target_cell)}'
-        weight = 0.001125
+        weight = net._params[key]*6
         net.add_connection(
             src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
@@ -499,7 +499,7 @@ def new_calcium_model(params=None, add_drives_from_params=False,
     target_cell = 'L2_basket'
     lamtha = 3.
     key = f'gbar_L2Pyr_{_short_name(target_cell)}'
-    weight = 0.00025
+    weight = net._params[key]*1.5
     loc = 'soma'
     receptor = 'ampa'
     net.add_connection(
