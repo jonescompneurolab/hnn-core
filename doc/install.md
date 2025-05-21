@@ -6,6 +6,8 @@ ask for help on [our GitHub Discussions page][]!
 
 If you wish to try out HNN-Core in the cloud without installing it locally, see the [Installation page at the HNN Textbook](https://dylansdaniels.github.io/website_redesign/content/01_getting_started/installation.html).
 
+Note: If you are at Brown University and trying to install HNN-Core on the OSCAR system, you should **not** follow these instructions, and instead follow the [instructions here](https://github.com/jonescompneurolab/oscar-install).
+
 --------------
 
 # `conda` Installation
