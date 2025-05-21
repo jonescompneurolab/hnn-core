@@ -194,7 +194,7 @@ Many of the examples on [our HNN Textbook website][] make use of Joblib support,
 
 If you want to use MPI, we recommend you first try to install our `conda` package detailed [at the top of the page](#conda-installation). Otherwise, we **strongly** recommend you use the [Anaconda Python Distribution](https://www.anaconda.com/download/success) specifically, since Anaconda is the easiest way to download [OpenMPI](https://anaconda.org/conda-forge/openmpi) binaries, which are *not* Python code. If you need to use your own specific MPI binaries/libraries (such as if you are installing on an HPC platform) and you need help, then let us know on [our Github Discussions page][].
 
-To install HNN-Core with its MPI dependendencies using the `pip` method, follow the below instructions for your operating system.
+To install HNN-Core with its MPI dependencies using the `pip` method, follow the below instructions for your operating system.
 
 #### `pip` MPI: Windows
 
