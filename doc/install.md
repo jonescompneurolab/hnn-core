@@ -12,11 +12,16 @@ Note: If you are at Brown University and trying to install HNN-Core on the OSCAR
 
 # `conda` Installation
 
-We *strongly* recommend that you install HNN-Core from our Anaconda package instead of from `pip`. This `conda` package includes all features (GUI, Optimization, and both Parallelism features), a working installation of OpenMPI, and is significantly easier to install. Follow the below instructions for your operating system.
+We recommend that you install HNN-Core from our Anaconda package instead of from `pip`. This `conda` package includes all features (GUI, Optimization, and both Parallelism features), a working installation of OpenMPI, and is significantly easier to install.
 
-The only exception is if you are using a High-Performance Computing (HPC) environment (also called a computing cluster or supercomputer). The `conda` installation may work on your HPC, but if you want to use your own MPI libraries, you can try our [`pip` MPI method](#pip-mpi-macos-or-linux), and you can always ask us for help at [our Github Discussions page][].
+The only exceptions are if:
+
+1. You want to install HNN-Core alongside MNE. In that case, we recommend you use the one of the below [`pip` Installation](#pip-installation) methods.
+2. You are using a High-Performance Computing (HPC) environment (also called a computing cluster or supercomputer). The `conda` installation may work on your HPC, but if you want to use your own MPI libraries, you can try our [`pip` MPI method](#pip-mpi-macos-or-linux), and you can always ask us for help at [our Github Discussions page][].
 
 If you want a minimal install of only the HNN-Core API using `conda`, then follow the instructions below, but replace the package name `hnn-core-all` with `hnn-core`.
+
+Follow the below instructions for your operating system.
 
 ## `conda` MacOS or Linux
 
@@ -89,7 +94,7 @@ If you see output similar to `WARNING: Your machine hardware does not appear to 
 
 # `pip` Installation
 
-Alternatively, you can install HNN-Core through `pip` if you want to contribute to development, only want certain features, or have issues with the `conda` install method. If using the `pip` method, please follow the instructions in Steps 1, 2, and 3, in that order. Again, we recommend the above `conda` method over the below `pip` methods.
+Alternatively, you can install HNN-Core through `pip` if you want install it alongside MNE, to contribute to development, only want certain features, or have issues with the `conda` install method. If using the `pip` method, please follow the instructions in Steps 1, 2, and 3, in that order.
 
 ## Step 1. `pip` Python Environment
 
