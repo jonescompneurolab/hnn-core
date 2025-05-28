@@ -492,309 +492,262 @@ document.write(`
                   
   <section id="installation-guide">
 <span id="install"></span><h1>Installation Guide<a class="headerlink" href="#installation-guide" title="Permalink to this heading">#</a></h1>
-<p>If you have any questions or problems while installing <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code>, feel free to
-ask for help <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/discussions">on our GitHub Discussions
-page</a>!</p>
-<p>If you wish to try out HNN in the cloud without installing it locally, see the <a class="reference external" href="https://dylansdaniels.github.io/website_redesign/content/01_getting_started/installation.html">Installation page at the HNN Textbook</a>.</p>
-<p>Please follow the instructions in Steps 1, 2, and 3, in that order.</p>
+<p>If you have any questions or problems while installing HNN-Core, feel free to
+ask for help on <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/discussions">our GitHub Discussions page</a>!</p>
+<p>If you wish to try out HNN-Core in the cloud without installing it locally, see the <a class="reference external" href="https://dylansdaniels.github.io/website_redesign/content/01_getting_started/installation.html">Installation page at the HNN Textbook</a>.</p>
+<p>Note: If you are at Brown University and trying to install HNN-Core on the OSCAR system, you should <strong>not</strong> follow these instructions, and instead follow the <a class="reference external" href="https://github.com/jonescompneurolab/oscar-install">instructions here</a>.</p>
 </section>
 <hr class="docutils" />
-<section id="step-1-python-environment">
-<h1>Step 1. Python Environment<a class="headerlink" href="#step-1-python-environment" title="Permalink to this heading">#</a></h1>
-<p>We strongly recommend that you install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> inside a “virtual
-environment” using software like the <a class="reference external" href="https://www.anaconda.com/download/success">Anaconda Python
-Distribution</a>. If you
-are new to Python or data science in Python, we recommend you review the
-resources here: <a class="reference external" href="https://docs.anaconda.com/getting-started/">https://docs.anaconda.com/getting-started/</a>.</p>
-<p>Note that <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> currently only supports Python 3.8, 3.9, 3.10, 3.11, and 3.12, but <em>not</em> 3.13.</p>
+<section id="conda-installation">
+<h1><code class="docutils literal notranslate"><span class="pre">conda</span></code> Installation<a class="headerlink" href="#conda-installation" title="Permalink to this heading">#</a></h1>
+<p>We recommend that you install HNN-Core from our Anaconda package instead of from <code class="docutils literal notranslate"><span class="pre">pip</span></code>. This <code class="docutils literal notranslate"><span class="pre">conda</span></code> package includes all features (GUI, Optimization, and both Parallelism features), a working installation of OpenMPI, and is significantly easier to install.</p>
+<p>The only exceptions are if:</p>
+<ol class="arabic simple">
+<li><p>You want to install HNN-Core alongside MNE. In that case, we recommend you use the one of the below <a class="reference internal" href="#pip-installation"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">pip</span></code> Installation</span></a> methods.</p></li>
+<li><p>You are using a High-Performance Computing (HPC) environment (also called a computing cluster or supercomputer). The <code class="docutils literal notranslate"><span class="pre">conda</span></code> installation may work on your HPC, but if you want to use your own MPI libraries, you can try our <a class="reference internal" href="#pip-mpi-macos-or-linux"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI method</span></a>, and you can always ask us for help at <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/discussions">our Github Discussions page</a>.</p></li>
+</ol>
+<p>If you want a minimal install of only the HNN-Core API using <code class="docutils literal notranslate"><span class="pre">conda</span></code>, then follow the instructions below, but replace the package name <code class="docutils literal notranslate"><span class="pre">hnn-core-all</span></code> with <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>.</p>
+<p>Follow the below instructions for your operating system.</p>
+<section id="conda-macos-or-linux">
+<h2><code class="docutils literal notranslate"><span class="pre">conda</span></code> MacOS or Linux<a class="headerlink" href="#conda-macos-or-linux" title="Permalink to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Install the <a class="reference external" href="https://www.anaconda.com/download/success">Anaconda Python Distribution</a>.</p></li>
+<li><p>Open a Terminal, then create and activate a new Python 3.12 environment by running the following commands:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">y</span> <span class="o">-</span><span class="n">q</span> <span class="o">-</span><span class="n">n</span> <span class="n">hnn</span><span class="o">-</span><span class="n">core</span><span class="o">-</span><span class="n">env</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.12</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">hnn</span><span class="o">-</span><span class="n">core</span><span class="o">-</span><span class="n">env</span>
+</pre></div>
+</div>
+<p>If desired, you can change the environment name <code class="docutils literal notranslate"><span class="pre">hnn-core-env</span></code> to whatever you wish. If you are new to Python or
+data science in Python, we recommend you review the resources here:
+<a class="reference external" href="https://docs.anaconda.com/getting-started/">https://docs.anaconda.com/getting-started/</a>.</p>
+<ol class="arabic simple" start="3">
+<li><p>Install our package using the following command:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="n">hnn</span><span class="o">-</span><span class="n">core</span><span class="o">-</span><span class="nb">all</span> <span class="o">-</span><span class="n">c</span> <span class="n">jonescompneurolab</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>Run the following command, and write down the number that is output. You can use this number as the number of CPU “Cores”, which will <em>greatly</em> speed up your simulations.</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;import psutil ; print(psutil.cpu_count(logical=False)-1)&quot;</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="5">
+<li><p>That’s it! HNN-Core should now be installed. Proceed to <a class="reference external" href="https://dylansdaniels.github.io/website_redesign/content/preface.html">our HNN Textbook website</a> to get started using HNN.</p></li>
+<li><p>Note: The next time you need to re-enter the Conda Environment, all you need to do is run <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">activate</span> <span class="pre">hnn-core-env</span></code>. From there, you can either run Python code using the HNN-Core API that you have written, or start the GUI using the <code class="docutils literal notranslate"><span class="pre">hnn-gui</span></code> command.</p></li>
+</ol>
+</section>
+<section id="conda-windows">
+<h2><code class="docutils literal notranslate"><span class="pre">conda</span></code> Windows<a class="headerlink" href="#conda-windows" title="Permalink to this heading">#</a></h2>
+<p>For Windows users, there are some extra steps needed since you need to install HNN-Core through “Windows Subsystem for Linux” (WSL).</p>
+<ol class="arabic simple">
+<li><p>Install WSL: Open the “PowerShell” or “Windows Command Prompt” programs in administrator mode by right-clicking the program icon and selecting “Run as administrator”. Then, in the window, run the following command:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wsl</span> <span class="o">--</span><span class="n">install</span>
+</pre></div>
+</div>
+<p>Follow the default options for your install. For more information, see <a class="reference external" href="https://learn.microsoft.com/en-us/windows/wsl/install">https://learn.microsoft.com/en-us/windows/wsl/install</a>.</p>
+<ol class="arabic simple" start="2">
+<li><p>Close the PowerShell or Command Prompt window.</p></li>
+<li><p>You will now have a new App available from the Start Menu called <code class="docutils literal notranslate"><span class="pre">Ubuntu</span></code>. Run that app.</p></li>
+<li><p>The first time you start Ubuntu, it will prompt you to <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">a</span> <span class="pre">default</span> <span class="pre">Unix</span> <span class="pre">user</span> <span class="pre">account</span></code> and ask for a password. If you provide a password, write it down.</p></li>
+<li><p>You should now see a prompt and a blinking cursor similar to PowerShell/Command Prompt. Copy and paste the following commands. If you entered a password in Step 4, enter that when it prompts you for your password.</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>build-essential
+sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>wget
+</pre></div>
+</div>
+<ol class="arabic simple" start="6">
+<li><p>In the same window, copy and paste the following commands, then follow the prompts. We strongly recommend that when you are asked  <code class="docutils literal notranslate"><span class="pre">Do</span> <span class="pre">you</span> <span class="pre">wish</span> <span class="pre">to</span> <span class="pre">update</span> <span class="pre">your</span> <span class="pre">shell</span> <span class="pre">profile</span> <span class="pre">to</span> <span class="pre">automatically</span> <span class="pre">initialize</span> <span class="pre">conda?</span></code> you enter <code class="docutils literal notranslate"><span class="pre">yes</span></code>. If you do not, then you will have to manually activate Conda whenever you open your Ubuntu app using the command this program provides at the end.</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget<span class="w"> </span>https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash<span class="w"> </span>Miniconda3-latest-Linux-x86_64.sh
+</pre></div>
+</div>
+<p>If you see output similar to <code class="docutils literal notranslate"><span class="pre">WARNING:</span> <span class="pre">Your</span> <span class="pre">machine</span> <span class="pre">hardware</span> <span class="pre">does</span> <span class="pre">not</span> <span class="pre">appear</span> <span class="pre">to</span> <span class="pre">be</span> <span class="pre">x86_64</span></code>, then please contact us via <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/discussions">our Github Discussions page</a>. You may be able to install by using <a class="reference external" href="https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh">https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh</a> instead.</p>
+<ol class="arabic simple" start="7">
+<li><p>Close the Ubuntu window, then open a new one. Your prompt should now show <code class="docutils literal notranslate"><span class="pre">(base)</span></code> at the beginning.</p></li>
+<li><p>Inside this window, follow the steps above in the <a class="reference internal" href="#conda-macos-or-linux"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">conda</span></code> MacOS or Linux</span></a> section, then return here.</p></li>
+<li><p>HNN-Core should now be installed!</p></li>
+<li><p>Note: On Windows, every time you start the GUI, you will need to navigate to <a class="reference external" href="http://localhost:8866">http://localhost:8866</a> in your browser (or refresh if you are already on the page).</p></li>
+</ol>
+</section>
 </section>
 <hr class="docutils" />
-<section id="step-2-platform-specific-requirements">
-<h1>Step 2. Platform-specific requirements<a class="headerlink" href="#step-2-platform-specific-requirements" title="Permalink to this heading">#</a></h1>
-<section id="windows">
-<h2>Windows<a class="headerlink" href="#windows" title="Permalink to this heading">#</a></h2>
-<ul>
-<li><p>Before you install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code>, it is important that you <strong>install</strong> the
-<a class="reference external" href="https://nrn.readthedocs.io/">NEURON</a> software system-wide using its <a class="reference external" href="https://nrn.readthedocs.io/en/latest/install/install_instructions.html#windows">Windows-specific
-binaries</a>. You
-can test that NEURON was installed correctly by opening a Command Prompt (or
-similar) via your Anaconda install, and running the following command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -c &quot;import neuron;&quot;
-</pre></div>
-</div>
-</li>
-</ul>
+<section id="pip-installation">
+<h1><code class="docutils literal notranslate"><span class="pre">pip</span></code> Installation<a class="headerlink" href="#pip-installation" title="Permalink to this heading">#</a></h1>
+<p>Alternatively, you can install HNN-Core through <code class="docutils literal notranslate"><span class="pre">pip</span></code> if you want install it alongside MNE, to contribute to development, only want certain features, or have issues with the <code class="docutils literal notranslate"><span class="pre">conda</span></code> install method. If using the <code class="docutils literal notranslate"><span class="pre">pip</span></code> method, please follow the instructions in Steps 1, 2, and 3, in that order.</p>
+<section id="step-1-pip-python-environment">
+<h2>Step 1. <code class="docutils literal notranslate"><span class="pre">pip</span></code> Python Environment<a class="headerlink" href="#step-1-pip-python-environment" title="Permalink to this heading">#</a></h2>
+<p>We strongly recommend that you install HNN-Core inside a “virtual environment” using software like the <a class="reference external" href="https://www.anaconda.com/download/success">Anaconda Python Distribution</a>. If you are new to Python or data science in Python, we recommend you review the resources here: <a class="reference external" href="https://docs.anaconda.com/getting-started/">https://docs.anaconda.com/getting-started/</a>.</p>
+<p>Note that if you use a virtual environment, you must first create the environment, and then separately <em>activate</em> the environment (see <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#activating-an-environment">Conda guidance here</a>) before running any of the commands below. <strong>All of the installation commands below assume you have already activated your environment</strong>. You may need to re-activate your environment every time you restart your computer or open a new terminal, depending on how you installed your virtual environment software.</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> currently only supports Python 3.8, 3.9, 3.10, 3.11, and 3.12, but <em>not</em> 3.13.</p>
 </section>
-<section id="macos">
-<h2>MacOS<a class="headerlink" href="#macos" title="Permalink to this heading">#</a></h2>
-<ul>
-<li><p>If you already installed the <a class="reference external" href="https://nrn.readthedocs.io/">NEURON</a> software system-wide using its
-traditional installer package, it is recommended to <strong>remove it</strong> first. We
-will be installing NEURON using its PyPI package alongside <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code>.</p></li>
-<li><p>Before you install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code>, it is important that you install “Xcode
-Command-Line Tools”.  This can be done easily by opening a Terminal and
-running the following command (followed by clicking through the prompts):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ xcode-select --install
-</pre></div>
-</div>
-</li>
-</ul>
-</section>
-<section id="linux">
-<h2>Linux<a class="headerlink" href="#linux" title="Permalink to this heading">#</a></h2>
+<section id="step-2-pip-platform-specific-requirements">
+<h2>Step 2. <code class="docutils literal notranslate"><span class="pre">pip</span></code> Platform-specific requirements<a class="headerlink" href="#step-2-pip-platform-specific-requirements" title="Permalink to this heading">#</a></h2>
+<section id="pip-on-macos">
+<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> on MacOS<a class="headerlink" href="#pip-on-macos" title="Permalink to this heading">#</a></h3>
 <ul class="simple">
 <li><p>If you already installed the <a class="reference external" href="https://nrn.readthedocs.io/">NEURON</a> software system-wide using its
 traditional installer package, it is recommended to <strong>remove it</strong> first. We
-will be installing NEURON using its PyPI package alongside <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code>.</p></li>
+will be installing NEURON using its PyPI package.</p></li>
+<li><p>Before you install HNN-Core, it is important that you install “Xcode Command-Line Tools”. This can be done easily by opening a Terminal, running the following command, and then clicking through the prompts in the window that will pop up. Note that you must restart your computer after Xcode Command-Line Tools has finished installing!</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">xcode</span><span class="o">-</span><span class="n">select</span> <span class="o">--</span><span class="n">install</span>
+</pre></div>
+</div>
+<p>If you run the above command and see output that resembles <code class="docutils literal notranslate"><span class="pre">xcode-select:</span> <span class="pre">note:</span> <span class="pre">Command</span> <span class="pre">line</span> <span class="pre">tools</span> <span class="pre">are</span> <span class="pre">already</span> <span class="pre">installed.</span></code>, then you already have it installed, do not need to restart your computer, and can proceed to the next step.</p>
+</section>
+<section id="pip-on-linux">
+<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> on Linux<a class="headerlink" href="#pip-on-linux" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>If you already installed the <a class="reference external" href="https://nrn.readthedocs.io/">NEURON</a> software system-wide using its
+traditional installer package, it is recommended to <strong>remove it</strong> first. We
+will be installing NEURON using its PyPI package.</p></li>
 </ul>
 </section>
+<section id="pip-on-windows">
+<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> on Windows<a class="headerlink" href="#pip-on-windows" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Before you install HNN-Core, it is important that you <strong>install</strong> the <a class="reference external" href="https://nrn.readthedocs.io/">NEURON</a> software system-wide using its <a class="reference external" href="https://nrn.readthedocs.io/en/latest/install/install_instructions.html#windows">Windows-specific binaries</a>. You can test that NEURON was installed correctly by opening a Command Prompt (or similar) via your Anaconda install (or virtual environment), and running the following command:</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;import neuron&quot;</span>
+</pre></div>
+</div>
 </section>
-<hr class="docutils" />
-<section id="step-3-hnn-core-installation-types">
-<h1>Step 3. <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> installation types<a class="headerlink" href="#step-3-hnn-core-installation-types" title="Permalink to this heading">#</a></h1>
-<p>Note that Step 1 and Step 2 above are required for <strong>all installation types</strong>. Note that you can install multiple sets of HNN features below during the install process by combining them similar to <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;hnn_core[gui,parallel]&quot;</span></code>.</p>
-<section id="basic-installation">
-<h2>Basic Installation<a class="headerlink" href="#basic-installation" title="Permalink to this heading">#</a></h2>
-<p>To install just the <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> API, open a Terminal or Command Prompt using a fresh virtual
+</section>
+<section id="step-3-pip-installation-types">
+<h2>Step 3. <code class="docutils literal notranslate"><span class="pre">pip</span></code> installation types<a class="headerlink" href="#step-3-pip-installation-types" title="Permalink to this heading">#</a></h2>
+<p>Note that you can install multiple sets of HNN-Core features below by combining them similar to <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;hnn_core[gui,parallel]&quot;</span></code>.</p>
+<section id="pip-basic-installation">
+<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> Basic Installation<a class="headerlink" href="#pip-basic-installation" title="Permalink to this heading">#</a></h3>
+<p>To install only the <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> API, open a Terminal or Command Prompt using a fresh virtual
 environment, and enter:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pip install hnn_core
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">hnn_core</span>
 </pre></div>
 </div>
-<p>This will install only the <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> API along with its required
-dependencies, which include:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://numpy.org/">NumPy</a></p></li>
-<li><p><a class="reference external" href="https://scipy.org/">SciPy</a></p></li>
-<li><p><a class="reference external" href="https://matplotlib.org/">Matplotlib</a></p></li>
-<li><p><a class="reference external" href="https://nrn.readthedocs.io/">NEURON</a> (&gt;=7.7)</p></li>
-<li><p><a class="reference external" href="https://github.com/h5io/h5io">h5io</a></p></li>
-</ul>
-<p>To check if everything worked fine, you can run:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ python -c &quot;import hnn_core&quot;
+<p>This will install only the <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> API along with its required dependencies, which include: <a class="reference external" href="https://numpy.org/">NumPy</a>, <a class="reference external" href="https://scipy.org/">SciPy</a>, <a class="reference external" href="https://matplotlib.org/">Matplotlib</a>, <a class="reference external" href="https://nrn.readthedocs.io/">NEURON</a> (&gt;=7.7), and <a class="reference external" href="https://github.com/h5io/h5io">h5io</a>. To check if everything worked fine, you can run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;from hnn_core import jones_2009_model, simulate_dipole ; simulate_dipole(jones_2009_model(), tstop=20)&quot;</span>
 </pre></div>
 </div>
-<p>and it should not give any error messages.</p>
-<p><strong>Basic Usage</strong>: For how to use the <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> API, which is available for every installation
-type, see our extensive <a class="reference internal" href="auto_examples/index.html"><span class="doc">Examples page</span></a>.</p>
+<p>This will run a very short test simulation, and should not give any Error messages (Warning messages are fine and expected). For how to use the <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> API, see <a class="reference external" href="https://dylansdaniels.github.io/website_redesign/content/preface.html">our HNN Textbook website</a>, including examples like our <a class="reference external" href="https://dylansdaniels.github.io/website_redesign/content/05_erps/hnn_core.html">API tutorial of ERP simulation</a>. Our public API documentation <a class="reference internal" href="api.html"><span class="doc">can be found here</span></a>.</p>
 </section>
-<section id="graphical-user-interface-gui-installation">
-<h2>Graphical User Interface (GUI) Installation<a class="headerlink" href="#graphical-user-interface-gui-installation" title="Permalink to this heading">#</a></h2>
-<p>To install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> with both its API and GUI support, a simple tweak to the above command is
-needed (pay attention to the “quotes”):</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pip install &quot;hnn_core[gui]&quot;
+<section id="pip-graphical-user-interface-gui-installation">
+<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> Graphical User Interface (GUI) Installation<a class="headerlink" href="#pip-graphical-user-interface-gui-installation" title="Permalink to this heading">#</a></h3>
+<p>To install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> with both its API and GUI support, run the following command (make sure to include the “quotes”):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;hnn_core[gui]&quot;</span>
 </pre></div>
 </div>
 <p>This will install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code>, its API dependencies, and the additional GUI dependencies, which
-include:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://ipykernel.readthedocs.io/en/stable/">ipykernel</a></p></li>
-<li><p><a class="reference external" href="https://matplotlib.org/ipympl/">ipympl</a></p></li>
-<li><p><a class="reference external" href="https://github.com/jupyter-widgets/ipywidgets">ipywidgets</a> &gt;=8.0.0</p></li>
-<li><p><a class="reference external" href="https://github.com/voila-dashboards/voila">voila</a></p></li>
-</ul>
-<p><strong>GUI Usage</strong>: To start the GUI, simply run:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ hnn-gui
+include: <a class="reference external" href="https://ipykernel.readthedocs.io/en/stable/">ipykernel</a>, <a class="reference external" href="https://matplotlib.org/ipympl/">ipympl</a>, <a class="reference external" href="https://github.com/jupyter-widgets/ipywidgets">ipywidgets</a> &gt;=8.0.0, and <a class="reference external" href="https://github.com/voila-dashboards/voila">voila</a>.</p>
+<p>To start the GUI, simply run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hnn</span><span class="o">-</span><span class="n">gui</span>
 </pre></div>
 </div>
+<p>For further guidance on using the GUI, see <a class="reference external" href="https://dylansdaniels.github.io/website_redesign/content/preface.html">our HNN Textbook website</a>, including examples like our <a class="reference external" href="https://dylansdaniels.github.io/website_redesign/content/05_erps/erps_in_gui.html">GUI tutorial of ERPs</a>.</p>
 </section>
-<section id="optimization-installation">
-<h2>Optimization Installation<a class="headerlink" href="#optimization-installation" title="Permalink to this heading">#</a></h2>
+<section id="pip-optimization-installation">
+<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> Optimization Installation<a class="headerlink" href="#pip-optimization-installation" title="Permalink to this heading">#</a></h3>
 <p>If you would like to use Bayesian optimization, then
 <a class="reference external" href="https://scikit-learn.org/stable/index.html"><code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code></a> is required. You
 can easily install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code>, its API dependencies, and its optimization
-dependencies using the following command (pay attention to the “quotes”):</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pip install &quot;hnn_core[opt]&quot;
+dependencies using the following command (make sure to include the “quotes”):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;hnn_core[opt]&quot;</span>
 </pre></div>
 </div>
-<p>If you are planning to use Optimization, it is strongly recommended to also
-install <a class="reference internal" href="#parallelism"><span class="xref myst">support for Parallelism, which can be found
-below</span></a>.</p>
-<p><strong>Optimization Usage</strong>: An example of how to use our Optimization support can be found <a class="reference internal" href="auto_examples/howto/optimize_evoked.html"><span class="doc">in the Example here</span></a>.</p>
+<p>If you are planning to use Optimization, it is recommended to also install Joblib support (see below). Instruction on how to use our Optimization support can be found on <a class="reference external" href="https://dylansdaniels.github.io/website_redesign/content/preface.html">our HNN Textbook website</a>, including this <a class="reference external" href="https://dylansdaniels.github.io/website_redesign/content/04_using_hnn/optimize_simulated_evoked_response_parameters.html">optimization tutorial</a>.</p>
 </section>
-<section id="parallelism">
-<h2>Parallelism<a class="headerlink" href="#parallelism" title="Permalink to this heading">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> supports two kinds of parallelism:</p>
-<ul class="simple">
-<li><p><a class="reference internal" href="#parallelism-joblib-installation"><span class="xref myst">Joblib parallelism</span></a>: <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> can take advantage of <a class="reference external" href="https://joblib.readthedocs.io/en/stable/">the Joblib
-library</a> in order to run multiple
-independent simulations simultaneously across multiple CPU processors (also called <a class="reference external" href="https://en.wikipedia.org/wiki/Embarrassingly_parallel">“embarrassingly parallel”
-jobs</a>).</p></li>
-<li><p><a class="reference internal" href="#parallelism-mpi-installation"><span class="xref myst">MPI parallelism</span></a>: <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> can take
-advantage of NEURON’s use of <a class="reference external" href="https://en.wikipedia.org/wiki/Message_Passing_Interface">the MPI
-protocol</a> to split
-neurons across CPU processors, greatly reducing simulation time as more cores
-are used. This is more complex than other installation methods, but offers the
-best single-simulation speed. Note that <a class="reference internal" href="#parallelism-mpi-windows"><span class="xref myst">we do not support MPI on
-Windows</span></a>.</p></li>
-</ul>
-</section>
-<section id="parallelism-joblib-installation">
-<h2>Parallelism: Joblib Installation<a class="headerlink" href="#parallelism-joblib-installation" title="Permalink to this heading">#</a></h2>
+<section id="pip-joblib-installation">
+<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> Joblib Installation<a class="headerlink" href="#pip-joblib-installation" title="Permalink to this heading">#</a></h3>
 <p>You can easily install the <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> API, its API dependencies, and its additional Joblib parallelism
-dependencies using the following command (pay attention to the “quotes”):</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pip install &quot;hnn_core[parallel]&quot;
+dependencies using the following command (make sure to include the “quotes”):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;hnn_core[parallel]&quot;</span>
 </pre></div>
 </div>
-<p>This automatically installs the following dependencies:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://joblib.readthedocs.io/en/stable/">Joblib</a></p></li>
-<li><p><a class="reference external" href="https://github.com/giampaolo/psutil">psutil</a></p></li>
-</ul>
-<p><strong>Parallelism: Joblib Usage</strong>:</p>
-<ul>
-<li><p>Once installed, you can run multiple trials simultaneously with only a small modification to your code, like this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <span class="n">JoblibBackend</span>
-
-<span class="c1"># set n_jobs to the number of trials to run in parallel with</span>
-<span class="c1"># Joblib (up to number of cores on system)</span>
-<span class="k">with</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-    <span class="n">dpls</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-</pre></div>
-</div>
-</li>
-<li><p>Some in-depth examples of Joblib usage for trials are available in the Examples <a class="reference internal" href="auto_examples/workflows/plot_simulate_alpha.html"><span class="doc">found here</span></a> and <a class="reference internal" href="auto_examples/workflows/plot_simulate_somato.html"><span class="doc">also here</span></a>.</p></li>
-<li><p>Joblib can also be used to simultaneously run multiple simulations across “batches” of simulation parameters, illustrated <a class="reference internal" href="auto_examples/howto/plot_batch_simulate.html"><span class="doc">in our Batch Simulation example</span></a>.</p></li>
-</ul>
+<p>This automatically installs the following dependencies: <a class="reference external" href="https://joblib.readthedocs.io/en/stable/">Joblib</a> and <a class="reference external" href="https://github.com/giampaolo/psutil">psutil</a>.</p>
+<p>Many of the examples on <a class="reference external" href="https://dylansdaniels.github.io/website_redesign/content/preface.html">our HNN Textbook website</a> make use of Joblib support, and we provide an explicit <a class="reference external" href="https://dylansdaniels.github.io/website_redesign/content/04_using_hnn/parallelism_joblib.html">tutorial for it here</a>.</p>
 </section>
-<section id="parallelism-mpi-installation">
-<h2>Parallelism: MPI Installation<a class="headerlink" href="#parallelism-mpi-installation" title="Permalink to this heading">#</a></h2>
-<p>For MPI installation, we <strong>strongly</strong> recommend you use the <a class="reference external" href="https://www.anaconda.com/download/success">Anaconda Python
-Distribution</a> specifically, since Anaconda is the easiest way to download <a class="reference external" href="https://anaconda.org/conda-forge/openmpi">OpenMPI</a> binaries, which are <em>not</em> Python code.</p>
-<section id="parallelism-mpi-windows">
-<h3>Parallelism: MPI: Windows<a class="headerlink" href="#parallelism-mpi-windows" title="Permalink to this heading">#</a></h3>
-<p>Unfortunately, we do not officially support MPI usage on Windows due to the
-complexity required. If this is a necessity for you and you do not have access
-to Linux/etc.-based HPC resources, please <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/discussions">get in touch via our GitHub
-Discussions
-page</a>. We may still
-be able to help.</p>
+<section id="pip-mpi-installation">
+<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI Installation<a class="headerlink" href="#pip-mpi-installation" title="Permalink to this heading">#</a></h3>
+<p>If you want to use MPI, we recommend you first try to install our <code class="docutils literal notranslate"><span class="pre">conda</span></code> package detailed <a class="reference internal" href="#conda-installation"><span class="xref myst">at the top of the page</span></a>. Otherwise, we <strong>strongly</strong> recommend you use the <a class="reference external" href="https://www.anaconda.com/download/success">Anaconda Python Distribution</a> specifically, since Anaconda is the easiest way to download <a class="reference external" href="https://anaconda.org/conda-forge/openmpi">OpenMPI</a> binaries, which are <em>not</em> Python code. If you need to use your own specific MPI binaries/libraries (such as if you are installing on an HPC platform) and you need help, then let us know on <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/discussions">our Github Discussions page</a>.</p>
+<p>To install HNN-Core with its MPI dependencies using the <code class="docutils literal notranslate"><span class="pre">pip</span></code> method, follow the below instructions for your operating system.</p>
+<section id="pip-mpi-windows">
+<h4><code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI: Windows<a class="headerlink" href="#pip-mpi-windows" title="Permalink to this heading">#</a></h4>
+<p>Unfortunately, we do not officially support MPI usage on native Windows due to the complexity required. However, we do support MPI through Windows Subsystem for Linux (WSL). To install <code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI support on WSL, follow the Steps 1 through 7 of the above <a class="reference internal" href="#conda-windows"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">conda</span></code> Windows guide</span></a>; this will install WSL and Miniconda. Then, inside your <code class="docutils literal notranslate"><span class="pre">Ubuntu</span></code> app window, follow the <code class="docutils literal notranslate"><span class="pre">pip</span></code> steps below for Linux, beginning with step 2.</p>
 </section>
-<section id="parallelism-mpi-macos">
-<h3>Parallelism: MPI: MacOS<a class="headerlink" href="#parallelism-mpi-macos" title="Permalink to this heading">#</a></h3>
-<ol class="arabic">
-<li><p>First, create and activate your <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment (but do not install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> yet).</p></li>
-<li><p>Inside your <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment, install the <code class="docutils literal notranslate"><span class="pre">conda-forge</span></code> versions of <a class="reference external" href="https://anaconda.org/conda-forge/openmpi">OpenMPI</a> and <a class="reference external" href="https://anaconda.org/conda-forge/mpi4py"><code class="docutils literal notranslate"><span class="pre">mpi4py</span></code></a> using the following command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install -y conda-forge::openmpi conda-forge::mpi4py
+<section id="pip-mpi-macos-or-linux">
+<h4><code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI: MacOS or Linux<a class="headerlink" href="#pip-mpi-macos-or-linux" title="Permalink to this heading">#</a></h4>
+<ol class="arabic simple">
+<li><p>Install the <a class="reference external" href="https://www.anaconda.com/download/success">Anaconda Python Distribution</a>.</p></li>
+<li><p>Create and activate a new <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment using commands like the following:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">y</span> <span class="o">-</span><span class="n">q</span> <span class="o">-</span><span class="n">n</span> <span class="n">hnn</span><span class="o">-</span><span class="n">core</span><span class="o">-</span><span class="n">env</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.12</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">hnn</span><span class="o">-</span><span class="n">core</span><span class="o">-</span><span class="n">env</span>
 </pre></div>
 </div>
-</li>
-<li><p>Next, copy, paste, and run the following commands to set some environment variables for your <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd ${CONDA_PREFIX}
-$ mkdir -p etc/conda/activate.d etc/conda/deactivate.d
-$ echo &quot;export OLD_DYLD_FALLBACK_LIBRARY_PATH=\$DYLD_FALLBACK_LIBRARY_PATH&quot; &gt;&gt; etc/conda/activate.d/env_vars.sh
-$ echo &quot;export DYLD_FALLBACK_LIBRARY_PATH=\$DYLD_FALLBACK_LIBRARY_PATH:\${CONDA_PREFIX}/lib&quot; &gt;&gt; etc/conda/activate.d/env_vars.sh
-$ echo &quot;export DYLD_FALLBACK_LIBRARY_PATH=\$OLD_DYLD_FALLBACK_LIBRARY_PATH&quot; &gt;&gt; etc/conda/deactivate.d/env_vars.sh
-$ echo &quot;unset OLD_DYLD_FALLBACK_LIBRARY_PATH&quot; &gt;&gt; etc/conda/deactivate.d/env_vars.sh
-$ export OLD_DYLD_FALLBACK_LIBRARY_PATH=$DYLD_FALLBACK_LIBRARY_PATH
-$ export DYLD_FALLBACK_LIBRARY_PATH=$DYLD_FALLBACK_LIBRARY_PATH:${CONDA_PREFIX}/lib
+<p>If desired, you can change the environment name <code class="docutils literal notranslate"><span class="pre">hnn-core-env</span></code> to whatever you wish. Compatible Python versions currently include 3.8, 3.9, 3.10, 3.11, and 3.12, but <em>not</em> 3.13.</p>
+<ol class="arabic simple" start="3">
+<li><p>(MacOS only) Copy, paste, and run the following commands to set some environment variables for your <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>mkdir -p $CONDA_PREFIX/etc/conda/activate.d $CONDA_PREFIX/etc/conda/deactivate.d
+echo &quot;export OLD_DYLD_FALLBACK_LIBRARY_PATH=\$DYLD_FALLBACK_LIBRARY_PATH&quot; &gt;&gt; $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
+echo &quot;export DYLD_FALLBACK_LIBRARY_PATH=\$DYLD_FALLBACK_LIBRARY_PATH:\${CONDA_PREFIX}/lib&quot; &gt;&gt; $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
+echo &quot;export DYLD_FALLBACK_LIBRARY_PATH=\$OLD_DYLD_FALLBACK_LIBRARY_PATH&quot; &gt;&gt; $CONDA_PREFIX/etc/conda/deactivate.d/env_vars.sh
+echo &quot;unset OLD_DYLD_FALLBACK_LIBRARY_PATH&quot; &gt;&gt; $CONDA_PREFIX/etc/conda/deactivate.d/env_vars.sh
+export OLD_DYLD_FALLBACK_LIBRARY_PATH=$DYLD_FALLBACK_LIBRARY_PATH
+export DYLD_FALLBACK_LIBRARY_PATH=$LD_LIBRARY_PATH:${CONDA_PREFIX}/lib
 </pre></div>
 </div>
-</li>
-<li><p>Next, install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> with parallel support (pay attention to the “quotes”):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install &quot;hnn_core[parallel]&quot;
+<ol class="arabic simple" start="4">
+<li><p>(Linux only) Copy, paste, and run the following commands to set some environment variables for your <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>mkdir -p $CONDA_PREFIX/etc/conda/activate.d $CONDA_PREFIX/etc/conda/deactivate.d
+echo &quot;export OLD_LD_LIBRARY_PATH=\$LD_LIBRARY_PATH&quot; &gt;&gt; $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
+echo &quot;export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:\${CONDA_PREFIX}/lib&quot; &gt;&gt; $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
+echo &quot;export LD_LIBRARY_PATH=\$OLD_LD_LIBRARY_PATH&quot; &gt;&gt; $CONDA_PREFIX/etc/conda/deactivate.d/env_vars.sh
+echo &quot;unset OLD_LD_LIBRARY_PATH&quot; &gt;&gt; $CONDA_PREFIX/etc/conda/deactivate.d/env_vars.sh
+export OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CONDA_PREFIX}/lib
 </pre></div>
 </div>
-</li>
-<li><p>Finally, test that the install worked. Run the following command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mpiexec -np 2 nrniv -mpi -python -c &#39;from neuron import h; from mpi4py import MPI; \
-                                   print(f&quot;Hello from proc {MPI.COMM_WORLD.Get_rank()}&quot;); \
-                                   h.quit()&#39;
+<ol class="arabic simple" start="5">
+<li><p>Run the following command to install your MPI dependencies (if you have your own MPI binaries, change this step accordingly to load/etc. them):</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">y</span> <span class="o">-</span><span class="n">q</span> <span class="s2">&quot;openmpi&gt;5&quot;</span> <span class="n">mpi4py</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="6">
+<li><p>Finally, install the PyPI package of <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> using the following command (make sure to include the “quotes”):</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;hnn_core[parallel]&quot;</span>
+</pre></div>
+</div>
+<p>Note that you can add other HNN-Core features to the install by, for example, changing <code class="docutils literal notranslate"><span class="pre">[parallel]</span></code> in the above command to <code class="docutils literal notranslate"><span class="pre">[opt,parallel]</span></code>, etc.</p>
+<ol class="arabic simple" start="7">
+<li><p>Let’s test that the install worked. Run the following command:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mpiexec</span> <span class="o">-</span><span class="n">np</span> <span class="mi">2</span> <span class="n">nrniv</span> <span class="o">-</span><span class="n">mpi</span> <span class="o">-</span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s1">&#39;from neuron import h; from mpi4py import MPI; </span><span class="se">\</span>
+<span class="s1">                                   print(f&quot;Hello from proc {MPI.COMM_WORLD.Get_rank()}&quot;); </span><span class="se">\</span>
+<span class="s1">                                   h.quit()&#39;</span>
 </pre></div>
 </div>
 <p>You should see output the looks like the following; this verifies that MPI, NEURON, and Python are all working together.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">numprocs</span><span class="o">=</span><span class="mi">2</span>
-<span class="n">NEURON</span> <span class="o">--</span> <span class="n">VERSION</span> <span class="mf">7.7.2</span> <span class="mf">7.7</span> <span class="p">(</span><span class="mi">2</span><span class="n">b7985ba</span><span class="p">)</span> <span class="mi">2019</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">20</span>
-<span class="n">Duke</span><span class="p">,</span> <span class="n">Yale</span><span class="p">,</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">BlueBrain</span> <span class="n">Project</span> <span class="o">--</span> <span class="n">Copyright</span> <span class="mi">1984</span><span class="o">-</span><span class="mi">2018</span>
+<span class="n">NEURON</span> <span class="o">--</span> <span class="n">VERSION</span> <span class="mf">8.2.6</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">gb6e6a5fad</span><span class="o">+</span> <span class="n">build</span><span class="o">-</span><span class="n">osx</span><span class="o">-</span><span class="n">wheels</span><span class="o">-</span><span class="n">script</span> <span class="p">(</span><span class="n">b6e6a5fad</span><span class="o">+</span><span class="p">)</span> <span class="mi">2024</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">25</span>
+<span class="p">,</span> <span class="n">Yale</span><span class="p">,</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">BlueBrain</span> <span class="n">Project</span> <span class="o">--</span> <span class="n">Copyright</span> <span class="mi">1984</span><span class="o">-</span><span class="mi">2022</span>
 <span class="n">See</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">neuron</span><span class="o">.</span><span class="n">yale</span><span class="o">.</span><span class="n">edu</span><span class="o">/</span><span class="n">neuron</span><span class="o">/</span><span class="n">credits</span>
 
 <span class="n">Hello</span> <span class="kn">from</span><span class="w"> </span><span class="nn">proc</span> <span class="mi">0</span>
 <span class="n">Hello</span> <span class="kn">from</span><span class="w"> </span><span class="nn">proc</span> <span class="mi">1</span>
 </pre></div>
 </div>
-</li>
+<ol class="arabic simple" start="8">
+<li><p>You can find tutorials on how to use MPI parallelism on <a class="reference external" href="https://dylansdaniels.github.io/website_redesign/content/preface.html">our HNN Textbook website</a>, specifically on <a class="reference external" href="https://dylansdaniels.github.io/website_redesign/content/04_using_hnn/parallelism_mpi.html">our MPI tutorial here</a>.</p></li>
 </ol>
 </section>
-<section id="parallelism-mpi-linux">
-<h3>Parallelism: MPI: Linux<a class="headerlink" href="#parallelism-mpi-linux" title="Permalink to this heading">#</a></h3>
-<ul class="simple">
-<li><p>Note: these instructions are for installing <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> with MPI support on
-a <em>personal</em> Linux computer, not a High-Performance Computing (HPC) environment (also
-called a computing cluster or supercomputer). If you are on an HPC, then you
-should refer to your local HPC environment’s documentation on how to load the
-necessary MPI libraries/executables before installing <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code>. Feel free
-to reach out to us <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/discussions">via our GitHub Discussions
-page</a> if you are
-unsure or run into problems; we should be able to help you get it working.</p></li>
-</ul>
-<ol class="arabic">
-<li><p>First, create and activate your <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment (but do not install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> yet).</p></li>
-<li><p>Inside your <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment, install the <code class="docutils literal notranslate"><span class="pre">conda-forge</span></code> versions of <a class="reference external" href="https://anaconda.org/conda-forge/openmpi">OpenMPI</a> and <a class="reference external" href="https://anaconda.org/conda-forge/mpi4py"><code class="docutils literal notranslate"><span class="pre">mpi4py</span></code></a> using the following command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda install -y conda-forge::openmpi conda-forge::mpi4py
-</pre></div>
-</div>
-</li>
-<li><p>Next, copy, paste, and run the following commands to set some environment variables for your <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd ${CONDA_PREFIX}
-$ mkdir -p etc/conda/activate.d etc/conda/deactivate.d
-$ echo &quot;export OLD_LD_LIBRARY_PATH=\$LD_LIBRARY_PATH&quot; &gt;&gt; etc/conda/activate.d/env_vars.sh
-$ echo &quot;export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:\${CONDA_PREFIX}/lib&quot; &gt;&gt; etc/conda/activate.d/env_vars.sh
-$ echo &quot;export LD_LIBRARY_PATH=\$OLD_LD_LIBRARY_PATH&quot; &gt;&gt; etc/conda/deactivate.d/env_vars.sh
-$ echo &quot;unset OLD_LD_LIBRARY_PATH&quot; &gt;&gt; etc/conda/deactivate.d/env_vars.sh
-$ export OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
-$ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CONDA_PREFIX}/lib
-</pre></div>
-</div>
-</li>
-<li><p>Next, install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> with parallel support (pay attention to the “quotes”):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install &quot;hnn_core[parallel]&quot;
-</pre></div>
-</div>
-</li>
-<li><p>Finally, test that the install worked. Run the following command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mpiexec -np 2 nrniv -mpi -python -c &#39;from neuron import h; from mpi4py import MPI; \
-                                   print(f&quot;Hello from proc {MPI.COMM_WORLD.Get_rank()}&quot;); \
-                                   h.quit()&#39;
-</pre></div>
-</div>
-<p>You should see output the looks like the following; this verifies that MPI, NEURON, and Python are all working together.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">numprocs</span><span class="o">=</span><span class="mi">2</span>
-<span class="n">NEURON</span> <span class="o">--</span> <span class="n">VERSION</span> <span class="mf">7.7.2</span> <span class="mf">7.7</span> <span class="p">(</span><span class="mi">2</span><span class="n">b7985ba</span><span class="p">)</span> <span class="mi">2019</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">20</span>
-<span class="n">Duke</span><span class="p">,</span> <span class="n">Yale</span><span class="p">,</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">BlueBrain</span> <span class="n">Project</span> <span class="o">--</span> <span class="n">Copyright</span> <span class="mi">1984</span><span class="o">-</span><span class="mi">2018</span>
-<span class="n">See</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">neuron</span><span class="o">.</span><span class="n">yale</span><span class="o">.</span><span class="n">edu</span><span class="o">/</span><span class="n">neuron</span><span class="o">/</span><span class="n">credits</span>
-
-<span class="n">Hello</span> <span class="kn">from</span><span class="w"> </span><span class="nn">proc</span> <span class="mi">0</span>
-<span class="n">Hello</span> <span class="kn">from</span><span class="w"> </span><span class="nn">proc</span> <span class="mi">1</span>
-</pre></div>
-</div>
-</li>
-</ol>
 </section>
-<section id="parallelism-mpi-usage">
-<h3>Parallelism: MPI: Usage<a class="headerlink" href="#parallelism-mpi-usage" title="Permalink to this heading">#</a></h3>
-<ul>
-<li><p>Once installed, you can run any simulation using multiple CPU processors with only a small modification to your code, like this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <span class="n">MPIBackend</span>
-
-<span class="c1"># Set n_procs to the number of processors MPI can use (up to</span>
-<span class="c1"># number of cores on system). A different launch command can be</span>
-<span class="c1"># specified for MPI distributions other than openmpi.</span>
-<span class="k">with</span> <span class="n">MPIBackend</span><span class="p">(</span><span class="n">n_procs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">mpi_cmd</span><span class="o">=</span><span class="s1">&#39;mpiexec&#39;</span><span class="p">):</span>
-    <span class="n">dpls</span> <span class="o">=</span> <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-</pre></div>
-</div>
-</li>
-<li><p>An in-depth example of MPI usage is available in the <a class="reference internal" href="auto_examples/howto/plot_simulate_mpi_backend.html"><span class="doc">Example found here</span></a>.</p></li>
-</ul>
-</section>
-</section>
-<section id="installing-multiple-optional-hnn-core-features">
-<h2>Installing multiple optional <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> features<a class="headerlink" href="#installing-multiple-optional-hnn-core-features" title="Permalink to this heading">#</a></h2>
-<p>Note that you easily install multiple groups of optional features. For example,
-if you want to install both GUI support and Optimization support, then simply
-run the following:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pip install &quot;hnn_core[gui,opt]&quot;
-</pre></div>
-</div>
 </section>
 </section>
 
@@ -843,27 +796,31 @@ run the following:</p>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Installation Guide</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-python-environment">Step 1. Python Environment</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-platform-specific-requirements">Step 2. Platform-specific requirements</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#windows">Windows</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#macos">MacOS</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linux">Linux</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#conda-installation"><code class="docutils literal notranslate"><span class="pre">conda</span></code> Installation</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conda-macos-or-linux"><code class="docutils literal notranslate"><span class="pre">conda</span></code> MacOS or Linux</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conda-windows"><code class="docutils literal notranslate"><span class="pre">conda</span></code> Windows</a></li>
 </ul>
 </li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#step-3-hnn-core-installation-types">Step 3. <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> installation types</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-installation">Basic Installation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#graphical-user-interface-gui-installation">Graphical User Interface (GUI) Installation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#optimization-installation">Optimization Installation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parallelism">Parallelism</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parallelism-joblib-installation">Parallelism: Joblib Installation</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parallelism-mpi-installation">Parallelism: MPI Installation</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parallelism-mpi-windows">Parallelism: MPI: Windows</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parallelism-mpi-macos">Parallelism: MPI: MacOS</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parallelism-mpi-linux">Parallelism: MPI: Linux</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parallelism-mpi-usage">Parallelism: MPI: Usage</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#pip-installation"><code class="docutils literal notranslate"><span class="pre">pip</span></code> Installation</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-pip-python-environment">Step 1. <code class="docutils literal notranslate"><span class="pre">pip</span></code> Python Environment</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-pip-platform-specific-requirements">Step 2. <code class="docutils literal notranslate"><span class="pre">pip</span></code> Platform-specific requirements</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pip-on-macos"><code class="docutils literal notranslate"><span class="pre">pip</span></code> on MacOS</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pip-on-linux"><code class="docutils literal notranslate"><span class="pre">pip</span></code> on Linux</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pip-on-windows"><code class="docutils literal notranslate"><span class="pre">pip</span></code> on Windows</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-multiple-optional-hnn-core-features">Installing multiple optional <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> features</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-3-pip-installation-types">Step 3. <code class="docutils literal notranslate"><span class="pre">pip</span></code> installation types</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pip-basic-installation"><code class="docutils literal notranslate"><span class="pre">pip</span></code> Basic Installation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pip-graphical-user-interface-gui-installation"><code class="docutils literal notranslate"><span class="pre">pip</span></code> Graphical User Interface (GUI) Installation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pip-optimization-installation"><code class="docutils literal notranslate"><span class="pre">pip</span></code> Optimization Installation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pip-joblib-installation"><code class="docutils literal notranslate"><span class="pre">pip</span></code> Joblib Installation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pip-mpi-installation"><code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI Installation</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pip-mpi-windows"><code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI: Windows</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#pip-mpi-macos-or-linux"><code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI: MacOS or Linux</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
