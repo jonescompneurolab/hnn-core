@@ -100,17 +100,11 @@ Alternatively, you can install HNN-Core through `pip` if you want install it alo
 
 We strongly recommend that you install HNN-Core inside a "virtual environment" using software like the [Anaconda Python Distribution](https://www.anaconda.com/download/success). If you are new to Python or data science in Python, we recommend you review the resources here: <https://docs.anaconda.com/getting-started/>.
 
+Note that if you use a virtual environment, you must first create the environment, and then separately *activate* the environment (see [Conda guidance here](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#activating-an-environment)) before running any of the commands below. **All of the installation commands below assume you have already activated your environment**. You may need to re-activate your environment every time you restart your computer or open a new terminal, depending on how you installed your virtual environment software.
+
 Note that `hnn_core` currently only supports Python 3.8, 3.9, 3.10, 3.11, and 3.12, but *not* 3.13.
 
 ## Step 2. `pip` Platform-specific requirements
-
-### `pip` on Windows
-
-- Before you install HNN-Core, it is important that you **install** the [NEURON][] software system-wide using its [Windows-specific binaries](https://nrn.readthedocs.io/en/latest/install/install_instructions.html#windows). You can test that NEURON was installed correctly by opening a Command Prompt (or similar) via your Anaconda install (or virtual environment), and running the following command:
-
-```
-python -c "import neuron"
-```
 
 ### `pip` on MacOS
 
@@ -123,11 +117,21 @@ python -c "import neuron"
 xcode-select --install
 ```
 
+If you run the above command and see output that resembles `xcode-select: note: Command line tools are already installed.`, then you already have it installed, do not need to restart your computer, and can proceed to the next step.
+
 ### `pip` on Linux
 
 - If you already installed the [NEURON][] software system-wide using its
   traditional installer package, it is recommended to **remove it** first. We
   will be installing NEURON using its PyPI package.
+
+### `pip` on Windows
+
+- Before you install HNN-Core, it is important that you **install** the [NEURON][] software system-wide using its [Windows-specific binaries](https://nrn.readthedocs.io/en/latest/install/install_instructions.html#windows). You can test that NEURON was installed correctly by opening a Command Prompt (or similar) via your Anaconda install (or virtual environment), and running the following command:
+
+```
+python -c "import neuron"
+```
 
 ## Step 3. `pip` installation types
 
