@@ -242,7 +242,8 @@ linkcheck_ignore = [
     'https://doi.org/10.1152/jn.00535.2009',
     'https://doi.org/10.1152/jn.00122.2010',
     'https://doi.org/10.1101/2021.04.16.440210',
-    'https://groups.google.com/g/hnnsolver'
+    'https://groups.google.com/g/hnnsolver',
+    'http://localhost:8866',
 ]
 
 sphinx_gallery_conf = {
