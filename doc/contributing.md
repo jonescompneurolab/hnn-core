@@ -135,12 +135,52 @@ them, they will need to be rebuilt using the command:
 
     $ python setup.py build_mod
 
+## Linting, spell-checking, and formatting
+
+Any code contributions need to pass checks for linting, spelling, and formatting. These
+are different than tests that actually test the functionality of the code (see next
+section). Fortunately, these checks are easy and fast to do, and if you used the
+previous install instructions, you already have the packages you need to run them.
+
+"Linting" your code, which checks for code syntax errors and other errors, can be done
+using the following command, which uses the `ruff` library:
+
+    $ make lint
+
+If the above command prints any errors, then you will **need** to fix those errors
+before your code will pass our Continuous Integration testing, which is required for it
+to be merged. Fixing the error is up to you: the above command does not change your
+code, but will often provide suggestions on potential fixes to most errors.
+
+Spell-checking your code can be done by simply running the following command. This
+command also only checks your code, but does not make changes to it:
+
+    $ make spell
+
+Formatting is handled similarly, but through two different commands. The first command,
+below, is used to check if your code is consistent with our enforced formatting style,
+which is currently the default `ruff` style. This command does not change your code:
+
+    $ make format-check
+
+However, most of the code you write will probably need to be re-formatted to pass `make
+format-check`. Fortunately, `ruff` provides a tool for safe, *automatic* formatting of
+your code. If `make format-check` returns any errors and tells you that any number of
+files "would be reformatted", and if you are ready to make a git commit or push, then you
+should run the following command. This command **will probably change your code
+automatically** as it re-formats your code:
+
+    $ make format-overwrite
+
+After you run the above command, your code should now be able to pass `make
+format-check`, and you will probably want to proceed to running the tests.
+
 ## Running tests
 
-Once you have the editable hnn-core, you should install the requirements
-for running the tests. Tests help ensure integrity of the package after
-your change has been made. We recommend developers to run tests locally
-on their computers after making changes.
+If you installed editable hnn-core using the instructions above, the requirements for
+running the tests should already be installed. Tests help ensure integrity of the
+package after your change has been made. We recommend developers to run tests locally on
+their computers after making changes.
 
 We use the `pytest` testing framework.
 
@@ -153,15 +193,9 @@ encourage contributors to follow the MPI portion of the
 {doc}`Installation Guide <install>` so that
 they can run the entire test suite locally on their computer.
 
-As part of `make test`, your code is also "linted" (meaning checked for errors)
-and spell-checked. If you would like to perform these checks individually, you
-can do so by running the following command to lint with `ruff`:
-
-    $ make lint
-
-Or the following command to perform common spell-checking:
-
-    $ make spell
+Note that `make test` first runs the checks for linting, spell-checking, and formatting,
+(described in the previous section) and then only *after* your code successfully passes
+those checks does it run the tests.
 
 ## Updating documentation
 
@@ -344,8 +378,6 @@ running a simple MPI simulation fails, subsequent tests that compare
 simulation output between different backends will be skipped. These
 types of failures will be marked as a failure in CI.
 
-[used in MNE-Python]: https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#L124-L132
-
 ## Making changes to the default network
 
 If you ever need to make scientific or technical changes to the default network, you must "re-generate" the smaller network we use for testing, in `hnn_core/tests/assets/jones2009_3x3_drives.json`. This is easily done via the following:
@@ -353,3 +385,5 @@ If you ever need to make scientific or technical changes to the default network,
     $ make regenerate-test-network
 
 Once you do this, make sure to re-run all the tests using `make test` to ensure that numerical tests dependent on the network itself have not broken.
+
+[used in MNE-Python]: https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#L124-L132
