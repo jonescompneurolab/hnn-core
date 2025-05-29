@@ -577,7 +577,7 @@ def test_add_drives():
     with pytest.raises(ValueError, match="Invalid value for the"):
         net.add_poisson_drive(
             "weird_poisson",
-            location="inbetween",
+            location="between",
             rate_constant=10.0,
             weights_ampa=weights_ampa,
             synaptic_delays=syn_delays,
