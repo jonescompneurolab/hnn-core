@@ -28,7 +28,7 @@ jobs:
       - name: Install Neuron on Windows separately
         shell: cmd
         run: |
-          powershell -command "gh release download --repo https://github.com/neuronsimulator/nrn --pattern '*.exe' --output nrn-setup.exe"
+          powershell -command "gh release download 8.2.6 --repo https://github.com/neuronsimulator/nrn --pattern '*.exe' --output nrn-setup.exe"
           start /b /wait .\nrn-setup.exe /S /D=C:\nrn_test
           powershell -command "'C:\nrn_test\bin' >> $env:GITHUB_PATH"
           python -c "import neuron"
