@@ -13,6 +13,7 @@ from neuron import h
 
 # This is due to: https://github.com/neuronsimulator/nrn/pull/746
 from neuron import __version__
+
 if int(__version__[0]) >= 8:
     h.nrnunit_use_legacy(1)
 
@@ -55,7 +56,7 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
     # Set tstop before instantiating any classes
     h.tstop = tstop
     h.dt = dt  # simulation duration and time-step
-    h.celsius = net._params['celsius']  # 37.0 - set temperature
+    h.celsius = net._params["celsius"]  # 37.0 - set temperature
 
     times = h.Vector().record(h._ref_t)
 
@@ -67,7 +68,7 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
     h.finitialize()
 
     def simulation_time():
-        print(f'Trial {trial_idx + 1}: {round(h.t, 2)} ms...')
+        print(f"Trial {trial_idx + 1}: {round(h.t, 2)} ms...")
 
     if rank == 0:
         for tt in range(0, int(h.tstop), 10):
@@ -98,7 +99,8 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
         isec_py[gid] = dict()
         for sec_name, isec in isec_dict.items():
             isec_py[gid][sec_name] = {
-                key: isec.to_python() for key, isec in isec.items()}
+                key: isec.to_python() for key, isec in isec.items()
+            }
 
     ca_py = dict()
     for gid, ca_dict in neuron_net._ca.items():
@@ -108,10 +110,10 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
                 ca_py[gid][sec_name] = ca.to_python()
 
     dpl_data = np.c_[
-        neuron_net._nrn_dipoles['L2_pyramidal'].as_numpy() +
-        neuron_net._nrn_dipoles['L5_pyramidal'].as_numpy(),
-        neuron_net._nrn_dipoles['L2_pyramidal'].as_numpy(),
-        neuron_net._nrn_dipoles['L5_pyramidal'].as_numpy()
+        neuron_net._nrn_dipoles["L2_pyramidal"].as_numpy()
+        + neuron_net._nrn_dipoles["L5_pyramidal"].as_numpy(),
+        neuron_net._nrn_dipoles["L2_pyramidal"].as_numpy(),
+        neuron_net._nrn_dipoles["L5_pyramidal"].as_numpy(),
     ]
 
     rec_arr_py = dict()
@@ -120,16 +122,18 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
         rec_arr_py.update({arr_name: nrn_arr._get_nrn_voltages()})
         rec_times_py.update({arr_name: nrn_arr._get_nrn_times()})
 
-    data = {'dpl_data': dpl_data,
-            'spike_times': neuron_net._all_spike_times.to_python(),
-            'spike_gids': neuron_net._all_spike_gids.to_python(),
-            'gid_ranges': net.gid_ranges,
-            'vsec': vsec_py,
-            'isec': isec_py,
-            'ca': ca_py,
-            'rec_data': rec_arr_py,
-            'rec_times': rec_times_py,
-            'times': times.to_python()}
+    data = {
+        "dpl_data": dpl_data,
+        "spike_times": neuron_net._all_spike_times.to_python(),
+        "spike_gids": neuron_net._all_spike_gids.to_python(),
+        "gid_ranges": net.gid_ranges,
+        "vsec": vsec_py,
+        "isec": isec_py,
+        "ca": ca_py,
+        "rec_data": rec_arr_py,
+        "rec_times": rec_times_py,
+        "times": times.to_python(),
+    }
 
     return data
 
@@ -138,39 +142,38 @@ def _is_loaded_mechanisms():
     # copied from:
     # https://www.neuron.yale.edu/neuron/static/py_doc/modelspec/programmatic/mechtype.html
     mt = h.MechanismType(0)
-    mname = h.ref('')
+    mname = h.ref("")
     mnames = list()
     for i in range(mt.count()):
         mt.select(i)
         mt.selected(mname)
         mnames.append(mname[0])
-    if 'hh2' not in mnames:
+    if "hh2" not in mnames:
         return False
     else:
         return True
 
 
 def load_custom_mechanisms():
-
     if _is_loaded_mechanisms():
         return
 
     # recursively find the .so / .dll library
     mech_fname = list()
-    mod_dir = op.join(op.dirname(__file__), 'mod')
+    mod_dir = op.join(op.dirname(__file__), "mod")
     for root, dirnames, filenames in os.walk(mod_dir):
         for filename in filenames:
-            if filename.endswith(('.so', '.dll')):
+            if filename.endswith((".so", ".dll")):
                 mech_fname.append(os.path.join(root, filename))
                 break
 
     if len(mech_fname) == 0:
-        raise FileNotFoundError(f'No .so or .dll file found in {mod_dir}')
+        raise FileNotFoundError(f"No .so or .dll file found in {mod_dir}")
 
     h.nrn_load_dll(mech_fname[0])
-    print('Loading custom mechanism files from %s' % mech_fname[0])
+    print("Loading custom mechanism files from %s" % mech_fname[0])
     if not _is_loaded_mechanisms():
-        raise ValueError('The custom mechanisms could not be loaded')
+        raise ValueError("The custom mechanisms could not be loaded")
 
 
 def _get_nhosts():
@@ -325,22 +328,24 @@ class NetworkBuilder(object):
         load_custom_mechanisms()
 
         if self._rank == 0:
-            print('Building the NEURON model')
+            print("Building the NEURON model")
 
         self._clear_last_network_objects()
 
-        self._nrn_dipoles['L5_pyramidal'] = h.Vector()
-        self._nrn_dipoles['L2_pyramidal'] = h.Vector()
+        self._nrn_dipoles["L5_pyramidal"] = h.Vector()
+        self._nrn_dipoles["L2_pyramidal"] = h.Vector()
 
         self._gid_assign()
 
-        record_vsec = self.net._params['record_vsec']
-        record_isec = self.net._params['record_isec']
-        record_ca = self.net._params['record_ca']
-        self._create_cells_and_drives(threshold=self.net._params['threshold'],
-                                      record_vsec=record_vsec,
-                                      record_isec=record_isec,
-                                      record_ca=record_ca)
+        record_vsec = self.net._params["record_vsec"]
+        record_isec = self.net._params["record_isec"]
+        record_ca = self.net._params["record_ca"]
+        self._create_cells_and_drives(
+            threshold=self.net._params["threshold"],
+            record_vsec=record_vsec,
+            record_isec=record_isec,
+            record_ca=record_ca,
+        )
 
         self.state_init()
 
@@ -359,7 +364,7 @@ class NetworkBuilder(object):
             self._record_extracellular()
 
         if self._rank == 0:
-            print('[Done]')
+            print("[Done]")
 
     def _gid_assign(self, rank=None, n_hosts=None):
         """Assign cell IDs to this node
@@ -383,34 +388,37 @@ class NetworkBuilder(object):
             self._gid_list.append(gid)
 
         for drive in self.net.external_drives.values():
-            if drive['cell_specific']:
+            if drive["cell_specific"]:
                 # only assign drive gids that have a target cell gid already
                 # assigned to this rank
-                for src_gid in self.net.gid_ranges[drive['name']]:
+                for src_gid in self.net.gid_ranges[drive["name"]]:
                     conn_idxs = pick_connection(self.net, src_gids=src_gid)
                     target_gids = set()
                     for conn_idx in conn_idxs:
-                        gid_pairs = self.net.connectivity[
-                            conn_idx]['gid_pairs']
+                        gid_pairs = self.net.connectivity[conn_idx]["gid_pairs"]
                         if src_gid in gid_pairs:
-                            target_gids.update(self.net.connectivity[conn_idx]
-                                               ['gid_pairs'][src_gid])
+                            target_gids.update(
+                                self.net.connectivity[conn_idx]["gid_pairs"][src_gid]
+                            )
 
                     for target_gid in target_gids:
-                        if (target_gid in self._gid_list and
-                                src_gid not in self._gid_list):
+                        if (
+                            target_gid in self._gid_list
+                            and src_gid not in self._gid_list
+                        ):
                             self._gid_list.append(src_gid)
             else:
                 # round robin assignment of drive gids
-                src_gids = list(self.net.gid_ranges[drive['name']])
+                src_gids = list(self.net.gid_ranges[drive["name"]])
                 for gid_idx in range(self._rank, len(src_gids), n_hosts):
                     self._gid_list.append(src_gids[gid_idx])
 
         # extremely important to get the gids in the right order
         self._gid_list.sort()
 
-    def _create_cells_and_drives(self, threshold, record_vsec=False,
-                                 record_isec=False, record_ca=False):
+    def _create_cells_and_drives(
+        self, threshold, record_vsec=False, record_isec=False, record_ca=False
+    ):
         """Parallel create cells AND external drives
 
         NB: _Cell.__init__ calls h.Section -> non-picklable!
@@ -436,15 +444,16 @@ class NetworkBuilder(object):
                 cell.pos = self.net.pos_dict[src_type][gid_idx]
 
                 # instantiate NEURON object
-                if src_type in ('L2_pyramidal', 'L5_pyramidal'):
-                    cell.build(sec_name_apical='apical_trunk')
+                if src_type in ("L2_pyramidal", "L5_pyramidal"):
+                    cell.build(sec_name_apical="apical_trunk")
                 else:
                     cell.build()
                 # add tonic biases
                 for bias in self.net.external_biases:
                     if src_type in self.net.external_biases[bias]:
-                        cell.create_tonic_bias(**self.net.external_biases
-                                               [bias][src_type])
+                        cell.create_tonic_bias(
+                            **self.net.external_biases[bias][src_type]
+                        )
                 cell.record(record_vsec, record_isec, record_ca)
 
                 # this call could belong in init of a _Cell (with threshold)?
@@ -455,8 +464,9 @@ class NetworkBuilder(object):
 
             # external driving inputs are special types of artificial-cells
             else:
-                event_times = self.net.external_drives[
-                    src_type]['events'][self.trial_idx][gid_idx]
+                event_times = self.net.external_drives[src_type]["events"][
+                    self.trial_idx
+                ][gid_idx]
                 drive_cell = _ArtificialCell(event_times, threshold, gid=gid)
                 _PC.cell(drive_cell.gid, drive_cell.nrn_netcon)
                 self._drive_cells.append(drive_cell)
@@ -475,18 +485,18 @@ class NetworkBuilder(object):
         assert len(self._cells) == len(self._gid_list) - len(self._drive_cells)
 
         for conn in connectivity:
-            loc, receptor = conn['loc'], conn['receptor']
-            nc_dict = deepcopy(conn['nc_dict'])
-            nc_dict['A_weight'] *= nc_dict['gain']
+            loc, receptor = conn["loc"], conn["receptor"]
+            nc_dict = deepcopy(conn["nc_dict"])
+            nc_dict["A_weight"] *= nc_dict["gain"]
             # Gather indices of targets on current node
             valid_targets = set()
-            for src_gid, target_gids in conn['gid_pairs'].items():
+            for src_gid, target_gids in conn["gid_pairs"].items():
                 filtered_targets = list()
                 for target_gid in target_gids:
                     if _PC.gid_exists(target_gid):
                         filtered_targets.append(target_gid)
                         valid_targets.add(target_gid)
-                conn['gid_pairs'][src_gid] = filtered_targets
+                conn["gid_pairs"][src_gid] = filtered_targets
 
             target_filter = dict()
             for idx in range(len(self._cells)):
@@ -495,35 +505,37 @@ class NetworkBuilder(object):
                     target_filter[gid] = idx
 
             # Iterate over src/target pairs and connect cells
-            for src_gid, target_gids in conn['gid_pairs'].items():
+            for src_gid, target_gids in conn["gid_pairs"].items():
                 for target_gid in target_gids:
                     src_type = self.net.gid_to_type(src_gid)
                     target_type = self.net.gid_to_type(target_gid)
                     target_cell = self._cells[target_filter[target_gid]]
-                    connection_name = f'{_short_name(src_type)}_'\
-                                      f'{_short_name(target_type)}_{receptor}'
+                    connection_name = (
+                        f"{_short_name(src_type)}_{_short_name(target_type)}_{receptor}"
+                    )
                     if connection_name not in self.ncs:
                         self.ncs[connection_name] = list()
                     pos_idx = src_gid - net.gid_ranges[_long_name(src_type)][0]
                     # NB pos_dict for this drive must include ALL cell types!
-                    nc_dict['pos_src'] = net.pos_dict[
-                        _long_name(src_type)][pos_idx]
+                    nc_dict["pos_src"] = net.pos_dict[_long_name(src_type)][pos_idx]
 
                     # get synapse locations
                     syn_keys = list()
                     # Targeting group of sections like proximal or distal
                     if loc in target_cell.sect_loc:
                         for sect in target_cell.sect_loc[loc]:
-                            syn_keys.append(f'{sect}_{receptor}')
+                            syn_keys.append(f"{sect}_{receptor}")
                     # Targeting individual section like soma or apical_tuft
                     else:
-                        syn_keys = [f'{loc}_{receptor}']
+                        syn_keys = [f"{loc}_{receptor}"]
 
                     for syn_key in syn_keys:
                         nc = target_cell.parconnect_from_src(
-                            src_gid, deepcopy(nc_dict),
+                            src_gid,
+                            deepcopy(nc_dict),
                             target_cell._nrn_synapses[syn_key],
-                            net._inplane_distance)
+                            net._inplane_distance,
+                        )
                         self.ncs[connection_name].append(nc)
 
     def _record_extracellular(self):
@@ -565,12 +577,14 @@ class NetworkBuilder(object):
 
         for cell in self._cells:
             # add dipoles across neurons on the current thread
-            if hasattr(cell, 'dipole'):
+            if hasattr(cell, "dipole"):
                 if cell.dipole.size() != n_samples:
-                    raise ValueError(f"n_samples does not match the size "
-                                     f"of at least one cell's dipole vector. "
-                                     f"Got n_samples={n_samples}, {cell.name}."
-                                     f"dipole.size()={cell.dipole.size()}.")
+                    raise ValueError(
+                        f"n_samples does not match the size "
+                        f"of at least one cell's dipole vector. "
+                        f"Got n_samples={n_samples}, {cell.name}."
+                        f"dipole.size()={cell.dipole.size()}."
+                    )
                 nrn_dpl = self._nrn_dipoles[_long_name(cell.name)]
                 nrn_dpl.add(cell.dipole)
 
@@ -613,23 +627,23 @@ class NetworkBuilder(object):
 
         for cell in self._cells:
             seclist = h.SectionList()
-            seclist.wholetree(sec=cell._nrn_sections['soma'])
+            seclist.wholetree(sec=cell._nrn_sections["soma"])
             for sect in seclist:
                 for seg in sect:
-                    if cell.name == 'L2Pyr':
+                    if cell.name == "L2Pyr":
                         seg.v = -71.46
-                    elif cell.name == 'L5Pyr':
-                        if sect.name() == 'L5Pyr_apical_1':
+                    elif cell.name == "L5Pyr":
+                        if sect.name() == "L5Pyr_apical_1":
                             seg.v = -71.32
-                        elif sect.name() == 'L5Pyr_apical_2':
+                        elif sect.name() == "L5Pyr_apical_2":
                             seg.v = -69.08
-                        elif sect.name() == 'L5Pyr_apical_tuft':
+                        elif sect.name() == "L5Pyr_apical_tuft":
                             seg.v = -67.30
                         else:
-                            seg.v = -72.
-                    elif cell.name == 'L2Basket':
+                            seg.v = -72.0
+                    elif cell.name == "L2Basket":
                         seg.v = -64.9737
-                    elif cell.name == 'L5Basket':
+                    elif cell.name == "L5Basket":
                         seg.v = -64.9737
 
     def _clear_neuron_objects(self):

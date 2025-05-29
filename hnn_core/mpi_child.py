@@ -23,18 +23,18 @@ def _pickle_data(sim_data):
 def _str_to_net(input_str):
     net = None
 
-    data_str = _extract_data(input_str, 'net')
+    data_str = _extract_data(input_str, "net")
     if len(data_str) > 0:
         # get the size, but start the search after data
-        net_size = _extract_data_length(input_str[len(data_str):],
-                                        'net')
+        net_size = _extract_data_length(input_str[len(data_str) :], "net")
         # check the size
         if len(data_str) != net_size:
-            raise ValueError("Got incorrect network size: %d bytes " %
-                             len(data_str) + "expected length: %d" % net_size)
+            raise ValueError(
+                "Got incorrect network size: %d bytes " % len(data_str)
+                + "expected length: %d" % net_size
+            )
         # unpickle the net
-        net = pickle.loads(base64.b64decode(data_str.encode(),
-                                            validate=True))
+        net = pickle.loads(base64.b64decode(data_str.encode(), validate=True))
     return net
 
 
@@ -52,6 +52,7 @@ class MPISimulation(object):
     rank : int
         The rank for each processor part of the MPI communicator
     """
+
     def __init__(self, skip_mpi_import=False):
         self.skip_mpi_import = skip_mpi_import
         if skip_mpi_import:
@@ -67,8 +68,9 @@ class MPISimulation(object):
 
     def __exit__(self, type, value, traceback):
         # skip Finalize() if we didn't import MPI on __init__
-        if hasattr(self, 'comm'):
+        if hasattr(self, "comm"):
             from mpi4py import MPI
+
             MPI.Finalize()
 
     def _read_net(self):
@@ -76,12 +78,12 @@ class MPISimulation(object):
 
         # read Network from stdin
         if self.rank == 0:
-            input_str = ''
+            input_str = ""
             while True:
                 line = sys.stdin.readline()
-                line = line.rstrip('\n')
+                line = line.rstrip("\n")
                 input_str += line
-                end_match = re.search(r'@end_of_net:\d+@', input_str)
+                end_match = re.search(r"@end_of_net:\d+@", input_str)
                 if end_match is not None:
                     break
 
@@ -95,12 +97,12 @@ class MPISimulation(object):
     def _wait_for_exit_signal(self):
         # read from stdin
         if self.rank == 0:
-            input_str = ''
+            input_str = ""
             while True:
                 line = sys.stdin.readline()
-                line = line.rstrip('\n')
+                line = line.rstrip("\n")
                 input_str += line
-                if '@data_received@' in input_str:
+                if "@data_received@" in input_str:
                     break
 
     def _write_data_stderr(self, sim_data):
@@ -110,14 +112,14 @@ class MPISimulation(object):
         if self.rank > 0:
             return
 
-        sys.stderr.write('@start_of_data@')
+        sys.stderr.write("@start_of_data@")
         pickled_bytes = _pickle_data(sim_data)
         sys.stderr.write(pickled_bytes.decode())
 
         # the parent process is waiting for "@end_of_data:[#bytes]@" with the
         # length of data. The '@' is not found in base64 encoding, so we can
         # be certain it is the border of the signal
-        sys.stderr.write('@end_of_data:%d@\n' % len(pickled_bytes))
+        sys.stderr.write("@end_of_data:%d@\n" % len(pickled_bytes))
         sys.stderr.flush()  # flush to ensure signal is not buffered
 
     def run(self, net, tstop, dt, n_trials):
@@ -140,10 +142,11 @@ class MPISimulation(object):
         return sim_data
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """This file is called on command-line from nrniv"""
 
     import traceback
+
     rc = 0
 
     try:
