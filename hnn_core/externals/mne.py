@@ -17,7 +17,7 @@ def parallel_func(func, n_jobs):
         try:
             from joblib import Parallel, delayed
         except ImportError:
-            warn('joblib not installed. Cannot run in parallel.')
+            warn("joblib not installed. Cannot run in parallel.")
             n_jobs = 1
     if n_jobs == 1:
         my_func = func
@@ -50,20 +50,178 @@ def next_fast_len(target):
     Copied from SciPy with minor modifications.
     """
     from bisect import bisect_left
-    hams = (8, 9, 10, 12, 15, 16, 18, 20, 24, 25, 27, 30, 32, 36, 40, 45, 48,
-            50, 54, 60, 64, 72, 75, 80, 81, 90, 96, 100, 108, 120, 125, 128,
-            135, 144, 150, 160, 162, 180, 192, 200, 216, 225, 240, 243, 250,
-            256, 270, 288, 300, 320, 324, 360, 375, 384, 400, 405, 432, 450,
-            480, 486, 500, 512, 540, 576, 600, 625, 640, 648, 675, 720, 729,
-            750, 768, 800, 810, 864, 900, 960, 972, 1000, 1024, 1080, 1125,
-            1152, 1200, 1215, 1250, 1280, 1296, 1350, 1440, 1458, 1500, 1536,
-            1600, 1620, 1728, 1800, 1875, 1920, 1944, 2000, 2025, 2048, 2160,
-            2187, 2250, 2304, 2400, 2430, 2500, 2560, 2592, 2700, 2880, 2916,
-            3000, 3072, 3125, 3200, 3240, 3375, 3456, 3600, 3645, 3750, 3840,
-            3888, 4000, 4050, 4096, 4320, 4374, 4500, 4608, 4800, 4860, 5000,
-            5120, 5184, 5400, 5625, 5760, 5832, 6000, 6075, 6144, 6250, 6400,
-            6480, 6561, 6750, 6912, 7200, 7290, 7500, 7680, 7776, 8000, 8100,
-            8192, 8640, 8748, 9000, 9216, 9375, 9600, 9720, 10000)
+
+    hams = (
+        8,
+        9,
+        10,
+        12,
+        15,
+        16,
+        18,
+        20,
+        24,
+        25,
+        27,
+        30,
+        32,
+        36,
+        40,
+        45,
+        48,
+        50,
+        54,
+        60,
+        64,
+        72,
+        75,
+        80,
+        81,
+        90,
+        96,
+        100,
+        108,
+        120,
+        125,
+        128,
+        135,
+        144,
+        150,
+        160,
+        162,
+        180,
+        192,
+        200,
+        216,
+        225,
+        240,
+        243,
+        250,
+        256,
+        270,
+        288,
+        300,
+        320,
+        324,
+        360,
+        375,
+        384,
+        400,
+        405,
+        432,
+        450,
+        480,
+        486,
+        500,
+        512,
+        540,
+        576,
+        600,
+        625,
+        640,
+        648,
+        675,
+        720,
+        729,
+        750,
+        768,
+        800,
+        810,
+        864,
+        900,
+        960,
+        972,
+        1000,
+        1024,
+        1080,
+        1125,
+        1152,
+        1200,
+        1215,
+        1250,
+        1280,
+        1296,
+        1350,
+        1440,
+        1458,
+        1500,
+        1536,
+        1600,
+        1620,
+        1728,
+        1800,
+        1875,
+        1920,
+        1944,
+        2000,
+        2025,
+        2048,
+        2160,
+        2187,
+        2250,
+        2304,
+        2400,
+        2430,
+        2500,
+        2560,
+        2592,
+        2700,
+        2880,
+        2916,
+        3000,
+        3072,
+        3125,
+        3200,
+        3240,
+        3375,
+        3456,
+        3600,
+        3645,
+        3750,
+        3840,
+        3888,
+        4000,
+        4050,
+        4096,
+        4320,
+        4374,
+        4500,
+        4608,
+        4800,
+        4860,
+        5000,
+        5120,
+        5184,
+        5400,
+        5625,
+        5760,
+        5832,
+        6000,
+        6075,
+        6144,
+        6250,
+        6400,
+        6480,
+        6561,
+        6750,
+        6912,
+        7200,
+        7290,
+        7500,
+        7680,
+        7776,
+        8000,
+        8100,
+        8192,
+        8640,
+        8748,
+        9000,
+        9216,
+        9375,
+        9600,
+        9720,
+        10000,
+    )
 
     if target <= 6:
         return target
@@ -76,7 +234,7 @@ def next_fast_len(target):
     if target <= hams[-1]:
         return hams[bisect_left(hams, target)]
 
-    match = float('inf')  # Anything found will be smaller
+    match = float("inf")  # Anything found will be smaller
     p5 = 1
     while p5 < target:
         p35 = p5
@@ -127,7 +285,7 @@ def _import_fft(name):
 
 ####################################################
 # mne/utils/check.py
-def _ensure_int(x, name='unknown', must_be='an int'):
+def _ensure_int(x, name="unknown", must_be="an int"):
     """Ensure a variable is an integer."""
     # This is preferred over numbers.Integral, see:
     # https://github.com/scipy/scipy/pull/7351#issuecomment-299713159
@@ -138,7 +296,7 @@ def _ensure_int(x, name='unknown', must_be='an int'):
             raise TypeError()
         x = int(operator.index(x))
     except TypeError:
-        raise TypeError('%s must be %s, got %s' % (name, must_be, type(x)))
+        raise TypeError("%s must be %s, got %s" % (name, must_be, type(x)))
     return x
 
 
@@ -164,11 +322,11 @@ class _Callable(object):
 
 
 _multi = {
-    'str': (str,),
-    'numeric': (np.floating, float, int_like),
-    'path-like': path_like,
-    'int-like': (int_like,),
-    'callable': (_Callable(),),
+    "str": (str,),
+    "numeric": (np.floating, float, int_like),
+    "path-like": path_like,
+    "int-like": (int_like,),
+    "callable": (_Callable(),),
 }
 
 
@@ -189,26 +347,45 @@ def _validate_type(item, types=None, item_name=None, type_name=None):
     if not isinstance(types, (list, tuple)):
         types = [types]
 
-    check_types = sum(((type(None),) if type_ is None else (type_,)
-                       if not isinstance(type_, str) else _multi[type_]
-                       for type_ in types), ())
+    check_types = sum(
+        (
+            (type(None),)
+            if type_ is None
+            else (type_,)
+            if not isinstance(type_, str)
+            else _multi[type_]
+            for type_ in types
+        ),
+        (),
+    )
     if not isinstance(item, check_types):
         if type_name is None:
-            type_name = ['None' if cls_ is None else cls_.__name__
-                         if not isinstance(cls_, str) else cls_
-                         for cls_ in types]
+            type_name = [
+                "None"
+                if cls_ is None
+                else cls_.__name__
+                if not isinstance(cls_, str)
+                else cls_
+                for cls_ in types
+            ]
             if len(type_name) == 1:
                 type_name = type_name[0]
             elif len(type_name) == 2:
-                type_name = ' or '.join(type_name)
+                type_name = " or ".join(type_name)
             else:
-                type_name[-1] = 'or ' + type_name[-1]
-                type_name = ', '.join(type_name)
-        raise TypeError('%s must be an instance of %s, got %s instead'
-                        % (item_name, type_name, type(item),))
+                type_name[-1] = "or " + type_name[-1]
+                type_name = ", ".join(type_name)
+        raise TypeError(
+            "%s must be an instance of %s, got %s instead"
+            % (
+                item_name,
+                type_name,
+                type(item),
+            )
+        )
 
 
-def _check_option(parameter, value, allowed_values, extra=''):
+def _check_option(parameter, value, allowed_values, extra=""):
     """Check the value of a parameter against a list of valid options.
     Return the value if it is valid, otherwise raise a ValueError with a
     readable error message.
@@ -236,25 +413,28 @@ def _check_option(parameter, value, allowed_values, extra=''):
         return value
 
     # Prepare a nice error message for the user
-    extra = ' ' + extra if extra else extra
-    msg = ("Invalid value for the '{parameter}' parameter{extra}. "
-           '{options}, but got {value!r} instead.')
+    extra = " " + extra if extra else extra
+    msg = (
+        "Invalid value for the '{parameter}' parameter{extra}. "
+        "{options}, but got {value!r} instead."
+    )
     allowed_values = list(allowed_values)  # e.g., if a dict was given
     if len(allowed_values) == 1:
-        options = f'The only allowed value is {repr(allowed_values[0])}'
+        options = f"The only allowed value is {repr(allowed_values[0])}"
     else:
-        options = 'Allowed values are '
-        options += ', '.join([f'{repr(v)}' for v in allowed_values[:-1]])
-        options += f', and {repr(allowed_values[-1])}'
-    raise ValueError(msg.format(parameter=parameter, options=options,
-                                value=value, extra=extra))
+        options = "Allowed values are "
+        options += ", ".join([f"{repr(v)}" for v in allowed_values[:-1]])
+        options += f", and {repr(allowed_values[-1])}"
+    raise ValueError(
+        msg.format(parameter=parameter, options=options, value=value, extra=extra)
+    )
 
 
 ####################################################
 # mne/time_frequency/tfr.py
 def _check_decim(decim):
     """Aux function checking the decim parameter."""
-    _validate_type(decim, ('int-like', slice), 'decim')
+    _validate_type(decim, ("int-like", slice), "decim")
     if not isinstance(decim, slice):
         decim = slice(None, None, int(decim))
     # ensure that we can actually use `decim.step`
@@ -304,12 +484,10 @@ def morlet(sfreq, freqs, n_cycles=7.0, sigma=None, zero_mean=False):
 
     freqs = np.array(freqs)
     if np.any(freqs <= 0):
-        raise ValueError("all frequencies in 'freqs' must be "
-                         "greater than 0.")
+        raise ValueError("all frequencies in 'freqs' must be greater than 0.")
 
     if (n_cycles.size != 1) and (n_cycles.size != len(freqs)):
-        raise ValueError("n_cycles should be fixed or defined for "
-                         "each frequency.")
+        raise ValueError("n_cycles should be fixed or defined for each frequency.")
     for k, f in enumerate(freqs):
         if len(n_cycles) != 1:
             this_n_cycles = n_cycles[k]
@@ -322,12 +500,12 @@ def morlet(sfreq, freqs, n_cycles=7.0, sigma=None, zero_mean=False):
             sigma_t = this_n_cycles / (2.0 * np.pi * sigma)
         # this scaling factor is proportional to (Tallon-Baudry 98):
         # (sigma_t*sqrt(pi))^(-1/2);
-        t = np.arange(0., 5. * sigma_t, 1.0 / sfreq)
+        t = np.arange(0.0, 5.0 * sigma_t, 1.0 / sfreq)
         t = np.r_[-t[::-1], t[1:]]
         oscillation = np.exp(2.0 * 1j * np.pi * f * t)
-        gaussian_enveloppe = np.exp(-t ** 2 / (2.0 * sigma_t ** 2))
+        gaussian_enveloppe = np.exp(-(t**2) / (2.0 * sigma_t**2))
         if zero_mean:  # to make it zero mean
-            real_offset = np.exp(- 2 * (np.pi * f * sigma_t) ** 2)
+            real_offset = np.exp(-2 * (np.pi * f * sigma_t) ** 2)
             oscillation -= real_offset
         W = oscillation * gaussian_enveloppe
         W /= np.sqrt(0.5) * np.linalg.norm(W.ravel())
@@ -360,8 +538,8 @@ def _cwt_gen(X, Ws, *, fsize=0, mode="same", decim=1, use_fft=True):
     out : array, shape (n_signals, n_freqs, n_time_decim)
         The time-frequency transform of the signals.
     """
-    fft, ifft = _import_fft(('fft', 'ifft'))
-    _check_option('mode', mode, ['same', 'valid', 'full'])
+    fft, ifft = _import_fft(("fft", "ifft"))
+    _check_option("mode", mode, ["same", "valid", "full"])
     decim = _check_decim(decim)
     X = np.asarray(X)
 
@@ -385,20 +563,19 @@ def _cwt_gen(X, Ws, *, fsize=0, mode="same", decim=1, use_fft=True):
         # Loop across wavelets
         for ii, W in enumerate(Ws):
             if use_fft:
-                ret = ifft(fft_x * fft_Ws[ii])[:n_times + W.size - 1]
+                ret = ifft(fft_x * fft_Ws[ii])[: n_times + W.size - 1]
             else:
                 ret = np.convolve(x, W, mode=mode)
 
             # Center and decimate decomposition
-            if mode == 'valid':
+            if mode == "valid":
                 sz = int(abs(W.size - n_times)) + 1
                 offset = (n_times - sz) // 2
-                this_slice = slice(offset // decim.step,
-                                   (offset + sz) // decim.step)
+                this_slice = slice(offset // decim.step, (offset + sz) // decim.step)
                 if use_fft:
                     ret = _centered(ret, sz)
                 tfr[ii, this_slice] = ret[decim]
-            elif mode == 'full' and not use_fft:
+            elif mode == "full" and not use_fft:
                 start = (W.size - 1) // 2
                 end = len(ret) - (W.size // 2)
                 ret = ret[start:end]
@@ -436,14 +613,14 @@ def _time_frequency_loop(X, Ws, output, use_fft, mode, decim):
     """
     # Set output type
     dtype = np.float64
-    if output in ['complex', 'avg_power_itc']:
+    if output in ["complex", "avg_power_itc"]:
         dtype = np.complex128
 
     # Init outputs
     decim = _check_decim(decim)
     n_epochs, n_times = X[:, decim].shape
     n_freqs = len(Ws[0])
-    if ('avg_' in output) or ('itc' in output):
+    if ("avg_" in output) or ("itc" in output):
         tfrs = np.zeros((n_freqs, n_times), dtype=dtype)
     else:
         tfrs = np.zeros((n_epochs, n_freqs, n_times), dtype=dtype)
@@ -452,42 +629,41 @@ def _time_frequency_loop(X, Ws, output, use_fft, mode, decim):
     for W in Ws:
         # No need to check here, it's done earlier (outside parallel part)
         nfft = _get_nfft(W, X, use_fft, check=False)
-        coefs = _cwt_gen(
-            X, W, fsize=nfft, mode=mode, decim=decim, use_fft=use_fft)
+        coefs = _cwt_gen(X, W, fsize=nfft, mode=mode, decim=decim, use_fft=use_fft)
 
         # Inter-trial phase locking is apparently computed per taper...
-        if 'itc' in output:
+        if "itc" in output:
             plf = np.zeros((n_freqs, n_times), dtype=np.complex128)
 
         # Loop across epochs
         for epoch_idx, tfr in enumerate(coefs):
             # Transform complex values
-            if output in ['power', 'avg_power']:
+            if output in ["power", "avg_power"]:
                 tfr = (tfr * tfr.conj()).real  # power
-            elif output == 'phase':
+            elif output == "phase":
                 tfr = np.angle(tfr)
-            elif output == 'avg_power_itc':
+            elif output == "avg_power_itc":
                 tfr_abs = np.abs(tfr)
                 plf += tfr / tfr_abs  # phase
-                tfr = tfr_abs ** 2  # power
-            elif output == 'itc':
+                tfr = tfr_abs**2  # power
+            elif output == "itc":
                 plf += tfr / np.abs(tfr)  # phase
                 continue  # not need to stack anything else than plf
 
             # Stack or add
-            if ('avg_' in output) or ('itc' in output):
+            if ("avg_" in output) or ("itc" in output):
                 tfrs += tfr
             else:
                 tfrs[epoch_idx] += tfr
 
         # Compute inter trial coherence
-        if output == 'avg_power_itc':
+        if output == "avg_power_itc":
             tfrs += 1j * np.abs(plf)
-        elif output == 'itc':
+        elif output == "itc":
             tfrs += np.abs(plf)
 
     # Normalization of average metrics
-    if ('avg_' in output) or ('itc' in output):
+    if ("avg_" in output) or ("itc" in output):
         tfrs /= n_epochs
 
     # Normalization by number of taper
@@ -495,10 +671,20 @@ def _time_frequency_loop(X, Ws, output, use_fft, mode, decim):
     return tfrs
 
 
-def _compute_tfr(epoch_data, freqs, sfreq=1.0, method='morlet',
-                 n_cycles=7.0, zero_mean=None, time_bandwidth=None,
-                 use_fft=True, decim=1, output='complex', n_jobs=1,
-                 verbose=None):
+def _compute_tfr(
+    epoch_data,
+    freqs,
+    sfreq=1.0,
+    method="morlet",
+    n_cycles=7.0,
+    zero_mean=None,
+    time_bandwidth=None,
+    use_fft=True,
+    decim=1,
+    output="complex",
+    n_jobs=1,
+    verbose=None,
+):
     """Compute time-frequency transforms.
     Parameters
     ----------
@@ -555,42 +741,55 @@ def _compute_tfr(epoch_data, freqs, sfreq=1.0, method='morlet',
     # Check data
     epoch_data = np.asarray(epoch_data)
     if epoch_data.ndim != 3:
-        raise ValueError('epoch_data must be of shape (n_epochs, n_chans, '
-                         'n_times), got %s' % (epoch_data.shape,))
+        raise ValueError(
+            "epoch_data must be of shape (n_epochs, n_chans, "
+            "n_times), got %s" % (epoch_data.shape,)
+        )
 
     # Check params
-    freqs, sfreq, zero_mean, n_cycles, time_bandwidth, decim = \
-        _check_tfr_param(freqs, sfreq, method, zero_mean, n_cycles,
-                         time_bandwidth, use_fft, decim, output)
+    freqs, sfreq, zero_mean, n_cycles, time_bandwidth, decim = _check_tfr_param(
+        freqs,
+        sfreq,
+        method,
+        zero_mean,
+        n_cycles,
+        time_bandwidth,
+        use_fft,
+        decim,
+        output,
+    )
 
     decim = _check_decim(decim)
-    if (freqs > sfreq / 2.).any():
-        raise ValueError('Cannot compute freq above Nyquist freq of the data '
-                         '(%0.1f Hz), got %0.1f Hz'
-                         % (sfreq / 2., freqs.max()))
+    if (freqs > sfreq / 2.0).any():
+        raise ValueError(
+            "Cannot compute freq above Nyquist freq of the data "
+            "(%0.1f Hz), got %0.1f Hz" % (sfreq / 2.0, freqs.max())
+        )
 
     # We decimate *after* decomposition, so we need to create our kernels
     # for the original sfreq
-    if method == 'morlet':
+    if method == "morlet":
         W = morlet(sfreq, freqs, n_cycles=n_cycles, zero_mean=zero_mean)
         Ws = [W]  # to have same dimensionality as the 'multitaper' case
 
     # Check wavelets
     if len(Ws[0][0]) > epoch_data.shape[2]:
-        raise ValueError('At least one of the wavelets is longer than the '
-                         'signal. Use a longer signal or shorter wavelets.')
+        raise ValueError(
+            "At least one of the wavelets is longer than the "
+            "signal. Use a longer signal or shorter wavelets."
+        )
 
     # Initialize output
     n_freqs = len(freqs)
     n_epochs, n_chans, n_times = epoch_data[:, :, decim].shape
-    if output in ('power', 'phase', 'avg_power', 'itc'):
+    if output in ("power", "phase", "avg_power", "itc"):
         dtype = np.float64
-    elif output in ('complex', 'avg_power_itc'):
+    elif output in ("complex", "avg_power_itc"):
         # avg_power_itc is stored as power + 1i * itc to keep a
         # simple dimensionality
         dtype = np.complex128
 
-    if ('avg_' in output) or ('itc' in output):
+    if ("avg_" in output) or ("itc" in output):
         out = np.empty((n_chans, n_freqs, n_times), dtype)
     else:
         out = np.empty((n_chans, n_epochs, n_freqs, n_times), dtype)
@@ -602,22 +801,32 @@ def _compute_tfr(epoch_data, freqs, sfreq=1.0, method='morlet',
 
     # Parallelization is applied across channels.
     tfrs = parallel(
-        my_cwt(channel, Ws, output, use_fft, 'same', decim)
-        for channel in epoch_data.transpose(1, 0, 2))
+        my_cwt(channel, Ws, output, use_fft, "same", decim)
+        for channel in epoch_data.transpose(1, 0, 2)
+    )
 
     # FIXME: to avoid overheads we should use np.array_split()
     for channel_idx, tfr in enumerate(tfrs):
         out[channel_idx] = tfr
 
-    if ('avg_' not in output) and ('itc' not in output):
+    if ("avg_" not in output) and ("itc" not in output):
         # This is to enforce that the first dimension is for epochs
         out = out.transpose(1, 0, 2, 3)
     return out
 
 
-def tfr_array_morlet(epoch_data, sfreq, freqs, n_cycles=7.0,
-                     zero_mean=False, use_fft=True, decim=1, output='complex',
-                     n_jobs=1, verbose=None):
+def tfr_array_morlet(
+    epoch_data,
+    sfreq,
+    freqs,
+    n_cycles=7.0,
+    zero_mean=False,
+    use_fft=True,
+    decim=1,
+    output="complex",
+    n_jobs=1,
+    verbose=None,
+):
     """Compute Time-Frequency Representation (TFR) using Morlet wavelets.
     Same computation as `~mne.time_frequency.tfr_morlet`, but operates on
     :class:`NumPy arrays <numpy.ndarray>` instead of `~mne.Epochs` objects.
@@ -675,22 +884,34 @@ def tfr_array_morlet(epoch_data, sfreq, freqs, n_cycles=7.0,
     -----
     .. versionadded:: 0.14.0
     """
-    return _compute_tfr(epoch_data=epoch_data, freqs=freqs,
-                        sfreq=sfreq, method='morlet', n_cycles=n_cycles,
-                        zero_mean=zero_mean, time_bandwidth=None,
-                        use_fft=use_fft, decim=decim, output=output,
-                        n_jobs=n_jobs, verbose=verbose)
+    return _compute_tfr(
+        epoch_data=epoch_data,
+        freqs=freqs,
+        sfreq=sfreq,
+        method="morlet",
+        n_cycles=n_cycles,
+        zero_mean=zero_mean,
+        time_bandwidth=None,
+        use_fft=use_fft,
+        decim=decim,
+        output=output,
+        n_jobs=n_jobs,
+        verbose=verbose,
+    )
 
 
 # Low level convolution
+
 
 def _get_nfft(wavelets, X, use_fft=True, check=True):
     n_times = X.shape[-1]
     max_size = max(w.size for w in wavelets)
     if max_size > n_times:
-        msg = (f'At least one of the wavelets ({max_size}) is longer than the '
-               f'signal ({n_times}). Consider using a longer signal or '
-               'shorter wavelets.')
+        msg = (
+            f"At least one of the wavelets ({max_size}) is longer than the "
+            f"signal ({n_times}). Consider using a longer signal or "
+            "shorter wavelets."
+        )
         if check:
             if use_fft:
                 warn(msg)  # warn(msg, UserWarning)
@@ -701,35 +922,39 @@ def _get_nfft(wavelets, X, use_fft=True, check=True):
     return nfft
 
 
-def _check_tfr_param(freqs, sfreq, method, zero_mean, n_cycles,
-                     time_bandwidth, use_fft, decim, output):
+def _check_tfr_param(
+    freqs, sfreq, method, zero_mean, n_cycles, time_bandwidth, use_fft, decim, output
+):
     """Aux. function to _compute_tfr to check the params validity."""
     # Check freqs
     if not isinstance(freqs, (list, np.ndarray)):
-        raise ValueError('freqs must be an array-like, got %s '
-                         'instead.' % type(freqs))
+        raise ValueError("freqs must be an array-like, got %s instead." % type(freqs))
     freqs = np.asarray(freqs, dtype=float)
     if freqs.ndim != 1:
-        raise ValueError('freqs must be of shape (n_freqs,), got %s '
-                         'instead.' % np.array(freqs.shape))
+        raise ValueError(
+            "freqs must be of shape (n_freqs,), got %s instead." % np.array(freqs.shape)
+        )
 
     # Check sfreq
     if not isinstance(sfreq, (float, int)):
-        raise ValueError('sfreq must be a float or an int, got %s '
-                         'instead.' % type(sfreq))
+        raise ValueError(
+            "sfreq must be a float or an int, got %s instead." % type(sfreq)
+        )
     sfreq = float(sfreq)
 
     # Default zero_mean = True if multitaper else False
-    zero_mean = method == 'multitaper' if zero_mean is None else zero_mean
+    zero_mean = method == "multitaper" if zero_mean is None else zero_mean
     if not isinstance(zero_mean, bool):
-        raise ValueError('zero_mean should be of type bool, got %s. instead'
-                         % type(zero_mean))
+        raise ValueError(
+            "zero_mean should be of type bool, got %s. instead" % type(zero_mean)
+        )
     freqs = np.asarray(freqs)
 
-    if (method == 'multitaper') and (output == 'phase'):
+    if (method == "multitaper") and (output == "phase"):
         raise NotImplementedError(
-            'This function is not optimized to compute the phase using the '
-            'multitaper method. Use np.angle of the complex output instead.')
+            "This function is not optimized to compute the phase using the "
+            "multitaper method. Use np.angle of the complex output instead."
+        )
 
     # Check n_cycles
     if isinstance(n_cycles, (int, float)):
@@ -737,35 +962,39 @@ def _check_tfr_param(freqs, sfreq, method, zero_mean, n_cycles,
     elif isinstance(n_cycles, (list, np.ndarray)):
         n_cycles = np.array(n_cycles)
         if len(n_cycles) != len(freqs):
-            raise ValueError('n_cycles must be a float or an array of length '
-                             '%i frequencies, got %i cycles instead.' %
-                             (len(freqs), len(n_cycles)))
+            raise ValueError(
+                "n_cycles must be a float or an array of length "
+                "%i frequencies, got %i cycles instead." % (len(freqs), len(n_cycles))
+            )
     else:
-        raise ValueError('n_cycles must be a float or an array, got %s '
-                         'instead.' % type(n_cycles))
+        raise ValueError(
+            "n_cycles must be a float or an array, got %s instead." % type(n_cycles)
+        )
 
     # Check time_bandwidth
-    if (method == 'morlet') and (time_bandwidth is not None):
+    if (method == "morlet") and (time_bandwidth is not None):
         raise ValueError('time_bandwidth only applies to "multitaper" method.')
-    elif method == 'multitaper':
-        time_bandwidth = (4.0 if time_bandwidth is None
-                          else float(time_bandwidth))
+    elif method == "multitaper":
+        time_bandwidth = 4.0 if time_bandwidth is None else float(time_bandwidth)
 
     # Check use_fft
     if not isinstance(use_fft, bool):
-        raise ValueError('use_fft must be a boolean, got %s '
-                         'instead.' % type(use_fft))
+        raise ValueError("use_fft must be a boolean, got %s instead." % type(use_fft))
     # Check decim
     if isinstance(decim, int):
         decim = slice(None, None, decim)
     if not isinstance(decim, slice):
-        raise ValueError('decim must be an integer or a slice, '
-                         'got %s instead.' % type(decim))
+        raise ValueError(
+            "decim must be an integer or a slice, got %s instead." % type(decim)
+        )
 
     # Check output
-    _check_option('output', output, ['complex', 'power', 'phase',
-                                     'avg_power_itc', 'avg_power', 'itc'])
-    _check_option('method', method, ['multitaper', 'morlet'])
+    _check_option(
+        "output",
+        output,
+        ["complex", "power", "phase", "avg_power_itc", "avg_power", "itc"],
+    )
+    _check_option("method", method, ["multitaper", "morlet"])
 
     return freqs, sfreq, zero_mean, n_cycles, time_bandwidth, decim
 

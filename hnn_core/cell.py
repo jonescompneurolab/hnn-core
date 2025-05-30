@@ -19,8 +19,9 @@ from .externals.mne import _validate_type, _check_option
 
 def _get_cos_theta(sections, sec_name_apical):
     """Get cos(theta) to compute dipole along the apical dendrite."""
-    a = (np.array(sections[sec_name_apical].end_pts[1]) -
-         np.array(sections[sec_name_apical].end_pts[0]))
+    a = np.array(sections[sec_name_apical].end_pts[1]) - np.array(
+        sections[sec_name_apical].end_pts[0]
+    )
     cos_thetas = dict()
     for sec_name, section in sections.items():
         b = np.array(section.end_pts[1]) - np.array(section.end_pts[0])
@@ -55,8 +56,7 @@ def _calculate_gaussian(x_val, height, lamtha):
     return x_height
 
 
-def _get_gaussian_connection(src_pos, target_pos, nc_dict,
-                             inplane_distance=1.):
+def _get_gaussian_connection(src_pos, target_pos, nc_dict, inplane_distance=1.0):
     """Calculate distance dependent connection properties.
 
     Parameters
@@ -86,12 +86,10 @@ def _get_gaussian_connection(src_pos, target_pos, nc_dict,
     x_dist = target_pos[0] - src_pos[0]
     y_dist = target_pos[1] - src_pos[1]
     cell_dist = np.sqrt(x_dist**2 + y_dist**2)
-    scaled_lamtha = nc_dict['lamtha'] * inplane_distance
+    scaled_lamtha = nc_dict["lamtha"] * inplane_distance
 
-    weight = _calculate_gaussian(
-        cell_dist, nc_dict['A_weight'], scaled_lamtha)
-    delay = nc_dict['A_delay'] / _calculate_gaussian(
-        cell_dist, 1, scaled_lamtha)
+    weight = _calculate_gaussian(cell_dist, nc_dict["A_weight"], scaled_lamtha)
+    delay = nc_dict["A_delay"] / _calculate_gaussian(cell_dist, 1, scaled_lamtha)
     return weight, delay
 
 
@@ -127,6 +125,7 @@ class _ArtificialCell:
     gid : int
         GID of the cell in a network (or None if not yet assigned)
     """
+
     def __init__(self, event_times, threshold, gid=None):
         # Convert event times into nrn vector
         self.nrn_eventvec = h.Vector()
@@ -151,17 +150,17 @@ class _ArtificialCell:
     @gid.setter
     def gid(self, gid):
         if not isinstance(gid, int):
-            raise ValueError('gid must be an integer')
+            raise ValueError("gid must be an integer")
         if self._gid is None:
             self._gid = gid
         else:
-            raise RuntimeError('Global ID for this cell already assigned!')
+            raise RuntimeError("Global ID for this cell already assigned!")
 
 
 def _get_nseg(L):
     nseg = 1
-    if L > 100.:  # 100 um
-        nseg = int(L / 50.)
+    if L > 100.0:  # 100 um
+        nseg = int(L / 50.0)
         # make dend.nseg odd for all sections
         if not nseg % 2:
             nseg += 1
@@ -205,8 +204,8 @@ class Section:
     nseg : int
         Number of segments in the section
     """
-    def __init__(self, L, diam, Ra, cm, end_pts=None):
 
+    def __init__(self, L, diam, Ra, cm, end_pts=None):
         self._L = L
         self._diam = diam
         self._Ra = Ra
@@ -222,7 +221,7 @@ class Section:
         self.nseg = _get_nseg(self.L)
 
     def __repr__(self):
-        return f'L={self.L}, diam={self.diam}, cm={self.cm}, Ra={self.Ra}'
+        return f"L={self.L}, diam={self.diam}, cm={self.cm}, Ra={self.Ra}"
 
     def __eq__(self, other):
         if not isinstance(other, Section):
@@ -238,13 +237,12 @@ class Section:
 
         # Check end_pts
         for self_end_pt, other_end_pt in zip(self.end_pts, other.end_pts):
-            if np.testing.assert_almost_equal(self_end_pt,
-                                              other_end_pt, 5) is not None:
+            if np.testing.assert_almost_equal(self_end_pt, other_end_pt, 5) is not None:
                 return False
 
         all_attrs = dir(self)
-        attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
-        attrs_to_ignore.extend(['end_pts', 'mechs', 'to_dict'])
+        attrs_to_ignore = [x for x in all_attrs if x.startswith("_")]
+        attrs_to_ignore.extend(["end_pts", "mechs", "to_dict"])
         attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
 
         # Check all other attributes
@@ -262,16 +260,16 @@ class Section:
         dictionary form of an object of Section class.
         """
         section_data = dict()
-        section_data['L'] = self.L
-        section_data['diam'] = self.diam
-        section_data['cm'] = self.cm
-        section_data['Ra'] = self.Ra
-        section_data['end_pts'] = self.end_pts
-        section_data['nseg'] = self.nseg
+        section_data["L"] = self.L
+        section_data["diam"] = self.diam
+        section_data["cm"] = self.cm
+        section_data["Ra"] = self.Ra
+        section_data["end_pts"] = self.end_pts
+        section_data["nseg"] = self.nseg
         # Need to solve the partial function problem
         # in mechs
-        section_data['mechs'] = self.mechs
-        section_data['syns'] = self.syns
+        section_data["mechs"] = self.mechs
+        section_data["syns"] = self.syns
         return section_data
 
     @property
@@ -378,14 +376,15 @@ class Cell:
         )
     """
 
-    def __init__(self, name, pos, sections, synapses, sect_loc, cell_tree,
-                 gid=None):
+    def __init__(self, name, pos, sections, synapses, sect_loc, cell_tree, gid=None):
         self.name = name
         self.pos = pos
         for section in sections.values():
             if not isinstance(section, Section):
-                raise ValueError(f'Items in section must be instances'
-                                 f' of Section. Got {type(section)}')
+                raise ValueError(
+                    f"Items in section must be instances"
+                    f" of Section. Got {type(section)}"
+                )
         self.sections = sections
         self.synapses = synapses
         self.sect_loc = sect_loc
@@ -411,20 +410,33 @@ class Cell:
 
     def __repr__(self):
         class_name = self.__class__.__name__
-        return f'<{class_name} | gid={self._gid}>'
+        return f"<{class_name} | gid={self._gid}>"
 
     def __eq__(self, other):
         if not isinstance(other, Cell):
             return NotImplemented
 
         all_attrs = dir(self)
-        attrs_to_ignore = [x for x in all_attrs if x.startswith('_')]
-        attrs_to_ignore.extend(['build', 'copy', 'create_tonic_bias',
-                                'define_shape', 'distance_section', 'gid',
-                                'list_IClamp', 'modify_section',
-                                'parconnect_from_src', 'plot_morphology',
-                                'record', 'sections', 'setup_source_netcon',
-                                'syn_create', 'to_dict'])
+        attrs_to_ignore = [x for x in all_attrs if x.startswith("_")]
+        attrs_to_ignore.extend(
+            [
+                "build",
+                "copy",
+                "create_tonic_bias",
+                "define_shape",
+                "distance_section",
+                "gid",
+                "list_IClamp",
+                "modify_section",
+                "parconnect_from_src",
+                "plot_morphology",
+                "record",
+                "sections",
+                "setup_source_netcon",
+                "syn_create",
+                "to_dict",
+            ]
+        )
         attrs_to_check = [x for x in all_attrs if x not in attrs_to_ignore]
 
         # Check all other attributes
@@ -449,15 +461,15 @@ class Cell:
         dictionary form of an object of Cell class.
         """
         cell_data = dict()
-        cell_data['name'] = self.name
-        cell_data['pos'] = self.pos
-        cell_data['sections'] = dict()
+        cell_data["name"] = self.name
+        cell_data["pos"] = self.pos
+        cell_data["sections"] = dict()
         for key in self.sections:
-            cell_data['sections'][key] = self.sections[key].to_dict()
-        cell_data['synapses'] = self.synapses
+            cell_data["sections"][key] = self.sections[key].to_dict()
+        cell_data["synapses"] = self.synapses
         # cell_data['cell_tree'] = self.cell_tree
         if self.cell_tree is None:
-            cell_data['cell_tree'] = None
+            cell_data["cell_tree"] = None
         else:
             cell_tree_dict = dict()
             for parent, children in self.cell_tree.items():
@@ -466,14 +478,14 @@ class Cell:
                 for child in children:
                     value.append(node_to_str(child))
                 cell_tree_dict[key] = value
-            cell_data['cell_tree'] = cell_tree_dict
-        cell_data['sect_loc'] = self.sect_loc
-        cell_data['gid'] = self.gid
-        cell_data['dipole_pp'] = self.dipole_pp
-        cell_data['vsec'] = self.vsec
-        cell_data['isec'] = self.isec
-        cell_data['ca'] = self.ca
-        cell_data['tonic_biases'] = self.tonic_biases
+            cell_data["cell_tree"] = cell_tree_dict
+        cell_data["sect_loc"] = self.sect_loc
+        cell_data["gid"] = self.gid
+        cell_data["dipole_pp"] = self.dipole_pp
+        cell_data["vsec"] = self.vsec
+        cell_data["isec"] = self.isec
+        cell_data["ca"] = self.ca
+        cell_data["tonic_biases"] = self.tonic_biases
         return cell_data
 
     @property
@@ -483,11 +495,11 @@ class Cell:
     @gid.setter
     def gid(self, gid):
         if not isinstance(gid, int):
-            raise ValueError('gid must be an integer')
+            raise ValueError("gid must be an integer")
         if self._gid is None:
             self._gid = gid
         else:
-            raise RuntimeError('Global ID for this cell already assigned!')
+            raise RuntimeError("Global ID for this cell already assigned!")
 
     def distance_section(self, target_sec_name, curr_node):
         """Find distance between the current node and the target section.
@@ -508,8 +520,7 @@ class Cell:
         # Python version of the Neuron distance function
         # https://nrn.readthedocs.io/en/latest/python/modelspec/programmatic/topology/geometry.html#distance  # noqa
         if self.cell_tree is None:
-            raise TypeError("distance_section() "
-                            "cannot work with cell_tree as None.")
+            raise TypeError("distance_section() cannot work with cell_tree as None.")
         if curr_node not in self.cell_tree:
             return np.nan
 
@@ -530,9 +541,11 @@ class Cell:
 
         # Recursion to find distance
         for node in self.cell_tree[curr_node]:
-            if (node[0] == curr_node[0]):
-                dist_temp = (self.distance_section(target_sec_name, node) +
-                             self.sections[node[0]].L)
+            if node[0] == curr_node[0]:
+                dist_temp = (
+                    self.distance_section(target_sec_name, node)
+                    + self.sections[node[0]].L
+                )
             else:
                 dist_temp = self.distance_section(target_sec_name, node)
             if np.isnan(dist) and np.isnan(dist_temp):
@@ -556,7 +569,7 @@ class Cell:
         # and set attribute depending on h.distance(seg.x), which returns
         # distance from the soma to this point on the CURRENTLY ACCESSED
         # SECTION!!!
-        h.distance(sec=self._nrn_sections['soma'])
+        h.distance(sec=self._nrn_sections["soma"])
         for sec_name, section in sections.items():
             sec = self._nrn_sections[sec_name]
             for mech_name, p_mech in section.mechs.items():
@@ -574,20 +587,17 @@ class Cell:
         for sec_name, section in sections.items():
             for mech_name, p_mech in section.mechs.items():
                 for attr, val in p_mech.items():
-                    if hasattr(val, '__call__'):
+                    if hasattr(val, "__call__"):
                         seg_xs, seg_vals = list(), list()
-                        section_distance = self.distance_section(sec_name,
-                                                                 ('soma', 0))
-                        seg_centers = (np.linspace(0, 1, section.nseg * 2 + 1)
-                                       [1::2])
+                        section_distance = self.distance_section(sec_name, ("soma", 0))
+                        seg_centers = np.linspace(0, 1, section.nseg * 2 + 1)[1::2]
 
                         for seg_x in seg_centers:
                             # sec_end_dist is distance between 0 end of soma to
                             # the 0 or 1 end of section (whichever is closer)
                             sec_end_dist = section_distance - (section.L / 2)
                             seg_xs.append(seg_x)
-                            seg_vals.append(val(sec_end_dist +
-                                                (seg_x * section.L)))
+                            seg_vals.append(val(sec_end_dist + (seg_x * section.L)))
                         p_mech[attr] = [seg_xs, seg_vals]
         return self.sections
 
@@ -595,10 +605,9 @@ class Cell:
         """Create synapses."""
         for sec_name in sections:
             for receptor in sections[sec_name].syns:
-                syn_key = f'{sec_name}_{receptor}'
+                syn_key = f"{sec_name}_{receptor}"
                 seg = self._nrn_sections[sec_name](0.5)
-                self._nrn_synapses[syn_key] = self.syn_create(
-                    seg, **synapses[receptor])
+                self._nrn_synapses[syn_key] = self.syn_create(seg, **synapses[receptor])
 
     def _create_sections(self, sections, cell_tree):
         """Create soma and set geometry.
@@ -609,11 +618,11 @@ class Cell:
         for height and xz plane for depth. This is opposite for model as a
         whole, but convention is followed in this function ease use of gui.
         """
-        if 'soma' not in self.sections:
-            raise KeyError('soma must be defined for cell')
+        if "soma" not in self.sections:
+            raise KeyError("soma must be defined for cell")
 
         for sec_name in sections:
-            sec = h.Section(name=f'{self.name}_{sec_name}')
+            sec = h.Section(name=f"{self.name}_{sec_name}")
             self._nrn_sections[sec_name] = sec
 
             h.pt3dclear(sec=sec)
@@ -662,9 +671,11 @@ class Cell:
         if sec_name_apical in self._nrn_sections:
             self._insert_dipole(sec_name_apical)
         elif sec_name_apical is not None:
-            raise ValueError(f'sec_name_apical must be an existing '
-                             f'section of the current cell or None. '
-                             f'Got {sec_name_apical}.')
+            raise ValueError(
+                f"sec_name_apical must be an existing "
+                f"section of the current cell or None. "
+                f"Got {sec_name_apical}."
+            )
 
     def copy(self):
         """Return copy of instance."""
@@ -685,12 +696,12 @@ class Cell:
         """
         self.dpl_vec = h.Vector(1)
         self.dpl_ref = self.dpl_vec._ref_x[0]
-        cos_thetas = _get_cos_theta(self.sections, 'apical_trunk')
+        cos_thetas = _get_cos_theta(self.sections, "apical_trunk")
 
         # setting pointers and ztan values
         for sect_name in self.sections:
             sect = self._nrn_sections[sect_name]
-            sect.insert('dipole')
+            sect.insert("dipole")
 
             dpp = h.Dipole(1, sec=sect)  # defined in dipole_pp.mod
             self.dipole_pp.append(dpp)
@@ -728,8 +739,7 @@ class Cell:
             dpp.ztan = seg_lens_z[-1]
         self.dipole = h.Vector().record(self.dpl_ref)
 
-    def create_tonic_bias(self, amplitude, t0, tstop, section='soma',
-                          loc=0.5):
+    def create_tonic_bias(self, amplitude, t0, tstop, section="soma", loc=0.5):
         """Create tonic bias at defined section.
 
         Parameters
@@ -753,7 +763,7 @@ class Cell:
         self.tonic_biases.append(stim)
 
     def record(self, record_vsec=False, record_isec=False, record_ca=False):
-        """ Record current and voltage from all sections
+        """Record current and voltage from all sections
 
         Parameters
         ----------
@@ -771,45 +781,47 @@ class Cell:
         section_names = list(self.sections.keys())
 
         # Logic checks if just recording soma, sections, or both
-        if record_vsec == 'soma':
-            self.vsec = dict.fromkeys(['soma'])
-        elif record_vsec == 'all':
+        if record_vsec == "soma":
+            self.vsec = dict.fromkeys(["soma"])
+        elif record_vsec == "all":
             self.vsec = dict.fromkeys(section_names)
 
         if record_vsec:
             for sec_name in self.vsec:
                 self.vsec[sec_name] = h.Vector()
-                self.vsec[sec_name].record(
-                    self._nrn_sections[sec_name](0.5)._ref_v)
+                self.vsec[sec_name].record(self._nrn_sections[sec_name](0.5)._ref_v)
 
-        if record_isec == 'soma':
-            self.isec = dict.fromkeys(['soma'])
-        elif record_isec == 'all':
+        if record_isec == "soma":
+            self.isec = dict.fromkeys(["soma"])
+        elif record_isec == "all":
             self.isec = dict.fromkeys(section_names)
 
         if record_isec:
             for sec_name in self.isec:
-                list_syn = [key for key in self._nrn_synapses.keys()
-                            if key.startswith(f'{sec_name}_')]
+                list_syn = [
+                    key
+                    for key in self._nrn_synapses.keys()
+                    if key.startswith(f"{sec_name}_")
+                ]
                 self.isec[sec_name] = dict.fromkeys(list_syn)
 
                 for syn_name in self.isec[sec_name]:
                     self.isec[sec_name][syn_name] = h.Vector()
                     self.isec[sec_name][syn_name].record(
-                        self._nrn_synapses[syn_name]._ref_i)
+                        self._nrn_synapses[syn_name]._ref_i
+                    )
 
         # calcium concentration
-        if record_ca == 'soma':
-            self.ca = dict.fromkeys(['soma'])
-        elif record_ca == 'all':
+        if record_ca == "soma":
+            self.ca = dict.fromkeys(["soma"])
+        elif record_ca == "all":
             self.ca = dict.fromkeys(section_names)
 
         if record_ca:
             for sec_name in self.ca:
-                if hasattr(self._nrn_sections[sec_name](0.5), '_ref_cai'):
+                if hasattr(self._nrn_sections[sec_name](0.5), "_ref_cai"):
                     self.ca[sec_name] = h.Vector()
-                    self.ca[sec_name].record(
-                        self._nrn_sections[sec_name](0.5)._ref_cai)
+                    self.ca[sec_name].record(self._nrn_sections[sec_name](0.5)._ref_cai)
 
     def syn_create(self, secloc, e, tau1, tau2):
         """Create an h.Exp2Syn synapse.
@@ -831,8 +843,9 @@ class Cell:
             A two state kinetic scheme synapse.
         """
         if not isinstance(secloc, nrn.Segment):
-            raise TypeError(f'secloc must be instance of'
-                            f'nrn.Segment. Got {type(secloc)}')
+            raise TypeError(
+                f"secloc must be instance ofnrn.Segment. Got {type(secloc)}"
+            )
         syn = h.Exp2Syn(secloc)
         syn.e = e
         syn.tau1 = tau1
@@ -847,13 +860,13 @@ class Cell:
         threshold : float
             The voltage threshold for action potential.
         """
-        nc = h.NetCon(self._nrn_sections['soma'](0.5)._ref_v, None,
-                      sec=self._nrn_sections['soma'])
+        nc = h.NetCon(
+            self._nrn_sections["soma"](0.5)._ref_v, None, sec=self._nrn_sections["soma"]
+        )
         nc.threshold = threshold
         return nc
 
-    def parconnect_from_src(self, gid_presyn, nc_dict, postsyn,
-                            inplane_distance):
+    def parconnect_from_src(self, gid_presyn, nc_dict, postsyn, inplane_distance):
         """Parallel receptor-centric connect FROM presyn TO this cell,
            based on GID.
 
@@ -880,16 +893,23 @@ class Cell:
         nc = _PC.gid_connect(gid_presyn, postsyn)
 
         # set props here.
-        nc.threshold = nc_dict['threshold']
+        nc.threshold = nc_dict["threshold"]
         nc.weight[0], nc.delay = _get_gaussian_connection(
-            nc_dict['pos_src'], self.pos, nc_dict,
-            inplane_distance=inplane_distance)
+            nc_dict["pos_src"], self.pos, nc_dict, inplane_distance=inplane_distance
+        )
 
         return nc
 
-    def plot_morphology(self, ax=None, color=None, pos=(0, 0, 0),
-                        xlim=(-250, 150), ylim=(-100, 100), zlim=(-100, 1200),
-                        show=True):
+    def plot_morphology(
+        self,
+        ax=None,
+        color=None,
+        pos=(0, 0, 0),
+        xlim=(-250, 150),
+        ylim=(-100, 100),
+        zlim=(-100, 1200),
+        show=True,
+    ):
         """Plot the cell morphology.
 
         Parameters
@@ -920,8 +940,16 @@ class Cell:
         axes : instance of Axes3D
             The matplotlib 3D axis handle.
         """
-        return plot_cell_morphology(self, ax=ax, color=color, pos=pos,
-                                    xlim=xlim, ylim=ylim, zlim=zlim, show=show)
+        return plot_cell_morphology(
+            self,
+            ax=ax,
+            color=color,
+            pos=pos,
+            xlim=xlim,
+            ylim=ylim,
+            zlim=zlim,
+            show=show,
+        )
 
     def _update_section_end_pts_L(self, node, dpt):
         if self.cell_tree is None:
@@ -970,8 +998,7 @@ class Cell:
             node_opp_end = 0
         pts = self.sections[node[0]].end_pts
         x0, y0, z0 = pts[node[1]][0], pts[node[1]][1], pts[node[1]][2]
-        x1, y1, z1 = (pts[node_opp_end][0], pts[node_opp_end][1],
-                      pts[node_opp_end][2])
+        x1, y1, z1 = (pts[node_opp_end][0], pts[node_opp_end][1], pts[node_opp_end][2])
 
         # Find the factor by which length is changed
         end_1 = np.array((x0, y0, z0))
@@ -1006,33 +1033,27 @@ class Cell:
         -------
         Updated end pts for the cell
         """
-        if 'soma' not in self.sections:
-            raise KeyError('soma must be defined for cell')
+        if "soma" not in self.sections:
+            raise KeyError("soma must be defined for cell")
         # cell tree is None therefore no end_pts to update
         if self.cell_tree is None:
             return
 
         # shift cell to self.pos and reorient apical dendrite
         # along z direction of self.pos
-        dx = self.pos[0] - self.sections['soma'].end_pts[0][0]
-        dy = self.pos[1] - self.sections['soma'].end_pts[0][1]
-        dz = self.pos[2] - self.sections['soma'].end_pts[0][2]
+        dx = self.pos[0] - self.sections["soma"].end_pts[0][0]
+        dy = self.pos[1] - self.sections["soma"].end_pts[0][1]
+        dz = self.pos[2] - self.sections["soma"].end_pts[0][2]
         for sec_name in self.sections:
             end_pts = self.sections[sec_name].end_pts
             updated_end_pts = list()
             for pt in end_pts:
-                updated_end_pts.append(
-                    [
-                        pt[0] + dx,
-                        pt[1] + dy,
-                        pt[2] + dz
-                    ]
-                )
+                updated_end_pts.append([pt[0] + dx, pt[1] + dy, pt[2] + dz])
             self.sections[sec_name]._end_pts = updated_end_pts
 
         # Check and update all end pts starting from root according to length
         # of sections.
-        self.define_shape(('soma', 0))
+        self.define_shape(("soma", 0))
 
     def modify_section(self, sec_name, L=None, diam=None, cm=None, Ra=None):
         """Change attributes of section specified by `sec_name`
@@ -1055,22 +1076,22 @@ class Cell:
         Leaving default of None produces no change.
         """
         valid_sec_names = list(self.sections.keys())
-        _check_option('sec_name', sec_name, valid_sec_names)
+        _check_option("sec_name", sec_name, valid_sec_names)
 
         if L is not None:
-            _validate_type(L, (float, int), 'L')
+            _validate_type(L, (float, int), "L")
             self.sections[sec_name]._L = L
 
         if diam is not None:
-            _validate_type(diam, (float, int), 'diam')
+            _validate_type(diam, (float, int), "diam")
             self.sections[sec_name]._diam = diam
 
         if cm is not None:
-            _validate_type(cm, (float, int), 'cm')
+            _validate_type(cm, (float, int), "cm")
             self.sections[sec_name]._cm = cm
 
         if Ra is not None:
-            _validate_type(Ra, (float, int), 'Ra')
+            _validate_type(Ra, (float, int), "Ra")
             self.sections[sec_name]._Ra = Ra
 
         self._update_end_pts()

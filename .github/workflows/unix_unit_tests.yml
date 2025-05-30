@@ -54,6 +54,10 @@
           shell: bash -el {0}
           run: |
             pip install --verbose '.[opt, parallel, test, gui]'
+        - name: Check ruff formatting
+          shell: bash -el {0}
+          run: |
+            ruff format hnn_core --check
         - name: Lint with ruff
           shell: bash -el {0}
           run: |
