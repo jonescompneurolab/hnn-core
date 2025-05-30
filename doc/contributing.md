@@ -206,6 +206,16 @@ safe, you should *always* run tests (see "Testing" section below) after you run 
 format-overwrite`, just in case the auto-formatter broke something, which it hopefully
 never will 🤞.
 
+One nice thing about the autoformatter is that if you are defining something that has
+multiple elements (e.g. a list `foo = [1, 2]`), and you change the code such that the
+final element of that list ends in a comma (i.e., continuing the example, `foo = [1,
+2,]`), then the autoformatter will automatically put each element of that list on its
+own line. See <https://docs.astral.sh/ruff/settings/#format_skip-magic-trailing-comma>
+for more details. Conversely, if you don't want this, then if you remove the "magic
+trailing comma" in question (i.e., continuing the example, changing it back to `foo =
+[1, 2]`), then the autoformatter will attempt to keep all the elements on the same line
+(but only if it is less than the allowed line length).
+
 ### Testing
 
 Tests are extremely important and help ensure integrity of the code functionality after
