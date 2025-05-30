@@ -15,6 +15,265 @@ from .cell import Cell, Section
 from .cell_response import CellResponse
 from .externals.mne import fill_doc
 
+from datetime import datetime
+
+def write_network_markdown(net, fname, overwrite=True):
+    """Write network config to a markdown file.
+    
+    Parameters
+    ----------
+    net : instance of Network
+        The Network object.
+    fname : str
+        Full path to the output file (.md).
+    overwrite : bool
+        If True, overwrite the output file if it exists.
+        
+    Returns
+    -------
+    markdown_text : str
+        The markdown representation of the network.
+    """
+    if overwrite is False and os.path.exists(fname):
+        raise FileExistsError(f'File already exists at path {fname}. Rename '
+                             f'the file or set overwrite=True.')
+    
+    md = list()
+    md.append("# HNN Network Configuration")
+    md.append("")
+    md.append(f"*Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}*")
+    md.append("")
+    md.append("")
+    
+    # sim params
+    md.append("## Simulation Parameters")
+    md.append("")
+    md.append("| Parameter | Value |")
+    md.append("|-----------|-------|")
+    md.append(f"| Time step (dt) | {net._params.get('dt', 'Not set')} ms |")
+    md.append(f"| Simulation time (tstop) | {net._params.get('tstop', 'Not set')} ms |")
+    md.append(f"| Number of trials | {net._params.get('N_trials', 'Not set')} |")
+    md.append(f"| Firing threshold | {net.threshold} mV |")
+    md.append("")
+    
+    # network structure
+    md.append("## Network Structure")
+    md.append("")
+    md.append("| Parameter | Value |")
+    md.append("|-----------|-------|")
+    md.append(f"| Mesh shape | {net._N_pyr_x} × {net._N_pyr_y} |")
+    md.append(f"| In-plane distance | {net._inplane_distance} µm |")
+    md.append(f"| Layer separation | {net._layer_separation} µm |")
+    md.append("")
+    
+    md.append("### Cell Counts")
+    md.append("")
+    md.append("| Cell Type | Count |")
+    md.append("|-----------|-------|")
+    for cell_type, pos_list in net.pos_dict.items():
+        if cell_type != 'origin' and cell_type not in net.external_drives:
+            md.append(f"| {cell_type} | {len(pos_list)} |")
+    md.append("")
+    
+    # connectivity/network
+    md.append("## Network Connectivity")
+    md.append("")
+    
+    cell_connections = [conn for conn in net.connectivity 
+                       if conn['src_type'] in net.cell_types]
+    
+    if cell_connections:
+        md.append("| Source | Target | Location | Receptor | Weight | Delay (ms) |")
+        md.append("|--------|--------|----------|----------|--------|------------|")
+        
+        for conn in cell_connections:
+            md.append(f"| {conn['src_type']} | {conn['target_type']} | "
+                     f"{conn['loc']} | {conn['receptor']} | "
+                     f"{conn['nc_dict']['A_weight']} | "
+                     f"{conn['nc_dict']['A_delay']} |")
+    else:
+        md.append("*No cell-to-cell connections defined*")
+    md.append("")
+    
+    md.append("## External Drives")
+    md.append("")
+    
+    if net.external_drives:
+        for drive_name, drive in net.external_drives.items():
+            md.append(f"### {drive_name} ({drive['type']})")
+            md.append("")
+            
+            md.append("| Parameter | Value |")
+            md.append("|-----------|-------|")
+            if drive['location'] is not None: 
+                md.append(f"| Location | {drive['location']} |")
+            md.append(f"| Number of drive cells | {drive['n_drive_cells']} |")
+            if 'cell_specific' in drive: 
+                md.append(f"| Cell specific | {drive['cell_specific']} |")
+            
+            for param_name, param_value in drive['dynamics'].items():
+                if not isinstance(param_value, dict):
+                    md.append(f"| {param_name} | {param_value} |")
+            md.append("")
+            
+            for param_name, param_value in drive['dynamics'].items():
+                if isinstance(param_value, dict):
+                    md.append(f"#### {param_name}")
+                    md.append("")
+                    md.append("| Cell Type | Value |")
+                    md.append("|-----------|-------|")
+                    for cell_type, value in param_value.items():
+                        md.append(f"| {cell_type} | {value} |")
+                    md.append("")
+            
+            if drive.get('weights_ampa'):
+                md.append("#### AMPA Weights")
+                md.append("")
+                md.append("| Cell Type | Weight |")
+                md.append("|-----------|--------|")
+                for cell_type, weight in drive['weights_ampa'].items():
+                    md.append(f"| {cell_type} | {weight} |")
+                md.append("")
+            
+            if drive.get('weights_nmda'):
+                md.append("#### NMDA Weights")
+                md.append("")
+                md.append("| Cell Type | Weight |")
+                md.append("|-----------|--------|")
+                for cell_type, weight in drive['weights_nmda'].items():
+                    md.append(f"| {cell_type} | {weight} |")
+                md.append("")
+            
+            if drive.get('synaptic_delays'):
+                if isinstance(drive['synaptic_delays'], dict):
+                    md.append("#### Synaptic Delays")
+                    md.append("")
+                    md.append("| Cell Type | Delay (ms) |")
+                    md.append("|-----------|------------|")
+                    for cell_type, delay in drive['synaptic_delays'].items():
+                        md.append(f"| {cell_type} | {delay} |")
+                else:
+                    md.append(f"#### Synaptic Delay: {drive['synaptic_delays']} ms")
+                md.append("")
+    else:
+        md.append("*No external drives defined*")
+    md.append("")
+    
+    if net.external_biases:
+        md.append("### Tonic Biases")
+        md.append("")
+        
+        for bias_name, bias_dict in net.external_biases.items():
+            md.append(f"#### {bias_name}")
+            md.append("")
+            
+            for cell_type, bias in bias_dict.items():
+                md.append(f"**{cell_type}**")
+                md.append("")
+                md.append("| Parameter | Value |")
+                md.append("|-----------|-------|")
+                md.append(f"| Amplitude | {bias['amplitude']} nA |")
+                md.append(f"| Start time | {bias['t0']} ms |")
+                if bias['tstop'] is not None:
+                    md.append(f"| Stop time | {bias['tstop']} ms |")
+                md.append(f"| Section | {bias['section']} |")
+                md.append("")
+    
+    md.append("## Cell Parameters")
+    md.append("")
+    
+    for cell_type, cell in net.cell_types.items():
+        md.append(f"### {cell_type}")
+        md.append("")
+        
+        md.append("#### Geometry")
+        md.append("")
+        md.append("| Section | Length (µm) | Diameter (µm) | Capacitance (µF/cm²) | Resistance (Ohm-cm) |")
+        md.append("|---------|-------------|---------------|----------------------|-------------------|")
+        
+        for section_name, section in cell.sections.items():
+            md.append(f"| {section_name} | {section.L} | {section.diam} | {section.cm} | {section.Ra} |")
+        md.append("")
+        
+        md.append("#### Synapses")
+        md.append("")
+        md.append("| Receptor | Reversal (mV) | Rise Time (ms) | Decay Time (ms) |")
+        md.append("|----------|---------------|----------------|-----------------|")
+        
+        for receptor, params in cell.synapses.items():
+            md.append(f"| {receptor} | {params['e']} | {params['tau1']} | {params['tau2']} |")
+        md.append("")
+        
+        md.append("#### Biophysics")
+        md.append("")
+        
+        if 'soma' in cell.sections:
+            md.append("##### Soma")
+            md.append("")
+            
+            has_params = False
+            for mech_name, params in cell.sections['soma'].mechs.items():
+                if params:
+                    has_params = True
+                    break
+                    
+            if has_params:
+                md.append("| Parameter | Value |")
+                md.append("|-----------|-------|")
+                
+                for mech_name, params in cell.sections['soma'].mechs.items():
+                    for param_name, value in params.items():
+                        if callable(value):
+                            md.append(f"| {param_name} ({mech_name}) | *function* |")
+                        elif isinstance(value, list):
+                            # different values at different locations
+                            md.append(f"| {param_name} ({mech_name}) | *segmented* |") 
+                        else:
+                            md.append(f"| {param_name} ({mech_name}) | {value} |")
+            else:
+                md.append("*No configurable parameters*")
+            md.append("")
+        
+        dendrite_sections = [sec for sec in cell.sections.keys() if sec != 'soma']
+        if dendrite_sections:
+            md.append("##### Dendrites")
+            md.append("")
+            
+            has_params = False
+            example_dend = cell.sections[dendrite_sections[0]]
+            for mech_name, params in example_dend.mechs.items():
+                if params:
+                    has_params = True
+                    break
+                    
+            if has_params:
+                md.append("| Parameter | Value |")
+                md.append("|-----------|-------|")
+                
+                for mech_name, params in example_dend.mechs.items():
+                    for param_name, value in params.items():
+                        if callable(value):
+                            md.append(f"| {param_name} ({mech_name}) | *function* |")
+                        elif isinstance(value, list):
+                            # different values at different locations
+                            md.append(f"| {param_name} ({mech_name}) | *segmented* |") 
+                        else:
+                            md.append(f"| {param_name} ({mech_name}) | {value} |")
+            else:
+                md.append("*No configurable parameters*")
+            md.append("")
+    
+    markdown_text = "\n".join(md)
+    
+    if fname is not None:
+        dirname = os.path.dirname(fname)
+        if dirname and not os.path.exists(dirname):
+            os.makedirs(dirname)
+            
+        with open(fname, 'w', encoding='utf-8') as f:
+            f.write(markdown_text)
+    
+    return markdown_text
 
 def _convert_np_array_to_list(obj):
     """Returns object with np.arrays converted to lists
