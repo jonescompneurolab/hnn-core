@@ -135,67 +135,94 @@ them, they will need to be rebuilt using the command:
 
     $ python setup.py build_mod
 
-## Linting, spell-checking, and formatting
+We highly encourage contributors to also follow the `pip` MPI portion of the
+{doc}`Installation Guide <install>` so that
+they can run the entire test suite locally on their computer.
 
-Any code contributions need to pass checks for linting, spelling, and formatting. These
-are different than tests that actually test the functionality of the code (see next
-section). Fortunately, these checks are easy and fast to do, and if you used the
-previous install instructions, you already have the packages you need to run them.
+## Quality control
+
+All new code contributions must pass linting checks, spell checks, format checks, and
+tests before they can be merged. If you used the above install instructions, then
+everything you need to run these should already be installed. We *strongly recommend*
+that Contributors first run all quality checks and tests *locally*, and *before* you
+push new code to any Pull Requests. These same checks and tests are run automatically by
+our Continuous Integration suite, and and if any of them fail on your local machine,
+then *they will fail* in the automated tests run on Github, and your contributions will
+not be merge-able (until the errors are fixed).
+
+How to run these checks and tests locally is described below.
+
+### Linting
 
 "Linting" your code, which checks for code syntax errors and other errors, can be done
 using the following command, which uses the `ruff` library:
 
     $ make lint
 
-If the above command prints any errors, then you will **need** to fix those errors
+If the above command prints any errors, then you will *need to fix* those errors
 before your code will pass our Continuous Integration testing, which is required for it
-to be merged. Fixing the error is up to you: the above command does not change your
-code, but will often provide suggestions on potential fixes to most errors.
+to be merged. How to fix the error is up to you: the above command does not change your
+code, but will often provide suggestions on potential fixes.
+
+Note that linting is also done as part of the `make test` command (see
+"Testing" section below), which means that you do not need to run `make lint` by
+itself unless you wish to.
+
+### Spell-checking
 
 Spell-checking your code can be done by simply running the following command. This
 command also only checks your code, but does not make changes to it:
 
     $ make spell
 
-Formatting is handled similarly, but through two different commands. The first command,
+Note that spell-checking is also done as part of the `make test` command (see
+"Testing" section below), which means that you do not need to run `make spell` by
+itself unless you wish to.
+
+### Formatting
+
+Formatting is handled differently, through two commands. The first command,
 below, is used to check if your code is consistent with our enforced formatting style,
 which is currently the default `ruff` style. This command does not change your code:
 
     $ make format-check
 
+Note that format-checking is also done as part of the `make test` command (see
+"Testing" section below), which means that you do not need to run `make format-check`
+by itself unless you wish to.
+
 However, most of the code you write will probably need to be re-formatted to pass `make
 format-check`. Fortunately, `ruff` provides a tool for safe, *automatic* formatting of
 your code. If `make format-check` returns any errors and tells you that any number of
-files "would be reformatted", and if you are ready to make a git commit or push, then you
-should run the following command. This command **will probably change your code
-automatically** as it re-formats your code:
+files "would be reformatted", and if you are ready to make a git commit, then you
+should run the following command. This command **will almost always change your code
+automatically**, since it re-formats your code:
 
     $ make format-overwrite
 
-After you run the above command, your code should now be able to pass `make
-format-check`, and you will probably want to proceed to running the tests.
+Unlike linting, spell-checking, and testing, we do provide a way to automatically fix
+formatting issues. That way is the above `make format-overwrite` command. Just to be
+safe, you should *always* run tests (see "Testing" section below) after you run `make
+format-overwrite`, just in case the auto-formatter broke something, which it hopefully
+never will 🤞.
 
-## Running tests
+### Testing
 
-If you installed editable hnn-core using the instructions above, the requirements for
-running the tests should already be installed. Tests help ensure integrity of the
-package after your change has been made. We recommend developers to run tests locally on
-their computers after making changes.
-
-We use the `pytest` testing framework.
-
-To run the tests simply type into your terminal:
+Tests are extremely important and help ensure integrity of the code functionality after
+your changes have been made. We use the [`pytest` testing
+framework](https://docs.pytest.org/en/stable/), and use the [`pytest-xdist`
+extension](https://pytest-xdist.readthedocs.io/en/stable/) to speed up your local test
+runs as fast as possible. To run the tests, run the following command:
 
     $ make test
 
-MPI tests are skipped if the `mpi4py` module is not installed. We highly
-encourage contributors to follow the MPI portion of the
-{doc}`Installation Guide <install>` so that
-they can run the entire test suite locally on their computer.
+Running tests will not change your code, but may download some additional files. MPI
+tests are skipped if the `mpi4py` module is not installed. See {doc}`Installation Guide
+<install>` for how to install MPI and `mpi4py`.
 
-Note that `make test` first runs the checks for linting, spell-checking, and formatting,
-(described in the previous section) and then only *after* your code successfully passes
-those checks does it run the tests.
+Note that `make test` first runs the checks above for linting, spell-checking, and
+formatting, and then runs the test suite only *after* your code successfully passes
+those initial checks.
 
 ## Updating documentation
 
