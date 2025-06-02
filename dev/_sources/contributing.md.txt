@@ -135,33 +135,104 @@ them, they will need to be rebuilt using the command:
 
     $ python setup.py build_mod
 
-## Running tests
-
-Once you have the editable hnn-core, you should install the requirements
-for running the tests. Tests help ensure integrity of the package after
-your change has been made. We recommend developers to run tests locally
-on their computers after making changes.
-
-We use the `pytest` testing framework.
-
-To run the tests simply type into your terminal:
-
-    $ make test
-
-MPI tests are skipped if the `mpi4py` module is not installed. We highly
-encourage contributors to follow the MPI portion of the
+We highly encourage contributors to also follow the `pip` MPI portion of the
 {doc}`Installation Guide <install>` so that
 they can run the entire test suite locally on their computer.
 
-As part of `make test`, your code is also "linted" (meaning checked for errors)
-and spell-checked. If you would like to perform these checks individually, you
-can do so by running the following command to lint with `ruff`:
+## Quality control
+
+All new code contributions must pass linting checks, spell checks, format checks, and
+tests before they can be merged. If you used the above install instructions, then
+everything you need to run these should already be installed. We *strongly recommend*
+that Contributors first run all quality checks and tests *locally*, and *before* you
+push new code to any Pull Requests. These same checks and tests are run automatically by
+our Continuous Integration suite, and and if any of them fail on your local machine,
+then *they will fail* in the automated tests run on Github, and your contributions will
+not be merge-able (until the errors are fixed).
+
+How to run these checks and tests locally is described below.
+
+### Linting
+
+"Linting" your code, which checks for code syntax errors and other errors, can be done
+using the following command, which uses the `ruff` library:
 
     $ make lint
 
-Or the following command to perform common spell-checking:
+If the above command prints any errors, then you will *need to fix* those errors
+before your code will pass our Continuous Integration testing, which is required for it
+to be merged. How to fix the error is up to you: the above command does not change your
+code, but will often provide suggestions on potential fixes.
+
+Note that linting is also done as part of the `make test` command (see
+"Testing" section below), which means that you do not need to run `make lint` by
+itself unless you wish to.
+
+### Spell-checking
+
+Spell-checking your code can be done by simply running the following command. This
+command also only checks your code, but does not make changes to it:
 
     $ make spell
+
+Note that spell-checking is also done as part of the `make test` command (see
+"Testing" section below), which means that you do not need to run `make spell` by
+itself unless you wish to.
+
+### Formatting
+
+Formatting is handled differently, through two commands. The first command,
+below, is used to check if your code is consistent with our enforced formatting style,
+which is currently the default `ruff` style. This command does not change your code:
+
+    $ make format-check
+
+Note that format-checking is also done as part of the `make test` command (see
+"Testing" section below), which means that you do not need to run `make format-check`
+by itself unless you wish to.
+
+However, most of the code you write will probably need to be re-formatted to pass `make
+format-check`. Fortunately, `ruff` provides a tool for safe, *automatic* formatting of
+your code. If `make format-check` returns any errors and tells you that any number of
+files "would be reformatted", and if you are ready to make a git commit, then you
+should run the following command. This command **will almost always change your code
+automatically**, since it re-formats your code:
+
+    $ make format-overwrite
+
+Unlike linting, spell-checking, and testing, we do provide a way to automatically fix
+formatting issues. That way is the above `make format-overwrite` command. Just to be
+safe, you should *always* run tests (see "Testing" section below) after you run `make
+format-overwrite`, just in case the auto-formatter broke something, which it hopefully
+never will 🤞.
+
+One nice thing about the autoformatter is that if you are defining something that has
+multiple elements (e.g. a list `foo = [1, 2]`), and you change the code such that the
+final element of that list ends in a comma (i.e., continuing the example, `foo = [1,
+2,]`), then the autoformatter will automatically put each element of that list on its
+own line. See <https://docs.astral.sh/ruff/settings/#format_skip-magic-trailing-comma>
+for more details. Conversely, if you don't want this, then if you remove the "magic
+trailing comma" in question (i.e., continuing the example, changing it back to `foo =
+[1, 2]`), then the autoformatter will attempt to keep all the elements on the same line
+(but only if it is less than the allowed line length).
+
+### Testing
+
+Tests are extremely important and help ensure integrity of the code functionality after
+your changes have been made. We use the [`pytest` testing
+framework](https://docs.pytest.org/en/stable/), and use the [`pytest-xdist`
+extension](https://pytest-xdist.readthedocs.io/en/stable/) to speed up your local test
+runs as fast as possible. To run the tests, run the following command:
+
+    $ make test
+
+Running tests will not change your code, but may download some additional files. MPI
+tests are skipped if the `mpi4py` module is not installed. See {doc}`Installation Guide
+<install>` for how to install MPI and `mpi4py`.
+
+Note that `make test` first runs the checks above for linting, spell-checking, and
+formatting, and then runs the test suite only *after* your code successfully passes
+those initial checks.
 
 ## Updating documentation
 
@@ -344,8 +415,6 @@ running a simple MPI simulation fails, subsequent tests that compare
 simulation output between different backends will be skipped. These
 types of failures will be marked as a failure in CI.
 
-[used in MNE-Python]: https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#L124-L132
-
 ## Making changes to the default network
 
 If you ever need to make scientific or technical changes to the default network, you must "re-generate" the smaller network we use for testing, in `hnn_core/tests/assets/jones2009_3x3_drives.json`. This is easily done via the following:
@@ -353,3 +422,5 @@ If you ever need to make scientific or technical changes to the default network,
     $ make regenerate-test-network
 
 Once you do this, make sure to re-run all the tests using `make test` to ensure that numerical tests dependent on the network itself have not broken.
+
+[used in MNE-Python]: https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#L124-L132

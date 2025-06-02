@@ -620,32 +620,94 @@ them, they will need to be rebuilt using the command:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ python setup.py build_mod
 </pre></div>
 </div>
-</section>
-<section id="running-tests">
-<h2>Running tests<a class="headerlink" href="#running-tests" title="Permalink to this heading">#</a></h2>
-<p>Once you have the editable hnn-core, you should install the requirements
-for running the tests. Tests help ensure integrity of the package after
-your change has been made. We recommend developers to run tests locally
-on their computers after making changes.</p>
-<p>We use the <code class="docutils literal notranslate"><span class="pre">pytest</span></code> testing framework.</p>
-<p>To run the tests simply type into your terminal:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make test
-</pre></div>
-</div>
-<p>MPI tests are skipped if the <code class="docutils literal notranslate"><span class="pre">mpi4py</span></code> module is not installed. We highly
-encourage contributors to follow the MPI portion of the
+<p>We highly encourage contributors to also follow the <code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI portion of the
 <a class="reference internal" href="install.html"><span class="doc">Installation Guide</span></a> so that
 they can run the entire test suite locally on their computer.</p>
-<p>As part of <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code>, your code is also “linted” (meaning checked for errors)
-and spell-checked. If you would like to perform these checks individually, you
-can do so by running the following command to lint with <code class="docutils literal notranslate"><span class="pre">ruff</span></code>:</p>
+</section>
+<section id="quality-control">
+<h2>Quality control<a class="headerlink" href="#quality-control" title="Permalink to this heading">#</a></h2>
+<p>All new code contributions must pass linting checks, spell checks, format checks, and
+tests before they can be merged. If you used the above install instructions, then
+everything you need to run these should already be installed. We <em>strongly recommend</em>
+that Contributors first run all quality checks and tests <em>locally</em>, and <em>before</em> you
+push new code to any Pull Requests. These same checks and tests are run automatically by
+our Continuous Integration suite, and and if any of them fail on your local machine,
+then <em>they will fail</em> in the automated tests run on Github, and your contributions will
+not be merge-able (until the errors are fixed).</p>
+<p>How to run these checks and tests locally is described below.</p>
+<section id="linting">
+<h3>Linting<a class="headerlink" href="#linting" title="Permalink to this heading">#</a></h3>
+<p>“Linting” your code, which checks for code syntax errors and other errors, can be done
+using the following command, which uses the <code class="docutils literal notranslate"><span class="pre">ruff</span></code> library:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make lint
 </pre></div>
 </div>
-<p>Or the following command to perform common spell-checking:</p>
+<p>If the above command prints any errors, then you will <em>need to fix</em> those errors
+before your code will pass our Continuous Integration testing, which is required for it
+to be merged. How to fix the error is up to you: the above command does not change your
+code, but will often provide suggestions on potential fixes.</p>
+<p>Note that linting is also done as part of the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code> command (see
+“Testing” section below), which means that you do not need to run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">lint</span></code> by
+itself unless you wish to.</p>
+</section>
+<section id="spell-checking">
+<h3>Spell-checking<a class="headerlink" href="#spell-checking" title="Permalink to this heading">#</a></h3>
+<p>Spell-checking your code can be done by simply running the following command. This
+command also only checks your code, but does not make changes to it:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make spell
 </pre></div>
 </div>
+<p>Note that spell-checking is also done as part of the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code> command (see
+“Testing” section below), which means that you do not need to run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">spell</span></code> by
+itself unless you wish to.</p>
+</section>
+<section id="formatting">
+<h3>Formatting<a class="headerlink" href="#formatting" title="Permalink to this heading">#</a></h3>
+<p>Formatting is handled differently, through two commands. The first command,
+below, is used to check if your code is consistent with our enforced formatting style,
+which is currently the default <code class="docutils literal notranslate"><span class="pre">ruff</span></code> style. This command does not change your code:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make format-check
+</pre></div>
+</div>
+<p>Note that format-checking is also done as part of the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code> command (see
+“Testing” section below), which means that you do not need to run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">format-check</span></code>
+by itself unless you wish to.</p>
+<p>However, most of the code you write will probably need to be re-formatted to pass <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">format-check</span></code>. Fortunately, <code class="docutils literal notranslate"><span class="pre">ruff</span></code> provides a tool for safe, <em>automatic</em> formatting of
+your code. If <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">format-check</span></code> returns any errors and tells you that any number of
+files “would be reformatted”, and if you are ready to make a git commit, then you
+should run the following command. This command <strong>will almost always change your code
+automatically</strong>, since it re-formats your code:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make format-overwrite
+</pre></div>
+</div>
+<p>Unlike linting, spell-checking, and testing, we do provide a way to automatically fix
+formatting issues. That way is the above <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">format-overwrite</span></code> command. Just to be
+safe, you should <em>always</em> run tests (see “Testing” section below) after you run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">format-overwrite</span></code>, just in case the auto-formatter broke something, which it hopefully
+never will 🤞.</p>
+<p>One nice thing about the autoformatter is that if you are defining something that has
+multiple elements (e.g. a list <code class="docutils literal notranslate"><span class="pre">foo</span> <span class="pre">=</span> <span class="pre">[1,</span> <span class="pre">2]</span></code>), and you change the code such that the
+final element of that list ends in a comma (i.e., continuing the example, <code class="docutils literal notranslate"><span class="pre">foo</span> <span class="pre">=</span> <span class="pre">[1,</span> <span class="pre">2,]</span></code>), then the autoformatter will automatically put each element of that list on its
+own line. See <a class="reference external" href="https://docs.astral.sh/ruff/settings/#format_skip-magic-trailing-comma">https://docs.astral.sh/ruff/settings/#format_skip-magic-trailing-comma</a>
+for more details. Conversely, if you don’t want this, then if you remove the “magic
+trailing comma” in question (i.e., continuing the example, changing it back to <code class="docutils literal notranslate"><span class="pre">foo</span> <span class="pre">=</span> <span class="pre">[1,</span> <span class="pre">2]</span></code>), then the autoformatter will attempt to keep all the elements on the same line
+(but only if it is less than the allowed line length).</p>
+</section>
+<section id="testing">
+<h3>Testing<a class="headerlink" href="#testing" title="Permalink to this heading">#</a></h3>
+<p>Tests are extremely important and help ensure integrity of the code functionality after
+your changes have been made. We use the <a class="reference external" href="https://docs.pytest.org/en/stable/"><code class="docutils literal notranslate"><span class="pre">pytest</span></code> testing
+framework</a>, and use the <a class="reference external" href="https://pytest-xdist.readthedocs.io/en/stable/"><code class="docutils literal notranslate"><span class="pre">pytest-xdist</span></code>
+extension</a> to speed up your local test
+runs as fast as possible. To run the tests, run the following command:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make test
+</pre></div>
+</div>
+<p>Running tests will not change your code, but may download some additional files. MPI
+tests are skipped if the <code class="docutils literal notranslate"><span class="pre">mpi4py</span></code> module is not installed. See <a class="reference internal" href="install.html"><span class="doc">Installation Guide</span></a> for how to install MPI and <code class="docutils literal notranslate"><span class="pre">mpi4py</span></code>.</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code> first runs the checks above for linting, spell-checking, and
+formatting, and then runs the test suite only <em>after</em> your code successfully passes
+those initial checks.</p>
+</section>
 </section>
 <section id="updating-documentation">
 <h2>Updating documentation<a class="headerlink" href="#updating-documentation" title="Permalink to this heading">#</a></h2>
@@ -892,7 +954,13 @@ types of failures will be marked as a failure in CI.</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#making-your-first-pull-request">Making your first pull request</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-editable-hnn-core">Installing editable hnn-core</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-tests">Running tests</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quality-control">Quality control</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#linting">Linting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spell-checking">Spell-checking</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#formatting">Formatting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#testing">Testing</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#updating-documentation">Updating documentation</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-documentation">Building the documentation</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-the-documentation">Writing the documentation</a></li>

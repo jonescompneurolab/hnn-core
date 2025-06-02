@@ -540,11 +540,12 @@ document.write(`
 <span class="sd">    csd[electrode] = -(LFP[electrode - 1] - 2*LFP[electrode] +</span>
 <span class="sd">                       LFP[electrode + 1]) / spacing ** 2</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">csd2d</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">lfp_data</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">delta</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="n">csd2d</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">lfp_data</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">delta</span><span class="o">**</span><span class="mi">2</span>
     <span class="n">bottom_border</span> <span class="o">=</span> <span class="n">csd2d</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">csd2d</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span>
     <span class="n">top_border</span> <span class="o">=</span> <span class="n">csd2d</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">csd2d</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
-    <span class="n">csd2d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">top_border</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">csd2d</span><span class="p">,</span>
-                            <span class="n">bottom_border</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">csd2d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">top_border</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="n">csd2d</span><span class="p">,</span> <span class="n">bottom_border</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="o">...</span><span class="p">]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">csd2d</span>
 
 
@@ -566,27 +567,32 @@ document.write(`
     <span class="n">n_contacts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">electrode_positions</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">n_contacts</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s1">&#39;Electrode array positions must contain more than 1 contact to be &#39;</span>
-            <span class="s1">&#39;compatible with laminar profiling in a neocortical column. Got &#39;</span>
-            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">n_contacts</span><span class="si">}</span><span class="s1"> electrode contact positions.&#39;</span><span class="p">)</span>
+            <span class="s2">&quot;Electrode array positions must contain more than 1 contact to be &quot;</span>
+            <span class="s2">&quot;compatible with laminar profiling in a neocortical column. Got &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_contacts</span><span class="si">}</span><span class="s2"> electrode contact positions.&quot;</span>
+        <span class="p">)</span>
     <span class="n">displacements</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">electrode_positions</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">z_delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">displacements</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
     <span class="n">magnitudes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">displacements</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">cross_prods</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">displacements</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">displacements</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">magnitudes</span><span class="p">,</span> <span class="n">magnitudes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="ow">and</span>  <span class="c1"># equally spaced</span>
-            <span class="n">z_delta</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span>  <span class="c1"># changes in z-direction</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">cross_prods</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>  <span class="c1"># colinear</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">magnitudes</span><span class="p">,</span> <span class="n">magnitudes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span class="c1"># equally spaced</span>
+        <span class="ow">and</span> <span class="n">z_delta</span> <span class="o">&gt;</span> <span class="mi">0</span>  <span class="c1"># changes in z-direction</span>
+        <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">cross_prods</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="p">):</span>  <span class="c1"># colinear</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s1">&#39;Electrode contacts are incompatible with laminar profiling &#39;</span>
-            <span class="s1">&#39;in a neocortical column. Make sure the &#39;</span>
-            <span class="s1">&#39;electrode positions are equispaced, colinear, and projecting &#39;</span>
-            <span class="s1">&#39;along the z-axis.&#39;</span><span class="p">)</span>
+            <span class="s2">&quot;Electrode contacts are incompatible with laminar profiling &quot;</span>
+            <span class="s2">&quot;in a neocortical column. Make sure the &quot;</span>
+            <span class="s2">&quot;electrode positions are equispaced, colinear, and projecting &quot;</span>
+            <span class="s2">&quot;along the z-axis.&quot;</span>
+        <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">electrode_positions</span><span class="p">)[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">z_delta</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_transfer_resistance</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">electrode_pos</span><span class="p">,</span> <span class="n">conductivity</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span>
-                         <span class="n">min_distance</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_transfer_resistance</span><span class="p">(</span>
+    <span class="n">section</span><span class="p">,</span> <span class="n">electrode_pos</span><span class="p">,</span> <span class="n">conductivity</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">min_distance</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Transfer resistance between section and electrode position.</span>
 
 <span class="sd">    To arrive at the extracellular potential, the value returned by this</span>
@@ -640,19 +646,17 @@ document.write(`
     <span class="n">first_len</span> <span class="o">=</span> <span class="n">line_lens</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">line_lens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">first_len</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">line_lens</span><span class="p">[</span><span class="mi">2</span><span class="p">:]))</span>
 
-    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;psa&#39;</span><span class="p">:</span>
-
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;psa&quot;</span><span class="p">:</span>
         <span class="c1"># distance from segment midpoints to electrode</span>
-        <span class="n">dis</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">electrode_pos</span><span class="p">,</span> <span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">nseg</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">-</span> <span class="n">seg_ctr</span><span class="p">,</span>
-                   <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">dis</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">electrode_pos</span><span class="p">,</span> <span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">nseg</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">-</span> <span class="n">seg_ctr</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="c1"># To avoid very large values when electrode is placed close to a</span>
         <span class="c1"># segment junction, enforce minimal radial distance</span>
         <span class="n">dis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">dis</span><span class="p">,</span> <span class="n">min_distance</span><span class="p">)</span>
 
-        <span class="n">phi</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">dis</span>
+        <span class="n">phi</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">dis</span>
 
-    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;lsa&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;lsa&quot;</span><span class="p">:</span>
         <span class="c1"># From: Appendix C (pp. 137) in Holt, G. R. A critical reexamination of</span>
         <span class="c1"># some assumptions and implications of cable theory in neurobiology.</span>
         <span class="c1"># CalTech, PhD Thesis (1998).</span>
@@ -680,21 +684,21 @@ document.write(`
             <span class="c1"># projection: H = a.cos(theta) = a.dot(b) / |a|</span>
             <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="o">/</span> <span class="n">norm_a</span>  <span class="c1"># NB can be negative</span>
             <span class="n">L</span> <span class="o">=</span> <span class="n">H</span> <span class="o">+</span> <span class="n">norm_a</span>
-            <span class="n">R2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">-</span> <span class="n">H</span> <span class="o">**</span> <span class="mi">2</span>  <span class="c1"># NB squares</span>
+            <span class="n">R2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">-</span> <span class="n">H</span><span class="o">**</span><span class="mi">2</span>  <span class="c1"># NB squares</span>
 
             <span class="c1"># To avoid very large values when electrode is placed (anywhere) on</span>
             <span class="c1"># the section axis, enforce minimal perpendicular distance</span>
-            <span class="n">R2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">R2</span><span class="p">,</span> <span class="n">min_distance</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">R2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">R2</span><span class="p">,</span> <span class="n">min_distance</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">L</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">H</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># electrode is &quot;behind&quot; line segment</span>
-                <span class="n">num</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">H</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">R2</span><span class="p">)</span> <span class="o">-</span> <span class="n">H</span>  <span class="c1"># == norm(b) - H</span>
-                <span class="n">denom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">L</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">R2</span><span class="p">)</span> <span class="o">-</span> <span class="n">L</span>
+                <span class="n">num</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">H</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">R2</span><span class="p">)</span> <span class="o">-</span> <span class="n">H</span>  <span class="c1"># == norm(b) - H</span>
+                <span class="n">denom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">L</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">R2</span><span class="p">)</span> <span class="o">-</span> <span class="n">L</span>
             <span class="k">elif</span> <span class="n">L</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">H</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># electrode is &quot;on top of&quot; line segment</span>
-                <span class="n">num</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">H</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">R2</span><span class="p">)</span> <span class="o">-</span> <span class="n">H</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">L</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">L</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">R2</span><span class="p">))</span>
+                <span class="n">num</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">H</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">R2</span><span class="p">)</span> <span class="o">-</span> <span class="n">H</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">L</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">L</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">R2</span><span class="p">))</span>
                 <span class="n">denom</span> <span class="o">=</span> <span class="n">R2</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># electrode is &quot;ahead of&quot; line segment</span>
-                <span class="n">num</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">L</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">R2</span><span class="p">)</span> <span class="o">+</span> <span class="n">L</span>
-                <span class="n">denom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">H</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">R2</span><span class="p">)</span> <span class="o">+</span> <span class="n">H</span>  <span class="c1"># == norm(b) + H</span>
+                <span class="n">num</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">L</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">R2</span><span class="p">)</span> <span class="o">+</span> <span class="n">L</span>
+                <span class="n">denom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">H</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">R2</span><span class="p">)</span> <span class="o">+</span> <span class="n">H</span>  <span class="c1"># == norm(b) + H</span>
 
             <span class="n">phi</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">num</span> <span class="o">/</span> <span class="n">denom</span><span class="p">)</span> <span class="o">/</span> <span class="n">norm_a</span>
 
@@ -761,45 +765,58 @@ document.write(`
 <span class="sd">    measured values of conductivity in rat cortex (note units there are mS/cm)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">positions</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">conductivity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;psa&#39;</span><span class="p">,</span>
-                 <span class="n">min_distance</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">times</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">voltages</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="s1">&#39;positions&#39;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">positions</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">conductivity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;psa&quot;</span><span class="p">,</span>
+        <span class="n">min_distance</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">times</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">voltages</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">positions</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="s2">&quot;positions&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">3</span><span class="p">,):</span>  <span class="c1"># a single coordinate given</span>
             <span class="n">positions</span> <span class="o">=</span> <span class="p">[</span><span class="n">positions</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">:</span>
-            <span class="n">_validate_type</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="s1">&#39;positions&#39;</span><span class="p">)</span>
+            <span class="n">_validate_type</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="s2">&quot;positions&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;positions should be provided as xyz &#39;</span>
-                                 <span class="sa">f</span><span class="s1">&#39;coordinate triplets, got: </span><span class="si">{</span><span class="n">positions</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;positions should be provided as xyz &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;coordinate triplets, got: </span><span class="si">{</span><span class="n">positions</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
 
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">conductivity</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;conductivity&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">conductivity</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;conductivity must be a positive number&#39;</span><span class="p">)</span>
-        <span class="n">_validate_type</span><span class="p">(</span><span class="n">min_distance</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s1">&#39;min_distance&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">min_distance</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;min_distance must be a positive number&#39;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">conductivity</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;conductivity&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">conductivity</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;conductivity must be a positive number&quot;</span><span class="p">)</span>
+        <span class="n">_validate_type</span><span class="p">(</span><span class="n">min_distance</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="s2">&quot;min_distance&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">min_distance</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;min_distance must be a positive number&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># method allowed to be None for testing</span>
-            <span class="n">_validate_type</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;method&#39;</span><span class="p">)</span>
-            <span class="n">_check_option</span><span class="p">(</span><span class="s1">&#39;method&#39;</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;psa&#39;</span><span class="p">,</span> <span class="s1">&#39;lsa&#39;</span><span class="p">])</span>
+            <span class="n">_validate_type</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;method&quot;</span><span class="p">)</span>
+            <span class="n">_check_option</span><span class="p">(</span><span class="s2">&quot;method&quot;</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;psa&quot;</span><span class="p">,</span> <span class="s2">&quot;lsa&quot;</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="n">times</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
         <span class="k">if</span> <span class="n">voltages</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">voltages</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
 
-        <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
-        <span class="n">voltages</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">voltages</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">)</span>
+        <span class="n">voltages</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">voltages</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">voltages</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># voltages is not None</span>
             <span class="n">n_trials</span><span class="p">,</span> <span class="n">n_electrodes</span><span class="p">,</span> <span class="n">n_times</span> <span class="o">=</span> <span class="n">voltages</span><span class="o">.</span><span class="n">shape</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_electrodes</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;number of voltage traces must match number&#39;</span>
-                                 <span class="sa">f</span><span class="s1">&#39; of channels, got </span><span class="si">{</span><span class="n">n_electrodes</span><span class="si">}</span><span class="s1"> and &#39;</span>
-                                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;number of voltage traces must match number&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; of channels, got </span><span class="si">{</span><span class="n">n_electrodes</span><span class="si">}</span><span class="s2"> and &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_times</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;length of times and voltages must match,&#39;</span>
-                                 <span class="sa">f</span><span class="s1">&#39; got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span><span class="si">}</span><span class="s1"> and </span><span class="si">{</span><span class="n">n_times</span><span class="si">}</span><span class="s1"> &#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;length of times and voltages must match,&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">)</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">n_times</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">positions</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
@@ -819,26 +836,34 @@ document.write(`
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trial_no</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
                 <span class="n">return_data</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">trial</span><span class="p">]</span> <span class="k">for</span> <span class="n">trial</span> <span class="ow">in</span> <span class="n">trial_no</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;trial index must be int, slice or list-like,&#39;</span>
-                                <span class="sa">f</span><span class="s1">&#39; got: </span><span class="si">{</span><span class="n">trial_no</span><span class="si">}</span><span class="s1"> which is </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">trial_no</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;trial index must be int, slice or list-like,&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; got: </span><span class="si">{</span><span class="n">trial_no</span><span class="si">}</span><span class="s2"> which is </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">trial_no</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
         <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;the data contain </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s1"> trials, the &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;indices provided are out of range: </span><span class="si">{</span><span class="n">trial_no</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">ExtracellularArray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span>
-                                  <span class="n">conductivity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conductivity</span><span class="p">,</span>
-                                  <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
-                                  <span class="n">times</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">,</span>
-                                  <span class="n">voltages</span><span class="o">=</span><span class="n">return_data</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;the data contain </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> trials, the &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;indices provided are out of range: </span><span class="si">{</span><span class="n">trial_no</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">ExtracellularArray</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span>
+            <span class="n">conductivity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conductivity</span><span class="p">,</span>
+            <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+            <span class="n">times</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">,</span>
+            <span class="n">voltages</span><span class="o">=</span><span class="n">return_data</span><span class="p">,</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="ExtracellularArray.__repr__"><a class="viewcode-back" href="../../generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray.__repr__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">class_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="si">}</span><span class="s1"> electrodes, &#39;</span>
-               <span class="sa">f</span><span class="s1">&#39;conductivity=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">conductivity</span><span class="si">}</span><span class="s1">, method=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="si">}</span><span class="s2"> electrodes, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;conductivity=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">conductivity</span><span class="si">}</span><span class="s2">, method=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; | </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span><span class="si">}</span><span class="s1"> trials, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">)</span><span class="si">}</span><span class="s1"> times&#39;</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; | </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span><span class="si">}</span><span class="s2"> trials, </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">)</span><span class="si">}</span><span class="s2"> times&quot;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39; (no data recorded yet)&#39;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&lt;</span><span class="si">{</span><span class="n">class_name</span><span class="si">}</span><span class="s1"> | </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s1">&gt;&#39;</span></div>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot; (no data recorded yet)&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">class_name</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span>  <span class="c1"># length == number of trials</span>
@@ -848,10 +873,22 @@ document.write(`
             <span class="k">return</span> <span class="bp">NotImplemented</span>
 
         <span class="n">all_attrs</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">attrs_to_ignore</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_attrs</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)]</span>
-        <span class="n">attrs_to_ignore</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;conductivity&#39;</span><span class="p">,</span> <span class="s1">&#39;copy&#39;</span><span class="p">,</span> <span class="s1">&#39;n_contacts&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;plot_csd&#39;</span><span class="p">,</span> <span class="s1">&#39;plot_lfp&#39;</span><span class="p">,</span> <span class="s1">&#39;sfreq&#39;</span><span class="p">,</span> <span class="s1">&#39;smooth&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;voltages&#39;</span><span class="p">,</span> <span class="s1">&#39;to_dict&#39;</span><span class="p">,</span> <span class="s1">&#39;times&#39;</span><span class="p">,</span> <span class="s1">&#39;voltages&#39;</span><span class="p">])</span>
+        <span class="n">attrs_to_ignore</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_attrs</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)]</span>
+        <span class="n">attrs_to_ignore</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;conductivity&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;copy&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;n_contacts&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;plot_csd&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;plot_lfp&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;sfreq&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;smooth&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;voltages&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;to_dict&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;times&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;voltages&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
         <span class="n">attrs_to_check</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">all_attrs</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attrs_to_ignore</span><span class="p">]</span>
 
         <span class="c1"># Check all other attributes</span>
@@ -859,8 +896,10 @@ document.write(`
             <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">times</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">and</span>
-                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voltages</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">voltages</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">times</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">voltages</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">voltages</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
 
         <span class="k">return</span> <span class="kc">True</span>
@@ -889,16 +928,17 @@ document.write(`
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Sampling rate is not defined for one sample&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Sampling rate is not defined for one sample&quot;</span><span class="p">)</span>
 
         <span class="n">dT</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">)</span>
         <span class="n">Tsamp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">dT</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dT</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">Tsamp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-3</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dT</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">-</span> <span class="n">Tsamp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-3</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="s1">&#39;Extracellular sampling times vary by more than 1 us. Check &#39;</span>
-                <span class="s1">&#39;times-attribute for errors.&#39;</span><span class="p">)</span>
+                <span class="s2">&quot;Extracellular sampling times vary by more than 1 us. Check &quot;</span>
+                <span class="s2">&quot;times-attribute for errors.&quot;</span>
+            <span class="p">)</span>
 
-        <span class="k">return</span> <span class="mf">1000.</span> <span class="o">/</span> <span class="n">Tsamp</span>  <span class="c1"># times are in in ms</span>
+        <span class="k">return</span> <span class="mf">1000.0</span> <span class="o">/</span> <span class="n">Tsamp</span>  <span class="c1"># times are in in ms</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -927,14 +967,25 @@ document.write(`
         <span class="k">for</span> <span class="n">n_trial</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
             <span class="k">for</span> <span class="n">n_contact</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">n_trial</span><span class="p">][</span><span class="n">n_contact</span><span class="p">]</span> <span class="o">=</span> <span class="n">smooth_waveform</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">n_trial</span><span class="p">][</span><span class="n">n_contact</span><span class="p">],</span> <span class="n">window_len</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">sfreq</span><span class="p">)</span>  <span class="c1"># XXX smooth_waveform returns ndarray</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">n_trial</span><span class="p">][</span><span class="n">n_contact</span><span class="p">],</span> <span class="n">window_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sfreq</span>
+                <span class="p">)</span>  <span class="c1"># XXX smooth_waveform returns ndarray</span>
 
         <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="ExtracellularArray.plot_lfp"><a class="viewcode-back" href="../../generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray.plot_lfp">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">plot_lfp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">trial_no</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">contact_no</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;cividis&#39;</span><span class="p">,</span> <span class="n">voltage_offset</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-                 <span class="n">voltage_scalebar</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="ExtracellularArray.plot_lfp"><a class="viewcode-back" href="../../generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray.plot_lfp">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">plot_lfp</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">trial_no</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">contact_no</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">tmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">tmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">decim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s2">&quot;cividis&quot;</span><span class="p">,</span>
+        <span class="n">voltage_offset</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">voltage_scalebar</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+        <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot laminar local field potential time series.</span>
 
 <span class="sd">        One plot is created for each trial. Multiple trials can be overlaid</span>
@@ -979,29 +1030,46 @@ document.write(`
         <span class="k">if</span> <span class="n">trial_no</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">plot_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltages</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trial_no</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">slice</span><span class="p">)):</span>
-            <span class="n">plot_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltages</span><span class="p">[</span><span class="n">trial_no</span><span class="p">,</span> <span class="p">]</span>
+            <span class="n">plot_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltages</span><span class="p">[</span><span class="n">trial_no</span><span class="p">,]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;unknown trial number type, got </span><span class="si">{</span><span class="n">trial_no</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unknown trial number type, got </span><span class="si">{</span><span class="n">trial_no</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">contact_no</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">slice</span><span class="p">)):</span>
-            <span class="n">plot_data</span> <span class="o">=</span> <span class="n">plot_data</span><span class="p">[:,</span> <span class="n">contact_no</span><span class="p">,</span> <span class="p">]</span>
+            <span class="n">plot_data</span> <span class="o">=</span> <span class="n">plot_data</span><span class="p">[</span>
+                <span class="p">:,</span>
+                <span class="n">contact_no</span><span class="p">,</span>
+            <span class="p">]</span>
         <span class="k">elif</span> <span class="n">contact_no</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;unknown contact number type, got </span><span class="si">{</span><span class="n">contact_no</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;unknown contact number type, got </span><span class="si">{</span><span class="n">contact_no</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">contact_labels</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_get_laminar_z_coords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">trial_data</span> <span class="ow">in</span> <span class="n">plot_data</span><span class="p">:</span>
             <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_laminar_lfp</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="n">trial_data</span><span class="p">,</span> <span class="n">tmin</span><span class="o">=</span><span class="n">tmin</span><span class="p">,</span> <span class="n">tmax</span><span class="o">=</span><span class="n">tmax</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
-                <span class="n">decim</span><span class="o">=</span><span class="n">decim</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">,</span>
+                <span class="n">trial_data</span><span class="p">,</span>
+                <span class="n">tmin</span><span class="o">=</span><span class="n">tmin</span><span class="p">,</span>
+                <span class="n">tmax</span><span class="o">=</span><span class="n">tmax</span><span class="p">,</span>
+                <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                <span class="n">decim</span><span class="o">=</span><span class="n">decim</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
                 <span class="n">voltage_offset</span><span class="o">=</span><span class="n">voltage_offset</span><span class="p">,</span>
                 <span class="n">voltage_scalebar</span><span class="o">=</span><span class="n">voltage_scalebar</span><span class="p">,</span>
                 <span class="n">contact_labels</span><span class="o">=</span><span class="n">contact_labels</span><span class="p">,</span>
-                <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span>
+                <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="n">fig</span></div>
 
-<div class="viewcode-block" id="ExtracellularArray.plot_csd"><a class="viewcode-back" href="../../generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray.plot_csd">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">plot_csd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;spline&#39;</span><span class="p">,</span>
-                 <span class="n">sink</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="ExtracellularArray.plot_csd"><a class="viewcode-back" href="../../generated/hnn_core.extracellular.ExtracellularArray.html#hnn_core.extracellular.ExtracellularArray.plot_csd">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">plot_csd</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;spline&quot;</span><span class="p">,</span>
+        <span class="n">sink</span><span class="o">=</span><span class="s2">&quot;b&quot;</span><span class="p">,</span>
+        <span class="n">colorbar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot laminar current source density (CSD) estimation</span>
 
 <span class="sd">        Parameters</span>
@@ -1031,17 +1099,24 @@ document.write(`
 <span class="sd">            The matplotlib figure handle.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_laminar_csd</span>
+
         <span class="n">lfp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">contact_labels</span><span class="p">,</span> <span class="n">delta</span> <span class="o">=</span> <span class="n">_get_laminar_z_coords</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
 
-        <span class="n">csd_data</span> <span class="o">=</span> <span class="n">calculate_csd2d</span><span class="p">(</span><span class="n">lfp_data</span><span class="o">=</span><span class="n">lfp</span><span class="p">,</span>
-                                   <span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">)</span>
+        <span class="n">csd_data</span> <span class="o">=</span> <span class="n">calculate_csd2d</span><span class="p">(</span><span class="n">lfp_data</span><span class="o">=</span><span class="n">lfp</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">)</span>
 
-        <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_laminar_csd</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">,</span> <span class="n">csd_data</span><span class="p">,</span>
-                               <span class="n">contact_labels</span><span class="o">=</span><span class="n">contact_labels</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
-                               <span class="n">colorbar</span><span class="o">=</span><span class="n">colorbar</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span>
-                               <span class="n">interpolation</span><span class="o">=</span><span class="n">interpolation</span><span class="p">,</span> <span class="n">sink</span><span class="o">=</span><span class="n">sink</span><span class="p">,</span>
-                               <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_laminar_csd</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">times</span><span class="p">,</span>
+            <span class="n">csd_data</span><span class="p">,</span>
+            <span class="n">contact_labels</span><span class="o">=</span><span class="n">contact_labels</span><span class="p">,</span>
+            <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+            <span class="n">colorbar</span><span class="o">=</span><span class="n">colorbar</span><span class="p">,</span>
+            <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span>
+            <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span>
+            <span class="n">interpolation</span><span class="o">=</span><span class="n">interpolation</span><span class="p">,</span>
+            <span class="n">sink</span><span class="o">=</span><span class="n">sink</span><span class="p">,</span>
+            <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">fig</span></div>
 
@@ -1054,12 +1129,12 @@ document.write(`
 <span class="sd">        dictionary form of an object of ExtracellularArray class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">rec_array_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">rec_array_data</span><span class="p">[</span><span class="s1">&#39;positions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions</span>
-        <span class="n">rec_array_data</span><span class="p">[</span><span class="s1">&#39;conductivity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conductivity</span>
-        <span class="n">rec_array_data</span><span class="p">[</span><span class="s1">&#39;method&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span>
-        <span class="n">rec_array_data</span><span class="p">[</span><span class="s1">&#39;min_distance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_distance</span>
-        <span class="n">rec_array_data</span><span class="p">[</span><span class="s1">&#39;times&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">times</span>
-        <span class="n">rec_array_data</span><span class="p">[</span><span class="s1">&#39;voltages&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltages</span>
+        <span class="n">rec_array_data</span><span class="p">[</span><span class="s2">&quot;positions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions</span>
+        <span class="n">rec_array_data</span><span class="p">[</span><span class="s2">&quot;conductivity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conductivity</span>
+        <span class="n">rec_array_data</span><span class="p">[</span><span class="s2">&quot;method&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span>
+        <span class="n">rec_array_data</span><span class="p">[</span><span class="s2">&quot;min_distance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_distance</span>
+        <span class="n">rec_array_data</span><span class="p">[</span><span class="s2">&quot;times&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">times</span>
+        <span class="n">rec_array_data</span><span class="p">[</span><span class="s2">&quot;voltages&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">voltages</span>
 
         <span class="k">return</span> <span class="n">rec_array_data</span></div></div>
 
@@ -1073,6 +1148,7 @@ document.write(`
 <span class="sd">        The instance of :class:`hnn_core.extracellular.ExtracellularArray` to</span>
 <span class="sd">        build in NEURON-Python</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">array</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">n_contacts</span>
@@ -1083,7 +1159,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_recording_callback</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cvode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_celltypes</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cvode</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_celltypes</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Assemble NEURON objects for calculating extracellular potentials.</span>
 
 <span class="sd">        The handler is set up to maintain a vector of membrane currents at at</span>
@@ -1104,11 +1180,9 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">secs_on_rank</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">allsec</span><span class="p">()</span>  <span class="c1"># get all h.Sections known to this MPI rank</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">include_celltypes</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-        <span class="n">_check_option</span><span class="p">(</span><span class="s1">&#39;include_celltypes&#39;</span><span class="p">,</span> <span class="n">include_celltypes</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="s1">&#39;Pyr&#39;</span><span class="p">,</span>
-                                                               <span class="s1">&#39;Basket&#39;</span><span class="p">])</span>
-        <span class="k">if</span> <span class="n">include_celltypes</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
-            <span class="n">secs_on_rank</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">secs_on_rank</span> <span class="k">if</span>
-                            <span class="n">include_celltypes</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">()]</span>
+        <span class="n">_check_option</span><span class="p">(</span><span class="s2">&quot;include_celltypes&quot;</span><span class="p">,</span> <span class="n">include_celltypes</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;Pyr&quot;</span><span class="p">,</span> <span class="s2">&quot;Basket&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">include_celltypes</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="n">secs_on_rank</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">secs_on_rank</span> <span class="k">if</span> <span class="n">include_celltypes</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">()]</span>
 
         <span class="n">segment_counts</span> <span class="o">=</span> <span class="p">[</span><span class="n">sec</span><span class="o">.</span><span class="n">nseg</span> <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="n">secs_on_rank</span><span class="p">]</span>
         <span class="n">n_total_segments</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">segment_counts</span><span class="p">)</span>
@@ -1122,12 +1196,12 @@ document.write(`
         <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="n">secs_on_rank</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">sec</span><span class="p">:</span>  <span class="c1"># section end points (0, 1) not included</span>
                 <span class="c1"># set Nth pointer to the net membrane current at this segment</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_ptrvec</span><span class="o">.</span><span class="n">pset</span><span class="p">(</span>
-                    <span class="n">ptr_idx</span><span class="p">,</span> <span class="n">sec</span><span class="p">(</span><span class="n">seg</span><span class="o">.</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">_ref_i_membrane_</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_ptrvec</span><span class="o">.</span><span class="n">pset</span><span class="p">(</span><span class="n">ptr_idx</span><span class="p">,</span> <span class="n">sec</span><span class="p">(</span><span class="n">seg</span><span class="o">.</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">_ref_i_membrane_</span><span class="p">)</span>
                 <span class="n">ptr_idx</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">ptr_idx</span> <span class="o">!=</span> <span class="n">n_total_segments</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expected </span><span class="si">{</span><span class="n">n_total_segments</span><span class="si">}</span><span class="s1"> imem pointers, &#39;</span>
-                               <span class="sa">f</span><span class="s1">&#39;got </span><span class="si">{</span><span class="n">ptr_idx</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">n_total_segments</span><span class="si">}</span><span class="s2"> imem pointers, got </span><span class="si">{</span><span class="n">ptr_idx</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
 
         <span class="c1"># transfer resistances for each segment (keep in Neuron Matrix object)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_r_transfer</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="p">,</span> <span class="n">n_total_segments</span><span class="p">)</span>
@@ -1137,16 +1211,18 @@ document.write(`
                 <span class="n">transfer_resistance</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
                 <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="n">secs_on_rank</span><span class="p">:</span>
                     <span class="n">this_xfer_r</span> <span class="o">=</span> <span class="n">_transfer_resistance</span><span class="p">(</span>
-                        <span class="n">sec</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">conductivity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">conductivity</span><span class="p">,</span>
+                        <span class="n">sec</span><span class="p">,</span>
+                        <span class="n">pos</span><span class="p">,</span>
+                        <span class="n">conductivity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">conductivity</span><span class="p">,</span>
                         <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
-                        <span class="n">min_distance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">min_distance</span><span class="p">)</span>
+                        <span class="n">min_distance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">min_distance</span><span class="p">,</span>
+                    <span class="p">)</span>
                     <span class="n">transfer_resistance</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">this_xfer_r</span><span class="p">)</span>
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_r_transfer</span><span class="o">.</span><span class="n">setrow</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">transfer_resistance</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># for testing, make a matrix of ones</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_r_transfer</span><span class="o">.</span><span class="n">setrow</span><span class="p">(</span><span class="n">row</span><span class="p">,</span>
-                                            <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">n_total_segments</span><span class="p">,</span> <span class="mf">1.</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_r_transfer</span><span class="o">.</span><span class="n">setrow</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="n">n_total_segments</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
 
         <span class="c1"># record time for each array</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_times</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">()</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">_ref_t</span><span class="p">)</span>
@@ -1155,7 +1231,7 @@ document.write(`
         <span class="c1"># potential at electrode (_PC.allreduce called in _simulate_dipole)</span>
         <span class="c1"># NB voltages of all contacts are initialised to 0 mV, i.e., the</span>
         <span class="c1"># potential at time 0.0 ms is defined to be zero.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
 
         <span class="c1"># NB we must make a copy of the function reference, and keep it for</span>
         <span class="c1"># later decoupling using extra_scatter_gather_remove</span>
@@ -1181,8 +1257,7 @@ document.write(`
         <span class="c1"># Calculate potentials by multiplying the _nrn_imem_vec by the matrix</span>
         <span class="c1"># _nrn_r_transfer. This is equivalent to a row-by-row dot-product:</span>
         <span class="c1"># V_i(t) = SUM_j ( R_i,j x I_j (t) )</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_r_transfer</span><span class="o">.</span><span class="n">mulv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_vec</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_r_transfer</span><span class="o">.</span><span class="n">mulv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_imem_vec</span><span class="p">))</span>
         <span class="c1"># NB all values appended to the h.Vector _nrn_voltages at current time</span>
         <span class="c1"># step. The vector will have size (n_contacts x n_samples, 1), which</span>
         <span class="c1"># will be reshaped later to (n_contacts, n_samples).</span>
@@ -1191,32 +1266,32 @@ document.write(`
     <span class="k">def</span><span class="w"> </span><span class="nf">_nrn_n_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the length (in samples) of the extracellular data.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Something went wrong: have </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="si">}</span><span class="s1">&#39;</span>
-                               <span class="sa">f</span><span class="s1">&#39;, but </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s1"> samples&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Something went wrong: have </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;, but </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="si">}</span><span class="s2"> samples&quot;</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_nrn_voltages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The extracellular data (n_contacts x n_samples).&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_n_samples</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_n_samples</span>
 
             <span class="c1"># first reshape to a Neuron Matrix object</span>
             <span class="n">extmat</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">Matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_contacts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_n_samples</span><span class="p">)</span>
             <span class="n">extmat</span><span class="o">.</span><span class="n">from_vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nrn_voltages</span><span class="p">)</span>
 
             <span class="c1"># then unpack into 2D python list and return</span>
-            <span class="k">return</span> <span class="p">[</span><span class="n">extmat</span><span class="o">.</span><span class="n">getrow</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span><span class="o">.</span><span class="n">to_python</span><span class="p">()</span> <span class="k">for</span>
-                    <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">extmat</span><span class="o">.</span><span class="n">nrow</span><span class="p">())]</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">extmat</span><span class="o">.</span><span class="n">getrow</span><span class="p">(</span><span class="n">ii</span><span class="p">)</span><span class="o">.</span><span class="n">to_python</span><span class="p">()</span> <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">extmat</span><span class="o">.</span><span class="n">nrow</span><span class="p">())]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Simulation not yet run!&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Simulation not yet run!&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_nrn_times</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The sampling time points.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_times</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nrn_times</span><span class="o">.</span><span class="n">to_python</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Simulation not yet run!&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Simulation not yet run!&quot;</span><span class="p">)</span>
 </pre></div>
 
                 </article>

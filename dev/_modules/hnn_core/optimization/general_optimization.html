@@ -500,8 +500,16 @@ document.write(`
 
 
 <div class="viewcode-block" id="Optimizer"><a class="viewcode-back" href="../../../generated/hnn_core.optimization.Optimizer.html#hnn_core.optimization.Optimizer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Optimizer</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial_net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">set_params</span><span class="p">,</span>
-                 <span class="n">solver</span><span class="o">=</span><span class="s1">&#39;bayesian&#39;</span><span class="p">,</span> <span class="n">obj_fun</span><span class="o">=</span><span class="s1">&#39;dipole_rmse&#39;</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">200</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">initial_net</span><span class="p">,</span>
+        <span class="n">tstop</span><span class="p">,</span>
+        <span class="n">constraints</span><span class="p">,</span>
+        <span class="n">set_params</span><span class="p">,</span>
+        <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;bayesian&quot;</span><span class="p">,</span>
+        <span class="n">obj_fun</span><span class="o">=</span><span class="s2">&quot;dipole_rmse&quot;</span><span class="p">,</span>
+        <span class="n">max_iter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Parameter optimization.</span>
 
 <span class="sd">        Parameters</span>
@@ -552,31 +560,33 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">initial_net</span><span class="o">.</span><span class="n">external_drives</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The current Network instance has external &quot;</span> <span class="o">+</span>
-                             <span class="s2">&quot;drives, provide a Network object with no &quot;</span> <span class="o">+</span>
-                             <span class="s2">&quot;external drives.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The current Network instance has external &quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;drives, provide a Network object with no &quot;</span>
+                <span class="o">+</span> <span class="s2">&quot;external drives.&quot;</span>
+            <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial_net</span> <span class="o">=</span> <span class="n">initial_net</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">=</span> <span class="n">constraints</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_set_params</span> <span class="o">=</span> <span class="n">set_params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span> <span class="o">=</span> <span class="n">max_iter</span>
         <span class="c1"># Optimizer method</span>
-        <span class="k">if</span> <span class="n">solver</span> <span class="o">==</span> <span class="s1">&#39;bayesian&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">solver</span> <span class="o">=</span> <span class="s1">&#39;bayesian&#39;</span>
+        <span class="k">if</span> <span class="n">solver</span> <span class="o">==</span> <span class="s2">&quot;bayesian&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">solver</span> <span class="o">=</span> <span class="s2">&quot;bayesian&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_constraints</span> <span class="o">=</span> <span class="n">_assemble_constraints_bayesian</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_run_opt</span> <span class="o">=</span> <span class="n">_run_opt_bayesian</span>
-        <span class="k">elif</span> <span class="n">solver</span> <span class="o">==</span> <span class="s1">&#39;cobyla&#39;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">solver</span> <span class="o">=</span> <span class="s1">&#39;cobyla&#39;</span>
+        <span class="k">elif</span> <span class="n">solver</span> <span class="o">==</span> <span class="s2">&quot;cobyla&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">solver</span> <span class="o">=</span> <span class="s2">&quot;cobyla&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_constraints</span> <span class="o">=</span> <span class="n">_assemble_constraints_cobyla</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_run_opt</span> <span class="o">=</span> <span class="n">_run_opt_cobyla</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;solver must be &#39;bayesian&#39; or &#39;cobyla&#39;&quot;</span><span class="p">)</span>
         <span class="c1"># Response to be optimized</span>
-        <span class="k">if</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s1">&#39;dipole_rmse&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">&quot;dipole_rmse&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">_rmse_evoked</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s1">&#39;dipole_rmse&#39;</span>
-        <span class="k">elif</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s1">&#39;maximize_psd&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s2">&quot;dipole_rmse&quot;</span>
+        <span class="k">elif</span> <span class="n">obj_fun</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">_maximize_psd</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s1">&#39;maximize_psd&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="s2">&quot;maximize_psd&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">obj_fun</span>  <span class="c1"># user-defined function</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="kc">None</span>
@@ -609,25 +619,27 @@ document.write(`
 <span class="sd">        smooth_window_len : float, optional</span>
 <span class="sd">            The smooth window length.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s1">&#39;dipole_rmse&#39;</span> <span class="ow">and</span>
-                <span class="s1">&#39;target&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;target must be specified&#39;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s1">&#39;maximize_psd&#39;</span> <span class="ow">and</span>
-              <span class="p">(</span><span class="s1">&#39;f_bands&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span> <span class="ow">or</span>
-               <span class="s1">&#39;relative_bandpower&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;f_bands and relative_bandpower must be specified&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;dipole_rmse&quot;</span> <span class="ow">and</span> <span class="s2">&quot;target&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;target must be specified&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="s2">&quot;f_bands&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span>
+            <span class="ow">or</span> <span class="s2">&quot;relative_bandpower&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;f_bands and relative_bandpower must be specified&quot;</span><span class="p">)</span>
 
         <span class="n">constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_constraints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
         <span class="n">initial_params</span> <span class="o">=</span> <span class="n">_get_initial_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
 
-        <span class="n">opt_params</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">net_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_opt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_initial_net</span><span class="p">,</span>
-                                              <span class="bp">self</span><span class="o">.</span><span class="n">tstop</span><span class="p">,</span>
-                                              <span class="n">constraints</span><span class="p">,</span>
-                                              <span class="bp">self</span><span class="o">.</span><span class="n">_set_params</span><span class="p">,</span>
-                                              <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span><span class="p">,</span>
-                                              <span class="n">initial_params</span><span class="p">,</span>
-                                              <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">,</span>
-                                              <span class="n">obj_fun_kwargs</span><span class="p">)</span>
+        <span class="n">opt_params</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">net_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_opt</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initial_net</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tstop</span><span class="p">,</span>
+            <span class="n">constraints</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_params</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span><span class="p">,</span>
+            <span class="n">initial_params</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">,</span>
+            <span class="n">obj_fun_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">net_</span> <span class="o">=</span> <span class="n">net_</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obj_</span> <span class="o">=</span> <span class="n">obj</span>
@@ -661,11 +673,11 @@ document.write(`
         <span class="n">y_min</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj_</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.01</span>
         <span class="n">y_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">obj_</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.01</span>
 
-        <span class="n">axis</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
         <span class="n">axis</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span><span class="p">])</span>
-        <span class="n">axis</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Convergence&#39;</span><span class="p">)</span>
-        <span class="n">axis</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Number of calls&#39;</span><span class="p">)</span>
-        <span class="n">axis</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Objective value&#39;</span><span class="p">)</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Convergence&quot;</span><span class="p">)</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Number of calls&quot;</span><span class="p">)</span>
+        <span class="n">axis</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Objective value&quot;</span><span class="p">)</span>
         <span class="n">axis</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
@@ -688,8 +700,9 @@ document.write(`
 
     <span class="n">initial_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">cons_key</span> <span class="ow">in</span> <span class="n">constraints</span><span class="p">:</span>
-        <span class="n">initial_params</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">cons_key</span><span class="p">:</span> <span class="p">((</span><span class="n">constraints</span><span class="p">[</span><span class="n">cons_key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span>
-                                          <span class="n">constraints</span><span class="p">[</span><span class="n">cons_key</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span> <span class="o">/</span> <span class="mi">2</span><span class="p">})</span>
+        <span class="n">initial_params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">cons_key</span><span class="p">:</span> <span class="p">(</span><span class="n">constraints</span><span class="p">[</span><span class="n">cons_key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">constraints</span><span class="p">[</span><span class="n">cons_key</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">}</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">initial_params</span>
 
@@ -730,10 +743,8 @@ document.write(`
     <span class="c1"># assemble constraints in solver-specific format</span>
     <span class="n">cons_cobyla</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">cons_key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">constraints</span><span class="p">):</span>
-        <span class="n">cons_cobyla</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="n">idx</span><span class="p">:</span>
-                           <span class="nb">float</span><span class="p">(</span><span class="n">constraints</span><span class="p">[</span><span class="n">cons_key</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
-        <span class="n">cons_cobyla</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="n">idx</span><span class="p">:</span>
-                           <span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">constraints</span><span class="p">[</span><span class="n">cons_key</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">cons_cobyla</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="n">idx</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">constraints</span><span class="p">[</span><span class="n">cons_key</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+        <span class="n">cons_cobyla</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">idx</span><span class="o">=</span><span class="n">idx</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">constraints</span><span class="p">[</span><span class="n">cons_key</span><span class="p">][</span><span class="mi">0</span><span class="p">]))</span>
 
     <span class="k">return</span> <span class="n">cons_cobyla</span>
 
@@ -761,8 +772,16 @@ document.write(`
     <span class="k">return</span> <span class="n">params</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_run_opt_bayesian</span><span class="p">(</span><span class="n">initial_net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">set_params</span><span class="p">,</span> <span class="n">obj_fun</span><span class="p">,</span>
-                      <span class="n">initial_params</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">,</span> <span class="n">obj_fun_kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_opt_bayesian</span><span class="p">(</span>
+    <span class="n">initial_net</span><span class="p">,</span>
+    <span class="n">tstop</span><span class="p">,</span>
+    <span class="n">constraints</span><span class="p">,</span>
+    <span class="n">set_params</span><span class="p">,</span>
+    <span class="n">obj_fun</span><span class="p">,</span>
+    <span class="n">initial_params</span><span class="p">,</span>
+    <span class="n">max_iter</span><span class="p">,</span>
+    <span class="n">obj_fun_kwargs</span><span class="p">,</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs optimization routine with gp_minimize optimizer.</span>
 
 <span class="sd">    Parameters</span>
@@ -797,20 +816,24 @@ document.write(`
     <span class="n">obj_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_obj_func</span><span class="p">(</span><span class="n">predicted_params</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">obj_fun</span><span class="p">(</span><span class="n">initial_net</span><span class="o">=</span><span class="n">initial_net</span><span class="p">,</span>
-                       <span class="n">initial_params</span><span class="o">=</span><span class="n">initial_params</span><span class="p">,</span>
-                       <span class="n">set_params</span><span class="o">=</span><span class="n">set_params</span><span class="p">,</span>
-                       <span class="n">predicted_params</span><span class="o">=</span><span class="n">predicted_params</span><span class="p">,</span>
-                       <span class="n">update_params</span><span class="o">=</span><span class="n">_update_params</span><span class="p">,</span>
-                       <span class="n">obj_values</span><span class="o">=</span><span class="n">obj_values</span><span class="p">,</span>
-                       <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
-                       <span class="n">obj_fun_kwargs</span><span class="o">=</span><span class="n">obj_fun_kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj_fun</span><span class="p">(</span>
+            <span class="n">initial_net</span><span class="o">=</span><span class="n">initial_net</span><span class="p">,</span>
+            <span class="n">initial_params</span><span class="o">=</span><span class="n">initial_params</span><span class="p">,</span>
+            <span class="n">set_params</span><span class="o">=</span><span class="n">set_params</span><span class="p">,</span>
+            <span class="n">predicted_params</span><span class="o">=</span><span class="n">predicted_params</span><span class="p">,</span>
+            <span class="n">update_params</span><span class="o">=</span><span class="n">_update_params</span><span class="p">,</span>
+            <span class="n">obj_values</span><span class="o">=</span><span class="n">obj_values</span><span class="p">,</span>
+            <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
+            <span class="n">obj_fun_kwargs</span><span class="o">=</span><span class="n">obj_fun_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
 
-    <span class="n">opt_results</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">bayes_opt</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">_obj_func</span><span class="p">,</span>
-                               <span class="n">x0</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">initial_params</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
-                               <span class="n">cons</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>
-                               <span class="n">acquisition</span><span class="o">=</span><span class="n">expected_improvement</span><span class="p">,</span>
-                               <span class="n">maxfun</span><span class="o">=</span><span class="n">max_iter</span><span class="p">)</span>
+    <span class="n">opt_results</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">bayes_opt</span><span class="p">(</span>
+        <span class="n">func</span><span class="o">=</span><span class="n">_obj_func</span><span class="p">,</span>
+        <span class="n">x0</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">initial_params</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+        <span class="n">cons</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>
+        <span class="n">acquisition</span><span class="o">=</span><span class="n">expected_improvement</span><span class="p">,</span>
+        <span class="n">maxfun</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="c1"># get optimized params</span>
     <span class="n">opt_params</span> <span class="o">=</span> <span class="n">opt_results</span>
@@ -826,8 +849,16 @@ document.write(`
     <span class="k">return</span> <span class="n">opt_params</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">net_</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_run_opt_cobyla</span><span class="p">(</span><span class="n">initial_net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">set_params</span><span class="p">,</span> <span class="n">obj_fun</span><span class="p">,</span>
-                    <span class="n">initial_params</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">,</span> <span class="n">obj_fun_kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_run_opt_cobyla</span><span class="p">(</span>
+    <span class="n">initial_net</span><span class="p">,</span>
+    <span class="n">tstop</span><span class="p">,</span>
+    <span class="n">constraints</span><span class="p">,</span>
+    <span class="n">set_params</span><span class="p">,</span>
+    <span class="n">obj_fun</span><span class="p">,</span>
+    <span class="n">initial_params</span><span class="p">,</span>
+    <span class="n">max_iter</span><span class="p">,</span>
+    <span class="n">obj_fun_kwargs</span><span class="p">,</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Runs optimization routine with fmin_cobyla optimizer.</span>
 
 <span class="sd">    Parameters</span>
@@ -862,22 +893,26 @@ document.write(`
     <span class="n">obj_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_obj_func</span><span class="p">(</span><span class="n">predicted_params</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">obj_fun</span><span class="p">(</span><span class="n">initial_net</span><span class="o">=</span><span class="n">initial_net</span><span class="p">,</span>
-                       <span class="n">initial_params</span><span class="o">=</span><span class="n">initial_params</span><span class="p">,</span>
-                       <span class="n">set_params</span><span class="o">=</span><span class="n">set_params</span><span class="p">,</span>
-                       <span class="n">predicted_params</span><span class="o">=</span><span class="n">predicted_params</span><span class="p">,</span>
-                       <span class="n">update_params</span><span class="o">=</span><span class="n">_update_params</span><span class="p">,</span>
-                       <span class="n">obj_values</span><span class="o">=</span><span class="n">obj_values</span><span class="p">,</span>
-                       <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
-                       <span class="n">obj_fun_kwargs</span><span class="o">=</span><span class="n">obj_fun_kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj_fun</span><span class="p">(</span>
+            <span class="n">initial_net</span><span class="o">=</span><span class="n">initial_net</span><span class="p">,</span>
+            <span class="n">initial_params</span><span class="o">=</span><span class="n">initial_params</span><span class="p">,</span>
+            <span class="n">set_params</span><span class="o">=</span><span class="n">set_params</span><span class="p">,</span>
+            <span class="n">predicted_params</span><span class="o">=</span><span class="n">predicted_params</span><span class="p">,</span>
+            <span class="n">update_params</span><span class="o">=</span><span class="n">_update_params</span><span class="p">,</span>
+            <span class="n">obj_values</span><span class="o">=</span><span class="n">obj_values</span><span class="p">,</span>
+            <span class="n">tstop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
+            <span class="n">obj_fun_kwargs</span><span class="o">=</span><span class="n">obj_fun_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
 
-    <span class="n">opt_results</span> <span class="o">=</span> <span class="n">fmin_cobyla</span><span class="p">(</span><span class="n">_obj_func</span><span class="p">,</span>
-                              <span class="n">cons</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>
-                              <span class="n">rhobeg</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-                              <span class="n">rhoend</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span>
-                              <span class="n">x0</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">initial_params</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
-                              <span class="n">maxfun</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span>
-                              <span class="n">catol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">opt_results</span> <span class="o">=</span> <span class="n">fmin_cobyla</span><span class="p">(</span>
+        <span class="n">_obj_func</span><span class="p">,</span>
+        <span class="n">cons</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span>
+        <span class="n">rhobeg</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">rhoend</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span>
+        <span class="n">x0</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">initial_params</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+        <span class="n">maxfun</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span>
+        <span class="n">catol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="c1"># get optimized params</span>
     <span class="n">opt_params</span> <span class="o">=</span> <span class="n">opt_results</span>
