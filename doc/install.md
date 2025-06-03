@@ -4,7 +4,7 @@
 If you have any questions or problems while installing HNN-Core, feel free to
 ask for help on [our GitHub Discussions page][]!
 
-If you wish to try out HNN-Core in the cloud without installing it locally, see the [Installation page at the HNN Textbook](https://dylansdaniels.github.io/website_redesign/content/01_getting_started/installation.html).
+If you wish to try out HNN-Core in the cloud without installing it locally, see the [Installation page at the HNN Textbook](https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html).
 
 Note: If you are at Brown University and trying to install HNN-Core on the OSCAR system, you should **not** follow these instructions, and instead follow the [instructions here](https://github.com/jonescompneurolab/oscar-install).
 
@@ -152,7 +152,7 @@ This will install only the `hnn_core` API along with its required dependencies, 
 python -c "from hnn_core import jones_2009_model, simulate_dipole ; simulate_dipole(jones_2009_model(), tstop=20)"
 ```
 
-This will run a very short test simulation, and should not give any Error messages (Warning messages are fine and expected). For how to use the `hnn_core` API, see [our HNN Textbook website][], including examples like our [API tutorial of ERP simulation](https://dylansdaniels.github.io/website_redesign/content/05_erps/hnn_core.html). Our public API documentation {doc}`can be found here <api>`.
+This will run a very short test simulation, and should not give any Error messages (Warning messages are fine and expected). For how to use the `hnn_core` API, see [our HNN Textbook website][], including examples like our [API tutorial of ERP simulation](https://jonescompneurolab.github.io/textbook/content/05_erps/hnn_core.html). Our public API documentation {doc}`can be found here <api>`.
 
 ### `pip` Graphical User Interface (GUI) Installation
 
@@ -171,7 +171,7 @@ To start the GUI, simply run:
 hnn-gui
 ```
 
-For further guidance on using the GUI, see [our HNN Textbook website][], including examples like our [GUI tutorial of ERPs](https://dylansdaniels.github.io/website_redesign/content/05_erps/erps_in_gui.html).
+For further guidance on using the GUI, see [our HNN Textbook website][], including examples like our [GUI tutorial of ERPs](https://jonescompneurolab.github.io/textbook/content/05_erps/erps_in_gui.html).
 
 ### `pip` Optimization Installation
 
@@ -184,7 +184,7 @@ dependencies using the following command (make sure to include the "quotes"):
 pip install "hnn_core[opt]"
 ```
 
-If you are planning to use Optimization, it is recommended to also install Joblib support (see below). Instruction on how to use our Optimization support can be found on [our HNN Textbook website][], including this [optimization tutorial](https://dylansdaniels.github.io/website_redesign/content/04_using_hnn/optimize_simulated_evoked_response_parameters.html).
+If you are planning to use Optimization, it is recommended to also install Joblib support (see below). Instruction on how to use our Optimization support can be found on [our HNN Textbook website][], including this [optimization tutorial](https://jonescompneurolab.github.io/textbook/content/04_using_hnn/optimize_simulated_evoked_response_parameters.html).
 
 ### `pip` Joblib Installation
 
@@ -197,7 +197,7 @@ pip install "hnn_core[parallel]"
 
 This automatically installs the following dependencies: [Joblib](https://joblib.readthedocs.io/en/stable/) and [psutil](https://github.com/giampaolo/psutil).
 
-Many of the examples on [our HNN Textbook website][] make use of Joblib support, and we provide an explicit [tutorial for it here](https://dylansdaniels.github.io/website_redesign/content/04_using_hnn/parallelism_joblib.html).
+Many of the examples on [our HNN Textbook website][] make use of Joblib support, and we provide an explicit [tutorial for it here](https://jonescompneurolab.github.io/textbook/content/04_using_hnn/parallelism_joblib.html).
 
 ### `pip` MPI Installation
 
@@ -280,8 +280,8 @@ Hello from proc 0
 Hello from proc 1
 ```
 
-8. You can find tutorials on how to use MPI parallelism on [our HNN Textbook website][], specifically on [our MPI tutorial here](https://dylansdaniels.github.io/website_redesign/content/04_using_hnn/parallelism_mpi.html).
+8. You can find tutorials on how to use MPI parallelism on [our HNN Textbook website][], specifically on [our MPI tutorial here](https://jonescompneurolab.github.io/textbook/content/04_using_hnn/parallelism_mpi.html).
 
 [NEURON]: https://nrn.readthedocs.io/
-[our HNN Textbook website]: https://dylansdaniels.github.io/website_redesign/content/preface.html
+[our HNN Textbook website]: https://jonescompneurolab.github.io/textbook/content/preface.html
 [our GitHub Discussions page]: https://github.com/jonescompneurolab/hnn-core/discussions
