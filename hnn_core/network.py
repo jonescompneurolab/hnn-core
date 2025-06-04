@@ -79,8 +79,7 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
         coords_sorted = sorted(coords, key=lambda pos: pos[1])
 
         # append the z value for position
-        list_coords = [(pos_xy[0], pos_xy[1], zdiff)
-                       for pos_xy in coords_sorted]
+        list_coords = [(pos_xy[0], pos_xy[1], zdiff) for pos_xy in coords_sorted]
 
         return list_coords
 
@@ -98,13 +97,15 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
     yyrange = np.arange(n_pyr_y) * inplane_distance
 
     pos_dict = {
-        'L5_pyramidal': _calc_pyramidal_coord(xxrange, yyrange, zdiff=0),
-        'L2_pyramidal': _calc_pyramidal_coord(xxrange, yyrange, zdiff=zdiff),
-        'L5_basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff=0,
-                                        inplane_distance=inplane_distance),
-        'L2_basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff=zdiff,
-                                        inplane_distance=inplane_distance),
-        'origin': _calc_origin(xxrange, yyrange, zdiff),
+        "L5_pyramidal": _calc_pyramidal_coord(xxrange, yyrange, zdiff=0),
+        "L2_pyramidal": _calc_pyramidal_coord(xxrange, yyrange, zdiff=zdiff),
+        "L5_basket": _calc_basket_coord(
+            n_pyr_x, n_pyr_y, zdiff=0, inplane_distance=inplane_distance
+        ),
+        "L2_basket": _calc_basket_coord(
+            n_pyr_x, n_pyr_y, zdiff=zdiff, inplane_distance=inplane_distance
+        ),
+        "origin": _calc_origin(xxrange, yyrange, zdiff),
     }
 
     return pos_dict
@@ -241,8 +242,7 @@ def pick_connection(net, src_gids=None, target_gids=None, loc=None, receptor=Non
     )
 
     _validate_type(loc, (str, list, None), "loc", "str, list, or None")
-    _validate_type(receptor, (str, list, None),
-                   "receptor", "str, list, or None")
+    _validate_type(receptor, (str, list, None), "receptor", "str, list, or None")
 
     valid_loc = ["proximal", "distal", "soma"]
     valid_receptor = ["ampa", "nmda", "gabaa", "gabab"]
@@ -666,8 +666,7 @@ class Network:
             probability < 1.0, the random subset of gids targeted is the same.
         """
         if not self._legacy_mode:
-            _check_drive_parameter_values(
-                "evoked", sigma=sigma, numspikes=numspikes)
+            _check_drive_parameter_values("evoked", sigma=sigma, numspikes=numspikes)
         drive = _NetworkDrive()
         drive["type"] = "evoked"
         drive["location"] = location
@@ -789,8 +788,7 @@ class Network:
         target_populations = _get_target_properties(
             weights_ampa, weights_nmda, synaptic_delays, location
         )[0]
-        _check_poisson_rates(
-            rate_constant, target_populations, self.cell_types.keys())
+        _check_poisson_rates(rate_constant, target_populations, self.cell_types.keys())
         if isinstance(rate_constant, dict):
             if not cell_specific:
                 raise ValueError(
@@ -1056,8 +1054,7 @@ class Network:
         if name in self.external_drives:
             raise ValueError(f"Drive {name} already defined")
 
-        _validate_type(probability, (float, dict),
-                       "probability", "float or dict")
+        _validate_type(probability, (float, dict), "probability", "float or dict")
         # allow passing weights as None, convert to dict here
         (target_populations, weights_by_type, delays_by_type, probability_by_type) = (
             _get_target_properties(
@@ -1165,8 +1162,7 @@ class Network:
             delays = delays_by_type[target_cell_type]
             probability = probability_by_type[target_cell_type]
             if cell_specific:
-                target_gids_nested = [[target_gid]
-                                      for target_gid in target_gids]
+                target_gids_nested = [[target_gid] for target_gid in target_gids]
                 src_idx_end = src_idx + len(target_gids)
                 src_gids = list(self.gid_ranges[name])[src_idx:src_idx_end]
                 src_idx = src_idx_end
@@ -1253,8 +1249,7 @@ class Network:
                     if drive["cell_specific"]:
                         # loop over drives (one for each target cell
                         # population) and create event times
-                        conn_idxs = pick_connection(
-                            self, src_gids=drive_cell_gid)
+                        conn_idxs = pick_connection(self, src_gids=drive_cell_gid)
                         target_types = set(
                             [
                                 self.connectivity[conn_idx]["target_type"]
@@ -1287,8 +1282,7 @@ class Network:
                         )
                         event_times.append(src_event_times)
                 # 'events': nested list (n_trials x n_drive_cells x n_events)
-                self.external_drives[drive["name"]
-                                     ]["events"].append(event_times)
+                self.external_drives[drive["name"]]["events"].append(event_times)
 
     def add_tonic_bias(
         self,
@@ -1523,8 +1517,7 @@ class Network:
         # set() used to avoid redundant checks.
         target_set = set()
         for target_src_pair in target_gids:
-            _validate_type(target_src_pair, list,
-                           "target_gids[idx]", "list or range")
+            _validate_type(target_src_pair, list, "target_gids[idx]", "list or range")
             for target_gid in target_src_pair:
                 target_set.add(target_gid)
         target_type = self.gid_to_type(target_gids[0][0])
@@ -1533,11 +1526,9 @@ class Network:
             # Ensure gids in range of Network.gid_ranges
             gid_type = self.gid_to_type(target_gid)
             if gid_type is None:
-                raise AssertionError(
-                    f"target_gid {target_gid}not in net.gid_ranges")
+                raise AssertionError(f"target_gid {target_gid}not in net.gid_ranges")
             elif gid_type != target_type:
-                raise AssertionError(
-                    "All target_gids must be of the same type")
+                raise AssertionError("All target_gids must be of the same type")
         conn["target_type"] = target_type
         conn["target_gids"] = target_set
         conn["num_targets"] = len(target_set)
@@ -1571,8 +1562,7 @@ class Network:
             "loc",
             loc,
             valid_loc,
-            extra=(
-                f" (the loc '{loc}' is not defined for '{target_type}' cells)"),
+            extra=(f" (the loc '{loc}' is not defined for '{target_type}' cells)"),
         )
         conn["loc"] = loc
 
@@ -1731,14 +1721,12 @@ class Network:
 
         e_conns = pick_connection(self, receptor=["ampa", "nmda"])
         e_cells = np.concatenate(
-            [list(net.connectivity[conn_idx]["src_gids"])
-             for conn_idx in e_conns]
+            [list(net.connectivity[conn_idx]["src_gids"]) for conn_idx in e_conns]
         ).tolist()
 
         i_conns = pick_connection(self, receptor=["gabaa", "gabab"])
         i_cells = np.concatenate(
-            [list(net.connectivity[conn_idx]["src_gids"])
-             for conn_idx in i_conns]
+            [list(net.connectivity[conn_idx]["src_gids"]) for conn_idx in i_conns]
         ).tolist()
         conn_types = {
             "e_e": (e_e, e_cells, e_cells),
@@ -1757,8 +1745,7 @@ class Network:
                     f"Synaptic gains must be non-negative.Got {gain} for '{conn_type}'."
                 )
 
-            conn_indices = pick_connection(
-                net, src_gids=e_vals, target_gids=i_vals)
+            conn_indices = pick_connection(net, src_gids=e_vals, target_gids=i_vals)
             for conn_idx in conn_indices:
                 net.connectivity[conn_idx]["nc_dict"]["gain"] = gain
 
@@ -1958,8 +1945,7 @@ def _add_cell_type_bias(
         network.external_biases[bias_name] = dict()
 
     if cell_type in network.external_biases[bias_name]:
-        raise ValueError(
-            f"Bias named {bias_name} already defined for {cell_type}")
+        raise ValueError(f"Bias named {bias_name} already defined for {cell_type}")
 
     cell_type_bias = {
         "amplitude": amplitude,
