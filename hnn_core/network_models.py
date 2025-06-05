@@ -75,6 +75,168 @@ def jones_2009_model(params=None, add_drives_from_params=False,
 
     delay = net.delay
 
+    # connectivity refactored
+    # The weights are from default.json
+    connectivity = {
+        'L2_pyramidal': {
+            'L2_pyramidal': [
+                {
+                    'receptor': 'nmda',
+                    'weight': net._params['gbar_L2Pyr_L2Pyr_nmda'],  # 0.0005
+                    'loc': 'proximal',
+                    'lamtha': 3.0,
+                    'allow_autapses': False
+                },
+                {
+                    'receptor': 'ampa',
+                    'weight': net._params['gbar_L2Pyr_L2Pyr_ampa'],  # 0.0005
+                    'loc': 'proximal',
+                    'lamtha': 3.0,
+                    'allow_autapses': False
+                }
+            ],
+            'L5_pyramidal': [
+                {
+                    'receptor': 'ampa',
+                    'weight': net._params['gbar_L2Pyr_L5Pyr'],  # 0.00025
+                    'loc': 'proximal',
+                    'lamtha': 3.0,
+                    'allow_autapses': True
+                },
+                {
+                    'receptor': 'ampa',
+                    'weight': net._params['gbar_L2Pyr_L5Pyr'],  # 0.00025
+                    'loc': 'distal',
+                    'lamtha': 3.0,
+                    'allow_autapses': True
+                }
+            ],
+            'L2_basket': [
+                {
+                    'receptor': 'ampa',
+                    'weight': net._params['gbar_L2Pyr_L2Basket'],  # 0.0005
+                    'loc': 'soma',
+                    'lamtha': 3.0,
+                    'allow_autapses': True
+                }
+            ],
+            'L5_basket': [
+                {
+                    'receptor': 'ampa',
+                    'weight': net._params['gbar_L2Pyr_L5Basket'],  # 0.00025
+                    'loc': 'soma',
+                    'lamtha': 3.0,
+                    'allow_autapses': True
+                }
+            ]
+        },
+        'L2_basket': {
+            'L2_pyramidal': [
+                {
+                    'receptor': 'gabaa',
+                    'weight': net._params['gbar_L2Basket_L2Pyr_gabaa'],  # 0.05
+                    'loc': 'soma',
+                    'lamtha': 50.0,
+                    'allow_autapses': True
+                },
+                {
+                    'receptor': 'gabab',
+                    'weight': net._params['gbar_L2Basket_L2Pyr_gabab'],  # 0.05
+                    'loc': 'soma',
+                    'lamtha': 50.0,
+                    'allow_autapses': True
+                }
+            ],
+            'L5_pyramidal': [
+                {
+                    'receptor': 'gabaa',
+                    'weight': net._params['gbar_L2Basket_L5Pyr'],  # 0.001
+                    'loc': 'distal',
+                    'lamtha': 50.0,
+                    'allow_autapses': True
+                }
+            ],
+            'L2_basket': [
+                {
+                    'receptor': 'gabaa',
+                    'weight': net._params['gbar_L2Basket_L2Basket'],  # 0.02
+                    'loc': 'soma',
+                    'lamtha': 20.0,
+                    'allow_autapses': True
+                }
+            ]
+        },
+        'L5_pyramidal': {
+            'L5_pyramidal': [
+                {
+                    'receptor': 'nmda',
+                    'weight': net._params['gbar_L5Pyr_L5Pyr_nmda'],  # 0.0005
+                    'loc': 'proximal',
+                    'lamtha': 3.0,
+                    'allow_autapses': False
+                },
+                {
+                    'receptor': 'ampa',
+                    'weight': net._params['gbar_L5Pyr_L5Pyr_ampa'],  # 0.0005
+                    'loc': 'proximal',
+                    'lamtha': 3.0,
+                    'allow_autapses': False
+                }
+            ],
+            'L5_basket': [
+                {
+                    'receptor': 'ampa',
+                    'weight': net._params['gbar_L5Pyr_L5Basket'],  # 0.0005
+                    'loc': 'soma',
+                    'lamtha': 3.0,
+                    'allow_autapses': True
+                }
+            ]
+        },
+        'L5_basket': {
+            'L5_pyramidal': [
+                {
+                    'receptor': 'gabaa',
+                    'weight': net._params['gbar_L5Basket_L5Pyr_gabaa'],  # 0.025
+                    'loc': 'soma',
+                    'lamtha': 70.0,
+                    'allow_autapses': True
+                },
+                {
+                    'receptor': 'gabab',
+                    'weight': net._params['gbar_L5Basket_L5Pyr_gabab'],  # 0.025
+                    'loc': 'soma',
+                    'lamtha': 70.0,
+                    'allow_autapses': True
+                }
+            ],
+            'L5_basket': [
+                {
+                    'receptor': 'gabaa',
+                    'weight': net._params['gbar_L5Basket_L5Basket'],  # 0.02
+                    'loc': 'soma',
+                    'lamtha': 20.0,
+                    'allow_autapses': False
+                }
+            ]
+        }
+    }
+
+    # Create connections from the connectivity dictionary
+    for src_cell in connectivity:
+        for target_cell in connectivity[src_cell]:
+            for conn_params in connectivity[src_cell][target_cell]:
+                net.add_connection(
+                    src_gids=src_cell,
+                    target_gids=target_cell,
+                    loc=conn_params['loc'],
+                    receptor=conn_params['receptor'],
+                    weight=conn_params['weight'],
+                    delay=delay,
+                    lamtha=conn_params['lamtha'],
+                    allow_autapses=conn_params.get('allow_autapses', True)
+                )
+
     # source of synapse is always at soma
 
     # layer2 Pyr -> layer2 Pyr
