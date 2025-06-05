@@ -27,10 +27,34 @@ def test_custom_cell_types():
         traceback.print_exc()
         return False
 
+def test_backward_compatibility():
+    """Test that existing code still works"""
+    print("Testing backward compatibility...")
+    try:
+        from hnn_core import jones_2009_model, simulate_dipole
+        
+        # Create network the old way
+        net = jones_2009_model()
+        assert len(net.cell_types) == 4, f"Expected 4 cell types, got {len(net.cell_types)}"
+        assert 'L2_pyramidal' in net.cell_types
+        assert 'L5_pyramidal' in net.cell_types
+        
+        # Quick sim to ensure it works
+        dpl = simulate_dipole(net, tstop=10, n_trials=1)
+        
+        print("Backward compatibility test passed")
+        return True
+    except Exception as e:
+        print(f"Backward compatibility test failed: {e}")
+        traceback.print_exc()
+        return False
+
+
 def main():
     
     tests = [
         test_custom_cell_types,
+        test_backward_compatibility
     ]
     
     results = []
