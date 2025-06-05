@@ -6,7 +6,7 @@
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
 from hnn_core import simulate_dipole
-from ..dipole import _rmse
+from ..dipole import _rmse, average_dipoles
 
 
 def _rmse_evoked(
@@ -49,16 +49,16 @@ def _rmse_evoked(
     # simulate dpl with predicted params
     new_net = initial_net.copy()
     set_params(new_net, params)
-    dpl = simulate_dipole(new_net, tstop=tstop, n_trials=1)[0]
+    dpls = simulate_dipole(new_net, tstop=tstop, n_trials=3)
 
     # smooth & scale
     if "scale_factor" in obj_fun_kwargs:
-        dpl.scale(obj_fun_kwargs["scale_factor"])
+        [dpl.scale(obj_fun_kwargs["scale_factor"]) for dpl in dpls]
     if "smooth_window_len" in obj_fun_kwargs:
-        dpl.smooth(obj_fun_kwargs["smooth_window_len"])
+        [dpl.smooth(obj_fun_kwargs["smooth_window_len"]) for dpl in dpls]
 
+    dpl = average_dipoles(dpls)
     obj = _rmse(dpl, obj_fun_kwargs["target"], tstop=tstop)
-
     obj_values.append(obj)
 
     return obj
@@ -118,15 +118,15 @@ def _maximize_psd(
     # simulate dpl with predicted params
     new_net = initial_net.copy()
     set_params(new_net, params)
-    dpl = simulate_dipole(new_net, tstop=tstop, n_trials=1)[0]
+    dpls = simulate_dipole(new_net, tstop=tstop, n_trials=3)
 
     # smooth & scale
     if "scale_factor" in obj_fun_kwargs:
-        dpl.scale(obj_fun_kwargs["scale_factor"])
+        [dpl.scale(obj_fun_kwargs["scale_factor"]) for dpl in dpls]
     if "smooth_window_len" in obj_fun_kwargs:
-        dpl.smooth(obj_fun_kwargs["smooth_window_len"])
+        [dpl.smooth(obj_fun_kwargs["smooth_window_len"]) for dpl in dpls]
 
-    # resample?
+    dpl = average_dipoles(dpls)
 
     # get psd of simulated dpl
     freqs_simulated, psd_simulated = periodogram(

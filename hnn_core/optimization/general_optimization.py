@@ -20,6 +20,7 @@ class Optimizer:
         solver="bayesian",
         obj_fun="dipole_rmse",
         max_iter=200,
+        initial_params=None,
     ):
         """Parameter optimization.
 
@@ -47,6 +48,10 @@ class Optimizer:
         max_iter : int, optional
             The max number of calls to the objective function. The default is
             200.
+        initial_params : dict, optional
+            Initial parameters for the objective function. Keys are parameter
+            names, values are initial parameters. The default is None.
+            If None, the parameters will be set to the midpoints of parameter ranges.
 
         Attributes
         ----------
@@ -68,6 +73,8 @@ class Optimizer:
             The objective function values.
         opt_params_ : list
             The list of optimized parameter values.
+        initial_params : dict
+            Initial parameters for the objective function.
         """
 
         if initial_net.external_drives:
@@ -101,6 +108,11 @@ class Optimizer:
         else:
             self.obj_fun = obj_fun  # user-defined function
             self.obj_fun_name = None
+        # Initial weights for the objective function
+        if initial_params is not None:
+            self.initial_params = initial_params
+        else:
+            self.initial_params = _get_initial_params(constraints)
         self.tstop = tstop
         self.net_ = None
         self.obj_ = list()
@@ -139,7 +151,6 @@ class Optimizer:
             raise Exception("f_bands and relative_bandpower must be specified")
 
         constraints = self._assemble_constraints(self.constraints)
-        initial_params = _get_initial_params(self.constraints)
 
         opt_params, obj, net_ = self._run_opt(
             self._initial_net,
@@ -147,7 +158,7 @@ class Optimizer:
             constraints,
             self._set_params,
             self.obj_fun,
-            initial_params,
+            self.initial_params,
             self.max_iter,
             obj_fun_kwargs,
         )
