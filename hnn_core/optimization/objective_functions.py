@@ -118,15 +118,13 @@ def _maximize_psd(
     # simulate dpl with predicted params
     new_net = initial_net.copy()
     set_params(new_net, params)
-    dpls = simulate_dipole(new_net, tstop=tstop, n_trials=3)
+    dpl = simulate_dipole(new_net, tstop=tstop, n_trials=1)[0]
 
     # smooth & scale
     if "scale_factor" in obj_fun_kwargs:
-        [dpl.scale(obj_fun_kwargs["scale_factor"]) for dpl in dpls]
+        dpl.scale(obj_fun_kwargs["scale_factor"])
     if "smooth_window_len" in obj_fun_kwargs:
-        [dpl.smooth(obj_fun_kwargs["smooth_window_len"]) for dpl in dpls]
-
-    dpl = average_dipoles(dpls)
+        dpl.smooth(obj_fun_kwargs["smooth_window_len"])
 
     # get psd of simulated dpl
     freqs_simulated, psd_simulated = periodogram(
