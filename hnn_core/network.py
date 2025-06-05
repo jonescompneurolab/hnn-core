@@ -365,7 +365,7 @@ class Network:
     """
 
     def __init__(self, params, add_drives_from_params=False,
-                 legacy_mode=False, mesh_shape=(10, 10)):
+                 legacy_mode=False, mesh_shape=(10, 10), cell_types=None):
         # Save the parameters used to create the Network
         _validate_type(params, dict, 'params')
         self._params = params
@@ -390,12 +390,13 @@ class Network:
                 stacklevel=1)
 
         # Source dict of names, first real ones only!
-        cell_types = {
-            'L2_basket': basket(cell_name=_short_name('L2_basket')),
-            'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
-            'L5_basket': basket(cell_name=_short_name('L5_basket')),
-            'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
-        }
+        if cell_types is None:
+            cell_types = {
+                'L2_basket': basket(cell_name=_short_name('L2_basket')),
+                'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
+                'L5_basket': basket(cell_name=_short_name('L5_basket')),
+                'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
+            }
 
         self.cell_response = None
         # external drives and biases

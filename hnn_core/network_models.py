@@ -9,6 +9,7 @@ from .network import Network
 from .params import _short_name
 from .cells_default import pyramidal_ca
 from .externals.mne import _validate_type
+from .cells_default import pyramidal, basket
 
 
 def jones_2009_model(params=None, add_drives_from_params=False,
@@ -60,8 +61,17 @@ def jones_2009_model(params=None, add_drives_from_params=False,
     if isinstance(params, str):
         params = read_params(params)
 
-    net = Network(params, add_drives_from_params=add_drives_from_params,
-                  legacy_mode=legacy_mode, mesh_shape=mesh_shape)
+    # Define cell types for Jones 2009 model
+    cell_types = {
+        'L2_basket': basket(cell_name=_short_name('L2_basket')),
+        'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
+        'L5_basket': basket(cell_name=_short_name('L5_basket')),
+        'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
+    }
+
+    # Create network with specified cell types
+    net = Network(params, add_drives_from_params= add_drives_from_params,
+                  legacy_mode=legacy_mode, mesh_shape=mesh_shape, cell_types=cell_types)# Pass cell types to Network
 
     delay = net.delay
 
@@ -73,8 +83,9 @@ def jones_2009_model(params=None, add_drives_from_params=False,
     loc = 'proximal'
     for target_cell in ['L2_pyramidal', 'L5_pyramidal']:
         for receptor in ['nmda', 'ampa']:
-            key = f'gbar_{_short_name(target_cell)}_'\
-                  f'{_short_name(target_cell)}_{receptor}'
+            key = (
+                f'gbar_{_short_name(target_cell)}_{_short_name(target_cell)}_{receptor}'
+            )
             weight = net._params[key]
             net.add_connection(
                 target_cell, target_cell, loc, receptor, weight,
