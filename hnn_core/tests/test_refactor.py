@@ -1,4 +1,3 @@
-import sys
 import traceback
 
 def test_custom_cell_types():
@@ -60,7 +59,6 @@ def main():
     results = []
     for test in tests:
         results.append(test())
-        print("-" * 50)
     
     passed = sum(results)
     total = len(results)
@@ -76,4 +74,4 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

@@ -76,7 +76,6 @@ def jones_2009_model(params=None, add_drives_from_params=False,
     delay = net.delay
 
     # connectivity refactored
-    # The weights are from default.json
     connectivity = {
         'L2_pyramidal': {
             'L2_pyramidal': [
