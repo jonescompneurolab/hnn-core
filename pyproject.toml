@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=40.8.0", "NEURON >=7.7, <8.2.7; platform_system != 'Windows'"]
+requires = ["setuptools>=40.8.0", "NEURON >=7.7; platform_system != 'Windows'"]
 build-backend = "setuptools.build_meta:__legacy__"
 [tool.codespell]
 skip = '.git,*.pdf,*.svg,./hnn_core/mod,./doc/_build,./build'
