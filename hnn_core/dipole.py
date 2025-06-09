@@ -15,8 +15,16 @@ from .externals.mne import _check_option
 from .viz import plot_dipole, plot_psd, plot_tfr_morlet
 
 
-def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
-                    record_isec=False, record_ca=False, postproc=False):
+def simulate_dipole(
+    net,
+    tstop,
+    dt=0.025,
+    n_trials=None,
+    record_vsec=False,
+    record_isec=False,
+    record_ca=False,
+    postproc=False,
+):
     """Simulate a dipole given the experiment parameters.
 
     Parameters
@@ -61,63 +69,67 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
         _BACKEND = JoblibBackend(n_jobs=1)
 
     if n_trials is None:
-        n_trials = net._params['N_trials']
+        n_trials = net._params["N_trials"]
     if n_trials < 1:
         raise ValueError("Invalid number of simulations: %d" % n_trials)
 
     if not net.connectivity:
-        warnings.warn('No connections instantiated in network. Consider using '
-                      'net = jones_2009_model() or net = law_2021_model() to '
-                      'create a predefined network from published models.',
-                      UserWarning)
+        warnings.warn(
+            "No connections instantiated in network. Consider using "
+            "net = jones_2009_model() or net = law_2021_model() to "
+            "create a predefined network from published models.",
+            UserWarning,
+        )
     # ADD DRIVE WARNINGS HERE
     if not net.external_drives and not net.external_biases:
-        warnings.warn('No external drives or biases loaded', UserWarning)
+        warnings.warn("No external drives or biases loaded", UserWarning)
 
     for drive_name, drive in net.external_drives.items():
-        if 'tstop' in drive['dynamics']:
-            if drive['dynamics']['tstop'] is None:
-                drive['dynamics']['tstop'] = tstop
+        if "tstop" in drive["dynamics"]:
+            if drive["dynamics"]["tstop"] is None:
+                drive["dynamics"]["tstop"] = tstop
     for bias_name, bias in net.external_biases.items():
         for cell_type, bias_cell_type in bias.items():
-            if bias_cell_type['tstop'] is None:
-                bias_cell_type['tstop'] = tstop
-            if bias_cell_type['tstop'] < 0.:
-                raise ValueError('End time of tonic input cannot be negative')
-            duration = bias_cell_type['tstop'] - bias_cell_type['t0']
-            if duration < 0.:
-                raise ValueError('Duration of tonic input cannot be negative')
+            if bias_cell_type["tstop"] is None:
+                bias_cell_type["tstop"] = tstop
+            if bias_cell_type["tstop"] < 0.0:
+                raise ValueError("End time of tonic input cannot be negative")
+            duration = bias_cell_type["tstop"] - bias_cell_type["t0"]
+            if duration < 0.0:
+                raise ValueError("Duration of tonic input cannot be negative")
 
     net._instantiate_drives(n_trials=n_trials, tstop=tstop)
     net._reset_rec_arrays()
 
-    _check_option('record_vsec', record_vsec, ['all', 'soma', False])
+    _check_option("record_vsec", record_vsec, ["all", "soma", False])
 
-    net._params['record_vsec'] = record_vsec
+    net._params["record_vsec"] = record_vsec
 
-    _check_option('record_isec', record_isec, ['all', 'soma', False])
+    _check_option("record_isec", record_isec, ["all", "soma", False])
 
-    net._params['record_isec'] = record_isec
+    net._params["record_isec"] = record_isec
 
-    _check_option('record_ca', record_ca, ['all', 'soma', False])
+    _check_option("record_ca", record_ca, ["all", "soma", False])
 
-    net._params['record_ca'] = record_ca
+    net._params["record_ca"] = record_ca
 
     net._tstop = tstop
 
     net._dt = dt
 
     if postproc:
-        warnings.warn('The postproc-argument is deprecated and will be removed'
-                      ' in a future release of hnn-core. Please define '
-                      'smoothing and scaling explicitly using Dipole methods.',
-                      DeprecationWarning)
+        warnings.warn(
+            "The postproc-argument is deprecated and will be removed"
+            " in a future release of hnn-core. Please define "
+            "smoothing and scaling explicitly using Dipole methods.",
+            DeprecationWarning,
+        )
     dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc)
 
     return dpls
 
 
-def _read_dipole_txt(fname, extension='.txt'):
+def _read_dipole_txt(fname, extension=".txt"):
     """Read dipole values from a txt file and create a Dipole instance.
 
     Parameters
@@ -130,16 +142,16 @@ def _read_dipole_txt(fname, extension='.txt'):
     dpl : Dipole
         The instance of Dipole class
     """
-    if extension == '.csv':
+    if extension == ".csv":
         # read from a csv file ignoring the headers
-        dpl_data = np.genfromtxt(fname, delimiter=',',
-                                 skip_header=1, dtype=float)
+        dpl_data = np.genfromtxt(fname, delimiter=",", skip_header=1, dtype=float)
     else:
         dpl_data = np.loadtxt(fname, dtype=float)
     ncols = dpl_data.shape[1]
     if ncols not in (2, 4):
         raise ValueError(
-            f'Data are supposed to have 2 or 4 columns while we have {ncols}.')
+            f"Data are supposed to have 2 or 4 columns while we have {ncols}."
+        )
     dpl = Dipole(dpl_data[:, 0], dpl_data[:, 1:])
     return dpl
 
@@ -159,19 +171,21 @@ def _read_dipole_hdf5(fname):
     """
 
     dpl_data = read_hdf5(fname)
-    if 'object_type' not in dpl_data:
-        raise NameError('The given file is not compatible. '
-                        'The file should contain information'
-                        ' about object type to be read.')
-    if dpl_data['object_type'] != 'Dipole':
-        raise ValueError('The object should be of type Dipole. '
-                         'The file contains object of '
-                         'type %s' % (dpl_data['object_type'],))
-    dpl = Dipole(times=dpl_data['times'],
-                 data=dpl_data['data'],
-                 nave=dpl_data['nave'])
-    dpl.sfreq = dpl_data['sfreq']
-    dpl.scale_applied = dpl_data['scale_applied']
+    if "object_type" not in dpl_data:
+        raise NameError(
+            "The given file is not compatible. "
+            "The file should contain information"
+            " about object type to be read."
+        )
+    if dpl_data["object_type"] != "Dipole":
+        raise ValueError(
+            "The object should be of type Dipole. "
+            "The file contains object of "
+            "type %s" % (dpl_data["object_type"],)
+        )
+    dpl = Dipole(times=dpl_data["times"], data=dpl_data["data"], nave=dpl_data["nave"])
+    dpl.sfreq = dpl_data["sfreq"]
+    dpl.scale_applied = dpl_data["scale_applied"]
     return dpl
 
 
@@ -192,15 +206,17 @@ def read_dipole(fname):
 
     fname = str(fname)
     if not os.path.exists(fname):
-        raise FileNotFoundError('File not found at path %s.' % (fname,))
+        raise FileNotFoundError("File not found at path %s." % (fname,))
     file_extension = os.path.splitext(fname)[-1]
-    if file_extension == '.txt':
+    if file_extension == ".txt":
         return _read_dipole_txt(fname)
-    elif file_extension == '.hdf5':
+    elif file_extension == ".hdf5":
         return _read_dipole_hdf5(fname)
     else:
-        raise NameError('File extension should be either txt or hdf5, but the '
-                        'given extension is %s' % (file_extension,))
+        raise NameError(
+            "File extension should be either txt or hdf5, but the "
+            "given extension is %s" % (file_extension,)
+        )
 
 
 def average_dipoles(dpls):
@@ -221,22 +237,22 @@ def average_dipoles(dpls):
     scale_applied = dpls[0].scale_applied
     for dpl_idx, dpl in enumerate(dpls):
         if dpl.scale_applied != scale_applied:
-            raise RuntimeError('All dipoles must be scaled equally!')
+            raise RuntimeError("All dipoles must be scaled equally!")
         if not isinstance(dpl, Dipole):
             raise ValueError(
                 f"All elements in the list should be instances of "
-                f"Dipole. Got {type(dpl)}")
+                f"Dipole. Got {type(dpl)}"
+            )
         if dpl.nave > 1:
-            raise ValueError("Dipole at index %d was already an average of %d"
-                             " trials. Cannot reaverage" %
-                             (dpl_idx, dpl.nave))
+            raise ValueError(
+                "Dipole at index %d was already an average of %d"
+                " trials. Cannot reaverage" % (dpl_idx, dpl.nave)
+            )
 
     avg_data = list()
     layers = dpl.data.keys()
     for layer in layers:
-        avg_data.append(
-            np.mean(np.array([dpl.data[layer] for dpl in dpls]), axis=0)
-        )
+        avg_data.append(np.mean(np.array([dpl.data[layer] for dpl in dpls]), axis=0))
     avg_data = np.c_[avg_data].T
     avg_dpl = Dipole(dpls[0].times, avg_data)
     # The averaged scale should equal all scals in the input dpl list.
@@ -249,7 +265,7 @@ def average_dipoles(dpls):
 
 
 def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
-    """ Calculates RMSE between data in dpl and exp_dpl
+    """Calculates RMSE between data in dpl and exp_dpl
     Parameters
     ----------
     dpl : instance of Dipole
@@ -299,16 +315,16 @@ def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
         weights = np.ones(len(sim_times[0:sim_end_index]))
     weights = weights[sim_start_index:sim_end_index]
 
-    dpl1 = dpl.data['agg'][sim_start_index:sim_end_index]
-    dpl2 = exp_dpl.data['agg'][exp_start_index:exp_end_index]
+    dpl1 = dpl.data["agg"][sim_start_index:sim_end_index]
+    dpl2 = exp_dpl.data["agg"][exp_start_index:exp_end_index]
 
-    if (sim_length > exp_length):
+    if sim_length > exp_length:
         # downsample simulation timeseries to match exp data
         dpl1 = signal.resample(dpl1, exp_length)
         weights = signal.resample(weights, exp_length)
         indices = np.where(weights < 1e-4)
         weights[indices] = 0
-    elif (sim_length < exp_length):
+    elif sim_length < exp_length:
         # downsample exp timeseries to match simulation data
         dpl2 = signal.resample(dpl2, sim_length)
 
@@ -359,13 +375,12 @@ class Dipole(object):
             if data.ndim == 1:
                 data = data[:, None]
             if data.shape[1] == 3:
-                self.data = {'agg': data[:, 0], 'L2': data[:, 1],
-                             'L5': data[:, 2]}
+                self.data = {"agg": data[:, 0], "L2": data[:, 1], "L5": data[:, 2]}
             elif data.shape[1] == 1:
-                self.data = {'agg': data[:, 0]}
+                self.data = {"agg": data[:, 0]}
 
         self.nave = nave
-        self.sfreq = 1000. / (times[1] - times[0])  # NB assumes len > 1
+        self.sfreq = 1000.0 / (times[1] - times[0])  # NB assumes len > 1
         self.scale_applied = 1  # for visualisation
 
     def copy(self):
@@ -438,8 +453,7 @@ class Dipole(object):
         from .utils import smooth_waveform
 
         for key in self.data.keys():
-            self.data[key] = smooth_waveform(self.data[key], window_len,
-                                             self.sfreq)
+            self.data[key] = smooth_waveform(self.data[key], window_len, self.sfreq)
 
         return self
 
@@ -468,19 +482,25 @@ class Dipole(object):
             A copy of the modified Dipole instance.
         """
         from .utils import _savgol_filter
+
         if h_freq < 0:
-            raise ValueError('h_freq cannot be negative')
+            raise ValueError("h_freq cannot be negative")
         elif h_freq > 0.5 * self.sfreq:
-            raise ValueError(
-                'h_freq must be less than half the sample rate')
+            raise ValueError("h_freq must be less than half the sample rate")
         for key in self.data.keys():
-            self.data[key] = _savgol_filter(self.data[key],
-                                            h_freq,
-                                            self.sfreq)
+            self.data[key] = _savgol_filter(self.data[key], h_freq, self.sfreq)
         return self
 
-    def plot(self, tmin=None, tmax=None, layer='agg', decim=None, ax=None,
-             color='k', show=True):
+    def plot(
+        self,
+        tmin=None,
+        tmax=None,
+        layer="agg",
+        decim=None,
+        ax=None,
+        color="k",
+        show=True,
+    ):
         """Simple layer-specific plot function.
 
         Parameters
@@ -502,11 +522,29 @@ class Dipole(object):
             The matplotlib figure handle.
         """
 
-        return plot_dipole(self, tmin=tmin, tmax=tmax, ax=ax, layer=layer,
-                           decim=decim, color=color, show=show)
+        return plot_dipole(
+            self,
+            tmin=tmin,
+            tmax=tmax,
+            ax=ax,
+            layer=layer,
+            decim=decim,
+            color=color,
+            show=show,
+        )
 
-    def plot_psd(self, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
-                 color=None, label=None, ax=None, show=True):
+    def plot_psd(
+        self,
+        fmin=0,
+        fmax=None,
+        tmin=None,
+        tmax=None,
+        layer="agg",
+        color=None,
+        label=None,
+        ax=None,
+        show=True,
+    ):
         """Plot power spectral density (PSD) of dipole time course
 
         Applies `~scipy.signal.periodogram` from SciPy with
@@ -547,14 +585,34 @@ class Dipole(object):
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
         """
-        return plot_psd(self, fmin=fmin, fmax=fmax, tmin=tmin, tmax=tmax,
-                        layer=layer, color=color, label=label, ax=ax,
-                        show=show)
+        return plot_psd(
+            self,
+            fmin=fmin,
+            fmax=fmax,
+            tmin=tmin,
+            tmax=tmax,
+            layer=layer,
+            color=color,
+            label=label,
+            ax=ax,
+            show=show,
+        )
 
-    def plot_tfr_morlet(self, freqs, n_cycles=7., tmin=None, tmax=None,
-                        layer='agg', decim=None, padding='zeros', ax=None,
-                        colormap='inferno', colorbar=True,
-                        colorbar_inside=False, show=True):
+    def plot_tfr_morlet(
+        self,
+        freqs,
+        n_cycles=7.0,
+        tmin=None,
+        tmax=None,
+        layer="agg",
+        decim=None,
+        padding="zeros",
+        ax=None,
+        colormap="inferno",
+        colorbar=True,
+        colorbar_inside=False,
+        show=True,
+    ):
         """Plot Morlet time-frequency representation of dipole time course
 
         NB: Calls `~mne.time_frequency.tfr_array_morlet`, so ``mne`` must be
@@ -603,10 +661,20 @@ class Dipole(object):
             The matplotlib figure handle.
         """
         return plot_tfr_morlet(
-            self, freqs, n_cycles=n_cycles, tmin=tmin, tmax=tmax,
-            layer=layer, decim=decim, padding=padding, ax=ax,
-            colormap=colormap, colorbar=colorbar,
-            colorbar_inside=colorbar_inside, show=show)
+            self,
+            freqs,
+            n_cycles=n_cycles,
+            tmin=tmin,
+            tmax=tmax,
+            layer=layer,
+            decim=decim,
+            padding=padding,
+            ax=ax,
+            colormap=colormap,
+            colorbar=colorbar,
+            colorbar_inside=colorbar_inside,
+            show=show,
+        )
 
     def _baseline_renormalize(self, N_pyr_x, N_pyr_y):
         """Only baseline renormalize if the units are fAm.
@@ -630,15 +698,15 @@ class Dipole(object):
         # dpl_offset = N_pyr * 50.207
         dpl_offset = {
             # these values will be subtracted
-            'L2': N_pyr * 0.0443,
-            'L5': N_pyr * -49.0502
+            "L2": N_pyr * 0.0443,
+            "L5": N_pyr * -49.0502,
             # 'L5': N_pyr * -48.3642,
             # will be calculated next, this is a placeholder
             # 'agg': None,
         }
         # L2 dipole offset can be roughly baseline shifted over
         # the entire range of t
-        self.data['L2'] -= dpl_offset['L2']
+        self.data["L2"] -= dpl_offset["L2"]
         # L5 dipole offset should be different for interval [50., 500.]
         # and then it can be offset
         # slope (m) and intercept (b) params for L5 dipole offset
@@ -647,18 +715,20 @@ class Dipole(object):
         m = 3.4770508e-3
         b = -51.231085
         # these values were fit over the range [750., 5000]
-        t1 = 750.
+        t1 = 750.0
         m1 = 1.01e-4
         b1 = -48.412078
         # piecewise normalization
-        self.data['L5'][self.times <= 37.] -= dpl_offset['L5']
-        self.data['L5'][(self.times > 37.) & (self.times < t1)] -= N_pyr * \
-            (m * self.times[(self.times > 37.) & (self.times < t1)] + b)
-        self.data['L5'][self.times >= t1] -= N_pyr * \
-            (m1 * self.times[self.times >= t1] + b1)
+        self.data["L5"][self.times <= 37.0] -= dpl_offset["L5"]
+        self.data["L5"][(self.times > 37.0) & (self.times < t1)] -= N_pyr * (
+            m * self.times[(self.times > 37.0) & (self.times < t1)] + b
+        )
+        self.data["L5"][self.times >= t1] -= N_pyr * (
+            m1 * self.times[self.times >= t1] + b1
+        )
         # recalculate the aggregate dipole based on the baseline
         # normalized ones
-        self.data['agg'] = self.data['L2'] + self.data['L5']
+        self.data["agg"] = self.data["L2"] + self.data["L5"]
 
     def _write_txt(self, fname):
         """Write dipole values to a file.
@@ -678,22 +748,19 @@ class Dipole(object):
             4) L5 current dipole (scaled nAm)
         """
 
-        warnings.warn('Writing dipole to txt file is deprecated '
-                      'and will be removed in future versions. '
-                      'Please use hdf5', DeprecationWarning, stacklevel=2)
-
         if self.nave > 1:
-            warnings.warn("Saving Dipole to file that is an average of %d"
-                          " trials" % self.nave)
+            warnings.warn(
+                "Saving Dipole to file that is an average of %d trials" % self.nave
+            )
 
         X = [self.times]
-        fmt = ['%3.3f']
+        fmt = ["%3.3f"]
         for data in self.data.values():
             X.append(data)
-            fmt.append('%5.4f')
+            fmt.append("%5.4f")
         X = np.r_[X].T
 
-        np.savetxt(fname, X, fmt=fmt, delimiter='\t')
+        np.savetxt(fname, X, fmt=fmt, delimiter="\t")
 
     def _write_hdf5(self, fname):
         """Write dipole values to a hdf5 file.
@@ -706,14 +773,14 @@ class Dipole(object):
         -------
         A hdf5 file containing the dipole object
         """
-        print(f'Writing file {fname}')
+        print(f"Writing file {fname}")
         dpl_data = dict()
-        dpl_data['object_type'] = "Dipole"
-        dpl_data['times'] = self.times
-        dpl_data['sfreq'] = self.sfreq
-        dpl_data['nave'] = self.nave
-        dpl_data['data'] = self.data
-        dpl_data['scale_applied'] = self.scale_applied
+        dpl_data["object_type"] = "Dipole"
+        dpl_data["times"] = self.times
+        dpl_data["sfreq"] = self.sfreq
+        dpl_data["nave"] = self.nave
+        dpl_data["data"] = self.data
+        dpl_data["scale_applied"] = self.scale_applied
         write_hdf5(fname, dpl_data, overwrite=True)
 
     def write(self, fname, overwrite=True):
@@ -741,13 +808,17 @@ class Dipole(object):
 
         fname = str(fname)
         if overwrite is False and os.path.exists(fname):
-            raise FileExistsError('File already exists at path %s. Rename '
-                                  'the file or set overwrite=True.' % (fname,))
+            raise FileExistsError(
+                "File already exists at path %s. Rename "
+                "the file or set overwrite=True." % (fname,)
+            )
         file_extension = os.path.splitext(fname)[-1]
-        if file_extension == '.txt':
+        if file_extension == ".txt":
             self._write_txt(fname)
-        elif file_extension == '.hdf5':
+        elif file_extension == ".hdf5":
             self._write_hdf5(fname)
         else:
-            raise NameError('File extension should be either txt or hdf5, but '
-                            'the given extension is %s.' % (file_extension,))
+            raise NameError(
+                "File extension should be either txt or hdf5, but "
+                "the given extension is %s." % (file_extension,)
+            )

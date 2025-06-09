@@ -8,8 +8,9 @@ from .externals.mne import _validate_type, _check_option
 
 def _check_gids(gids, gid_ranges, valid_cells, arg_name, same_type=True):
     """Format different gid specifications into list of gids"""
-    _validate_type(gids, (int, list, range, str, None), arg_name,
-                   'int list, range, str, or None')
+    _validate_type(
+        gids, (int, list, range, str, None), arg_name, "int list, range, str, or None"
+    )
 
     # Convert gids to list
     if gids is None:
@@ -28,10 +29,9 @@ def _check_gids(gids, gid_ranges, valid_cells, arg_name, same_type=True):
         _validate_type(gid, int, arg_name)
         gid_type = _gid_to_type(gid, gid_ranges)
         if gid_type is None:
-            raise AssertionError(
-                f'{arg_name} {gid} not in net.gid_ranges')
+            raise AssertionError(f"{arg_name} {gid} not in net.gid_ranges")
         if same_type and gid_type != cell_type:
-            raise AssertionError(f'All {arg_name} must be of the same type')
+            raise AssertionError(f"All {arg_name} must be of the same type")
 
     return gids
 

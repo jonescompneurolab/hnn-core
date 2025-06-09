@@ -23,7 +23,7 @@ version = None
 with open(os.path.join('hnn_core', '__init__.py'), 'r') as fid:
     for line in (line.strip() for line in fid):
         if line.startswith('__version__'):
-            version = line.split('=')[1].strip().strip('\'')
+            version = line.split('=')[1].strip().strip('\"')
             break
 if version is None:
     raise RuntimeError('Could not determine version')
@@ -97,6 +97,7 @@ if __name__ == "__main__":
           version=version,
           download_url=DOWNLOAD_URL,
           long_description=open('README.md').read(),
+          long_description_content_type='text/markdown',
           classifiers=[
               'Intended Audience :: Science/Research',
               'Intended Audience :: Developers',
@@ -112,7 +113,7 @@ if __name__ == "__main__":
           platforms='any',
           install_requires=[
               'numpy >=1.14',
-              'NEURON >=7.7; platform_system != "Windows"',
+              'NEURON >=7.7, <8.2.7; platform_system != "Windows"',
               'matplotlib>=3.5.3',
               'scipy',
               'h5io'

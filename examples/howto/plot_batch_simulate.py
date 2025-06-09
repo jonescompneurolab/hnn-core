@@ -8,6 +8,12 @@ efficiently run multiple simulations with different parameters
 for comprehensive analysis.
 """
 
+###############################################################################
+# Note that batch simulation requires you to install HNN-core with Joblib
+# parallel support, which you can do by installing it with
+# ``pip install "hnn_core[parallel]"``
+
+
 # Authors: Abdul Samad Siddiqui <abdulsamadsid1@gmail.com>
 #          Nick Tolley <nicholas_tolley@brown.edu>
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
@@ -20,6 +26,7 @@ for comprehensive analysis.
 
 import matplotlib.pyplot as plt
 import numpy as np
+
 from hnn_core.batch_simulate import BatchSimulate
 from hnn_core import jones_2009_model
 

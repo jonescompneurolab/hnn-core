@@ -27,7 +27,7 @@ _BACKEND = None
 def _thread_handler(event, out, queue):
     while not event.is_set():
         line = out.readline()
-        if line == '':
+        if line == "":
             break
         queue.put(line)
 
@@ -42,37 +42,36 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
 
     # Create array of equally sampled time points for simulating currents
     cell_type_names = list(net.cell_types.keys())
-    cell_response = CellResponse(times=sim_data[0]['times'],
-                                 cell_type_names=cell_type_names)
+    cell_response = CellResponse(
+        cell_type_names=cell_type_names, times=sim_data[0]["times"]
+    )
     net.cell_response = cell_response
 
     for idx in range(n_trials):
-
         # cell response
-        net.cell_response._spike_times.append(sim_data[idx]['spike_times'])
-        net.cell_response._spike_gids.append(sim_data[idx]['spike_gids'])
+        net.cell_response._spike_times.append(sim_data[idx]["spike_times"])
+        net.cell_response._spike_gids.append(sim_data[idx]["spike_gids"])
         net.cell_response.update_types(net.gid_ranges)
-        net.cell_response._vsec.append(sim_data[idx]['vsec'])
-        net.cell_response._isec.append(sim_data[idx]['isec'])
-        net.cell_response._ca.append(sim_data[idx]['ca'])
+        net.cell_response._vsec.append(sim_data[idx]["vsec"])
+        net.cell_response._isec.append(sim_data[idx]["isec"])
+        net.cell_response._ca.append(sim_data[idx]["ca"])
 
         # extracellular array
         for arr_name, arr in net.rec_arrays.items():
             # voltages is a n_trials x n_contacts x n_samples array
-            arr._data.append(sim_data[idx]['rec_data'][arr_name])
-            arr._times = sim_data[idx]['rec_times'][arr_name]
+            arr._data.append(sim_data[idx]["rec_data"][arr_name])
+            arr._times = sim_data[idx]["rec_times"][arr_name]
 
         # dipole
-        dpl = Dipole(times=sim_data[idx]['times'],
-                     data=sim_data[idx]['dpl_data'])
+        dpl = Dipole(times=sim_data[idx]["times"], data=sim_data[idx]["dpl_data"])
 
         N_pyr_x = net._N_pyr_x
         N_pyr_y = net._N_pyr_y
         dpl._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
         dpl._convert_fAm_to_nAm()  # always applied, cf. #264
         if postproc:
-            window_len = net._params['dipole_smooth_win']  # specified in ms
-            fctr = net._params['dipole_scalefctr']
+            window_len = net._params["dipole_smooth_win"]  # specified in ms
+            fctr = net._params["dipole_scalefctr"]
             if window_len > 0:  # param files set this to zero for no smoothing
                 dpl.smooth(window_len=window_len)
             if fctr > 0:
@@ -86,10 +85,10 @@ def _get_mpi_env():
     """Set some MPI environment variables."""
     my_env = os.environ.copy()
     # For Linux systems
-    if sys.platform != 'win32':
-        my_env["OMPI_MCA_btl_base_warn_component_unused"] = '0'
+    if sys.platform != "win32":
+        my_env["OMPI_MCA_btl_base_warn_component_unused"] = "0"
 
-    if 'darwin' in sys.platform:
+    if "darwin" in sys.platform:
         my_env["PMIX_MCA_gds"] = "^ds12"  # open-mpi/ompi/issues/7516
         my_env["TMPDIR"] = "/tmp"  # open-mpi/ompi/issues/2956
     return my_env
@@ -113,7 +112,7 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     child_data : object
         The data returned by the child process.
     """
-    proc_data_bytes = b''
+    proc_data_bytes = b""
     # each loop while waiting will involve two Queue.get() timeouts, each
     # 0.01s. This calculation will error on the side of a longer timeout
     # than is specified because more is done each loop that just Queue.get()
@@ -128,8 +127,7 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     threads_started = False
 
     try:
-        proc = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE, *args,
-                     **kwargs)
+        proc = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE, *args, **kwargs)
 
         # now that the process has started, add it to the queue
         # used by MPIBackend.terminate()
@@ -139,10 +137,8 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
         # set up polling first so all of child's stdout/stderr
         # gets captured
         event = Event()
-        out_t = Thread(target=_thread_handler,
-                       args=(event, proc.stdout, out_q))
-        err_t = Thread(target=_thread_handler,
-                       args=(event, proc.stderr, err_q))
+        out_t = Thread(target=_thread_handler, args=(event, proc.stdout, out_q))
+        err_t = Thread(target=_thread_handler, args=(event, proc.stderr, err_q))
         out_t.start()
         err_t.start()
         threads_started = True
@@ -168,7 +164,7 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
                     # child terminated early, and we already
                     # captured output left in queues
                     warn("Child process failed unexpectedly")
-                    kill_proc_name('nrniv')
+                    kill_proc_name("nrniv")
                     break
 
             if not sent_network:
@@ -179,8 +175,10 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
                     # child failed during _write_net(). get the
                     # output and break out of loop on the next
                     # iteration
-                    warn("Received BrokenPipeError exception. "
-                         "Child process failed unexpectedly")
+                    warn(
+                        "Received BrokenPipeError exception. "
+                        "Child process failed unexpectedly"
+                    )
                     continue
                 else:
                     sent_network = True
@@ -193,11 +191,12 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
                 # the network has been sent)
                 break
 
-            if not child_terminated and \
-                    count_since_last_output > timeout_cycles:
-                warn("Timeout exceeded while waiting for child process output"
-                     ". Terminating...")
-                kill_proc_name('nrniv')
+            if not child_terminated and count_since_last_output > timeout_cycles:
+                warn(
+                    "Timeout exceeded while waiting for child process output"
+                    ". Terminating..."
+                )
+                kill_proc_name("nrniv")
                 break
     except KeyboardInterrupt:
         warn("Received KeyboardInterrupt. Stopping simulation process...")
@@ -233,8 +232,7 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
 
     if not proc.returncode == 0:
         # simulation failed with a numeric return code
-        raise RuntimeError("MPI simulation failed. Return code: %d" %
-                           proc.returncode)
+        raise RuntimeError("MPI simulation failed. Return code: %d" % proc.returncode)
 
     child_data = _process_child_data(proc_data_bytes, data_len)
 
@@ -262,8 +260,10 @@ def _process_child_data(data_bytes, data_len):
     """
     if not data_len == len(data_bytes):
         # This is indicative of a failure. For debugging purposes.
-        warn("Length of received data unexpected. Expecting %d bytes, "
-             "got %d" % (data_len, len(data_bytes)))
+        warn(
+            "Length of received data unexpected. Expecting %d bytes, "
+            "got %d" % (data_len, len(data_bytes))
+        )
 
     if len(data_bytes) == 0:
         raise RuntimeError("MPI simulation didn't return any data")
@@ -275,16 +275,17 @@ def _process_child_data(data_bytes, data_len):
         # This is here for future debugging purposes. Unit tests can't
         # reproduce an incorrectly padded string, but this has been an
         # issue before
-        raise ValueError("Incorrect padding for data length %d bytes" %
-                         len(data_len) + " (mod 4 = %d)" %
-                         (len(data_len) % 4))
+        raise ValueError(
+            "Incorrect padding for data length %d bytes" % len(data_len)
+            + " (mod 4 = %d)" % (len(data_len) % 4)
+        )
 
     # unpickle the data
     return pickle.loads(data_pickled)
 
 
 def _echo_child_output(out_q):
-    out = ''
+    out = ""
     while True:
         try:
             out += out_q.get(timeout=0.01)
@@ -298,9 +299,9 @@ def _echo_child_output(out_q):
 
 
 def _get_data_from_child_err(err_q):
-    err = ''
+    err = ""
     data_length = 0
-    data_bytes = b''
+    data_bytes = b""
 
     while True:
         try:
@@ -309,15 +310,15 @@ def _get_data_from_child_err(err_q):
             break
 
     # check for data signal
-    extracted_data = _extract_data(err, 'data')
+    extracted_data = _extract_data(err, "data")
     if len(extracted_data) > 0:
         # _extract_data only returns data when signals on
         # both sides were seen
 
-        err = err.replace('@start_of_data@', '')
-        err = err.replace(extracted_data, '')
-        data_length = _extract_data_length(err, 'data')
-        err = err.replace('@end_of_data:%d@\n' % data_length, '')
+        err = err.replace("@start_of_data@", "")
+        err = err.replace(extracted_data, "")
+        data_length = _extract_data_length(err, "data")
+        err = err.replace("@end_of_data:%d@\n" % data_length, "")
         data_bytes = extracted_data.encode()
 
     # print the rest of the child's stderr to our stdout
@@ -352,14 +353,15 @@ def requires_mpi4py(function):
 
     try:
         import mpi4py
-        assert hasattr(mpi4py, '__version__')
+
+        assert hasattr(mpi4py, "__version__")
         skip = False
     except (ImportError, ModuleNotFoundError) as err:
         if "TRAVIS_OS_NAME" not in os.environ:
             skip = True
         else:
             raise ImportError(err)
-    reason = 'mpi4py not available'
+    reason = "mpi4py not available"
     return pytest.mark.skipif(skip, reason=reason)(function)
 
 
@@ -369,20 +371,20 @@ def requires_psutil(function):
 
     try:
         import psutil
-        assert hasattr(psutil, '__version__')
+
+        assert hasattr(psutil, "__version__")
         skip = False
     except (ImportError, ModuleNotFoundError) as err:
         if "TRAVIS_OS_NAME" not in os.environ:
             skip = True
         else:
             raise ImportError(err)
-    reason = 'psutil not available'
+    reason = "psutil not available"
     return pytest.mark.skipif(skip, reason=reason)(function)
 
 
 def _extract_data_length(data_str, object_name):
-    data_len_match = re.search('@end_of_%s:' % object_name + r'(\d+)@',
-                               data_str)
+    data_len_match = re.search("@end_of_%s:" % object_name + r"(\d+)@", data_str)
     if data_len_match is not None:
         return int(data_len_match.group(1))
     else:
@@ -392,14 +394,14 @@ def _extract_data_length(data_str, object_name):
 def _extract_data(data_str, object_name):
     start_idx = 0
     end_idx = 0
-    start_match = re.search('@start_of_%s@' % object_name, data_str)
+    start_match = re.search("@start_of_%s@" % object_name, data_str)
     if start_match is not None:
         start_idx = start_match.end()
     else:
         # need start signal
-        return ''
+        return ""
 
-    end_match = re.search('@end_of_%s:' % object_name + r'\d+@', data_str)
+    end_match = re.search("@end_of_%s:" % object_name + r"\d+@", data_str)
     if end_match is not None:
         end_idx = end_match.start()
 
@@ -433,11 +435,14 @@ def _get_procs_running(proc_name):
 
     process_list = []
     for p in process_iter(attrs=["name", "exe", "cmdline"]):
-        if proc_name == p.info['name'] or \
-                (p.info['exe'] is not None and
-                 os.path.basename(p.info['exe']) == proc_name) or \
-                (p.info['cmdline'] and
-                 p.info['cmdline'][0] == proc_name):
+        if (
+            proc_name == p.info["name"]
+            or (
+                p.info["exe"] is not None
+                and os.path.basename(p.info["exe"]) == proc_name
+            )
+            or (p.info["cmdline"] and p.info["cmdline"][0] == proc_name)
+        ):
             process_list.append(p)
     return process_list
 
@@ -464,8 +469,7 @@ def kill_proc_name(proc_name):
             if len(running) < len(procs):
                 killed_procs = True
             pids = [str(proc.pid) for proc in running]
-            warn("Failed to kill nrniv process(es) %s" %
-                 ','.join(pids))
+            warn("Failed to kill nrniv process(es) %s" % ",".join(pids))
         else:
             killed_procs = True
 
@@ -474,15 +478,15 @@ def kill_proc_name(proc_name):
 
 def _write_net(stream, pickled_net):
     stream.flush()
-    stream.write('@start_of_net@')
+    stream.write("@start_of_net@")
     stream.write(pickled_net.decode())
-    stream.write('@end_of_net:%d@\n' % len(pickled_net))
+    stream.write("@end_of_net:%d@\n" % len(pickled_net))
     stream.flush()
 
 
 def _write_child_exit_signal(stream):
     stream.flush()
-    stream.write('@data_received@\n')
+    stream.write("@data_received@\n")
     stream.flush()
 
 
@@ -500,6 +504,7 @@ class JoblibBackend(object):
     n_jobs : int
         The number of jobs to start in parallel
     """
+
     def __init__(self, n_jobs=1):
         self.n_jobs = n_jobs
 
@@ -508,7 +513,7 @@ class JoblibBackend(object):
             try:
                 from joblib import Parallel, delayed
             except ImportError:
-                warn('joblib not installed. Cannot run in parallel.')
+                warn("joblib not installed. Cannot run in parallel.")
                 self.n_jobs = 1
         if self.n_jobs == 1:
             my_func = func
@@ -572,8 +577,8 @@ class JoblibBackend(object):
 
 
 def _determine_cores_hwthreading(
-        use_hwthreading_if_found: bool = True,
-        sensible_default_cores: bool = True,
+    use_hwthreading_if_found: bool = True,
+    sensible_default_cores: bool = True,
 ) -> [int, bool]:
     """Return the available core number and if hardware-threading is detected.
 
@@ -631,6 +636,7 @@ def _determine_cores_hwthreading(
     if _has_mpi4py() and _has_psutil():
         import platform
         import psutil
+
         if platform.system() == "Darwin":
             # In Macos' case here, the situation is relatively simple, and we
             # can determine all the information we need. We are never using
@@ -769,8 +775,10 @@ def _determine_cores_hwthreading(
         if not _has_psutil():
             missing_packages += ["psutil"]
         missing_packages = " and ".join(missing_packages)
-        warn(f"{missing_packages} not installed. Will run on single "
-             "processor, with no hardware-threading.")
+        warn(
+            f"{missing_packages} not installed. Will run on single "
+            "processor, with no hardware-threading."
+        )
         core_count = 1
         hwthreading_present = False
 
@@ -855,10 +863,10 @@ class MPIBackend(object):
         # Check of psutil and mpi4py import has been moved into this function,
         # since this function is called by GUI before MPIBackend()
         # instantiated.
-        n_available_cores, hwthreading_available = \
-            _determine_cores_hwthreading(
-                use_hwthreading_if_found=use_hwthreading_if_found,
-                sensible_default_cores=sensible_default_cores)
+        n_available_cores, hwthreading_available = _determine_cores_hwthreading(
+            use_hwthreading_if_found=use_hwthreading_if_found,
+            sensible_default_cores=sensible_default_cores,
+        )
 
         self.n_procs = n_available_cores if (n_procs is None) else n_procs
 
@@ -870,12 +878,11 @@ class MPIBackend(object):
         # 1. the user has not changed 'override_hwthreading_option',
         # 2. if the user wants to use hardware-threading, and
         # 3. hardware-threading is detected.
-        if ((override_hwthreading_option is True) or
-            (
-                (override_hwthreading_option is None) and
-                (use_hwthreading_if_found is True) and
-                hwthreading_available
-        )):
+        if (override_hwthreading_option is True) or (
+            (override_hwthreading_option is None)
+            and (use_hwthreading_if_found is True)
+            and hwthreading_available
+        ):
             self.mpi_cmd += " --use-hwthread-cpus"
 
         # Use the oversubscribe option if the user wants to force
@@ -883,19 +890,17 @@ class MPIBackend(object):
         # 'override_oversubscribe_option', use our original heuristic: did user
         # specify the number of cores (see `n_procs` logic above), AND did they
         # specify more cores than are available?
-        if ((override_oversubscribe_option is True) or
-            (
-                (override_oversubscribe_option is None) and
-                (self.n_procs > n_available_cores)
-        )):
+        if (override_oversubscribe_option is True) or (
+            (override_oversubscribe_option is None)
+            and (self.n_procs > n_available_cores)
+        ):
             warn(
                 "Number of requested MPI processes exceeds available "
                 "cores. Enabling MPI oversubscription automatically."
             )
             self.mpi_cmd += " --oversubscribe"
-        elif (
-                (override_oversubscribe_option is False) and
-                (self.n_procs > n_available_cores)
+        elif (override_oversubscribe_option is False) and (
+            self.n_procs > n_available_cores
         ):
             warn(
                 "Number of requested MPI processes exceeds available "
@@ -907,20 +912,19 @@ class MPIBackend(object):
             )
             pass
 
-
         self.mpi_cmd += " -np " + str(self.n_procs)
 
         self.mpi_cmd += (
-            " nrniv -python -mpi -nobanner " +
-            sys.executable +
-            " " +
-            os.path.join(
+            " nrniv -python -mpi -nobanner "
+            + sys.executable
+            + " "
+            + os.path.join(
                 os.path.dirname(sys.modules[__name__].__file__), "mpi_child.py"
             )
         )
 
         # Split the command into shell arguments for passing to Popen
-        use_posix = True if sys.platform != 'win32' else False
+        use_posix = True if sys.platform != "win32" else False
         self.mpi_cmd = shlex.split(self.mpi_cmd, posix=use_posix)
 
     def __enter__(self):
@@ -938,7 +942,7 @@ class MPIBackend(object):
 
         # always kill nrniv processes for good measure
         if self.n_procs > 1:
-            kill_proc_name('nrniv')
+            kill_proc_name("nrniv")
 
     def simulate(self, net, tstop, dt, n_trials, postproc=False):
         """Simulate the HNN model in parallel on all cores
@@ -965,29 +969,39 @@ class MPIBackend(object):
 
         # just use the joblib backend for a single core
         if self.n_procs == 1:
-            print("MPIBackend is set to use 1 core: transferring the "
-                  "simulation to JoblibBackend....")
-            return JoblibBackend(n_jobs=1).simulate(net, tstop=tstop,
-                                                    dt=dt,
-                                                    n_trials=n_trials,
-                                                    postproc=postproc)
+            print(
+                "MPIBackend is set to use 1 core: transferring the "
+                "simulation to JoblibBackend...."
+            )
+            return JoblibBackend(n_jobs=1).simulate(
+                net, tstop=tstop, dt=dt, n_trials=n_trials, postproc=postproc
+            )
 
         if self.n_procs > net._n_cells:
-            raise ValueError(f'More MPI processes were assigned than there '
-                             f'are cells in the network. Please decrease '
-                             f'the number of parallel processes (got n_procs='
-                             f'{self.n_procs}) over which you will '
-                             f'distribute the {net._n_cells} network neurons.')
+            raise ValueError(
+                f"More MPI processes were assigned than there "
+                f"are cells in the network. Please decrease "
+                f"the number of parallel processes (got n_procs="
+                f"{self.n_procs}) over which you will "
+                f"distribute the {net._n_cells} network neurons."
+            )
 
-        print(f"MPI will run {n_trials} trial(s) sequentially by "
-              f"distributing network neurons over {self.n_procs} processes.")
+        print(
+            f"MPI will run {n_trials} trial(s) sequentially by "
+            f"distributing network neurons over {self.n_procs} processes."
+        )
 
         env = _get_mpi_env()
 
         self.proc, sim_data = run_subprocess(
-            command=self.mpi_cmd, obj=[net, tstop, dt, n_trials], timeout=30,
-            proc_queue=self.proc_queue, env=env, cwd=os.getcwd(),
-            universal_newlines=True)
+            command=self.mpi_cmd,
+            obj=[net, tstop, dt, n_trials],
+            timeout=30,
+            proc_queue=self.proc_queue,
+            env=env,
+            cwd=os.getcwd(),
+            universal_newlines=True,
+        )
 
         dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
         return dpls
@@ -1009,5 +1023,4 @@ class MPIBackend(object):
             try:
                 proc.wait(5)  # wait maximum of 5s
             except TimeoutExpired:
-                warn("Could not kill python subprocess: PID %d" %
-                     proc.pid)
+                warn("Could not kill python subprocess: PID %d" % proc.pid)

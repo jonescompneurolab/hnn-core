@@ -8,11 +8,29 @@
 all: modl
 
 clean :
-	rm -rf hnn_core/mod/x86_64/*
-	rm -rf hnn_core/mod/arm64/*
+	rm -rf hnn_core/mod/x86_64
+	rm -rf hnn_core/mod/arm64
 
 check-manifest:
 	check-manifest
+
+format-check:
+	@if command -v ruff > /dev/null; then \
+		echo "Running check of ruff format"; \
+		ruff format hnn_core --check; \
+	else \
+		echo "ruff not found, please install it!"; \
+		exit 1; \
+	fi;
+
+format-overwrite:
+	@if command -v ruff > /dev/null; then \
+		echo "Running ruff format, this will likely change some code!"; \
+		ruff format hnn_core; \
+	else \
+		echo "ruff not found, please install it!"; \
+		exit 1; \
+	fi;
 
 lint:
 	@if command -v ruff > /dev/null; then \
@@ -38,6 +56,6 @@ spell:
 		exit 1; \
 	fi;
 
-test: lint spell
+test: format-check lint spell
 	pytest ./hnn_core/tests/ -m "not uses_mpi" -n auto
 	pytest ./hnn_core/tests/ -m "uses_mpi"

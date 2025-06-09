@@ -6,7 +6,6 @@
 
 from glob import glob
 from warnings import warn
-
 import numpy as np
 
 from .viz import plot_spikes_hist, plot_spikes_raster
@@ -17,6 +16,9 @@ class CellResponse(object):
 
     Parameters
     ----------
+    cell_type_names : list
+        List of unique cell type names that are explicitly modeled in the
+        network.
     spike_times : list (n_trials,) of list (n_spikes,) of float | None
         Each element of the outer list is a trial.
         The inner list contains the time stamps of spikes.
@@ -25,16 +27,14 @@ class CellResponse(object):
         The inner list contains the cell IDs of neurons that
         spiked.
     spike_types : list (n_trials,) of list (n_spikes,) of float | None
-        Each element of the outer list is a trial.
-        The inner list contains the type of spike (e.g., evprox1
-        or L2_pyramidal) that occurred at the corresponding time stamp.
-        Each gid corresponds to a type via Network().gid_ranges.
+        Each element of the outer list is a trial. The inner list contains the
+        type of spike (e.g., evprox1 or L2_pyramidal) that occurred at the
+        corresponding time stamp.  Each gid corresponds to a type via
+        Network().gid_ranges. Note that the type of spike can be from a
+        cell type or a drive.
     times : numpy array | None
         Array of time points for samples in continuous data.
         This includes vsoma and isoma.
-    cell_type_names : list
-        List of unique cell type names that are explicitly modeled in the
-        network
 
     Attributes
     ----------
@@ -46,10 +46,11 @@ class CellResponse(object):
         The inner list contains the cell IDs of neurons that
         spiked.
     spike_types : list (n_trials,) of list (n_spikes,) of float
-        Each element of the outer list is a trial.
-        The inner list contains the type of spike (e.g., evprox1
-        or L2_pyramidal) that occurred at the corresponding time stamp.
-        Each gid corresponds to a type via Network::gid_ranges.
+        Each element of the outer list is a trial. The inner list contains the
+        type of spike (e.g., evprox1 or L2_pyramidal) that occurred at the
+        corresponding time stamp.  Each gid corresponds to a type via
+        Network().gid_ranges. Note that the type of spike can be from a
+        cell type or a drive.
     vsec : list (n_trials,) of dict
         Each element of the outer list is a trial.
         Dictionary indexed by gids containing voltages for cell sections.
@@ -80,8 +81,14 @@ class CellResponse(object):
         Write spiking activity to a collection of spike trial files.
     """
 
-    def __init__(self, spike_times=None, spike_gids=None, spike_types=None,
-                 times=None, cell_type_names=None):
+    def __init__(
+        self,
+        cell_type_names,
+        spike_times=None,
+        spike_gids=None,
+        spike_types=None,
+        times=None,
+    ):
         if spike_times is None:
             spike_times = list()
         if spike_gids is None:
@@ -91,29 +98,26 @@ class CellResponse(object):
         if times is None:
             times = list()
 
-        if cell_type_names is None:
-            cell_type_names = ['L2_basket', 'L2_pyramidal',
-                               'L5_basket', 'L5_pyramidal']
-
         # Validate arguments
-        arg_names = ['spike_times', 'spike_gids', 'spike_types']
+        arg_names = ["spike_times", "spike_gids", "spike_types"]
         for arg_idx, arg in enumerate([spike_times, spike_gids, spike_types]):
             # Validate outer list
             if not isinstance(arg, list):
-                raise TypeError('%s should be a list of lists'
-                                % (arg_names[arg_idx],))
+                raise TypeError("%s should be a list of lists" % (arg_names[arg_idx],))
             # If arg is not an empty list, validate inner list
             for trial_list in arg:
                 if not isinstance(trial_list, list):
-                    raise TypeError('%s should be a list of lists'
-                                    % (arg_names[arg_idx],))
+                    raise TypeError(
+                        "%s should be a list of lists" % (arg_names[arg_idx],)
+                    )
             # Set the length of 'spike_times' as a references and validate
             # uniform length
             if arg == spike_times:
                 n_trials = len(spike_times)
             if len(arg) != n_trials:
-                raise ValueError('spike times, gids, and types should be '
-                                 'lists of the same length')
+                raise ValueError(
+                    "spike times, gids, and types should be lists of the same length"
+                )
         self._spike_times = spike_times
         self._spike_gids = spike_gids
         self._spike_types = spike_types
@@ -129,25 +133,27 @@ class CellResponse(object):
     def __repr__(self):
         class_name = self.__class__.__name__
         n_trials = len(self._spike_times)
-        return '<%s | %d simulation trials>' % (class_name, n_trials)
+        return "<%s | %d simulation trials>" % (class_name, n_trials)
 
     def __eq__(self, other):
         if not isinstance(other, CellResponse):
             return NotImplemented
         # Round each time element
-        times_self = [[round(time, 3) for time in trial]
-                      for trial in self._spike_times]
-        times_other = [[round(time, 3) for time in trial]
-                       for trial in other._spike_times]
-        return (times_self == times_other and
-                self._spike_gids == other._spike_gids and
-                self._spike_types == other._spike_types and
-                self._vsec == other._vsec and
-                self._isec == other._isec and
-                self._ca == other._ca and
-                self.vsec == other.vsec and
-                self.isec == other.isec and
-                self.ca == other.ca)
+        times_self = [[round(time, 3) for time in trial] for trial in self._spike_times]
+        times_other = [
+            [round(time, 3) for time in trial] for trial in other._spike_times
+        ]
+        return (
+            times_self == times_other
+            and self._spike_gids == other._spike_gids
+            and self._spike_types == other._spike_types
+            and self._vsec == other._vsec
+            and self._isec == other._isec
+            and self._ca == other._ca
+            and self.vsec == other.vsec
+            and self.isec == other.isec
+            and self.ca == other.ca
+        )
 
     @property
     def spike_times(self):
@@ -156,8 +162,7 @@ class CellResponse(object):
     @property
     def cell_types(self):
         """Get unique cell types."""
-        spike_types_data = np.concatenate(np.array(self.spike_types,
-                                                   dtype=object))
+        spike_types_data = np.concatenate(np.array(self.spike_types, dtype=object))
         return np.unique(spike_types_data).tolist()
 
     @property
@@ -166,8 +171,9 @@ class CellResponse(object):
         spike_times = dict()
         for cell_type in self.cell_types:
             spike_times[cell_type] = list()
-            for trial_spike_times, trial_spike_types in zip(self.spike_times,
-                                                            self.spike_types):
+            for trial_spike_times, trial_spike_types in zip(
+                self.spike_times, self.spike_types
+            ):
                 mask = np.isin(trial_spike_types, cell_type)
                 cell_spike_times = np.array(trial_spike_times)[mask].tolist()
                 spike_times[cell_type].append(cell_spike_times)
@@ -215,20 +221,22 @@ class CellResponse(object):
                 gid_set_1 = set(all_gid_ranges[item_idx_1])
                 gid_set_2 = set(all_gid_ranges[item_idx_2])
                 if not gid_set_1.isdisjoint(gid_set_2):
-                    raise ValueError('gid_ranges should contain only disjoint '
-                                     'sets of gid values')
+                    raise ValueError(
+                        "gid_ranges should contain only disjoint sets of gid values"
+                    )
 
         spike_types = list()
         for trial_idx in range(len(self._spike_times)):
-            spike_types_trial = np.empty_like(self._spike_times[trial_idx],
-                                              dtype='<U36')
+            spike_types_trial = np.empty_like(
+                self._spike_times[trial_idx], dtype="<U36"
+            )
             for gidtype, gids in gid_ranges.items():
                 spike_gids_mask = np.isin(self._spike_gids[trial_idx], gids)
                 spike_types_trial[spike_gids_mask] = gidtype
             spike_types += [list(spike_types_trial)]
         self._spike_types = spike_types
 
-    def mean_rates(self, tstart, tstop, gid_ranges, mean_type='all'):
+    def mean_rates(self, tstart, tstop, gid_ranges, mean_type="all"):
         """Mean spike rates (Hz) by cell type.
 
         Parameters
@@ -256,16 +264,17 @@ class CellResponse(object):
         """
         spike_rates = dict()
 
-        if mean_type not in ['all', 'trial', 'cell']:
-            raise ValueError("Invalid mean_type. Valid arguments include "
-                             f"'all', 'trial', or 'cell'. Got {mean_type}")
+        if mean_type not in ["all", "trial", "cell"]:
+            raise ValueError(
+                "Invalid mean_type. Valid arguments include "
+                f"'all', 'trial', or 'cell'. Got {mean_type}"
+            )
 
         # Validate tstart, tstop
-        if not isinstance(tstart, (int, float)) or not isinstance(
-                tstop, (int, float)):
-            raise ValueError('tstart and tstop must be of type int or float')
+        if not isinstance(tstart, (int, float)) or not isinstance(tstop, (int, float)):
+            raise ValueError("tstart and tstop must be of type int or float")
         elif tstop <= tstart:
-            raise ValueError('tstop must be greater than tstart')
+            raise ValueError("tstop must be greater than tstart")
 
         for cell_type in self._cell_type_names:
             cell_type_gids = np.array(gid_ranges[cell_type])
@@ -275,26 +284,37 @@ class CellResponse(object):
             trial_data = zip(self._spike_types, self._spike_gids)
             for trial_idx, (spike_types, spike_gids) in enumerate(trial_data):
                 trial_type_mask = np.isin(spike_types, cell_type)
-                gids, gid_counts = np.unique(np.array(
-                    spike_gids)[trial_type_mask], return_counts=True)
+                gids, gid_counts = np.unique(
+                    np.array(spike_gids)[trial_type_mask], return_counts=True
+                )
 
                 gid_spike_rate[trial_idx, np.isin(cell_type_gids, gids)] = (
-                    gid_counts / (tstop - tstart)) * 1000
+                    gid_counts / (tstop - tstart)
+                ) * 1000
 
-            if mean_type == 'all':
-                spike_rates[cell_type] = np.mean(
-                    gid_spike_rate.mean(axis=1))
-            if mean_type == 'trial':
-                spike_rates[cell_type] = np.mean(
-                    gid_spike_rate, axis=1).tolist()
-            if mean_type == 'cell':
-                spike_rates[cell_type] = [gid_trial_rate.tolist()
-                                          for gid_trial_rate in gid_spike_rate]
+            if mean_type == "all":
+                spike_rates[cell_type] = np.mean(gid_spike_rate.mean(axis=1))
+            if mean_type == "trial":
+                spike_rates[cell_type] = np.mean(gid_spike_rate, axis=1).tolist()
+            if mean_type == "cell":
+                spike_rates[cell_type] = [
+                    gid_trial_rate.tolist() for gid_trial_rate in gid_spike_rate
+                ]
 
         return spike_rates
 
-    def plot_spikes_raster(self, trial_idx=None, ax=None, show=True,
-                           colors=None):
+    def plot_spikes_raster(
+        self,
+        trial_idx=None,
+        ax=None,
+        show=True,
+        cell_types=None,
+        colors=None,
+        show_legend=True,
+        marker_size=5.0,
+        dpl=None,
+        overlay_dipoles=False,
+    ):
         """Plot the aggregate spiking activity according to cell type.
 
         Parameters
@@ -314,12 +334,28 @@ class CellResponse(object):
             The matplotlib figure object.
         """
         return plot_spikes_raster(
-            cell_response=self, trial_idx=trial_idx, ax=ax, show=show,
-            colors=colors)
+            cell_response=self,
+            trial_idx=trial_idx,
+            ax=ax,
+            show=show,
+            cell_types=cell_types,
+            colors=colors,
+            show_legend=show_legend,
+            marker_size=marker_size,
+            dpl=dpl,
+            overlay_dipoles=overlay_dipoles,
+        )
 
-    def plot_spikes_hist(self, trial_idx=None, ax=None, spike_types=None,
-                         color=None, invert_spike_types=None, show=True,
-                         **kwargs_hist):
+    def plot_spikes_hist(
+        self,
+        trial_idx=None,
+        ax=None,
+        spike_types=None,
+        color=None,
+        invert_spike_types=None,
+        show=True,
+        **kwargs_hist,
+    ):
         """Plot the histogram of spiking activity across trials.
 
         Parameters
@@ -370,10 +406,16 @@ class CellResponse(object):
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
         """
-        return plot_spikes_hist(self, trial_idx=trial_idx, ax=ax,
-                                spike_types=spike_types,
-                                invert_spike_types=invert_spike_types,
-                                color=color, show=show, **kwargs_hist)
+        return plot_spikes_hist(
+            self,
+            trial_idx=trial_idx,
+            ax=ax,
+            spike_types=spike_types,
+            invert_spike_types=invert_spike_types,
+            color=color,
+            show=show,
+            **kwargs_hist,
+        )
 
     def to_dict(self):
         """Return cell response as a dict object.
@@ -383,28 +425,28 @@ class CellResponse(object):
         dict object containing the cell response
         """
         cell_response_data = dict()
-        cell_response_data['spike_times'] = self.spike_times
-        cell_response_data['spike_gids'] = self.spike_gids
-        cell_response_data['spike_types'] = self.spike_types
+        cell_response_data["spike_times"] = self.spike_times
+        cell_response_data["spike_gids"] = self.spike_gids
+        cell_response_data["spike_types"] = self.spike_types
         vsec_data = self.vsec
-        cell_response_data['vsec'] = list()
+        cell_response_data["vsec"] = list()
         for trial in vsec_data:
             # Turn `int` gid keys into string values for hdf5 format
             trial = dict((str(key), val) for key, val in trial.items())
-            cell_response_data['vsec'].append(trial)
+            cell_response_data["vsec"].append(trial)
         isec_data = self.isec
-        cell_response_data['isec'] = list()
+        cell_response_data["isec"] = list()
         for trial in isec_data:
             # Turn `int` gid keys into string values for hdf5 format
             trial = dict((str(key), val) for key, val in trial.items())
-            cell_response_data['isec'].append(trial)
+            cell_response_data["isec"].append(trial)
         ca_data = self.ca
-        cell_response_data['ca'] = list()
+        cell_response_data["ca"] = list()
         for trial in ca_data:
             # Turn `int` gid keys into string values for hdf5 format
             trial = dict((str(key), val) for key, val in trial.items())
-            cell_response_data['ca'].append(trial)
-        cell_response_data['times'] = self.times
+            cell_response_data["ca"].append(trial)
+        cell_response_data["times"] = self.times
         return cell_response_data
 
     def write(self, fname):
@@ -426,10 +468,6 @@ class CellResponse(object):
             2) spike gid, and
             3) gid type
         """
-        warn('Writing cell response to txt files is deprecated '
-             'and will be removed in future versions. Please save '
-             'cell response along with network',
-             DeprecationWarning, stacklevel=2)
         fname = str(fname)
         old_style = True
         try:
@@ -438,20 +476,23 @@ class CellResponse(object):
             fname.format(0)
             old_style = False
         except TypeError:
-            fname.replace('.txt', '_%d.txt')
+            fname.replace(".txt", "_%d.txt")
 
         for trial_idx in range(len(self._spike_times)):
             if old_style:
                 this_fname = fname % (trial_idx,)
             else:
                 this_fname = fname.format(trial_idx)
-            print(f'Writing file {this_fname}')
-            with open(this_fname, 'w') as f:
+            print(f"Writing file {this_fname}")
+            with open(this_fname, "w") as f:
                 for spike_idx in range(len(self._spike_times[trial_idx])):
-                    f.write('{:.3f}\t{}\t{}\n'.format(
-                        self._spike_times[trial_idx][spike_idx],
-                        int(self._spike_gids[trial_idx][spike_idx]),
-                        self._spike_types[trial_idx][spike_idx]))
+                    f.write(
+                        "{:.3f}\t{}\t{}\n".format(
+                            self._spike_times[trial_idx][spike_idx],
+                            int(self._spike_gids[trial_idx][spike_idx]),
+                            self._spike_types[trial_idx][spike_idx],
+                        )
+                    )
 
 
 def read_spikes(fname, gid_ranges=None):
@@ -473,10 +514,13 @@ def read_spikes(fname, gid_ranges=None):
     cell_response : CellResponse
         An instance of the CellResponse object.
     """
-    warn('Reading cell response from txt files is deprecated '
-         'and will be removed in future versions. Please load '
-         'cell response along with simulated network',
-         DeprecationWarning, stacklevel=2)
+    warn(
+        "Reading cell response from txt files is deprecated "
+        "and will be removed in future versions. Please load "
+        "cell response along with simulated network",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     spike_times = list()
     spike_gids = list()
     spike_types = list()
@@ -493,18 +537,27 @@ def read_spikes(fname, gid_ranges=None):
                 spike_types += [list(spike_trial[:, 2].astype(str))]
             else:
                 if gid_ranges is None:
-                    raise ValueError("gid_ranges must be provided if spike "
-                                     "types are unspecified in the "
-                                     "file %s" % (file,))
+                    raise ValueError(
+                        "gid_ranges must be provided if spike "
+                        "types are unspecified in the "
+                        "file %s" % (file,)
+                    )
                 spike_types += [list()]
         else:
             spike_times += [list()]
             spike_gids += [list()]
             spike_types += [list()]
 
-    cell_response = CellResponse(spike_times=spike_times,
-                                 spike_gids=spike_gids,
-                                 spike_types=spike_types)
+    network_cell_names = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
+    cell_type_names = list(
+        cell_name for cell_name in network_cell_names if cell_name in spike_types
+    )
+    cell_response = CellResponse(
+        cell_type_names=cell_type_names,
+        spike_times=spike_times,
+        spike_gids=spike_gids,
+        spike_types=spike_types,
+    )
     if gid_ranges is not None:
         cell_response.update_types(gid_ranges)
 

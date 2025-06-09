@@ -1,290 +1,287 @@
 (install)=
 # Installation Guide
 
-If you have any questions or problems while installing `hnn_core`, feel free to
-ask for help [on our GitHub Discussions
-page](https://github.com/jonescompneurolab/hnn-core/discussions)!
+If you have any questions or problems while installing HNN-Core, feel free to
+ask for help on [our GitHub Discussions page][]!
 
-Please follow the instructions in Steps 1, 2, and 3, in that order.
+If you wish to try out HNN-Core in the cloud without installing it locally, see the [Installation page at the HNN Textbook](https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html).
 
---------------
-
-# Step 1. Python Environment
-
-We strongly recommend that you install `hnn_core` inside a "virtual
-environment" using software like the [Anaconda Python
-Distribution](https://www.anaconda.com/download/success). If you
-are new to Python or data science in Python, we recommend you review the
-resources here: <https://docs.anaconda.com/getting-started/>.
-
-Note that `hnn-core` currently only supports Python 3.8, 3.9, 3.10, 3.11, and 3.12, but *not* 3.13.
+Note: If you are at Brown University and trying to install HNN-Core on the OSCAR system, you should **not** follow these instructions, and instead follow the [instructions here](https://github.com/jonescompneurolab/oscar-install).
 
 --------------
 
-# Step 2. Platform-specific requirements
+# `conda` Installation
 
-## Windows
+We recommend that you install HNN-Core from our Anaconda package instead of from `pip`. This `conda` package includes all features (GUI, Optimization, and both Parallelism features), a working installation of OpenMPI, and is significantly easier to install.
 
-- Before you install `hnn_core`, it is important that you **install** the
-  [NEURON][] software system-wide using its [Windows-specific
-  binaries](https://nrn.readthedocs.io/en/latest/install/install_instructions.html#windows). You
-  can test that NEURON was installed correctly by opening a Command Prompt (or
-  similar) via your Anaconda install, and running the following command:
+The only exceptions are if:
 
-    ```
-    $ python -c "import neuron;"
-    ```
+1. You want to install HNN-Core alongside MNE. In that case, we recommend you use the one of the below [`pip` Installation](#pip-installation) methods.
+2. You are using a High-Performance Computing (HPC) environment (also called a computing cluster or supercomputer). The `conda` installation may work on your HPC, but if you want to use your own MPI libraries, you can try our [`pip` MPI method](#pip-mpi-macos-or-linux), and you can always ask us for help at [our Github Discussions page][].
 
-## MacOS
+If you want a minimal install of only the HNN-Core API using `conda`, then follow the instructions below, but replace the package name `hnn-core-all` with `hnn-core`.
+
+Follow the below instructions for your operating system.
+
+## `conda` MacOS or Linux
+
+1. Install the [Anaconda Python Distribution](https://www.anaconda.com/download/success).
+
+2. Open a Terminal, then create and activate a new Python 3.12 environment by running the following commands:
+
+```
+conda create -y -q -n hnn-core-env python=3.12
+conda activate hnn-core-env
+```
+
+If desired, you can change the environment name `hnn-core-env` to whatever you wish. If you are new to Python or
+data science in Python, we recommend you review the resources here:
+<https://docs.anaconda.com/getting-started/>.
+
+3. Install our package using the following command:
+
+```
+conda install hnn-core-all -c jonescompneurolab -c conda-forge
+```
+
+4. Run the following command, and write down the number that is output. You can use this number as the number of CPU "Cores", which will *greatly* speed up your simulations.
+
+```
+python -c "import psutil ; print(psutil.cpu_count(logical=False)-1)"
+```
+
+5. That's it! HNN-Core should now be installed. Proceed to [our HNN Textbook website][] to get started using HNN.
+6. Note: The next time you need to re-enter the Conda Environment, all you need to do is run `conda activate hnn-core-env`. From there, you can either run Python code using the HNN-Core API that you have written, or start the GUI using the `hnn-gui` command.
+
+## `conda` Windows
+
+For Windows users, there are some extra steps needed since you need to install HNN-Core through "Windows Subsystem for Linux" (WSL).
+
+1. Install WSL: Open the "PowerShell" or "Windows Command Prompt" programs in administrator mode by right-clicking the program icon and selecting "Run as administrator". Then, in the window, run the following command:
+
+```
+wsl --install
+```
+
+Follow the default options for your install. For more information, see <https://learn.microsoft.com/en-us/windows/wsl/install>.
+
+2. Close the PowerShell or Command Prompt window.
+3. You will now have a new App available from the Start Menu called `Ubuntu`. Run that app.
+4. The first time you start Ubuntu, it will prompt you to `Create a default Unix user account` and ask for a password. If you provide a password, write it down.
+5. You should now see a prompt and a blinking cursor similar to PowerShell/Command Prompt. Copy and paste the following commands. If you entered a password in Step 4, enter that when it prompts you for your password.
+
+```bash
+sudo apt-get update
+sudo apt-get install build-essential
+sudo apt-get install wget
+```
+
+6. In the same window, copy and paste the following commands, then follow the prompts. We strongly recommend that when you are asked  `Do you wish to update your shell profile to automatically initialize conda?` you enter `yes`. If you do not, then you will have to manually activate Conda whenever you open your Ubuntu app using the command this program provides at the end.
+
+```bash
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+```
+
+If you see output similar to `WARNING: Your machine hardware does not appear to be x86_64`, then please contact us via [our Github Discussions page][]. You may be able to install by using <https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh> instead.
+
+7. Close the Ubuntu window, then open a new one. Your prompt should now show `(base)` at the beginning.
+8. Inside this window, follow the steps above in the [`conda` MacOS or Linux](#conda-macos-or-linux) section, then return here.
+9. HNN-Core should now be installed!
+10. Note: On Windows, every time you start the GUI, you will need to navigate to <http://localhost:8866> in your browser (or refresh if you are already on the page).
+
+--------------
+
+# `pip` Installation
+
+Alternatively, you can install HNN-Core through `pip` if you want install it alongside MNE, to contribute to development, only want certain features, or have issues with the `conda` install method. If using the `pip` method, please follow the instructions in Steps 1, 2, and 3, in that order.
+
+## Step 1. `pip` Python Environment
+
+We strongly recommend that you install HNN-Core inside a "virtual environment" using software like the [Anaconda Python Distribution](https://www.anaconda.com/download/success). If you are new to Python or data science in Python, we recommend you review the resources here: <https://docs.anaconda.com/getting-started/>.
+
+Note that if you use a virtual environment, you must first create the environment, and then separately *activate* the environment (see [Conda guidance here](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#activating-an-environment)) before running any of the commands below. **All of the installation commands below assume you have already activated your environment**. You may need to re-activate your environment every time you restart your computer or open a new terminal, depending on how you installed your virtual environment software.
+
+Note that `hnn_core` currently only supports Python 3.8, 3.9, 3.10, 3.11, and 3.12, but *not* 3.13.
+
+## Step 2. `pip` Platform-specific requirements
+
+### `pip` on MacOS
 
 - If you already installed the [NEURON][] software system-wide using its
   traditional installer package, it is recommended to **remove it** first. We
-  will be installing NEURON using its PyPI package alongside `hnn_core`.
-- Before you install `hnn_core`, it is important that you install "Xcode
-  Command-Line Tools".  This can be done easily by opening a Terminal and
-  running the following command (followed by clicking through the prompts):
-    ```
-    $ xcode-select --install
-    ```
+  will be installing NEURON using its PyPI package.
+- Before you install HNN-Core, it is important that you install "Xcode Command-Line Tools". This can be done easily by opening a Terminal, running the following command, and then clicking through the prompts in the window that will pop up. Note that you must restart your computer after Xcode Command-Line Tools has finished installing!
 
-## Linux
+```
+xcode-select --install
+```
+
+If you run the above command and see output that resembles `xcode-select: note: Command line tools are already installed.`, then you already have it installed, do not need to restart your computer, and can proceed to the next step.
+
+### `pip` on Linux
 
 - If you already installed the [NEURON][] software system-wide using its
   traditional installer package, it is recommended to **remove it** first. We
-  will be installing NEURON using its PyPI package alongside `hnn_core`.
+  will be installing NEURON using its PyPI package.
 
---------------
+### `pip` on Windows
 
-# Step 3. `hnn_core` installation types
+- Before you install HNN-Core, it is important that you **install** the [NEURON][] software system-wide using its [Windows-specific binaries](https://nrn.readthedocs.io/en/latest/install/install_instructions.html#windows). You can test that NEURON was installed correctly by opening a Command Prompt (or similar) via your Anaconda install (or virtual environment), and running the following command:
 
-Note that Step 1 and Step 2 above are required for **all installation types**. Note that you can install multiple sets of HNN features below during the install process by combining them similar to `pip install "hnn_core[gui,parallel]"`.
+```
+python -c "import neuron"
+```
 
-## Basic Installation
+## Step 3. `pip` installation types
 
-To install just the `hnn_core` API, open a Terminal or Command Prompt using a fresh virtual
+Note that you can install multiple sets of HNN-Core features below by combining them similar to `pip install "hnn_core[gui,parallel]"`.
+
+### `pip` Basic Installation
+
+To install only the `hnn_core` API, open a Terminal or Command Prompt using a fresh virtual
 environment, and enter:
 
-    $ pip install hnn_core
+```
+pip install hnn_core
+```
 
-This will install only the `hnn_core` API along with its required
-dependencies, which include:
+This will install only the `hnn_core` API along with its required dependencies, which include: [NumPy](https://numpy.org/), [SciPy](https://scipy.org/), [Matplotlib](https://matplotlib.org/), [NEURON][] (>=7.7), and [h5io](https://github.com/h5io/h5io). To check if everything worked fine, you can run:
 
-- [NumPy](https://numpy.org/)
-- [SciPy](https://scipy.org/)
-- [Matplotlib](https://matplotlib.org/)
-- [NEURON][] (>=7.7)
-- [h5io](https://github.com/h5io/h5io)
+```
+python -c "from hnn_core import jones_2009_model, simulate_dipole ; simulate_dipole(jones_2009_model(), tstop=20)"
+```
 
-To check if everything worked fine, you can run:
+This will run a very short test simulation, and should not give any Error messages (Warning messages are fine and expected). For how to use the `hnn_core` API, see [our HNN Textbook website][], including examples like our [API tutorial of ERP simulation](https://jonescompneurolab.github.io/textbook/content/05_erps/hnn_core.html). Our public API documentation {doc}`can be found here <api>`.
 
-    $ python -c "import hnn_core"
+### `pip` Graphical User Interface (GUI) Installation
 
-and it should not give any error messages.
+To install `hnn_core` with both its API and GUI support, run the following command (make sure to include the "quotes"):
 
-**Basic Usage**: For how to use the `hnn_core` API, which is available for every installation
-type, see our extensive {doc}`Examples page <auto_examples/index>`.
-
-## Graphical User Interface (GUI) Installation
-
-To install `hnn_core` with both its API and GUI support, a simple tweak to the above command is
-needed (pay attention to the "quotes"):
-
-    $ pip install "hnn_core[gui]"
+```
+pip install "hnn_core[gui]"
+```
 
 This will install `hnn_core`, its API dependencies, and the additional GUI dependencies, which
-include:
+include: [ipykernel](https://ipykernel.readthedocs.io/en/stable/), [ipympl](https://matplotlib.org/ipympl/), [ipywidgets](https://github.com/jupyter-widgets/ipywidgets) >=8.0.0, and [voila](https://github.com/voila-dashboards/voila).
 
-- [ipykernel](https://ipykernel.readthedocs.io/en/stable/)
-- [ipympl](https://matplotlib.org/ipympl/)
-- [ipywidgets](https://github.com/jupyter-widgets/ipywidgets) >=8.0.0
-- [voila](https://github.com/voila-dashboards/voila)
+To start the GUI, simply run:
 
-**GUI Usage**: To start the GUI, simply run:
+```
+hnn-gui
+```
 
-    $ hnn-gui
+For further guidance on using the GUI, see [our HNN Textbook website][], including examples like our [GUI tutorial of ERPs](https://jonescompneurolab.github.io/textbook/content/05_erps/erps_in_gui.html).
 
-## Optimization Installation
+### `pip` Optimization Installation
 
 If you would like to use Bayesian optimization, then
 [`scikit-learn`](https://scikit-learn.org/stable/index.html) is required. You
 can easily install `hnn_core`, its API dependencies, and its optimization
-dependencies using the following command (pay attention to the "quotes"):
+dependencies using the following command (make sure to include the "quotes"):
 
-    $ pip install "hnn_core[opt]"
+```
+pip install "hnn_core[opt]"
+```
 
-If you are planning to use Optimization, it is strongly recommended to also
-install [support for Parallelism, which can be found
-below](#parallelism).
+If you are planning to use Optimization, it is recommended to also install Joblib support (see below). Instruction on how to use our Optimization support can be found on [our HNN Textbook website][], including this [optimization tutorial](https://jonescompneurolab.github.io/textbook/content/04_using_hnn/optimize_simulated_evoked_response_parameters.html).
 
-**Optimization Usage**: An example of how to use our Optimization support can be found {doc}`in the Example
-here <auto_examples/howto/optimize_evoked>`.
-
-## Parallelism
-
-`hnn_core` supports two kinds of parallelism:
-
-- [Joblib parallelism](#parallelism-joblib-installation): `hnn_core` can take advantage of [the Joblib
-library](https://joblib.readthedocs.io/en/stable/) in order to run multiple
-independent simulations simultaneously across multiple CPU processors (also called ["embarrassingly parallel"
-jobs](https://en.wikipedia.org/wiki/Embarrassingly_parallel)).
-
-- [MPI parallelism](#parallelism-mpi-installation): `hnn_core` can take
-advantage of NEURON's use of [the MPI
-protocol](https://en.wikipedia.org/wiki/Message_Passing_Interface) to split
-neurons across CPU processors, greatly reducing simulation time as more cores
-are used. This is more complex than other installation methods, but offers the
-best single-simulation speed. Note that [we do not support MPI on
-Windows](#parallelism-mpi-windows).
-
-## Parallelism: Joblib Installation
+### `pip` Joblib Installation
 
 You can easily install the `hnn_core` API, its API dependencies, and its additional Joblib parallelism
-dependencies using the following command (pay attention to the "quotes"):
+dependencies using the following command (make sure to include the "quotes"):
 
-    $ pip install "hnn_core[parallel]"
+```
+pip install "hnn_core[parallel]"
+```
 
-This automatically installs the following dependencies:
+This automatically installs the following dependencies: [Joblib](https://joblib.readthedocs.io/en/stable/) and [psutil](https://github.com/giampaolo/psutil).
 
-- [Joblib](https://joblib.readthedocs.io/en/stable/)
-- [psutil](https://github.com/giampaolo/psutil)
+Many of the examples on [our HNN Textbook website][] make use of Joblib support, and we provide an explicit [tutorial for it here](https://jonescompneurolab.github.io/textbook/content/04_using_hnn/parallelism_joblib.html).
 
-**Parallelism: Joblib Usage**:
-- Once installed, you can run multiple trials simultaneously with only a small modification to your code, like this:
-    ```
-    from hnn_core import JoblibBackend
+### `pip` MPI Installation
 
-    # set n_jobs to the number of trials to run in parallel with
-    # Joblib (up to number of cores on system)
-    with JoblibBackend(n_jobs=2):
-        dpls = simulate_dipole(net, n_trials=2)
-    ```
-- Some in-depth examples of Joblib usage for trials are available in the Examples {doc}`found here <auto_examples/workflows/plot_simulate_alpha>` and {doc}`also here <auto_examples/workflows/plot_simulate_somato>`.
-- Joblib can also be used to simultaneously run multiple simulations across "batches" of simulation parameters, illustrated {doc}`in our Batch Simulation example <auto_examples/howto/plot_batch_simulate>`.
+If you want to use MPI, we recommend you first try to install our `conda` package detailed [at the top of the page](#conda-installation). Otherwise, we **strongly** recommend you use the [Anaconda Python Distribution](https://www.anaconda.com/download/success) specifically, since Anaconda is the easiest way to download [OpenMPI](https://anaconda.org/conda-forge/openmpi) binaries, which are *not* Python code. If you need to use your own specific MPI binaries/libraries (such as if you are installing on an HPC platform) and you need help, then let us know on [our Github Discussions page][].
 
-## Parallelism: MPI Installation
+To install HNN-Core with its MPI dependencies using the `pip` method, follow the below instructions for your operating system.
 
-For MPI installation, we **strongly** recommend you use the [Anaconda Python
-Distribution](https://www.anaconda.com/download/success) specifically, since Anaconda is the easiest way to download [OpenMPI](https://anaconda.org/conda-forge/openmpi) binaries, which are *not* Python code.
+#### `pip` MPI: Windows
 
-### Parallelism: MPI: Windows
+Unfortunately, we do not officially support MPI usage on native Windows due to the complexity required. However, we do support MPI through Windows Subsystem for Linux (WSL). To install `pip` MPI support on WSL, follow the Steps 1 through 7 of the above [`conda` Windows guide](#conda-windows); this will install WSL and Miniconda. Then, inside your `Ubuntu` app window, follow the `pip` steps below for Linux, beginning with step 2.
 
-Unfortunately, we do not officially support MPI usage on Windows due to the
-complexity required. If this is a necessity for you and you do not have access
-to Linux/etc.-based HPC resources, please [get in touch via our GitHub
-Discussions
-page](https://github.com/jonescompneurolab/hnn-core/discussions). We may still
-be able to help.
+#### `pip` MPI: MacOS or Linux
 
-### Parallelism: MPI: MacOS
+1. Install the [Anaconda Python Distribution](https://www.anaconda.com/download/success).
 
-1. First, create and activate your `conda` environment (but do not install `hnn_core` yet).
-2. Inside your `conda` environment, install the `conda-forge` versions of [OpenMPI](https://anaconda.org/conda-forge/openmpi) and [`mpi4py`](https://anaconda.org/conda-forge/mpi4py) using the following command:
-    ```
-    $ conda install -y conda-forge::openmpi conda-forge::mpi4py
-    ```
-3. Next, copy, paste, and run the following commands to set some environment variables for your `conda` environment:
-    ```
-    $ cd ${CONDA_PREFIX}
-    $ mkdir -p etc/conda/activate.d etc/conda/deactivate.d
-    $ echo "export OLD_DYLD_FALLBACK_LIBRARY_PATH=\$DYLD_FALLBACK_LIBRARY_PATH" >> etc/conda/activate.d/env_vars.sh
-    $ echo "export DYLD_FALLBACK_LIBRARY_PATH=\$DYLD_FALLBACK_LIBRARY_PATH:\${CONDA_PREFIX}/lib" >> etc/conda/activate.d/env_vars.sh
-    $ echo "export DYLD_FALLBACK_LIBRARY_PATH=\$OLD_DYLD_FALLBACK_LIBRARY_PATH" >> etc/conda/deactivate.d/env_vars.sh
-    $ echo "unset OLD_DYLD_FALLBACK_LIBRARY_PATH" >> etc/conda/deactivate.d/env_vars.sh
-    $ export OLD_DYLD_FALLBACK_LIBRARY_PATH=$DYLD_FALLBACK_LIBRARY_PATH
-    $ export DYLD_FALLBACK_LIBRARY_PATH=$DYLD_FALLBACK_LIBRARY_PATH:${CONDA_PREFIX}/lib
-    ```
-4. Next, install `hnn_core` with parallel support (pay attention to the "quotes"):
-    ```
-    $ pip install "hnn_core[parallel]"
-    ```
-5. Finally, test that the install worked. Run the following command:
-    ```
-    $ mpiexec -np 2 nrniv -mpi -python -c 'from neuron import h; from mpi4py import MPI; \
-                                       print(f"Hello from proc {MPI.COMM_WORLD.Get_rank()}"); \
-                                       h.quit()'
-    ```
-     You should see output the looks like the following; this verifies that MPI, NEURON, and Python are all working together.
+2. Create and activate a new `conda` environment using commands like the following:
 
-    ```
-    numprocs=2
-    NEURON -- VERSION 7.7.2 7.7 (2b7985ba) 2019-06-20
-    Duke, Yale, and the BlueBrain Project -- Copyright 1984-2018
-    See http://neuron.yale.edu/neuron/credits
+```
+conda create -y -q -n hnn-core-env python=3.12
+conda activate hnn-core-env
+```
 
-    Hello from proc 0
-    Hello from proc 1
-    ```
+If desired, you can change the environment name `hnn-core-env` to whatever you wish. Compatible Python versions currently include 3.8, 3.9, 3.10, 3.11, and 3.12, but *not* 3.13.
 
+3. (MacOS only) Copy, paste, and run the following commands to set some environment variables for your `conda` environment:
 
-### Parallelism: MPI: Linux
+```
+mkdir -p $CONDA_PREFIX/etc/conda/activate.d $CONDA_PREFIX/etc/conda/deactivate.d
+echo "export OLD_DYLD_FALLBACK_LIBRARY_PATH=\$DYLD_FALLBACK_LIBRARY_PATH" >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
+echo "export DYLD_FALLBACK_LIBRARY_PATH=\$DYLD_FALLBACK_LIBRARY_PATH:\${CONDA_PREFIX}/lib" >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
+echo "export DYLD_FALLBACK_LIBRARY_PATH=\$OLD_DYLD_FALLBACK_LIBRARY_PATH" >> $CONDA_PREFIX/etc/conda/deactivate.d/env_vars.sh
+echo "unset OLD_DYLD_FALLBACK_LIBRARY_PATH" >> $CONDA_PREFIX/etc/conda/deactivate.d/env_vars.sh
+export OLD_DYLD_FALLBACK_LIBRARY_PATH=$DYLD_FALLBACK_LIBRARY_PATH
+export DYLD_FALLBACK_LIBRARY_PATH=$LD_LIBRARY_PATH:${CONDA_PREFIX}/lib
+```
 
-- Note: these instructions are for installing `hnn_core` with MPI support on
-a *personal* Linux computer, not a High-Performance Computing (HPC) environment (also
-called a computing cluster or supercomputer). If you are on an HPC, then you
-should refer to your local HPC environment's documentation on how to load the
-necessary MPI libraries/executables before installing `hnn_core`. Feel free
-to reach out to us [via our GitHub Discussions
-page](https://github.com/jonescompneurolab/hnn-core/discussions) if you are
-unsure or run into problems; we should be able to help you get it working.
+4. (Linux only) Copy, paste, and run the following commands to set some environment variables for your `conda` environment:
 
-1. First, create and activate your `conda` environment (but do not install `hnn_core` yet).
-2. Inside your `conda` environment, install the `conda-forge` versions of [OpenMPI](https://anaconda.org/conda-forge/openmpi) and [`mpi4py`](https://anaconda.org/conda-forge/mpi4py) using the following command:
-    ```
-    $ conda install -y conda-forge::openmpi conda-forge::mpi4py
-    ```
-3. Next, copy, paste, and run the following commands to set some environment variables for your `conda` environment:
-    ```
-    $ cd ${CONDA_PREFIX}
-    $ mkdir -p etc/conda/activate.d etc/conda/deactivate.d
-    $ echo "export OLD_LD_LIBRARY_PATH=\$LD_LIBRARY_PATH" >> etc/conda/activate.d/env_vars.sh
-    $ echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:\${CONDA_PREFIX}/lib" >> etc/conda/activate.d/env_vars.sh
-    $ echo "export LD_LIBRARY_PATH=\$OLD_LD_LIBRARY_PATH" >> etc/conda/deactivate.d/env_vars.sh
-    $ echo "unset OLD_LD_LIBRARY_PATH" >> etc/conda/deactivate.d/env_vars.sh
-    $ export OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
-    $ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CONDA_PREFIX}/lib
-    ```
-4. Next, install `hnn_core` with parallel support (pay attention to the "quotes"):
-    ```
-    $ pip install "hnn_core[parallel]"
-    ```
-5. Finally, test that the install worked. Run the following command:
-    ```
-    $ mpiexec -np 2 nrniv -mpi -python -c 'from neuron import h; from mpi4py import MPI; \
-                                       print(f"Hello from proc {MPI.COMM_WORLD.Get_rank()}"); \
-                                       h.quit()'
-    ```
-     You should see output the looks like the following; this verifies that MPI, NEURON, and Python are all working together.
-    ```
-    numprocs=2
-    NEURON -- VERSION 7.7.2 7.7 (2b7985ba) 2019-06-20
-    Duke, Yale, and the BlueBrain Project -- Copyright 1984-2018
-    See http://neuron.yale.edu/neuron/credits
+```
+mkdir -p $CONDA_PREFIX/etc/conda/activate.d $CONDA_PREFIX/etc/conda/deactivate.d
+echo "export OLD_LD_LIBRARY_PATH=\$LD_LIBRARY_PATH" >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
+echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:\${CONDA_PREFIX}/lib" >> $CONDA_PREFIX/etc/conda/activate.d/env_vars.sh
+echo "export LD_LIBRARY_PATH=\$OLD_LD_LIBRARY_PATH" >> $CONDA_PREFIX/etc/conda/deactivate.d/env_vars.sh
+echo "unset OLD_LD_LIBRARY_PATH" >> $CONDA_PREFIX/etc/conda/deactivate.d/env_vars.sh
+export OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CONDA_PREFIX}/lib
+```
 
-    Hello from proc 0
-    Hello from proc 1
-    ```
+5. Run the following command to install your MPI dependencies (if you have your own MPI binaries, change this step accordingly to load/etc. them):
 
-### Parallelism: MPI: Usage
+```
+conda install -y -q "openmpi>5" mpi4py -c conda-forge
+```
 
-- Once installed, you can run any simulation using multiple CPU processors with only a small modification to your code, like this:
-    ```
-    from hnn_core import MPIBackend
+6. Finally, install the PyPI package of `hnn_core` using the following command (make sure to include the "quotes"):
 
-    # Set n_procs to the number of processors MPI can use (up to
-    # number of cores on system). A different launch command can be
-    # specified for MPI distributions other than openmpi.
-    with MPIBackend(n_procs=2, mpi_cmd='mpiexec'):
-        dpls = simulate_dipole(net, n_trials=1)
-    ```
-- An in-depth example of MPI usage is available in the {doc}`Example found here <auto_examples/howto/plot_simulate_mpi_backend>`.
+```
+pip install "hnn_core[parallel]"
+```
 
-## Installing multiple optional `hnn_core` features
+Note that you can add other HNN-Core features to the install by, for example, changing `[parallel]` in the above command to `[opt,parallel]`, etc.
 
-Note that you easily install multiple groups of optional features. For example,
-if you want to install both GUI support and Optimization support, then simply
-run the following:
+7. Let's test that the install worked. Run the following command:
 
-    $ pip install "hnn_core[gui,opt]"
+```
+mpiexec -np 2 nrniv -mpi -python -c 'from neuron import h; from mpi4py import MPI; \
+                                   print(f"Hello from proc {MPI.COMM_WORLD.Get_rank()}"); \
+                                   h.quit()'
+```
+
+You should see output the looks like the following; this verifies that MPI, NEURON, and Python are all working together.
+
+```
+numprocs=2
+NEURON -- VERSION 8.2.6-1-gb6e6a5fad+ build-osx-wheels-script (b6e6a5fad+) 2024-07-25
+, Yale, and the BlueBrain Project -- Copyright 1984-2022
+See http://neuron.yale.edu/neuron/credits
+
+Hello from proc 0
+Hello from proc 1
+```
+
+8. You can find tutorials on how to use MPI parallelism on [our HNN Textbook website][], specifically on [our MPI tutorial here](https://jonescompneurolab.github.io/textbook/content/04_using_hnn/parallelism_mpi.html).
 
 [NEURON]: https://nrn.readthedocs.io/
-
+[our HNN Textbook website]: https://jonescompneurolab.github.io/textbook/content/preface.html
+[our GitHub Discussions page]: https://github.com/jonescompneurolab/hnn-core/discussions

@@ -27,14 +27,39 @@ sys.path.append(os.path.abspath(os.path.join(curdir, 'sphinxext')))
 # -- Project information -----------------------------------------------------
 
 project = 'hnn-core'
-copyright = '2024, HNN Developers'
+copyright = '2025, HNN Developers'
 author = 'HNN Developers'
 
-# The short X.Y version
-version = '0.4'
-# The full version, including alpha/beta/rc tags
-release = ''
+# -- Version handling --------------------------------------------------------
 
+# The short X.Y version
+version = '0.5.0.dev0'
+# The full version, including alpha/beta/rc tags
+release = '0.5.0.dev0'
+
+### HTML theme version control
+# If you are making a stable release, then you should add entries to the file
+# located in `doc/_static/versions.json`. Once your PR with that change is
+# merged, that file will be pushed to the following URL. Unfortunately our
+# theme system wants a public URL, NOT a local file for this version control.
+json_versions_url = "https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json"
+if (("rc" in version) or ("dev" in version)):
+    switcher_version_match = "dev"
+else:
+    switcher_version_match = version
+
+### Binder version control
+# Resolve binder variable `filepath_prefix` to go in `sphinx_gallery_conf`
+# below. From the docs:
+#   "A prefix to append to the filepath in the Binder links. You should use this
+#    if you will store your built documentation in a sub-folder of a repository,
+#    instead of in the root."
+# We will store dev docs in a `dev` subdirectory and all other docs in a
+# directory "v" + version_str. E.g., "v0.3"
+if (("rc" in version) or ("dev" in version)):
+    filepath_prefix = 'dev'
+else:
+    filepath_prefix = 'v{}'.format(version)
 
 # -- General configuration ---------------------------------------------------
 
@@ -78,7 +103,6 @@ source_suffix = {
     '.md': 'markdown',
 }
 
-
 # The master toctree document.
 master_doc = 'index'
 
@@ -97,13 +121,6 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'gui/index.rst']
 # -- Options for HTML output -------------------------------------------------
 
 html_theme = "pydata_sphinx_theme"
-
-# versions
-#
-# The actual, local version of `versions.json` that you should edit (if
-# necessary) is in `_static/versions.json`.
-json_versions_url = "https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json"
-switcher_version_match = "dev" if ".rc" in version else version
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -225,19 +242,9 @@ linkcheck_ignore = [
     'https://doi.org/10.1152/jn.00535.2009',
     'https://doi.org/10.1152/jn.00122.2010',
     'https://doi.org/10.1101/2021.04.16.440210',
-    'https://groups.google.com/g/hnnsolver'
+    'https://groups.google.com/g/hnnsolver',
+    'http://localhost:8866',
 ]
-
-# Resolve binder filepath_prefix. From the docs:
-# "A prefix to append to the filepath in the Binder links. You should use this
-# if you will store your built documentation in a sub-folder of a repository,
-# instead of in the root."
-# we will store dev docs in a `dev` subdirectory and all other docs in a
-# directory "v" + version_str. E.g., "v0.3"
-if 'dev' in version:
-    filepath_prefix = 'dev'
-else:
-    filepath_prefix = 'v{}'.format(version)
 
 sphinx_gallery_conf = {
     'first_notebook_cell': ("import pyvista as pv\n"
