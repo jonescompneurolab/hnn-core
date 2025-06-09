@@ -629,7 +629,13 @@ class Cell:
             h.pt3dconst(0, sec=sec)  # be explicit, see documentation
             for pt in sections[sec_name].end_pts:
                 # Add positional offset to each coordinate
-                h.pt3dadd(pt[0] + self.pos[0], pt[1] + self.pos[1], pt[2] + self.pos[2], 1, sec=sec)
+                h.pt3dadd(
+                    pt[0] + self.pos[0],
+                    pt[1] + self.pos[1],
+                    pt[2] + self.pos[2],
+                    1,
+                    sec=sec,
+                )
             # with pt3dconst==0, these will alter the 3d points defined above!
             sec.L = sections[sec_name].L
             sec.diam = sections[sec_name].diam
