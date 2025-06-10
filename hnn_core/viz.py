@@ -716,6 +716,7 @@ def plot_cells(net, ax=None, show=True):
     """
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
+    from matplotlib.lines import Line2D
 
     if ax is None:
         fig = plt.figure()
@@ -749,7 +750,26 @@ def plot_cells(net, ax=None, show=True):
                        label=arr_name)
 
     plt.legend(bbox_to_anchor=(-0.15, 1.025), loc="upper left")
+    annotation_lines = []
+    for cell_type in ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']:
+        if cell_type not in net.pos_dict:
+            continue
+        pos_list = net.pos_dict[cell_type]
+        x_avg = np.mean([pos[0] for pos in pos_list])
+        y_avg = np.mean([pos[1] for pos in pos_list])
+        z_avg = np.mean([pos[2] for pos in pos_list])
 
+        color = colors[cell_type]
+        marker = markers[cell_type]
+        label = f"{cell_type}: ({x_avg:.1f}, {y_avg:.1f}, {z_avg:.1f})"
+        line = Line2D([0], [0], marker=marker, color='w', label=label,
+                    markerfacecolor=color, markeredgecolor=color,
+                    markersize=10, linestyle='None')
+        annotation_lines.append(line)
+
+    ax.legend(handles=annotation_lines,
+            loc='upper center', bbox_to_anchor=(0.5, 1.10),
+            frameon=True, title='Cell Positions')
     plt_show(show)
     return ax.get_figure()
 
