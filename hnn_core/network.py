@@ -983,7 +983,7 @@ class Network:
             cell_specific,
             probability,
         )
-    
+
     def add_spike_train_drive(self, name, *, spike_data, target_config, conn_seed=None):
         """Add an external drive from explicitly defined spike trains.
 
@@ -1033,90 +1033,117 @@ class Network:
             Seed for random number generator if 'probability' < 1.0.
             Fixed across trials.
         """
-    
 
         if not spike_data:
             drive = _NetworkDrive()
-            drive['type'] = 'spike_train'
-            drive['name'] = name
-            drive['explicit_spike_data'] = {}
-            drive['n_drive_cells'] = 0
-            drive['cell_specific'] = True 
-            drive['events'] = [] 
+            drive["type"] = "spike_train"
+            drive["name"] = name
+            drive["explicit_spike_data"] = {}
+            drive["n_drive_cells"] = 0
+            drive["cell_specific"] = True
+            drive["events"] = []
             self.external_drives[name] = drive
-            return 
+            return
 
         # --- 2. Drive Registration ---
         drive = _NetworkDrive()
-        drive['type'] = 'spike_train'
-        drive['name'] = name
-        drive['conn_seed'] = conn_seed
-        drive['explicit_spike_data'] = deepcopy(spike_data) 
+        drive["type"] = "spike_train"
+        drive["name"] = name
+        drive["conn_seed"] = conn_seed
+        drive["explicit_spike_data"] = deepcopy(spike_data)
 
         # --- 3. GID Management for Drive's Source Channels ---
         source_channel_ids = sorted(list(spike_data.keys()))
         n_drive_sources = len(source_channel_ids)
-        drive['n_drive_cells'] = n_drive_sources
-        drive['cell_specific'] = True 
+        drive["n_drive_cells"] = n_drive_sources
+        drive["cell_specific"] = True
 
         # Use network's origin for symbolic positions of these drive sources
-        drive_source_positions = [self.pos_dict['origin']] * n_drive_sources
-        self._add_cell_type(name, drive_source_positions) 
+        drive_source_positions = [self.pos_dict["origin"]] * n_drive_sources
+        self._add_cell_type(name, drive_source_positions)
 
         self.external_drives[name] = drive
 
         # --- 4. Connection Setup ---
         drive_gids_for_sources = list(self.gid_ranges[name])
-        source_id_to_gid_map = {src_id: gid for src_id, gid in zip(source_channel_ids, drive_gids_for_sources)}
+        source_id_to_gid_map = {
+            src_id: gid
+            for src_id, gid in zip(source_channel_ids, drive_gids_for_sources)
+        }
 
         for loop_idx, source_channel_id in enumerate(source_channel_ids):
             src_gid_for_this_channel = source_id_to_gid_map[source_channel_id]
-            cfg_item = target_config[source_channel_id]            
-            target_cell_types_in_b = cfg_item.get('target_cell_types')
-            location = cfg_item.get('location')
+            cfg_item = target_config[source_channel_id]
+            target_cell_types_in_b = cfg_item.get("target_cell_types")
+            location = cfg_item.get("location")
             for t_cell_type in target_cell_types_in_b:
                 if t_cell_type not in self.cell_types:
-                    raise ValueError(f"Target cell type '{t_cell_type}' for drive '{name}', channel '{source_channel_id}' not found in this Network's cell_types: {list(self.cell_types.keys())}.")
+                    raise ValueError(
+                        f"Target cell type '{t_cell_type}' for drive '{name}', channel '{source_channel_id}' not found in this Network's cell_types: {list(self.cell_types.keys())}."
+                    )
 
-            syn_delays = cfg_item.get('synaptic_delays')            
-            probability = cfg_item.get('probability', 1.0)
+            syn_delays = cfg_item.get("synaptic_delays")
+            probability = cfg_item.get("probability", 1.0)
             if not (0.0 <= probability <= 1.0):
-                raise ValueError(f"Probability for '{source_channel_id}' must be between 0.0 and 1.0. Got {probability}")
+                raise ValueError(
+                    f"Probability for '{source_channel_id}' must be between 0.0 and 1.0. Got {probability}"
+                )
 
-            for receptor_config_key, receptor_neuron_name in [('weights_ampa', 'ampa'), ('weights_nmda', 'nmda')]:
+            for receptor_config_key, receptor_neuron_name in [
+                ("weights_ampa", "ampa"),
+                ("weights_nmda", "nmda"),
+            ]:
                 weights_for_receptor = cfg_item.get(receptor_config_key)
                 if not weights_for_receptor:
                     continue
                 for target_cell_type_in_b in target_cell_types_in_b:
                     if target_cell_type_in_b not in weights_for_receptor:
-                        warnings.warn(f"No '{receptor_config_key}' weight for target cell type '{target_cell_type_in_b}' from channel '{source_channel_id}'. Skipping {receptor_neuron_name} connection to this type for this channel.", UserWarning)
+                        warnings.warn(
+                            f"No '{receptor_config_key}' weight for target cell type '{target_cell_type_in_b}' from channel '{source_channel_id}'. Skipping {receptor_neuron_name} connection to this type for this channel.",
+                            UserWarning,
+                        )
                         continue
                     if target_cell_type_in_b not in syn_delays:
-                        raise ValueError(f"Synaptic delay for target cell type '{target_cell_type_in_b}' not found in synaptic_delays for channel '{source_channel_id}'.")
+                        raise ValueError(
+                            f"Synaptic delay for target cell type '{target_cell_type_in_b}' not found in synaptic_delays for channel '{source_channel_id}'."
+                        )
 
                     weight_value = weights_for_receptor[target_cell_type_in_b]
-                    
+
                     delay_value = syn_delays[target_cell_type_in_b]
-                    if delay_value < 0: # NEURON requires delay >= 0, often >= dt
-                        raise ValueError(f"Synaptic delay must be non-negative. Got {delay_value} for {target_cell_type_in_b}")
+                    if delay_value < 0:  # NEURON requires delay >= 0, often >= dt
+                        raise ValueError(
+                            f"Synaptic delay must be non-negative. Got {delay_value} for {target_cell_type_in_b}"
+                        )
 
                     # lamtha: space constant for synaptic weight/delay falloff.
                     # For these abstract drives, a very large value means no spatial falloff.
                     # Or, could be a specific parameter if spatial mapping is intended.
-                    lamtha_for_drive = self._params.get('dipole_lamtha', 1e9) # Default from params or large value
+                    lamtha_for_drive = self._params.get(
+                        "dipole_lamtha", 1e9
+                    )  # Default from params or large value
 
-                    actual_target_gids_in_b = list(self.gid_ranges[target_cell_type_in_b])
+                    actual_target_gids_in_b = list(
+                        self.gid_ranges[target_cell_type_in_b]
+                    )
                     if not actual_target_gids_in_b:
-                        warnings.warn(f"Target cell type '{target_cell_type_in_b}' has no GIDs. Cannot connect from {source_channel_id}.", UserWarning)
+                        warnings.warn(
+                            f"Target cell type '{target_cell_type_in_b}' has no GIDs. Cannot connect from {source_channel_id}.",
+                            UserWarning,
+                        )
                         continue
-                        
+
                     current_connection_seed = None
                     if conn_seed is not None and probability < 1.0:
                         # Create a more robust unique seed per connection rule
                         # This ensures that if probability < 1, different rules get different random subsets
-                        seed_offset = loop_idx * len(self.cell_types) * 2 # *2 for ampa/nmda
-                        seed_offset += list(self.cell_types.keys()).index(target_cell_type_in_b)
-                        if receptor_neuron_name == 'nmda':
+                        seed_offset = (
+                            loop_idx * len(self.cell_types) * 2
+                        )  # *2 for ampa/nmda
+                        seed_offset += list(self.cell_types.keys()).index(
+                            target_cell_type_in_b
+                        )
+                        if receptor_neuron_name == "nmda":
                             seed_offset += len(self.cell_types)
                         current_connection_seed = conn_seed + seed_offset
 
@@ -1129,8 +1156,9 @@ class Network:
                         delay=delay_value,
                         lamtha=lamtha_for_drive,
                         probability=probability,
-                        conn_seed=current_connection_seed
+                        conn_seed=current_connection_seed,
                     )
+
     def _attach_drive(
         self,
         name,
