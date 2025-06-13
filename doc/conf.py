@@ -244,7 +244,8 @@ linkcheck_ignore = [
     'https://doi.org/10.1152/jn.00122.2010',
     'https://doi.org/10.1101/2021.04.16.440210',
     'https://groups.google.com/g/hnnsolver',
-    'http://localhost:8866',
+    r'(http|https):\/\/localhost:\d+',
+    r'(http|https):\/\/github\.com\/jonescompneurolab\/hnn-core\/(issues|pull)\/\d+',
 ]
 
 sphinx_gallery_conf = {
