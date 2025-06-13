@@ -102,7 +102,7 @@ We strongly recommend that you install HNN-Core inside a "virtual environment" u
 
 Note that if you use a virtual environment, you must first create the environment, and then separately *activate* the environment (see [Conda guidance here](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#activating-an-environment)) before running any of the commands below. **All of the installation commands below assume you have already activated your environment**. You may need to re-activate your environment every time you restart your computer or open a new terminal, depending on how you installed your virtual environment software.
 
-Note that `hnn_core` currently only supports Python 3.8, 3.9, 3.10, 3.11, and 3.12, but *not* 3.13.
+`hnn-core` currently supports Python 3.9 to 3.13, inclusively.
 
 ## Step 2. `pip` Platform-specific requirements
 
@@ -220,7 +220,7 @@ conda create -y -q -n hnn-core-env python=3.12
 conda activate hnn-core-env
 ```
 
-If desired, you can change the environment name `hnn-core-env` to whatever you wish. Compatible Python versions currently include 3.8, 3.9, 3.10, 3.11, and 3.12, but *not* 3.13.
+If desired, you can change the environment name `hnn-core-env` to whatever you wish. Compatible Python versions currently include 3.9 to 3.13, inclusively.
 
 3. (MacOS only) Copy, paste, and run the following commands to set some environment variables for your `conda` environment:
 
