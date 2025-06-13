@@ -9,6 +9,10 @@ on:
 env:
     PYTHONPATH: C:\nrn_test\lib\python
     NEURONHOME: C:\nrn_test
+    
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
