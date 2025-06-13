@@ -469,10 +469,35 @@ types of failures will be marked as a failure in CI.
 
 ## Making changes to the default network
 
-If you ever need to make scientific or technical changes to the default network, you must "re-generate" the smaller network we use for testing, in `hnn_core/tests/assets/jones2009_3x3_drives.json`. This is easily done via the following:
+If you ever need to make scientific or technical changes to the default network, you
+must change at least three files:
 
-    $ make regenerate-test-network
+1. `hnn_core/param/default.json`: This is the base file used for the important
+   `jones_2009_model()` function. Make sure that if you need to change certain
+   parameters, then change them in this all-important file **manually**. Note that not
+   all parameters are in this file.
 
-Once you do this, make sure to re-run all the tests using `make test` to ensure that numerical tests dependent on the network itself have not broken.
+2. `hnn_core/param/jones2009_base.json`: This is the base file used for the GUI. This
+   file has been built using the code in `hnn_core/params.py::convert_to_json`. You do
+   **not** have to change this file manually. Instead, you should "regenerate" this file
+   (overwriting it in-place) using the following make command from the top-level of the
+   repository:
+
+```
+make regenerate-base-network
+```
+
+3. `hnn_core/test/assets/jones2009_3x3_drives.json`: This is the base file used for many
+   tests. This file has been built using the script in
+   `hnn_core/tests/regenerate_test_network.py`. You do **not** have to change this file
+   manually. Instead, you should "regenerate" this file (overwriting it in-place) using
+   the following make command from the top-level of the repository:
+
+```
+make regenerate-test-network
+```
+
+Once you do this, make sure to re-run all the tests using `make test` to ensure that
+numerical tests dependent on the network itself have not broken.
 
 [used in MNE-Python]: https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#L124-L132
