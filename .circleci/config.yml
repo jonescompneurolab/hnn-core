@@ -27,8 +27,10 @@ jobs:
               command: |
                   export PATH=~/miniconda/bin:$PATH
                   conda update --yes --quiet conda
-                  conda create -n testenv --yes pip python=3.8
+                  conda create -n testenv --yes pip python=3.13
                   source activate testenv
+                  # necessary due to https://github.com/mpi4py/mpi4py/issues/335#issuecomment-1486366039
+                  rm $CONDA_PREFIX/compiler_compat/ld
                   conda install --yes scipy numpy matplotlib
                   pip install mpi4py
 
