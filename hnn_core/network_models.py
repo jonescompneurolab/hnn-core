@@ -13,7 +13,8 @@ from .cells_default import pyramidal, basket
 
 
 def jones_2009_model(params=None, add_drives_from_params=False,
-                     legacy_mode=False, mesh_shape=(10, 10)):
+                     legacy_mode=False, mesh_shape=(10, 10), 
+                     custom_positions=None):
     """Instantiate the network model described in
     Jones et al. J. of Neurophys. 2009 [1]_
 
@@ -70,9 +71,9 @@ def jones_2009_model(params=None, add_drives_from_params=False,
     }
 
     # Create network with specified cell types
-    net = Network(params, add_drives_from_params= add_drives_from_params,
-                  legacy_mode=legacy_mode, mesh_shape=mesh_shape, cell_types=cell_types)# Pass cell types to Network
-
+    net = Network(params, add_drives_from_params=add_drives_from_params,
+                 legacy_mode=legacy_mode, mesh_shape=mesh_shape,
+                 custom_positions=custom_positions)
     delay = net.delay
 
     # connectivity refactored

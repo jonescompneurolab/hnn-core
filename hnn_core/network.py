@@ -365,14 +365,14 @@ class Network:
     """
 
     def __init__(self, params, add_drives_from_params=False,
-                legacy_mode=False, mesh_shape=(10, 10), custom_pos_dict=None):
+                legacy_mode=False, mesh_shape=(10, 10), custom_positions=None):  # CHANGED PARAMETER NAME
         # Save the parameters used to create the Network
         _validate_type(params, dict, 'params')
         self._params = params
         
-        # Initialize ALL instance attributes (this was missing!)
+        # Initialize ALL instance attributes
         self.gid_ranges = OrderedDict()
-        self._n_gids = 0  # utility: keep track of last GID
+        self._n_gids = 0
         self.cell_response = None
         self.external_drives = dict()
         self.external_biases = dict()
@@ -380,11 +380,11 @@ class Network:
         self.threshold = self._params['threshold']
         self.delay = 1.0
         self.rec_arrays = dict()
-        self._n_cells = 0  # used in tests and MPIBackend checks
+        self._n_cells = 0
         self.pos_dict = dict()
         self.cell_types = dict()
         
-        # XXX this can be removed once tests are made independent of HNN GUI
+        # Legacy mode handling
         self._legacy_mode = legacy_mode
         if self._legacy_mode:
             warnings.warn(
@@ -393,16 +393,13 @@ class Network:
                 'deprecrated in future releases.', DeprecationWarning,
                 stacklevel=1)
 
-        # Source dict of names, first real ones only!
+        # Define default cell types
         cell_types = {
             'L2_basket': basket(cell_name=_short_name('L2_basket')),
             'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
             'L5_basket': basket(cell_name=_short_name('L5_basket')),
             'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
         }
-        
-        # Store custom_pos_dict for later use
-        self._custom_pos_dict = custom_pos_dict
         
         # Validate mesh_shape
         _validate_type(mesh_shape, tuple, 'mesh_shape')
@@ -413,41 +410,25 @@ class Network:
             raise ValueError(f'mesh_shape must be a tuple of positive '
                             f'integers, got: {mesh_shape}')
         
-        # Handle cell positions
-        if custom_pos_dict is not None:
-            # Validate and use custom positions
-            self._validate_custom_pos_dict(custom_pos_dict)
-            self.pos_dict = deepcopy(custom_pos_dict)
-            
-            # Only add cell types that are present in custom_pos_dict
-            available_cell_types = [ct for ct in cell_types.keys() 
-                                if ct in custom_pos_dict]
-            
-            # Extract mesh shape from custom positions if possible
-            if 'L2_pyramidal' in custom_pos_dict and len(custom_pos_dict['L2_pyramidal']) > 0:
-                self._infer_mesh_shape_from_positions(custom_pos_dict)
-            else:
-                self._N_pyr_x = mesh_shape[0]
-                self._N_pyr_y = mesh_shape[1]
-        else:
-            # Use default mesh shape and create positions
-            self._N_pyr_x = mesh_shape[0]
-            self._N_pyr_y = mesh_shape[1]
-            
-            self._inplane_distance = 1.0  # XXX hard-coded default
-            self._layer_separation = 1307.4  # XXX hard-coded default
-            self.set_cell_positions(
-                inplane_distance=self._inplane_distance,
-                layer_separation=self._layer_separation,
-            )
-            
-            # When using default positions, add all cell types
-            available_cell_types = list(cell_types.keys())
+        self._N_pyr_x = mesh_shape[0]
+        self._N_pyr_y = mesh_shape[1]
+        self._inplane_distance = 1.0
+        self._layer_separation = 1307.4
+                
+        # default positions first
+        self.set_cell_positions(
+            inplane_distance=self._inplane_distance,
+            layer_separation=self._layer_separation,
+        )
         
-        # populates self.gid_ranges for the 1st time: order matters for
-        # NetworkBuilder!
-        for cell_name in available_cell_types:
-            self._add_cell_type(cell_name, self.pos_dict[cell_name],
+        # Then apply custom positions if provided
+        if custom_positions is not None:
+            self._apply_custom_positions(custom_positions)
+        
+        # Add cell types that have positions
+        for cell_name in cell_types:
+            if cell_name in self.pos_dict and len(self.pos_dict[cell_name]) > 0:
+                self._add_cell_type(cell_name, self.pos_dict[cell_name],
                                 cell_template=cell_types[cell_name])
         
         if add_drives_from_params:
@@ -455,73 +436,98 @@ class Network:
 
         self._tstop = None
         self._dt = None
-
-    def _validate_custom_pos_dict(self, pos_dict):
-        """ custom position dictionary.
+    def _apply_custom_positions(self, custom_positions):
+        """Apply custom positions to specific cell types.
         
         Parameters
         ----------
-        pos_dict : dict
+        custom_positions : dict
             Dictionary with cell type names as keys and position lists as values.
-            
-        Raises
-        ------
-        ValueError
-            If pos_dict structure is invalid.
+            This can be a partial dictionary - only specified cell types will be updated.
         """
-        required_keys = ['origin']
-        optional_keys = ['L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket']
+        _validate_type(custom_positions, dict, 'custom_positions')
         
-        # origin check
-        if 'origin' not in pos_dict:
-            raise ValueError("custom_pos_dict must contain 'origin' key")
-            
-        # stuct check
-        for key, positions in pos_dict.items():
+        for cell_type, positions in custom_positions.items():
             if not isinstance(positions, (list, tuple)):
-                raise ValueError(f"Positions for '{key}' must be a list or tuple")
-                
-            # origin edge case
-            if key == 'origin':
-                if not isinstance(positions, (list, tuple)) or len(positions) != 3:
-                    raise ValueError("'origin' must be a single (x, y, z) tuple")
-                continue
-                
-            # pos check
+                raise ValueError(f"Positions for '{cell_type}' must be a list or tuple")
+            
+            # Validate each position
+            validated_positions = []
             for idx, pos in enumerate(positions):
                 if not isinstance(pos, (list, tuple)) or len(pos) != 3:
                     raise ValueError(
-                        f"Position {idx} for '{key}' must be (x, y, z) tuple"
+                        f"Position {idx} for '{cell_type}' must be (x, y, z) tuple"
                     )
                 try:
                     x, y, z = float(pos[0]), float(pos[1]), float(pos[2])
+                    validated_positions.append((x, y, z))
                 except (ValueError, TypeError):
                     raise ValueError(
-                        f"Position {idx} for '{key}' must contain numeric values"
+                        f"Position {idx} for '{cell_type}' must contain numeric values"
                     )
-    
-    def _infer_mesh_shape_from_positions(self, pos_dict):
-        # pyramidal cells to infer grid size
-        for cell_type in ['L2_pyramidal', 'L5_pyramidal']:
-            if cell_type in pos_dict and len(pos_dict[cell_type]) > 0:
-                positions = pos_dict[cell_type]
-                x_coords = sorted(set(pos[0] for pos in positions))
-                y_coords = sorted(set(pos[1] for pos in positions))
-                
-                if len(x_coords) > 0 and len(y_coords) > 0:
-                    self._N_pyr_x = len(x_coords)
-                    self._N_pyr_y = len(y_coords)
-                    return
+            
+            # Update positions for this cell type
+            self.pos_dict[cell_type] = validated_positions
         
-        # Fallback to sqrt of total pyramidal cells
-        n_pyr = len(pos_dict.get('L2_pyramidal', [])) or len(pos_dict.get('L5_pyramidal', []))
-        if n_pyr > 0:
-            side = int(np.sqrt(n_pyr))
-            self._N_pyr_x = side
-            self._N_pyr_y = side
-        else:
-            self._N_pyr_x = 1
-            self._N_pyr_y = 1
+        # Update mesh shape if pyramidal positions changed
+        if 'L2_pyramidal' in custom_positions or 'L5_pyramidal' in custom_positions:
+            # Try to infer grid size from custom positions
+            for cell_type in ['L2_pyramidal', 'L5_pyramidal']:
+                if cell_type in self.pos_dict and len(self.pos_dict[cell_type]) > 0:
+                    n_cells = len(self.pos_dict[cell_type])
+                    # Simple square root for grid size estimation
+                    side = int(np.sqrt(n_cells))
+                    self._N_pyr_x = side
+                    self._N_pyr_y = side
+                    break
+
+    def update_cell_positions(self, cell_type, positions):
+        """Update positions for a specific cell type.
+        
+        Parameters
+        ----------
+        cell_type : str
+            Name of the cell type to update
+        positions : list of tuple
+            List of (x, y, z) positions for the cells
+        """
+        if cell_type not in self.cell_types:
+            raise ValueError(f"Cell type '{cell_type}' not found in network")
+        
+        self._apply_custom_positions({cell_type: positions})
+        
+        # Update gid_ranges if number of cells changed
+        old_n_cells = len(self.gid_ranges[cell_type])
+        new_n_cells = len(positions)
+        
+        if old_n_cells != new_n_cells:
+            # This is more complex - would need to reassign all GIDs
+            raise NotImplementedError(
+                "Changing the number of cells for an existing cell type "
+                "is not yet supported. Consider creating a new network."
+            )
+
+    def add_cell_type(self, cell_name, cell_template, positions):
+        """Add a new cell type with specified positions.
+        
+        Parameters
+        ----------
+        cell_name : str
+            Name of the new cell type
+        cell_template : Cell
+            Cell template object
+        positions : list of tuple
+            List of (x, y, z) positions for the cells
+        """
+        if cell_name in self.cell_types:
+            raise ValueError(f"Cell type '{cell_name}' already exists")
+        
+        # Validate positions
+        self._apply_custom_positions({cell_name: positions})
+        
+        # Add the cell type
+        self._add_cell_type(cell_name, self.pos_dict[cell_name], 
+                        cell_template=cell_template)
 
     def __repr__(self):
         class_name = self.__class__.__name__
@@ -569,7 +575,7 @@ class Network:
     def set_cell_positions(self, *, inplane_distance=None, layer_separation=None):
         """Set relative positions of cells arranged in a square grid
 
-        Now possible to change only a subset of the parameters
+        Note that it is possible to change only a subset of the parameters
         (the default value of each is None, which implies no change).
         
         Parameters
@@ -582,16 +588,7 @@ class Network:
             The separation of pyramidal cell soma layers 2/3 and 5. Note that
             this parameter does not affect the amplitude of the dipole moment.
         """
-        # If custom positions were provided, only update drive positions
-        if self._custom_pos_dict is not None:
-            # Update drive positions to network origin
-            for drive_name in self.external_drives.keys():
-                if drive_name not in self.pos_dict:
-                    n_drive_cells = self.external_drives[drive_name]["n_drive_cells"]
-                    self.pos_dict[drive_name] = [self.pos_dict["origin"]] * n_drive_cells
-            return
-            
-        # og implementation for automatic positioning
+    
         if inplane_distance is None:
             inplane_distance = self._inplane_distance
         _validate_type(inplane_distance, (float, int), "inplane_distance")
@@ -1305,9 +1302,9 @@ class Network:
                 raise ValueError(f"Position {idx} must be (x, y, z) tuple")
                     
         self._add_cell_type(cell_name, positions, cell_template=cell_template)
-        def gid_to_type(self, gid):
-            """Reverse lookup of gid to type."""
-            return _gid_to_type(gid, self.gid_ranges)
+    def gid_to_type(self, gid):
+        """Reverse lookup of gid to type."""
+        return _gid_to_type(gid, self.gid_ranges)
 
     def add_connection(self, src_gids, target_gids, loc, receptor,
                        weight, delay, lamtha, allow_autapses=True,
