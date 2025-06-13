@@ -57,7 +57,7 @@ on Mac or Linux, simply do:
 
     $ pip install hnn_core
 
-`hnn-core` currently supports Python 3.8 through 3.13, inclusively.
+`hnn-core` currently supports Python 3.9 through 3.13, inclusively.
 
 If you want to track the latest developments of `hnn-core`, you can
 install the current version of the code (nightly) with:
