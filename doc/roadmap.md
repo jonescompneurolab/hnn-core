@@ -276,4 +276,4 @@ sensory and motor cortices during median nerve stimulation.
 
 [^1]: We do not claim all the neural mechanisms of these signals are completely understood, rather that there is a baseline of knowledge to build from and that HNN provides a framework for further investigation.
 
-[prior studies]: https://hnn.brown.edu/index.php/publications/
+[prior studies]: https://hnn.brown.edu/publications.html
