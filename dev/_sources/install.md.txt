@@ -184,7 +184,7 @@ dependencies using the following command (make sure to include the "quotes"):
 pip install "hnn_core[opt]"
 ```
 
-If you are planning to use Optimization, it is recommended to also install Joblib support (see below). Instruction on how to use our Optimization support can be found on [our HNN Textbook website][], including this [optimization tutorial](https://jonescompneurolab.github.io/textbook/content/04_using_hnn/optimize_simulated_evoked_response_parameters.html).
+If you are planning to use Optimization, it is recommended to also install Joblib support (see below). Instruction on how to use our Optimization support can be found on [our HNN Textbook website][], including this [optimization tutorial](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/optimize_simulated_evoked_response_parameters.html).
 
 ### `pip` Joblib Installation
 
@@ -197,7 +197,7 @@ pip install "hnn_core[parallel]"
 
 This automatically installs the following dependencies: [Joblib](https://joblib.readthedocs.io/en/stable/) and [psutil](https://github.com/giampaolo/psutil).
 
-Many of the examples on [our HNN Textbook website][] make use of Joblib support, and we provide an explicit [tutorial for it here](https://jonescompneurolab.github.io/textbook/content/04_using_hnn/parallelism_joblib.html).
+Many of the examples on [our HNN Textbook website][] make use of Joblib support, and we provide an explicit [tutorial for it here](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/parallelism_joblib.html).
 
 ### `pip` MPI Installation
 
@@ -280,7 +280,7 @@ Hello from proc 0
 Hello from proc 1
 ```
 
-8. You can find tutorials on how to use MPI parallelism on [our HNN Textbook website][], specifically on [our MPI tutorial here](https://jonescompneurolab.github.io/textbook/content/04_using_hnn/parallelism_mpi.html).
+8. You can find tutorials on how to use MPI parallelism on [our HNN Textbook website][], specifically on [our MPI tutorial here](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/parallelism_mpi.html).
 
 [NEURON]: https://nrn.readthedocs.io/
 [our HNN Textbook website]: https://jonescompneurolab.github.io/textbook/content/preface.html
