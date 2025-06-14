@@ -984,180 +984,192 @@ class Network:
             probability,
         )
 
-    def add_spike_train_drive(self, name, *, spike_data, target_config, conn_seed=None):
+    def add_spike_train_drive(
+        self,
+        name,
+        *,
+        spike_data,
+        location,
+        weights_ampa=None,
+        weights_nmda=None,
+        synaptic_delays=0.1,
+        space_constant=3.0,
+        probability=1.0,
+        conn_seed=None,
+    ):
         """Add an external drive from explicitly defined spike trains.
 
-        This method allows the network to be driven by spike times that are
-        provided directly, for instance, from the output of another simulation
-        or an artificial spike generator.
+        This method allows the network to receive input from external spike trains,
+        such as those recorded from another network simulation or from experimental data.
 
         Parameters
         ----------
         name : str
-            Unique name for this spike train drive.
+            Unique name for the drive
         spike_data : dict
-            A dictionary where keys are unique string identifiers for each
-            "source channel" (e.g., representing a specific neuron or group
-            from a source network like "NetA_L5_Pyr_GID150"). The values are
-            lists of spike times (float, in ms) for that channel.
-            Example:
-            {
-                "NetA_L2pyr_GID7": [17.25, 25.3, ...],
-                "NetA_L5pyr_GID19": [19.47, 29.55, 40.60, ...]
-            }
-        target_config : dict
-            A dictionary that maps each "source channel" identifier (from
-            spike_data.keys()) to its connection properties onto this network.
-            Each value is a dictionary specifying:
-            - 'target_cell_types' (list of str): Cell types in *this* network
-              to target (e.g., ['L2_pyramidal', 'L5_basket']).
-            - 'location' (str): Synaptic location on target cells
-              (e.g., 'proximal', 'distal', 'soma').
-            - 'weights_ampa' (dict): {'cell_type': weight_value, ...}.
-            - 'weights_nmda' (dict, optional): {'cell_type': weight_value, ...}.
-            - 'synaptic_delays' (dict): {'cell_type': delay_value, ...} (in ms).
-              This is the delay from spike arrival at this network to effect.
-            - 'probability' (float, optional): Connection probability (0 to 1.0).
-              Default is 1.0.
-            Example for one source channel:
-            {
-                "NetA_L2pyr_GID7": {
-                    'target_cell_types': ['L5_pyramidal'],
-                    'location': 'distal',
-                    'weights_ampa': {'L5_pyramidal': 0.005},
-                    'synaptic_delays': {'L5_pyramidal': 1.5},
-                    'probability': 0.8
-                }, ...
-            }
-        conn_seed : int, optional
-            Seed for random number generator if 'probability' < 1.0.
-            Fixed across trials.
+            Dictionary containing spike information in one of two formats:
+            - Format 1 (source channels): Keys are source channel identifiers (strings)
+              and values are lists of spike times for that source in ms.
+              Example: {"NetA_L2_pyramidal_GID0": [10.2, 25.3, ...], ...}
+            - Format 2 (consolidated): A dict with keys 'times' and 'gids' where
+              'times' is an array of all spike times in ms and 'gids' are the
+              corresponding drive cell IDs (integers starting from 0).
+        location : str
+            Target location of synapses. Must be 'proximal', 'distal', or 'soma',
+            or a specific section name (when legacy_mode=False).
+        weights_ampa : dict or None
+            Synaptic weights (in uS) of AMPA receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
+        weights_nmda : dict or None
+            Synaptic weights (in uS) of NMDA receptors on each targeted cell
+            type (dict keys). Cell types omitted from the dict are set to zero.
+        synaptic_delays : dict or float
+            Synaptic delay (in ms) at the column origin, dispersed laterally as
+            a function of the space_constant. If float, applies to all target
+            cell types. Use dict to create delay->cell mapping.
+        space_constant : float
+            Describes lateral dispersion (from the column origin) of synaptic
+            weights and delays within the simulated column. The constant is
+            measured in the units of ``inplane_distance`` of
+            :class:`~hnn_core.Network`. Default: 3.0
+        probability : float or dict
+            Probability of connection between any src-target pair.
+            Default is 1.0, producing an all-to-all pattern.
+        conn_seed : int
+            Optional initial seed for random number generator (default: None).
+            Used to randomly remove connections when probability < 1.0.
         """
+        if not self._legacy_mode:
+            warnings.warn(
+                "Spike train drives can only target sections defined in "
+                "`Cell.sect_loc` when `legacy_mode=False`.",
+                UserWarning,
+            )
 
-        if not spike_data:
-            drive = _NetworkDrive()
-            drive["type"] = "spike_train"
-            drive["name"] = name
-            drive["explicit_spike_data"] = {}
-            drive["n_drive_cells"] = 0
-            drive["cell_specific"] = True
-            drive["events"] = []
-            self.external_drives[name] = drive
-            return
-
-        # --- 2. Drive Registration ---
+        # Create the drive object
         drive = _NetworkDrive()
         drive["type"] = "spike_train"
-        drive["name"] = name
-        drive["conn_seed"] = conn_seed
-        drive["explicit_spike_data"] = deepcopy(spike_data)
+        drive["location"] = location
+        drive["events"] = list()  # Will be populated during instantiation
 
-        # --- 3. GID Management for Drive's Source Channels ---
-        source_channel_ids = sorted(list(spike_data.keys()))
-        n_drive_sources = len(source_channel_ids)
-        drive["n_drive_cells"] = n_drive_sources
-        drive["cell_specific"] = True
-
-        # Use network's origin for symbolic positions of these drive sources
-        drive_source_positions = [self.pos_dict["origin"]] * n_drive_sources
-        self._add_cell_type(name, drive_source_positions)
-
-        self.external_drives[name] = drive
-
-        # --- 4. Connection Setup ---
-        drive_gids_for_sources = list(self.gid_ranges[name])
-        source_id_to_gid_map = {
-            src_id: gid
-            for src_id, gid in zip(source_channel_ids, drive_gids_for_sources)
-        }
-
-        for loop_idx, source_channel_id in enumerate(source_channel_ids):
-            src_gid_for_this_channel = source_id_to_gid_map[source_channel_id]
-            cfg_item = target_config[source_channel_id]
-            target_cell_types_in_b = cfg_item.get("target_cell_types")
-            location = cfg_item.get("location")
-            for t_cell_type in target_cell_types_in_b:
-                if t_cell_type not in self.cell_types:
+        # Process spike_data into a standardized format
+        if isinstance(spike_data, dict):
+            # Check which format we have
+            if "times" in spike_data and "gids" in spike_data:
+                # Format 2: Already in {times: [...], gids: [...]} format
+                # Validate
+                if not (
+                    isinstance(spike_data["times"], (list, np.ndarray))
+                    and isinstance(spike_data["gids"], (list, np.ndarray))
+                ):
                     raise ValueError(
-                        f"Target cell type '{t_cell_type}' for drive '{name}', channel '{source_channel_id}' not found in this Network's cell_types: {list(self.cell_types.keys())}."
+                        "For 'times'/'gids' format, both 'times' and 'gids' "
+                        "must be lists or numpy arrays."
+                    )
+                if len(spike_data["times"]) != len(spike_data["gids"]):
+                    raise ValueError(
+                        "'times' and 'gids' arrays must have the same length."
                     )
 
-            syn_delays = cfg_item.get("synaptic_delays")
-            probability = cfg_item.get("probability", 1.0)
-            if not (0.0 <= probability <= 1.0):
-                raise ValueError(
-                    f"Probability for '{source_channel_id}' must be between 0.0 and 1.0. Got {probability}"
-                )
+                # Count unique drive cells
+                unique_gids = np.unique(spike_data["gids"])
+                drive["n_drive_cells"] = len(unique_gids)
 
-            for receptor_config_key, receptor_neuron_name in [
-                ("weights_ampa", "ampa"),
-                ("weights_nmda", "nmda"),
-            ]:
-                weights_for_receptor = cfg_item.get(receptor_config_key)
-                if not weights_for_receptor:
-                    continue
-                for target_cell_type_in_b in target_cell_types_in_b:
-                    if target_cell_type_in_b not in weights_for_receptor:
-                        warnings.warn(
-                            f"No '{receptor_config_key}' weight for target cell type '{target_cell_type_in_b}' from channel '{source_channel_id}'. Skipping {receptor_neuron_name} connection to this type for this channel.",
-                            UserWarning,
-                        )
-                        continue
-                    if target_cell_type_in_b not in syn_delays:
+                # Ensure gids are sequential from 0 to n-1
+                if len(unique_gids) > 0:
+                    if (
+                        np.min(unique_gids) != 0
+                        or np.max(unique_gids) != len(unique_gids) - 1
+                    ):
+                        # Reindex gids to be 0-based sequential integers
+                        gid_map = {
+                            old_gid: new_gid
+                            for new_gid, old_gid in enumerate(sorted(unique_gids))
+                        }
+                        new_gids = [gid_map[gid] for gid in spike_data["gids"]]
+                        standardized_data = {
+                            "times": spike_data["times"],
+                            "gids": new_gids,
+                        }
+                    else:
+                        standardized_data = {
+                            "times": spike_data["times"],
+                            "gids": spike_data["gids"],
+                        }
+                else:
+                    standardized_data = {"times": [], "gids": []}
+            else:
+                # Format 1: {source_id: [spike_times], ...}
+                source_ids = list(spike_data.keys())
+                drive["n_drive_cells"] = len(source_ids)
+
+                # Transform to standardized format
+                all_times = []
+                all_gids = []
+
+                # Map source IDs to sequential gids
+                source_id_to_gid = {src_id: i for i, src_id in enumerate(source_ids)}
+
+                # Collect all spike times and corresponding gids
+                for src_id, times in spike_data.items():
+                    gid = source_id_to_gid[src_id]
+                    if isinstance(times, (list, np.ndarray)):
+                        all_times.extend(times)
+                        all_gids.extend([gid] * len(times))
+                    else:
                         raise ValueError(
-                            f"Synaptic delay for target cell type '{target_cell_type_in_b}' not found in synaptic_delays for channel '{source_channel_id}'."
+                            f"Spike times for source '{src_id}' must be a list or array. "
+                            f"Got {type(times)}."
                         )
 
-                    weight_value = weights_for_receptor[target_cell_type_in_b]
+                standardized_data = {
+                    "times": all_times,
+                    "gids": all_gids,
+                }
 
-                    delay_value = syn_delays[target_cell_type_in_b]
-                    if delay_value < 0:  # NEURON requires delay >= 0, often >= dt
-                        raise ValueError(
-                            f"Synaptic delay must be non-negative. Got {delay_value} for {target_cell_type_in_b}"
-                        )
+                # Store the mapping for reference
+                drive["source_to_gid_map"] = source_id_to_gid
+        else:
+            raise ValueError(
+                "spike_data must be a dictionary with either source channel identifiers "
+                "as keys and spike time lists as values, or with 'times' and 'gids' keys."
+            )
 
-                    # lamtha: space constant for synaptic weight/delay falloff.
-                    # For these abstract drives, a very large value means no spatial falloff.
-                    # Or, could be a specific parameter if spatial mapping is intended.
-                    lamtha_for_drive = self._params.get(
-                        "dipole_lamtha", 1e9
-                    )  # Default from params or large value
+        # Set required drive properties
+        drive["dynamics"] = (
+            standardized_data  # This is what _drive_cell_event_times will use
+        )
+        drive["conn_seed"] = conn_seed
+        drive["event_seed"] = (
+            0  # Not used for spike train, but included for consistency
+        )
 
-                    actual_target_gids_in_b = list(
-                        self.gid_ranges[target_cell_type_in_b]
-                    )
-                    if not actual_target_gids_in_b:
-                        warnings.warn(
-                            f"Target cell type '{target_cell_type_in_b}' has no GIDs. Cannot connect from {source_channel_id}.",
-                            UserWarning,
-                        )
-                        continue
+        # Save connection parameters
+        drive["weights_ampa"] = weights_ampa
+        drive["weights_nmda"] = weights_nmda
+        drive["synaptic_delays"] = synaptic_delays
+        drive["probability"] = probability
 
-                    current_connection_seed = None
-                    if conn_seed is not None and probability < 1.0:
-                        # Create a more robust unique seed per connection rule
-                        # This ensures that if probability < 1, different rules get different random subsets
-                        seed_offset = (
-                            loop_idx * len(self.cell_types) * 2
-                        )  # *2 for ampa/nmda
-                        seed_offset += list(self.cell_types.keys()).index(
-                            target_cell_type_in_b
-                        )
-                        if receptor_neuron_name == "nmda":
-                            seed_offset += len(self.cell_types)
-                        current_connection_seed = conn_seed + seed_offset
+        # Register the drive with the network
+        # self.external_drives[name] = drive
 
-                    self.add_connection(
-                        src_gids=[src_gid_for_this_channel],
-                        target_gids=actual_target_gids_in_b,
-                        loc=location,
-                        receptor=receptor_neuron_name,
-                        weight=weight_value,
-                        delay=delay_value,
-                        lamtha=lamtha_for_drive,
-                        probability=probability,
-                        conn_seed=current_connection_seed,
-                    )
+        # Create positions for the drive "cells" (all at origin)
+        # pos = [self.pos_dict["origin"]] * drive["n_drive_cells"]
+        # self._add_cell_type(name, pos)
+
+        # Attach the drive to network cells
+        self._attach_drive(
+            name,
+            drive,
+            weights_ampa=weights_ampa,
+            weights_nmda=weights_nmda,
+            location=location,
+            space_constant=space_constant,
+            synaptic_delays=synaptic_delays,
+            n_drive_cells=drive["n_drive_cells"],
+            cell_specific=False,
+            probability=probability,
+        )
 
     def _attach_drive(
         self,
