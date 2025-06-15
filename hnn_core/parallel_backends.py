@@ -69,11 +69,13 @@ def _gather_trial_data(sim_data, net, n_trials, postproc, bsl_cor='jones'):
         N_pyr_x = net._N_pyr_x
         N_pyr_y = net._N_pyr_y
         if bsl_cor == 'jones':
+            print('Applying Jones baseline correction', flush=True)
             dpl._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
 
         dpl._convert_fAm_to_nAm()  # always applied, cf. #264
 
         if bsl_cor == 'calcium':
+            print('Applying calcium model baseline correction', flush=True)
             dpl._baseline_renormalize_ca()
 
         if postproc:
@@ -987,7 +989,7 @@ class MPIBackend(object):
                 "simulation to JoblibBackend...."
             )
             return JoblibBackend(n_jobs=1).simulate(
-                net, tstop=tstop, dt=dt, n_trials=n_trials, postproc=postproc
+                net, tstop=tstop, dt=dt, n_trials=n_trials, postproc=postproc, bsl_cor=bsl_cor
             )
 
         if self.n_procs > net._n_cells:
