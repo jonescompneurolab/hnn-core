@@ -393,7 +393,9 @@ def get_L2Pyr_params_new():
         'L2Pyr_dend_gbar_Ih': 0.000080/2*5,
         'L2Pyr_dend_gbar_Im': 8e-3/2,
         'L2Pyr_dend_g_pas': 1.0 / 12000.0,
-        'L2Pyr_dend_e_pas': -85}
+        'L2Pyr_dend_e_pas': -85,
+        'L2Pyr_dend_decay_CaDynamics_E2' : 342.544232,
+        'L2Pyr_dend_gamma_CaDynamics_E2' : 0.000533}
 
 def get_L5PyrET_params():
 

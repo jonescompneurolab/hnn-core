@@ -405,7 +405,7 @@ def human_ET_model(params=None, add_drives_from_params=False,
     """"Initiate like old calcium model and then replace with new cells"""
 
     hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, 'param', 'default.json')
+    params_fname = op.join(hnn_core_root, 'param', 'default_human_ET.json')
     if params is None:
         params = read_params(params_fname)
 
@@ -423,7 +423,7 @@ def human_ET_model(params=None, add_drives_from_params=False,
     for receptor in ['nmda', 'ampa']:
         key = f'gbar_{_short_name(target_cell)}_'\
                 f'{_short_name(target_cell)}_{receptor}'
-        weight = 0.001
+        weight = params[key]
         net.add_connection(
             target_cell, target_cell, loc, receptor, weight,
             delay, lamtha, allow_autapses=False)
@@ -432,7 +432,7 @@ def human_ET_model(params=None, add_drives_from_params=False,
     for receptor in ['nmda', 'ampa']:
         key = f'gbar_{_short_name(target_cell)}_'\
                 f'{_short_name(target_cell)}_{receptor}'
-        weight = 0.0005
+        weight = params[key]
 
         net.add_connection(
             target_cell, target_cell, loc, receptor, weight,
@@ -447,13 +447,13 @@ def human_ET_model(params=None, add_drives_from_params=False,
     loc = 'soma'
     receptor='gabaa'
     key = f'gbar_L2Basket_L2Pyr_{receptor}'
-    weight = 0.05
+    weight = params[key]
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
     
     receptor='gabab'
     key = f'gbar_L2Basket_L2Pyr_{receptor}'
-    weight = 0.05
+    weight = params[key]
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
         
@@ -465,12 +465,12 @@ def human_ET_model(params=None, add_drives_from_params=False,
     loc = 'soma'
     receptor = 'gabaa'
     key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
-    weight = 0.025
+    weight = params[key]
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
     receptor = 'gabab'
     key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
-    weight = 0.0125
+    weight = params[key]
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
@@ -480,7 +480,7 @@ def human_ET_model(params=None, add_drives_from_params=False,
     receptor = 'ampa'
     for loc in ['proximal', 'distal']:
         key = f'gbar_L2Pyr_{_short_name(target_cell)}'
-        weight = 0.001125
+        weight = params[key]
         net.add_connection(
             src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
@@ -488,7 +488,7 @@ def human_ET_model(params=None, add_drives_from_params=False,
     src_cell = 'L2_basket'
     lamtha = 50.
     key = f'gbar_L2Basket_{_short_name(target_cell)}'
-    weight = 0.002
+    weight = params[key]
     loc = 'distal'
     receptor = 'gabaa'
     net.add_connection(
@@ -499,7 +499,7 @@ def human_ET_model(params=None, add_drives_from_params=False,
     target_cell = 'L2_basket'
     lamtha = 3.
     key = f'gbar_L2Pyr_{_short_name(target_cell)}'
-    weight = 0.00025
+    weight = params[key]
     loc = 'soma'
     receptor = 'ampa'
     net.add_connection(
@@ -508,7 +508,7 @@ def human_ET_model(params=None, add_drives_from_params=False,
     src_cell = 'L2_basket'
     lamtha = 20.
     key = f'gbar_L2Basket_{_short_name(target_cell)}'
-    weight = 0.02
+    weight = params[key]
     loc = 'soma'
     receptor = 'gabaa'
     net.add_connection(
@@ -521,7 +521,7 @@ def human_ET_model(params=None, add_drives_from_params=False,
     loc = 'soma'
     receptor = 'gabaa'
     key = f'gbar_L5Basket_{_short_name(target_cell)}'
-    weight = 0.02
+    weight = params[key]
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha,
         allow_autapses=False)
@@ -529,7 +529,7 @@ def human_ET_model(params=None, add_drives_from_params=False,
     src_cell = 'L5_pyramidal'
     lamtha = 3.
     key = f'gbar_L5Pyr_{_short_name(target_cell)}'
-    weight = 0.00016666666666666666
+    weight = params[key]
     loc = 'soma'
     receptor = 'ampa'
     net.add_connection(
@@ -538,7 +538,7 @@ def human_ET_model(params=None, add_drives_from_params=False,
     src_cell = 'L2_pyramidal'
     lamtha = 3.
     key = f'gbar_L2Pyr_{_short_name(target_cell)}'
-    weight = 8.333333333333333e-05
+    weight = params[key]
     loc = 'soma'
     receptor = 'ampa'
     net.add_connection(
