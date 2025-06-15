@@ -114,7 +114,7 @@ def jones_2009_model(params=None, add_drives_from_params=False,
             src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # layer2 Basket -> layer5 Pyr
-    src_cell = 'L2_basket'
+    src_cell = 'L2_basket'  
     lamtha = 50.
     key = f'gbar_L2Basket_{_short_name(target_cell)}'
     weight = net._params[key]
@@ -309,7 +309,7 @@ def calcium_model(params=None, add_drives_from_params=False,
 
     return net
 
-def new_calcium_model(params=None, add_drives_from_params=False,
+def human_ET_model(params=None, add_drives_from_params=False,
                   legacy_mode=False, mesh_shape=(10, 10)):
 
 

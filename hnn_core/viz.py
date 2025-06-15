@@ -1413,7 +1413,7 @@ def plot_laminar_csd(times, data, contact_labels, ax=None, colorbar=True,
         vmax = np.max(np.abs(data))
 
     im = ax.pcolormesh(times, new_depths, data,
-                       cmap=cmap, shading='auto', vmin=vmin, vmax=vmax)
+                       cmap=cmap, shading='auto', vmin=vmin, vmax=vmax, rasterized=True)
     ax.set_xlabel('time (s)')
     ax.set_ylabel('electrode depth')
     if colorbar:
