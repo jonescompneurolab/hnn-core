@@ -816,13 +816,9 @@ def pyramidal_l23(cell_name,pos, gid=None):
     p_all = get_L2Pyr_params_new()
 
     gbar_Ih = partial(_exp_g_at_dist, zero_val=p_all['L2Pyr_dend_gbar_Ih'],exp_term = 1/110, slope=2, offset=-0.869600)
-    # gbar_NaTs2_t_32d = partial(_linear_g_at_dist, gsoma=p_all['L2Pyr_soma_gbar_NaTs2_t_32d'], gdend=p_all['L2Pyr_soma_gbar_NaTs2_t_32d']*0.1, xkink=1500)
-    # gbar_SKv3_1 = partial(_linear_g_at_dist, gsoma=p_all['L2Pyr_soma_gbar_SKv3_1']*0.5, gdend=p_all['L2Pyr_soma_gbar_SKv3_1'], xkink=1500)
 
     override_params = dict()
     override_params['L2Pyr_dend_gbar_Ih'] = gbar_Ih
-    # override_params['L2Pyr_basal_gbar_NaTs2_t_32d'] = gbar_NaTs2_t_32d
-    # override_params['L2Pyr_basal_gbar_SKv3_1'] = gbar_SKv3_1
 
     p_all = compare_dictionaries(p_all, override_params)
 
