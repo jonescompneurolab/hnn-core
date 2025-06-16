@@ -14,3 +14,4 @@ from .cells_default import pyramidal, basket
 from .parallel_backends import MPIBackend, JoblibBackend
 
 __version__ = "0.4.2.dev0"
+
