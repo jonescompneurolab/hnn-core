@@ -55,5 +55,8 @@ html_dev-pattern:
 linkcheck:
 	@$(SPHINXBUILD) -b linkcheck -D nitpicky=0 -D plot_gallery=0 -d _build/doctrees . _build/linkcheck
 
+linkcheck-all:
+	@$(SPHINXBUILD) -b linkcheck -D nitpicky=0 -D plot_gallery=0 -D linkcheck_ignore='https://doi.org/10.1152/jn.00535.2009','https://doi.org/10.1152/jn.00122.2010','https://doi.org/10.1101/2021.04.16.440210','http://localhost:8866','https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#' -d _build/doctrees . _build/linkcheck
+
 view:
 	@python -c "import webbrowser; webbrowser.open_new_tab('file://$(PWD)/_build/html/index.html')"
