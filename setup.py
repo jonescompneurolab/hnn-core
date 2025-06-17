@@ -109,6 +109,11 @@ if __name__ == "__main__":
               'Operating System :: POSIX',
               'Operating System :: Unix',
               'Operating System :: MacOS',
+              'Programming Language :: Python :: 3.9',
+              'Programming Language :: Python :: 3.10',
+              'Programming Language :: Python :: 3.11',
+              'Programming Language :: Python :: 3.12',
+              'Programming Language :: Python :: 3.13',
           ],
           platforms='any',
           install_requires=[
@@ -116,10 +121,10 @@ if __name__ == "__main__":
               'NEURON >=7.7; platform_system != "Windows"',
               'matplotlib>=3.5.3',
               'scipy',
-              'h5io'
+              'h5io',
           ],
           extras_require=extras,
-          python_requires='>=3.8',
+          python_requires='>=3.9, <3.14',
           packages=find_packages(),
           package_data={'hnn_core': [
               'param/*.json',
