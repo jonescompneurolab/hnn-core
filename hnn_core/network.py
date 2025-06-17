@@ -27,102 +27,6 @@ from .hnn_io import write_network_configuration, network_to_dict
 from .externals.mne import copy_doc
 
 
-def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
-    """Creates coordinate grid and place cells in it.
-
-    Parameters
-    ----------
-    n_pyr_x : int
-        The number of Pyramidal cells in x direction.
-    n_pyr_y : int
-        The number of Pyramidal cells in y direction.
-    zdiff : float
-        Expressed as a positive DEPTH of L2 relative to L5 pyramidal cell
-        somas, where L5 is defined to lie at z==0. Interlaminar weight/delay
-        calculations (lamtha) are not affected. The basket cells are
-        arbitrarily placed slightly above (L5) and slightly below (L2) their
-        respective pyramidal cell layers.
-    inplane_distance : float
-        The grid spacing of pyramidal cells (in um). Note that basket cells are
-        placed in an uneven formation. Each one of them lies on a grid point
-        together with a pyramidal cell, though (overlapping).
-
-    Returns
-    -------
-    pos_dict : dict of list of tuple (x, y, z)
-        Dictionary containing coordinate positions.
-        Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
-        'common', or any of the elements of the list p_unique_keys
-
-    Notes
-    -----
-    Common positions are all located at origin.
-    Sort of a hack because of redundancy.
-    """
-    def _calc_pyramidal_coord(xxrange, yyrange, zdiff):
-        list_coords = [pos for pos in it.product(xxrange, yyrange, [zdiff])]
-        return list_coords
-
-    def _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff, inplane_distance, weight):
-        xzero = np.arange(0, n_pyr_x, 3) * inplane_distance
-        xone = np.arange(1, n_pyr_x, 3) * inplane_distance
-        # split even and odd y vals
-        yeven = np.arange(0, n_pyr_y, 2) * inplane_distance
-        yodd = np.arange(1, n_pyr_y, 2) * inplane_distance
-        # create general list of x,y coords and sort it
-        coords = [pos for pos in it.product(
-            xzero, yeven)] + [pos for pos in it.product(xone, yodd)]
-        coords_sorted = sorted(coords, key=lambda pos: pos[1])
-
-        # append the z value for position
-        list_coords = [(pos_xy[0], pos_xy[1], weight * zdiff)
-                       for pos_xy in coords_sorted]
-
-        return list_coords
-
-    def _calc_origin(xxrange, yyrange, zdiff):
-        # origin's z component isn't used in calculating distance functions.
-        # will be used for adding external drives.
-        origin_x = xxrange[int((len(xxrange) - 1) // 2)]
-        origin_y = yyrange[int((len(yyrange) - 1) // 2)]
-        origin_z = np.floor(zdiff / 2)
-        origin = (origin_x, origin_y, origin_z)
-        return origin
-
-    # Calculate distances
-    xxrange = np.arange(n_pyr_x) * inplane_distance
-    yyrange = np.arange(n_pyr_y) * inplane_distance
-
-    pos_dict = {
-        'L5_pyramidal': _calc_pyramidal_coord(xxrange, yyrange, zdiff=0),
-        'L2_pyramidal': _calc_pyramidal_coord(xxrange, yyrange, zdiff=zdiff),
-        'L5_basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
-                                        inplane_distance, weight=0.2
-                                        ),
-        'L2_basket': _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff,
-                                        inplane_distance, weight=0.8
-                                        ),
-        'origin': _calc_origin(xxrange, yyrange, zdiff),
-    }
-
-    return pos_dict
-
-
-def _compare_lists(s, t):
-    """
-    Compares lists for equality
-
-    From https://stackoverflow.com/a/7829388
-    """
-    t = list(t)  # make a mutable copy
-    try:
-        for elem in s:
-            t.remove(elem)
-    except ValueError:
-        return False
-    return not t
-
-
 def _connection_probability(conn, probability, conn_seed=None):
     """Remove/keep a random subset of connections.
 
@@ -365,7 +269,7 @@ class Network:
     """
 
     def __init__(self, params, add_drives_from_params=False,
-                legacy_mode=False, mesh_shape=(10, 10), custom_positions=None):  # CHANGED PARAMETER NAME
+                 legacy_mode=False, pos_dict=None, cell_types=None):
         # Save the parameters used to create the Network
         _validate_type(params, dict, 'params')
         self._params = params
@@ -390,52 +294,49 @@ class Network:
             warnings.warn(
                 'Legacy mode is used solely to maintain compatibility with'
                 '.param files of the old HNN GUI. This feature will be '
-                'deprecrated in future releases.', DeprecationWarning,
+                'deprecated in future releases.', DeprecationWarning,
                 stacklevel=1)
-
-        # Define default cell types
-        cell_types = {
-            'L2_basket': basket(cell_name=_short_name('L2_basket')),
-            'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
-            'L5_basket': basket(cell_name=_short_name('L5_basket')),
-            'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
-        }
         
-        # Validate mesh_shape
-        _validate_type(mesh_shape, tuple, 'mesh_shape')
-        _validate_type(mesh_shape[0], int, 'mesh_shape[0]')
-        _validate_type(mesh_shape[1], int, 'mesh_shape[1]')
-        
-        if mesh_shape[0] < 1 or mesh_shape[1] < 1:
-            raise ValueError(f'mesh_shape must be a tuple of positive '
-                            f'integers, got: {mesh_shape}')
-        
-        self._N_pyr_x = mesh_shape[0]
-        self._N_pyr_y = mesh_shape[1]
+        # Store layer parameters for potential use
         self._inplane_distance = 1.0
         self._layer_separation = 1307.4
-                
-        # default positions first
-        self.set_cell_positions(
-            inplane_distance=self._inplane_distance,
-            layer_separation=self._layer_separation,
-        )
         
-        # Then apply custom positions if provided
-        if custom_positions is not None:
-            self._apply_custom_positions(custom_positions)
+        # Apply provided positions if any
+        if pos_dict is not None:
+            _validate_type(pos_dict, dict, 'pos_dict')
+            self.pos_dict = deepcopy(pos_dict)
+            
+            # Try to infer grid size from positions if pyramidal cells present
+            for cell_type in ['L2_pyramidal', 'L5_pyramidal']:
+                if cell_type in self.pos_dict and len(self.pos_dict[cell_type]) > 0:
+                    n_cells = len(self.pos_dict[cell_type])
+                    # Simple square root for grid size estimation
+                    side = int(np.sqrt(n_cells))
+                    self._N_pyr_x = side
+                    self._N_pyr_y = side
+                    break
+            else:
+                # Default if no pyramidal cells
+                self._N_pyr_x = 10
+                self._N_pyr_y = 10
+        else:
+            self._N_pyr_x = 10
+            self._N_pyr_y = 10
         
-        # Add cell types that have positions
-        for cell_name in cell_types:
-            if cell_name in self.pos_dict and len(self.pos_dict[cell_name]) > 0:
-                self._add_cell_type(cell_name, self.pos_dict[cell_name],
-                                cell_template=cell_types[cell_name])
+        # Add cell types if provided
+        if cell_types is not None:
+            _validate_type(cell_types, dict, 'cell_types')
+            for cell_name, cell_template in cell_types.items():
+                if cell_name in self.pos_dict and len(self.pos_dict[cell_name]) > 0:
+                    self._add_cell_type(cell_name, self.pos_dict[cell_name],
+                                        cell_template=cell_template)
         
         if add_drives_from_params:
             _add_drives_from_params(self)
 
         self._tstop = None
         self._dt = None
+
     def _apply_custom_positions(self, custom_positions):
         """Apply custom positions to specific cell types.
         
@@ -572,56 +473,6 @@ class Network:
             self.cell_types.update({cell_name: cell_template})
             self._n_cells += len(pos)
 
-    def set_cell_positions(self, *, inplane_distance=None, layer_separation=None):
-        """Set relative positions of cells arranged in a square grid
-
-        Note that it is possible to change only a subset of the parameters
-        (the default value of each is None, which implies no change).
-        
-        Parameters
-        ----------
-        inplane_distance : float
-            The in plane-distance (in um) between pyramidal cell somas in the
-            square grid. Note that this parameter does not affect the amplitude
-            of the dipole moment.
-        layer_separation : float
-            The separation of pyramidal cell soma layers 2/3 and 5. Note that
-            this parameter does not affect the amplitude of the dipole moment.
-        """
-    
-        if inplane_distance is None:
-            inplane_distance = self._inplane_distance
-        _validate_type(inplane_distance, (float, int), "inplane_distance")
-        if not inplane_distance > 0.0:
-            raise ValueError(
-                f"In-plane distance must be positive, got: {inplane_distance}"
-            )
-
-        if layer_separation is None:
-            layer_separation = self._layer_separation
-        _validate_type(layer_separation, (float, int), "layer_separation")
-        if not layer_separation > 0.0:
-            raise ValueError(
-                f"Layer separation must be positive, got: {layer_separation}"
-            )
-
-        pos = _create_cell_coords(
-            n_pyr_x=self._N_pyr_x,
-            n_pyr_y=self._N_pyr_y,
-            zdiff=layer_separation,
-            inplane_distance=inplane_distance,
-        )
-        # update positions of the real cells
-        for key in pos.keys():
-            self.pos_dict[key] = pos[key]
-
-        # update drives to be positioned at network origin
-        for drive_name, drive in self.external_drives.items():
-            pos = [self.pos_dict["origin"]] * drive["n_drive_cells"]
-            self.pos_dict[drive_name] = pos
-
-        self._inplane_distance = inplane_distance
-        self._layer_separation = layer_separation
 
     def copy(self):
         """Return a copy of the Network instance

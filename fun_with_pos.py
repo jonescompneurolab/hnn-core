@@ -96,3 +96,18 @@ net_hnn = jones_2009_model(custom_positions={
 print("phewww")
 net_hnn.plot_cells()
 
+# some assertation based tests
+# checking that positions were applied correctly
+net4 = jones_2009_model(custom_positions={'L2_pyramidal': [(0, 0, 1307.4)]})
+assert len(net4.pos_dict['L2_pyramidal']) == 1
+assert net4.pos_dict['L2_pyramidal'][0] == (0, 0, 1307.4)
+print("Custom positions applied correctly")
+
+# are the other cell types still existing with default positions
+assert 'L2_basket' in net4.pos_dict
+assert len(net4.pos_dict['L2_basket']) > 0
+print("Default positions preserved for other cell types")
+
+# Check that connectivity still works
+assert len(net4.connectivity) > 0
+print("Connectivity established")
