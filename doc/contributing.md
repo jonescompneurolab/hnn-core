@@ -470,34 +470,38 @@ types of failures will be marked as a failure in CI.
 ## Making changes to the default network
 
 If you ever need to make scientific or technical changes to the default network, you
-must change at least three files:
+need to do three things:
 
-1. `hnn_core/param/default.json`: This is the base file used for the important
-   `jones_2009_model()` function. Make sure that if you need to change certain
-   parameters, then change them in this all-important file **manually**. Note that not
-   all parameters are in this file.
+1. Step 1: If needed, manually make changes to `hnn_core/param/default.json`. This is
+   the base file used for the important `jones_2009_model()` function. Make sure that if
+   you need to change certain parameters, then change them in this all-important file
+   **manually**. Note that not all parameters are in this file. If your changes do not
+   affect the parameters in this file, then you don't need to make any change to the
+   file.
 
-2. `hnn_core/param/jones2009_base.json`: This is the base file used for the GUI. This
-   file has been built using the code in `hnn_core/params.py::convert_to_json`. You do
-   **not** have to change this file manually. Instead, you should "regenerate" this file
-   (overwriting it in-place) using the following make command from the top-level of the
-   repository:
+2. Step 2: Run the following command from the top-level of the repository:
 
-```
-make regenerate-base-network
-```
+    ```
+    make regenerate-networks
+    ```
 
-3. `hnn_core/test/assets/jones2009_3x3_drives.json`: This is the base file used for many
-   tests. This file has been built using the script in
-   `hnn_core/tests/regenerate_test_network.py`. You do **not** have to change this file
-   manually. Instead, you should "regenerate" this file (overwriting it in-place) using
-   the following make command from the top-level of the repository:
+    This command runs two scripts, each of which rebuild a particular "hierarchical
+    JSON" network file which are used in HNN-Core. These two files are described
+    below. Note that you do **not** need to make manual changes to these files; running
+    the above command is sufficient. However, you **do** need to commit the new
+    versions of these files. The two files:
 
-```
-make regenerate-test-network
-```
+    A. `hnn_core/param/jones2009_base.json`: This is the base file used for the
+       GUI. This file has been built using the code in
+       `hnn_core/params.py::convert_to_json` by way of
+       `dev_scripts/regenerate_base_network.py`.
 
-Once you do this, make sure to re-run all the tests using `make test` to ensure that
-numerical tests dependent on the network itself have not broken.
+    B. `hnn_core/test/assets/jones2009_3x3_drives.json`: This is the base file used for
+       many tests. This file has been built using the script in
+       `hnn_core/tests/regenerate_test_network.py`.
+
+3. Step 3: Once all the above versions of the network have been updated, make sure to
+   re-run all the tests using `make test`! If the new network files break tests, then
+   that breakage needs to be fixed before we can merge your updates.
 
 [used in MNE-Python]: https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#L124-L132

@@ -44,10 +44,8 @@ lint:
 modl:
 	cd hnn_core/mod/ && nrnivmodl
 
-regenerate-base-network:
+regenerate-networks:
 	python ./dev_scripts/regenerate_base_network.py
-
-regenerate-test-network:
 	python ./hnn_core/tests/regenerate_test_network.py
 
 spell:
