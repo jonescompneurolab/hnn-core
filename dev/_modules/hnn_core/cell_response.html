@@ -495,6 +495,7 @@ document.write(`
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">glob</span><span class="w"> </span><span class="kn">import</span> <span class="n">glob</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_spikes_hist</span><span class="p">,</span> <span class="n">plot_spikes_raster</span>
@@ -814,8 +815,22 @@ document.write(`
 <span class="sd">            An axis object from matplotlib. If None, a new figure is created.</span>
 <span class="sd">        show : bool</span>
 <span class="sd">            If True, show the figure.</span>
-<span class="sd">        colors: list of str | None</span>
+<span class="sd">        cell_types : list of str</span>
+<span class="sd">            List of cell types to plot</span>
+<span class="sd">        colors : list of str | None</span>
 <span class="sd">            Optional custom colors to plot. Default will use the color cycler.</span>
+<span class="sd">        show_legend : bool</span>
+<span class="sd">            If True, show the legend with colors for cell types</span>
+<span class="sd">        marker_size : float</span>
+<span class="sd">            Optional marker size to use when plotting spikes. Uses</span>
+<span class="sd">            &quot;linelengths&quot; argument of ax.eventplot, which accepts positive</span>
+<span class="sd">            numeric values only</span>
+<span class="sd">        dpl : instance of Dipole | list</span>
+<span class="sd">            The Dipole object containing layer-specific dipole data</span>
+<span class="sd">            to overlay on the raster plot</span>
+<span class="sd">        overlay_dipoles : bool</span>
+<span class="sd">            If True, overlay the layer-specific dipole data on the</span>
+<span class="sd">            raster plot</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>

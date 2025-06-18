@@ -692,7 +692,21 @@ the name of this group must be used to specify the colors.</p>
 </dd>
 <dt><strong>show</strong><span class="classifier">bool</span></dt><dd><p>If True, show the figure.</p>
 </dd>
-<dt><strong>colors: list of str | None</strong></dt><dd><p>Optional custom colors to plot. Default will use the color cycler.</p>
+<dt><strong>cell_types</strong><span class="classifier">list of str</span></dt><dd><p>List of cell types to plot</p>
+</dd>
+<dt><strong>colors</strong><span class="classifier">list of str | None</span></dt><dd><p>Optional custom colors to plot. Default will use the color cycler.</p>
+</dd>
+<dt><strong>show_legend</strong><span class="classifier">bool</span></dt><dd><p>If True, show the legend with colors for cell types</p>
+</dd>
+<dt><strong>marker_size</strong><span class="classifier">float</span></dt><dd><p>Optional marker size to use when plotting spikes. Uses
+“linelengths” argument of ax.eventplot, which accepts positive
+numeric values only</p>
+</dd>
+<dt><strong>dpl</strong><span class="classifier">instance of Dipole | list</span></dt><dd><p>The Dipole object containing layer-specific dipole data
+to overlay on the raster plot</p>
+</dd>
+<dt><strong>overlay_dipoles</strong><span class="classifier">bool</span></dt><dd><p>If True, overlay the layer-specific dipole data on the
+raster plot</p>
 </dd>
 </dl>
 </dd>
