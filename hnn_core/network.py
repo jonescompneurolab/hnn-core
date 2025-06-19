@@ -280,9 +280,8 @@ class Network:
     produce a network with no cell-to-cell connections. As such,
     connectivity information contained in ``params`` will be ignored.
     """
-
-    def __init__(self, params, add_drives_from_params=False,
-                 legacy_mode=False, pos_dict=None, cell_types=None):
+    def __init__(self, params, add_drives_from_params=False, legacy_mode=False, 
+                 pos_dict=None, cell_types=None, mesh_shape=None):
         # Save the parameters used to create the Network
         _validate_type(params, dict, 'params')
         self._params = params

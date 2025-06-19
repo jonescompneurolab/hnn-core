@@ -415,13 +415,18 @@ def dict_to_network(net_data,
     params['celsius'] = net_data['celsius']
     params['threshold'] = net_data['threshold']
 
-    mesh_shape = (net_data['N_pyr_x'], net_data['N_pyr_y'])
+    # Read cell types from the saved data
+    cell_types = _read_cell_types(net_data['cell_types'])
+    pos_dict = _read_pos_dict(net_data['pos_dict'])
+
 
     # Instantiating network
     net = Network(params,
-                  mesh_shape=mesh_shape,
-                  legacy_mode=net_data['legacy_mode']
-                  )
+                  pos_dict=pos_dict,
+                  cell_types=cell_types,
+                  legacy_mode=net_data['legacy_mode'])
+    net._N_pyr_x = net_data['N_pyr_x']
+    net._N_pyr_y = net_data['N_pyr_y']
 
     # Setting attributes
     # Set cell types
