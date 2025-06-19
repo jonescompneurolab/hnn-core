@@ -96,7 +96,7 @@ net_hnn = jones_2009_model(custom_positions={
 print("phewww")
 net_hnn.plot_cells()
 
-# some assertation based tests
+# some assertion based tests
 # checking that positions were applied correctly
 net4 = jones_2009_model(custom_positions={'L2_pyramidal': [(0, 0, 1307.4)]})
 assert len(net4.pos_dict['L2_pyramidal']) == 1

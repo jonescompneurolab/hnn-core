@@ -7,7 +7,6 @@
 #          Nick Tolley <nicholas_tolley@brown.edu>
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 
-import itertools as it
 from copy import deepcopy
 from collections import OrderedDict, defaultdict
 
@@ -17,14 +16,28 @@ import warnings
 from .drives import _drive_cell_event_times
 from .drives import _get_target_properties, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
-from .cells_default import pyramidal, basket
-from .params import _long_name, _short_name
+from .params import _long_name
 from .viz import plot_cells
 from .externals.mne import _validate_type, _check_option
 from .extracellular import ExtracellularArray
 from .check import _check_gids, _gid_to_type, _string_input_to_list
 from .hnn_io import write_network_configuration, network_to_dict
 from .externals.mne import copy_doc
+
+
+def _compare_lists(s, t):
+    """
+    Compares lists for equality
+
+    From https://stackoverflow.com/a/7829388
+    """
+    t = list(t)  # make a mutable copy
+    try:
+        for elem in s:
+            t.remove(elem)
+    except ValueError:
+        return False
+    return not t
 
 
 def _connection_probability(conn, probability, conn_seed=None):
@@ -407,7 +420,7 @@ class Network:
                 "Changing the number of cells for an existing cell type "
                 "is not yet supported. Consider creating a new network."
             )
-
+    '''
     def add_cell_type(self, cell_name, cell_template, positions):
         """Add a new cell type with specified positions.
         
@@ -429,6 +442,7 @@ class Network:
         # Add the cell type
         self._add_cell_type(cell_name, self.pos_dict[cell_name], 
                         cell_template=cell_template)
+        '''
 
     def __repr__(self):
         class_name = self.__class__.__name__
