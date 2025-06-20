@@ -9,8 +9,7 @@ on:
   #   branches:
   #     - master
   push:
-    branches:
-      - asoplata:auto-release-pypi
+    branches: ['**']
     tags:
       - v0.*
 
