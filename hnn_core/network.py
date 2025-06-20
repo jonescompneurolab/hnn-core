@@ -327,13 +327,14 @@ class Network:
                     self._N_pyr_x = side
                     self._N_pyr_y = side
                     break
-            else:
-                # Default if no pyramidal cells
-                self._N_pyr_x = 10
-                self._N_pyr_y = 10
+                else:
+                    # Default if no pyramidal cells
+                    self._N_pyr_x = 10
+                    self._N_pyr_y = 10
         else:
             self._N_pyr_x = 10
             self._N_pyr_y = 10
+                    
         
         # Add cell types if provided
         if cell_types is not None:
