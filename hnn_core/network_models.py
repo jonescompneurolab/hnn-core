@@ -5,98 +5,11 @@
 import os.path as op
 import hnn_core
 from hnn_core import read_params
-from .network import Network
+from .network import Network, _create_cell_coords
 from .params import _short_name
 from .cells_default import pyramidal_ca
 from .externals.mne import _validate_type
 from .cells_default import pyramidal, basket
-import itertools as it
-import numpy as np
-
-
-def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
-    """Creates coordinate grid for different cortical layers.
-
-    Parameters
-    ----------
-    n_pyr_x : int
-        The number of cells in x direction.
-    n_pyr_y : int
-        The number of cells in y direction.
-    zdiff : float
-        Expressed as a positive DEPTH of L2 relative to L5 cell
-        somas, where L5 is defined to lie at z==0.
-    inplane_distance : float
-        The grid spacing of cells (in um).
-
-    Returns
-    -------
-    layer_dict : dict of list of tuple (x, y, z)
-        Dictionary containing coordinate positions for each layer.
-        Keys are 'L5_bottom', 'L2_bottom', 'L5_mid', 'L2_mid', 'origin'
-    """
-    def _calc_grid_positions(xxrange, yyrange, z_coord):
-        """Calculate positions on a regular grid at given z-coordinate."""
-        list_coords = [pos for pos in it.product(xxrange, yyrange, [z_coord])]
-        return list_coords
-
-    def _calc_basket_positions(n_x, n_y, z_coord, inplane_distance):
-        """Calculate basket cell positions in checkerboard pattern."""
-        xzero = np.arange(0, n_x, 3) * inplane_distance
-        xone = np.arange(1, n_x, 3) * inplane_distance
-        # split even and odd y vals
-        yeven = np.arange(0, n_y, 2) * inplane_distance
-        yodd = np.arange(1, n_y, 2) * inplane_distance
-        # create general list of x,y coords and sort it
-        coords = [pos for pos in it.product(xzero, yeven)] + \
-                 [pos for pos in it.product(xone, yodd)]
-        coords_sorted = sorted(coords, key=lambda pos: pos[1])
-
-        # append the z value for position
-        list_coords = [(pos_xy[0], pos_xy[1], z_coord)
-                       for pos_xy in coords_sorted]
-        return list_coords
-
-    def _calc_origin(xxrange, yyrange, zdiff):
-        """Calculate the origin position."""
-        origin_x = xxrange[int((len(xxrange) - 1) // 2)]
-        origin_y = yyrange[int((len(yyrange) - 1) // 2)]
-        origin_z = np.floor(zdiff / 2)
-        origin = (origin_x, origin_y, origin_z)
-        return origin
-
-    # Calculate coordinate ranges
-    xxrange = np.arange(n_pyr_x) * inplane_distance
-    yyrange = np.arange(n_pyr_y) * inplane_distance
-
-    # Create layer dictionary with anatomical layer positions
-    layer_dict = {
-        'L5_bottom': _calc_grid_positions(xxrange, yyrange, z_coord=0),
-        'L2_bottom': _calc_grid_positions(xxrange, yyrange, z_coord=zdiff),
-        'L5_mid': _calc_basket_positions(n_pyr_x, n_pyr_y, 
-                                         z_coord=0.2 * zdiff, 
-                                         inplane_distance=inplane_distance),
-        'L2_mid': _calc_basket_positions(n_pyr_x, n_pyr_y, 
-                                         z_coord=0.8 * zdiff, 
-                                         inplane_distance=inplane_distance),
-        'origin': _calc_origin(xxrange, yyrange, zdiff),
-    }
-
-    return layer_dict
-
-def _compare_lists(s, t):
-    """
-    Compares lists for equality
-
-    From https://stackoverflow.com/a/7829388
-    """
-    t = list(t)  # make a mutable copy
-    try:
-        for elem in s:
-            t.remove(elem)
-    except ValueError:
-        return False
-    return not t
 
 
 def jones_2009_model(params=None, add_drives_from_params=False,

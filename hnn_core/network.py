@@ -9,6 +9,7 @@
 
 from copy import deepcopy
 from collections import OrderedDict, defaultdict
+import itertools as it
 
 import numpy as np
 import warnings
@@ -25,6 +26,76 @@ from .hnn_io import write_network_configuration, network_to_dict
 from .externals.mne import copy_doc
 
 
+def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
+    """Creates coordinate grid for different cortical layers.
+
+    Parameters
+    ----------
+    n_pyr_x : int
+        The number of cells in x direction.
+    n_pyr_y : int
+        The number of cells in y direction.
+    zdiff : float
+        Expressed as a positive DEPTH of L2 relative to L5 cell
+        somas, where L5 is defined to lie at z==0.
+    inplane_distance : float
+        The grid spacing of cells (in um).
+
+    Returns
+    -------
+    layer_dict : dict of list of tuple (x, y, z)
+        Dictionary containing coordinate positions for each layer.
+        Keys are 'L5_bottom', 'L2_bottom', 'L5_mid', 'L2_mid', 'origin'
+    """
+    def _calc_grid_positions(xxrange, yyrange, z_coord):
+        """Calculate positions on a regular grid at given z-coordinate."""
+        list_coords = [pos for pos in it.product(xxrange, yyrange, [z_coord])]
+        return list_coords
+
+    def _calc_basket_positions(n_x, n_y, z_coord, inplane_distance):
+        """Calculate basket cell positions in checkerboard pattern."""
+        xzero = np.arange(0, n_x, 3) * inplane_distance
+        xone = np.arange(1, n_x, 3) * inplane_distance
+        # split even and odd y vals
+        yeven = np.arange(0, n_y, 2) * inplane_distance
+        yodd = np.arange(1, n_y, 2) * inplane_distance
+        # create general list of x,y coords and sort it
+        coords = [pos for pos in it.product(xzero, yeven)] + \
+                 [pos for pos in it.product(xone, yodd)]
+        coords_sorted = sorted(coords, key=lambda pos: pos[1])
+
+        # append the z value for position
+        list_coords = [(pos_xy[0], pos_xy[1], z_coord)
+                       for pos_xy in coords_sorted]
+        return list_coords
+
+    def _calc_origin(xxrange, yyrange, zdiff):
+        """Calculate the origin position."""
+        origin_x = xxrange[int((len(xxrange) - 1) // 2)]
+        origin_y = yyrange[int((len(yyrange) - 1) // 2)]
+        origin_z = np.floor(zdiff / 2)
+        origin = (origin_x, origin_y, origin_z)
+        return origin
+
+    # Calculate coordinate ranges
+    xxrange = np.arange(n_pyr_x) * inplane_distance
+    yyrange = np.arange(n_pyr_y) * inplane_distance
+
+    # Create layer dictionary with anatomical layer positions
+    layer_dict = {
+        'L5_bottom': _calc_grid_positions(xxrange, yyrange, z_coord=0),
+        'L2_bottom': _calc_grid_positions(xxrange, yyrange, z_coord=zdiff),
+        'L5_mid': _calc_basket_positions(n_pyr_x, n_pyr_y, 
+                                         z_coord=0.2 * zdiff, 
+                                         inplane_distance=inplane_distance),
+        'L2_mid': _calc_basket_positions(n_pyr_x, n_pyr_y, 
+                                         z_coord=0.8 * zdiff, 
+                                         inplane_distance=inplane_distance),
+        'origin': _calc_origin(xxrange, yyrange, zdiff),
+    }
+
+    return layer_dict
+
 def _compare_lists(s, t):
     """
     Compares lists for equality
@@ -38,7 +109,6 @@ def _compare_lists(s, t):
     except ValueError:
         return False
     return not t
-
 
 def _connection_probability(conn, probability, conn_seed=None):
     """Remove/keep a random subset of connections.
@@ -395,32 +465,73 @@ class Network:
                     self._N_pyr_y = side
                     break
 
-    def update_cell_positions(self, cell_type, positions):
-        """Update positions for a specific cell type.
-        
+    def set_cell_positions(self, *, pos_dict=None, inplane_distance=None, 
+                           layer_separation=None):
+        """Set cell positions using a position dictionary or grid parameters.
+
         Parameters
         ----------
-        cell_type : str
-            Name of the cell type to update
-        positions : list of tuple
-            List of (x, y, z) positions for the cells
+        pos_dict : dict, optional
+            Dictionary with cell type names as keys and position lists as values.
+            If provided, this overrides grid-based positioning.
+        inplane_distance : float, optional
+            The in-plane distance (in um) between cells in the grid.
+        layer_separation : float, optional
+            The separation of layers 2/3 and 5.
         """
-        if cell_type not in self.cell_types:
-            raise ValueError(f"Cell type '{cell_type}' not found in network")
-        
-        self._apply_custom_positions({cell_type: positions})
-        
-        # Update gid_ranges if number of cells changed
-        old_n_cells = len(self.gid_ranges[cell_type])
-        new_n_cells = len(positions)
-        
-        if old_n_cells != new_n_cells:
-            # This is more complex - would need to reassign all GIDs
-            raise NotImplementedError(
-                "Changing the number of cells for an existing cell type "
-                "is not yet supported. Consider creating a new network."
+        if pos_dict is not None:
+            _validate_type(pos_dict, dict, 'pos_dict')
+            self.pos_dict = deepcopy(pos_dict)
+            
+            # Update drives to network origin if it exists
+            if 'origin' in self.pos_dict:
+                for drive_name, drive in self.external_drives.items():
+                    pos = [self.pos_dict['origin']] * drive['n_drive_cells']
+                    self.pos_dict[drive_name] = pos
+        else:
+            # Use grid-based positioning (backward compatibility)
+            if inplane_distance is None:
+                inplane_distance = self._inplane_distance
+            if layer_separation is None:
+                layer_separation = self._layer_separation
+                
+            _validate_type(inplane_distance, (float, int), "inplane_distance")
+            _validate_type(layer_separation, (float, int), "layer_separation")
+            
+            if not inplane_distance > 0.0:
+                raise ValueError(
+                    f"In-plane distance must be positive, got: {inplane_distance}"
+                )
+            if not layer_separation > 0.0:
+                raise ValueError(
+                    f"Layer separation must be positive, got: {layer_separation}"
+                )
+            
+            # Get layer positions
+            layer_dict = _create_cell_coords(
+                n_pyr_x=self._N_pyr_x,
+                n_pyr_y=self._N_pyr_y,
+                zdiff=layer_separation,
+                inplane_distance=inplane_distance,
             )
-    '''
+            
+            # Create default pos_dict (for backward compatibility)
+            self.pos_dict = {
+                'L5_pyramidal': layer_dict['L5_bottom'],
+                'L2_pyramidal': layer_dict['L2_bottom'],
+                'L5_basket': layer_dict['L5_mid'],
+                'L2_basket': layer_dict['L2_mid'],
+                'origin': layer_dict['origin']
+            }
+            
+            # Update drives to network origin
+            for drive_name, drive in self.external_drives.items():
+                pos = [layer_dict['origin']] * drive['n_drive_cells']
+                self.pos_dict[drive_name] = pos
+            
+            self._inplane_distance = inplane_distance
+            self._layer_separation = layer_separation
+            '''
     def add_cell_type(self, cell_name, cell_template, positions):
         """Add a new cell type with specified positions.
         
