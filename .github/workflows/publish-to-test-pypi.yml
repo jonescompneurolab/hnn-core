@@ -1,8 +1,14 @@
 name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
 
+# Relevant documentation links:
+# - https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
+# - https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#running-your-workflow-only-when-a-push-of-specific-tags-occurs
+
 on:
+  # push:
   pull_request:
-    branches: ['**']
+    tags:
+      - v0.*
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -21,6 +27,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
+        # Note that this uses the "newest available Python 3 release"
         python-version: "3.x"
 
     - name: Install some preliminary build libs
