@@ -6,7 +6,11 @@ name: Publish Python 🐍 distribution 📦 to PyPI and TestPyPI
 
 on:
   # push:
-  pull_request:
+  #   branches:
+  #     - master
+  push:
+    branches:
+      - auto-release-pypi
     tags:
       - v0.*
 
