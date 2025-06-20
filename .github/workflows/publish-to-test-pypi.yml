@@ -70,8 +70,6 @@ jobs:
     name: Publish Python 🐍 distribution 📦 to TestPyPI
     needs:
     - build
-    - setuptools
-    - twine
     runs-on: ubuntu-latest
 
     environment:
