@@ -10,7 +10,7 @@ on:
   #     - master
   push:
     branches:
-      - auto-release-pypi
+      - asoplata:auto-release-pypi
     tags:
       - v0.*
 
