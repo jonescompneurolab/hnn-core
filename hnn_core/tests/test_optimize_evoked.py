@@ -160,7 +160,7 @@ def test_optimize_evoked():
         )
 
     which_drives = ["evprox1"]  # drive selected to optimize
-    maxiter = 10
+    maxiter = 12
     # try without returning iteration RMSE first
     net_opt = optimize_evoked(
         net_offset,

@@ -510,7 +510,7 @@ def optimize_evoked(
         The initial dipole to start the optimization.
     maxiter : int
         The maximum number of simulations to run for optimizing
-        one "chunk".
+        one "chunk". Must be at least 12 or greater.
     timing_range_multiplier : float
         The scale of timing values to sweep over.
     sigma_range_multiplier : float
@@ -623,6 +623,11 @@ def optimize_evoked(
         if maxiter == 0:
             print("Skipping optimization step %d (0 simulations)" % (step + 1))
             continue
+        elif maxiter < 12:
+            print(
+                "'maxiter' must be at least 12 for optimization to run. Increasing 'maxiter' to 12."
+            )
+            maxiter = 12
 
         if opt_params["cur_step"] > 0 and opt_params["cur_step"] == total_steps - 1:
             # For the last step (all inputs), recalculate ranges and update
