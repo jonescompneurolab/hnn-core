@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from pathlib import Path
+from shutil import copy
 
 from hnn_core import read_params, jones_2009_model
 
@@ -112,10 +113,28 @@ def jones_2009_additional_features():
 
 if __name__ == "__main__":
     new_test_network_path = assets_path.joinpath("jones2009_3x3_drives.json")
+
+    backup_path = Path(
+        new_test_network_path.parent,
+        (
+            new_test_network_path.stem
+            + "-pre_regen_BACKUP"
+            + new_test_network_path.suffix
+        ),
+    )
+
     print(f"""
-    Note that this will OVERWRITE the current contents of
-    '{new_test_network_path}' with a fresh generation of the smaller test
-    network! Only use this if you know what you are doing.
+Note that this will OVERWRITE the current contents of
+
+'{new_test_network_path}'
+
+with a fresh generation of the smaller test network! Only use this if you know
+what you are doing. This will make a backup located at
+
+'{backup_path}'
     """)
+
+    copy(new_test_network_path, backup_path)
+
     net = jones_2009_additional_features()
     net.write_configuration(new_test_network_path)
