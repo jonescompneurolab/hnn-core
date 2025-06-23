@@ -14,8 +14,7 @@ from .externals.mne import _validate_type
 def jones_2009_model(
     params=None, add_drives_from_params=False, legacy_mode=False, mesh_shape=(10, 10)
 ):
-    """Instantiate the network model described in
-    Jones et al. J. of Neurophys. 2009 [1]_
+    """Instantiate the network model described in Jones et al. 2009 [1]_
 
     Parameters
     ----------
@@ -47,12 +46,20 @@ def jones_2009_model(
     connectivity pattern is applied between cells. Inhibitory basket cells are
     present at a 1:3-ratio.
 
+    This network was first described in Jones et al. 2009 [1]_ , and this code provides
+    the implementation used in Neymotin et al. 2020 [2]_ .
+
     References
     ----------
     .. [1] Jones, Stephanie R., et al. "Quantitative Analysis and
            Biophysically Realistic Neural Modeling of the MEG Mu Rhythm:
            Rhythmogenesis and Modulation of Sensory-Evoked Responses."
            Journal of Neurophysiology 102, 3554–3572 (2009).
+           https://doi.org/10.1152/jn.00535.2009
+
+    .. [2] Neymotin, Samuel A, et al. 2020. "Human Neocortical Neurosolver (HNN), a New
+           Software Tool for Interpreting the Cellular and Network Origin of Human
+           MEG/EEG Data." eLife 9 (January):e51214. https://doi.org/10.7554/eLife.51214
 
     """
     hnn_core_root = op.dirname(hnn_core.__file__)
