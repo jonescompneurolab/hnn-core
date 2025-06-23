@@ -9,11 +9,11 @@ on:
 
 permissions:
   contents: read
-  
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-  
+
 jobs:
   codespell:
     name: Check for spelling errors
@@ -24,3 +24,4 @@ jobs:
         uses: actions/checkout@v4
       - name: Codespell
         uses: codespell-project/actions-codespell@v2
+
