@@ -269,12 +269,12 @@
                     "Ra": 200.0,
                     "end_pts": [
                         [
+                            2.842170943040401e-14,
                             0.0,
-                            0.0,
-                            -85.0
+                            -84.99999999999997
                         ],
                         [
-                            -180.31222920256963,
+                            -180.3122292025696,
                             0.0,
                             -265.3122292025696
                         ]
@@ -305,12 +305,12 @@
                     "Ra": 200.0,
                     "end_pts": [
                         [
+                            -2.842170943040401e-14,
                             0.0,
-                            0.0,
-                            -85.0
+                            -84.99999999999997
                         ],
                         [
-                            180.31222920256963,
+                            180.3122292025696,
                             0.0,
                             -265.3122292025696
                         ]
@@ -955,12 +955,12 @@
                     "Ra": 200.0,
                     "end_pts": [
                         [
+                            2.842170943040401e-14,
                             0.0,
-                            0.0,
-                            -85.0
+                            -84.99999999999997
                         ],
                         [
-                            -180.31222920256963,
+                            -180.3122292025696,
                             0.0,
                             -265.3122292025696
                         ]
@@ -1021,12 +1021,12 @@
                     "Ra": 200.0,
                     "end_pts": [
                         [
+                            -2.842170943040401e-14,
                             0.0,
-                            0.0,
-                            -85.0
+                            -84.99999999999997
                         ],
                         [
-                            180.31222920256963,
+                            180.3122292025696,
                             0.0,
                             -265.3122292025696
                         ]
@@ -2256,354 +2256,354 @@
             [
                 0.0,
                 0.0,
-                261.48
+                0
             ],
             [
                 3.0,
                 0.0,
-                261.48
+                0
             ],
             [
                 6.0,
                 0.0,
-                261.48
+                0
             ],
             [
                 9.0,
                 0.0,
-                261.48
+                0
             ],
             [
                 1.0,
                 1.0,
-                261.48
+                0
             ],
             [
                 4.0,
                 1.0,
-                261.48
+                0
             ],
             [
                 7.0,
                 1.0,
-                261.48
+                0
             ],
             [
                 0.0,
                 2.0,
-                261.48
+                0
             ],
             [
                 3.0,
                 2.0,
-                261.48
+                0
             ],
             [
                 6.0,
                 2.0,
-                261.48
+                0
             ],
             [
                 9.0,
                 2.0,
-                261.48
+                0
             ],
             [
                 1.0,
                 3.0,
-                261.48
+                0
             ],
             [
                 4.0,
                 3.0,
-                261.48
+                0
             ],
             [
                 7.0,
                 3.0,
-                261.48
+                0
             ],
             [
                 0.0,
                 4.0,
-                261.48
+                0
             ],
             [
                 3.0,
                 4.0,
-                261.48
+                0
             ],
             [
                 6.0,
                 4.0,
-                261.48
+                0
             ],
             [
                 9.0,
                 4.0,
-                261.48
+                0
             ],
             [
                 1.0,
                 5.0,
-                261.48
+                0
             ],
             [
                 4.0,
                 5.0,
-                261.48
+                0
             ],
             [
                 7.0,
                 5.0,
-                261.48
+                0
             ],
             [
                 0.0,
                 6.0,
-                261.48
+                0
             ],
             [
                 3.0,
                 6.0,
-                261.48
+                0
             ],
             [
                 6.0,
                 6.0,
-                261.48
+                0
             ],
             [
                 9.0,
                 6.0,
-                261.48
+                0
             ],
             [
                 1.0,
                 7.0,
-                261.48
+                0
             ],
             [
                 4.0,
                 7.0,
-                261.48
+                0
             ],
             [
                 7.0,
                 7.0,
-                261.48
+                0
             ],
             [
                 0.0,
                 8.0,
-                261.48
+                0
             ],
             [
                 3.0,
                 8.0,
-                261.48
+                0
             ],
             [
                 6.0,
                 8.0,
-                261.48
+                0
             ],
             [
                 9.0,
                 8.0,
-                261.48
+                0
             ],
             [
                 1.0,
                 9.0,
-                261.48
+                0
             ],
             [
                 4.0,
                 9.0,
-                261.48
+                0
             ],
             [
                 7.0,
                 9.0,
-                261.48
+                0
             ]
         ],
         "L2_basket": [
             [
                 0.0,
                 0.0,
-                1045.92
+                1307.4
             ],
             [
                 3.0,
                 0.0,
-                1045.92
+                1307.4
             ],
             [
                 6.0,
                 0.0,
-                1045.92
+                1307.4
             ],
             [
                 9.0,
                 0.0,
-                1045.92
+                1307.4
             ],
             [
                 1.0,
                 1.0,
-                1045.92
+                1307.4
             ],
             [
                 4.0,
                 1.0,
-                1045.92
+                1307.4
             ],
             [
                 7.0,
                 1.0,
-                1045.92
+                1307.4
             ],
             [
                 0.0,
                 2.0,
-                1045.92
+                1307.4
             ],
             [
                 3.0,
                 2.0,
-                1045.92
+                1307.4
             ],
             [
                 6.0,
                 2.0,
-                1045.92
+                1307.4
             ],
             [
                 9.0,
                 2.0,
-                1045.92
+                1307.4
             ],
             [
                 1.0,
                 3.0,
-                1045.92
+                1307.4
             ],
             [
                 4.0,
                 3.0,
-                1045.92
+                1307.4
             ],
             [
                 7.0,
                 3.0,
-                1045.92
+                1307.4
             ],
             [
                 0.0,
                 4.0,
-                1045.92
+                1307.4
             ],
             [
                 3.0,
                 4.0,
-                1045.92
+                1307.4
             ],
             [
                 6.0,
                 4.0,
-                1045.92
+                1307.4
             ],
             [
                 9.0,
                 4.0,
-                1045.92
+                1307.4
             ],
             [
                 1.0,
                 5.0,
-                1045.92
+                1307.4
             ],
             [
                 4.0,
                 5.0,
-                1045.92
+                1307.4
             ],
             [
                 7.0,
                 5.0,
-                1045.92
+                1307.4
             ],
             [
                 0.0,
                 6.0,
-                1045.92
+                1307.4
             ],
             [
                 3.0,
                 6.0,
-                1045.92
+                1307.4
             ],
             [
                 6.0,
                 6.0,
-                1045.92
+                1307.4
             ],
             [
                 9.0,
                 6.0,
-                1045.92
+                1307.4
             ],
             [
                 1.0,
                 7.0,
-                1045.92
+                1307.4
             ],
             [
                 4.0,
                 7.0,
-                1045.92
+                1307.4
             ],
             [
                 7.0,
                 7.0,
-                1045.92
+                1307.4
             ],
             [
                 0.0,
                 8.0,
-                1045.92
+                1307.4
             ],
             [
                 3.0,
                 8.0,
-                1045.92
+                1307.4
             ],
             [
                 6.0,
                 8.0,
-                1045.92
+                1307.4
             ],
             [
                 9.0,
                 8.0,
-                1045.92
+                1307.4
             ],
             [
                 1.0,
                 9.0,
-                1045.92
+                1307.4
             ],
             [
                 4.0,
                 9.0,
-                1045.92
+                1307.4
             ],
             [
                 7.0,
                 9.0,
-                1045.92
+                1307.4
             ]
         ],
         "origin": [
@@ -16931,7 +16931,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0005,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 0,
             "probability": 1.0
@@ -27253,7 +27254,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0005,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 0,
             "probability": 1.0
@@ -37575,7 +37577,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0005,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 0,
             "probability": 1.0
@@ -47897,7 +47900,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0005,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 0,
             "probability": 1.0
@@ -51624,7 +51628,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.05,
                 "lamtha": 50.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -55351,7 +55356,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.05,
                 "lamtha": 50.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -59078,7 +59084,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.025,
                 "lamtha": 70.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -62805,7 +62812,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.025,
                 "lamtha": 70.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -73227,7 +73235,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.00025,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -83649,7 +83658,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.00025,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -87376,7 +87386,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.001,
                 "lamtha": 50.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -91233,7 +91244,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0005,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -92620,7 +92632,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.02,
                 "lamtha": 20.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -93972,7 +93985,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.02,
                 "lamtha": 20.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 0,
             "probability": 1.0
@@ -97829,7 +97843,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0005,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -101686,7 +101701,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.00025,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -101883,7 +101899,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.006562,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -102080,7 +102097,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.019482,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -102602,7 +102620,8 @@
                 "A_delay": 0.1,
                 "A_weight": 7e-06,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -103124,7 +103143,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.004317,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -103646,7 +103666,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.1423,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -104168,7 +104189,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.080074,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -104365,7 +104387,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.08831,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -104562,7 +104585,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.0,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -105084,7 +105108,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.01525,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -105606,7 +105631,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.0,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -105803,7 +105829,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.19934,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -106000,7 +106027,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -106522,7 +106550,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.00865,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -107044,7 +107073,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -107241,7 +107271,8 @@
                 "A_delay": 0.1,
                 "A_weight": 3e-06,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -107438,7 +107469,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.0,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -107960,7 +107992,8 @@
                 "A_delay": 0.1,
                 "A_weight": 1.43884,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -108482,7 +108515,8 @@
                 "A_delay": 0.1,
                 "A_weight": 0.0,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -108679,7 +108713,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.008958,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -108876,7 +108911,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -109398,7 +109434,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.684013,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
@@ -109920,7 +109957,8 @@
                 "A_delay": 1.0,
                 "A_weight": 0.0,
                 "lamtha": 3.0,
-                "threshold": 0.0
+                "threshold": 0.0,
+                "gain": 1.0
             },
             "allow_autapses": 1,
             "probability": 1.0
