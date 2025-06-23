@@ -144,7 +144,7 @@ html_theme_options = {
     "header_links_before_dropdown": 7,
     "navbar_align": "left",
     "navbar_start": ["navbar-logo"],
-    "navbar_center": ["navbar-nav"],
+    "navbar_center": ["frontpage_icon.html", "navbar-nav"],
     "navbar_end": ["version-switcher"],
     "pygments_dark_style": "monokai",
     "switcher": {
