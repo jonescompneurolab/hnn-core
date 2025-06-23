@@ -8,7 +8,7 @@ from hnn_core.params import _short_name
 def test_basic_jones_model():
     """Test basic Jones 2009 model creation."""
     
-    net = jones_2009_model(mesh_shape=(10, 10))
+    net = jones_2009_model()
     
     # validating cell counts
     print(f"Network created: {net}")

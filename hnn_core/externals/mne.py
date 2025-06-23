@@ -241,14 +241,16 @@ def _check_option(parameter, value, allowed_values, extra=''):
            '{options}, but got {value!r} instead.')
     allowed_values = list(allowed_values)  # e.g., if a dict was given
     if len(allowed_values) == 1:
-        options = f'The only allowed value is {repr(allowed_values[0])}'
+        pass
+        #options = f'The only allowed value is {repr(allowed_values[0])}'
+    
     else:
         options = 'Allowed values are '
         options += ', '.join([f'{repr(v)}' for v in allowed_values[:-1]])
         options += f', and {repr(allowed_values[-1])}'
     raise ValueError(msg.format(parameter=parameter, options=options,
                                 value=value, extra=extra))
-
+    
 
 ####################################################
 # mne/time_frequency/tfr.py

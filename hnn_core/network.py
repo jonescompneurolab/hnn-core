@@ -351,7 +351,7 @@ class Network:
     connectivity information contained in ``params`` will be ignored.
     """
     def __init__(self, params, add_drives_from_params=False, legacy_mode=False, 
-                 pos_dict=None, cell_types=None, mesh_shape=None):
+                 pos_dict=None, cell_types=None):
         # Save the parameters used to create the Network
         _validate_type(params, dict, 'params')
         self._params = params
@@ -387,20 +387,8 @@ class Network:
         if pos_dict is not None:
             _validate_type(pos_dict, dict, 'pos_dict')
             self.pos_dict = deepcopy(pos_dict)
-            
-            # Try to infer grid size from positions if pyramidal cells present
-            for cell_type in ['L2_pyramidal', 'L5_pyramidal']:
-                if cell_type in self.pos_dict and len(self.pos_dict[cell_type]) > 0:
-                    n_cells = len(self.pos_dict[cell_type])
-                    # Simple square root for grid size estimation
-                    side = int(np.sqrt(n_cells))
-                    self._N_pyr_x = side
-                    self._N_pyr_y = side
-                    break
-                else:
-                    # Default if no pyramidal cells
-                    self._N_pyr_x = 10
-                    self._N_pyr_y = 10
+            self._N_pyr_x = 10
+            self._N_pyr_y = 10
         else:
             self._N_pyr_x = 10
             self._N_pyr_y = 10
@@ -1331,6 +1319,8 @@ class Network:
         {src_gid: [target_gids, ...], ...} where each src_gid indexes a list of
         all its targets.
         """
+        #import pdb 
+        #pdb.set_trace()  # AES debug
         conn = _Connectivity()
         threshold = self.threshold
 
