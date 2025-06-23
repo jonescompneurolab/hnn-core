@@ -531,51 +531,54 @@ typical contribution process is to</p>
 to your own account on github. Look for the Fork button in the top
 right corner</p></li>
 <li><p>On the terminal of your local computer clone the fork:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/&lt;username&gt;/hnn-core
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/&lt;</span><span class="n">username</span><span class="o">&gt;/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span>
 </pre></div>
 </div>
 </li>
 <li><p>On the terminal of your local computer set up the remotes:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ cd hnn-core
-$ git remote add upstream https://github.com/jonescompneurolab/hnn-core
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">hnn</span><span class="o">-</span><span class="n">core</span>
+<span class="n">git</span> <span class="n">remote</span> <span class="n">add</span> <span class="n">upstream</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">jonescompneurolab</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span>
 </pre></div>
 </div>
 </li>
 <li><p>Check that the remotes have been correctly added:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ git remote -v
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">remote</span> <span class="o">-</span><span class="n">v</span>
 </pre></div>
 </div>
 <p>You should see:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>origin      https://github.com/&lt;username&gt;/hnn-core (fetch)
-origin      https://github.com/&lt;username&gt;/hnn-core (push)
-upstream    https://github.com/jonescompneurolab/hnn-core (fetch)
-upstream    https://github.com/jonescompneurolab/hnn-core (push)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">origin</span>      <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/&lt;</span><span class="n">username</span><span class="o">&gt;/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">fetch</span><span class="p">)</span>
+<span class="n">origin</span>      <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/&lt;</span><span class="n">username</span><span class="o">&gt;/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">push</span><span class="p">)</span>
+<span class="n">upstream</span>    <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">jonescompneurolab</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">fetch</span><span class="p">)</span>
+<span class="n">upstream</span>    <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">jonescompneurolab</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">push</span><span class="p">)</span>
 </pre></div>
 </div>
 </li>
 <li><p>To start a new feature branch, we will copy the existing <code class="docutils literal notranslate"><span class="pre">master</span></code>
 branch from the <code class="docutils literal notranslate"><span class="pre">upstream</span></code> remote and give it a specific name:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ git fetch upstream master:cool_feature
-$ git checkout cool_feature
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">fetch</span> <span class="n">upstream</span> <span class="n">master</span><span class="p">:</span><span class="n">cool_feature</span>
+<span class="n">git</span> <span class="n">checkout</span> <span class="n">cool_feature</span>
 </pre></div>
 </div>
 </li>
-<li><p>Make your changes relevant to the pull request</p></li>
+<li><p>If you have not already done so, install the editable version of hnn-core <a class="reference internal" href="#installing-editable-hnn-core"><span class="xref myst">using the
+instructions below</span></a>, so that you can execute and test
+your changes as you make them.</p></li>
+<li><p>Make your changes relevant to the pull request.</p></li>
 <li><p>To make a commit, you first have to add the files you have changed
 to the staging area:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ git add -u
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">add</span> <span class="o">-</span><span class="n">u</span>
 </pre></div>
 </div>
 <p>ensure they have been added correctly:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ git status
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">status</span>
 </pre></div>
 </div>
 <p>make a commit:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ git commit -m &quot;your commit message&quot;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">commit</span> <span class="o">-</span><span class="n">m</span> <span class="s2">&quot;your commit message&quot;</span>
 </pre></div>
 </div>
 <p>and finally check that the commit has been added:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ git log
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">log</span>
 </pre></div>
 </div>
 <p>Note: see the <a class="reference external" href="https://numpy.org/doc/stable/dev/development_workflow.html#writing-the-commit-message">numpy contributing
@@ -583,7 +586,7 @@ guide</a>
 for tips on informative commit messages.</p>
 </li>
 <li><p>Now push the feature branch to your fork:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ git push origin cool_feature
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">push</span> <span class="n">origin</span> <span class="n">cool_feature</span>
 </pre></div>
 </div>
 </li>
@@ -603,10 +606,10 @@ guide on using git.</p>
 <p>For making changes to hnn-core, you will need to install an editable
 version of hnn-core. For that you need to have the git cloned <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>
 repository and use pip with the editable (<code class="docutils literal notranslate"><span class="pre">-e</span></code>) flag:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/jonescompneurolab/hnn-core
-$ cd hnn-core
-$ pip install -e &#39;.[dev]&#39;
-$ python setup.py build_mod
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">jonescompneurolab</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span>
+<span class="n">cd</span> <span class="n">hnn</span><span class="o">-</span><span class="n">core</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;.[dev]&#39;</span>
+<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build_mod</span>
 </pre></div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">'.[dev]'</span></code> step will install all extra packages used
@@ -617,7 +620,7 @@ specific cellular mechanisms. These are converted to C, and hence
 require a compilation step. In the normal course of development, you
 will not have to edit these files. However, if you do have to update
 them, they will need to be rebuilt using the command:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ python setup.py build_mod
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build_mod</span>
 </pre></div>
 </div>
 <p>We highly encourage contributors to also follow the <code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI portion of the
@@ -639,7 +642,7 @@ not be merge-able (until the errors are fixed).</p>
 <h3>Linting<a class="headerlink" href="#linting" title="Permalink to this heading">#</a></h3>
 <p>“Linting” your code, which checks for code syntax errors and other errors, can be done
 using the following command, which uses the <code class="docutils literal notranslate"><span class="pre">ruff</span></code> library:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make lint
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">lint</span>
 </pre></div>
 </div>
 <p>If the above command prints any errors, then you will <em>need to fix</em> those errors
@@ -654,7 +657,7 @@ itself unless you wish to.</p>
 <h3>Spell-checking<a class="headerlink" href="#spell-checking" title="Permalink to this heading">#</a></h3>
 <p>Spell-checking your code can be done by simply running the following command. This
 command also only checks your code, but does not make changes to it:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make spell
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">spell</span>
 </pre></div>
 </div>
 <p>Note that spell-checking is also done as part of the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code> command (see
@@ -666,7 +669,7 @@ itself unless you wish to.</p>
 <p>Formatting is handled differently, through two commands. The first command,
 below, is used to check if your code is consistent with our enforced formatting style,
 which is currently the default <code class="docutils literal notranslate"><span class="pre">ruff</span></code> style. This command does not change your code:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make format-check
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="nb">format</span><span class="o">-</span><span class="n">check</span>
 </pre></div>
 </div>
 <p>Note that format-checking is also done as part of the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code> command (see
@@ -677,7 +680,7 @@ your code. If <code class="docutils literal notranslate"><span class="pre">make<
 files “would be reformatted”, and if you are ready to make a git commit, then you
 should run the following command. This command <strong>will almost always change your code
 automatically</strong>, since it re-formats your code:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make format-overwrite
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="nb">format</span><span class="o">-</span><span class="n">overwrite</span>
 </pre></div>
 </div>
 <p>Unlike linting, spell-checking, and testing, we do provide a way to automatically fix
@@ -699,7 +702,7 @@ your changes have been made. We use the <a class="reference external" href="http
 framework</a>, and use the <a class="reference external" href="https://pytest-xdist.readthedocs.io/en/stable/"><code class="docutils literal notranslate"><span class="pre">pytest-xdist</span></code>
 extension</a> to speed up your local test
 runs as fast as possible. To run the tests, run the following command:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make test
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">test</span>
 </pre></div>
 </div>
 <p>Running tests will not change your code, but may download some additional files. MPI
@@ -726,17 +729,17 @@ to avoid rebase conflicts with other pull requests.</p>
 <h3>Building the documentation<a class="headerlink" href="#building-the-documentation" title="Permalink to this heading">#</a></h3>
 <p>The documentation can be built using sphinx.</p>
 <p>You can build the documentation locally using the command:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ cd doc/
-$ make html
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">doc</span><span class="o">/</span>
+<span class="n">make</span> <span class="n">html</span>
 </pre></div>
 </div>
 <p>If you want to build the documentation locally without running all the
 examples, use the command:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make html-noplot
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">html</span><span class="o">-</span><span class="n">noplot</span>
 </pre></div>
 </div>
 <p>Finally, to view the documentation, do:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make view
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">view</span>
 </pre></div>
 </div>
 </section>
@@ -802,35 +805,37 @@ the readability of Markdown.</p>
 article</a>
 for more details on the differences between these workflows.</p>
 <p>To rebase, we do the following:</p>
-<ol class="arabic">
-<li><p>Checkout the feature branch:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ git checkout cool_feature
+<ol class="arabic simple">
+<li><p>Checkout the feature branch:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">checkout</span> <span class="n">cool_feature</span>
 </pre></div>
 </div>
-</li>
-<li><p>Delete the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch and fetch a new copy:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ git branch -D master
-$ git fetch upstream master:master
+<ol class="arabic simple" start="2">
+<li><p>Delete the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch and fetch a new copy:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">branch</span> <span class="o">-</span><span class="n">D</span> <span class="n">master</span>
+<span class="n">git</span> <span class="n">fetch</span> <span class="n">upstream</span> <span class="n">master</span><span class="p">:</span><span class="n">master</span>
 </pre></div>
 </div>
-</li>
-<li><p>Start the rebase:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ git rebase master
+<ol class="arabic simple" start="3">
+<li><p>Start the rebase:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">rebase</span> <span class="n">master</span>
 </pre></div>
 </div>
-</li>
+<ol class="arabic simple" start="4">
 <li><p>If there are conflicts, the easiest approach is to resolve them in
 an editor like VS code. See <a class="reference external" href="https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging">this
 guide</a>
 for more general information on resolve merge conflicts</p></li>
 <li><p>Once the conflicts have been resolved, add the resolved files to the
-staging area:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ git add -u
-$ git rebase --continue
+staging area:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">add</span> <span class="o">-</span><span class="n">u</span>
+<span class="n">git</span> <span class="n">rebase</span> <span class="o">--</span><span class="k">continue</span>
 </pre></div>
 </div>
-</li>
-</ol>
 <p>In general it is best to rebase frequently if you are aware of pull
 requests being merged into the <code class="docutils literal notranslate"><span class="pre">master</span></code> base.</p>
 <p>If you face a lot of difficulting resolving merge conflicts, it may be
@@ -905,11 +910,36 @@ types of failures will be marked as a failure in CI.</p>
 </section>
 <section id="making-changes-to-the-default-network">
 <h2>Making changes to the default network<a class="headerlink" href="#making-changes-to-the-default-network" title="Permalink to this heading">#</a></h2>
-<p>If you ever need to make scientific or technical changes to the default network, you must “re-generate” the smaller network we use for testing, in <code class="docutils literal notranslate"><span class="pre">hnn_core/tests/assets/jones2009_3x3_drives.json</span></code>. This is easily done via the following:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ make regenerate-test-network
+<p>If you ever need to make scientific or technical changes to the default network, you
+need to do three things:</p>
+<ol class="arabic">
+<li><p>Step 1: If needed, manually make changes to <code class="docutils literal notranslate"><span class="pre">hnn_core/param/default.json</span></code>. This is
+the base file used for the important <code class="docutils literal notranslate"><span class="pre">jones_2009_model()</span></code> function. Make sure that if
+you need to change certain parameters, then change them in this all-important file
+<strong>manually</strong>. Note that not all parameters are in this file. If your changes do not
+affect the parameters in this file, then you don’t need to make any change to the
+file.</p></li>
+<li><p>Step 2: Run the following command from the top-level of the repository:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">regenerate</span><span class="o">-</span><span class="n">networks</span>
 </pre></div>
 </div>
-<p>Once you do this, make sure to re-run all the tests using <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code> to ensure that numerical tests dependent on the network itself have not broken.</p>
+<p>This command runs two scripts, each of which rebuild a particular “hierarchical
+JSON” network file which are used in HNN-Core. These two files are described
+below. Note that you do <strong>not</strong> need to make manual changes to these files; running
+the above command is sufficient. However, you <strong>do</strong> need to commit the new
+versions of these files. The two files:</p>
+<p>A. <code class="docutils literal notranslate"><span class="pre">hnn_core/param/jones2009_base.json</span></code>: This is the base file used for the
+GUI. This file has been built using the code in
+<code class="docutils literal notranslate"><span class="pre">hnn_core/params.py::convert_to_json</span></code> by way of
+<code class="docutils literal notranslate"><span class="pre">dev_scripts/regenerate_base_network.py</span></code>.</p>
+<p>B. <code class="docutils literal notranslate"><span class="pre">hnn_core/test/assets/jones2009_3x3_drives.json</span></code>: This is the base file used for
+many tests. This file has been built using the script in
+<code class="docutils literal notranslate"><span class="pre">hnn_core/tests/regenerate_test_network.py</span></code>.</p>
+</li>
+<li><p>Step 3: Once all the above versions of the network have been updated, make sure to
+re-run all the tests using <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code>! If the new network files break tests, then
+that breakage needs to be fixed before we can merge your updates.</p></li>
+</ol>
 </section>
 </section>
 
