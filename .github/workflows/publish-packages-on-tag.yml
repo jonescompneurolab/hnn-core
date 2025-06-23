@@ -7,10 +7,10 @@ name: Publish Python 🐍 distribution package to PyPI and TestPyPI
 on:
   push:
     branches:
-      - ['**']  # Useful for debugging
+      - '**'  # Useful for debugging
       # - master
     tags:
-      - v0.*
+      - v*
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
