@@ -1,39 +1,39 @@
-# name: Linkcheck
-# 
-# on:
-#   push:
-#     branches:
-#       - master
-#   schedule:
-#     - cron: "0 0 1,15 * *"
-# 
-# concurrency:
-#   group: ${{ github.workflow }}-${{ github.ref }}
-#   cancel-in-progress: true
-#   
-# jobs:
-#   build:
-# 
-#     runs-on: ${{ matrix.os }}
-#     strategy:
-#       matrix:
-#         os: [ubuntu-latest]
-#         python-version: [3.11]
-# 
-#     steps:
-#       - uses: actions/checkout@v4
-#       - uses: conda-incubator/setup-miniconda@v3
-#         with:
-#           activate-environment: test
-#           python-version: ${{ matrix.python-version }}
-#       - name: Install dependencies
-#         shell: bash -el {0}
-#         run: |
-#           python -m pip install --upgrade pip
-#           pip install '.[docs, gui, parallel]'
-# 
-#       - name: Linkcheck
-#         shell: bash -el {0}
-#         run: |
-#           make -C doc linkcheck
-# 
+name: Linkcheck
+
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: "0 0 1,15 * *"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.11]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: test
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        shell: bash -el {0}
+        run: |
+          python -m pip install --upgrade pip
+          pip install '.[docs, gui, parallel]'
+
+      - name: Linkcheck
+        shell: bash -el {0}
+        run: |
+          make -C doc linkcheck
+
