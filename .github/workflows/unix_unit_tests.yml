@@ -12,7 +12,6 @@ concurrency:
 
 jobs:
   build:
-
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -22,60 +21,54 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Ubuntu System dependencies
-        if: matrix.os == 'ubuntu-latest'
-        shell: bash -el {0}
-        run: |
-            sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-            sudo apt-get update
-            sudo apt-get install libopenmpi-dev openmpi-bin
-
-      - name: Activate conda environment for macOS
-        if: matrix.os == 'macos-latest'
+      - name: Create and activate conda environment
         uses: conda-incubator/setup-miniconda@v3
         with:
-          activate-environment: test
           python-version: ${{ matrix.python-version }}
-          fetch-depth: 2
 
-      - name: Activate Python environment for Ubuntu
-        if: matrix.os == 'ubuntu-latest'
-        uses: actions/setup-python@v5
-        with:
-            python-version: ${{ matrix.python-version }}
-
-      - name: Install Python  dependencies
+      - name: Install Python and Conda dependencies
         shell: bash -el {0}
         run: |
-          if [ ${{ matrix.os }} == 'macos-latest' ]; then
-            python -m pip install --upgrade pip
-            conda install --yes -c conda-forge mpi4py "openmpi >5"
+          python -m pip install --upgrade pip
+          if [ ${{ matrix.os }} == "macos-latest" ]; then
+              echo "DYLD_FALLBACK_LIBRARY_PATH=${CONDA_PREFIX}/lib:$DYLD_FALLBACK_LIBRARY_PATH" >> $GITHUB_ENV
           elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            python -m pip install --upgrade pip
-            python -m pip install mpi4py
+              echo "LD_LIBRARY_PATH=${CONDA_PREFIX}/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
           fi
+          conda install --yes --quiet -c conda-forge mpi4py "openmpi >5"
+
       - name: Install HNN-core
         shell: bash -el {0}
         run: |
           pip install --verbose '.[opt, parallel, test, gui]'
+
+      - name: Print environment info
+        run: |
+          conda info
+          conda list
+        shell: bash -el {0}
+
       - name: Check ruff formatting
         shell: bash -el {0}
         run: |
           ruff format hnn_core --check
+
       - name: Lint with ruff
         shell: bash -el {0}
         run: |
           ruff check hnn_core
+
       - name: Test non-MPI, embarrassingly parallel tests with pytest
         shell: bash -el {0}
         run: |
           python -m pytest ./hnn_core/tests/ -m "not uses_mpi" -n auto --cov=hnn_core --cov-report=xml
+
       - name: Test MPI-using parallel tests with pytest
         shell: bash -el {0}
         run: |
           python -m pytest ./hnn_core/tests/ -m "uses_mpi" --cov=hnn_core --cov-report=xml --cov-append
+
       - name:  Upload coverage to Codecov
         shell: bash -el {0}
         run: |
           bash <(curl -s https://codecov.io/bash) -f ./coverage.xml
-
