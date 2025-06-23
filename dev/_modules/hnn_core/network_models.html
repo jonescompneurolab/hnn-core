@@ -503,8 +503,7 @@ document.write(`
 <div class="viewcode-block" id="jones_2009_model"><a class="viewcode-back" href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">jones_2009_model</span><span class="p">(</span>
     <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the network model described in</span>
-<span class="sd">    Jones et al. J. of Neurophys. 2009 [1]_</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the network model described in Jones et al. 2009 [1]_</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -536,12 +535,20 @@ document.write(`
 <span class="sd">    connectivity pattern is applied between cells. Inhibitory basket cells are</span>
 <span class="sd">    present at a 1:3-ratio.</span>
 
+<span class="sd">    This network was first described in Jones et al. 2009 [1]_ , and this code provides</span>
+<span class="sd">    the implementation used in Neymotin et al. 2020 [2]_ .</span>
+
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
 <span class="sd">    .. [1] Jones, Stephanie R., et al. &quot;Quantitative Analysis and</span>
 <span class="sd">           Biophysically Realistic Neural Modeling of the MEG Mu Rhythm:</span>
 <span class="sd">           Rhythmogenesis and Modulation of Sensory-Evoked Responses.&quot;</span>
 <span class="sd">           Journal of Neurophysiology 102, 3554–3572 (2009).</span>
+<span class="sd">           https://doi.org/10.1152/jn.00535.2009</span>
+
+<span class="sd">    .. [2] Neymotin, Samuel A, et al. 2020. &quot;Human Neocortical Neurosolver (HNN), a New</span>
+<span class="sd">           Software Tool for Interpreting the Cellular and Network Origin of Human</span>
+<span class="sd">           MEG/EEG Data.&quot; eLife 9 (January):e51214. https://doi.org/10.7554/eLife.51214</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">hnn_core_root</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">hnn_core</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
