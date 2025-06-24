@@ -352,12 +352,11 @@ class Network:
     connectivity information contained in ``params`` will be ignored.
     """
     def __init__(self, params, add_drives_from_params=False, legacy_mode=False, 
-                 pos_dict=None, cell_types=None):
-        # Save the parameters used to create the Network
+                 mesh_shape=(10, 10), pos_dict=None, cell_types=None):
         _validate_type(params, dict, 'params')
         self._params = params
         
-        # Initialize ALL instance attributes
+        # Initialize all instance attributes
         self.gid_ranges = OrderedDict()
         self._n_gids = 0
         self.cell_response = None
@@ -380,42 +379,60 @@ class Network:
                 'deprecated in future releases.', DeprecationWarning,
                 stacklevel=1)
 
-        cell_types = {
-            "L2_basket": basket(cell_name=_short_name("L2_basket")),
-            "L2_pyramidal": pyramidal(cell_name=_short_name("L2_pyramidal")),
-            "L5_basket": basket(cell_name=_short_name("L5_basket")),
-            "L5_pyramidal": pyramidal(cell_name=_short_name("L5_pyramidal")),
-        }
-
-        # Store layer parameters for potential use
+        # Set mesh shape
+        _validate_type(mesh_shape, tuple, 'mesh_shape')
+        _validate_type(mesh_shape[0], int, 'mesh_shape[0]')
+        _validate_type(mesh_shape[1], int, 'mesh_shape[1]')
+        
+        if mesh_shape[0] < 1 or mesh_shape[1] < 1:
+            raise ValueError(
+                f'mesh_shape must be a tuple of positive integers, got: {mesh_shape}'
+            )
+        
+        self._N_pyr_x = mesh_shape[0]
+        self._N_pyr_y = mesh_shape[1]
         self._inplane_distance = 1.0
         self._layer_separation = 1307.4
         
-        # Apply provided positions if any
-        if pos_dict is not None:
+        # Handle positions and cell types
+        if pos_dict is not None and cell_types is not None:
+            # Use provided positions and cell types
             _validate_type(pos_dict, dict, 'pos_dict')
-            self.pos_dict = deepcopy(pos_dict)
-            self._N_pyr_x = 10
-            self._N_pyr_y = 10
-        else:
-            self._N_pyr_x = 10
-            self._N_pyr_y = 10
-                    
-        
-        # Add cell types if provided
-        if cell_types is not None:
             _validate_type(cell_types, dict, 'cell_types')
-        for cell_name, cell_template in cell_types.items():
-            if cell_name in self.pos_dict and len(self.pos_dict[cell_name]) > 0:
-                self._add_cell_type(cell_name, self.pos_dict[cell_name],
-                                    cell_template=cell_template)
+            self.pos_dict = deepcopy(pos_dict)
+            
+            # Add cell types from provided dictionary
+            for cell_name, cell_template in cell_types.items():
+                if cell_name in self.pos_dict:
+                    self._add_cell_type(cell_name, self.pos_dict[cell_name],
+                                        cell_template=cell_template)
+        else:
+            # Default behavior - create standard network
+            cell_types_default = {
+                'L2_basket': basket(cell_name=_short_name('L2_basket')),
+                'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
+                'L5_basket': basket(cell_name=_short_name('L5_basket')),
+                'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
+            }
+            
+            self.set_cell_positions(
+                inplane_distance=self._inplane_distance,
+                layer_separation=self._layer_separation,
+            )
+            
+            # Add default cell types
+            for cell_name in cell_types_default:
+                self._add_cell_type(
+                    cell_name, self.pos_dict[cell_name], 
+                    cell_template=cell_types_default[cell_name]
+                )
         
         if add_drives_from_params:
             _add_drives_from_params(self)
 
         self._tstop = None
         self._dt = None
-
+        
     def _apply_custom_positions(self, custom_positions):
         """Apply custom positions to specific cell types.
         
@@ -475,59 +492,48 @@ class Network:
         layer_separation : float, optional
             The separation of layers 2/3 and 5.
         """
-        if pos_dict is not None:
-            _validate_type(pos_dict, dict, 'pos_dict')
-            self.pos_dict = deepcopy(pos_dict)
-            
-            # Update drives to network origin if it exists
-            if 'origin' in self.pos_dict:
-                for drive_name, drive in self.external_drives.items():
-                    pos = [self.pos_dict['origin']] * drive['n_drive_cells']
-                    self.pos_dict[drive_name] = pos
-        else:
-            # Use grid-based positioning (backward compatibility)
-            if inplane_distance is None:
-                inplane_distance = self._inplane_distance
-            if layer_separation is None:
-                layer_separation = self._layer_separation
-                
-            _validate_type(inplane_distance, (float, int), "inplane_distance")
-            _validate_type(layer_separation, (float, int), "layer_separation")
-            
-            if not inplane_distance > 0.0:
-                raise ValueError(
-                    f"In-plane distance must be positive, got: {inplane_distance}"
-                )
-            if not layer_separation > 0.0:
-                raise ValueError(
-                    f"Layer separation must be positive, got: {layer_separation}"
-                )
-            
-            # Get layer positions
-            layer_dict = _create_cell_coords(
-                n_pyr_x=self._N_pyr_x,
-                n_pyr_y=self._N_pyr_y,
-                zdiff=layer_separation,
-                inplane_distance=inplane_distance,
+        if inplane_distance is None:
+            inplane_distance = self._inplane_distance
+        _validate_type(inplane_distance, (float, int), 'inplane_distance')
+        if not inplane_distance > 0.0:
+            raise ValueError(
+                f'In-plane distance must be positive, got: {inplane_distance}'
             )
+
+        if layer_separation is None:
+            layer_separation = self._layer_separation
+        _validate_type(layer_separation, (float, int), 'layer_separation')
+        if not layer_separation > 0.0:
+            raise ValueError(
+                f'Layer separation must be positive, got: {layer_separation}'
+            )
+
+        # Get layer positions using the new modular function
+        layer_dict = _create_cell_coords(
+            n_pyr_x=self._N_pyr_x,
+            n_pyr_y=self._N_pyr_y,
+            zdiff=layer_separation,
+            inplane_distance=inplane_distance,
+        )
+        
+        # Map layers to cell types (default mapping)
+        self.pos_dict = {
+            'L5_pyramidal': layer_dict['L5_bottom'],
+            'L2_pyramidal': layer_dict['L2_bottom'],
+            'L5_basket': layer_dict['L5_mid'],
+            'L2_basket': layer_dict['L2_mid'],
+            'origin': layer_dict['origin']
+        }
+
+        # update drives to be positioned at network origin
+        for drive_name, drive in self.external_drives.items():
+            pos = [self.pos_dict['origin']] * drive['n_drive_cells']
+            self.pos_dict[drive_name] = pos
+
+        self._inplane_distance = inplane_distance
+        self._layer_separation = layer_separation
             
-            # Create default pos_dict (for backward compatibility)
-            self.pos_dict = {
-                'L5_pyramidal': layer_dict['L5_bottom'],
-                'L2_pyramidal': layer_dict['L2_bottom'],
-                'L5_basket': layer_dict['L5_mid'],
-                'L2_basket': layer_dict['L2_mid'],
-                'origin': layer_dict['origin']
-            }
-            
-            # Update drives to network origin
-            for drive_name, drive in self.external_drives.items():
-                pos = [layer_dict['origin']] * drive['n_drive_cells']
-                self.pos_dict[drive_name] = pos
-            
-            self._inplane_distance = inplane_distance
-            self._layer_separation = layer_separation
-            '''
+    '''
     def add_cell_type(self, cell_name, cell_template, positions):
         """Add a new cell type with specified positions.
         
@@ -1337,8 +1343,8 @@ class Network:
         {src_gid: [target_gids, ...], ...} where each src_gid indexes a list of
         all its targets.
         """
-        import pdb
-        pdb.set_trace()
+        #import pdb
+        #pdb.set_trace()
         conn = _Connectivity()
         threshold = self.threshold
         _validate_type(
