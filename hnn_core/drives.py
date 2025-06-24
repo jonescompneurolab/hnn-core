@@ -298,7 +298,7 @@ def _drive_cell_event_times(
     )
 
     # check drive name validity, allowing substring matches
-    valid_drives = ["evoked", "poisson", "gaussian", "bursty"]
+    valid_drives = ["evoked", "poisson", "gaussian", "bursty", "spike_train"]
     # NB check if drive_type has a valid substring, not vice versa
     matches = [f for f in valid_drives if f in drive_type]
     if len(matches) == 0:
@@ -340,6 +340,24 @@ def _drive_cell_event_times(
             prng=prng,
             prng2=prng2,
         )
+    # Add this new case for spike_train drives
+    elif drive_type == "spike_train":
+        # For spike_train, the event times are explicitly provided in dynamics
+        if "times" not in dynamics or "gids" not in dynamics:
+            return []
+
+        # Get all spike times from the specified drive cell
+        times = dynamics["times"]
+        gids = dynamics["gids"]
+
+        # Extract only spikes from this drive cell GID
+        if times and gids:
+            mask = np.array(gids) == drive_cell_gid
+            cell_event_times = np.array(times)[mask].tolist()
+        else:
+            cell_event_times = []
+
+        return cell_event_times
 
     # brute force remove non-zero times. Might result in fewer vals
     # than desired
