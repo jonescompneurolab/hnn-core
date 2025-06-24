@@ -10,6 +10,7 @@ from .params import _short_name
 from .cells_default import pyramidal_ca
 from .externals.mne import _validate_type
 from .cells_default import pyramidal, basket
+import numpy as np
 
 
 def jones_2009_model(params=None, add_drives_from_params=False,
@@ -389,3 +390,167 @@ def add_erp_drives_to_jones_model(net, tstart=0.0):
         'evprox2', mu=137.12 + tstart, sigma=8.33, numspikes=1,
         weights_ampa=weights_ampa_p2, location='proximal',
         synaptic_delays=synaptic_delays_prox, event_seed=814)
+
+def layer_separated_model(n_pyr_x=10, n_pyr_y=10, layer_separation=1307.4,
+                          inplane_distance=1.0, params=None, 
+                          add_drives_from_params=False, legacy_mode=False):
+    """Create a network model with customizable layer-based positioning.
+
+    Returns
+    -------
+    net : Instance of Network object
+        Network object with layer-based cell positioning.
+    """
+    from hnn_core import read_params
+    from .network import Network, _create_cell_coords
+    from .params import _short_name
+    from .cells_default import pyramidal, basket
+    
+    if params is None:
+        params = {'threshold': 0.0, 'celsius': 37.0}
+    elif isinstance(params, str):
+        params = read_params(params)
+    
+    layer_dict = _create_cell_coords(
+        n_pyr_x=n_pyr_x,
+        n_pyr_y=n_pyr_y,
+        zdiff=layer_separation,
+        inplane_distance=inplane_distance
+    )
+    
+    # mapping cell types to layer positions
+    pos_dict = {
+        'L5_pyramidal': layer_dict['L5_bottom'],
+        'L2_pyramidal': layer_dict['L2_bottom'],
+        'L5_basket': layer_dict['L5_mid'],
+        'L2_basket': layer_dict['L2_mid'],
+        'origin': layer_dict['origin']
+    }
+    
+    cell_types = {
+        'L2_basket': basket(cell_name=_short_name('L2_basket')),
+        'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
+        'L5_basket': basket(cell_name=_short_name('L5_basket')),
+        'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
+    }
+    
+    net = Network(params, 
+                  add_drives_from_params=add_drives_from_params,
+                  legacy_mode=legacy_mode,
+                  mesh_shape=(n_pyr_x, n_pyr_y),
+                  pos_dict=pos_dict,
+                  cell_types=cell_types)
+    
+    #  similar to jones_2009_model but simplified
+    delay = 1.0
+    
+    # Pyramidal to pyramidal connections
+    for target_cell in ['L2_pyramidal', 'L5_pyramidal']:
+        net.add_connection(
+            target_cell, target_cell, 'proximal', 'ampa', 
+            weight=0.0005, delay=delay, lamtha=3.0, allow_autapses=False)
+    
+    # Basket to pyramidal connections
+    net.add_connection(
+        'L2_basket', 'L2_pyramidal', 'soma', 'gabaa',
+        weight=0.05, delay=delay, lamtha=50.0)
+    
+    net.add_connection(
+        'L5_basket', 'L5_pyramidal', 'soma', 'gabaa',
+        weight=0.05, delay=delay, lamtha=70.0)
+    
+    return net
+
+
+def custom_geometry_model(positions_dict, params=None,
+                          add_drives_from_params=False, legacy_mode=False):
+    """Create a network model with exact positions for each cell type
+
+    Returns
+    -------
+    net : Instance of Network object
+        Network object with custom cell positioning.
+    """
+    from hnn_core import read_params
+    from .network import Network
+    from .params import _short_name
+    from .cells_default import pyramidal, basket
+    
+    # Validate required keys
+    required_keys = ['L2_pyramidal', 'L2_basket', 'L5_pyramidal', 
+                     'L5_basket', 'origin']
+    missing_keys = set(required_keys) - set(positions_dict.keys())
+    if missing_keys:
+        raise ValueError(f"positions_dict missing required keys: {missing_keys}")
+    
+    if params is None:
+        params = {'threshold': 0.0, 'celsius': 37.0}
+    elif isinstance(params, str):
+        params = read_params(params)
+    
+    # Validate and convert positions
+    validated_positions = {}
+    for cell_type, positions in positions_dict.items():
+        if cell_type == 'origin':
+            # Origin should be a single position
+            if not isinstance(positions, (list, tuple)) or len(positions) != 3:
+                raise ValueError("'origin' must be a single (x, y, z) position")
+            validated_positions[cell_type] = tuple(float(p) for p in positions)
+        else:
+            # Cell types should have lists of positions
+            if not isinstance(positions, (list, tuple)):
+                raise ValueError(f"Positions for '{cell_type}' must be a list")
+            
+            validated_list = []
+            for idx, pos in enumerate(positions):
+                if not isinstance(pos, (list, tuple)) or len(pos) != 3:
+                    raise ValueError(
+                        f"Position {idx} for '{cell_type}' must be (x, y, z) tuple"
+                    )
+                validated_list.append(tuple(float(p) for p in pos))
+            validated_positions[cell_type] = validated_list
+    
+    # Define cell types
+    cell_types = {
+        'L2_basket': basket(cell_name=_short_name('L2_basket')),
+        'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
+        'L5_basket': basket(cell_name=_short_name('L5_basket')),
+        'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
+    }
+    
+    # mesh shape from pyramidal cell count
+    n_pyr = max(len(validated_positions['L2_pyramidal']), 
+                len(validated_positions['L5_pyramidal']))
+    mesh_side = int(np.sqrt(n_pyr))
+    mesh_shape = (mesh_side, mesh_side) if mesh_side * mesh_side == n_pyr else (n_pyr, 1)
+    
+    # create network
+    net = Network(params,
+                  add_drives_from_params=add_drives_from_params,
+                  legacy_mode=legacy_mode,
+                  mesh_shape=mesh_shape,
+                  pos_dict=validated_positions,
+                  cell_types=cell_types)
+    
+    # basic connectivity
+    delay = 1.0
+    
+    # Pyramidal to pyramidal connections
+    for target_cell in ['L2_pyramidal', 'L5_pyramidal']:
+        if len(net.gid_ranges[target_cell]) > 0:
+            net.add_connection(
+                target_cell, target_cell, 'proximal', 'ampa',
+                weight=0.0005, delay=delay, lamtha=3.0, allow_autapses=False)
+    
+    # Basket to pyramidal connections
+    if len(net.gid_ranges['L2_basket']) > 0 and len(net.gid_ranges['L2_pyramidal']) > 0:
+        net.add_connection(
+            'L2_basket', 'L2_pyramidal', 'soma', 'gabaa',
+            weight=0.05, delay=delay, lamtha=50.0)
+    
+    if len(net.gid_ranges['L5_basket']) > 0 and len(net.gid_ranges['L5_pyramidal']) > 0:
+        net.add_connection(
+            'L5_basket', 'L5_pyramidal', 'soma', 'gabaa',
+            weight=0.05, delay=delay, lamtha=70.0)
+    
+    return net
