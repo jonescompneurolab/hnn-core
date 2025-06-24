@@ -1278,9 +1278,19 @@ class Network:
         """Reverse lookup of gid to type."""
         return _gid_to_type(gid, self.gid_ranges)
 
-    def add_connection(self, src_gids, target_gids, loc, receptor,
-                       weight, delay, lamtha, allow_autapses=True,
-                       probability=1.0, conn_seed=None):
+    def add_connection(
+        self,
+        src_gids,
+        target_gids,
+        loc,
+        receptor,
+        weight,
+        delay,
+        lamtha,
+        allow_autapses=True,
+        probability=1.0,
+        conn_seed=None,
+    ):
         """Appends connections to connectivity list
 
         Parameters
@@ -1327,59 +1337,63 @@ class Network:
         {src_gid: [target_gids, ...], ...} where each src_gid indexes a list of
         all its targets.
         """
-        import pdb 
-        pdb.set_trace()  # AES debug
+        import pdb
+        pdb.set_trace()
         conn = _Connectivity()
         threshold = self.threshold
-
-        _validate_type(target_gids, (int, list, range, str), 'target_gids',
-                       'int list, range or str')
-        _validate_type(allow_autapses, bool, 'target_gids', 'bool')
+        _validate_type(
+            target_gids,
+            (int, list, range, str),
+            "target_gids",
+            "int list, range or str",
+        )
+        _validate_type(allow_autapses, bool, "target_gids", "bool")
         valid_source_cells = list(self.gid_ranges.keys())
 
         # Convert src_gids to list
-        src_gids = _check_gids(src_gids, self.gid_ranges,
-                               valid_source_cells, 'src_gids')
+        src_gids = _check_gids(
+            src_gids, self.gid_ranges, valid_source_cells, "src_gids"
+        )
 
         # Convert target_gids to list of list, one element for each src_gid
         valid_target_cells = list(self.cell_types.keys())
         if isinstance(target_gids, int):
             target_gids = [[target_gids] for _ in range(len(src_gids))]
         elif isinstance(target_gids, str):
-            _check_option('target_gids', target_gids, valid_target_cells)
-            target_gids = [list(self.gid_ranges[_long_name(target_gids)])
-                           for _ in range(len(src_gids))]
+            _check_option("target_gids", target_gids, valid_target_cells)
+            target_gids = [
+                list(self.gid_ranges[_long_name(target_gids)])
+                for _ in range(len(src_gids))
+            ]
         elif isinstance(target_gids, range):
             target_gids = [list(target_gids) for _ in range(len(src_gids))]
-        elif isinstance(target_gids, list) and all(isinstance(t_gid, int)
-                                                   for t_gid in target_gids):
+        elif isinstance(target_gids, list) and all(
+            isinstance(t_gid, int) for t_gid in target_gids
+        ):
             target_gids = [target_gids for _ in range(len(src_gids))]
 
         # Validate each target list - src pairs.
         # set() used to avoid redundant checks.
         target_set = set()
         for target_src_pair in target_gids:
-            _validate_type(target_src_pair, list, 'target_gids[idx]',
-                           'list or range')
+            _validate_type(target_src_pair, list, "target_gids[idx]", "list or range")
             for target_gid in target_src_pair:
                 target_set.add(target_gid)
         target_type = self.gid_to_type(target_gids[0][0])
         for target_gid in target_set:
-            _validate_type(target_gid, int, 'target_gid', 'int')
+            _validate_type(target_gid, int, "target_gid", "int")
             # Ensure gids in range of Network.gid_ranges
             gid_type = self.gid_to_type(target_gid)
             if gid_type is None:
-                raise AssertionError(
-                    f'target_gid {target_gid}''not in net.gid_ranges')
+                raise AssertionError(f"target_gid {target_gid}not in net.gid_ranges")
             elif gid_type != target_type:
-                raise AssertionError(
-                    'All target_gids must be of the same type')
-        conn['target_type'] = target_type
-        conn['target_gids'] = target_set
-        conn['num_targets'] = len(target_set)
+                raise AssertionError("All target_gids must be of the same type")
+        conn["target_type"] = target_type
+        conn["target_gids"] = target_set
+        conn["num_targets"] = len(target_set)
 
         if len(target_gids) != len(src_gids):
-            raise AssertionError('target_gids must have a list for each src.')
+            raise AssertionError("target_gids must have a list for each src.")
 
         # Format gid_pairs and add to conn dictionary
         gid_pairs = dict()
@@ -1389,64 +1403,75 @@ class Network:
                 target_src_pair = np.array(target_src_pair)[mask].tolist()
             gid_pairs[src_gid] = target_src_pair
 
-        conn['src_type'] = self.gid_to_type(src_gids[0])
-        conn['src_gids'] = set(src_gids)
-        conn['num_srcs'] = len(src_gids)
+        conn["src_type"] = self.gid_to_type(src_gids[0])
+        conn["src_gids"] = set(src_gids)
+        conn["num_srcs"] = len(src_gids)
 
-        conn['gid_pairs'] = gid_pairs
+        conn["gid_pairs"] = gid_pairs
 
         # Validate string inputs
-        _validate_type(loc, str, 'loc')
-        _validate_type(receptor, str, 'receptor')
+        _validate_type(loc, str, "loc")
+        _validate_type(receptor, str, "receptor")
 
         target_sect_loc = self.cell_types[target_type].sect_loc
         target_sections = self.cell_types[target_type].sections
-        valid_loc = list(
-            target_sect_loc.keys()) + list(target_sections.keys())
+        valid_loc = list(target_sect_loc.keys()) + list(target_sections.keys())
 
-        _check_option('loc', loc, valid_loc,
-                      extra=(f" (the loc '{loc}' is not defined "
-                             f"for '{target_type}' cells)"))
-        conn['loc'] = loc
+        _check_option(
+            "loc",
+            loc,
+            valid_loc,
+            extra=(f" (the loc '{loc}' is not defined for '{target_type}' cells)"),
+        )
+        conn["loc"] = loc
 
         # `loc` specifies a group of sections, all must contain the synapse
         # specified by `receptor`
         if loc in target_sect_loc:
             for sec_name in target_sect_loc[loc]:
                 valid_receptor = target_sections[sec_name].syns
-                _check_option('receptor', receptor, valid_receptor,
-                              extra=f" (the '{receptor}' receptor is not "
-                                    f"defined for the '{sec_name}' of"
-                                    f"'{target_type}' cells)")
+                _check_option(
+                    "receptor",
+                    receptor,
+                    valid_receptor,
+                    extra=f" (the '{receptor}' receptor is not "
+                    f"defined for the '{sec_name}' of"
+                    f"'{target_type}' cells)",
+                )
         # `loc` specifies an individual section
         else:
             valid_receptor = target_sections[loc].syns
-            _check_option('receptor', receptor, valid_receptor,
-                          extra=f"(the '{receptor}' receptor is not "
-                                f"defined for the '{loc}' of"
-                                f"'{target_type}' cells)")
+            _check_option(
+                "receptor",
+                receptor,
+                valid_receptor,
+                extra=f"(the '{receptor}' receptor is not "
+                f"defined for the '{loc}' of"
+                f"'{target_type}' cells)",
+            )
 
-        conn['receptor'] = receptor
+        conn["receptor"] = receptor
 
         # Create and validate nc_dict
-        conn['nc_dict'] = dict()
-        arg_names = ['delay', 'weight', 'lamtha', 'threshold']
-        nc_dict_keys = ['A_delay', 'A_weight', 'lamtha', 'threshold']
+        conn["nc_dict"] = dict()
+        arg_names = ["delay", "weight", "lamtha", "threshold"]
+        nc_dict_keys = ["A_delay", "A_weight", "lamtha", "threshold"]
         nc_conn_items = [delay, weight, lamtha, threshold]
         for key, arg_name, item in zip(nc_dict_keys, arg_names, nc_conn_items):
-            _validate_type(item, (int, float), arg_name, 'int or float')
-            conn['nc_dict'][key] = item
+            _validate_type(item, (int, float), arg_name, "int or float")
+            conn["nc_dict"][key] = item
 
-        conn['nc_dict']['gain'] = 1.0
+        conn["nc_dict"]["gain"] = 1.0
 
         # Probabilistically define connections
         if probability != 1.0:
             _connection_probability(conn, probability, conn_seed)
 
-        conn['probability'] = probability
-        conn['allow_autapses'] = allow_autapses
+        conn["probability"] = probability
+        conn["allow_autapses"] = allow_autapses
 
         self.connectivity.append(deepcopy(conn))
+
 
     def clear_connectivity(self):
         """Remove all connections defined in Network.connectivity
