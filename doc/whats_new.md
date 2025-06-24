@@ -28,8 +28,6 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ## 0.4.2 Patch Notes
 
-TODO add docs that we support 3.13
-
 Version 0.4.2 is a patch release that fixes two important bugs: one affecting LFP and CSD output ({gh}`1062`) and another preventing users from upgrading to the recently released NEURON 8.2.7 ({gh}`1058`), which also enables use of HNN-Core with Python 3.13. This also includes other, smaller bug fixes and changes.
 
 If you have been using HNN-Core to simulate LFP or CSD output, we *strongly* recommend you update to this version.
@@ -78,7 +76,7 @@ If you expect that you will still require `hnn_core` using Python 3.8, please re
 - `hnn_core` code now follows the default `ruff` code formatting style, and all new
   contributions are expected to follow this style as well. Fortunately, there is a
   single command that developers need to run which automatically format their code
-  appropriately, see [the new Quality Control section of our Contributing
+  appropriately (`make format-overwrite`), see [the new Quality Control section of our Contributing
   Guide](https://jonescompneurolab.github.io/hnn-core/dev/contributing.html#quality-control)
   for details.
 
@@ -131,7 +129,7 @@ If you expect that you will still require `hnn_core` using Python 3.8, please re
   paper, but the "implementation" is from Neymotin 2020. Citations for both papers are
   included in the docstring. By [Austin E. Soplata][] in {gh}`1056`.
 
-- Added support for "regeneration" of both required hierchical JSON network files
+- Added support for "regeneration" of both required hierarchical JSON network files
   alongside documentation,
   by [Austin E. Soplata][] in {gh}`1068`.
 
