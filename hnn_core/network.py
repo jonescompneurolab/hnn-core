@@ -17,7 +17,8 @@ import warnings
 from .drives import _drive_cell_event_times
 from .drives import _get_target_properties, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
-from .params import _long_name
+from .cells_default import pyramidal, basket
+from .params import _long_name,_short_name
 from .viz import plot_cells
 from .externals.mne import _validate_type, _check_option
 from .extracellular import ExtracellularArray
@@ -378,7 +379,14 @@ class Network:
                 '.param files of the old HNN GUI. This feature will be '
                 'deprecated in future releases.', DeprecationWarning,
                 stacklevel=1)
-        
+
+        cell_types = {
+            "L2_basket": basket(cell_name=_short_name("L2_basket")),
+            "L2_pyramidal": pyramidal(cell_name=_short_name("L2_pyramidal")),
+            "L5_basket": basket(cell_name=_short_name("L5_basket")),
+            "L5_pyramidal": pyramidal(cell_name=_short_name("L5_pyramidal")),
+        }
+
         # Store layer parameters for potential use
         self._inplane_distance = 1.0
         self._layer_separation = 1307.4
@@ -397,10 +405,10 @@ class Network:
         # Add cell types if provided
         if cell_types is not None:
             _validate_type(cell_types, dict, 'cell_types')
-            for cell_name, cell_template in cell_types.items():
-                if cell_name in self.pos_dict and len(self.pos_dict[cell_name]) > 0:
-                    self._add_cell_type(cell_name, self.pos_dict[cell_name],
-                                        cell_template=cell_template)
+        for cell_name, cell_template in cell_types.items():
+            if cell_name in self.pos_dict and len(self.pos_dict[cell_name]) > 0:
+                self._add_cell_type(cell_name, self.pos_dict[cell_name],
+                                    cell_template=cell_template)
         
         if add_drives_from_params:
             _add_drives_from_params(self)
@@ -1319,8 +1327,8 @@ class Network:
         {src_gid: [target_gids, ...], ...} where each src_gid indexes a list of
         all its targets.
         """
-        #import pdb 
-        #pdb.set_trace()  # AES debug
+        import pdb 
+        pdb.set_trace()  # AES debug
         conn = _Connectivity()
         threshold = self.threshold
 
