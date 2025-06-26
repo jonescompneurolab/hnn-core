@@ -10,7 +10,7 @@ Last updated: 2025-06-26
 ## 0. Notes before starting
 
 - We use at least 2 types of releases:
-    1. "stable" releases (aka "full" version releases), which are updates to the *default* version that is publically distributed. I.e. these are what users will install if they run `pip install hnn-core`, etc.
+    1. "stable" releases (aka "full" version releases), which are updates to the *default* version that is publicly distributed. I.e. these are what users will install if they run `pip install hnn-core`, etc.
     2. "dev" releases, or development releases. These can be incremented as desired, but are mainly used to distinguish new work that is merged after the latest stable release. After any stable release, there should immediately be a follow-up PR (or commit) that begins creation of the next dev release. Dev releases *can* be pushed to Pypi as long as they are indicated as development versions. However, we typically only need to do all of the steps on this page for a stable release, not every dev release.
     3. (optional) "rc" releases, or "release candidates". If desired, a dev version can be changed to an rc version if we want to distribute specific rc versions for "beta-testing" for an soon and upcoming stable release.
 
