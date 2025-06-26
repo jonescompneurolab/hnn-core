@@ -39,11 +39,6 @@ Last updated: 2025-06-26
 
 - The original "How to make a release" is [available here](https://github.com/jonescompneurolab/hnn-core/wiki/How-to-make-a-release), however it should be considered deprecated. It leaves out a few important steps (or suggests doing them out-of-order), and does not account for our new automatic Github-tag publishing workflow.
 
-- If you are new to open-source development on Github, especially using forks, then there are many helpful tutorials online for understanding the somewhat complex workflow. Here are some:
-    - <https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project>
-    - <https://www.dataschool.io/how-to-contribute-on-github/>
-    - <https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project>
-
 ## 1. Before making a release
 
 - Make sure all milestones are achieved or migrated to the next version.
