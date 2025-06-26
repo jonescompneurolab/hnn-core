@@ -504,4 +504,9 @@ need to do three things:
    re-run all the tests using `make test`! If the new network files break tests, then
    that breakage needs to be fixed before we can merge your updates.
 
+## Publishing new releases
+
+For an updated version of how we make releases, {doc}`see our guide here
+<how_to_create_releases>`.
+
 [used in MNE-Python]: https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#L124-L132
