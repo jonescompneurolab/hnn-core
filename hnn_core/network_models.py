@@ -11,7 +11,245 @@ from .cells_default import pyramidal_ca
 from .externals.mne import _validate_type
 from .cells_default import pyramidal, basket
 import numpy as np
+from .cell import Cell, Section
+from .cells_default import pyramidal, basket, _get_basket_syn_props
 
+
+class CellTypeBuilder:
+    """Helper class to build custom cell types."""
+    
+    @staticmethod
+    def create_interneuron(name, pos=(0, 0, 0), gid=None):
+        """Create a custom interneuron."""
+        # Define custom soma
+        soma = Section(
+            L=30.,           # Smaller than basket
+            diam=15.,        # Thinner
+            cm=0.85,
+            Ra=200.,
+        )
+        soma._end_pts = [[0, 0, 0], [0, 0, 30.]]
+        
+        # Custom synapses
+        synapses = {
+            'ampa': {'e': 0, 'tau1': 0.3, 'tau2': 3.},      
+            'gabaa': {'e': -80, 'tau1': 0.3, 'tau2': 3.},   
+            'nmda': {'e': 0, 'tau1': 0.5, 'tau2': 15.}      
+        }
+        
+        # Set up soma properties
+        soma.syns = list(synapses.keys())
+        soma.mechs = {'hh2': dict()}
+        
+        sections = {'soma': soma}
+        sect_loc = dict(proximal=['soma'], distal=['soma'])
+        
+        return Cell(
+            name, pos,
+            sections=sections,
+            synapses=synapses,
+            sect_loc=sect_loc,
+            cell_tree=None,
+            gid=gid
+        )
+    
+    @staticmethod
+    def create_stellate(name, pos=(0, 0, 0), gid=None):
+        """Create a stellate cell."""
+        # Define multiple dendrites
+        soma = Section(L=25., diam=20., cm=1.0, Ra=150.)
+        soma._end_pts = [[0, 0, 0], [0, 0, 25.]]
+        
+        dend1 = Section(L=100., diam=3., cm=1.0, Ra=150.)
+        dend1._end_pts = [[0, 0, 25], [50, 0, 75]]
+        
+        dend2 = Section(L=100., diam=3., cm=1.0, Ra=150.)
+        dend2._end_pts = [[0, 0, 25], [-50, 0, 75]]
+        
+        sections = {
+            'soma': soma,
+            'dend1': dend1,
+            'dend2': dend2
+        }
+        
+        synapses = _get_basket_syn_props()  # Use default for now
+        
+        # section properties
+        for sec_name, section in sections.items():
+            section.syns = list(synapses.keys())
+            section.mechs = {'hh2': dict()}
+        
+        sect_loc = dict(
+            proximal=['soma'],
+            distal=['dend1', 'dend2']
+        )
+        
+        cell_tree = {
+            ('soma', 0): [('soma', 1)],
+            ('soma', 1): [('dend1', 0), ('dend2', 0)],
+            ('dend1', 0): [('dend1', 1)],
+            ('dend2', 0): [('dend2', 1)]
+        }
+        
+        return Cell(
+            name, pos,
+            sections=sections,
+            synapses=synapses,
+            sect_loc=sect_loc,
+            cell_tree=cell_tree,
+            gid=gid
+        )
+
+def custom_cell_types_model(mesh_shape=(5, 5)):
+    """Model with completely custom cell types."""
+    
+    params = {
+        'tstop': 200.0,
+        'dt': 0.025,
+        'celsius': 37.0,
+        'threshold': 0.0,
+        'N_trials': 1,
+        't0_pois': 0.,
+        'T_pois': -1,
+        'dipole_smooth_win': 15.0,
+        'dipole_scalefctr': 30e3,
+        'prng_seedcore_input_prox': 2,
+        'prng_seedcore_input_dist': 2,
+        'prng_seedcore_extpois': 2,
+        'prng_seedcore_extgauss': 2,
+    }
+    
+    cell_types = {
+        'L2_interneuron': custom_cell_factory('L2_interneuron')(),  # Create template instance
+        'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
+        'L4_stellate': custom_cell_factory('L4_stellate')(),
+        'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
+    }
+        
+    # layer positions
+    layer_dict = _create_cell_coords(
+        n_pyr_x=mesh_shape[0],
+        n_pyr_y=mesh_shape[1],
+        zdiff=1307.4,
+        inplane_distance=1.0
+    )
+    
+    # layer position for L4
+    l4_z = (layer_dict['L2_bottom'][0][2] + layer_dict['L5_bottom'][0][2]) / 2
+    layer_dict['L4_middle'] = [(x, y, l4_z) for x, y, _ in layer_dict['L2_bottom']]
+    
+    # cell types to positions
+    pos_dict = {
+        'L5_pyramidal': layer_dict['L5_bottom'],
+        'L2_pyramidal': layer_dict['L2_bottom'],
+        'L2_interneuron': layer_dict['L2_mid'],
+        'L4_stellate': layer_dict['L4_middle'][:len(layer_dict['L4_middle'])//2],  # Half the cells
+        'origin': layer_dict['origin']
+    }
+    
+    net = Network(params, 
+                  mesh_shape=mesh_shape,
+                  pos_dict=pos_dict,
+                  cell_types=cell_types)
+    
+    # Add custom connections
+    delay = 1.0
+    
+    # L2 interneuron inhibits pyramidals
+    net.add_connection(
+        'L2_interneuron', 'L2_pyramidal', 'soma', 'gabaa',
+        weight=0.08, delay=delay, lamtha=30.)
+    
+    # L4 stellate excites both layers
+    net.add_connection(
+        'L4_stellate', 'L2_pyramidal', 'proximal', 'ampa',
+        weight=0.002, delay=delay, lamtha=5.)
+    
+    net.add_connection(
+        'L4_stellate', 'L5_pyramidal', 'proximal', 'ampa',
+        weight=0.003, delay=delay, lamtha=5.)
+    
+    # Pyramidals excite stellate cells
+    net.add_connection(
+        'L2_pyramidal', 'L4_stellate', 'distal', 'ampa',
+        weight=0.001, delay=delay, lamtha=3.)
+    
+    return net
+
+def custom_cell_factory(cell_type_name):
+    """Factory function to create custom cell types."""
+    def create_cell(pos=(0, 0, 0), gid=None):
+        if cell_type_name == 'L2_interneuron':
+            return CellTypeBuilder.create_interneuron(cell_type_name, pos, gid)
+        elif cell_type_name == 'L4_stellate':
+            return CellTypeBuilder.create_stellate(cell_type_name, pos, gid)
+        else:
+            raise ValueError(f"Unknown custom cell type: {cell_type_name}")
+    return create_cell
+
+def random_model(params=None, add_drives_from_params=False,
+                                   legacy_mode=False, mesh_shape=(10, 10)):
+    """
+    L2_random instead of L2_basket to test modularity.
+    
+    """
+    import os.path as op
+    import hnn_core
+    from hnn_core import read_params
+    
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    if params is None:
+        params = op.join(hnn_core_root, 'param', 'default.json')
+    if isinstance(params, str):
+        params = read_params(params)
+    
+    cell_types = {
+        'L2_random': basket(cell_name='L2Random'),  # short name convention
+        'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
+        'L5_basket': basket(cell_name=_short_name('L5_basket')),
+        'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
+    }
+    
+
+    layer_dict = _create_cell_coords(
+        n_pyr_x=mesh_shape[0],
+        n_pyr_y=mesh_shape[1],
+        zdiff=1307.4,
+        inplane_distance=1.0
+    )
+    
+    pos_dict = {
+        'L5_pyramidal': layer_dict['L5_bottom'],
+        'L2_pyramidal': layer_dict['L2_bottom'],
+        'L5_basket': layer_dict['L5_mid'],
+        'L2_random': layer_dict['L2_mid'],  # Using same position as L2_basket
+        'origin': layer_dict['origin']
+    }
+    
+    net = Network(params, 
+                  add_drives_from_params=add_drives_from_params,
+                  legacy_mode=legacy_mode, 
+                  mesh_shape=mesh_shape,
+                  pos_dict=pos_dict,
+                  cell_types=cell_types)
+    
+    delay = net.delay
+    
+    # L2_random -> L2_pyramidal (like L2_basket -> L2_pyramidal)
+    src_cell = 'L2_random'
+    target_cell = 'L2_pyramidal'
+    weight = 0.05  # Simple fixed weight instead of param lookup
+    net.add_connection(
+        src_cell, target_cell, 'soma', 'gabaa', weight, delay, lamtha=50.)
+    
+    # L2_pyramidal -> L2_random (like L2_pyramidal -> L2_basket)
+    src_cell = 'L2_pyramidal'
+    target_cell = 'L2_random'
+    weight = 0.001
+    net.add_connection(
+        src_cell, target_cell, 'soma', 'ampa', weight, delay, lamtha=3.)
+    
+    return net
 
 def jones_2009_model(params=None, add_drives_from_params=False,
                      legacy_mode=False, mesh_shape=(10, 10), 

@@ -560,10 +560,18 @@ class Network:
     def __repr__(self):
         class_name = self.__class__.__name__
         s = ("%d x %d Pyramidal cells (L2, L5)"
-             % (self._N_pyr_x, self._N_pyr_y))
-        s += ("\n%d L2 basket cells\n%d L5 basket cells"
-              % (len(self.pos_dict['L2_basket']),
-                 len(self.pos_dict['L5_basket'])))
+            % (self._N_pyr_x, self._N_pyr_y))
+        
+        # Make this dynamic instead of hardcoded
+        basket_counts = []
+        for cell_name in sorted(self.cell_types.keys()):
+            if 'basket' in cell_name.lower() or cell_name == 'L2_random':
+                count = len(self.pos_dict.get(cell_name, []))
+                basket_counts.append(f"{count} {cell_name} cells")
+        
+        if basket_counts:
+            s += "\n" + "\n".join(basket_counts)
+        
         return '<%s | %s>' % (class_name, s)
 
     def __eq__(self, other):
@@ -1610,7 +1618,7 @@ class Network:
         if copy:
             return net
 
-    def plot_cells(self, ax=None, show=True):
+    def plot_cells(self, ax=None, show=True, cell_colors=None, cell_markers=None):
         """Plot the cells using Network.pos_dict.
 
         Parameters
@@ -1626,7 +1634,8 @@ class Network:
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
         """
-        return plot_cells(net=self, ax=ax, show=show)
+        return plot_cells(net=self, ax=ax, show=show, 
+                        cell_colors=cell_colors, cell_markers=cell_markers)
 
     def to_dict(self, write_output=False):
         return network_to_dict(self, write_output=write_output)

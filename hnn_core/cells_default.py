@@ -16,6 +16,42 @@ from .params_default import (get_L2Pyr_params_default,
 # units for taur: ms
 
 
+def custom_cell(cell_name, pos=(0, 0, 0), gid=None, 
+                sections_config=None, synapses_config=None, 
+                sect_loc_config=None, cell_tree_config=None):
+    """Create a custom cell
+    """
+    # Default to basket-like if no config provided
+    if sections_config is None:
+        sections = dict()
+        sections['soma'] = _get_basket_soma(cell_name)
+    else:
+        sections = sections_config
+    
+    if synapses_config is None:
+        synapses = _get_basket_syn_props()
+    else:
+        synapses = synapses_config
+    
+    if sect_loc_config is None:
+        sect_loc = dict(proximal=['soma'], distal=['soma'])
+    else:
+        sect_loc = sect_loc_config
+    
+    # Set up synapses and mechanisms
+    for sec_name, section in sections.items():
+        if not hasattr(section, 'syns'):
+            section.syns = list(synapses.keys())
+        if not hasattr(section, 'mechs'):
+            section.mechs = {'hh2': dict()}
+    
+    return Cell(cell_name, pos,
+                sections=sections,
+                synapses=synapses,
+                sect_loc=sect_loc,
+                cell_tree=cell_tree_config,
+                gid=gid)
+
 def _get_dends(params, cell_type, section_names):
     """Convert a flat dictionary to a nested dictionary.
 
@@ -340,12 +376,23 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
     cell : instance of BasketSingle
         The basket cell.
     """
-    if cell_name == 'L2Basket':
+def basket(cell_name, pos=(0, 0, 0), gid=None):
+    """Get layer 2 / layer 5 basket cells."""
+    # Check for specific known types first
+    if cell_name in ['L2Basket', 'L2Random']:
         sect_loc = dict(proximal=['soma'], distal=['soma'])
     elif cell_name == 'L5Basket':
         sect_loc = dict(proximal=['soma'], distal=[])
+    # Then check for patterns for flexibility
+    elif 'L2' in cell_name:
+        sect_loc = dict(proximal=['soma'], distal=['soma'])
+    elif 'L5' in cell_name:
+        sect_loc = dict(proximal=['soma'], distal=[])
     else:
-        raise ValueError(f'Unknown basket cell type: {cell_name}')
+        # Default behavior
+        sect_loc = dict(proximal=['soma'], distal=['soma'])
+        import warnings
+        warnings.warn(f"Unknown basket cell type: {cell_name}. Using L2-like configuration.")
 
     sections = dict()
     sections['soma'] = _get_basket_soma(cell_name)
@@ -360,7 +407,6 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
                 sect_loc=sect_loc,
                 cell_tree=cell_tree,
                 gid=gid)
-
 
 def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
     """Pyramidal neuron.
@@ -378,6 +424,12 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
         The GID is an integer from 0 to n_cells, or None if the cell is not
         yet attached to a network. Once the GID is set, it cannot be changed.
     """
+    if cell_name == 'L2_pyramidal':
+        cell_name = 'L2Pyr'
+    elif cell_name == 'L5_pyramidal':
+        cell_name = 'L5Pyr'
+    
+    # Now check with short names
     if cell_name == 'L2Pyr':
         return _cell_L2Pyr(override_params, pos=pos, gid=gid)
     elif cell_name == 'L5Pyr':

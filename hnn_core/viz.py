@@ -696,7 +696,7 @@ def plot_spikes_raster(cell_response, trial_idx=None, ax=None, show=True,
     return ax.get_figure()
 
 
-def plot_cells(net, ax=None, show=True):
+def plot_cells(net, ax=None, show=True, cell_colors=None, cell_markers=None):
     """Plot the cells using Network.pos_dict.
 
     Parameters
@@ -717,6 +717,7 @@ def plot_cells(net, ax=None, show=True):
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
     from matplotlib.lines import Line2D
+    import numpy as np
 
     if ax is None:
         fig = plt.figure()
@@ -726,19 +727,64 @@ def plot_cells(net, ax=None, show=True):
         raise TypeError("Expected 'ax' to be an instance of Axes3D, "
                         f"but got {type(ax).__name__}")
 
-    colors = {'L5_pyramidal': 'b', 'L2_pyramidal': 'c',
-              'L5_basket': 'r', 'L2_basket': 'm'}
-    markers = {'L5_pyramidal': '^', 'L2_pyramidal': '^',
-               'L5_basket': 'x', 'L2_basket': 'x'}
-
+    # Default colors and markers for known cell types
+    default_colors = {'L5_pyramidal': 'b', 'L2_pyramidal': 'c',
+                      'L5_basket': 'r', 'L2_basket': 'm'}
+    default_markers = {'L5_pyramidal': '^', 'L2_pyramidal': '^',
+                       'L5_basket': 'x', 'L2_basket': 'x'}
+    
+    # Start with defaults
+    colors = default_colors.copy()
+    markers = default_markers.copy()
+    
+    # If custom colors/markers provided, update
+    if cell_colors is not None:
+        colors.update(cell_colors)
+    
+    if cell_markers is not None:
+        markers.update(cell_markers)
+    
+    # Get color cycle for unknown cell types
+    color_cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
+    available_colors = [c for c in color_cycle if c not in colors.values()]
+    color_iter = iter(available_colors)
+    
+    # Marker options for different cell types
+    basket_markers = ['x', '+', '*']
+    pyramidal_markers = ['^', 'v', '<', '>']
+    other_markers = ['o', 's', 'D', 'p', 'h']
+    
+    # Plot all cell types
     for cell_type in net.cell_types:
         x = [pos[0] for pos in net.pos_dict[cell_type]]
         y = [pos[1] for pos in net.pos_dict[cell_type]]
         z = [pos[2] for pos in net.pos_dict[cell_type]]
-        if cell_type in colors:
-            color = colors[cell_type]
-            marker = markers[cell_type]
-            ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
+        
+        # Determine color
+        if cell_type not in colors:
+            try:
+                colors[cell_type] = next(color_iter)
+            except StopIteration:
+                # If we run out of colors, cycle back
+                color_iter = iter(color_cycle)
+                colors[cell_type] = next(color_iter)
+        
+        # Determine marker based on cell type pattern
+        if cell_type not in markers:
+            if 'basket' in cell_type.lower() or 'interneuron' in cell_type.lower() or cell_type == 'L2_random':
+                # Use basket-like markers for inhibitory cells
+                markers[cell_type] = basket_markers[len([k for k in markers if 'basket' in k.lower() or 'interneuron' in k.lower()]) % len(basket_markers)]
+            elif 'pyramidal' in cell_type.lower():
+                # Use pyramidal markers
+                markers[cell_type] = pyramidal_markers[len([k for k in markers if 'pyramidal' in k.lower()]) % len(pyramidal_markers)]
+            else:
+                # Use other markers for unknown types
+                used_other = len([k for k in markers if k not in default_markers])
+                markers[cell_type] = other_markers[used_other % len(other_markers)]
+        
+        color = colors[cell_type]
+        marker = markers[cell_type]
+        ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
 
     if net.rec_arrays:
         cols = plt.get_cmap('inferno', len(net.rec_arrays) + 2)
@@ -750,22 +796,25 @@ def plot_cells(net, ax=None, show=True):
                        label=arr_name)
 
     plt.legend(bbox_to_anchor=(-0.15, 1.025), loc="upper left")
+    
+    # Create annotation lines for all cell types
     annotation_lines = []
-    for cell_type in ['L2_basket', 'L2_pyramidal', 'L5_basket', 'L5_pyramidal']:
+    for cell_type in net.cell_types:
         if cell_type not in net.pos_dict:
             continue
         pos_list = net.pos_dict[cell_type]
-        x_avg = np.mean([pos[0] for pos in pos_list])
-        y_avg = np.mean([pos[1] for pos in pos_list])
-        z_avg = np.mean([pos[2] for pos in pos_list])
+        if len(pos_list) > 0:  # Only if there are cells of this type
+            x_avg = np.mean([pos[0] for pos in pos_list])
+            y_avg = np.mean([pos[1] for pos in pos_list])
+            z_avg = np.mean([pos[2] for pos in pos_list])
 
-        color = colors[cell_type]
-        marker = markers[cell_type]
-        label = f"{cell_type}: ({x_avg:.1f}, {y_avg:.1f}, {z_avg:.1f})"
-        line = Line2D([0], [0], marker=marker, color='w', label=label,
-                    markerfacecolor=color, markeredgecolor=color,
-                    markersize=10, linestyle='None')
-        annotation_lines.append(line)
+            color = colors.get(cell_type, 'gray')
+            marker = markers.get(cell_type, 'o')
+            label = f"{cell_type}: ({x_avg:.1f}, {y_avg:.1f}, {z_avg:.1f})"
+            line = Line2D([0], [0], marker=marker, color='w', label=label,
+                        markerfacecolor=color, markeredgecolor=color,
+                        markersize=10, linestyle='None')
+            annotation_lines.append(line)
 
     ax.legend(handles=annotation_lines,
             loc='upper center', bbox_to_anchor=(0.5, 1.10),
