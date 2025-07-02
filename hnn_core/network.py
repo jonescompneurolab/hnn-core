@@ -1074,7 +1074,7 @@ class Network:
         for arr in self.rec_arrays.values():
             arr._reset()
 
-    def _instantiate_drives(self, tstop, n_trials=1):
+    def _instantiate_drives(self, tstop, n_trials=1, change_seed_per_drive=False):
         """Creates event time vectors for all drives across trials
 
         Parameters
@@ -1090,11 +1090,24 @@ class Network:
         need to be recalculated, all the GIDs etc remain the same.
         """
         self._reset_drives()
-
+        rnd_seed = int(np.random.uniform(100, 1000))
         # each trial needs unique event time vectors
         for trial_idx in range(n_trials):
-            for drive in self.external_drives.values():
+            for d, drive in enumerate(self.external_drives.values()):
                 event_times = list()  # new list for each trial and drive
+
+                if change_seed_per_drive:
+                    
+                    warnings.warn('change_seed_per_drive set to True. '
+                                  'Starting seed will be changed from '
+                                    f'{drive["event_seed"]} to '
+                                    f'{rnd_seed} to ensure different '
+                                    'drives across gids.')
+
+                    event_seed = (rnd_seed*d)
+                else:
+                    event_seed = drive['event_seed']
+                    
                 for drive_cell_gid in self.gid_ranges[drive['name']]:
                     drive_cell_gid_offset = (drive_cell_gid -
                                              self.gid_ranges[drive['name']][0])
@@ -1108,13 +1121,14 @@ class Network:
                                             ['target_type'] for conn_idx in
                                             conn_idxs])
                         for target_type in target_types:
+
                             event_times.append(_drive_cell_event_times(
                                 drive['type'],
                                 drive['dynamics'],
                                 target_type=target_type,
                                 trial_idx=trial_idx,
                                 drive_cell_gid=drive_cell_gid_offset,
-                                event_seed=drive['event_seed'],
+                                event_seed=event_seed,
                                 tstop=tstop,
                                 trial_seed_offset=trial_seed_offset)
                             )
@@ -1126,7 +1140,7 @@ class Network:
                             target_type='any',
                             trial_idx=trial_idx,
                             drive_cell_gid=drive_cell_gid_offset,
-                            event_seed=drive['event_seed'],
+                            event_seed=event_seed,
                             trial_seed_offset=trial_seed_offset)
                         event_times.append(src_event_times)
                 # 'events': nested list (n_trials x n_drive_cells x n_events)

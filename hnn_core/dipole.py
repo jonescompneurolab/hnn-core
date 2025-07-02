@@ -19,7 +19,7 @@ from .viz import plot_dipole, plot_psd, plot_tfr_morlet
 
 
 def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
-                    record_isec=False, record_ca=False, postproc=False, bsl_cor='jones'):
+                    record_isec=False, record_ca=False, postproc=False, bsl_cor='jones', change_seed_per_drive=False):
     """Simulate a dipole given the experiment parameters.
 
     Parameters
@@ -97,7 +97,7 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
             if duration < 0.:
                 raise ValueError('Duration of tonic input cannot be negative')
 
-    net._instantiate_drives(n_trials=n_trials, tstop=tstop)
+    net._instantiate_drives(n_trials=n_trials, tstop=tstop, change_seed_per_drive=change_seed_per_drive)
     net._reset_rec_arrays()
 
     _check_option('record_vsec', record_vsec, ['all', 'soma', False])

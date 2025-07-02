@@ -959,7 +959,7 @@ def plot_psd(dpl, *, fmin=0, fmax=None, tmin=None, tmax=None, layer='agg',
         freqs, Pxx = periodogram(data, sfreq, window='hamming', nfft=len(data))
         trial_power.append(Pxx)
 
-    ax.plot(freqs, np.mean(np.array(Pxx, ndmin=2), axis=0), color=color,
+    ax.plot(freqs, np.mean(np.array(trial_power, ndmin=2), axis=0), color=color,
             label=label)
     if label:
         ax.legend()
