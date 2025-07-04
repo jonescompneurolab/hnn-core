@@ -92,7 +92,7 @@ conn_properties = {
     },
     'L2_pyramidal': {
         'location': 'proximal',
-        'weights_ampa': 0.003,
+        'weights_ampa': 0.003,   
         'synaptic_delays': 1.0,
     }
 }
@@ -120,6 +120,35 @@ all_weights_ampa = {}
 for cfg in target_config.values():
     all_weights_ampa.update(cfg['weights_ampa'])
 
+
+
+# Alternative Format 2 approach (times/gids format)
+# Create spike data using the tuple format
+# spike_data = []
+
+# if net_A.cell_response and net_A.cell_response.spike_times:
+#     # Get spike data from the first trial
+#     trial_idx = 0
+#     spike_times = net_A.cell_response.spike_times[trial_idx]
+#     spike_gids = net_A.cell_response.spike_gids[trial_idx]
+#     spike_types = net_A.cell_response.spike_types[trial_idx]
+    
+#     # Keep only pyramidal cells
+#     pyramidal_mask = np.array([cell_type in ['L2_pyramidal', 'L5_pyramidal'] 
+#                               for cell_type in spike_types])
+    
+#     filtered_times = np.array(spike_times)[pyramidal_mask]
+#     filtered_gids = np.array(spike_gids)[pyramidal_mask]
+    
+#     # Create (time, gid) tuples for each spike
+#     for i in range(len(filtered_times)):
+#         time = filtered_times[i]
+#         gid = filtered_gids[i]
+#         spike_data.append((time, gid))
+    
+#     # Optional: Sort by time
+#     spike_data.sort(key=lambda x: x[0])
+
 net_B.add_spike_train_drive(
     name='drive_from_NetA',
     spike_data=spike_data,
@@ -129,37 +158,6 @@ net_B.add_spike_train_drive(
     synaptic_delays=0.1,
     conn_seed=42
 )
-    
-    # Alternative Format 2 approach (times/gids format)
-    # First, convert to times/gids format
-# '''
-# all_times = []
-# all_gids = []
-# gid_map = {}
-
-# for i, src_id in enumerate(spike_data.keys()):
-#     gid_map[src_id] = i
-#     times = spike_data[src_id]
-#     all_times.extend(times)
-#     all_gids.extend([i] * len(times))
-
-# times_gids_format = {
-#     'times': all_times,
-#     'gids': all_gids
-# }
-
-# # Demonstrate how to use Format 2
-# net_B.add_spike_train_drive(
-#     name='drive_from_NetA',
-#     spike_data=times_gids_format,
-#     location='distal',
-#     weights_ampa={'L5_pyramidal': 0.005, 'L2_pyramidal': 0.003},
-#     weights_nmda=None,
-#     synaptic_delays={'L5_pyramidal': 1.5, 'L2_pyramidal': 1.0},
-#     probability=0.7,
-#     conn_seed=42
-# )
-# '''
 
 # Verify drive setup
 print("\nVerifying configuration:")
@@ -189,34 +187,20 @@ else:
 print("\nSimulating Network B...")
 dpls_B = simulate_dipole(net_B, tstop=225.0, n_trials=1)
 
-# Plot results
-plt.figure(figsize=(12, 8))
 
-# Plot Network A dipole
-plt.subplot(2, 1, 1)
-times_A = dpls_A[0].times
-data_A = dpls_A[0].data['agg']
-plt.plot(times_A, data_A, 'b-', label='Network A')
-plt.title('Network A Dipole')
-plt.xlabel('Time (ms)')
-plt.ylabel('Dipole (nAm)')
-plt.grid(True)
-plt.legend()
+# Create a comprehensive visualization of both networks
+fig, axes = plt.subplots(2, 1, figsize=(10, 12), sharex=True, constrained_layout=True)
 
-# Plot Network B dipole
-plt.subplot(2, 1, 2)
-times_B = dpls_B[0].times
-data_B = dpls_B[0].data['agg']
-plt.plot(times_B, data_B, 'r-', label='Network B')
-plt.title('Network B Dipole (receiving spikes from Network A)')
-plt.xlabel('Time (ms)')
-plt.ylabel('Dipole (nAm)')
-plt.grid(True)
-plt.legend()
 
-plt.tight_layout()
-plt.savefig('network_communication.png')
-print("Saved plot to 'network_communication.png'")
+# 1. Network A: Spike raster
+net_A.cell_response.plot_spikes_raster(ax=axes[0], show=False)
+axes[0].set_title('Network A: Spike Raster')
+axes[0].set_ylabel('Cell ID')
+
+# 2. Network B: Spike raster
+net_B.cell_response.plot_spikes_raster(ax=axes[1], show=False)
+axes[1].set_title('Network B: Spike Raster')
+axes[1].set_ylabel('Cell ID')
+axes[1].set_xlabel('Time (ms)')
+
 plt.show()
-
-print("Complete!")

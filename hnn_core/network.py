@@ -999,45 +999,61 @@ class Network:
     ):
         """Add an external drive from explicitly defined spike trains.
 
-        This method allows the network to receive input from external spike trains,
-        such as those recorded from another network simulation or from experimental data.
+        This method enables the target network to receive spike trains from a source network
+        (e.g., another HNN simulation) or external data, driving activity in the target network's cells.
 
         Parameters
         ----------
         name : str
-            Unique name for the drive
-        spike_data : dict
-            Dictionary containing spike information in one of two formats:
-            - Format 1 (source channels): Keys are source channel identifiers (strings)
-              and values are lists of spike times for that source in ms.
-              Example: {"NetA_L2_pyramidal_GID0": [10.2, 25.3, ...], ...}
-            - Format 2 (consolidated): A dict with keys 'times' and 'gids' where
-              'times' is an array of all spike times in ms and 'gids' are the
-              corresponding drive cell IDs (integers starting from 0).
+            Unique name for the drive (e.g., 'drive_from_NetA').
+        spike_data : dict or list of tuple
+        Spike train data from the **source network** (or external source) in one of two formats:
+
+        - Format 1 (dictionary): Keys are unique identifiers (str) for source
+        cells and values are lists of spike times in milliseconds. The keys
+        can be any string that helps identify the source.
+        Example:
+        ```
+        {"NetA_L2_pyramidal_GID0": [10.2, 25.3], "NetA_L5_pyramidal_GID1": [15.1, 30.4]}
+        ```
+
+        - Format 2 (tuples): A list of (time, gid) tuples, where each tuple
+        contains a spike time (float, in ms) and a GID (int). The GIDs can be
+        any integers that uniquely identify different source cells.
+        Example:
+        ```
+        [(10.2, 0), (25.3, 1), (15.1, 0), (30.4, 1)]
+        ```
+
+        Note: The GIDs in both formats refer to the source cells in the originating
+        network (or external data). These are arbitrary identifiers that will be
+        remapped internally to sequential drive cell IDs (0 to n-1) in the target
+        network. Different GIDs should be used for different source cells.
         location : str
-            Target location of synapses. Must be 'proximal', 'distal', or 'soma',
-            or a specific section name (when legacy_mode=False).
+            Target location of synapses in the target network. Must be 'proximal', 'distal', or
+            'soma', or a specific section name (when legacy_mode=False).
         weights_ampa : dict or None
-            Synaptic weights (in uS) of AMPA receptors on each targeted cell
-            type (dict keys). Cell types omitted from the dict are set to zero.
+            Synaptic weights (in uS) of AMPA receptors for each targeted cell type (dict keys).
+            Cell types omitted are set to zero.
         weights_nmda : dict or None
-            Synaptic weights (in uS) of NMDA receptors on each targeted cell
-            type (dict keys). Cell types omitted from the dict are set to zero.
+            Synaptic weights (in uS) of NMDA receptors for each targeted cell type (dict keys).
+            Cell types omitted are set to zero.
         synaptic_delays : dict or float
-            Synaptic delay (in ms) at the column origin, dispersed laterally as
-            a function of the space_constant. If float, applies to all target
-            cell types. Use dict to create delay->cell mapping.
+            Synaptic delay (in ms) at the column origin, dispersed laterally as a function of
+            space_constant. If float, applies to all target cell types. Use dict for cell-specific
+            delays.
         space_constant : float
-            Describes lateral dispersion (from the column origin) of synaptic
-            weights and delays within the simulated column. The constant is
-            measured in the units of ``inplane_distance`` of
-            :class:`~hnn_core.Network`. Default: 3.0
+            Lateral dispersion constant (in units of inplane_distance) for synaptic weights and
+            delays within the target network. Default: 3.0
         probability : float or dict
-            Probability of connection between any src-target pair.
-            Default is 1.0, producing an all-to-all pattern.
+            Connection probability between source and target cells. Default: 1.0 (all-to-all).
         conn_seed : int
-            Optional initial seed for random number generator (default: None).
-            Used to randomly remove connections when probability < 1.0.
+            Optional seed for random number generator for connectivity (default: None).
+        cell_specific : bool
+            If True, enables cell-specific connectivity (e.g., for 1-to-1 mapping). Default: False.
+        n_drive_cells : str or int
+            Number of drive cells. Use 'n_cells' for 1-to-1 mapping with target cell types,
+            or an integer for a fixed number. Default: None (inferred from spike_data).
         """
         if not self._legacy_mode:
             warnings.warn(
@@ -1053,92 +1069,15 @@ class Network:
         drive["events"] = list()  # Will be populated during instantiation
 
         # Process spike_data into a standardized format
-        if isinstance(spike_data, dict):
-            # Check which format we have
-            if "times" in spike_data and "gids" in spike_data:
-                # Format 2: Already in {times: [...], gids: [...]} format
-                # Validate
-                if not (
-                    isinstance(spike_data["times"], (list, np.ndarray))
-                    and isinstance(spike_data["gids"], (list, np.ndarray))
-                ):
-                    raise ValueError(
-                        "For 'times'/'gids' format, both 'times' and 'gids' "
-                        "must be lists or numpy arrays."
-                    )
-                if len(spike_data["times"]) != len(spike_data["gids"]):
-                    raise ValueError(
-                        "'times' and 'gids' arrays must have the same length."
-                    )
-
-                # Count unique drive cells
-                unique_gids = np.unique(spike_data["gids"])
-                drive["n_drive_cells"] = len(unique_gids)
-
-                # Ensure gids are sequential from 0 to n-1
-                if len(unique_gids) > 0:
-                    if (
-                        np.min(unique_gids) != 0
-                        or np.max(unique_gids) != len(unique_gids) - 1
-                    ):
-                        # Reindex gids to be 0-based sequential integers
-                        gid_map = {
-                            old_gid: new_gid
-                            for new_gid, old_gid in enumerate(sorted(unique_gids))
-                        }
-                        new_gids = [gid_map[gid] for gid in spike_data["gids"]]
-                        standardized_data = {
-                            "times": spike_data["times"],
-                            "gids": new_gids,
-                        }
-                    else:
-                        standardized_data = {
-                            "times": spike_data["times"],
-                            "gids": spike_data["gids"],
-                        }
-                else:
-                    standardized_data = {"times": [], "gids": []}
-            else:
-                # Format 1: {source_id: [spike_times], ...}
-                source_ids = list(spike_data.keys())
-                drive["n_drive_cells"] = len(source_ids)
-
-                # Transform to standardized format
-                all_times = []
-                all_gids = []
-
-                # Map source IDs to sequential gids
-                source_id_to_gid = {src_id: i for i, src_id in enumerate(source_ids)}
-
-                # Collect all spike times and corresponding gids
-                for src_id, times in spike_data.items():
-                    gid = source_id_to_gid[src_id]
-                    if isinstance(times, (list, np.ndarray)):
-                        all_times.extend(times)
-                        all_gids.extend([gid] * len(times))
-                    else:
-                        raise ValueError(
-                            f"Spike times for source '{src_id}' must be a list or array. "
-                            f"Got {type(times)}."
-                        )
-
-                standardized_data = {
-                    "times": all_times,
-                    "gids": all_gids,
-                }
-
-                # Store the mapping for reference
-                drive["source_to_gid_map"] = source_id_to_gid
-        else:
-            raise ValueError(
-                "spike_data must be a dictionary with either source channel identifiers "
-                "as keys and spike time lists as values, or with 'times' and 'gids' keys."
-            )
-
-        # Set required drive properties
-        drive["dynamics"] = (
-            standardized_data  # This is what _drive_cell_event_times will use
+        standardized_data, n_drive_cells, source_to_gid_map = (
+            self._standardize_spike_data(spike_data)
         )
+
+        # Set drive properties
+        drive["dynamics"] = standardized_data
+        drive["n_drive_cells"] = n_drive_cells
+        if source_to_gid_map is not None:
+            drive["source_to_gid_map"] = source_to_gid_map
         drive["conn_seed"] = conn_seed
         drive["event_seed"] = (
             0  # Not used for spike train, but included for consistency
@@ -1149,13 +1088,6 @@ class Network:
         drive["weights_nmda"] = weights_nmda
         drive["synaptic_delays"] = synaptic_delays
         drive["probability"] = probability
-
-        # Register the drive with the network
-        # self.external_drives[name] = drive
-
-        # Create positions for the drive "cells" (all at origin)
-        # pos = [self.pos_dict["origin"]] * drive["n_drive_cells"]
-        # self._add_cell_type(name, pos)
 
         # Attach the drive to network cells
         self._attach_drive(
@@ -1965,6 +1897,106 @@ class Network:
     @copy_doc(write_network_configuration)
     def write_configuration(self, fname, overwrite=True):
         write_network_configuration(self, fname, overwrite)
+
+    def _standardize_spike_data(self, spike_data):
+        """Standardize spike data to internal format with 'times' and 'gids' keys.
+
+        Parameters
+        ----------
+        spike_data : dict or list
+            Input spike data in one of two formats:
+            - Format 1: Dictionary where keys are source identifiers and values are
+            lists of spike times in ms.
+            Example: {"NetA_L2_pyramidal_GID0": [10.2, 25.3], ...}
+            - Format 2: List of (time, gid) tuples where time is the spike time in ms
+            and gid identifies the source cell.
+            Example: [(10.2, 0), (15.6, 1), (25.3, 0)]
+
+        Returns
+        -------
+        standardized_data : dict
+            Dictionary with 'times' and 'gids' keys containing spike information
+            in standardized internal format
+        n_drive_cells : int
+            Number of unique source cells detected
+        source_to_gid_map : dict or None
+            Mapping from source identifiers to sequential GIDs (for Format 1),
+            or None for Format 2
+        """
+        source_to_gid_map = None
+
+        if isinstance(spike_data, list) and all(
+            isinstance(x, tuple) and len(x) == 2 for x in spike_data
+        ):
+            # Format 2: List of (time, gid) tuples
+            times = [pair[0] for pair in spike_data]
+            gids = [pair[1] for pair in spike_data]
+
+            # Count unique drive cells
+            unique_gids = np.unique(gids)
+            n_drive_cells = len(unique_gids)
+
+            # Ensure gids are sequential from 0 to n-1
+            if len(unique_gids) > 0:
+                if (
+                    np.min(unique_gids) != 0
+                    or np.max(unique_gids) != len(unique_gids) - 1
+                ):
+                    # Reindex gids to be 0-based sequential integers
+                    gid_map = {
+                        old_gid: new_gid
+                        for new_gid, old_gid in enumerate(sorted(unique_gids))
+                    }
+                    new_gids = [gid_map[gid] for gid in gids]
+                    standardized_data = {
+                        "times": times,
+                        "gids": new_gids,
+                    }
+                else:
+                    standardized_data = {
+                        "times": times,
+                        "gids": gids,
+                    }
+            else:
+                standardized_data = {"times": [], "gids": []}
+
+        elif isinstance(spike_data, dict):
+            # Format 1: {source_id: [spike_times], ...}
+            source_ids = list(spike_data.keys())
+            n_drive_cells = len(source_ids)
+
+            # Transform to standardized format
+            all_times = []
+            all_gids = []
+
+            # Map source IDs to sequential gids
+            source_to_gid_map = {src_id: i for i, src_id in enumerate(source_ids)}
+
+            # Collect all spike times and corresponding gids
+            for src_id, times in spike_data.items():
+                gid = source_to_gid_map[src_id]
+                if isinstance(times, (list, np.ndarray)):
+                    all_times.extend(times)
+                    all_gids.extend([gid] * len(times))
+                else:
+                    raise ValueError(
+                        f"Spike times for source '{src_id}' must be a list or array. "
+                        f"Got {type(times)}."
+                    )
+
+            standardized_data = {
+                "times": all_times,
+                "gids": all_gids,
+            }
+        else:
+            raise ValueError(
+                "spike_data must be either:\n"
+                "1. A dictionary {source_id: [spike_times], ...}\n"
+                "2. A list of (time, gid) tuples\n"
+                f"Got {type(spike_data)}."
+            )
+
+        return standardized_data, n_drive_cells, source_to_gid_map
 
 
 class _Connectivity(dict):
