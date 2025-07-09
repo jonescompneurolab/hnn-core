@@ -13,4 +13,4 @@ from .cell_response import CellResponse, read_spikes
 from .cells_default import pyramidal, basket
 from .parallel_backends import MPIBackend, JoblibBackend
 
-__version__ = "0.5.0.dev0"
+__version__ = "0.4.3dev2"

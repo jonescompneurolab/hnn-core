@@ -48,65 +48,89 @@ typical contribution process is to
 
 2.  On the terminal of your local computer clone the fork:
 
-        $ git clone https://github.com/<username>/hnn-core
+    ```
+    git clone https://github.com/<username>/hnn-core
+    ```
 
 3.  On the terminal of your local computer set up the remotes:
 
-        $ cd hnn-core
-        $ git remote add upstream https://github.com/jonescompneurolab/hnn-core
+    ```
+    cd hnn-core
+    git remote add upstream https://github.com/jonescompneurolab/hnn-core
+    ```
 
 4.  Check that the remotes have been correctly added:
 
-        $ git remote -v
+    ```
+    git remote -v
+    ```
 
     You should see:
 
-        origin      https://github.com/<username>/hnn-core (fetch)
-        origin      https://github.com/<username>/hnn-core (push)
-        upstream    https://github.com/jonescompneurolab/hnn-core (fetch)
-        upstream    https://github.com/jonescompneurolab/hnn-core (push)
+    ```
+    origin      https://github.com/<username>/hnn-core (fetch)
+    origin      https://github.com/<username>/hnn-core (push)
+    upstream    https://github.com/jonescompneurolab/hnn-core (fetch)
+    upstream    https://github.com/jonescompneurolab/hnn-core (push)
+    ```
 
 5.  To start a new feature branch, we will copy the existing `master`
     branch from the `upstream` remote and give it a specific name:
 
-        $ git fetch upstream master:cool_feature
-        $ git checkout cool_feature
+    ```
+    git fetch upstream master:cool_feature
+    git checkout cool_feature
+    ```
 
-6.  Make your changes relevant to the pull request
+6.  If you have not already done so, install the editable version of hnn-core [using the
+    instructions below](#installing-editable-hnn-core), so that you can execute and test
+    your changes as you make them.
 
-7.  To make a commit, you first have to add the files you have changed
+7.  Make your changes relevant to the pull request.
+
+8.  To make a commit, you first have to add the files you have changed
     to the staging area:
 
-        $ git add -u
+    ```
+    git add -u
+    ```
 
     ensure they have been added correctly:
 
-        $ git status
+    ```
+    git status
+    ```
 
     make a commit:
 
-        $ git commit -m "your commit message"
+    ```
+    git commit -m "your commit message"
+    ```
 
     and finally check that the commit has been added:
 
-        $ git log
+    ```
+    git log
+    ```
 
     Note: see the [numpy contributing
     guide](https://numpy.org/doc/stable/dev/development_workflow.html#writing-the-commit-message)
     for tips on informative commit messages.
 
-8.  Now push the feature branch to your fork:
+9.  Now push the feature branch to your fork:
 
-        $ git push origin cool_feature
+    ```
+    git push origin cool_feature
+    ```
 
-9.  Go to <https://github.com/jonescompneurolab/hnn-core/compare> to
+10.  Go to <https://github.com/jonescompneurolab/hnn-core/compare> to
     open the pull request by selecting your feature branch. You should
     also see this link on the terminal when you make the push.
 
-10. After your pull request is reviewed, repeat steps 6-8 to update the
+11. After your pull request is reviewed, repeat steps 6-8 to update the
     pull request.
 
-11. Once the pull request is ready to be merged, add the prefix [MRG]
+12. Once the pull request is ready to be merged, add the prefix [MRG]
     to the title.
 
 See the [git book](https://git-scm.com/book/en/v2) for a more general
@@ -118,10 +142,12 @@ For making changes to hnn-core, you will need to install an editable
 version of hnn-core. For that you need to have the git cloned `hnn-core`
 repository and use pip with the editable (`-e`) flag:
 
-    $ git clone https://github.com/jonescompneurolab/hnn-core
-    $ cd hnn-core
-    $ pip install -e '.[dev]'
-    $ python setup.py build_mod
+```
+git clone https://github.com/jonescompneurolab/hnn-core
+cd hnn-core
+pip install -e '.[dev]'
+python setup.py build_mod
+```
 
 The `pip install -e '.[dev]'` step will install all extra packages used
 by developers to access all features and to perform testing and building
@@ -133,7 +159,9 @@ require a compilation step. In the normal course of development, you
 will not have to edit these files. However, if you do have to update
 them, they will need to be rebuilt using the command:
 
-    $ python setup.py build_mod
+```
+python setup.py build_mod
+```
 
 We highly encourage contributors to also follow the `pip` MPI portion of the
 {doc}`Installation Guide <install>` so that
@@ -157,7 +185,9 @@ How to run these checks and tests locally is described below.
 "Linting" your code, which checks for code syntax errors and other errors, can be done
 using the following command, which uses the `ruff` library:
 
-    $ make lint
+```
+make lint
+```
 
 If the above command prints any errors, then you will *need to fix* those errors
 before your code will pass our Continuous Integration testing, which is required for it
@@ -173,7 +203,9 @@ itself unless you wish to.
 Spell-checking your code can be done by simply running the following command. This
 command also only checks your code, but does not make changes to it:
 
-    $ make spell
+```
+make spell
+```
 
 Note that spell-checking is also done as part of the `make test` command (see
 "Testing" section below), which means that you do not need to run `make spell` by
@@ -185,7 +217,9 @@ Formatting is handled differently, through two commands. The first command,
 below, is used to check if your code is consistent with our enforced formatting style,
 which is currently the default `ruff` style. This command does not change your code:
 
-    $ make format-check
+```
+make format-check
+```
 
 Note that format-checking is also done as part of the `make test` command (see
 "Testing" section below), which means that you do not need to run `make format-check`
@@ -198,7 +232,9 @@ files "would be reformatted", and if you are ready to make a git commit, then yo
 should run the following command. This command **will almost always change your code
 automatically**, since it re-formats your code:
 
-    $ make format-overwrite
+```
+make format-overwrite
+```
 
 Unlike linting, spell-checking, and testing, we do provide a way to automatically fix
 formatting issues. That way is the above `make format-overwrite` command. Just to be
@@ -224,7 +260,9 @@ framework](https://docs.pytest.org/en/stable/), and use the [`pytest-xdist`
 extension](https://pytest-xdist.readthedocs.io/en/stable/) to speed up your local test
 runs as fast as possible. To run the tests, run the following command:
 
-    $ make test
+```
+make test
+```
 
 Running tests will not change your code, but may download some additional files. MPI
 tests are skipped if the `mpi4py` module is not installed. See {doc}`Installation Guide
@@ -255,17 +293,23 @@ The documentation can be built using sphinx.
 
 You can build the documentation locally using the command:
 
-    $ cd doc/
-    $ make html
+```
+cd doc/
+make html
+```
 
 If you want to build the documentation locally without running all the
 examples, use the command:
 
-    $ make html-noplot
+```
+make html-noplot
+```
 
 Finally, to view the documentation, do:
 
-    $ make view
+```
+make view
+```
 
 ### Writing the documentation
 
@@ -317,16 +361,22 @@ To rebase, we do the following:
 
 1.  Checkout the feature branch:
 
-        $ git checkout cool_feature
+```
+git checkout cool_feature
+```
 
 2.  Delete the `master` branch and fetch a new copy:
 
-        $ git branch -D master
-        $ git fetch upstream master:master
+```
+git branch -D master
+git fetch upstream master:master
+```
 
 3.  Start the rebase:
 
-        $ git rebase master
+```
+git rebase master
+```
 
 4.  If there are conflicts, the easiest approach is to resolve them in
     an editor like VS code. See [this
@@ -336,8 +386,10 @@ To rebase, we do the following:
 5.  Once the conflicts have been resolved, add the resolved files to the
     staging area:
 
-        $ git add -u
-        $ git rebase --continue
+```
+git add -u
+git rebase --continue
+```
 
 In general it is best to rebase frequently if you are aware of pull
 requests being merged into the `master` base.
@@ -417,10 +469,44 @@ types of failures will be marked as a failure in CI.
 
 ## Making changes to the default network
 
-If you ever need to make scientific or technical changes to the default network, you must "re-generate" the smaller network we use for testing, in `hnn_core/tests/assets/jones2009_3x3_drives.json`. This is easily done via the following:
+If you ever need to make scientific or technical changes to the default network, you
+need to do three things:
 
-    $ make regenerate-test-network
+1. Step 1: If needed, manually make changes to `hnn_core/param/default.json`. This is
+   the base file used for the important `jones_2009_model()` function. Make sure that if
+   you need to change certain parameters, then change them in this all-important file
+   **manually**. Note that not all parameters are in this file. If your changes do not
+   affect the parameters in this file, then you don't need to make any change to the
+   file.
 
-Once you do this, make sure to re-run all the tests using `make test` to ensure that numerical tests dependent on the network itself have not broken.
+2. Step 2: Run the following command from the top-level of the repository:
+
+    ```
+    make regenerate-networks
+    ```
+
+    This command runs two scripts, each of which rebuild a particular "hierarchical
+    JSON" network file which are used in HNN-Core. These two files are described
+    below. Note that you do **not** need to make manual changes to these files; running
+    the above command is sufficient. However, you **do** need to commit the new
+    versions of these files. The two files:
+
+    A. `hnn_core/param/jones2009_base.json`: This is the base file used for the
+       GUI. This file has been built using the code in
+       `hnn_core/params.py::convert_to_json` by way of
+       `dev_scripts/regenerate_base_network.py`.
+
+    B. `hnn_core/test/assets/jones2009_3x3_drives.json`: This is the base file used for
+       many tests. This file has been built using the script in
+       `hnn_core/tests/regenerate_test_network.py`.
+
+3. Step 3: Once all the above versions of the network have been updated, make sure to
+   re-run all the tests using `make test`! If the new network files break tests, then
+   that breakage needs to be fixed before we can merge your updates.
+
+## Publishing new releases
+
+For an updated version of how we make releases, {doc}`see our guide here
+<how_to_create_releases>`.
 
 [used in MNE-Python]: https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#L124-L132

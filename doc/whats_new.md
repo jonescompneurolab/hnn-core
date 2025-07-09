@@ -5,18 +5,185 @@ orphan: true
 (whats_new)=
 # What's new?
 
-## Current development version
+<!-- Protip: the Github PRs webpage can NOT give you the true order of *when* PRs were
+merged into `master`! Use `git log` instead and cross-reference instead. -->
+
+<!-- template below for new release notes: -->
+
+<!-- ## 0.4.2 Patch Notes -->
+
+<!-- ### New Features -->
+
+<!-- ### Deprecations -->
+
+<!-- ### Upcoming Deprecations -->
+
+<!-- ### Bug Fixes -->
+
+<!-- ### API Changes -->
+
+<!-- ### People who contributed to this release (in alphabetical order of family name): -->
+
+<!-- ### Changelog -->
+
+## 0.4.2 Patch Notes
+
+Version 0.4.2 is a patch release that fixes two important bugs: one affecting LFP and CSD output ({gh}`1062`) and another preventing users from upgrading to the recently released NEURON 8.2.7 ({gh}`1058`), which also enables use of HNN-Core with Python 3.13. This also includes other, smaller bug fixes and changes.
+
+If you have been using HNN-Core to simulate LFP or CSD output, we *strongly* recommend you update to this version.
+
+We have also recently overhauled our [HNN Frontpage](https://hnn.brown.edu) and our new [HNN Textbook website](https://jonescompneurolab.github.io/textbook/content/preface.html), so check them out!
+
+### New Features
+
+- We now provide `conda` packages that offer *significantly* easier installation of
+  HNN-Core, including an option with all features included (including MPI!). See our
+  {doc}`Installation Guide <install>` for how to install them.
+
+- We now support Python 3.13, in addition to previously supported Python versions.
+
+### Upcoming Deprecations
+
+- In the next minor release (0.5.x), we will be dropping Python 3.8 support for two reasons:
+    1. It has reached "end-of-life" and is no longer supported, including NOT receiving any future security upgrades (see <https://devguide.python.org/versions/>).
+    2. NEURON 8.2.7 has dropped support for Python 3.8.
+
+If you expect that you will still require `hnn_core` using Python 3.8, please reach out to us on our [Github Discussions page](https://github.com/jonescompneurolab/hnn-core/discussions). We will likely be able to continue supporting your use-case.
+
+### Bug Fixes
+
+- Major bugfix: Cell positions were previously starting at origin (incorrect) instead of
+  origin + their `pos_dict` locations (correct). This has been fixed. This change should
+  not affect results from dipole or single-cell output, but *will* affect results from
+  LFP or CSD output. Identified and fixed
+  by [Katharina Duecker][] in {gh}`1062`.
+
+- `hnn_core/viz.py::plot_spikes_raster()` now correctly titles the plot according to if
+  dipoles are overlaid or not,
+  by [Dylan Daniels][] in {gh}`1074`.
+
+- Update `hnn_core/mod/vecevent.mod` to a newer version from NEURON's source code,
+  enabling use of NEURON's latest version (8.2.7) and Python's latest stable version
+  (3.13). The prior version of this file would not correctly compile on Windows using
+  NEURON 8.2.7.
+  By [Austin E. Soplata][] in {gh}`1058`.
+
+- Fix test breakage caused by upstream dependency change in `scipy.optimize`,
+  by [Austin E. Soplata][] in {gh}`1076`.
+
+### Development Workflow Changes
+
+- `hnn_core` code now follows the default `ruff` code formatting style, and all new
+  contributions are expected to follow this style as well. Fortunately, there is a
+  single command that developers need to run which automatically format their code
+  appropriately (`make format-overwrite`), see [the new Quality Control section of our Contributing
+  Guide](https://jonescompneurolab.github.io/hnn-core/dev/contributing.html#quality-control)
+  for details.
+
+- Updates to Linkcheck Workflow frequency so it only runs on every merge to `master` and
+  on the 1st and 15th of every month,
+  by [Maira Usman][] in {gh}`1043` (new contributor!!!).
+
+- Concurrency in Github Actions is now utilized: if you push a new commit to your
+  existing PR branch while prior workflows are still running, the prior workflows are
+  canceled ({gh}`1015`).
+
+- You can now build and deploy new package distributions of `hnn_core` directly from
+  Github to Pypi and TestPypi by pushed any new tag that begins with `v` ({gh}`1073` and
+  {gh}`1077`). Documentation for how to make a release has not been updated yet, but
+  will be soon.
+
+- When a developer needs to update parameters of the "default model" used in HNN, there
+  is now both documentation and commands to help guide them. See [the new "Making
+  changes to the default network" section of our Contributing
+  Guide](https://jonescompneurolab.github.io/hnn-core/dev/contributing.html#making-changes-to-the-default-network)
+  ({gh}`1068`).
 
 ### API Changes
 
-- :class:`~hnn_core.CellResponse` now requires a `cell_type_names` argument, whereas before the argument was optional.
+- :class:`~hnn_core.CellResponse` now requires a `cell_type_names` argument, whereas before the argument was optional ({gh}`970`).
+
+- `hnn_core/optimization/optimized_evoked.py::optimized_evoked` now enforces a minimum
+  number of iterations, twelve (12). This is a temporary, possibly permanent, fix
+  introduced in {gh}`1076`.
+
+### People who contributed to this release (in alphabetical order of family name):
+
+- [Dylan Daniels][]
+- [Katharina Duecker][]
+- [Mohamed W. ElSayed][]
+- [Austin E. Soplata][]
+- [Maira Usman][]
 
 ### Changelog
 
-- Remove hardcoding of celltypes in :class:`~hnn_core.CellResponse` and add
-  {func}`~hnn_core.Network.rename_cell`, by [Mohamed W. ElSayed][] in {gh}`702` and {gh}`970`.
+- Fix tiny typo in `pip` MPI install documentation,
+  by [Austin E. Soplata][] in {gh}`1072`. (he's also responsible for the original typo...)
 
-## 0.4.1 Patch notes
+- Update the Linux path of our Unix unit tests to use `conda` for its MPI installation,
+  NOT system packages. This makes our unit tests consistent with our recently-changed
+  recommended installation pathways for `pip` MPI on Linux.
+  By [Austin E. Soplata][] in {gh}`1071`.
+
+- Tiny docstring update to `jones_2009_model` that the "model" is from the Jones 2009
+  paper, but the "implementation" is from Neymotin 2020. Citations for both papers are
+  included in the docstring. By [Austin E. Soplata][] in {gh}`1056`.
+
+- Added support for "regeneration" of both required hierarchical JSON network files
+  alongside documentation,
+  by [Austin E. Soplata][] in {gh}`1068`.
+
+- Enable automated package release building and deployment via Github Actions to Pypi and TestPypi,
+  by [Austin E. Soplata][] in {gh}`1073` and hotfix in {gh}`1077`.
+
+- Version downgraded from 0.5.0dev0 to 0.4.2.devX in preparation for this release (no PR).
+
+- Fix test breakage caused by upstream dependency change in `scipy.optimize`,
+  by [Austin E. Soplata][] in {gh}`1076`.
+
+- `hnn_core/viz.py::plot_spikes_raster()` now correctly titles the plot according to if
+  dipoles are overlaid or not,
+  by [Dylan Daniels][] in {gh}`1074`.
+
+- Update `hnn_core/mod/vecevent.mod` to a newer version from NEURON's source code,
+  enabling use of NEURON's latest version (8.2.7) and Python's latest stable version
+  (3.13),
+  by [Austin E. Soplata][] in {gh}`1058`.
+
+- Introduce concurrency controls to Github Actions,
+  by [Maira Usman][] in {gh}`1015`.
+
+- Major bugfix: Cell positions were previously starting at origin (incorrect) instead of
+  origin + their `pos_dict` locations (correct). This has been fixed. This change should
+  not affect results from dipole or single-cell output, but *will* affect results from
+  LFP or CSD output. Identified and fixed
+  by [Katharina Duecker][] in {gh}`1062`.
+
+- Updates to Linkcheck Workflow frequency so it only runs on every merge to `master` and
+  on the 1st and 15th of every month,
+  by [Maira Usman][] in {gh}`1043` (new contributor!!!).
+
+- Miscellaneous link updates/fixes needed due to our overhaul of our [HNN
+  Frontpage](https://hnn.brown.edu) and our new [HNN Textbook
+  website](https://jonescompneurolab.github.io/textbook/content/preface.html),
+  by [Austin E. Soplata][] in {gh}`1055`, {gh}`1059`, {gh}`1063`, and {gh}`1067`.
+
+- Add support for `ruff format`, merge changes taken from running it, and require its
+  use for new code contributions,
+  by [Austin E. Soplata][] in {gh}`934`.
+
+- Add `conda` package installation instructions,
+  by [Austin E. Soplata][] in {gh}`1051`.
+
+- Add and update "Cloud" usage instructions on install page to redirect to our new
+  Textbook website,
+  by [Austin E. Soplata][] in {gh}`1046` and {gh}`1048`.
+
+- Remove hardcoding of celltypes in :class:`~hnn_core.CellResponse` and add
+  {func}`~hnn_core.Network.rename_cell`,
+  by [Mohamed W. ElSayed][] in {gh}`702` and {gh}`970`.
+
+## 0.4.1 Patch Notes
 
 - Version 0.4.1 is a bug-fixing patch release for version 0.4. This includes changes to importing of `BatchSimulate` due to previously-undetected install/import issues ({gh}`1034`), configuration of packaging metadata format (same PR), and elimination of a discrepancy in our method of cleaning local compiled files that led to architecture-specific files being included in the Pypi 0.4 release, which caused simulations on some platforms to fail ({gh}`1035`). The public Pypi version has already been updated to 0.4.1.
 
@@ -889,3 +1056,5 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Dan Toms]: https://github.com/pynmash
 [Shehroz Kashif]: https://github.com/Shehrozkashif
 [Mohamed W. ElSayed]: https://github.com/wagdy88
+[Maira Usman]: https://github.com/Myrausman
+[Chetan Kandpal]: https://github.com/Chetank99

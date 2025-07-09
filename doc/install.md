@@ -36,7 +36,7 @@ conda activate hnn-core-env
 
 If desired, you can change the environment name `hnn-core-env` to whatever you wish. If you are new to Python or
 data science in Python, we recommend you review the resources here:
-<https://docs.anaconda.com/getting-started/>.
+<https://docs.anaconda.com/getting-started/>. Note that for this step, you **must** use Python 3.12, as our `conda` packages are currently only built against Python 3.12.
 
 3. Install our package using the following command:
 
@@ -102,7 +102,7 @@ We strongly recommend that you install HNN-Core inside a "virtual environment" u
 
 Note that if you use a virtual environment, you must first create the environment, and then separately *activate* the environment (see [Conda guidance here](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#activating-an-environment)) before running any of the commands below. **All of the installation commands below assume you have already activated your environment**. You may need to re-activate your environment every time you restart your computer or open a new terminal, depending on how you installed your virtual environment software.
 
-Note that `hnn_core` currently only supports Python 3.8, 3.9, 3.10, 3.11, and 3.12, but *not* 3.13.
+If installing through `pip`, `hnn-core` currently supports Python 3.9 through 3.13, inclusively.
 
 ## Step 2. `pip` Platform-specific requirements
 
@@ -184,7 +184,7 @@ dependencies using the following command (make sure to include the "quotes"):
 pip install "hnn_core[opt]"
 ```
 
-If you are planning to use Optimization, it is recommended to also install Joblib support (see below). Instruction on how to use our Optimization support can be found on [our HNN Textbook website][], including this [optimization tutorial](https://jonescompneurolab.github.io/textbook/content/04_using_hnn/optimize_simulated_evoked_response_parameters.html).
+If you are planning to use Optimization, it is recommended to also install Joblib support (see below). Instruction on how to use our Optimization support can be found on [our HNN Textbook website][], including this [optimization tutorial](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/optimize_simulated_evoked_response_parameters.html).
 
 ### `pip` Joblib Installation
 
@@ -197,7 +197,7 @@ pip install "hnn_core[parallel]"
 
 This automatically installs the following dependencies: [Joblib](https://joblib.readthedocs.io/en/stable/) and [psutil](https://github.com/giampaolo/psutil).
 
-Many of the examples on [our HNN Textbook website][] make use of Joblib support, and we provide an explicit [tutorial for it here](https://jonescompneurolab.github.io/textbook/content/04_using_hnn/parallelism_joblib.html).
+Many of the examples on [our HNN Textbook website][] make use of Joblib support, and we provide an explicit [tutorial for it here](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/parallelism_joblib.html).
 
 ### `pip` MPI Installation
 
@@ -220,7 +220,7 @@ conda create -y -q -n hnn-core-env python=3.12
 conda activate hnn-core-env
 ```
 
-If desired, you can change the environment name `hnn-core-env` to whatever you wish. Compatible Python versions currently include 3.8, 3.9, 3.10, 3.11, and 3.12, but *not* 3.13.
+If desired, you can change the environment name `hnn-core-env` to whatever you wish. Compatible Python versions currently include 3.9 to 3.13, inclusively.
 
 3. (MacOS only) Copy, paste, and run the following commands to set some environment variables for your `conda` environment:
 
@@ -231,7 +231,7 @@ echo "export DYLD_FALLBACK_LIBRARY_PATH=\$DYLD_FALLBACK_LIBRARY_PATH:\${CONDA_PR
 echo "export DYLD_FALLBACK_LIBRARY_PATH=\$OLD_DYLD_FALLBACK_LIBRARY_PATH" >> $CONDA_PREFIX/etc/conda/deactivate.d/env_vars.sh
 echo "unset OLD_DYLD_FALLBACK_LIBRARY_PATH" >> $CONDA_PREFIX/etc/conda/deactivate.d/env_vars.sh
 export OLD_DYLD_FALLBACK_LIBRARY_PATH=$DYLD_FALLBACK_LIBRARY_PATH
-export DYLD_FALLBACK_LIBRARY_PATH=$LD_LIBRARY_PATH:${CONDA_PREFIX}/lib
+export DYLD_FALLBACK_LIBRARY_PATH=$DYLD_FALLBACK_LIBRARY_PATH:${CONDA_PREFIX}/lib
 ```
 
 4. (Linux only) Copy, paste, and run the following commands to set some environment variables for your `conda` environment:
@@ -280,7 +280,7 @@ Hello from proc 0
 Hello from proc 1
 ```
 
-8. You can find tutorials on how to use MPI parallelism on [our HNN Textbook website][], specifically on [our MPI tutorial here](https://jonescompneurolab.github.io/textbook/content/04_using_hnn/parallelism_mpi.html).
+8. You can find tutorials on how to use MPI parallelism on [our HNN Textbook website][], specifically on [our MPI tutorial here](https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/parallelism_mpi.html).
 
 [NEURON]: https://nrn.readthedocs.io/
 [our HNN Textbook website]: https://jonescompneurolab.github.io/textbook/content/preface.html
