@@ -1472,13 +1472,13 @@ def test_rename_cell_types(base_network):
 
 def test_spike_train_drive_formats():
     """Test both formats of spike_data are accepted and processed correctly."""
-    
+
     # Create dictionary format (Format 1)
     dict_format = {"src1": [10.0, 20.0, 30.0], "src2": [15.0, 25.0, 35.0]}
-    
+
     # Create tuple format (Format 2)
     tuple_format = [(10.0, 0), (15.0, 1), (20.0, 0), (25.0, 1), (30.0, 0), (35.0, 1)]
-    
+
     # Test with dictionary format
     net_dict = jones_2009_model()
     net_dict.add_spike_train_drive(
@@ -1487,9 +1487,9 @@ def test_spike_train_drive_formats():
         location="distal",
         weights_ampa={"L5_pyramidal": 0.005},
         synaptic_delays=1.0,
-        conn_seed=42
+        conn_seed=42,
     )
-    
+
     # Test with tuple format
     net_tuple = jones_2009_model()
     net_tuple.add_spike_train_drive(
@@ -1498,27 +1498,27 @@ def test_spike_train_drive_formats():
         location="distal",
         weights_ampa={"L5_pyramidal": 0.005},
         synaptic_delays=1.0,
-        conn_seed=42
+        conn_seed=42,
     )
-    
+
     # Check both drives were created
     assert "drive_dict" in net_dict.external_drives
     assert "drive_tuple" in net_tuple.external_drives
-    
+
     # Check both have the correct number of drive cells
     assert net_dict.external_drives["drive_dict"]["n_drive_cells"] == 2
     assert net_tuple.external_drives["drive_tuple"]["n_drive_cells"] == 2
-    
+
     # Verify drive type
     assert net_dict.external_drives["drive_dict"]["type"] == "spike_train"
     assert net_tuple.external_drives["drive_tuple"]["type"] == "spike_train"
-    
+
     # Verify standardized data structure
     assert "times" in net_dict.external_drives["drive_dict"]["dynamics"]
     assert "gids" in net_dict.external_drives["drive_dict"]["dynamics"]
     assert "times" in net_tuple.external_drives["drive_tuple"]["dynamics"]
     assert "gids" in net_tuple.external_drives["drive_tuple"]["dynamics"]
-    
+
     # Verify the total number of spikes
     assert len(net_dict.external_drives["drive_dict"]["dynamics"]["times"]) == 6
     assert len(net_tuple.external_drives["drive_tuple"]["dynamics"]["times"]) == 6
@@ -1542,7 +1542,7 @@ def test_spike_train_drive_simulations():
         location="distal",
         weights_ampa={"L5_pyramidal": 0.1, "L2_pyramidal": 0.05},
         synaptic_delays=1.0,
-        conn_seed=42
+        conn_seed=42,
     )
 
     net_tuple.add_spike_train_drive(
@@ -1551,7 +1551,7 @@ def test_spike_train_drive_simulations():
         location="distal",
         weights_ampa={"L5_pyramidal": 0.1, "L2_pyramidal": 0.05},
         synaptic_delays=1.0,
-        conn_seed=42  
+        conn_seed=42,
     )
 
     # Simulate networks
@@ -1581,7 +1581,7 @@ def test_multi_network_communication():
         location="distal",
         weights_ampa={"L5_pyramidal": 0.2, "L2_pyramidal": 0.1},
         weights_nmda=None,
-        conn_seed=42
+        conn_seed=42,
     )
 
     # Simulate first network
@@ -1616,7 +1616,7 @@ def test_multi_network_communication():
         location="distal",
         weights_ampa={"L5_pyramidal": 0.1, "L2_pyramidal": 0.05},
         synaptic_delays=1.0,
-        conn_seed=42
+        conn_seed=42,
     )
 
     # Simulate second network
