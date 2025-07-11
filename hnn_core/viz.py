@@ -872,7 +872,10 @@ def plot_spikes_raster(
     ax.tick_params(axis="y", length=0)
 
     # add title
-    ax.set_title("Raster Plot with Layer-Specific Dipole Overlays")
+    if overlay_dipoles:
+        ax.set_title("Raster Plot with Layer-Specific Dipole Overlays")
+    else:
+        ax.set_title("Raster Plot")
 
     if len(cell_response.times) > 0:
         ax.set_xlim(left=0, right=cell_response.times[-1])

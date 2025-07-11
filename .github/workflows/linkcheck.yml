@@ -7,6 +7,10 @@ on:
   schedule:
     - cron: "0 0 1,15 * *"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
 
@@ -32,3 +36,4 @@ jobs:
         shell: bash -el {0}
         run: |
           make -C doc linkcheck
+

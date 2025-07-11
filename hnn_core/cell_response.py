@@ -6,6 +6,7 @@
 
 from glob import glob
 from warnings import warn
+
 import numpy as np
 
 from .viz import plot_spikes_hist, plot_spikes_raster
@@ -325,8 +326,22 @@ class CellResponse(object):
             An axis object from matplotlib. If None, a new figure is created.
         show : bool
             If True, show the figure.
-        colors: list of str | None
+        cell_types : list of str
+            List of cell types to plot
+        colors : list of str | None
             Optional custom colors to plot. Default will use the color cycler.
+        show_legend : bool
+            If True, show the legend with colors for cell types
+        marker_size : float
+            Optional marker size to use when plotting spikes. Uses
+            "linelengths" argument of ax.eventplot, which accepts positive
+            numeric values only
+        dpl : instance of Dipole | list
+            The Dipole object containing layer-specific dipole data
+            to overlay on the raster plot
+        overlay_dipoles : bool
+            If True, overlay the layer-specific dipole data on the
+            raster plot
 
         Returns
         -------
