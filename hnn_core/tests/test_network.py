@@ -1468,3 +1468,164 @@ def test_rename_cell_types(base_network):
         show=False, cell_types=list(cell_type_rename_mapping.values())
     )
     net4.cell_response.plot_spikes_hist(show=False)
+
+
+def test_spike_train_drive_formats():
+    """Test both formats of spike_data are accepted and processed correctly."""
+    
+    # Create dictionary format (Format 1)
+    dict_format = {"src1": [10.0, 20.0, 30.0], "src2": [15.0, 25.0, 35.0]}
+    
+    # Create tuple format (Format 2)
+    tuple_format = [(10.0, 0), (15.0, 1), (20.0, 0), (25.0, 1), (30.0, 0), (35.0, 1)]
+    
+    # Test with dictionary format
+    net_dict = jones_2009_model()
+    net_dict.add_spike_train_drive(
+        name="drive_dict",
+        spike_data=dict_format,
+        location="distal",
+        weights_ampa={"L5_pyramidal": 0.005},
+        synaptic_delays=1.0,
+        conn_seed=42
+    )
+    
+    # Test with tuple format
+    net_tuple = jones_2009_model()
+    net_tuple.add_spike_train_drive(
+        name="drive_tuple",
+        spike_data=tuple_format,
+        location="distal",
+        weights_ampa={"L5_pyramidal": 0.005},
+        synaptic_delays=1.0,
+        conn_seed=42
+    )
+    
+    # Check both drives were created
+    assert "drive_dict" in net_dict.external_drives
+    assert "drive_tuple" in net_tuple.external_drives
+    
+    # Check both have the correct number of drive cells
+    assert net_dict.external_drives["drive_dict"]["n_drive_cells"] == 2
+    assert net_tuple.external_drives["drive_tuple"]["n_drive_cells"] == 2
+    
+    # Verify drive type
+    assert net_dict.external_drives["drive_dict"]["type"] == "spike_train"
+    assert net_tuple.external_drives["drive_tuple"]["type"] == "spike_train"
+    
+    # Verify standardized data structure
+    assert "times" in net_dict.external_drives["drive_dict"]["dynamics"]
+    assert "gids" in net_dict.external_drives["drive_dict"]["dynamics"]
+    assert "times" in net_tuple.external_drives["drive_tuple"]["dynamics"]
+    assert "gids" in net_tuple.external_drives["drive_tuple"]["dynamics"]
+    
+    # Verify the total number of spikes
+    assert len(net_dict.external_drives["drive_dict"]["dynamics"]["times"]) == 6
+    assert len(net_tuple.external_drives["drive_tuple"]["dynamics"]["times"]) == 6
+
+
+def test_spike_train_drive_simulations():
+    """Test simulating networks with spike train drives."""
+    # Create networks
+    net_dict = jones_2009_model()
+    net_tuple = jones_2009_model()
+
+    # Create spike data
+    dict_format = {"src1": [50.0, 70.0, 90.0], "src2": [55.0, 75.0, 95.0]}
+
+    tuple_format = [(50.0, 0), (55.0, 1), (70.0, 0), (75.0, 1), (90.0, 0), (95.0, 1)]
+
+    # Add drives
+    net_dict.add_spike_train_drive(
+        name="drive_dict",
+        spike_data=dict_format,
+        location="distal",
+        weights_ampa={"L5_pyramidal": 0.1, "L2_pyramidal": 0.05},
+        synaptic_delays=1.0,
+        conn_seed=42
+    )
+
+    net_tuple.add_spike_train_drive(
+        name="drive_tuple",
+        spike_data=tuple_format,
+        location="distal",
+        weights_ampa={"L5_pyramidal": 0.1, "L2_pyramidal": 0.05},
+        synaptic_delays=1.0,
+        conn_seed=42  
+    )
+
+    # Simulate networks
+    dpls_dict = simulate_dipole(net_dict, tstop=150.0, n_trials=1)
+    dpls_tuple = simulate_dipole(net_tuple, tstop=150.0, n_trials=1)
+
+    # Make sure simulations completed successfully
+    assert len(dpls_dict[0].times) > 0
+    assert len(dpls_tuple[0].times) > 0
+
+    # Verify spikes were generated
+    assert len(net_dict.cell_response.spike_times[0]) > 0
+    assert len(net_tuple.cell_response.spike_times[0]) > 0
+
+
+def test_multi_network_communication():
+    """Test a full workflow of network-to-network communication."""
+    # Create first network
+    net_A = jones_2009_model()
+
+    # Add drive to first network
+    net_A.add_evoked_drive(
+        name="evdist1",
+        mu=50.0,
+        sigma=2.0,
+        numspikes=1,
+        location="distal",
+        weights_ampa={"L5_pyramidal": 0.2, "L2_pyramidal": 0.1},
+        weights_nmda=None,
+        conn_seed=42
+    )
+
+    # Simulate first network
+    dpls_A = simulate_dipole(net_A, tstop=100.0, n_trials=1)
+
+    # Extract spike data from first network
+    spike_data = {}
+    if net_A.cell_response and net_A.cell_response.spike_times:
+        trial_idx = 0
+        spike_times = net_A.cell_response.spike_times[trial_idx]
+        spike_gids = net_A.cell_response.spike_gids[trial_idx]
+        spike_types = net_A.cell_response.spike_types[trial_idx]
+
+        for i in range(len(spike_times)):
+            gid = spike_gids[i]
+            cell_type = spike_types[i]
+            time = spike_times[i]
+            src_id = f"NetA_{cell_type}_GID{gid}"
+
+            if src_id not in spike_data:
+                spike_data[src_id] = []
+
+            spike_data[src_id].append(time)
+
+    # Create second network
+    net_B = jones_2009_model()
+
+    # Feed spike data to second network
+    net_B.add_spike_train_drive(
+        name="drive_from_NetA",
+        spike_data=spike_data,
+        location="distal",
+        weights_ampa={"L5_pyramidal": 0.1, "L2_pyramidal": 0.05},
+        synaptic_delays=1.0,
+        conn_seed=42
+    )
+
+    # Simulate second network
+    dpls_B = simulate_dipole(net_B, tstop=150.0, n_trials=1)
+
+    # Verify both simulations completed successfully
+    assert len(dpls_A[0].times) > 0
+    assert len(dpls_B[0].times) > 0
+
+    # Verify both networks generated spikes
+    assert len(net_A.cell_response.spike_times[0]) > 0
+    assert len(net_B.cell_response.spike_times[0]) > 0
