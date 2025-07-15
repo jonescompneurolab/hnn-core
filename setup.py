@@ -117,7 +117,7 @@ if __name__ == "__main__":
           ],
           platforms='any',
           install_requires=[
-              'numpy >=1.14',
+              'numpy <=2.2.3',
               'NEURON >=7.7; platform_system != "Windows"',
               'matplotlib>=3.5.3',
               'scipy',
