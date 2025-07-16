@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../../" >
 
   <head>
     <meta charset="utf-8" />
@@ -14,19 +14,21 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-
-  
-  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -35,22 +37,24 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=478316d9"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/documentation_options.js?v=9097ff11"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/workflows/plot_simulate_somato';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.14.4';
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
-        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -59,6 +63,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.4.3dev2" />
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
 <script>
@@ -77,32 +82,16 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../search.html"
       method="get">
@@ -110,7 +99,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -118,20 +106,27 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
   
   <div class=" navbar-header-items__start">
     
       <div class="navbar-item">
 
+  
+    
   
 
 <a class="navbar-brand logo" href="../../index.html">
@@ -146,7 +141,7 @@
     
     
     <img src="../../_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core 0.4.3dev2 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/hnn-medium.png" class="logo__image only-dark" alt="hnn-core 0.4.3dev2 documentation - Home"/>`);</script>
+    <img src="../../_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core 0.4.3dev2 documentation - Home"/>
   
   
 </a></div>
@@ -158,82 +153,78 @@
     <div class="me-auto navbar-header-items__center">
       
         <div class="navbar-item">
-<nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../install.html">
-                        Install
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Install
+  </a>
+</li>
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../index.html">
-                        Examples
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../api.html">
-                        API
-                      </a>
-                    </li>
-                
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Examples
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../glossary.html">
-                        Glossary
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../whats_new.html">
-                        What’s new?
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../contributing.html">
-                        Contributing
-                      </a>
-                    </li>
-                
 
-                <li class="nav-item">
-                  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
-                    GitHub (Code)
-                  </a>
-                </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../glossary.html">
+    Glossary
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
             <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
                     More
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
-                    PyPI
-                  </a>
-                </li>
-                
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
 
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
-                    HNN Frontpage
-                  </a>
-                </li>
-                
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
                 </ul>
             </li>
             
@@ -248,41 +239,33 @@
         <div class="navbar-item navbar-persistent--container">
           
 
- <script>
- document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-2"
-      type="button"
-      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-2"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-2"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-2">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
       
     </div>
     
@@ -291,31 +274,31 @@ document.write(`
   
     <div class="navbar-persistent--mobile">
 
- <script>
- document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
-    </label>
+    </button>
   
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -324,88 +307,77 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
-<nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+          
+          
+            <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../install.html">
-                        Install
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Install
+  </a>
+</li>
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../index.html">
-                        Examples
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../api.html">
-                        API
-                      </a>
-                    </li>
-                
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Examples
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../glossary.html">
-                        Glossary
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../whats_new.html">
-                        What’s new?
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../contributing.html">
-                        Contributing
-                      </a>
-                    </li>
-                
 
-                <li class="nav-item">
-                  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
-                    GitHub (Code)
-                  </a>
-                </li>
-                
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
-                    More
-                </button>
-                <ul id="pst-nav-more-links-2" class="dropdown-menu">
-                    
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
-                    PyPI
-                  </a>
-                </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../glossary.html">
+    Glossary
+  </a>
+</li>
 
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
-                    HNN Frontpage
-                  </a>
-                </li>
-                
-                </ul>
-            </li>
-            
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -414,28 +386,24 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-3"
-      type="button"
-      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-3"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-3"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-3">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
         
       </div>
     
@@ -443,29 +411,32 @@ document.write(`
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
         <div class="header-article-item">
 
-
-
-<nav aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
@@ -479,7 +450,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">Tutorials</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">04. From...</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">04. From MEG sensor-space data to HNN simulation</span></li>
   </ul>
 </nav>
 </div>
@@ -494,7 +465,7 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
@@ -502,7 +473,7 @@ document.write(`
 to download the full example code. or to run this example in your browser via Binder</p>
 </div>
 <section class="sphx-glr-example-title" id="from-meg-sensor-space-data-to-hnn-simulation">
-<span id="sphx-glr-auto-examples-workflows-plot-simulate-somato-py"></span><h1>04. From MEG sensor-space data to HNN simulation<a class="headerlink" href="#from-meg-sensor-space-data-to-hnn-simulation" title="Permalink to this heading">#</a></h1>
+<span id="sphx-glr-auto-examples-workflows-plot-simulate-somato-py"></span><h1>04. From MEG sensor-space data to HNN simulation<a class="headerlink" href="#from-meg-sensor-space-data-to-hnn-simulation" title="Link to this heading">#</a></h1>
 <p>This example demonstrates how to calculate an inverse solution of the median
 nerve evoked response potential (ERP) in S1 from the MNE somatosensory dataset,
 and then simulate a biophysical model network that reproduces the observed
@@ -544,93 +515,98 @@ importing <code class="docutils literal notranslate"><span class="pre">somato</s
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Using default location ~/mne_data for somato...
-Creating ~/mne_data
+Creating /home/circleci/mne_data
 Downloading file &#39;MNE-somato-data.tar.gz&#39; from &#39;https://osf.io/tp4sg/download?version=7&#39; to &#39;/home/circleci/mne_data&#39;.
 
   0%|                                               | 0.00/611M [00:00&lt;?, ?B/s]
-  1%|▎                                     | 4.30M/611M [00:00&lt;00:14, 43.0MB/s]
-  2%|▌                                     | 9.26M/611M [00:00&lt;00:12, 46.7MB/s]
-  3%|▉                                     | 16.0M/611M [00:00&lt;00:10, 56.0MB/s]
-  4%|█▌                                    | 25.4M/611M [00:00&lt;00:08, 71.2MB/s]
-  6%|██▏                                   | 35.1M/611M [00:00&lt;00:07, 80.5MB/s]
-  7%|██▊                                   | 44.7M/611M [00:00&lt;00:06, 85.7MB/s]
-  9%|███▍                                  | 54.2M/611M [00:00&lt;00:06, 88.9MB/s]
- 10%|███▉                                  | 63.9M/611M [00:00&lt;00:05, 91.1MB/s]
- 12%|████▌                                 | 73.6M/611M [00:00&lt;00:05, 93.2MB/s]
- 14%|█████▏                                | 83.3M/611M [00:01&lt;00:05, 94.1MB/s]
- 15%|█████▊                                | 92.9M/611M [00:01&lt;00:05, 94.8MB/s]
- 17%|██████▌                                | 103M/611M [00:01&lt;00:05, 95.8MB/s]
- 18%|███████▏                               | 112M/611M [00:01&lt;00:05, 96.0MB/s]
- 20%|███████▊                               | 122M/611M [00:01&lt;00:05, 96.0MB/s]
- 22%|████████▍                              | 132M/611M [00:01&lt;00:04, 96.6MB/s]
- 23%|█████████                              | 141M/611M [00:01&lt;00:04, 96.6MB/s]
- 25%|█████████▋                             | 151M/611M [00:01&lt;00:04, 96.5MB/s]
- 26%|██████████▎                            | 161M/611M [00:01&lt;00:04, 97.1MB/s]
- 28%|██████████▉                            | 171M/611M [00:01&lt;00:04, 96.9MB/s]
- 30%|███████████▌                           | 180M/611M [00:02&lt;00:05, 74.1MB/s]
- 31%|████████████                           | 189M/611M [00:02&lt;00:06, 63.1MB/s]
- 32%|████████████▍                          | 196M/611M [00:02&lt;00:06, 65.0MB/s]
- 33%|████████████▉                          | 203M/611M [00:02&lt;00:06, 62.4MB/s]
- 34%|█████████████▍                         | 210M/611M [00:02&lt;00:06, 65.6MB/s]
- 36%|█████████████▉                         | 218M/611M [00:02&lt;00:05, 68.8MB/s]
- 37%|██████████████▌                        | 227M/611M [00:02&lt;00:05, 74.3MB/s]
- 39%|███████████████                        | 236M/611M [00:02&lt;00:04, 78.1MB/s]
- 40%|███████████████▌                       | 244M/611M [00:03&lt;00:04, 80.5MB/s]
- 41%|████████████████▏                      | 253M/611M [00:03&lt;00:04, 82.0MB/s]
- 43%|████████████████▋                      | 262M/611M [00:03&lt;00:04, 82.8MB/s]
- 44%|█████████████████▎                     | 271M/611M [00:03&lt;00:04, 85.0MB/s]
- 46%|█████████████████▊                     | 280M/611M [00:03&lt;00:03, 87.1MB/s]
- 47%|██████████████████▍                    | 289M/611M [00:03&lt;00:03, 87.6MB/s]
- 49%|███████████████████                    | 297M/611M [00:03&lt;00:04, 75.6MB/s]
- 50%|███████████████████▌                   | 305M/611M [00:03&lt;00:04, 74.4MB/s]
- 51%|███████████████████▉                   | 313M/611M [00:03&lt;00:04, 69.1MB/s]
- 53%|████████████████████▌                  | 322M/611M [00:04&lt;00:03, 74.0MB/s]
- 54%|█████████████████████                  | 329M/611M [00:04&lt;00:03, 72.4MB/s]
- 55%|█████████████████████▌                 | 337M/611M [00:04&lt;00:03, 72.5MB/s]
- 56%|██████████████████████                 | 345M/611M [00:04&lt;00:03, 75.0MB/s]
- 58%|██████████████████████▌                | 353M/611M [00:04&lt;00:03, 77.0MB/s]
- 59%|███████████████████████                | 361M/611M [00:04&lt;00:03, 76.3MB/s]
- 60%|███████████████████████▌               | 369M/611M [00:04&lt;00:03, 72.8MB/s]
- 62%|████████████████████████               | 376M/611M [00:04&lt;00:03, 63.3MB/s]
- 63%|████████████████████████▍              | 382M/611M [00:04&lt;00:03, 58.6MB/s]
- 64%|████████████████████████▊              | 388M/611M [00:05&lt;00:05, 40.5MB/s]
- 64%|█████████████████████████▏             | 393M/611M [00:05&lt;00:05, 41.4MB/s]
- 66%|█████████████████████████▌             | 400M/611M [00:05&lt;00:04, 46.6MB/s]
- 67%|█████████████████████████▉             | 406M/611M [00:05&lt;00:03, 51.1MB/s]
- 68%|██████████████████████████▍            | 414M/611M [00:05&lt;00:03, 57.5MB/s]
- 69%|███████████████████████████            | 423M/611M [00:05&lt;00:02, 66.0MB/s]
- 71%|███████████████████████████▌           | 431M/611M [00:05&lt;00:02, 70.0MB/s]
- 72%|████████████████████████████           | 438M/611M [00:05&lt;00:02, 68.7MB/s]
- 73%|████████████████████████████▍          | 446M/611M [00:06&lt;00:02, 58.7MB/s]
- 74%|████████████████████████████▊          | 452M/611M [00:06&lt;00:02, 59.3MB/s]
- 75%|█████████████████████████████▎         | 458M/611M [00:06&lt;00:02, 52.5MB/s]
- 76%|█████████████████████████████▋         | 465M/611M [00:06&lt;00:02, 56.8MB/s]
- 77%|██████████████████████████████▏        | 473M/611M [00:06&lt;00:02, 62.7MB/s]
- 79%|██████████████████████████████▋        | 480M/611M [00:06&lt;00:01, 65.2MB/s]
- 80%|███████████████████████████████▏       | 489M/611M [00:06&lt;00:01, 71.0MB/s]
- 81%|███████████████████████████████▋       | 497M/611M [00:06&lt;00:01, 73.7MB/s]
- 83%|████████████████████████████████▏      | 504M/611M [00:06&lt;00:01, 73.6MB/s]
- 84%|████████████████████████████████▋      | 512M/611M [00:07&lt;00:01, 75.5MB/s]
- 85%|█████████████████████████████████▏     | 520M/611M [00:07&lt;00:01, 71.4MB/s]
- 86%|█████████████████████████████████▋     | 528M/611M [00:07&lt;00:01, 73.6MB/s]
- 88%|██████████████████████████████████▏    | 535M/611M [00:07&lt;00:01, 73.4MB/s]
- 89%|██████████████████████████████████▋    | 543M/611M [00:07&lt;00:01, 57.9MB/s]
- 90%|███████████████████████████████████▏   | 550M/611M [00:07&lt;00:00, 62.2MB/s]
- 91%|███████████████████████████████████▌   | 558M/611M [00:07&lt;00:00, 64.9MB/s]
- 93%|████████████████████████████████████▏  | 566M/611M [00:07&lt;00:00, 70.4MB/s]
- 94%|████████████████████████████████████▋  | 573M/611M [00:08&lt;00:00, 66.4MB/s]
- 95%|█████████████████████████████████████  | 580M/611M [00:08&lt;00:00, 64.2MB/s]
- 96%|█████████████████████████████████████▍ | 587M/611M [00:08&lt;00:00, 52.3MB/s]
- 97%|█████████████████████████████████████▊ | 593M/611M [00:08&lt;00:00, 48.4MB/s]
- 98%|██████████████████████████████████████▏| 598M/611M [00:08&lt;00:00, 48.3MB/s]
- 99%|██████████████████████████████████████▌| 603M/611M [00:08&lt;00:00, 44.4MB/s]
-100%|██████████████████████████████████████▉| 609M/611M [00:08&lt;00:00, 47.5MB/s]
+  0%|▏                                     | 2.16M/611M [00:00&lt;00:28, 21.6MB/s]
+  1%|▎                                     | 5.54M/611M [00:00&lt;00:21, 28.8MB/s]
+  2%|▋                                     | 10.7M/611M [00:00&lt;00:15, 39.4MB/s]
+  2%|▉                                     | 14.7M/611M [00:00&lt;00:15, 37.5MB/s]
+  3%|█▎                                    | 20.7M/611M [00:00&lt;00:13, 45.2MB/s]
+  5%|█▉                                    | 30.6M/611M [00:00&lt;00:09, 63.1MB/s]
+  7%|██▌                                   | 40.4M/611M [00:00&lt;00:07, 73.0MB/s]
+  8%|██▉                                   | 47.7M/611M [00:00&lt;00:08, 68.3MB/s]
+  9%|███▌                                  | 57.4M/611M [00:00&lt;00:07, 74.6MB/s]
+ 11%|████                                  | 66.1M/611M [00:01&lt;00:08, 62.6MB/s]
+ 12%|████▌                                 | 72.7M/611M [00:01&lt;00:08, 61.7MB/s]
+ 14%|█████▎                                | 84.8M/611M [00:01&lt;00:06, 76.9MB/s]
+ 16%|█████▉                                | 96.3M/611M [00:01&lt;00:05, 87.3MB/s]
+ 17%|██████▊                                | 106M/611M [00:01&lt;00:05, 91.2MB/s]
+ 19%|███████▍                               | 117M/611M [00:01&lt;00:05, 94.4MB/s]
+ 21%|████████                               | 126M/611M [00:01&lt;00:05, 90.6MB/s]
+ 22%|████████▋                              | 136M/611M [00:01&lt;00:05, 82.1MB/s]
+ 24%|█████████▏                             | 144M/611M [00:02&lt;00:05, 80.6MB/s]
+ 25%|█████████▋                             | 152M/611M [00:02&lt;00:05, 77.1MB/s]
+ 26%|██████████▏                            | 160M/611M [00:02&lt;00:06, 71.2MB/s]
+ 28%|██████████▊                            | 169M/611M [00:02&lt;00:05, 76.1MB/s]
+ 29%|███████████▎                           | 177M/611M [00:02&lt;00:05, 77.1MB/s]
+ 31%|████████████                           | 188M/611M [00:02&lt;00:04, 86.7MB/s]
+ 33%|████████████▋                          | 199M/611M [00:02&lt;00:04, 93.4MB/s]
+ 34%|█████████████▍                         | 210M/611M [00:02&lt;00:04, 95.8MB/s]
+ 36%|██████████████                         | 220M/611M [00:02&lt;00:03, 99.4MB/s]
+ 38%|██████████████▋                        | 230M/611M [00:03&lt;00:04, 83.7MB/s]
+ 39%|███████████████▎                       | 239M/611M [00:03&lt;00:05, 68.3MB/s]
+ 40%|███████████████▊                       | 247M/611M [00:03&lt;00:05, 65.1MB/s]
+ 42%|████████████████▏                      | 254M/611M [00:03&lt;00:05, 65.1MB/s]
+ 43%|████████████████▋                      | 261M/611M [00:03&lt;00:05, 65.5MB/s]
+ 44%|█████████████████                      | 267M/611M [00:03&lt;00:05, 62.1MB/s]
+ 45%|█████████████████▌                     | 274M/611M [00:03&lt;00:05, 63.6MB/s]
+ 46%|█████████████████▉                     | 282M/611M [00:03&lt;00:04, 66.3MB/s]
+ 48%|██████████████████▌                    | 291M/611M [00:03&lt;00:04, 73.8MB/s]
+ 49%|███████████████████                    | 299M/611M [00:04&lt;00:04, 71.1MB/s]
+ 50%|███████████████████▌                   | 306M/611M [00:04&lt;00:04, 67.6MB/s]
+ 51%|████████████████████                   | 313M/611M [00:04&lt;00:04, 70.1MB/s]
+ 53%|████████████████████▋                  | 324M/611M [00:04&lt;00:03, 79.6MB/s]
+ 54%|█████████████████████▏                 | 332M/611M [00:04&lt;00:03, 78.4MB/s]
+ 56%|█████████████████████▋                 | 340M/611M [00:04&lt;00:03, 76.6MB/s]
+ 57%|██████████████████████▏                | 348M/611M [00:04&lt;00:03, 69.5MB/s]
+ 58%|██████████████████████▋                | 355M/611M [00:04&lt;00:04, 60.6MB/s]
+ 59%|███████████████████████                | 361M/611M [00:05&lt;00:04, 60.0MB/s]
+ 60%|███████████████████████▍               | 367M/611M [00:05&lt;00:04, 60.0MB/s]
+ 61%|███████████████████████▊               | 373M/611M [00:05&lt;00:04, 58.6MB/s]
+ 62%|████████████████████████▏              | 380M/611M [00:05&lt;00:03, 59.4MB/s]
+ 63%|████████████████████████▋              | 387M/611M [00:05&lt;00:03, 63.0MB/s]
+ 65%|█████████████████████████▎             | 396M/611M [00:05&lt;00:03, 69.5MB/s]
+ 66%|█████████████████████████▋             | 403M/611M [00:05&lt;00:03, 62.8MB/s]
+ 67%|██████████████████████████▏            | 410M/611M [00:05&lt;00:03, 65.6MB/s]
+ 68%|██████████████████████████▌            | 417M/611M [00:05&lt;00:03, 56.0MB/s]
+ 69%|███████████████████████████            | 423M/611M [00:06&lt;00:03, 58.4MB/s]
+ 71%|███████████████████████████▌           | 432M/611M [00:06&lt;00:02, 65.4MB/s]
+ 72%|████████████████████████████           | 440M/611M [00:06&lt;00:02, 69.8MB/s]
+ 73%|████████████████████████████▌          | 447M/611M [00:06&lt;00:02, 65.1MB/s]
+ 74%|████████████████████████████▉          | 454M/611M [00:06&lt;00:02, 65.0MB/s]
+ 76%|█████████████████████████████▍         | 461M/611M [00:06&lt;00:02, 67.8MB/s]
+ 77%|█████████████████████████████▉         | 468M/611M [00:06&lt;00:02, 55.7MB/s]
+ 78%|██████████████████████████████▍        | 476M/611M [00:06&lt;00:02, 60.4MB/s]
+ 79%|██████████████████████████████▉        | 484M/611M [00:06&lt;00:01, 67.2MB/s]
+ 81%|███████████████████████████████▌       | 493M/611M [00:07&lt;00:01, 73.3MB/s]
+ 83%|████████████████████████████████▏      | 505M/611M [00:07&lt;00:01, 84.7MB/s]
+ 84%|████████████████████████████████▊      | 513M/611M [00:07&lt;00:01, 75.7MB/s]
+ 85%|█████████████████████████████████▎     | 521M/611M [00:07&lt;00:01, 72.3MB/s]
+ 87%|█████████████████████████████████▊     | 530M/611M [00:07&lt;00:01, 66.2MB/s]
+ 88%|██████████████████████████████████▎    | 536M/611M [00:07&lt;00:01, 64.0MB/s]
+ 89%|██████████████████████████████████▋    | 543M/611M [00:07&lt;00:01, 62.9MB/s]
+ 90%|███████████████████████████████████    | 549M/611M [00:08&lt;00:01, 42.2MB/s]
+ 91%|███████████████████████████████████▍   | 555M/611M [00:08&lt;00:01, 42.9MB/s]
+ 92%|███████████████████████████████████▋   | 560M/611M [00:08&lt;00:01, 36.9MB/s]
+ 92%|████████████████████████████████████   | 565M/611M [00:08&lt;00:01, 39.9MB/s]
+ 93%|████████████████████████████████████▎  | 569M/611M [00:08&lt;00:01, 41.2MB/s]
+ 94%|████████████████████████████████████▋  | 574M/611M [00:08&lt;00:00, 42.9MB/s]
+ 95%|████████████████████████████████████▉  | 579M/611M [00:08&lt;00:00, 44.2MB/s]
+ 96%|█████████████████████████████████████▎ | 584M/611M [00:08&lt;00:00, 43.9MB/s]
+ 96%|█████████████████████████████████████▌ | 588M/611M [00:09&lt;00:00, 37.6MB/s]
+ 97%|█████████████████████████████████████▉ | 594M/611M [00:09&lt;00:00, 42.2MB/s]
+ 98%|██████████████████████████████████████▏| 598M/611M [00:09&lt;00:00, 42.2MB/s]
+ 99%|██████████████████████████████████████▍| 603M/611M [00:09&lt;00:00, 38.2MB/s]
+100%|██████████████████████████████████████▉| 609M/611M [00:09&lt;00:00, 45.2MB/s]
   0%|                                               | 0.00/611M [00:00&lt;?, ?B/s]
-100%|███████████████████████████████████████| 611M/611M [00:00&lt;00:00, 1.69TB/s]
+100%|███████████████████████████████████████| 611M/611M [00:00&lt;00:00, 1.64TB/s]
 Untarring contents of &#39;/home/circleci/mne_data/MNE-somato-data.tar.gz&#39; to &#39;/home/circleci/mne_data&#39;
 Attempting to create new mne-python configuration file:
 /home/circleci/.mne/mne-python.json
-Download complete in 14s (582.2 MB)
+Could not read the /home/circleci/.mne/mne-python.json json file during the writing. Assuming it is empty. Got: Expecting value: line 1 column 1 (char 0)
+Download complete in 18s (582.2 MB)
 </pre></div>
 </div>
 <p>Then, we load the raw data and estimate the inverse operator.</p>
@@ -672,10 +648,7 @@ Designing a one-pass, zero-phase, non-causal bandpass filter:
 - Upper transition bandwidth: 10.00 Hz (-6 dB cutoff frequency: 45.00 Hz)
 - Filter length: 993 samples (3.307 s)
 
-[Parallel(n_jobs=1)]: Done  17 tasks      | elapsed:    0.1s
-[Parallel(n_jobs=1)]: Done  71 tasks      | elapsed:    0.4s
-[Parallel(n_jobs=1)]: Done 161 tasks      | elapsed:    0.9s
-[Parallel(n_jobs=1)]: Done 287 tasks      | elapsed:    1.6s
+Finding events on: STI 014
 111 events found on stim channel STI 014
 Event IDs: [1]
 Not setting metadata
@@ -690,13 +663,9 @@ Reading forward solution from /home/circleci/mne_data/MNE-somato-data/derivative
     Reading a source space...
     [done]
     2 source spaces read
-    Desired named matrix (kind = 3523) not available
+    Desired named matrix (kind = 3523 (FIFF_MNE_FORWARD_SOLUTION_GRAD)) not available
     Read MEG forward solution (8155 sources, 306 channels, free orientations)
     Source spaces transformed to the forward solution coordinate frame
-Computing rank from data with rank=None
-    Using tolerance 1.5e-08 (2.2e-16 eps * 306 dim * 2.2e+05  max singular value)
-    Estimated rank (mag + grad): 306
-    MEG: rank 306 computed from 306 data channels with 0 projectors
 /home/circleci/project/examples/workflows/plot_simulate_somato.py:66: RuntimeWarning: Something went wrong in the data-driven estimation of the data rank as it exceeds the theoretical rank from the info (306 &gt; 64). Consider setting rank to &quot;auto&quot; or setting it explicitly as an integer.
   cov = mne.compute_covariance(epochs)
 Reducing data rank from 306 -&gt; 306
@@ -940,11 +909,11 @@ nerve evoked response waveforms, and output spike histogram.</p>
 <a href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_raster" title="hnn_core.CellResponse.plot_spikes_raster" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">plot_spikes_raster</span></a><span class="p">(</span><span class="n">ax</span><span class="o">=</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_simulate_somato_002.png" srcset="../../_images/sphx_glr_plot_simulate_somato_002.png" alt="Aggregate (L2/3 + L5), Raster Plot with Layer-Specific Dipole Overlays" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 600x600 with 3 Axes&gt;
+<img src="../../_images/sphx_glr_plot_simulate_somato_002.png" srcset="../../_images/sphx_glr_plot_simulate_somato_002.png" alt="Aggregate (L2/3 + L5), Raster Plot" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 600x600 with 3 Axes&gt;
 </pre></div>
 </div>
 <section id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this heading">#</a></h2>
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id5" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
@@ -964,10 +933,11 @@ network origin of human MEG/EEG data. eLife 9, e51214 (2020).
 <a class="reference external" href="https://doi.org/10.7554/eLife.51214">https://doi.org/10.7554/eLife.51214</a></p>
 </aside>
 </aside>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 48.436 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 57.675 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-workflows-plot-simulate-somato-py">
 <div class="binder-badge docutils container">
-<a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/workflows/plot_simulate_somato.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo1.svg" width="150px" /></a>
+<a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/workflows/plot_simulate_somato.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo1.svg" style="width: 150px;" />
+</a>
 </div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/0c72935893aeb250a0d8212cbf71dc3b/plot_simulate_somato.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_simulate_somato.ipynb</span></code></a></p>
@@ -990,7 +960,7 @@ network origin of human MEG/EEG data. eLife 9, e51214 (2020).
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -1018,27 +988,30 @@ network origin of human MEG/EEG data. eLife 9, e51214 (2020).
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
 
   <div class="sidebar-secondary-item">
-
-  <div class="page-toc tocsection onthispage">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
-
-  <div class="tocsection sourcelink">
-    <a href="../../_sources/auto_examples/workflows/plot_simulate_somato.rst.txt">
-      <i class="fa-solid fa-file-lines"></i> Show Source
-    </a>
-  </div>
-</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/auto_examples/workflows/plot_simulate_somato.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
 
 </div></div>
               
@@ -1053,8 +1026,8 @@ network origin of human MEG/EEG data. eLife 9, e51214 (2020).
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1074,7 +1047,7 @@ network origin of human MEG/EEG data. eLife 9, e51214 (2020).
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>
@@ -1087,7 +1060,8 @@ network origin of human MEG/EEG data. eLife 9, e51214 (2020).
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>

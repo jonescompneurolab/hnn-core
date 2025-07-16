@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../../" >
 
   <head>
     <meta charset="utf-8" />
@@ -14,19 +14,21 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-
-  
-  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -35,22 +37,24 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=478316d9"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/documentation_options.js?v=9097ff11"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/howto/plot_batch_simulate';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.14.4';
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
-        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -59,6 +63,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.4.3dev2" />
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
 <script>
@@ -77,32 +82,16 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../search.html"
       method="get">
@@ -110,7 +99,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -118,20 +106,27 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
   
   <div class=" navbar-header-items__start">
     
       <div class="navbar-item">
 
+  
+    
   
 
 <a class="navbar-brand logo" href="../../index.html">
@@ -146,7 +141,7 @@
     
     
     <img src="../../_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core 0.4.3dev2 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/hnn-medium.png" class="logo__image only-dark" alt="hnn-core 0.4.3dev2 documentation - Home"/>`);</script>
+    <img src="../../_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core 0.4.3dev2 documentation - Home"/>
   
   
 </a></div>
@@ -158,82 +153,78 @@
     <div class="me-auto navbar-header-items__center">
       
         <div class="navbar-item">
-<nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../install.html">
-                        Install
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Install
+  </a>
+</li>
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../index.html">
-                        Examples
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../api.html">
-                        API
-                      </a>
-                    </li>
-                
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Examples
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../glossary.html">
-                        Glossary
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../whats_new.html">
-                        What’s new?
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../contributing.html">
-                        Contributing
-                      </a>
-                    </li>
-                
 
-                <li class="nav-item">
-                  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
-                    GitHub (Code)
-                  </a>
-                </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../glossary.html">
+    Glossary
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
             <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
                     More
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
-                    PyPI
-                  </a>
-                </li>
-                
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
 
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
-                    HNN Frontpage
-                  </a>
-                </li>
-                
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
                 </ul>
             </li>
             
@@ -248,41 +239,33 @@
         <div class="navbar-item navbar-persistent--container">
           
 
- <script>
- document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-2"
-      type="button"
-      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-2"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-2"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-2">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
       
     </div>
     
@@ -291,31 +274,31 @@ document.write(`
   
     <div class="navbar-persistent--mobile">
 
- <script>
- document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
-    </label>
+    </button>
   
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -324,88 +307,77 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
-<nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+          
+          
+            <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../install.html">
-                        Install
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Install
+  </a>
+</li>
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../index.html">
-                        Examples
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../api.html">
-                        API
-                      </a>
-                    </li>
-                
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Examples
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../glossary.html">
-                        Glossary
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../whats_new.html">
-                        What’s new?
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../contributing.html">
-                        Contributing
-                      </a>
-                    </li>
-                
 
-                <li class="nav-item">
-                  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
-                    GitHub (Code)
-                  </a>
-                </li>
-                
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
-                    More
-                </button>
-                <ul id="pst-nav-more-links-2" class="dropdown-menu">
-                    
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
-                    PyPI
-                  </a>
-                </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../glossary.html">
+    Glossary
+  </a>
+</li>
 
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
-                    HNN Frontpage
-                  </a>
-                </li>
-                
-                </ul>
-            </li>
-            
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -414,28 +386,24 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-3"
-      type="button"
-      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-3"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-3"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-3">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
         
       </div>
     
@@ -443,29 +411,32 @@ document.write(`
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
         <div class="header-article-item">
 
-
-
-<nav aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
@@ -479,7 +450,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">How to</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">07. Batch Simulation</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">07. Batch Simulation</span></li>
   </ul>
 </nav>
 </div>
@@ -494,7 +465,7 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
@@ -502,7 +473,7 @@ document.write(`
 to download the full example code. or to run this example in your browser via Binder</p>
 </div>
 <section class="sphx-glr-example-title" id="batch-simulation">
-<span id="sphx-glr-auto-examples-howto-plot-batch-simulate-py"></span><h1>07. Batch Simulation<a class="headerlink" href="#batch-simulation" title="Permalink to this heading">#</a></h1>
+<span id="sphx-glr-auto-examples-howto-plot-batch-simulate-py"></span><h1>07. Batch Simulation<a class="headerlink" href="#batch-simulation" title="Link to this heading">#</a></h1>
 <p>This example shows how to do batch simulations in HNN-core, allowing users to
 efficiently run multiple simulations with different parameters
 for comprehensive analysis.</p>
@@ -616,86 +587,86 @@ resulting in the complex waveforms observed.</p>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
-[Parallel(n_jobs=4)]: Done   1 tasks      | elapsed:    3.2s
-[Parallel(n_jobs=4)]: Done   2 tasks      | elapsed:    3.2s
-[Parallel(n_jobs=4)]: Done   3 tasks      | elapsed:    3.2s
-[Parallel(n_jobs=4)]: Done   4 tasks      | elapsed:    3.3s
-[Parallel(n_jobs=4)]: Done   5 tasks      | elapsed:    5.8s
-[Parallel(n_jobs=4)]: Done   6 tasks      | elapsed:    5.9s
-[Parallel(n_jobs=4)]: Done   7 tasks      | elapsed:    5.9s
-[Parallel(n_jobs=4)]: Done   8 tasks      | elapsed:    5.9s
-[Parallel(n_jobs=4)]: Done   9 tasks      | elapsed:    8.4s
-[Parallel(n_jobs=4)]: Done  10 tasks      | elapsed:    8.5s
-[Parallel(n_jobs=4)]: Done  11 tasks      | elapsed:    8.5s
-[Parallel(n_jobs=4)]: Done  12 tasks      | elapsed:    8.6s
-[Parallel(n_jobs=4)]: Done  13 tasks      | elapsed:   11.0s
-[Parallel(n_jobs=4)]: Done  14 out of  20 | elapsed:   11.1s remaining:    4.8s
-[Parallel(n_jobs=4)]: Done  15 out of  20 | elapsed:   11.2s remaining:    3.7s
-[Parallel(n_jobs=4)]: Done  16 out of  20 | elapsed:   11.2s remaining:    2.8s
-[Parallel(n_jobs=4)]: Done  17 out of  20 | elapsed:   13.7s remaining:    2.4s
-[Parallel(n_jobs=4)]: Done  18 out of  20 | elapsed:   13.8s remaining:    1.5s
-[Parallel(n_jobs=4)]: Done  20 out of  20 | elapsed:   13.8s finished
-Simulation results: {&#39;summary_statistics&#39;: [[{&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 2.438299811172486e-05}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 3.5625970074068246e-05}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 5.187123572695806e-05}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 7.539737690213312e-05}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.00010962271639761121}, {&#39;min_peak&#39;: -0.0008187098140745111, &#39;max_peak&#39;: 0.0011853731897260899}, {&#39;min_peak&#39;: -0.000690091109881642, &#39;max_peak&#39;: 0.0014532366142034046}, {&#39;min_peak&#39;: -7.443630674152456e-05, &#39;max_peak&#39;: 0.0006303483688791796}, {&#39;min_peak&#39;: -0.0003831247250500211, &#39;max_peak&#39;: 0.00155887835458659}, {&#39;min_peak&#39;: -0.0005827286517536029, &#39;max_peak&#39;: 0.0014794795458269632}, {&#39;min_peak&#39;: -0.0005759203533290836, &#39;max_peak&#39;: 0.0014539235295249087}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.0013262182394243962}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.0013283313099600614}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.0011853462053579664}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.0011649633329457508}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.0011845854148153814}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.001231155285096076}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.0013115554222262653}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.0014314315232221645}, {&#39;min_peak&#39;: -1.9487233699162363e-05, &#39;max_peak&#39;: 0.0015123789975719478}]], &#39;simulated_data&#39;: [[{&#39;net&#39;: &lt;Network | 3 L2_basket cells
+[Parallel(n_jobs=4)]: Done   1 tasks      | elapsed:    3.4s
+[Parallel(n_jobs=4)]: Done   2 tasks      | elapsed:    3.4s
+[Parallel(n_jobs=4)]: Done   3 tasks      | elapsed:    3.4s
+[Parallel(n_jobs=4)]: Done   4 tasks      | elapsed:    3.5s
+[Parallel(n_jobs=4)]: Done   5 tasks      | elapsed:    6.2s
+[Parallel(n_jobs=4)]: Done   6 tasks      | elapsed:    6.2s
+[Parallel(n_jobs=4)]: Done   7 tasks      | elapsed:    6.3s
+[Parallel(n_jobs=4)]: Done   8 tasks      | elapsed:    6.3s
+[Parallel(n_jobs=4)]: Done   9 tasks      | elapsed:    8.9s
+[Parallel(n_jobs=4)]: Done  10 tasks      | elapsed:    9.0s
+[Parallel(n_jobs=4)]: Done  11 tasks      | elapsed:    9.0s
+[Parallel(n_jobs=4)]: Done  12 tasks      | elapsed:    9.1s
+[Parallel(n_jobs=4)]: Done  13 tasks      | elapsed:   11.6s
+[Parallel(n_jobs=4)]: Done  14 out of  20 | elapsed:   11.7s remaining:    5.0s
+[Parallel(n_jobs=4)]: Done  15 out of  20 | elapsed:   11.8s remaining:    3.9s
+[Parallel(n_jobs=4)]: Done  16 out of  20 | elapsed:   11.9s remaining:    3.0s
+[Parallel(n_jobs=4)]: Done  17 out of  20 | elapsed:   14.4s remaining:    2.5s
+[Parallel(n_jobs=4)]: Done  18 out of  20 | elapsed:   14.5s remaining:    1.6s
+[Parallel(n_jobs=4)]: Done  20 out of  20 | elapsed:   14.6s finished
+Simulation results: {&#39;summary_statistics&#39;: [[{&#39;min_peak&#39;: np.float64(-1.9487233699162363e-05), &#39;max_peak&#39;: np.float64(2.438299811172486e-05)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162363e-05), &#39;max_peak&#39;: np.float64(3.5625970074068165e-05)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162363e-05), &#39;max_peak&#39;: np.float64(5.187123572695802e-05)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162363e-05), &#39;max_peak&#39;: np.float64(7.539737690213309e-05)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162363e-05), &#39;max_peak&#39;: np.float64(0.00010962271639761121)}, {&#39;min_peak&#39;: np.float64(-0.0008187098140745246), &#39;max_peak&#39;: np.float64(0.0011853731897260916)}, {&#39;min_peak&#39;: np.float64(-0.0006900911098816499), &#39;max_peak&#39;: np.float64(0.0014532366142034126)}, {&#39;min_peak&#39;: np.float64(-7.443630674152414e-05), &#39;max_peak&#39;: np.float64(0.000630348368879176)}, {&#39;min_peak&#39;: np.float64(-0.00038312472505001405), &#39;max_peak&#39;: np.float64(0.0015588783545866054)}, {&#39;min_peak&#39;: np.float64(-0.0005827286517535934), &#39;max_peak&#39;: np.float64(0.0014794795458269719)}, {&#39;min_peak&#39;: np.float64(-0.000575920353329084), &#39;max_peak&#39;: np.float64(0.0014539235295249029)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162363e-05), &#39;max_peak&#39;: np.float64(0.0013262182394243865)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162363e-05), &#39;max_peak&#39;: np.float64(0.001328331309960041)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162363e-05), &#39;max_peak&#39;: np.float64(0.001185346205357968)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162363e-05), &#39;max_peak&#39;: np.float64(0.0011649633329457543)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162363e-05), &#39;max_peak&#39;: np.float64(0.0011845854148153723)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162363e-05), &#39;max_peak&#39;: np.float64(0.0012311552850961124)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162363e-05), &#39;max_peak&#39;: np.float64(0.0013115554222262711)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162363e-05), &#39;max_peak&#39;: np.float64(0.001431431523222179)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162363e-05), &#39;max_peak&#39;: np.float64(0.0015123789975719447)}]], &#39;simulated_data&#39;: [[{&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 9.999999999999999e-05, &#39;weight_pyr&#39;: 9.999999999999999e-05}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45b144f490&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0001), &#39;weight_pyr&#39;: np.float64(0.0001)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0bc4b0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.00014384498882876628, &#39;weight_pyr&#39;: 0.00014384498882876628}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45c547df10&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0001438449888287663), &#39;weight_pyr&#39;: np.float64(0.0001438449888287663)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0bc7c0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.000206913808111479, &#39;weight_pyr&#39;: 0.000206913808111479}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45b8422b80&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.00020691380811147902), &#39;weight_pyr&#39;: np.float64(0.00020691380811147902)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0bd780&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.00029763514416313193, &#39;weight_pyr&#39;: 0.00029763514416313193}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45b29872e0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.00029763514416313193), &#39;weight_pyr&#39;: np.float64(0.00029763514416313193)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0bd2b0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.00042813323987193956, &#39;weight_pyr&#39;: 0.00042813323987193956}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45b33d64c0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.00042813323987193956), &#39;weight_pyr&#39;: np.float64(0.00042813323987193956)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0bd080&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.0006158482110660266, &#39;weight_pyr&#39;: 0.0006158482110660266}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45b8349970&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0006158482110660267), &#39;weight_pyr&#39;: np.float64(0.0006158482110660267)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0bdb00&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.0008858667904100822, &#39;weight_pyr&#39;: 0.0008858667904100822}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45b33dbe20&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0008858667904100822), &#39;weight_pyr&#39;: np.float64(0.0008858667904100822)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0bcc90&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.0012742749857031334, &#39;weight_pyr&#39;: 0.0012742749857031334}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45b298ddf0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0012742749857031334), &#39;weight_pyr&#39;: np.float64(0.0012742749857031334)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0bd010&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.0018329807108324356, &#39;weight_pyr&#39;: 0.0018329807108324356}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45b93ba310&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0018329807108324356), &#39;weight_pyr&#39;: np.float64(0.0018329807108324356)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0bc830&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.002636650898730358, &#39;weight_pyr&#39;: 0.002636650898730358}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45b29616a0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0026366508987303583), &#39;weight_pyr&#39;: np.float64(0.0026366508987303583)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0bf0e0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.00379269019073225, &#39;weight_pyr&#39;: 0.00379269019073225}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45be8ff250&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.00379269019073225), &#39;weight_pyr&#39;: np.float64(0.00379269019073225)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0bf540&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.005455594781168514, &#39;weight_pyr&#39;: 0.005455594781168514}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45b9630640&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.005455594781168515), &#39;weight_pyr&#39;: np.float64(0.005455594781168515)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0bf7e0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.007847599703514606, &#39;weight_pyr&#39;: 0.007847599703514606}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45b340d5e0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.007847599703514606), &#39;weight_pyr&#39;: np.float64(0.007847599703514606)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0bc750&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.011288378916846885, &#39;weight_pyr&#39;: 0.011288378916846885}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45b8057580&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.011288378916846883), &#39;weight_pyr&#39;: np.float64(0.011288378916846883)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0bc210&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.01623776739188721, &#39;weight_pyr&#39;: 0.01623776739188721}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45b808e8e0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.01623776739188721), &#39;weight_pyr&#39;: np.float64(0.01623776739188721)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0bf700&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.023357214690901212, &#39;weight_pyr&#39;: 0.023357214690901212}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45b8d9bac0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.023357214690901212), &#39;weight_pyr&#39;: np.float64(0.023357214690901212)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0bd240&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.033598182862837805, &#39;weight_pyr&#39;: 0.033598182862837805}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45b82033a0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.03359818286283781), &#39;weight_pyr&#39;: np.float64(0.03359818286283781)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0be190&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.04832930238571752, &#39;weight_pyr&#39;: 0.04832930238571752}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45b939dfd0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.04832930238571752), &#39;weight_pyr&#39;: np.float64(0.04832930238571752)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0bd940&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.06951927961775606, &#39;weight_pyr&#39;: 0.06951927961775606}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45b98e7af0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.06951927961775606), &#39;weight_pyr&#39;: np.float64(0.06951927961775606)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd0bc6e0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: 0.09999999999999999, &#39;weight_pyr&#39;: 0.09999999999999999}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7f45b8cfe1c0&gt;]}]]}
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.1), &#39;weight_pyr&#39;: np.float64(0.1)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x77ffcd6e3230&gt;]}]]}
 </pre></div>
 </div>
 <p>This plot shows an overlay of all smoothed dipole waveforms from the
@@ -762,10 +733,11 @@ dipole activity changes as we vary the synaptic strength parameter.</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_batch_simulate_002.png" srcset="../../_images/sphx_glr_plot_batch_simulate_002.png" alt="Min and Max Dipole Peaks across Simulations" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 14.395 seconds)</p>
+<img src="../../_images/sphx_glr_plot_batch_simulate_002.png" srcset="../../_images/sphx_glr_plot_batch_simulate_002.png" alt="Min and Max Dipole Peaks across Simulations" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 15.105 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-batch-simulate-py">
 <div class="binder-badge docutils container">
-<a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_batch_simulate.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" width="150px" /></a>
+<a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_batch_simulate.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" style="width: 150px;" />
+</a>
 </div>
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/20b224a3775181a4359df878ed1f9d35/plot_batch_simulate.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_batch_simulate.ipynb</span></code></a></p>
@@ -787,7 +759,7 @@ dipole activity changes as we vary the synaptic strength parameter.</p>
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -815,16 +787,18 @@ dipole activity changes as we vary the synaptic strength parameter.</p>
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
 
   <div class="sidebar-secondary-item">
-
-  <div class="tocsection sourcelink">
-    <a href="../../_sources/auto_examples/howto/plot_batch_simulate.rst.txt">
-      <i class="fa-solid fa-file-lines"></i> Show Source
-    </a>
-  </div>
-</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/auto_examples/howto/plot_batch_simulate.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
 
 </div></div>
               
@@ -839,8 +813,8 @@ dipole activity changes as we vary the synaptic strength parameter.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -860,7 +834,7 @@ dipole activity changes as we vary the synaptic strength parameter.</p>
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>
@@ -873,7 +847,8 @@ dipole activity changes as we vary the synaptic strength parameter.</p>
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>

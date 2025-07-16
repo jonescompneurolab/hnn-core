@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="./" >
 
   <head>
     <meta charset="utf-8" />
@@ -14,19 +14,21 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-
-  
-  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -35,22 +37,24 @@
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=478316d9"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
-    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/documentation_options.js?v=9097ff11"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'install';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.14.4';
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
-        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
         </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -59,6 +63,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.4.3dev2" />
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
 <script>
@@ -77,32 +82,16 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="search.html"
       method="get">
@@ -110,7 +99,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -118,20 +106,27 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
   
   <div class=" navbar-header-items__start">
     
       <div class="navbar-item">
 
+  
+    
   
 
 <a class="navbar-brand logo" href="index.html">
@@ -146,7 +141,7 @@
     
     
     <img src="_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core 0.4.3dev2 documentation - Home"/>
-    <script>document.write(`<img src="_static/hnn-medium.png" class="logo__image only-dark" alt="hnn-core 0.4.3dev2 documentation - Home"/>`);</script>
+    <img src="_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core 0.4.3dev2 documentation - Home"/>
   
   
 </a></div>
@@ -158,82 +153,78 @@
     <div class="me-auto navbar-header-items__center">
       
         <div class="navbar-item">
-<nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="#">
-                        Install
-                      </a>
-                    </li>
-                
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Install
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="auto_examples/index.html">
-                        Examples
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="api.html">
-                        API
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_examples/index.html">
+    Examples
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="glossary.html">
-                        Glossary
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="whats_new.html">
-                        What’s new?
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="contributing.html">
-                        Contributing
-                      </a>
-                    </li>
-                
 
-                <li class="nav-item">
-                  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
-                    GitHub (Code)
-                  </a>
-                </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="glossary.html">
+    Glossary
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
             <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
                     More
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
-                    PyPI
-                  </a>
-                </li>
-                
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
 
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
-                    HNN Frontpage
-                  </a>
-                </li>
-                
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
                 </ul>
             </li>
             
@@ -248,41 +239,33 @@
         <div class="navbar-item navbar-persistent--container">
           
 
- <script>
- document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-2"
-      type="button"
-      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-2"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-2"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-2">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
       
     </div>
     
@@ -291,31 +274,31 @@ document.write(`
   
     <div class="navbar-persistent--mobile">
 
- <script>
- document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
-    </label>
+    </button>
   
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -324,88 +307,77 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
-<nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+          
+          
+            <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="#">
-                        Install
-                      </a>
-                    </li>
-                
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Install
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="auto_examples/index.html">
-                        Examples
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="api.html">
-                        API
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_examples/index.html">
+    Examples
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="glossary.html">
-                        Glossary
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="whats_new.html">
-                        What’s new?
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="contributing.html">
-                        Contributing
-                      </a>
-                    </li>
-                
 
-                <li class="nav-item">
-                  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
-                    GitHub (Code)
-                  </a>
-                </li>
-                
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
-                    More
-                </button>
-                <ul id="pst-nav-more-links-2" class="dropdown-menu">
-                    
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
-                    PyPI
-                  </a>
-                </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="glossary.html">
+    Glossary
+  </a>
+</li>
 
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
-                    HNN Frontpage
-                  </a>
-                </li>
-                
-                </ul>
-            </li>
-            
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -414,28 +386,24 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-3"
-      type="button"
-      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-3"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-3"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-3">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
         
       </div>
     
@@ -443,29 +411,32 @@ document.write(`
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
         <div class="header-article-item">
 
-
-
-<nav aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
@@ -473,7 +444,7 @@ document.write(`
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page">Installation Guide</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Installation Guide</span></li>
   </ul>
 </nav>
 </div>
@@ -488,10 +459,10 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section id="installation-guide">
-<span id="install"></span><h1>Installation Guide<a class="headerlink" href="#installation-guide" title="Permalink to this heading">#</a></h1>
+<span id="install"></span><h1>Installation Guide<a class="headerlink" href="#installation-guide" title="Link to this heading">#</a></h1>
 <p>If you have any questions or problems while installing HNN-Core, feel free to
 ask for help on <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/discussions">our GitHub Discussions page</a>!</p>
 <p>If you wish to try out HNN-Core in the cloud without installing it locally, see the <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html">Installation page at the HNN Textbook</a>.</p>
@@ -499,7 +470,7 @@ ask for help on <a class="reference external" href="https://github.com/jonescomp
 </section>
 <hr class="docutils" />
 <section id="conda-installation">
-<h1><code class="docutils literal notranslate"><span class="pre">conda</span></code> Installation<a class="headerlink" href="#conda-installation" title="Permalink to this heading">#</a></h1>
+<h1><code class="docutils literal notranslate"><span class="pre">conda</span></code> Installation<a class="headerlink" href="#conda-installation" title="Link to this heading">#</a></h1>
 <p>We recommend that you install HNN-Core from our Anaconda package instead of from <code class="docutils literal notranslate"><span class="pre">pip</span></code>. This <code class="docutils literal notranslate"><span class="pre">conda</span></code> package includes all features (GUI, Optimization, and both Parallelism features), a working installation of OpenMPI, and is significantly easier to install.</p>
 <p>The only exceptions are if:</p>
 <ol class="arabic simple">
@@ -509,7 +480,7 @@ ask for help on <a class="reference external" href="https://github.com/jonescomp
 <p>If you want a minimal install of only the HNN-Core API using <code class="docutils literal notranslate"><span class="pre">conda</span></code>, then follow the instructions below, but replace the package name <code class="docutils literal notranslate"><span class="pre">hnn-core-all</span></code> with <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>.</p>
 <p>Follow the below instructions for your operating system.</p>
 <section id="conda-macos-or-linux">
-<h2><code class="docutils literal notranslate"><span class="pre">conda</span></code> MacOS or Linux<a class="headerlink" href="#conda-macos-or-linux" title="Permalink to this heading">#</a></h2>
+<h2><code class="docutils literal notranslate"><span class="pre">conda</span></code> MacOS or Linux<a class="headerlink" href="#conda-macos-or-linux" title="Link to this heading">#</a></h2>
 <ol class="arabic simple">
 <li><p>Install the <a class="reference external" href="https://www.anaconda.com/download/success">Anaconda Python Distribution</a>.</p></li>
 <li><p>Open a Terminal, then create and activate a new Python 3.12 environment by running the following commands:</p></li>
@@ -539,7 +510,7 @@ data science in Python, we recommend you review the resources here:
 </ol>
 </section>
 <section id="conda-windows">
-<h2><code class="docutils literal notranslate"><span class="pre">conda</span></code> Windows<a class="headerlink" href="#conda-windows" title="Permalink to this heading">#</a></h2>
+<h2><code class="docutils literal notranslate"><span class="pre">conda</span></code> Windows<a class="headerlink" href="#conda-windows" title="Link to this heading">#</a></h2>
 <p>For Windows users, there are some extra steps needed since you need to install HNN-Core through “Windows Subsystem for Linux” (WSL).</p>
 <ol class="arabic simple">
 <li><p>Install WSL: Open the “PowerShell” or “Windows Command Prompt” programs in administrator mode by right-clicking the program icon and selecting “Run as administrator”. Then, in the window, run the following command:</p></li>
@@ -577,18 +548,18 @@ bash<span class="w"> </span>Miniconda3-latest-Linux-x86_64.sh
 </section>
 <hr class="docutils" />
 <section id="pip-installation">
-<h1><code class="docutils literal notranslate"><span class="pre">pip</span></code> Installation<a class="headerlink" href="#pip-installation" title="Permalink to this heading">#</a></h1>
+<h1><code class="docutils literal notranslate"><span class="pre">pip</span></code> Installation<a class="headerlink" href="#pip-installation" title="Link to this heading">#</a></h1>
 <p>Alternatively, you can install HNN-Core through <code class="docutils literal notranslate"><span class="pre">pip</span></code> if you want install it alongside MNE, to contribute to development, only want certain features, or have issues with the <code class="docutils literal notranslate"><span class="pre">conda</span></code> install method. If using the <code class="docutils literal notranslate"><span class="pre">pip</span></code> method, please follow the instructions in Steps 1, 2, and 3, in that order.</p>
 <section id="step-1-pip-python-environment">
-<h2>Step 1. <code class="docutils literal notranslate"><span class="pre">pip</span></code> Python Environment<a class="headerlink" href="#step-1-pip-python-environment" title="Permalink to this heading">#</a></h2>
+<h2>Step 1. <code class="docutils literal notranslate"><span class="pre">pip</span></code> Python Environment<a class="headerlink" href="#step-1-pip-python-environment" title="Link to this heading">#</a></h2>
 <p>We strongly recommend that you install HNN-Core inside a “virtual environment” using software like the <a class="reference external" href="https://www.anaconda.com/download/success">Anaconda Python Distribution</a>. If you are new to Python or data science in Python, we recommend you review the resources here: <a class="reference external" href="https://docs.anaconda.com/getting-started/">https://docs.anaconda.com/getting-started/</a>.</p>
 <p>Note that if you use a virtual environment, you must first create the environment, and then separately <em>activate</em> the environment (see <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#activating-an-environment">Conda guidance here</a>) before running any of the commands below. <strong>All of the installation commands below assume you have already activated your environment</strong>. You may need to re-activate your environment every time you restart your computer or open a new terminal, depending on how you installed your virtual environment software.</p>
-<p>If installing through <code class="docutils literal notranslate"><span class="pre">pip</span></code>, <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> currently supports Python 3.8 through 3.13, inclusively.</p>
+<p>If installing through <code class="docutils literal notranslate"><span class="pre">pip</span></code>, <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> currently supports Python 3.9 through 3.13, inclusively.</p>
 </section>
 <section id="step-2-pip-platform-specific-requirements">
-<h2>Step 2. <code class="docutils literal notranslate"><span class="pre">pip</span></code> Platform-specific requirements<a class="headerlink" href="#step-2-pip-platform-specific-requirements" title="Permalink to this heading">#</a></h2>
+<h2>Step 2. <code class="docutils literal notranslate"><span class="pre">pip</span></code> Platform-specific requirements<a class="headerlink" href="#step-2-pip-platform-specific-requirements" title="Link to this heading">#</a></h2>
 <section id="pip-on-macos">
-<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> on MacOS<a class="headerlink" href="#pip-on-macos" title="Permalink to this heading">#</a></h3>
+<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> on MacOS<a class="headerlink" href="#pip-on-macos" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>If you already installed the <a class="reference external" href="https://nrn.readthedocs.io/">NEURON</a> software system-wide using its
 traditional installer package, it is recommended to <strong>remove it</strong> first. We
@@ -601,7 +572,7 @@ will be installing NEURON using its PyPI package.</p></li>
 <p>If you run the above command and see output that resembles <code class="docutils literal notranslate"><span class="pre">xcode-select:</span> <span class="pre">note:</span> <span class="pre">Command</span> <span class="pre">line</span> <span class="pre">tools</span> <span class="pre">are</span> <span class="pre">already</span> <span class="pre">installed.</span></code>, then you already have it installed, do not need to restart your computer, and can proceed to the next step.</p>
 </section>
 <section id="pip-on-linux">
-<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> on Linux<a class="headerlink" href="#pip-on-linux" title="Permalink to this heading">#</a></h3>
+<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> on Linux<a class="headerlink" href="#pip-on-linux" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>If you already installed the <a class="reference external" href="https://nrn.readthedocs.io/">NEURON</a> software system-wide using its
 traditional installer package, it is recommended to <strong>remove it</strong> first. We
@@ -609,7 +580,7 @@ will be installing NEURON using its PyPI package.</p></li>
 </ul>
 </section>
 <section id="pip-on-windows">
-<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> on Windows<a class="headerlink" href="#pip-on-windows" title="Permalink to this heading">#</a></h3>
+<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> on Windows<a class="headerlink" href="#pip-on-windows" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Before you install HNN-Core, it is important that you <strong>install</strong> the <a class="reference external" href="https://nrn.readthedocs.io/">NEURON</a> software system-wide using its <a class="reference external" href="https://nrn.readthedocs.io/en/latest/install/install_instructions.html#windows">Windows-specific binaries</a>. You can test that NEURON was installed correctly by opening a Command Prompt (or similar) via your Anaconda install (or virtual environment), and running the following command:</p></li>
 </ul>
@@ -619,10 +590,10 @@ will be installing NEURON using its PyPI package.</p></li>
 </section>
 </section>
 <section id="step-3-pip-installation-types">
-<h2>Step 3. <code class="docutils literal notranslate"><span class="pre">pip</span></code> installation types<a class="headerlink" href="#step-3-pip-installation-types" title="Permalink to this heading">#</a></h2>
+<h2>Step 3. <code class="docutils literal notranslate"><span class="pre">pip</span></code> installation types<a class="headerlink" href="#step-3-pip-installation-types" title="Link to this heading">#</a></h2>
 <p>Note that you can install multiple sets of HNN-Core features below by combining them similar to <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;hnn_core[gui,parallel]&quot;</span></code>.</p>
 <section id="pip-basic-installation">
-<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> Basic Installation<a class="headerlink" href="#pip-basic-installation" title="Permalink to this heading">#</a></h3>
+<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> Basic Installation<a class="headerlink" href="#pip-basic-installation" title="Link to this heading">#</a></h3>
 <p>To install only the <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> API, open a Terminal or Command Prompt using a fresh virtual
 environment, and enter:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">hnn_core</span>
@@ -635,7 +606,7 @@ environment, and enter:</p>
 <p>This will run a very short test simulation, and should not give any Error messages (Warning messages are fine and expected). For how to use the <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> API, see <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">our HNN Textbook website</a>, including examples like our <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/05_erps/hnn_core.html">API tutorial of ERP simulation</a>. Our public API documentation <a class="reference internal" href="api.html"><span class="doc">can be found here</span></a>.</p>
 </section>
 <section id="pip-graphical-user-interface-gui-installation">
-<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> Graphical User Interface (GUI) Installation<a class="headerlink" href="#pip-graphical-user-interface-gui-installation" title="Permalink to this heading">#</a></h3>
+<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> Graphical User Interface (GUI) Installation<a class="headerlink" href="#pip-graphical-user-interface-gui-installation" title="Link to this heading">#</a></h3>
 <p>To install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> with both its API and GUI support, run the following command (make sure to include the “quotes”):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;hnn_core[gui]&quot;</span>
 </pre></div>
@@ -649,7 +620,7 @@ include: <a class="reference external" href="https://ipykernel.readthedocs.io/en
 <p>For further guidance on using the GUI, see <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">our HNN Textbook website</a>, including examples like our <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/05_erps/erps_in_gui.html">GUI tutorial of ERPs</a>.</p>
 </section>
 <section id="pip-optimization-installation">
-<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> Optimization Installation<a class="headerlink" href="#pip-optimization-installation" title="Permalink to this heading">#</a></h3>
+<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> Optimization Installation<a class="headerlink" href="#pip-optimization-installation" title="Link to this heading">#</a></h3>
 <p>If you would like to use Bayesian optimization, then
 <a class="reference external" href="https://scikit-learn.org/stable/index.html"><code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code></a> is required. You
 can easily install <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code>, its API dependencies, and its optimization
@@ -660,7 +631,7 @@ dependencies using the following command (make sure to include the “quotes”)
 <p>If you are planning to use Optimization, it is recommended to also install Joblib support (see below). Instruction on how to use our Optimization support can be found on <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">our HNN Textbook website</a>, including this <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/optimize_simulated_evoked_response_parameters.html">optimization tutorial</a>.</p>
 </section>
 <section id="pip-joblib-installation">
-<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> Joblib Installation<a class="headerlink" href="#pip-joblib-installation" title="Permalink to this heading">#</a></h3>
+<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> Joblib Installation<a class="headerlink" href="#pip-joblib-installation" title="Link to this heading">#</a></h3>
 <p>You can easily install the <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> API, its API dependencies, and its additional Joblib parallelism
 dependencies using the following command (make sure to include the “quotes”):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="s2">&quot;hnn_core[parallel]&quot;</span>
@@ -670,15 +641,15 @@ dependencies using the following command (make sure to include the “quotes”)
 <p>Many of the examples on <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">our HNN Textbook website</a> make use of Joblib support, and we provide an explicit <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/08_using_hnn_api/parallelism_joblib.html">tutorial for it here</a>.</p>
 </section>
 <section id="pip-mpi-installation">
-<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI Installation<a class="headerlink" href="#pip-mpi-installation" title="Permalink to this heading">#</a></h3>
+<h3><code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI Installation<a class="headerlink" href="#pip-mpi-installation" title="Link to this heading">#</a></h3>
 <p>If you want to use MPI, we recommend you first try to install our <code class="docutils literal notranslate"><span class="pre">conda</span></code> package detailed <a class="reference internal" href="#conda-installation"><span class="xref myst">at the top of the page</span></a>. Otherwise, we <strong>strongly</strong> recommend you use the <a class="reference external" href="https://www.anaconda.com/download/success">Anaconda Python Distribution</a> specifically, since Anaconda is the easiest way to download <a class="reference external" href="https://anaconda.org/conda-forge/openmpi">OpenMPI</a> binaries, which are <em>not</em> Python code. If you need to use your own specific MPI binaries/libraries (such as if you are installing on an HPC platform) and you need help, then let us know on <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/discussions">our Github Discussions page</a>.</p>
 <p>To install HNN-Core with its MPI dependencies using the <code class="docutils literal notranslate"><span class="pre">pip</span></code> method, follow the below instructions for your operating system.</p>
 <section id="pip-mpi-windows">
-<h4><code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI: Windows<a class="headerlink" href="#pip-mpi-windows" title="Permalink to this heading">#</a></h4>
+<h4><code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI: Windows<a class="headerlink" href="#pip-mpi-windows" title="Link to this heading">#</a></h4>
 <p>Unfortunately, we do not officially support MPI usage on native Windows due to the complexity required. However, we do support MPI through Windows Subsystem for Linux (WSL). To install <code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI support on WSL, follow the Steps 1 through 7 of the above <a class="reference internal" href="#conda-windows"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">conda</span></code> Windows guide</span></a>; this will install WSL and Miniconda. Then, inside your <code class="docutils literal notranslate"><span class="pre">Ubuntu</span></code> app window, follow the <code class="docutils literal notranslate"><span class="pre">pip</span></code> steps below for Linux, beginning with step 2.</p>
 </section>
 <section id="pip-mpi-macos-or-linux">
-<h4><code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI: MacOS or Linux<a class="headerlink" href="#pip-mpi-macos-or-linux" title="Permalink to this heading">#</a></h4>
+<h4><code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI: MacOS or Linux<a class="headerlink" href="#pip-mpi-macos-or-linux" title="Link to this heading">#</a></h4>
 <ol class="arabic simple">
 <li><p>Install the <a class="reference external" href="https://www.anaconda.com/download/success">Anaconda Python Distribution</a>.</p></li>
 <li><p>Create and activate a new <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment using commands like the following:</p></li>
@@ -687,7 +658,7 @@ dependencies using the following command (make sure to include the “quotes”)
 <span class="n">conda</span> <span class="n">activate</span> <span class="n">hnn</span><span class="o">-</span><span class="n">core</span><span class="o">-</span><span class="n">env</span>
 </pre></div>
 </div>
-<p>If desired, you can change the environment name <code class="docutils literal notranslate"><span class="pre">hnn-core-env</span></code> to whatever you wish. For this step, you can use any Python version that <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> supports, including Python 3.8 through 3.13, inclusively.</p>
+<p>If desired, you can change the environment name <code class="docutils literal notranslate"><span class="pre">hnn-core-env</span></code> to whatever you wish. Compatible Python versions currently include 3.9 to 3.13, inclusively.</p>
 <ol class="arabic simple" start="3">
 <li><p>(MacOS only) Copy, paste, and run the following commands to set some environment variables for your <code class="docutils literal notranslate"><span class="pre">conda</span></code> environment:</p></li>
 </ol>
@@ -758,7 +729,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CONDA_PREFIX}/lib
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -786,14 +757,17 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CONDA_PREFIX}/lib
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
 
   <div class="sidebar-secondary-item">
-
-  <div class="page-toc tocsection onthispage">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">Installation Guide</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#conda-installation"><code class="docutils literal notranslate"><span class="pre">conda</span></code> Installation</a><ul class="visible nav section-nav flex-column">
@@ -828,13 +802,13 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CONDA_PREFIX}/lib
   </nav></div>
 
   <div class="sidebar-secondary-item">
-
-  <div class="tocsection sourcelink">
-    <a href="_sources/install.md.txt">
-      <i class="fa-solid fa-file-lines"></i> Show Source
-    </a>
-  </div>
-</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/install.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
 
 </div></div>
               
@@ -849,8 +823,8 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CONDA_PREFIX}/lib
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -870,7 +844,7 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CONDA_PREFIX}/lib
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>
@@ -883,7 +857,8 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CONDA_PREFIX}/lib
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>

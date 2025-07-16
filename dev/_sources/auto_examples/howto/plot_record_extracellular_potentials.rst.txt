@@ -237,17 +237,10 @@ steps). Decimation speeds up plotting significantly.
 
 
 .. image-sg:: /auto_examples/howto/images/sphx_glr_plot_record_extracellular_potentials_003.png
-   :alt: Aggregate (L2/3 + L5), Raster Plot with Layer-Specific Dipole Overlays
+   :alt: Aggregate (L2/3 + L5), Raster Plot
    :srcset: /auto_examples/howto/images/sphx_glr_plot_record_extracellular_potentials_003.png
    :class: sphx-glr-single-img
 
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    /home/circleci/project/examples/howto/plot_record_extracellular_potentials.py:103: UserWarning: The figure layout has changed to tight
-      plt.tight_layout()
 
 
 
@@ -265,7 +258,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 41.165 seconds)
+   **Total running time of the script:** (0 minutes 50.238 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_record_extracellular_potentials.py:

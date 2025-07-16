@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="./" >
 
   <head>
     <meta charset="utf-8" />
@@ -14,19 +14,21 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-
-  
-  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -35,22 +37,24 @@
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=478316d9"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
-    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/documentation_options.js?v=9097ff11"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'whats_new';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.14.4';
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
-        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
         </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -59,6 +63,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.4.3dev2" />
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
 <script>
@@ -77,32 +82,16 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="search.html"
       method="get">
@@ -110,7 +99,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -118,20 +106,27 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
   
   <div class=" navbar-header-items__start">
     
       <div class="navbar-item">
 
+  
+    
   
 
 <a class="navbar-brand logo" href="index.html">
@@ -146,7 +141,7 @@
     
     
     <img src="_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core 0.4.3dev2 documentation - Home"/>
-    <script>document.write(`<img src="_static/hnn-medium.png" class="logo__image only-dark" alt="hnn-core 0.4.3dev2 documentation - Home"/>`);</script>
+    <img src="_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core 0.4.3dev2 documentation - Home"/>
   
   
 </a></div>
@@ -158,82 +153,78 @@
     <div class="me-auto navbar-header-items__center">
       
         <div class="navbar-item">
-<nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="install.html">
-                        Install
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="install.html">
+    Install
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="auto_examples/index.html">
-                        Examples
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="api.html">
-                        API
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_examples/index.html">
+    Examples
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="glossary.html">
-                        Glossary
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="#">
-                        What’s new?
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="contributing.html">
-                        Contributing
-                      </a>
-                    </li>
-                
 
-                <li class="nav-item">
-                  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
-                    GitHub (Code)
-                  </a>
-                </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="glossary.html">
+    Glossary
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
             <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
                     More
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
-                    PyPI
-                  </a>
-                </li>
-                
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
 
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
-                    HNN Frontpage
-                  </a>
-                </li>
-                
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
                 </ul>
             </li>
             
@@ -248,41 +239,33 @@
         <div class="navbar-item navbar-persistent--container">
           
 
- <script>
- document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-2"
-      type="button"
-      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-2"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-2"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-2">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
       
     </div>
     
@@ -291,31 +274,31 @@ document.write(`
   
     <div class="navbar-persistent--mobile">
 
- <script>
- document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
-    </label>
+    </button>
   
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -324,88 +307,77 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
-<nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+          
+          
+            <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="install.html">
-                        Install
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="install.html">
+    Install
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="auto_examples/index.html">
-                        Examples
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="api.html">
-                        API
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_examples/index.html">
+    Examples
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="glossary.html">
-                        Glossary
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="#">
-                        What’s new?
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="contributing.html">
-                        Contributing
-                      </a>
-                    </li>
-                
 
-                <li class="nav-item">
-                  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
-                    GitHub (Code)
-                  </a>
-                </li>
-                
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
-                    More
-                </button>
-                <ul id="pst-nav-more-links-2" class="dropdown-menu">
-                    
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
-                    PyPI
-                  </a>
-                </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="glossary.html">
+    Glossary
+  </a>
+</li>
 
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
-                    HNN Frontpage
-                  </a>
-                </li>
-                
-                </ul>
-            </li>
-            
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -414,28 +386,24 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-3"
-      type="button"
-      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-3"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-3"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-3">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
         
       </div>
     
@@ -443,29 +411,32 @@ document.write(`
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
         <div class="header-article-item">
 
-
-
-<nav aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
@@ -473,7 +444,7 @@ document.write(`
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page">What’s new?</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">What’s new?</span></li>
   </ul>
 </nav>
 </div>
@@ -488,10 +459,10 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section id="what-s-new">
-<span id="whats-new"></span><h1>What’s new?<a class="headerlink" href="#what-s-new" title="Permalink to this heading">#</a></h1>
+<span id="whats-new"></span><h1>What’s new?<a class="headerlink" href="#what-s-new" title="Link to this heading">#</a></h1>
 <!-- Protip: the Github PRs webpage can NOT give you the true order of *when* PRs were
 merged into `master`! Use `git log` instead and cross-reference instead. -->
 <!-- template below for new release notes: -->
@@ -504,12 +475,12 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 <!-- ### People who contributed to this release (in alphabetical order of family name): -->
 <!-- ### Changelog -->
 <section id="patch-notes">
-<h2>0.4.2 Patch Notes<a class="headerlink" href="#patch-notes" title="Permalink to this heading">#</a></h2>
+<h2>0.4.2 Patch Notes<a class="headerlink" href="#patch-notes" title="Link to this heading">#</a></h2>
 <p>Version 0.4.2 is a patch release that fixes two important bugs: one affecting LFP and CSD output (<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1062">#1062</a>) and another preventing users from upgrading to the recently released NEURON 8.2.7 (<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1058">#1058</a>), which also enables use of HNN-Core with Python 3.13. This also includes other, smaller bug fixes and changes.</p>
 <p>If you have been using HNN-Core to simulate LFP or CSD output, we <em>strongly</em> recommend you update to this version.</p>
 <p>We have also recently overhauled our <a class="reference external" href="https://hnn.brown.edu">HNN Frontpage</a> and our new <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">HNN Textbook website</a>, so check them out!</p>
 <section id="new-features">
-<h3>New Features<a class="headerlink" href="#new-features" title="Permalink to this heading">#</a></h3>
+<h3>New Features<a class="headerlink" href="#new-features" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>We now provide <code class="docutils literal notranslate"><span class="pre">conda</span></code> packages that offer <em>significantly</em> easier installation of
 HNN-Core, including an option with all features included (including MPI!). See our
@@ -518,7 +489,7 @@ HNN-Core, including an option with all features included (including MPI!). See o
 </ul>
 </section>
 <section id="upcoming-deprecations">
-<h3>Upcoming Deprecations<a class="headerlink" href="#upcoming-deprecations" title="Permalink to this heading">#</a></h3>
+<h3>Upcoming Deprecations<a class="headerlink" href="#upcoming-deprecations" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>In the next minor release (0.5.x), we will be dropping Python 3.8 support for two reasons:</p>
 <ol class="arabic simple">
@@ -530,7 +501,7 @@ HNN-Core, including an option with all features included (including MPI!). See o
 <p>If you expect that you will still require <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> using Python 3.8, please reach out to us on our <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/discussions">Github Discussions page</a>. We will likely be able to continue supporting your use-case.</p>
 </section>
 <section id="bug-fixes">
-<h3>Bug Fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this heading">#</a></h3>
+<h3>Bug Fixes<a class="headerlink" href="#bug-fixes" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Major bugfix: Cell positions were previously starting at origin (incorrect) instead of
 origin + their <code class="docutils literal notranslate"><span class="pre">pos_dict</span></code> locations (correct). This has been fixed. This change should
@@ -550,7 +521,7 @@ by <a class="reference external" href="https://github.com/asoplata">Austin E. So
 </ul>
 </section>
 <section id="development-workflow-changes">
-<h3>Development Workflow Changes<a class="headerlink" href="#development-workflow-changes" title="Permalink to this heading">#</a></h3>
+<h3>Development Workflow Changes<a class="headerlink" href="#development-workflow-changes" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> code now follows the default <code class="docutils literal notranslate"><span class="pre">ruff</span></code> code formatting style, and all new
 contributions are expected to follow this style as well. Fortunately, there is a
@@ -576,7 +547,7 @@ Guide</a>
 </ul>
 </section>
 <section id="api-changes">
-<h3>API Changes<a class="headerlink" href="#api-changes" title="Permalink to this heading">#</a></h3>
+<h3>API Changes<a class="headerlink" href="#api-changes" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>:class:<code class="docutils literal notranslate"><span class="pre">~hnn_core.CellResponse</span></code> now requires a <code class="docutils literal notranslate"><span class="pre">cell_type_names</span></code> argument, whereas before the argument was optional (<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/970">#970</a>).</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">hnn_core/optimization/optimized_evoked.py::optimized_evoked</span></code> now enforces a minimum
@@ -585,7 +556,7 @@ introduced in <a class="reference external" href="https://github.com/jonescompne
 </ul>
 </section>
 <section id="people-who-contributed-to-this-release-in-alphabetical-order-of-family-name">
-<h3>People who contributed to this release (in alphabetical order of family name):<a class="headerlink" href="#people-who-contributed-to-this-release-in-alphabetical-order-of-family-name" title="Permalink to this heading">#</a></h3>
+<h3>People who contributed to this release (in alphabetical order of family name):<a class="headerlink" href="#people-who-contributed-to-this-release-in-alphabetical-order-of-family-name" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/dylansdaniels">Dylan Daniels</a></p></li>
 <li><p><a class="reference external" href="https://github.com/katduecker">Katharina Duecker</a></p></li>
@@ -595,7 +566,7 @@ introduced in <a class="reference external" href="https://github.com/jonescompne
 </ul>
 </section>
 <section id="changelog">
-<h3>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">#</a></h3>
+<h3>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fix tiny typo in <code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI install documentation,
 by <a class="reference external" href="https://github.com/asoplata">Austin E. Soplata</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1072">#1072</a>. (he’s also responsible for the original typo…)</p></li>
@@ -650,16 +621,16 @@ by <a class="reference external" href="https://github.com/wagdy88">Mohamed W. El
 </section>
 </section>
 <section id="id1">
-<h2>0.4.1 Patch Notes<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h2>
+<h2>0.4.1 Patch Notes<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p>Version 0.4.1 is a bug-fixing patch release for version 0.4. This includes changes to importing of <code class="docutils literal notranslate"><span class="pre">BatchSimulate</span></code> due to previously-undetected install/import issues (<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1034">#1034</a>), configuration of packaging metadata format (same PR), and elimination of a discrepancy in our method of cleaning local compiled files that led to architecture-specific files being included in the Pypi 0.4 release, which caused simulations on some platforms to fail (<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1035">#1035</a>). The public Pypi version has already been updated to 0.4.1.</p></li>
 </ul>
 </section>
 <section id="release-notes">
-<h2>0.4 Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this heading">#</a></h2>
+<h2>0.4 Release Notes<a class="headerlink" href="#release-notes" title="Link to this heading">#</a></h2>
 <p>v0.4 represents a major milestone in development of <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> and the HNN ecosystem as a whole. v0.4 includes over <em>two years</em> of active development work by many people (&gt;800 commits!), and brings with it many new and exciting features, including significant improvements to robustness, testing, and bug-fixing.</p>
 <section id="id2">
-<h3>New Features<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
+<h3>New Features<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> now includes a fully-tested and robust GUI of its own. The <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> GUI was present as a prototype in v0.3, but it is now ready for production. New features and visual improvements will still be coming to it in the future, such as the ability to use optimization. See our new <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/install.html">Install page</a> for ways to install it, and we have already begun incorporating it into a new, fresh series of tutorials for our upcoming revamp of the HNN website. If you have installed it, you can start the GUI using <code class="docutils literal notranslate"><span class="pre">hnn-gui</span></code> in your terminal/command prompt window.</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">BatchSimulate</span></code> class: Thanks to <a class="reference external" href="https://github.com/samadpls">Abdul Samad Siddiqui</a> and Google Summer of Code 2024, there is now the capability to run “batches” of simulations across multiple parameter sets, enabling easy analysis and simulation of behavior across parameter sweeps. See our <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py">example for more details</a>. Note that currently, only its <code class="docutils literal notranslate"><span class="pre">loky</span></code> backend is supported, and the <code class="docutils literal notranslate"><span class="pre">&quot;hnn-core[parallel]&quot;</span></code> dependencies must be installed for it to be used.</p></li>
@@ -674,13 +645,13 @@ or all sections, are enabled by setting <code class="docutils literal notranslat
 </ul>
 </section>
 <section id="deprecations">
-<h3>Deprecations<a class="headerlink" href="#deprecations" title="Permalink to this heading">#</a></h3>
+<h3>Deprecations<a class="headerlink" href="#deprecations" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>The new Python 3.13 is <strong>not</strong> supported by <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> at this time, due to <a class="reference external" href="https://nrn.readthedocs.io/en/8.2.6/">NEURON</a>’s current lack of support for it. This will change in the near future. We still support 3.8 through 3.12 (inclusively).</p></li>
 </ul>
 </section>
 <section id="id3">
-<h3>Upcoming Deprecations<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h3>
+<h3>Upcoming Deprecations<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Both <a class="reference internal" href="generated/hnn_core.viz.plot_laminar_lfp.html#hnn_core.viz.plot_laminar_lfp" title="hnn_core.viz.plot_laminar_lfp"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_laminar_lfp()</span></code></a> and <a class="reference internal" href="generated/hnn_core.viz.plot_dipole.html#hnn_core.viz.plot_dipole" title="hnn_core.viz.plot_dipole"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_dipole()</span></code></a> will have their <code class="docutils literal notranslate"><span class="pre">tmin</span></code> and <code class="docutils literal notranslate"><span class="pre">tmax</span></code> arguments removed in the future. Please set the x-axis limits using methods called directly on the existing <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> objects, or using <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.xlim.html#matplotlib.pyplot.xlim"><code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.xlim</span></code></a>.</p></li>
 <li><p><a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a>’s argument of <code class="docutils literal notranslate"><span class="pre">legacy_mode</span></code> for importing old param files will be removed in the future.</p></li>
@@ -689,7 +660,7 @@ or all sections, are enabled by setting <code class="docutils literal notranslat
 </ul>
 </section>
 <section id="id4">
-<h3>API Changes<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h3>
+<h3>API Changes<a class="headerlink" href="#id4" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>New argument to <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> initialization: you can now set <code class="docutils literal notranslate"><span class="pre">mesh_shape</span></code> to easily make a grid of different sizes of <code class="docutils literal notranslate"><span class="pre">Network</span></code>s.</p></li>
 <li><p><a class="reference internal" href="generated/hnn_core.Cell.html#hnn_core.Cell" title="hnn_core.Cell"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cell</span></code></a> initialization argument <code class="docutils literal notranslate"><span class="pre">topology</span></code> has had both its name changed to <code class="docutils literal notranslate"><span class="pre">cell_tree</span></code> and its data type significantly changed; see <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/generated/hnn_core.Cell.html#hnn_core.Cell">the API docs of <code class="docutils literal notranslate"><span class="pre">Cell</span></code> for details</a>.</p></li>
@@ -704,7 +675,7 @@ or all sections, are enabled by setting <code class="docutils literal notranslat
 </ul>
 </section>
 <section id="id5">
-<h3>People who contributed to this release (in alphabetical order of family name):<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h3>
+<h3>People who contributed to this release (in alphabetical order of family name):<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/chenghuzi">Huzi Cheng</a></p></li>
 <li><p><a class="reference external" href="https://github.com/tianqi-cheng">Tianqi Cheng</a></p></li>
@@ -727,7 +698,7 @@ or all sections, are enabled by setting <code class="docutils literal notranslat
 </ul>
 </section>
 <section id="prs-merged-api">
-<h3>PRs merged (API)<a class="headerlink" href="#prs-merged-api" title="Permalink to this heading">#</a></h3>
+<h3>PRs merged (API)<a class="headerlink" href="#prs-merged-api" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Add ability to manually define colors in spike histogram plots, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in
 <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/640">#640</a></p></li>
@@ -799,7 +770,7 @@ in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-
 </ul>
 </section>
 <section id="prs-merged-bug-fixes-and-corrections">
-<h3>PRs merged (Bug fixes and corrections)<a class="headerlink" href="#prs-merged-bug-fixes-and-corrections" title="Permalink to this heading">#</a></h3>
+<h3>PRs merged (Bug fixes and corrections)<a class="headerlink" href="#prs-merged-bug-fixes-and-corrections" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Objective function called by <code class="xref py py-func docutils literal notranslate"><span class="pre">optimize_evoked()</span></code> now
 returns a scalar instead of tuple, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/670">#670</a></p></li>
@@ -870,7 +841,7 @@ runs by <a class="reference external" href="https://github.com/asoplata">Austin 
 </ul>
 </section>
 <section id="prs-merged-gui-changes">
-<h3>PRs merged (GUI changes)<a class="headerlink" href="#prs-merged-gui-changes" title="Permalink to this heading">#</a></h3>
+<h3>PRs merged (GUI changes)<a class="headerlink" href="#prs-merged-gui-changes" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Add RMSE calculation and plotting to GUI, by <a class="reference external" href="https://github.com/chenghuzi">Huzi Cheng</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/636">#636</a></p></li>
 <li><p>Update GUI to use ipywidgets v8.0.0+ API, by <a class="reference external" href="https://github.com/gtdang">George Dang</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/696">#696</a></p></li>
@@ -926,7 +897,7 @@ changes by <a class="reference external" href="https://github.com/dylansdaniels"
 </ul>
 </section>
 <section id="prs-merged-other">
-<h3>PRs merged (Other)<a class="headerlink" href="#prs-merged-other" title="Permalink to this heading">#</a></h3>
+<h3>PRs merged (Other)<a class="headerlink" href="#prs-merged-other" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Add Github Discussions installation template, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/630">#630</a></p></li>
 <li><p>Replace NEURON functions like <code class="docutils literal notranslate"><span class="pre">define_shape()</span></code> and <code class="docutils literal notranslate"><span class="pre">distance()</span></code> with Python
@@ -980,9 +951,9 @@ in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-
 </section>
 </section>
 <section id="id6">
-<h2>0.3<a class="headerlink" href="#id6" title="Permalink to this heading">#</a></h2>
+<h2>0.3<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
 <section id="id7">
-<h3>Changelog<a class="headerlink" href="#id7" title="Permalink to this heading">#</a></h3>
+<h3>Changelog<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Add option to select drives using argument ‘which_drives’ in
 <code class="xref py py-func docutils literal notranslate"><span class="pre">optimize_evoked()</span></code>, by <a class="reference external" href="https://github.com/mohdsherif/">Mohamed A. Sherif</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/478">#478</a></p></li>
@@ -1001,7 +972,7 @@ by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</
 </ul>
 </section>
 <section id="bug">
-<h3>Bug<a class="headerlink" href="#bug" title="Permalink to this heading">#</a></h3>
+<h3>Bug<a class="headerlink" href="#bug" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fix bugs in drives API to enable: rate constant argument as float; evoked drive with
 connection probability, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/458">#458</a></p></li>
@@ -1037,7 +1008,7 @@ type of Dipole, by <a class="reference external" href="https://github.com/raj170
 </ul>
 </section>
 <section id="api">
-<h3>API<a class="headerlink" href="#api" title="Permalink to this heading">#</a></h3>
+<h3>API<a class="headerlink" href="#api" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Optimization of the evoked drives can be conducted on any <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a>
 template model by passing a <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> instance directly into
@@ -1061,7 +1032,7 @@ in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-
 </ul>
 </section>
 <section id="people-who-contributed-to-this-release-in-alphabetical-order">
-<h3>People who contributed to this release (in alphabetical order):<a class="headerlink" href="#people-who-contributed-to-this-release-in-alphabetical-order" title="Permalink to this heading">#</a></h3>
+<h3>People who contributed to this release (in alphabetical order):<a class="headerlink" href="#people-who-contributed-to-this-release-in-alphabetical-order" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a></p></li>
 <li><p><a class="reference external" href="https://github.com/chenghuzi">Huzi Cheng</a></p></li>
@@ -1080,10 +1051,10 @@ in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-
 </section>
 </section>
 <section id="id8">
-<h2>0.2<a class="headerlink" href="#id8" title="Permalink to this heading">#</a></h2>
+<h2>0.2<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
 </section>
 <section id="notable-changes">
-<h2>Notable Changes<a class="headerlink" href="#notable-changes" title="Permalink to this heading">#</a></h2>
+<h2>Notable Changes<a class="headerlink" href="#notable-changes" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p>Local field potentials can now be recorded during simulations <a class="reference internal" href="auto_examples/howto/plot_record_extracellular_potentials.html#sphx-glr-auto-examples-howto-plot-record-extracellular-potentials-py"><span class="std std-ref">[Example]</span></a></p></li>
 <li><p>Ability to optimize parameters to reproduce event related potentials from real data
@@ -1094,7 +1065,7 @@ in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-
 <li><p>Improved visualization including spectral analysis, connectivity, and cell morphology</p></li>
 </ul>
 <section id="id9">
-<h3>Changelog<a class="headerlink" href="#id9" title="Permalink to this heading">#</a></h3>
+<h3>Changelog<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Store all connectivity information under <code class="xref py py-attr docutils literal notranslate"><span class="pre">connectivity</span></code> before building
 the network, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/276">#276</a></p></li>
@@ -1138,7 +1109,7 @@ Tolley</a> in <a class="reference external" href="https://github.com/jonescompne
 </ul>
 </section>
 <section id="id10">
-<h3>Bug<a class="headerlink" href="#id10" title="Permalink to this heading">#</a></h3>
+<h3>Bug<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Remove rounding error caused by repositioning of NEURON cell sections, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> and <a class="reference external" href="https://github.com/rythorpe">Ryan
 Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/314">#314</a></p></li>
@@ -1158,7 +1129,7 @@ and <code class="docutils literal notranslate"><span class="pre">data</span></co
 </ul>
 </section>
 <section id="id11">
-<h3>API<a class="headerlink" href="#id11" title="Permalink to this heading">#</a></h3>
+<h3>API<a class="headerlink" href="#id11" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>New API for defining cell-cell connections. Custom connections can be added with
 <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network.add_connection" title="hnn_core.Network.add_connection"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_connection()</span></code></a>, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/276">#276</a></p></li>
@@ -1191,7 +1162,7 @@ weight and delay dictionaries assigned in <code class="docutils literal notransl
 </ul>
 </section>
 <section id="id12">
-<h3>People who contributed to this release (in alphabetical order):<a class="headerlink" href="#id12" title="Permalink to this heading">#</a></h3>
+<h3>People who contributed to this release (in alphabetical order):<a class="headerlink" href="#id12" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/alexrockhill">Alex Rockhill</a></p></li>
 <li><p><a class="reference external" href="https://github.com/blakecaldwell">Blake Caldwell</a></p></li>
@@ -1207,9 +1178,9 @@ weight and delay dictionaries assigned in <code class="docutils literal notransl
 </section>
 </section>
 <section id="id13">
-<h2>0.1<a class="headerlink" href="#id13" title="Permalink to this heading">#</a></h2>
+<h2>0.1<a class="headerlink" href="#id13" title="Link to this heading">#</a></h2>
 <section id="id14">
-<h3>Changelog<a class="headerlink" href="#id14" title="Permalink to this heading">#</a></h3>
+<h3>Changelog<a class="headerlink" href="#id14" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Add ability to simulate multiple trials in parallel using joblibs, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/44">#44</a></p></li>
 <li><p>Rhythmic inputs can now be turned off by setting their conductance weights to 0 instead of setting
@@ -1245,12 +1216,12 @@ in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-
 <li><p>Add y-label units (nAm) to all visualisation functions involving dipole moments, by <a class="reference external" href="https://github.com/cjayb">Christopher
 Bailey</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/264">#264</a></p></li>
 <li><p>Add Savitzky-Golay filtering method <a class="reference internal" href="generated/hnn_core.dipole.Dipole.html#hnn_core.dipole.Dipole.savgol_filter" title="hnn_core.dipole.Dipole.savgol_filter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a> to <code class="docutils literal notranslate"><span class="pre">Dipole</span></code>;
-copied from <code class="docutils literal notranslate"><span class="pre">mne-python</span></code> <a class="reference external" href="https://mne.tools/dev/generated/mne.Evoked.html#mne.Evoked.savgol_filter" title="(in MNE v1.10)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a>, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in
+copied from <code class="docutils literal notranslate"><span class="pre">mne-python</span></code> <a class="reference external" href="https://mne.tools/dev/generated/mne.Evoked.html#mne.Evoked.savgol_filter" title="(in MNE v1.11)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">savgol_filter()</span></code></a>, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in
 <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/264">#264</a></p></li>
 </ul>
 </section>
 <section id="id15">
-<h3>Bug<a class="headerlink" href="#id15" title="Permalink to this heading">#</a></h3>
+<h3>Bug<a class="headerlink" href="#id15" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fix missing autapses in network construction, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/50">#50</a></p></li>
 <li><p>Fix rhythmic input feed, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/98">#98</a></p></li>
@@ -1268,7 +1239,7 @@ Thorpe</a> in <a class="reference external" href="https://github.com/jonescompne
 </ul>
 </section>
 <section id="id16">
-<h3>API<a class="headerlink" href="#id16" title="Permalink to this heading">#</a></h3>
+<h3>API<a class="headerlink" href="#id16" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Make a context manager for Network class, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> and <a class="reference external" href="https://github.com/blakecaldwell">Blake Caldwell</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/86">#86</a></p></li>
 <li><p>Create Spikes class, add write methods and read functions for Spikes and Dipole classes, by <a class="reference external" href="https://github.com/rythorpe">Ryan
@@ -1289,7 +1260,7 @@ scaling, by <a class="reference external" href="https://github.com/cjayb">Christ
 </ul>
 </section>
 <section id="id17">
-<h3>People who contributed to this release (in alphabetical order):<a class="headerlink" href="#id17" title="Permalink to this heading">#</a></h3>
+<h3>People who contributed to this release (in alphabetical order):<a class="headerlink" href="#id17" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/blakecaldwell">Blake Caldwell</a></p></li>
 <li><p><a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a></p></li>
@@ -1311,7 +1282,7 @@ scaling, by <a class="reference external" href="https://github.com/cjayb">Christ
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -1339,14 +1310,17 @@ scaling, by <a class="reference external" href="https://github.com/cjayb">Christ
             
             
               
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
 
   <div class="sidebar-secondary-item">
-
-  <div class="page-toc tocsection onthispage">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc">
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#patch-notes">0.4.2 Patch Notes</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#new-features">New Features</a></li>
@@ -1397,13 +1371,13 @@ scaling, by <a class="reference external" href="https://github.com/cjayb">Christ
   </nav></div>
 
   <div class="sidebar-secondary-item">
-
-  <div class="tocsection sourcelink">
-    <a href="_sources/whats_new.md.txt">
-      <i class="fa-solid fa-file-lines"></i> Show Source
-    </a>
-  </div>
-</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/whats_new.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
 
 </div></div>
               
@@ -1418,8 +1392,8 @@ scaling, by <a class="reference external" href="https://github.com/cjayb">Christ
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1439,7 +1413,7 @@ scaling, by <a class="reference external" href="https://github.com/cjayb">Christ
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>
@@ -1452,7 +1426,8 @@ scaling, by <a class="reference external" href="https://github.com/cjayb">Christ
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>

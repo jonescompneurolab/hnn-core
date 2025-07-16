@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="" >
+<html lang="en" data-content_root="../../" >
 
   <head>
     <meta charset="utf-8" />
@@ -13,19 +13,21 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-
-  
-  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -34,28 +36,31 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=478316d9"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/documentation_options.js?v=9097ff11"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/hnn_core/network';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.14.4';
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
-        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.4.3dev2" />
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
 <script>
@@ -74,32 +79,16 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
-  
-  <input type="checkbox"
-          class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
-  
-  <div class="search-button__wrapper">
-    <div class="search-button__overlay"></div>
-    <div class="search-button__search-container">
+  <dialog id="pst-search-dialog">
+    
 <form class="bd-search d-flex align-items-center"
       action="../../search.html"
       method="get">
@@ -107,7 +96,6 @@
   <input type="search"
          class="form-control"
          name="q"
-         id="search-input"
          placeholder="Search the docs ..."
          aria-label="Search the docs ..."
          autocomplete="off"
@@ -115,20 +103,27 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form></div>
-  </div>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
   
   <div class=" navbar-header-items__start">
     
       <div class="navbar-item">
 
+  
+    
   
 
 <a class="navbar-brand logo" href="../../index.html">
@@ -143,7 +138,7 @@
     
     
     <img src="../../_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core 0.4.3dev2 documentation - Home"/>
-    <script>document.write(`<img src="../../_static/hnn-medium.png" class="logo__image only-dark" alt="hnn-core 0.4.3dev2 documentation - Home"/>`);</script>
+    <img src="../../_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core 0.4.3dev2 documentation - Home"/>
   
   
 </a></div>
@@ -155,82 +150,78 @@
     <div class="me-auto navbar-header-items__center">
       
         <div class="navbar-item">
-<nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../install.html">
-                        Install
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Install
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-                        Examples
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../api.html">
-                        API
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    Examples
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../glossary.html">
-                        Glossary
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../whats_new.html">
-                        What’s new?
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../contributing.html">
-                        Contributing
-                      </a>
-                    </li>
-                
 
-                <li class="nav-item">
-                  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
-                    GitHub (Code)
-                  </a>
-                </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../glossary.html">
+    Glossary
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
             <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
                     More
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
-                    PyPI
-                  </a>
-                </li>
-                
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
 
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
-                    HNN Frontpage
-                  </a>
-                </li>
-                
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
                 </ul>
             </li>
             
@@ -245,41 +236,33 @@
         <div class="navbar-item navbar-persistent--container">
           
 
- <script>
- document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
         </div>
       
       
         <div class="navbar-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-2"
-      type="button"
-      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-2"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-2"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-2">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
       
     </div>
     
@@ -288,27 +271,29 @@ document.write(`
   
     <div class="navbar-persistent--mobile">
 
- <script>
- document.write(`
-   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <i class="fa-solid fa-magnifying-glass"></i>
-    <span class="search-button__default-text">Search</span>
-    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-   </button>
- `);
- </script>
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
     </div>
   
 
   
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
       
-      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -317,88 +302,77 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
-<nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
+          
+          
+            <div class="navbar-item">
+<nav>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../install.html">
-                        Install
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Install
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../auto_examples/index.html">
-                        Examples
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../api.html">
-                        API
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../auto_examples/index.html">
+    Examples
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../glossary.html">
-                        Glossary
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../whats_new.html">
-                        What’s new?
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../contributing.html">
-                        Contributing
-                      </a>
-                    </li>
-                
 
-                <li class="nav-item">
-                  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
-                    GitHub (Code)
-                  </a>
-                </li>
-                
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
-                    More
-                </button>
-                <ul id="pst-nav-more-links-2" class="dropdown-menu">
-                    
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
-                    PyPI
-                  </a>
-                </li>
-                
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../glossary.html">
+    Glossary
+  </a>
+</li>
 
-                <li class="nav-item">
-                  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
-                    HNN Frontpage
-                  </a>
-                </li>
-                
-                </ul>
-            </li>
-            
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -407,28 +381,24 @@ document.write(`
       <div class="sidebar-header-items__end">
         
           <div class="navbar-item">
-<script>
-document.write(`
-  <div class="version-switcher__container dropdown">
-    <button id="pst-version-switcher-button-3"
-      type="button"
-      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
-      data-bs-toggle="dropdown"
-      aria-haspopup="listbox"
-      aria-controls="pst-version-switcher-list-3"
-      aria-label="Version switcher list"
-    >
-      Choose version  <!-- this text may get changed later by javascript -->
-      <span class="caret"></span>
-    </button>
-    <div id="pst-version-switcher-list-3"
-      class="version-switcher__menu dropdown-menu list-group-flush py-0"
-      role="listbox" aria-labelledby="pst-version-switcher-button-3">
-      <!-- dropdown will be populated by javascript on page load -->
-    </div>
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
   </div>
-`);
-</script></div>
+</div></div>
         
       </div>
     
@@ -436,29 +406,32 @@ document.write(`
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
   </div>
-  
-  <div id="rtd-footer-container"></div>
 
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
       
         <div class="header-article-item">
 
-
-
-<nav aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
@@ -469,7 +442,7 @@ document.write(`
     
     <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page">hnn_core.network</li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">hnn_core.network</span></li>
   </ul>
 </nav>
 </div>
@@ -484,7 +457,7 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <h1>Source code for hnn_core.network</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Network class.&quot;&quot;&quot;</span>
@@ -676,7 +649,9 @@ document.write(`
         <span class="n">conn</span><span class="p">[</span><span class="s2">&quot;gid_pairs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">src_gid</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="pick_connection"><a class="viewcode-back" href="../../generated/hnn_core.pick_connection.html#hnn_core.pick_connection">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">pick_connection</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">src_gids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_gids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">receptor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="pick_connection">
+<a class="viewcode-back" href="../../generated/hnn_core.pick_connection.html#hnn_core.pick_connection">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">pick_connection</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">src_gids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target_gids</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">receptor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns indices of connections that match search parameters.</span>
 
 <span class="sd">    Parameters</span>
@@ -792,7 +767,10 @@ document.write(`
     <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">conn_set</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Network"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Network</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Network">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Network</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The Network class.</span>
 
 <span class="sd">    Parameters</span>
@@ -950,7 +928,9 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_tstop</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dt</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="Network.__repr__"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.__repr__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Network.__repr__">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.__repr__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">class_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="c1"># Dynamically create the description based on the current cell types</span>
         <span class="n">descriptions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -961,6 +941,7 @@ document.write(`
         <span class="c1"># Combine all descriptions into a single string</span>
         <span class="n">description_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">descriptions</span><span class="p">)</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">class_name</span><span class="si">}</span><span class="s2"> | </span><span class="si">{</span><span class="n">description_str</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div>
+
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Network</span><span class="p">):</span>
@@ -987,7 +968,9 @@ document.write(`
 
         <span class="k">return</span> <span class="kc">True</span>
 
-<div class="viewcode-block" id="Network.set_cell_positions"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.set_cell_positions">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_cell_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer_separation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Network.set_cell_positions">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.set_cell_positions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_cell_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer_separation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set relative positions of cells arranged in a square grid</span>
 
 <span class="sd">        Note that it is possible to change only a subset of the parameters</span>
@@ -1037,7 +1020,10 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_inplane_distance</span> <span class="o">=</span> <span class="n">inplane_distance</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_layer_separation</span> <span class="o">=</span> <span class="n">layer_separation</span></div>
 
-<div class="viewcode-block" id="Network.copy"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.copy">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Network.copy">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.copy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a copy of the Network instance</span>
 
 <span class="sd">        The returned copy retains the intrinsic connectivity between cells, as</span>
@@ -1059,7 +1045,10 @@ document.write(`
         <span class="n">net_copy</span><span class="o">.</span><span class="n">_reset_rec_arrays</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">net_copy</span></div>
 
-<div class="viewcode-block" id="Network.add_evoked_drive"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_evoked_drive">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_evoked_drive</span><span class="p">(</span>
+
+<div class="viewcode-block" id="Network.add_evoked_drive">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_evoked_drive">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_evoked_drive</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1187,7 +1176,10 @@ document.write(`
             <span class="n">probability</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Network.add_poisson_drive"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_poisson_drive">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_poisson_drive</span><span class="p">(</span>
+
+<div class="viewcode-block" id="Network.add_poisson_drive">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_poisson_drive">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_poisson_drive</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1324,7 +1316,10 @@ document.write(`
             <span class="n">probability</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Network.add_bursty_drive"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_bursty_drive">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_bursty_drive</span><span class="p">(</span>
+
+<div class="viewcode-block" id="Network.add_bursty_drive">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_bursty_drive">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_bursty_drive</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1472,6 +1467,7 @@ document.write(`
             <span class="n">cell_specific</span><span class="p">,</span>
             <span class="n">probability</span><span class="p">,</span>
         <span class="p">)</span></div>
+
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_attach_drive</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1775,7 +1771,9 @@ document.write(`
                 <span class="c1"># &#39;events&#39;: nested list (n_trials x n_drive_cells x n_events)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">external_drives</span><span class="p">[</span><span class="n">drive</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]][</span><span class="s2">&quot;events&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event_times</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Network.add_tonic_bias"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_tonic_bias">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_tonic_bias</span><span class="p">(</span>
+<div class="viewcode-block" id="Network.add_tonic_bias">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_tonic_bias">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_tonic_bias</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">cell_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1856,6 +1854,7 @@ document.write(`
                     <span class="n">t_stop</span><span class="o">=</span><span class="n">tstop</span><span class="p">,</span>
                 <span class="p">)</span></div>
 
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_add_cell_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cell_name</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">cell_template</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add cell type by updating pos_dict and gid_ranges.&quot;&quot;&quot;</span>
         <span class="n">ll</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_n_gids</span>
@@ -1907,11 +1906,16 @@ document.write(`
                     <span class="k">if</span> <span class="n">connection</span><span class="p">[</span><span class="s2">&quot;target_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">original_name</span><span class="p">:</span>
                         <span class="n">connection</span><span class="p">[</span><span class="s2">&quot;target_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_name</span>
 
-<div class="viewcode-block" id="Network.gid_to_type"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.gid_to_type">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">gid_to_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid</span><span class="p">):</span>
+<div class="viewcode-block" id="Network.gid_to_type">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.gid_to_type">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gid_to_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gid</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Reverse lookup of gid to type.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_gid_to_type</span><span class="p">(</span><span class="n">gid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Network.add_connection"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_connection">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_connection</span><span class="p">(</span>
+
+<div class="viewcode-block" id="Network.add_connection">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_connection">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_connection</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">src_gids</span><span class="p">,</span>
         <span class="n">target_gids</span><span class="p">,</span>
@@ -2104,7 +2108,10 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">connectivity</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">conn</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="Network.clear_connectivity"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.clear_connectivity">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">clear_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Network.clear_connectivity">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.clear_connectivity">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove all connections defined in Network.connectivity&quot;&quot;&quot;</span>
         <span class="n">connectivity</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">conn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectivity</span><span class="p">:</span>
@@ -2112,7 +2119,10 @@ document.write(`
                 <span class="n">connectivity</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connectivity</span> <span class="o">=</span> <span class="n">connectivity</span></div>
 
-<div class="viewcode-block" id="Network.clear_drives"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.clear_drives">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">clear_drives</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Network.clear_drives">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.clear_drives">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_drives</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove all drives defined in Network.connectivity&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connectivity</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">conn</span>
@@ -2128,7 +2138,10 @@ document.write(`
 
         <span class="bp">self</span><span class="o">.</span><span class="n">external_drives</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Network.add_electrode_array"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_electrode_array">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_electrode_array</span><span class="p">(</span>
+
+<div class="viewcode-block" id="Network.add_electrode_array">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_electrode_array">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_electrode_array</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">electrode_pos</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">conductivity</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;psa&quot;</span><span class="p">,</span> <span class="n">min_distance</span><span class="o">=</span><span class="mf">0.5</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Specify coordinates of electrode array for extracellular recording.</span>
@@ -2172,7 +2185,10 @@ document.write(`
             <span class="p">}</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="Network.update_weights"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.update_weights">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e_e</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">e_i</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">i_e</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">i_i</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Network.update_weights">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.update_weights">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e_e</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">e_i</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">i_e</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">i_i</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update synaptic weights of the network.</span>
 
 <span class="sd">        Parameters</span>
@@ -2243,7 +2259,10 @@ document.write(`
         <span class="k">if</span> <span class="n">copy</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">net</span></div>
 
-<div class="viewcode-block" id="Network.plot_cells"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.plot_cells">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">plot_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Network.plot_cells">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.plot_cells">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Plot the cells using Network.pos_dict.</span>
 
 <span class="sd">        Parameters</span>
@@ -2261,12 +2280,17 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">plot_cells</span><span class="p">(</span><span class="n">net</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span></div>
 
+
     <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write_output</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">network_to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write_output</span><span class="o">=</span><span class="n">write_output</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Network.write_configuration"><a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.write_configuration">[docs]</a>    <span class="nd">@copy_doc</span><span class="p">(</span><span class="n">write_network_configuration</span><span class="p">)</span>
+<div class="viewcode-block" id="Network.write_configuration">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.write_configuration">[docs]</a>
+    <span class="nd">@copy_doc</span><span class="p">(</span><span class="n">write_network_configuration</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">write_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="n">write_network_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">)</span></div></div>
+        <span class="n">write_network_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">)</span></div>
+</div>
+
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_Connectivity</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
@@ -2462,7 +2486,7 @@ document.write(`
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
 </div>
@@ -2483,8 +2507,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -2504,7 +2528,7 @@ document.write(`
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
     <br/>
   </p>
 </div>
@@ -2517,7 +2541,8 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
 </p></div>
       
     </div>
