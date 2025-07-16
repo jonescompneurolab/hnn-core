@@ -4,7 +4,8 @@ version: 2.1
 jobs:
     build_docs:
       machine:
-        image: ubuntu-2004:current
+        # from https://circleci.com/docs/configuration-reference/#available-linux-machine-images-cloud
+        image: ubuntu-2204:current
       resource_class: large
       steps:
           - checkout
