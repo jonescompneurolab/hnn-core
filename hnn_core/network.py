@@ -1039,9 +1039,9 @@ class Network:
             Synaptic weights (in uS) of NMDA receptors for each targeted cell type (dict keys).
             Cell types omitted are set to zero.
         synaptic_delays : dict or float
-            Synaptic delay (in ms) at the column origin, dispersed laterally as a function of
-            space_constant. If float, applies to all target cell types. Use dict for cell-specific
-            delays.
+            Synaptic delay (in ms) at the column origin, dispersed laterally as
+            a function of the space_constant. If float, applies to all target
+            cell types. Use dict to create delay->cell mapping.
         space_constant : float
             Lateral dispersion constant (in units of inplane_distance) for synaptic weights and
             delays within the target network. Default: 3.0
@@ -1809,6 +1809,7 @@ class Network:
         ----------
         e_e : float
             Synaptic gain of excitatory to excitatory connections
+
             (default None)
         e_i : float
             Synaptic gain of excitatory to inhibitory connections
@@ -1903,14 +1904,16 @@ class Network:
 
         Parameters
         ----------
-        spike_data : dict or list
-            Input spike data in one of two formats:
+        spike_data : dict or list or str
+            Input spike data in one of three formats:
             - Format 1: Dictionary where keys are source identifiers and values are
-            lists of spike times in ms.
-            Example: {"NetA_L2_pyramidal_GID0": [10.2, 25.3], ...}
+              lists of spike times in ms.
+              Example: {"NetA_L2_pyramidal_GID0": [10.2, 25.3], ...}
             - Format 2: List of (time, gid) tuples where time is the spike time in ms
-            and gid identifies the source cell.
-            Example: [(10.2, 0), (15.6, 1), (25.3, 0)]
+              and gid identifies the source cell.
+              Example: [(10.2, 0), (15.6, 1), (25.3, 0)]
+            - Format 3: String path (or glob pattern) to spike files that can be loaded
+              with hnn_core.read_spikes(), like "path/to/spk_*.txt"
 
         Returns
         -------
@@ -1925,7 +1928,36 @@ class Network:
         """
         source_to_gid_map = None
 
-        if isinstance(spike_data, list) and all(
+        if isinstance(spike_data, dict):
+            # Format 1: {source_id: [spike_times], ...}
+            source_ids = list(spike_data.keys())
+            n_drive_cells = len(source_ids)
+
+            # Transform to standardized format
+            all_times = []
+            all_gids = []
+
+            # Map source IDs to sequential gids
+            source_to_gid_map = {src_id: i for i, src_id in enumerate(source_ids)}
+
+            # Collect all spike times and corresponding gids
+            for src_id, times in spike_data.items():
+                gid = source_to_gid_map[src_id]
+                if isinstance(times, (list, np.ndarray)):
+                    all_times.extend(times)
+                    all_gids.extend([gid] * len(times))
+                else:
+                    raise ValueError(
+                        f"Spike times for source '{src_id}' must be a list or array. "
+                        f"Got {type(times)}."
+                    )
+
+            standardized_data = {
+                "times": all_times,
+                "gids": all_gids,
+            }
+
+        elif isinstance(spike_data, list) and all(
             isinstance(x, tuple) and len(x) == 2 for x in spike_data
         ):
             # Format 2: List of (time, gid) tuples
@@ -1960,39 +1992,48 @@ class Network:
             else:
                 standardized_data = {"times": [], "gids": []}
 
-        elif isinstance(spike_data, dict):
-            # Format 1: {source_id: [spike_times], ...}
-            source_ids = list(spike_data.keys())
-            n_drive_cells = len(source_ids)
+        # Handle string input as file path
+        elif isinstance(spike_data, str):
+            try:
+                from hnn_core import read_spikes
 
-            # Transform to standardized format
-            all_times = []
-            all_gids = []
+                # Read spike data from file
+                cell_response = read_spikes(spike_data)
 
-            # Map source IDs to sequential gids
-            source_to_gid_map = {src_id: i for i, src_id in enumerate(source_ids)}
-
-            # Collect all spike times and corresponding gids
-            for src_id, times in spike_data.items():
-                gid = source_to_gid_map[src_id]
-                if isinstance(times, (list, np.ndarray)):
-                    all_times.extend(times)
-                    all_gids.extend([gid] * len(times))
-                else:
+                # By default, use the first trial
+                trial_idx = 0
+                if trial_idx >= len(cell_response.spike_times):
                     raise ValueError(
-                        f"Spike times for source '{src_id}' must be a list or array. "
-                        f"Got {type(times)}."
+                        f"Trial index {trial_idx} exceeds available trials "
+                        f"({len(cell_response.spike_times)})"
                     )
 
-            standardized_data = {
-                "times": all_times,
-                "gids": all_gids,
-            }
+                # Extract spike data from specified trial
+                spike_times = cell_response.spike_times[trial_idx]
+                spike_gids = cell_response.spike_gids[trial_idx]
+                spike_types = cell_response.spike_types[trial_idx]
+
+                # Convert to dictionary format (Format 1)
+                spike_data_dict = {}
+                for t, g, cell_type in zip(spike_times, spike_gids, spike_types):
+                    src_id = f"{cell_type}_GID{g}"
+                    if src_id not in spike_data_dict:
+                        spike_data_dict[src_id] = []
+                    spike_data_dict[src_id].append(t)
+
+                # Recursively call this function with the dictionary data
+                return self._standardize_spike_data(spike_data_dict)
+
+            except Exception as e:
+                raise ValueError(
+                    f"Error loading spike data from file '{spike_data}': {str(e)}"
+                )
         else:
             raise ValueError(
                 "spike_data must be either:\n"
                 "1. A dictionary {source_id: [spike_times], ...}\n"
                 "2. A list of (time, gid) tuples\n"
+                "3. A file path string loadable with read_spikes()\n"
                 f"Got {type(spike_data)}."
             )
 
