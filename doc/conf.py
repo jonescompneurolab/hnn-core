@@ -14,7 +14,7 @@
 #
 import os
 import sys
-from sphinx_gallery.sorting import ExampleTitleSortKey, ExplicitOrder
+# from sphinx_gallery.sorting import ExampleTitleSortKey, ExplicitOrder
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -72,9 +72,9 @@ else:
 # ones.
 extensions = [
     'gh_substitutions',  # custom extension, see ./sphinxext/gh_substitutions.py
-    'myst_parser',
+    'myst_nb',
     'numpydoc',
-    'sphinx_gallery.gen_gallery',
+    # 'sphinx_gallery.gen_gallery',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
     'sphinx.ext.autodoc',
@@ -98,9 +98,11 @@ templates_path = ['_templates']
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a dict:
+# Order matters for these!
 source_suffix = {
     '.rst': 'restructuredtext',
-    '.md': 'markdown',
+    '.md': 'myst-nb',
+    '.ipynb': 'myst-nb',
 }
 
 # The master toctree document.
@@ -247,30 +249,30 @@ linkcheck_ignore = [
     'http://localhost:8866',
 ]
 
-sphinx_gallery_conf = {
-    'first_notebook_cell': ("import pyvista as pv\n"
-                            "from mne.viz import set_3d_backend\n"
-                            "set_3d_backend('notebook')\n"
-                            "pv.set_jupyter_backend('client')"
-                            ),
-    'doc_module': 'hnn_core',
-    # path to your examples scripts
-    'examples_dirs': '../examples',
-    # path where to save gallery generated examples
-    'gallery_dirs': 'auto_examples',
-    'backreferences_dir': 'generated',
-    'reference_url': {
-        'hnn_core': None
-    },
-    'within_subsection_order': ExampleTitleSortKey,
-    'subsection_order': ExplicitOrder(['../examples/workflows/',
-                                       '../examples/howto/']),
-    'binder': {'org': 'jonescompneurolab',
-               'repo': 'hnn-core',
-               'branch': 'gh-pages',
-               'binderhub_url': 'https://mybinder.org',
-               'filepath_prefix': filepath_prefix,
-               'notebooks_dir': 'notebooks',
-               'dependencies': 'Dockerfile'
-               }
-}
+# sphinx_gallery_conf = {
+#     'first_notebook_cell': ("import pyvista as pv\n"
+#                             "from mne.viz import set_3d_backend\n"
+#                             "set_3d_backend('notebook')\n"
+#                             "pv.set_jupyter_backend('client')"
+#                             ),
+#     'doc_module': 'hnn_core',
+#     # path to your examples scripts
+#     'examples_dirs': '../examples',
+#     # path where to save gallery generated examples
+#     'gallery_dirs': 'auto_examples',
+#     'backreferences_dir': 'generated',
+#     'reference_url': {
+#         'hnn_core': None
+#     },
+#     'within_subsection_order': ExampleTitleSortKey,
+#     'subsection_order': ExplicitOrder(['../examples/workflows/',
+#                                        '../examples/howto/']),
+#     'binder': {'org': 'jonescompneurolab',
+#                'repo': 'hnn-core',
+#                'branch': 'gh-pages',
+#                'binderhub_url': 'https://mybinder.org',
+#                'filepath_prefix': filepath_prefix,
+#                'notebooks_dir': 'notebooks',
+#                'dependencies': 'Dockerfile'
+#                }
+# }
