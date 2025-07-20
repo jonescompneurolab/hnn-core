@@ -457,6 +457,8 @@ def get_L5PyrET_params():
         # Dendrite
         'L5Pyr_dend_cm': 1,
         'L5Pyr_dend_Ra': 100, #Rich 495.73, Hay: 100
+        'L5Pyr_basal_cm': 1,
+        'L5Pyr_basal_Ra': 100, #Rich 495.73, Hay: 100
 
         'L5Pyr_apicaltrunk_L': 102.,
         'L5Pyr_apicaltrunk_diam': 10.2,
