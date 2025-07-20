@@ -62,9 +62,7 @@ def _get_basal(params, cell_type, section_names, v_init = {'all': -65}):
         dend_prop = dict()
         middle = section_name.replace('_', '')
         for key in prop_names:
-            if key == 'Ra':
-                dend_prop[key] = params[f'{cell_type}_dend_{key}']*2
-            elif key=='cm':
+            if key == 'Ra' or key == 'cm':
                 dend_prop[key] = params[f'{cell_type}_dend_{key}']
             else:
                 dend_prop[key] = params[f'{cell_type}_{middle}_{key}']
