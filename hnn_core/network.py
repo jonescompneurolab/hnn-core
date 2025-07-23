@@ -15,6 +15,7 @@ from typing import Dict
 import numpy as np
 import warnings
 
+from .cell_response import read_spikes
 from .drives import _drive_cell_event_times
 from .drives import _get_target_properties, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
@@ -999,36 +1000,41 @@ class Network:
     ):
         """Add an external drive from explicitly defined spike trains.
 
-        This method enables the target network to receive spike trains from a source network
-        (e.g., another HNN simulation) or external data, driving activity in the target network's cells.
+        This method enables the target network to receive spike trains from a source
+        network (e.g., another HNN simulation) or external data, driving activity in the
+        target network's cells.
 
         Parameters
         ----------
         name : str
             Unique name for the drive (e.g., 'drive_from_NetA').
         spike_data : dict or list of tuple
-        Spike train data from the **source network** (or external source) in one of two formats:
+            Spike train data from the **source network** (or external source) in one of
+            three formats:
 
-        - Format 1 (dictionary): Keys are unique identifiers (str) for source
-        cells and values are lists of spike times in milliseconds. The keys
-        can be any string that helps identify the source.
-        Example:
-        ```
-        {"NetA_L2_pyramidal_GID0": [10.2, 25.3], "NetA_L5_pyramidal_GID1": [15.1, 30.4]}
-        ```
+            - *Format 1 (dictionary)*: Keys are unique identifiers (str) for source
+            cells and values are lists of spike times in milliseconds. The keys
+            can be any string that helps identify the source.
+            Example:
+            ```
+            {"NetA_L2_pyramidal_GID0": [10.2, 25.3], "NetA_L5_pyramidal_GID1": [15.1, 30.4]}
+            ```
 
-        - Format 2 (tuples): A list of (time, gid) tuples, where each tuple
-        contains a spike time (float, in ms) and a GID (int). The GIDs can be
-        any integers that uniquely identify different source cells.
-        Example:
-        ```
-        [(10.2, 0), (25.3, 1), (15.1, 0), (30.4, 1)]
-        ```
+            - *Format 2 (tuples)*: A list of (time, gid) tuples, where each tuple
+            contains a spike time (float, in ms) and a GID (int). The GIDs can be
+            any integers that uniquely identify different source cells.
+            Example:
+            ```
+            [(10.2, 0), (25.3, 1), (15.1, 0), (30.4, 1)]
+            ```
 
-        Note: The GIDs in both formats refer to the source cells in the originating
-        network (or external data). These are arbitrary identifiers that will be
-        remapped internally to sequential drive cell IDs (0 to n-1) in the target
-        network. Different GIDs should be used for different source cells.
+            - *Format 3*: String path (or glob pattern) to spike files that can be loaded
+            with :func:`~hnn_core.read_spikes`. Example: "path/to/spk_*.txt"
+
+            Note: The GIDs in both formats refer to the source cells in the originating
+            network (or external data). These are arbitrary identifiers that will be
+            remapped internally to sequential drive cell IDs (0 to n-1) in the target
+            network. Different GIDs should be used for different source cells.
         location : str
             Target location of synapses in the target network. Must be 'proximal', 'distal', or
             'soma', or a specific section name (when legacy_mode=False).
@@ -1924,7 +1930,7 @@ class Network:
             Number of unique source cells detected
         source_to_gid_map : dict or None
             Mapping from source identifiers to sequential GIDs (for Format 1),
-            or None for Format 2
+            or None (for Format 2 or Format 3)
         """
         source_to_gid_map = None
 
@@ -1992,42 +1998,40 @@ class Network:
             else:
                 standardized_data = {"times": [], "gids": []}
 
-        # Handle string input as file path
         elif isinstance(spike_data, str):
+            # Format 3: Handle string input as file path
             try:
-                from hnn_core import read_spikes
-
                 # Read spike data from file
                 cell_response = read_spikes(spike_data)
-
-                # By default, use the first trial
-                trial_idx = 0
-                if trial_idx >= len(cell_response.spike_times):
-                    raise ValueError(
-                        f"Trial index {trial_idx} exceeds available trials "
-                        f"({len(cell_response.spike_times)})"
-                    )
-
-                # Extract spike data from specified trial
-                spike_times = cell_response.spike_times[trial_idx]
-                spike_gids = cell_response.spike_gids[trial_idx]
-                spike_types = cell_response.spike_types[trial_idx]
-
-                # Convert to dictionary format (Format 1)
-                spike_data_dict = {}
-                for t, g, cell_type in zip(spike_times, spike_gids, spike_types):
-                    src_id = f"{cell_type}_GID{g}"
-                    if src_id not in spike_data_dict:
-                        spike_data_dict[src_id] = []
-                    spike_data_dict[src_id].append(t)
-
-                # Recursively call this function with the dictionary data
-                return self._standardize_spike_data(spike_data_dict)
-
             except Exception as e:
                 raise ValueError(
                     f"Error loading spike data from file '{spike_data}': {str(e)}"
                 )
+
+            # By default, use the first trial
+            trial_idx = 0
+            if trial_idx >= len(cell_response.spike_times):
+                raise ValueError(
+                    f"Trial index {trial_idx} exceeds available trials "
+                    f"({len(cell_response.spike_times)})"
+                )
+
+            # Extract spike data from specified trial
+            spike_times = cell_response.spike_times[trial_idx]
+            spike_gids = cell_response.spike_gids[trial_idx]
+            spike_types = cell_response.spike_types[trial_idx]
+
+            # Convert to dictionary format (Format 1)
+            spike_data_dict = {}
+            for t, g, cell_type in zip(spike_times, spike_gids, spike_types):
+                src_id = f"{cell_type}_GID{g}"
+                if src_id not in spike_data_dict:
+                    spike_data_dict[src_id] = []
+                spike_data_dict[src_id].append(t)
+
+            # Recursively call this function with the dictionary data
+            return self._standardize_spike_data(spike_data_dict)
+
         else:
             raise ValueError(
                 "spike_data must be either:\n"
