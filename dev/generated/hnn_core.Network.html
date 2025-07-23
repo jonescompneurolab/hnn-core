@@ -546,31 +546,34 @@ instances of <a class="reference internal" href="hnn_core.extracellular.Extracel
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.add_poisson_drive" title="hnn_core.Network.add_poisson_drive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_poisson_drive</span></code></a>(name, *[, tstart, tstop, ...])</p></td>
 <td><p>Add a Poisson-distributed external drive to the network</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.add_tonic_bias" title="hnn_core.Network.add_tonic_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_tonic_bias</span></code></a>(*[, cell_type, section, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.add_spike_train_drive" title="hnn_core.Network.add_spike_train_drive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_spike_train_drive</span></code></a>(name, *, spike_data, ...)</p></td>
+<td><p>Add an external drive from explicitly defined spike trains.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.add_tonic_bias" title="hnn_core.Network.add_tonic_bias"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_tonic_bias</span></code></a>(*[, cell_type, section, ...])</p></td>
 <td><p>Attaches parameters of tonic bias input for given cell types</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.clear_connectivity" title="hnn_core.Network.clear_connectivity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_connectivity</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.clear_connectivity" title="hnn_core.Network.clear_connectivity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_connectivity</span></code></a>()</p></td>
 <td><p>Remove all connections defined in Network.connectivity</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.clear_drives" title="hnn_core.Network.clear_drives"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_drives</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.clear_drives" title="hnn_core.Network.clear_drives"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_drives</span></code></a>()</p></td>
 <td><p>Remove all drives defined in Network.connectivity</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.copy" title="hnn_core.Network.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.copy" title="hnn_core.Network.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
 <td><p>Return a copy of the Network instance</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.gid_to_type" title="hnn_core.Network.gid_to_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gid_to_type</span></code></a>(gid)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.gid_to_type" title="hnn_core.Network.gid_to_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gid_to_type</span></code></a>(gid)</p></td>
 <td><p>Reverse lookup of gid to type.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.plot_cells" title="hnn_core.Network.plot_cells"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cells</span></code></a>([ax, show])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.plot_cells" title="hnn_core.Network.plot_cells"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cells</span></code></a>([ax, show])</p></td>
 <td><p>Plot the cells using Network.pos_dict.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.set_cell_positions" title="hnn_core.Network.set_cell_positions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_cell_positions</span></code></a>(*[, inplane_distance, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.set_cell_positions" title="hnn_core.Network.set_cell_positions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_cell_positions</span></code></a>(*[, inplane_distance, ...])</p></td>
 <td><p>Set relative positions of cells arranged in a square grid</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.update_weights" title="hnn_core.Network.update_weights"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_weights</span></code></a>([e_e, e_i, i_e, i_i, copy])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.update_weights" title="hnn_core.Network.update_weights"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_weights</span></code></a>([e_e, e_i, i_e, i_i, copy])</p></td>
 <td><p>Update synaptic weights of the network.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.write_configuration" title="hnn_core.Network.write_configuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_configuration</span></code></a>(fname[, overwrite])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.write_configuration" title="hnn_core.Network.write_configuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_configuration</span></code></a>(fname[, overwrite])</p></td>
 <td><p>Writes network configuration to a json file.</p></td>
 </tr>
 </tbody>
@@ -929,6 +932,77 @@ Used to randomly remove connections when probability &lt; 1.0.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Network.add_spike_train_drive">
+<span class="sig-name descname"><span class="pre">add_spike_train_drive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_ampa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_nmda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">synaptic_delays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_constant</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_spike_train_drive"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_spike_train_drive" title="Link to this definition">#</a></dt>
+<dd><p>Add an external drive from explicitly defined spike trains.</p>
+<p>This method enables the target network to receive spike trains from a source
+network (e.g., another HNN simulation) or external data, driving activity in the
+target network’s cells.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>Unique name for the drive (e.g., ‘drive_from_NetA’).</p>
+</dd>
+<dt><strong>spike_data</strong><span class="classifier">dict or list of tuple</span></dt><dd><p>Spike train data from the <strong>source network</strong> (or external source) in one of
+three formats:</p>
+<ul class="simple">
+<li><p><em>Format 1 (dictionary)</em>: Keys are unique identifiers (str) for source</p></li>
+</ul>
+<p>cells and values are lists of spike times in milliseconds. The keys
+can be any string that helps identify the source.
+Example:
+<code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">{&quot;NetA_L2_pyramidal_GID0&quot;:</span> <span class="pre">[10.2,</span> <span class="pre">25.3],</span> <span class="pre">&quot;NetA_L5_pyramidal_GID1&quot;:</span> <span class="pre">[15.1,</span> <span class="pre">30.4]}</span>
+<span class="pre">`</span></code></p>
+<ul class="simple">
+<li><p><em>Format 2 (tuples)</em>: A list of (time, gid) tuples, where each tuple</p></li>
+</ul>
+<p>contains a spike time (float, in ms) and a GID (int). The GIDs can be
+any integers that uniquely identify different source cells.
+Example:
+<code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">[(10.2,</span> <span class="pre">0),</span> <span class="pre">(25.3,</span> <span class="pre">1),</span> <span class="pre">(15.1,</span> <span class="pre">0),</span> <span class="pre">(30.4,</span> <span class="pre">1)]</span>
+<span class="pre">`</span></code></p>
+<ul class="simple">
+<li><p><em>Format 3</em>: String path (or glob pattern) to spike files that can be loaded</p></li>
+</ul>
+<p>with <a class="reference internal" href="hnn_core.read_spikes.html#hnn_core.read_spikes" title="hnn_core.read_spikes"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_spikes()</span></code></a>. Example: “path/to/spk_*.txt”</p>
+<p>Note: The GIDs in both formats refer to the source cells in the originating
+network (or external data). These are arbitrary identifiers that will be
+remapped internally to sequential drive cell IDs (0 to n-1) in the target
+network. Different GIDs should be used for different source cells.</p>
+</dd>
+<dt><strong>location</strong><span class="classifier">str</span></dt><dd><p>Target location of synapses in the target network. Must be ‘proximal’, ‘distal’, or
+‘soma’, or a specific section name (when legacy_mode=False).</p>
+</dd>
+<dt><strong>weights_ampa</strong><span class="classifier">dict or None</span></dt><dd><p>Synaptic weights (in uS) of AMPA receptors for each targeted cell type (dict keys).
+Cell types omitted are set to zero.</p>
+</dd>
+<dt><strong>weights_nmda</strong><span class="classifier">dict or None</span></dt><dd><p>Synaptic weights (in uS) of NMDA receptors for each targeted cell type (dict keys).
+Cell types omitted are set to zero.</p>
+</dd>
+<dt><strong>synaptic_delays</strong><span class="classifier">dict or float</span></dt><dd><p>Synaptic delay (in ms) at the column origin, dispersed laterally as
+a function of the space_constant. If float, applies to all target
+cell types. Use dict to create delay-&gt;cell mapping.</p>
+</dd>
+<dt><strong>space_constant</strong><span class="classifier">float</span></dt><dd><p>Lateral dispersion constant (in units of inplane_distance) for synaptic weights and
+delays within the target network. Default: 3.0</p>
+</dd>
+<dt><strong>probability</strong><span class="classifier">float or dict</span></dt><dd><p>Connection probability between source and target cells. Default: 1.0 (all-to-all).</p>
+</dd>
+<dt><strong>conn_seed</strong><span class="classifier">int</span></dt><dd><p>Optional seed for random number generator for connectivity (default: None).</p>
+</dd>
+<dt><strong>cell_specific</strong><span class="classifier">bool</span></dt><dd><p>If True, enables cell-specific connectivity (e.g., for 1-to-1 mapping). Default: False.</p>
+</dd>
+<dt><strong>n_drive_cells</strong><span class="classifier">str or int</span></dt><dd><p>Number of drive cells. Use ‘n_cells’ for 1-to-1 mapping with target cell types,
+or an integer for a fixed number. Default: None (inferred from spike_data).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.add_tonic_bias">
 <span class="sig-name descname"><span class="pre">add_tonic_bias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'soma'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tonic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_tonic_bias"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_tonic_bias" title="Link to this definition">#</a></dt>
 <dd><p>Attaches parameters of tonic bias input for given cell types</p>
@@ -1051,11 +1125,11 @@ this parameter does not affect the amplitude of the dipole moment.</p>
 <dt class="sig sig-object py" id="hnn_core.Network.update_weights">
 <span class="sig-name descname"><span class="pre">update_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e_e</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_e</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.update_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.update_weights" title="Link to this definition">#</a></dt>
 <dd><p>Update synaptic weights of the network.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>e_e</strong><span class="classifier">float</span></dt><dd><p>Synaptic gain of excitatory to excitatory connections
-(default None)</p>
+<dd class="field-odd"><dl>
+<dt><strong>e_e</strong><span class="classifier">float</span></dt><dd><p>Synaptic gain of excitatory to excitatory connections</p>
+<p>(default None)</p>
 </dd>
 <dt><strong>e_i</strong><span class="classifier">float</span></dt><dd><p>Synaptic gain of excitatory to inhibitory connections
 (default None)</p>
@@ -1113,7 +1187,13 @@ voltages are not saved due to size.</p>
 
 </dd></dl>
 
-<span class="target" id="sphx-glr-backreferences-hnn-core-network"></span></section>
+<section id="examples-using-hnn-core-network">
+<span id="sphx-glr-backreferences-hnn-core-network"></span><h2>Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.Network</span></code><a class="headerlink" href="#examples-using-hnn-core-network" title="Link to this heading">#</a></h2>
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="Welcome to this hands-on tutorial on simulating communication between two neocortical networks using HNN-Core! This notebook guides you through creating a source network (Network A), extracting its spike data, feeding it into a target network (Network B) using the add_spike_train_drive method, simulating both, and visualizing the results. Let&#x27;s dive in!"><img alt="" src="../_images/sphx_glr_plot_replaying_spike_data_as_input_thumb.png" />
+<p><a class="reference internal" href="../auto_examples/howto/plot_replaying_spike_data_as_input.html#sphx-glr-auto-examples-howto-plot-replaying-spike-data-as-input-py"><span class="std std-ref">09. Replaying Spike Data as Input</span></a></p>
+  <div class="sphx-glr-thumbnail-title">09. Replaying Spike Data as Input</div>
+</div></div></section>
+</section>
 
 
                 </article>
@@ -1169,6 +1249,7 @@ voltages are not saved due to size.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.add_electrode_array"><code class="docutils literal notranslate"><span class="pre">Network.add_electrode_array()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.add_evoked_drive"><code class="docutils literal notranslate"><span class="pre">Network.add_evoked_drive()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.add_poisson_drive"><code class="docutils literal notranslate"><span class="pre">Network.add_poisson_drive()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.add_spike_train_drive"><code class="docutils literal notranslate"><span class="pre">Network.add_spike_train_drive()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.add_tonic_bias"><code class="docutils literal notranslate"><span class="pre">Network.add_tonic_bias()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.clear_connectivity"><code class="docutils literal notranslate"><span class="pre">Network.clear_connectivity()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.clear_drives"><code class="docutils literal notranslate"><span class="pre">Network.clear_drives()</span></code></a></li>
@@ -1180,6 +1261,7 @@ voltages are not saved due to size.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.write_configuration"><code class="docutils literal notranslate"><span class="pre">Network.write_configuration()</span></code></a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples-using-hnn-core-network">Examples using <code class="docutils literal notranslate"><span class="pre">hnn_core.Network</span></code></a></li>
 </ul>
   </nav></div>
 

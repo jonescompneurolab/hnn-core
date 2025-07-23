@@ -477,6 +477,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cell_response</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_spikes</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.drives</span><span class="w"> </span><span class="kn">import</span> <span class="n">_drive_cell_event_times</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.drives</span><span class="w"> </span><span class="kn">import</span> <span class="n">_get_target_properties</span><span class="p">,</span> <span class="n">_add_drives_from_params</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.drives</span><span class="w"> </span><span class="kn">import</span> <span class="n">_check_drive_parameter_values</span><span class="p">,</span> <span class="n">_check_poisson_rates</span>
@@ -1469,6 +1470,133 @@
         <span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="Network.add_spike_train_drive">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.add_spike_train_drive">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_spike_train_drive</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">spike_data</span><span class="p">,</span>
+        <span class="n">location</span><span class="p">,</span>
+        <span class="n">weights_ampa</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">weights_nmda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">synaptic_delays</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">space_constant</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span>
+        <span class="n">probability</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">conn_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add an external drive from explicitly defined spike trains.</span>
+
+<span class="sd">        This method enables the target network to receive spike trains from a source</span>
+<span class="sd">        network (e.g., another HNN simulation) or external data, driving activity in the</span>
+<span class="sd">        target network&#39;s cells.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            Unique name for the drive (e.g., &#39;drive_from_NetA&#39;).</span>
+<span class="sd">        spike_data : dict or list of tuple</span>
+<span class="sd">            Spike train data from the **source network** (or external source) in one of</span>
+<span class="sd">            three formats:</span>
+
+<span class="sd">            - *Format 1 (dictionary)*: Keys are unique identifiers (str) for source</span>
+<span class="sd">            cells and values are lists of spike times in milliseconds. The keys</span>
+<span class="sd">            can be any string that helps identify the source.</span>
+<span class="sd">            Example:</span>
+<span class="sd">            ```</span>
+<span class="sd">            {&quot;NetA_L2_pyramidal_GID0&quot;: [10.2, 25.3], &quot;NetA_L5_pyramidal_GID1&quot;: [15.1, 30.4]}</span>
+<span class="sd">            ```</span>
+
+<span class="sd">            - *Format 2 (tuples)*: A list of (time, gid) tuples, where each tuple</span>
+<span class="sd">            contains a spike time (float, in ms) and a GID (int). The GIDs can be</span>
+<span class="sd">            any integers that uniquely identify different source cells.</span>
+<span class="sd">            Example:</span>
+<span class="sd">            ```</span>
+<span class="sd">            [(10.2, 0), (25.3, 1), (15.1, 0), (30.4, 1)]</span>
+<span class="sd">            ```</span>
+
+<span class="sd">            - *Format 3*: String path (or glob pattern) to spike files that can be loaded</span>
+<span class="sd">            with :func:`~hnn_core.read_spikes`. Example: &quot;path/to/spk_*.txt&quot;</span>
+
+<span class="sd">            Note: The GIDs in both formats refer to the source cells in the originating</span>
+<span class="sd">            network (or external data). These are arbitrary identifiers that will be</span>
+<span class="sd">            remapped internally to sequential drive cell IDs (0 to n-1) in the target</span>
+<span class="sd">            network. Different GIDs should be used for different source cells.</span>
+<span class="sd">        location : str</span>
+<span class="sd">            Target location of synapses in the target network. Must be &#39;proximal&#39;, &#39;distal&#39;, or</span>
+<span class="sd">            &#39;soma&#39;, or a specific section name (when legacy_mode=False).</span>
+<span class="sd">        weights_ampa : dict or None</span>
+<span class="sd">            Synaptic weights (in uS) of AMPA receptors for each targeted cell type (dict keys).</span>
+<span class="sd">            Cell types omitted are set to zero.</span>
+<span class="sd">        weights_nmda : dict or None</span>
+<span class="sd">            Synaptic weights (in uS) of NMDA receptors for each targeted cell type (dict keys).</span>
+<span class="sd">            Cell types omitted are set to zero.</span>
+<span class="sd">        synaptic_delays : dict or float</span>
+<span class="sd">            Synaptic delay (in ms) at the column origin, dispersed laterally as</span>
+<span class="sd">            a function of the space_constant. If float, applies to all target</span>
+<span class="sd">            cell types. Use dict to create delay-&gt;cell mapping.</span>
+<span class="sd">        space_constant : float</span>
+<span class="sd">            Lateral dispersion constant (in units of inplane_distance) for synaptic weights and</span>
+<span class="sd">            delays within the target network. Default: 3.0</span>
+<span class="sd">        probability : float or dict</span>
+<span class="sd">            Connection probability between source and target cells. Default: 1.0 (all-to-all).</span>
+<span class="sd">        conn_seed : int</span>
+<span class="sd">            Optional seed for random number generator for connectivity (default: None).</span>
+<span class="sd">        cell_specific : bool</span>
+<span class="sd">            If True, enables cell-specific connectivity (e.g., for 1-to-1 mapping). Default: False.</span>
+<span class="sd">        n_drive_cells : str or int</span>
+<span class="sd">            Number of drive cells. Use &#39;n_cells&#39; for 1-to-1 mapping with target cell types,</span>
+<span class="sd">            or an integer for a fixed number. Default: None (inferred from spike_data).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_legacy_mode</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Spike train drives can only target sections defined in &quot;</span>
+                <span class="s2">&quot;`Cell.sect_loc` when `legacy_mode=False`.&quot;</span><span class="p">,</span>
+                <span class="ne">UserWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Create the drive object</span>
+        <span class="n">drive</span> <span class="o">=</span> <span class="n">_NetworkDrive</span><span class="p">()</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;spike_train&quot;</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;location&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">location</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;events&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>  <span class="c1"># Will be populated during instantiation</span>
+
+        <span class="c1"># Process spike_data into a standardized format</span>
+        <span class="n">standardized_data</span><span class="p">,</span> <span class="n">n_drive_cells</span><span class="p">,</span> <span class="n">source_to_gid_map</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_standardize_spike_data</span><span class="p">(</span><span class="n">spike_data</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Set drive properties</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;dynamics&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">standardized_data</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;n_drive_cells&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_drive_cells</span>
+        <span class="k">if</span> <span class="n">source_to_gid_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;source_to_gid_map&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">source_to_gid_map</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;conn_seed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">conn_seed</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;event_seed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">0</span>  <span class="c1"># Not used for spike train, but included for consistency</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Save connection parameters</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;weights_ampa&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights_ampa</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;weights_nmda&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights_nmda</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;synaptic_delays&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">synaptic_delays</span>
+        <span class="n">drive</span><span class="p">[</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">probability</span>
+
+        <span class="c1"># Attach the drive to network cells</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_attach_drive</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span>
+            <span class="n">drive</span><span class="p">,</span>
+            <span class="n">weights_ampa</span><span class="o">=</span><span class="n">weights_ampa</span><span class="p">,</span>
+            <span class="n">weights_nmda</span><span class="o">=</span><span class="n">weights_nmda</span><span class="p">,</span>
+            <span class="n">location</span><span class="o">=</span><span class="n">location</span><span class="p">,</span>
+            <span class="n">space_constant</span><span class="o">=</span><span class="n">space_constant</span><span class="p">,</span>
+            <span class="n">synaptic_delays</span><span class="o">=</span><span class="n">synaptic_delays</span><span class="p">,</span>
+            <span class="n">n_drive_cells</span><span class="o">=</span><span class="n">drive</span><span class="p">[</span><span class="s2">&quot;n_drive_cells&quot;</span><span class="p">],</span>
+            <span class="n">cell_specific</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">probability</span><span class="o">=</span><span class="n">probability</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
     <span class="k">def</span><span class="w"> </span><span class="nf">_attach_drive</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">,</span>
@@ -2195,6 +2323,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        e_e : float</span>
 <span class="sd">            Synaptic gain of excitatory to excitatory connections</span>
+
 <span class="sd">            (default None)</span>
 <span class="sd">        e_i : float</span>
 <span class="sd">            Synaptic gain of excitatory to inhibitory connections</span>
@@ -2289,7 +2418,145 @@
     <span class="nd">@copy_doc</span><span class="p">(</span><span class="n">write_network_configuration</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">write_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">write_network_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">overwrite</span><span class="p">)</span></div>
-</div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_standardize_spike_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spike_data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Standardize spike data to internal format with &#39;times&#39; and &#39;gids&#39; keys.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        spike_data : dict or list or str</span>
+<span class="sd">            Input spike data in one of three formats:</span>
+<span class="sd">            - Format 1: Dictionary where keys are source identifiers and values are</span>
+<span class="sd">              lists of spike times in ms.</span>
+<span class="sd">              Example: {&quot;NetA_L2_pyramidal_GID0&quot;: [10.2, 25.3], ...}</span>
+<span class="sd">            - Format 2: List of (time, gid) tuples where time is the spike time in ms</span>
+<span class="sd">              and gid identifies the source cell.</span>
+<span class="sd">              Example: [(10.2, 0), (15.6, 1), (25.3, 0)]</span>
+<span class="sd">            - Format 3: String path (or glob pattern) to spike files that can be loaded</span>
+<span class="sd">              with hnn_core.read_spikes(), like &quot;path/to/spk_*.txt&quot;</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        standardized_data : dict</span>
+<span class="sd">            Dictionary with &#39;times&#39; and &#39;gids&#39; keys containing spike information</span>
+<span class="sd">            in standardized internal format</span>
+<span class="sd">        n_drive_cells : int</span>
+<span class="sd">            Number of unique source cells detected</span>
+<span class="sd">        source_to_gid_map : dict or None</span>
+<span class="sd">            Mapping from source identifiers to sequential GIDs (for Format 1),</span>
+<span class="sd">            or None (for Format 2 or Format 3)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">source_to_gid_map</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spike_data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="c1"># Format 1: {source_id: [spike_times], ...}</span>
+            <span class="n">source_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">spike_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="n">n_drive_cells</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">source_ids</span><span class="p">)</span>
+
+            <span class="c1"># Transform to standardized format</span>
+            <span class="n">all_times</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">all_gids</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="c1"># Map source IDs to sequential gids</span>
+            <span class="n">source_to_gid_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">src_id</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">src_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">source_ids</span><span class="p">)}</span>
+
+            <span class="c1"># Collect all spike times and corresponding gids</span>
+            <span class="k">for</span> <span class="n">src_id</span><span class="p">,</span> <span class="n">times</span> <span class="ow">in</span> <span class="n">spike_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">gid</span> <span class="o">=</span> <span class="n">source_to_gid_map</span><span class="p">[</span><span class="n">src_id</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+                    <span class="n">all_times</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
+                    <span class="n">all_gids</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">gid</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">times</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Spike times for source &#39;</span><span class="si">{</span><span class="n">src_id</span><span class="si">}</span><span class="s2">&#39; must be a list or array. &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">times</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+                    <span class="p">)</span>
+
+            <span class="n">standardized_data</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;times&quot;</span><span class="p">:</span> <span class="n">all_times</span><span class="p">,</span>
+                <span class="s2">&quot;gids&quot;</span><span class="p">:</span> <span class="n">all_gids</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spike_data</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">spike_data</span>
+        <span class="p">):</span>
+            <span class="c1"># Format 2: List of (time, gid) tuples</span>
+            <span class="n">times</span> <span class="o">=</span> <span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">spike_data</span><span class="p">]</span>
+            <span class="n">gids</span> <span class="o">=</span> <span class="p">[</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="n">spike_data</span><span class="p">]</span>
+
+            <span class="c1"># Count unique drive cells</span>
+            <span class="n">unique_gids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">gids</span><span class="p">)</span>
+            <span class="n">n_drive_cells</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_gids</span><span class="p">)</span>
+
+            <span class="c1"># Ensure gids are sequential from 0 to n-1</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_gids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">unique_gids</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
+                    <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">unique_gids</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_gids</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="p">):</span>
+                    <span class="c1"># Reindex gids to be 0-based sequential integers</span>
+                    <span class="n">gid_map</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="n">old_gid</span><span class="p">:</span> <span class="n">new_gid</span>
+                        <span class="k">for</span> <span class="n">new_gid</span><span class="p">,</span> <span class="n">old_gid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">unique_gids</span><span class="p">))</span>
+                    <span class="p">}</span>
+                    <span class="n">new_gids</span> <span class="o">=</span> <span class="p">[</span><span class="n">gid_map</span><span class="p">[</span><span class="n">gid</span><span class="p">]</span> <span class="k">for</span> <span class="n">gid</span> <span class="ow">in</span> <span class="n">gids</span><span class="p">]</span>
+                    <span class="n">standardized_data</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s2">&quot;times&quot;</span><span class="p">:</span> <span class="n">times</span><span class="p">,</span>
+                        <span class="s2">&quot;gids&quot;</span><span class="p">:</span> <span class="n">new_gids</span><span class="p">,</span>
+                    <span class="p">}</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">standardized_data</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s2">&quot;times&quot;</span><span class="p">:</span> <span class="n">times</span><span class="p">,</span>
+                        <span class="s2">&quot;gids&quot;</span><span class="p">:</span> <span class="n">gids</span><span class="p">,</span>
+                    <span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">standardized_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;times&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;gids&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spike_data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c1"># Format 3: Handle string input as file path</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Read spike data from file</span>
+                <span class="n">cell_response</span> <span class="o">=</span> <span class="n">read_spikes</span><span class="p">(</span><span class="n">spike_data</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Error loading spike data from file &#39;</span><span class="si">{</span><span class="n">spike_data</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># By default, use the first trial</span>
+            <span class="n">trial_idx</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">trial_idx</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cell_response</span><span class="o">.</span><span class="n">spike_times</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Trial index </span><span class="si">{</span><span class="n">trial_idx</span><span class="si">}</span><span class="s2"> exceeds available trials &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">cell_response</span><span class="o">.</span><span class="n">spike_times</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Extract spike data from specified trial</span>
+            <span class="n">spike_times</span> <span class="o">=</span> <span class="n">cell_response</span><span class="o">.</span><span class="n">spike_times</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">]</span>
+            <span class="n">spike_gids</span> <span class="o">=</span> <span class="n">cell_response</span><span class="o">.</span><span class="n">spike_gids</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">]</span>
+            <span class="n">spike_types</span> <span class="o">=</span> <span class="n">cell_response</span><span class="o">.</span><span class="n">spike_types</span><span class="p">[</span><span class="n">trial_idx</span><span class="p">]</span>
+
+            <span class="c1"># Convert to dictionary format (Format 1)</span>
+            <span class="n">spike_data_dict</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">cell_type</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">spike_times</span><span class="p">,</span> <span class="n">spike_gids</span><span class="p">,</span> <span class="n">spike_types</span><span class="p">):</span>
+                <span class="n">src_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cell_type</span><span class="si">}</span><span class="s2">_GID</span><span class="si">{</span><span class="n">g</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">if</span> <span class="n">src_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">spike_data_dict</span><span class="p">:</span>
+                    <span class="n">spike_data_dict</span><span class="p">[</span><span class="n">src_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">spike_data_dict</span><span class="p">[</span><span class="n">src_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+            <span class="c1"># Recursively call this function with the dictionary data</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_standardize_spike_data</span><span class="p">(</span><span class="n">spike_data_dict</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;spike_data must be either:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;1. A dictionary {source_id: [spike_times], ...}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;2. A list of (time, gid) tuples</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;3. A file path string loadable with read_spikes()</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">spike_data</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">standardized_data</span><span class="p">,</span> <span class="n">n_drive_cells</span><span class="p">,</span> <span class="n">source_to_gid_map</span></div>
 
 
 

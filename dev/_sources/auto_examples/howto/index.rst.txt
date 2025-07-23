@@ -152,6 +152,23 @@ tasks.
     </div>
 
 
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Welcome to this hands-on tutorial on simulating communication between two neocortical networks using HNN-Core! This notebook guides you through creating a source network (Network A), extracting its spike data, feeding it into a target network (Network B) using the add_spike_train_drive method, simulating both, and visualizing the results. Let&#x27;s dive in!">
+
+.. only:: html
+
+  .. image:: /auto_examples/howto/images/thumb/sphx_glr_plot_replaying_spike_data_as_input_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_howto_plot_replaying_spike_data_as_input.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">09. Replaying Spike Data as Input</div>
+    </div>
+
+
 .. thumbnail-parent-div-close
 
 .. raw:: html
@@ -170,4 +187,5 @@ tasks.
    /auto_examples/howto/plot_hnn_animation
    /auto_examples/howto/plot_batch_simulate
    /auto_examples/howto/optimize_rhythmic
+   /auto_examples/howto/plot_replaying_spike_data_as_input
 
