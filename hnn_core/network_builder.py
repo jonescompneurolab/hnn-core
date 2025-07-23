@@ -386,7 +386,9 @@ class NetworkBuilder(object):
         # round robin assignment of cell gids
         # Assign cell gids based on actual gid_ranges
         for cell_type, gid_range in self.net.gid_ranges.items():
-            print("Assigning gids for cell type,gid range:", self.net.gid_ranges.items())
+            print(
+                "Assigning gids for cell type,gid range:", self.net.gid_ranges.items()
+            )
             # Only assign real cell types (not drives) here
             if cell_type in self.net.cell_types:
                 gids = list(gid_range)
@@ -509,7 +511,7 @@ class NetworkBuilder(object):
                         filtered_targets.append(target_gid)
                         valid_targets.add(target_gid)
                 conn["gid_pairs"][src_gid] = filtered_targets
-            print("valid targets:", valid_targets)  
+            # print("valid targets:", valid_targets)
             target_filter = dict()
             for idx in range(len(self._cells)):
                 gid = self._gid_list[idx]
@@ -526,9 +528,9 @@ class NetworkBuilder(object):
                     # print("src_type, target_type:", src_type, target_type)
                     target_cell = self._cells[target_filter[target_gid]]
                     connection_name = (
-                        f"{_short_name(self.get_base_type(src_type))}_{_short_name(self.get_base_type(target_type))}_{receptor}"
+                        f"{_short_name(src_type)}_{_short_name(target_type)}_{receptor}"
                     )
-                    print("Connection name",connection_name)
+                    # print("Connection name",connection_name)
                     if connection_name not in self.ncs:
                         self.ncs[connection_name] = list()
                     pos_idx = src_gid - net.gid_ranges[_long_name(src_type)][0]
@@ -559,7 +561,8 @@ class NetworkBuilder(object):
             nrn_arr = _ExtracellularArrayBuilder(arr)
             nrn_arr._build(cvode=_CVODE)
             self._nrn_rec_arrays.update({arr_name: nrn_arr})
-    def get_base_type(self,cell_type):
+
+    def get_base_type(self, cell_type):
         # Handles any suffix after the base type
         for base in ["L2_pyramidal", "L5_pyramidal", "L2_basket", "L5_basket"]:
             if cell_type.startswith(base):
