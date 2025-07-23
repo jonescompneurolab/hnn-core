@@ -1482,24 +1482,24 @@ def test_spike_train_drive_formats_and_simulation():
     with tempfile.TemporaryDirectory() as tmp_dir:
         # Create dictionary format (Format 1)
         dict_format = {
-            "L2_pyramidal": [50.0, 70.0, 90.0],
-            "L5_pyramidal": [55.0, 75.0, 95.0],
+            "L2_pyramidal": [10.0, 20.0, 30.0],
+            "L5_pyramidal": [15.0, 25.0, 35.0],
         }
 
         # Create tuple format (Format 2)
         tuple_format = [
-            (50.0, 0),
-            (55.0, 1),
-            (70.0, 0),
-            (75.0, 1),
-            (90.0, 0),
-            (95.0, 1),
+            (10.0, 0),
+            (15.0, 1),
+            (20.0, 0),
+            (25.0, 1),
+            (30.0, 0),
+            (35.0, 1),
         ]
 
         # Create test spike files for file format (Format 3)
         # Create a CellResponse object with test data
         cell_types = ["L2_pyramidal", "L5_pyramidal"]
-        spike_times = [[50.0, 55.0, 70.0, 75.0, 90.0, 95.0]]
+        spike_times = [[10.0, 15.0, 20.0, 25.0, 30.0, 35.0]]
         spike_gids = [[1, 2, 1, 2, 1, 2]]
         spike_types = [
             [
@@ -1574,7 +1574,7 @@ def test_spike_train_drive_formats_and_simulation():
             assert len(drive["dynamics"]["times"]) == 6
 
             # Simulate networks
-            dpls = simulate_dipole(net, tstop=150.0, n_trials=1)
+            dpls = simulate_dipole(net, tstop=50.0, n_trials=1)
 
             # Verify simulations completed successfully
             assert len(dpls[0].times) > 0
