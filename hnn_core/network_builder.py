@@ -367,7 +367,7 @@ class NetworkBuilder(object):
             print("[Done]")
 
     def _gid_assign(self, rank=None, n_hosts=None):
-        """Assign cell IDs to this node
+        """Assign cell IDs to this noder
 
         Parameters
         ----------
@@ -384,8 +384,19 @@ class NetworkBuilder(object):
             n_hosts = _get_nhosts()
 
         # round robin assignment of cell gids
-        for gid in range(self._rank, self.net._n_cells, n_hosts):
-            self._gid_list.append(gid)
+        # Assign cell gids based on actual gid_ranges
+        for cell_type, gid_range in self.net.gid_ranges.items():
+            print("Assigning gids for cell type,gid range:", self.net.gid_ranges.items())
+            # Only assign real cell types (not drives) here
+            if cell_type in self.net.cell_types:
+                gids = list(gid_range)
+                # print("GIDS:", gids, "RANK", self._rank, "Host:", n_hosts)
+                for gid_idx in range(self._rank, len(gids), n_hosts):
+                    # print("GID idx:", gid_idx)
+                    gid = gids[gid_idx]
+                    # print("GID:", gid)
+                    # print("GID:", gid, "RANK", self._rank, "Host:", n_hosts)
+                    self._gid_list.append(gid)
 
         for drive in self.net.external_drives.values():
             if drive["cell_specific"]:
@@ -434,6 +445,7 @@ class NetworkBuilder(object):
         # loop through ALL gids
         # have to loop over self._gid_list, since this is what we got
         # on this rank (MPI)
+        print("gid_list:", self._gid_list)
         for gid in self._gid_list:
             src_type = self.net.gid_to_type(gid)
             gid_idx = gid - self.net.gid_ranges[src_type][0]
@@ -497,10 +509,11 @@ class NetworkBuilder(object):
                         filtered_targets.append(target_gid)
                         valid_targets.add(target_gid)
                 conn["gid_pairs"][src_gid] = filtered_targets
-
+            print("valid targets:", valid_targets)  
             target_filter = dict()
             for idx in range(len(self._cells)):
                 gid = self._gid_list[idx]
+                # print("gid, idx:", gid, idx)
                 if gid in valid_targets:
                     target_filter[gid] = idx
 
@@ -508,11 +521,14 @@ class NetworkBuilder(object):
             for src_gid, target_gids in conn["gid_pairs"].items():
                 for target_gid in target_gids:
                     src_type = self.net.gid_to_type(src_gid)
+                    # print("src_gid, target_gid:", src_gid, target_gid)
                     target_type = self.net.gid_to_type(target_gid)
+                    # print("src_type, target_type:", src_type, target_type)
                     target_cell = self._cells[target_filter[target_gid]]
                     connection_name = (
-                        f"{_short_name(src_type)}_{_short_name(target_type)}_{receptor}"
+                        f"{_short_name(self.get_base_type(src_type))}_{_short_name(self.get_base_type(target_type))}_{receptor}"
                     )
+                    print("Connection name",connection_name)
                     if connection_name not in self.ncs:
                         self.ncs[connection_name] = list()
                     pos_idx = src_gid - net.gid_ranges[_long_name(src_type)][0]
@@ -543,6 +559,12 @@ class NetworkBuilder(object):
             nrn_arr = _ExtracellularArrayBuilder(arr)
             nrn_arr._build(cvode=_CVODE)
             self._nrn_rec_arrays.update({arr_name: nrn_arr})
+    def get_base_type(self,cell_type):
+        # Handles any suffix after the base type
+        for base in ["L2_pyramidal", "L5_pyramidal", "L2_basket", "L5_basket"]:
+            if cell_type.startswith(base):
+                return base
+        return cell_type  # fallback
 
     def _record_spikes(self):
         """Setup spike recording for this node"""
