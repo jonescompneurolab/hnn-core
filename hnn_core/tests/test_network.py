@@ -5,6 +5,8 @@ import os.path as op
 import numpy as np
 from numpy.testing import assert_allclose
 import pytest
+import matplotlib.pyplot as plt
+import tempfile
 
 import hnn_core
 from hnn_core import read_params, CellResponse, Network
@@ -1468,3 +1470,218 @@ def test_rename_cell_types(base_network):
         show=False, cell_types=list(cell_type_rename_mapping.values())
     )
     net4.cell_response.plot_spikes_hist(show=False)
+
+
+def test_spike_train_drive_formats_and_simulation():
+    """Test spike train drive formats are accepted, processed correctly, and simulated."""
+    # Create networks
+    net_dict = jones_2009_model()
+    net_tuple = jones_2009_model()
+
+    # File format will be tested in a temporary directory
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        # Create dictionary format (Format 1)
+        dict_format = {
+            "L2_pyramidal": [10.0, 20.0, 30.0],
+            "L5_pyramidal": [15.0, 25.0, 35.0],
+        }
+
+        # Create tuple format (Format 2)
+        tuple_format = [
+            (10.0, 0),
+            (15.0, 1),
+            (20.0, 0),
+            (25.0, 1),
+            (30.0, 0),
+            (35.0, 1),
+        ]
+
+        # Create test spike files for file format (Format 3)
+        # Create a CellResponse object with test data
+        cell_types = ["L2_pyramidal", "L5_pyramidal"]
+        spike_times = [[10.0, 15.0, 20.0, 25.0, 30.0, 35.0]]
+        spike_gids = [[1, 2, 1, 2, 1, 2]]
+        spike_types = [
+            [
+                cell_types[0],
+                cell_types[1],
+                cell_types[0],
+                cell_types[1],
+                cell_types[0],
+                cell_types[1],
+            ]
+        ]
+
+        cell_response = CellResponse(
+            spike_times=spike_times,
+            spike_gids=spike_gids,
+            spike_types=spike_types,
+            cell_type_names=cell_types,
+        )
+
+        # Write spike data to file
+        spike_file_pattern = op.join(tmp_dir, "spk_%d.txt")
+        cell_response.write(spike_file_pattern)
+        file_format = op.join(tmp_dir, "spk_*.txt")
+
+        # Add drives to networks with different formats
+        net_dict.add_spike_train_drive(
+            name="drive_dict",
+            spike_data=dict_format,
+            location="distal",
+            weights_ampa={"L5_pyramidal": 0.1, "L2_pyramidal": 0.05},
+            synaptic_delays=1.0,
+            conn_seed=42,
+        )
+
+        net_tuple.add_spike_train_drive(
+            name="drive_tuple",
+            spike_data=tuple_format,
+            location="distal",
+            weights_ampa={"L5_pyramidal": 0.1, "L2_pyramidal": 0.05},
+            synaptic_delays=1.0,
+            conn_seed=42,
+        )
+
+        # Create network for file format testing
+        net_file = jones_2009_model()
+        net_file.add_spike_train_drive(
+            name="drive_file",
+            spike_data=file_format,
+            location="distal",
+            weights_ampa={"L5_pyramidal": 0.1, "L2_pyramidal": 0.05},
+            synaptic_delays=1.0,
+            conn_seed=42,
+        )
+
+        # Check all drives were created with correct structure
+        for net, drive_name, format_name in [
+            (net_dict, "drive_dict", "dictionary"),
+            (net_tuple, "drive_tuple", "tuple list"),
+            (net_file, "drive_file", "file path"),
+        ]:
+            # Check drive exists
+            assert drive_name in net.external_drives
+
+            # Check drive properties
+            drive = net.external_drives[drive_name]
+            assert drive["type"] == "spike_train"
+            assert drive["n_drive_cells"] == 2
+
+            # Check standardized data structure
+            assert "times" in drive["dynamics"]
+            assert "gids" in drive["dynamics"]
+            assert len(drive["dynamics"]["times"]) == 6
+
+            # Simulate networks
+            dpls = simulate_dipole(net, tstop=50.0, n_trials=1)
+
+            # Verify simulations completed successfully
+            assert len(dpls[0].times) > 0
+
+            # Verify spikes were generated
+            assert len(net.cell_response.spike_times[0]) > 0
+
+            # Create plots to verify simulation worked correctly
+            fig, axes = plt.subplots(2, 1, figsize=(8, 6), constrained_layout=True)
+            dpls[0].plot(ax=axes[0], show=False)
+            axes[0].set_title(f"Dipole with {format_name} format spike drive")
+            net.cell_response.plot_spikes_raster(ax=axes[1], show=False)
+            axes[1].set_title(f"Spike raster with {format_name} format spike drive")
+            plt.close(fig)
+
+
+def test_offline_spike_replay():
+    """Test a workflow of offline spike recording and replay between networks."""
+    # Create first network (source)
+    net_A = jones_2009_model()
+
+    # Add drive to first network
+    net_A.add_evoked_drive(
+        name="evdist1",
+        mu=50.0,
+        sigma=2.0,
+        numspikes=1,
+        location="distal",
+        weights_ampa={"L5_pyramidal": 0.2, "L2_pyramidal": 0.1},
+        weights_nmda=None,
+        conn_seed=42,
+    )
+
+    # Simulate first network
+    dpls_A = simulate_dipole(net_A, tstop=100.0, n_trials=1)
+
+    # Extract spike data from first network
+    spike_data = {}
+    if net_A.cell_response and net_A.cell_response.spike_times:
+        trial_idx = 0
+        spike_times = net_A.cell_response.spike_times[trial_idx]
+        spike_gids = net_A.cell_response.spike_gids[trial_idx]
+        spike_types = net_A.cell_response.spike_types[trial_idx]
+
+        # Filter for pyramidal cells (since we're using these in net_B)
+        pyr_mask = np.array(
+            [t in ["L2_pyramidal", "L5_pyramidal"] for t in spike_types]
+        )
+        filtered_times = np.array(spike_times)[pyr_mask]
+        filtered_gids = np.array(spike_gids)[pyr_mask]
+        filtered_types = np.array(spike_types)[pyr_mask]
+
+        for i in range(len(filtered_times)):
+            gid = filtered_gids[i]
+            cell_type = filtered_types[i]
+            time = filtered_times[i]
+            src_id = f"NetA_{cell_type}_GID{gid}"
+
+            if src_id not in spike_data:
+                spike_data[src_id] = []
+
+            spike_data[src_id].append(time)
+
+    # Verify we have spikes to replay
+    assert len(spike_data) >= 1, "No spikes recorded from source network"
+    total_spikes = sum(len(spikes) for spikes in spike_data.values())
+    assert total_spikes >= 2, f"Not enough spikes recorded ({total_spikes})"
+
+    # Create second network (target)
+    net_B = jones_2009_model()
+
+    # Feed spike data to second network
+    net_B.add_spike_train_drive(
+        name="drive_from_NetA",
+        spike_data=spike_data,
+        location="distal",
+        weights_ampa={"L5_pyramidal": 0.1, "L2_pyramidal": 0.05},
+        synaptic_delays=1.0,
+        conn_seed=42,
+    )
+
+    # Simulate second network
+    dpls_B = simulate_dipole(net_B, tstop=150.0, n_trials=1)
+
+    # Verify both simulations completed successfully
+    assert len(dpls_A[0].times) > 0
+    assert len(dpls_B[0].times) > 0
+
+    # Verify both networks generated spikes
+    assert len(net_A.cell_response.spike_times[0]) > 0
+    assert len(net_B.cell_response.spike_times[0]) > 0
+
+    # Create plots to verify correct simulation
+    fig, axes = plt.subplots(4, 1, figsize=(10, 12), constrained_layout=True)
+
+    # Source network visualization
+    dpls_A[0].plot(ax=axes[0], show=False)
+    axes[0].set_title("Source Network: Dipole")
+
+    net_A.cell_response.plot_spikes_raster(ax=axes[1], show=False)
+    axes[1].set_title("Source Network: Spike Raster")
+
+    # Target network visualization
+    dpls_B[0].plot(ax=axes[2], show=False)
+    axes[2].set_title("Target Network: Dipole")
+
+    net_B.cell_response.plot_spikes_raster(ax=axes[3], show=False)
+    axes[3].set_title("Target Network: Spike Raster")
+
+    plt.close(fig)

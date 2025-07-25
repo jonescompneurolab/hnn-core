@@ -85,7 +85,8 @@ def simulate_dipole(
         warnings.warn("No external drives or biases loaded", UserWarning)
 
     for drive_name, drive in net.external_drives.items():
-        if "tstop" in drive["dynamics"]:
+        # Check if 'dynamics' key exists before trying to access its contents
+        if "dynamics" in drive and "tstop" in drive["dynamics"]:
             if drive["dynamics"]["tstop"] is None:
                 drive["dynamics"]["tstop"] = tstop
     for bias_name, bias in net.external_biases.items():
