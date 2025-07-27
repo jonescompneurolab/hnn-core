@@ -23,7 +23,7 @@ version = None
 with open(os.path.join('hnn_core', '__init__.py'), 'r') as fid:
     for line in (line.strip() for line in fid):
         if line.startswith('__version__'):
-            version = line.split('=')[1].strip().strip('\'')
+            version = line.split('=')[1].strip().strip('\"')
             break
 if version is None:
     raise RuntimeError('Could not determine version')
@@ -31,6 +31,7 @@ if version is None:
 
 # test install with:
 # $ rm -rf hnn_core/mod/x86_64/
+# $ rm -rf hnn_core/mod/arm64/
 # $ python setup.py clean --all install
 #
 # to make sure there are no residual mod files
@@ -75,21 +76,17 @@ class build_py_mod(build_py):
 
 if __name__ == "__main__":
     extras = {
-        'docs': ['mne', 'nibabel', 'pooch', 'tdqm',
-                 'sphinx', 'sphinx-gallery',
-                 'sphinx_bootstrap_theme', 'sphinx-copybutton',
-                 'pillow', 'numpydoc',
-                 ],
-        'gui': ['ipywidgets>=8.0.0', 'ipykernel', 'ipympl', 'voila', ],
         'opt': ['scikit-learn'],
         'parallel': ['joblib', 'psutil'],
+        'test': ['codespell', 'pytest', 'pytest-cov', 'pytest-xdist', 'ruff'],
+        'docs': ['mne', 'myst-parser', 'nibabel', 'numpydoc', 'pillow',
+                 'pooch', 'pydata-sphinx-theme', 'sphinx', 'sphinx-gallery',
+                 'sphinx-copybutton', 'tdqm'],
         'sbi': ['sbi'],
-        'test': ['flake8', 'pytest', 'pytest-cov', ],
+        'gui': ['ipywidgets>=8.0.0', 'ipykernel', 'ipympl', 'voila'],
     }
-    extras['dev'] = (extras['docs'] + extras['gui'] + extras['opt']
-                     + extras['parallel'] + extras['sbi'] + extras['test']
-                     )
-
+    extras['dev'] = (extras['opt'] + extras['parallel'] + extras['test'] +
+                     extras['docs'] + extras['gui']) + extras['sbi']
 
     setup(name=DISTNAME,
           maintainer=MAINTAINER,
@@ -99,7 +96,8 @@ if __name__ == "__main__":
           url=URL,
           version=version,
           download_url=DOWNLOAD_URL,
-          long_description=open('README.rst').read(),
+          long_description=open('README.md').read(),
+          long_description_content_type='text/markdown',
           classifiers=[
               'Intended Audience :: Science/Research',
               'Intended Audience :: Developers',
@@ -111,6 +109,11 @@ if __name__ == "__main__":
               'Operating System :: POSIX',
               'Operating System :: Unix',
               'Operating System :: MacOS',
+              'Programming Language :: Python :: 3.9',
+              'Programming Language :: Python :: 3.10',
+              'Programming Language :: Python :: 3.11',
+              'Programming Language :: Python :: 3.12',
+              'Programming Language :: Python :: 3.13',
           ],
           platforms='any',
           install_requires=[
@@ -118,10 +121,10 @@ if __name__ == "__main__":
               'NEURON >=7.7; platform_system != "Windows"',
               'matplotlib>=3.5.3',
               'scipy',
-              'h5io'
+              'h5io',
           ],
           extras_require=extras,
-          python_requires='>=3.8',
+          python_requires='>=3.9, <3.14',
           packages=find_packages(),
           package_data={'hnn_core': [
               'param/*.json',

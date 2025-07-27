@@ -14,11 +14,7 @@
 #
 import os
 import sys
-# sys.path.insert(0, os.path.abspath('.'))
-import sphinx_gallery
 from sphinx_gallery.sorting import ExampleTitleSortKey, ExplicitOrder
-
-import sphinx_bootstrap_theme
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -31,14 +27,39 @@ sys.path.append(os.path.abspath(os.path.join(curdir, 'sphinxext')))
 # -- Project information -----------------------------------------------------
 
 project = 'hnn-core'
-copyright = '2024, HNN Developers'
+copyright = '2025, HNN Developers'
 author = 'HNN Developers'
 
-# The short X.Y version
-version = '0.4'
-# The full version, including alpha/beta/rc tags
-release = ''
+# -- Version handling --------------------------------------------------------
 
+# The short X.Y version
+version = '0.4.3dev2'
+# The full version, including alpha/beta/rc tags
+release = '0.4.3dev2'
+
+### HTML theme version control
+# If you are making a stable release, then you should add entries to the file
+# located in `doc/_static/versions.json`. Once your PR with that change is
+# merged, that file will be pushed to the following URL. Unfortunately our
+# theme system wants a public URL, NOT a local file for this version control.
+json_versions_url = "https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json"
+if (("rc" in version) or ("dev" in version)):
+    switcher_version_match = "dev"
+else:
+    switcher_version_match = version
+
+### Binder version control
+# Resolve binder variable `filepath_prefix` to go in `sphinx_gallery_conf`
+# below. From the docs:
+#   "A prefix to append to the filepath in the Binder links. You should use this
+#    if you will store your built documentation in a sub-folder of a repository,
+#    instead of in the root."
+# We will store dev docs in a `dev` subdirectory and all other docs in a
+# directory "v" + version_str. E.g., "v0.3"
+if (("rc" in version) or ("dev" in version)):
+    filepath_prefix = 'dev'
+else:
+    filepath_prefix = 'v{}'.format(version)
 
 # -- General configuration ---------------------------------------------------
 
@@ -50,14 +71,15 @@ release = ''
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'gh_substitutions',  # custom extension, see ./sphinxext/gh_substitutions.py
+    'myst_parser',
+    'numpydoc',
     'sphinx_gallery.gen_gallery',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
-    'numpydoc',
     'sphinx_copybutton',
-    'gh_substitutions'  # custom extension, see ./sphinxext/gh_substitutions.py
 ]
 
 # generate autosummary even if no references
@@ -75,10 +97,11 @@ copybutton_prompt_is_regexp = True
 templates_path = ['_templates']
 
 # The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
-#
-# source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+# You can specify multiple suffix as a dict:
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
+}
 
 # The master toctree document.
 master_doc = 'index'
@@ -95,48 +118,58 @@ language = None
 # This pattern also affects html_static_path and html_extra_path .
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'gui/index.rst']
 
-# The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
-
-
 # -- Options for HTML output -------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
-html_theme = 'bootstrap'
+html_theme = "pydata_sphinx_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
-# documentation.
-#
+# documentation:
+# https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html
 html_theme_options = {
-    'navbar_sidebarrel': False,
-    'navbar_links': [
-        ("Examples", "auto_examples/index"),
-        ("API", "api"),
-        ("Glossary", "glossary"),
-        ("What's new", "whats_new"),
-        ("GitHub", "https://github.com/jonescompneurolab/hnn-core", True)
+    "external_links": [
+        {
+            "url": "https://github.com/jonescompneurolab/hnn-core",
+            "name": "GitHub (Code)",
+        },
+        {
+            "url": "https://pypi.org/project/hnn-core/",
+            "name": "PyPI",
+        },
+        {
+            "url": "https://hnn.brown.edu/",
+            "name": "HNN Frontpage",
+        },
     ],
-    'bootswatch_theme': "yeti"
+    "header_links_before_dropdown": 7,
+    "navbar_align": "left",
+    "navbar_start": ["navbar-logo"],
+    "navbar_center": ["navbar-nav"],
+    "navbar_end": ["version-switcher"],
+    "pygments_dark_style": "monokai",
+    "switcher": {
+        "json_url": json_versions_url,
+        "version_match": switcher_version_match,
+    },
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+# so a file named "default.css" will overwrite the builtin "default.css". This
+# folder also holds versions.json.
+html_static_path = ["_static"]
+html_logo = "_static/hnn-medium.png"
 
-# Custom sidebar templates, must be a dictionary that maps document names
-# to template names.
-#
-# The default sidebars (for documents that don't match any pattern) are
-# defined by theme itself.  Builtin themes are using these templates by
-# default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
-# 'searchbox.html']``.
-#
-# html_sidebars = {}
-
+# The default sidebars (for documents that don't match any pattern) are defined
+# by theme itself.  Builtin themes are using these templates by default:
+# ``['localtoc.html', 'relations.html', 'sourcelink.html',
+# 'searchbox.html']``. Not that the following removes the "primary" sidebar (on
+# the left), but not the "secondary" # sidebar (on the right), for the PyData
+# theme. From
+# https://pydata-sphinx-theme.readthedocs.io/en/latest/user_guide/layout.html#remove-the-primary-sidebar-from-pages
+html_sidebars = {
+    "**": []
+}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
@@ -203,25 +236,16 @@ intersphinx_mapping = {
 }
 intersphinx_timeout = 5
 
+linkcheck_anchors = False
+
 linkcheck_ignore = [
-    'https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#',
     'https://neuron.yale.edu/neuron',
     'https://doi.org/10.1152/jn.00535.2009',
     'https://doi.org/10.1152/jn.00122.2010',
     'https://doi.org/10.1101/2021.04.16.440210',
-    'https://groups.google.com/g/hnnsolver'
+    'https://groups.google.com/g/hnnsolver',
+    'http://localhost:8866',
 ]
-
-# Resolve binder filepath_prefix. From the docs:
-# "A prefix to append to the filepath in the Binder links. You should use this
-# if you will store your built documentation in a sub-folder of a repository,
-# instead of in the root."
-# we will store dev docs in a `dev` subdirectory and all other docs in a
-# directory "v" + version_str. E.g., "v0.3"
-if 'dev' in version:
-    filepath_prefix = 'dev'
-else:
-    filepath_prefix = 'v{}'.format(version)
 
 sphinx_gallery_conf = {
     'first_notebook_cell': ("import pyvista as pv\n"

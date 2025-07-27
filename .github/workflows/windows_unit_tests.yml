@@ -10,6 +10,10 @@ env:
     PYTHONPATH: C:\nrn_test\lib\python
     NEURONHOME: C:\nrn_test
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
 
@@ -17,7 +21,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest]
-        python-version: [3.8, 3.11, 3.12]
+        python-version: [3.9, 3.11, 3.13]
 
     steps:
       - uses: actions/checkout@v4

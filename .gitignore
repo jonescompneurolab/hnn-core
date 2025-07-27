@@ -1,6 +1,7 @@
 # HNN-core build
 dpl.txt
 hnn_core/mod/x86_64/
+hnn_core/mod/arm64/
 
 # Distribution / packaging
 .Python

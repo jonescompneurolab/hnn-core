@@ -1,5 +1,10 @@
 :orphan:
 
+..
+   This document is kept in RST instead of Markdown format due to its
+   importance, accessibility, and the potential for mistaken configuration in
+   adapting it to the MyST Markdown parser.
+
 .. _api_documentation:
 
 =================
@@ -82,6 +87,7 @@ Visualization (:py:mod:`hnn_core.viz`):
    plot_connectivity_matrix
    plot_laminar_lfp
    plot_laminar_csd
+   plot_drive_strength
    NetworkPlotter
 
 Parallel backends (:py:mod:`hnn_core.parallel_backends`):
@@ -93,7 +99,6 @@ Parallel backends (:py:mod:`hnn_core.parallel_backends`):
 
    MPIBackend
    JoblibBackend
-
 
 Input and Output:
 -----------------

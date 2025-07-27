@@ -11,8 +11,16 @@ from .objective_functions import _rmse_evoked, _maximize_psd
 
 
 class Optimizer:
-    def __init__(self, initial_net, tstop, constraints, set_params,
-                 solver='bayesian', obj_fun='dipole_rmse', max_iter=200):
+    def __init__(
+        self,
+        initial_net,
+        tstop,
+        constraints,
+        set_params,
+        solver="bayesian",
+        obj_fun="dipole_rmse",
+        max_iter=200,
+    ):
         """Parameter optimization.
 
         Parameters
@@ -63,31 +71,33 @@ class Optimizer:
         """
 
         if initial_net.external_drives:
-            raise ValueError("The current Network instance has external " +
-                             "drives, provide a Network object with no " +
-                             "external drives.")
+            raise ValueError(
+                "The current Network instance has external "
+                + "drives, provide a Network object with no "
+                + "external drives."
+            )
         self._initial_net = initial_net
         self.constraints = constraints
         self._set_params = set_params
         self.max_iter = max_iter
         # Optimizer method
-        if solver == 'bayesian':
-            self.solver = 'bayesian'
+        if solver == "bayesian":
+            self.solver = "bayesian"
             self._assemble_constraints = _assemble_constraints_bayesian
             self._run_opt = _run_opt_bayesian
-        elif solver == 'cobyla':
-            self.solver = 'cobyla'
+        elif solver == "cobyla":
+            self.solver = "cobyla"
             self._assemble_constraints = _assemble_constraints_cobyla
             self._run_opt = _run_opt_cobyla
         else:
             raise ValueError("solver must be 'bayesian' or 'cobyla'")
         # Response to be optimized
-        if obj_fun == 'dipole_rmse':
+        if obj_fun == "dipole_rmse":
             self.obj_fun = _rmse_evoked
-            self.obj_fun_name = 'dipole_rmse'
-        elif obj_fun == 'maximize_psd':
+            self.obj_fun_name = "dipole_rmse"
+        elif obj_fun == "maximize_psd":
             self.obj_fun = _maximize_psd
-            self.obj_fun_name = 'maximize_psd'
+            self.obj_fun_name = "maximize_psd"
         else:
             self.obj_fun = obj_fun  # user-defined function
             self.obj_fun_name = None
@@ -120,25 +130,27 @@ class Optimizer:
         smooth_window_len : float, optional
             The smooth window length.
         """
-        if (self.obj_fun_name == 'dipole_rmse' and
-                'target' not in obj_fun_kwargs):
-            raise Exception('target must be specified')
-        elif (self.obj_fun_name == 'maximize_psd' and
-              ('f_bands' not in obj_fun_kwargs or
-               'relative_bandpower' not in obj_fun_kwargs)):
-            raise Exception('f_bands and relative_bandpower must be specified')
+        if self.obj_fun_name == "dipole_rmse" and "target" not in obj_fun_kwargs:
+            raise Exception("target must be specified")
+        elif self.obj_fun_name == "maximize_psd" and (
+            "f_bands" not in obj_fun_kwargs
+            or "relative_bandpower" not in obj_fun_kwargs
+        ):
+            raise Exception("f_bands and relative_bandpower must be specified")
 
         constraints = self._assemble_constraints(self.constraints)
         initial_params = _get_initial_params(self.constraints)
 
-        opt_params, obj, net_ = self._run_opt(self._initial_net,
-                                              self.tstop,
-                                              constraints,
-                                              self._set_params,
-                                              self.obj_fun,
-                                              initial_params,
-                                              self.max_iter,
-                                              obj_fun_kwargs)
+        opt_params, obj, net_ = self._run_opt(
+            self._initial_net,
+            self.tstop,
+            constraints,
+            self._set_params,
+            self.obj_fun,
+            initial_params,
+            self.max_iter,
+            obj_fun_kwargs,
+        )
 
         self.net_ = net_
         self.obj_ = obj
@@ -172,11 +184,11 @@ class Optimizer:
         y_min = min(self.obj_) - 0.01
         y_max = max(self.obj_) + 0.01
 
-        axis.plot(x, self.obj_, color='black')
+        axis.plot(x, self.obj_, color="black")
         axis.set_ylim([y_min, y_max])
-        axis.set_title('Convergence')
-        axis.set_xlabel('Number of calls')
-        axis.set_ylabel('Objective value')
+        axis.set_title("Convergence")
+        axis.set_xlabel("Number of calls")
+        axis.set_ylabel("Objective value")
         axis.grid(visible=True)
 
         fig.show(show)
@@ -199,8 +211,9 @@ def _get_initial_params(constraints):
 
     initial_params = dict()
     for cons_key in constraints:
-        initial_params.update({cons_key: ((constraints[cons_key][0] +
-                                          constraints[cons_key][1])) / 2})
+        initial_params.update(
+            {cons_key: (constraints[cons_key][0] + constraints[cons_key][1]) / 2}
+        )
 
     return initial_params
 
@@ -241,10 +254,8 @@ def _assemble_constraints_cobyla(constraints):
     # assemble constraints in solver-specific format
     cons_cobyla = list()
     for idx, cons_key in enumerate(constraints):
-        cons_cobyla.append(lambda x, idx=idx:
-                           float(constraints[cons_key][1]) - x[idx])
-        cons_cobyla.append(lambda x, idx=idx:
-                           x[idx] - float(constraints[cons_key][0]))
+        cons_cobyla.append(lambda x, idx=idx: float(constraints[cons_key][1]) - x[idx])
+        cons_cobyla.append(lambda x, idx=idx: x[idx] - float(constraints[cons_key][0]))
 
     return cons_cobyla
 
@@ -272,8 +283,16 @@ def _update_params(initial_params, predicted_params):
     return params
 
 
-def _run_opt_bayesian(initial_net, tstop, constraints, set_params, obj_fun,
-                      initial_params, max_iter, obj_fun_kwargs):
+def _run_opt_bayesian(
+    initial_net,
+    tstop,
+    constraints,
+    set_params,
+    obj_fun,
+    initial_params,
+    max_iter,
+    obj_fun_kwargs,
+):
     """Runs optimization routine with gp_minimize optimizer.
 
     Parameters
@@ -308,20 +327,24 @@ def _run_opt_bayesian(initial_net, tstop, constraints, set_params, obj_fun,
     obj_values = list()
 
     def _obj_func(predicted_params):
-        return obj_fun(initial_net=initial_net,
-                       initial_params=initial_params,
-                       set_params=set_params,
-                       predicted_params=predicted_params,
-                       update_params=_update_params,
-                       obj_values=obj_values,
-                       tstop=tstop,
-                       obj_fun_kwargs=obj_fun_kwargs)
+        return obj_fun(
+            initial_net=initial_net,
+            initial_params=initial_params,
+            set_params=set_params,
+            predicted_params=predicted_params,
+            update_params=_update_params,
+            obj_values=obj_values,
+            tstop=tstop,
+            obj_fun_kwargs=obj_fun_kwargs,
+        )
 
-    opt_results, _ = bayes_opt(func=_obj_func,
-                               x0=list(initial_params.values()),
-                               cons=constraints,
-                               acquisition=expected_improvement,
-                               maxfun=max_iter)
+    opt_results, _ = bayes_opt(
+        func=_obj_func,
+        x0=list(initial_params.values()),
+        cons=constraints,
+        acquisition=expected_improvement,
+        maxfun=max_iter,
+    )
 
     # get optimized params
     opt_params = opt_results
@@ -337,8 +360,16 @@ def _run_opt_bayesian(initial_net, tstop, constraints, set_params, obj_fun,
     return opt_params, obj, net_
 
 
-def _run_opt_cobyla(initial_net, tstop, constraints, set_params, obj_fun,
-                    initial_params, max_iter, obj_fun_kwargs):
+def _run_opt_cobyla(
+    initial_net,
+    tstop,
+    constraints,
+    set_params,
+    obj_fun,
+    initial_params,
+    max_iter,
+    obj_fun_kwargs,
+):
     """Runs optimization routine with fmin_cobyla optimizer.
 
     Parameters
@@ -373,22 +404,26 @@ def _run_opt_cobyla(initial_net, tstop, constraints, set_params, obj_fun,
     obj_values = list()
 
     def _obj_func(predicted_params):
-        return obj_fun(initial_net=initial_net,
-                       initial_params=initial_params,
-                       set_params=set_params,
-                       predicted_params=predicted_params,
-                       update_params=_update_params,
-                       obj_values=obj_values,
-                       tstop=tstop,
-                       obj_fun_kwargs=obj_fun_kwargs)
+        return obj_fun(
+            initial_net=initial_net,
+            initial_params=initial_params,
+            set_params=set_params,
+            predicted_params=predicted_params,
+            update_params=_update_params,
+            obj_values=obj_values,
+            tstop=tstop,
+            obj_fun_kwargs=obj_fun_kwargs,
+        )
 
-    opt_results = fmin_cobyla(_obj_func,
-                              cons=constraints,
-                              rhobeg=0.1,
-                              rhoend=1e-4,
-                              x0=list(initial_params.values()),
-                              maxfun=max_iter,
-                              catol=0.0)
+    opt_results = fmin_cobyla(
+        _obj_func,
+        cons=constraints,
+        rhobeg=0.1,
+        rhoend=1e-4,
+        x0=list(initial_params.values()),
+        maxfun=max_iter,
+        catol=0.0,
+    )
 
     # get optimized params
     opt_params = opt_results
