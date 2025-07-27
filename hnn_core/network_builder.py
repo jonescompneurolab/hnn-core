@@ -527,9 +527,7 @@ class NetworkBuilder(object):
                     target_type = self.net.gid_to_type(target_gid)
                     # print("src_type, target_type:", src_type, target_type)
                     target_cell = self._cells[target_filter[target_gid]]
-                    connection_name = (
-                        f"{_short_name(src_type)}_{_short_name(target_type)}_{receptor}"
-                    )
+                    connection_name = f"{_short_name(self.get_base_type(src_type))}_{_short_name(self.get_base_type(target_type))}_{receptor}"
                     # print("Connection name",connection_name)
                     if connection_name not in self.ncs:
                         self.ncs[connection_name] = list()
