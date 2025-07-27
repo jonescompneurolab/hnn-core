@@ -384,21 +384,8 @@ class NetworkBuilder(object):
             n_hosts = _get_nhosts()
 
         # round robin assignment of cell gids
-        # Assign cell gids based on actual gid_ranges
-        for cell_type, gid_range in self.net.gid_ranges.items():
-            print(
-                "Assigning gids for cell type,gid range:", self.net.gid_ranges.items()
-            )
-            # Only assign real cell types (not drives) here
-            if cell_type in self.net.cell_types:
-                gids = list(gid_range)
-                # print("GIDS:", gids, "RANK", self._rank, "Host:", n_hosts)
-                for gid_idx in range(self._rank, len(gids), n_hosts):
-                    # print("GID idx:", gid_idx)
-                    gid = gids[gid_idx]
-                    # print("GID:", gid)
-                    # print("GID:", gid, "RANK", self._rank, "Host:", n_hosts)
-                    self._gid_list.append(gid)
+        for gid in range(self._rank, self.net._n_cells, n_hosts):
+            self._gid_list.append(gid)
 
         for drive in self.net.external_drives.values():
             if drive["cell_specific"]:
