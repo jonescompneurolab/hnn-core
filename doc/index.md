@@ -4,7 +4,7 @@
 :hidden:
 
 Install <install>
-Examples <auto_examples/index>
+Examples <notebook_examples>
 API <api>
 glossary
 whats_new
