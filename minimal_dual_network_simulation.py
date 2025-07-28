@@ -20,13 +20,7 @@ def create_minimal_network(cell_type_suffix=None, gid_start=0, network_separatio
             'L5_basket': f'L5_basket{cell_type_suffix}',
         }
         net._rename_cell_types(mapping)
-        # Optionally update GID ranges if needed
-        # current_gid = gid_start
-        # for ct in mapping.values():
-        #     n_cells = len(net.pos_dict[ct])
-        #     net.gid_ranges[ct] = range(current_gid, current_gid + n_cells)
-        #     current_gid += n_cells
-        # Shift all cell positions in x-direction by network_separation
+        
     for cell_type, positions in net.pos_dict.items():
         shifted_positions = []
         for pos in positions:
@@ -40,22 +34,24 @@ def create_minimal_network(cell_type_suffix=None, gid_start=0, network_separatio
 
     return net
 
-def plot_combined_spike_raster(net1, net2, title="Combined Spike Raster"):
+def plot_combined_spike_raster(net1, net2, title="Combined Spike Raster",plot_net1=True, plot_net2=True):
     """Plot spikes from both networks on a single raster plot."""
     # Gather spike data from both networks
     spikes = []
     gids = []
     types = []
     # # Net1
-    for trial_idx in range(len(net1.cell_response.spike_times)):
-        spikes.extend(net1.cell_response.spike_times[trial_idx])
-        gids.extend(net1.cell_response.spike_gids[trial_idx])
-        types.extend(net1.cell_response.spike_types[trial_idx])
+    if plot_net1:
+        for trial_idx in range(len(net1.cell_response.spike_times)):
+            spikes.extend(net1.cell_response.spike_times[trial_idx])
+            gids.extend(net1.cell_response.spike_gids[trial_idx])
+            types.extend(net1.cell_response.spike_types[trial_idx])
+    if plot_net2:
     # Net2
-    for trial_idx in range(len(net2.cell_response.spike_times)):
-        spikes.extend(net2.cell_response.spike_times[trial_idx])
-        gids.extend(net2.cell_response.spike_gids[trial_idx])
-        types.extend(net2.cell_response.spike_types[trial_idx])
+        for trial_idx in range(len(net2.cell_response.spike_times)):
+            spikes.extend(net2.cell_response.spike_times[trial_idx])
+            gids.extend(net2.cell_response.spike_gids[trial_idx])
+            types.extend(net2.cell_response.spike_types[trial_idx])
 
     # Assign each cell type a color
     unique_types = sorted(set(types))
@@ -113,7 +109,7 @@ def main():
     print("Minimal dual network simulation...")
 
     net1 = create_minimal_network()
-    net2 = create_minimal_network(cell_type_suffix='_net2', network_separation=1)
+    net2 = create_minimal_network(cell_type_suffix='_net2', network_separation=2)
 
     net1.add_evoked_drive(
         'evdist1', mu=5.0, sigma=1.0, numspikes=1, location='distal',
@@ -135,21 +131,23 @@ def main():
     print("Net1 spikes:", len(net_1.cell_response.spike_times[0]))
     print("Net2 spikes:", len(net_2.cell_response.spike_times[0]))
 
-    plot_combined_spike_raster(net_1, net_2, title="Combined Spike Raster (Net1 + Net2)")   
+    plot_combined_spike_raster(net_1, net_2, title="Net 2 before connection",plot_net1=True,plot_net2=True)
 
     # Connect net1 pyramidal cells to all net2 cells
     connect_pyramidal_to_all(net1, net2, weight=0.001, delay=1.0, receptor='gabaa')
-    print("Simulating net1...")
-    dpl1 = simulate_dipole(net1, tstop=20, dt=0.025, n_trials=1)
+    print("Successfully connected net1 pyramidal cells to all net2 cells.")
+    # print("Simulating net1...")
+    # dpl1 = simulate_dipole(net1, tstop=20, dt=0.025, n_trials=1)
     print("Simulating net2...")
     dpl2 = simulate_dipole(net2, tstop=20, dt=0.025, n_trials=1)
     print("after connection")
-    print("Net1 dipole peak:", max(abs(dpl1[0].data['agg'])))
+    # print("Net1 dipole peak:", max(abs(dpl1[0].data['agg'])))
     print("Net2 dipole peak:", max(abs(dpl2[0].data['agg'])))
-    print("Net1 spikes:", len(net1.cell_response.spike_times[0]))
+    # print("Net1 spikes:", len(net1.cell_response.spike_times[0]))
     print("Net2 spikes:", len(net2.cell_response.spike_times[0]))
 
-    plot_combined_spike_raster(net1, net2, title="Combined Spike Raster after connection")    
+    plot_combined_spike_raster(net1, net2, title="Combined Raster (Net1 + Net2) after connection",plot_net1=False, plot_net2=True)    
+
 
 
 if __name__ == "__main__":
