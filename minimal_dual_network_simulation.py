@@ -5,6 +5,7 @@ Simulates two smallest possible HNN-Core networks (one cell per type) and analyz
 """
 
 import copy
+from collections import OrderedDict
 from hnn_core import jones_2009_model, simulate_dipole
 import matplotlib.pyplot as plt
 
@@ -13,24 +14,31 @@ def create_minimal_network(cell_type_suffix=None, gid_start=0, network_separatio
     net = jones_2009_model()
     # Optionally rename cell types for net2
     if cell_type_suffix:
-        mapping = {
-            'L2_pyramidal': f'L2_pyramidal{cell_type_suffix}',
-            'L5_pyramidal': f'L5_pyramidal{cell_type_suffix}',
-            'L2_basket': f'L2_basket{cell_type_suffix}',
-            'L5_basket': f'L5_basket{cell_type_suffix}',
-        }
+        mapping = OrderedDict([
+            ('L2_basket', f'L2_basket{cell_type_suffix}'),
+            ('L2_pyramidal', f'L2_pyramidal{cell_type_suffix}'),
+            ('L5_basket', f'L5_basket{cell_type_suffix}'),
+            ('L5_pyramidal', f'L5_pyramidal{cell_type_suffix}'),
+        ])
         net._rename_cell_types(mapping)
-        
-    for cell_type, positions in net.pos_dict.items():
-        shifted_positions = []
-        for pos in positions:
-            # Only shift if pos is a tuple/list of length 3
-            if isinstance(pos, (tuple, list)) and len(pos) == 3:
-                shifted_pos = (pos[0] + network_separation, pos[1], pos[2])
-            else:
-                shifted_pos = pos  # leave unchanged
-            shifted_positions.append(shifted_pos)
-        net.pos_dict[cell_type] = shifted_positions
+        # Update GID ranges to start at gid_start and avoid overlap
+        current_gid = gid_start
+        net.gid_ranges = OrderedDict()
+        for ct in mapping.values():
+            n_cells = len(net.pos_dict[ct])
+            net.gid_ranges[ct] = range(current_gid, current_gid + n_cells)
+            current_gid += n_cells
+        # Shift all cell positions in x-direction by network_separation
+        for cell_type, positions in net.pos_dict.items():
+            shifted_positions = []
+            for pos in positions:
+                # Only shift if not origin
+                if isinstance(pos, (tuple, list)) and len(pos) == 3:
+                    shifted_pos = (pos[0] + network_separation, pos[1], pos[2])
+                else:
+                    shifted_pos = pos  # leave unchanged
+                shifted_positions.append(shifted_pos)
+            net.pos_dict[cell_type] = shifted_positions
 
     return net
 
@@ -105,48 +113,62 @@ def connect_pyramidal_to_all(net1, net2, weight=0.001, delay=1.0, receptor='gaba
                         allow_autapses=False
                     )
 
+def get_next_gid(net):
+    max_gid = -1
+    for rng in net.gid_ranges.values():
+        if len(rng) > 0:
+            max_gid = max(max_gid, max(rng))
+    return max_gid + 1
+
 def main():
     print("Minimal dual network simulation...")
 
     net1 = create_minimal_network()
-    net2 = create_minimal_network(cell_type_suffix='_net2', network_separation=2)
-
     net1.add_evoked_drive(
         'evdist1', mu=5.0, sigma=1.0, numspikes=1, location='distal',
         weights_ampa={'L2_pyramidal': 0.1, 'L5_pyramidal': 0.1}
     )
+    next_gid = get_next_gid(net1)
+    net2 = create_minimal_network(cell_type_suffix='_net2', gid_start=next_gid)
+
+    # Only call get_next_gid(net2) here, before adding any drives!
+    next_gid_net2 = get_next_gid(net2)
+    
     net2.add_evoked_drive(
         'evdist2', mu=5.0, sigma=1.0, numspikes=1, location='distal',
-        weights_ampa={'L2_pyramidal_net2': 0.1, 'L5_pyramidal_net2': 0.1}
+        weights_ampa={'L2_pyramidal_net2': 0.1, 'L5_pyramidal_net2': 0.1},gid_start=next_gid_net2
     )
     net_1=net1.copy()
     net_2=net2.copy()
     print("Simulating net1...")
+    print("Net1 gid ranges:", net_1.gid_ranges)
+    print("Net2 gid ranges:", net_2.gid_ranges)
     dpl_1 = simulate_dipole(net_1, tstop=20, dt=0.025, n_trials=1)
     print("Simulating net2...")
     dpl_2 = simulate_dipole(net_2, tstop=20, dt=0.025, n_trials=1)
     print("before connection")
+
     print("Net1 dipole peak:", max(abs(dpl_1[0].data['agg'])))
     print("Net2 dipole peak:", max(abs(dpl_2[0].data['agg'])))
     print("Net1 spikes:", len(net_1.cell_response.spike_times[0]))
     print("Net2 spikes:", len(net_2.cell_response.spike_times[0]))
 
-    plot_combined_spike_raster(net_1, net_2, title="Net 2 before connection",plot_net1=True,plot_net2=True)
+    plot_combined_spike_raster(net_1, net_2, title="Net 1 + Net 2 before connection",plot_net1=False,plot_net2=True)
 
-    # Connect net1 pyramidal cells to all net2 cells
-    connect_pyramidal_to_all(net1, net2, weight=0.001, delay=1.0, receptor='gabaa')
-    print("Successfully connected net1 pyramidal cells to all net2 cells.")
+    # # Connect net1 pyramidal cells to all net2 cells
+    # connect_pyramidal_to_all(net1, net2, weight=0.001, delay=1.0, receptor='gabaa')
+    # print("Successfully connected net1 pyramidal cells to all net2 cells.")
     # print("Simulating net1...")
     # dpl1 = simulate_dipole(net1, tstop=20, dt=0.025, n_trials=1)
-    print("Simulating net2...")
-    dpl2 = simulate_dipole(net2, tstop=20, dt=0.025, n_trials=1)
-    print("after connection")
+    # print("Simulating net2...")
+    # dpl2 = simulate_dipole(net2, tstop=20, dt=0.025, n_trials=1)
+    # print("after connection")
     # print("Net1 dipole peak:", max(abs(dpl1[0].data['agg'])))
-    print("Net2 dipole peak:", max(abs(dpl2[0].data['agg'])))
+    # print("Net2 dipole peak:", max(abs(dpl2[0].data['agg'])))
     # print("Net1 spikes:", len(net1.cell_response.spike_times[0]))
-    print("Net2 spikes:", len(net2.cell_response.spike_times[0]))
+    # print("Net2 spikes:", len(net2.cell_response.spike_times[0]))
 
-    plot_combined_spike_raster(net1, net2, title="Combined Raster (Net1 + Net2) after connection",plot_net1=False, plot_net2=True)    
+    # plot_combined_spike_raster(net1, net2, title="Combined Raster (Net1 + Net2) after connection",plot_net1=False, plot_net2=True)    
 
 
 

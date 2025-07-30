@@ -588,6 +588,7 @@ class Network:
         probability=1.0,
         event_seed=2,
         conn_seed=3,
+        gid_start=None,
     ):
         """Add an 'evoked' external drive to the network
 
@@ -697,6 +698,7 @@ class Network:
             n_drive_cells,
             cell_specific,
             probability,
+            gid_start=gid_start,
         )
 
     def add_poisson_drive(
@@ -1121,6 +1123,7 @@ class Network:
         n_drive_cells,
         cell_specific,
         probability,
+        gid_start=None,
     ):
         """Attach a drive to network based on connectivity information
 
@@ -1274,7 +1277,7 @@ class Network:
         self.external_drives[name] = drive
 
         pos = [self.pos_dict["origin"]] * n_drive_cells
-        self._add_cell_type(name, pos)
+        self._add_cell_type(name, pos, gid_start=gid_start)
 
         # Set the starting index for cell-specific source gids
         # This will be updated depending on the number of target cells
@@ -1492,10 +1495,14 @@ class Network:
                     t_stop=tstop,
                 )
 
-    def _add_cell_type(self, cell_name, pos, cell_template=None):
+    def _add_cell_type(self, cell_name, pos, cell_template=None, gid_start=None):
         """Add cell type by updating pos_dict and gid_ranges."""
-        ll = self._n_gids
-        self._n_gids += len(pos)
+        if gid_start is None:
+            ll = self._n_gids
+        else:
+            ll = gid_start
+        self._n_gids = ll + len(pos)
+        print(f"Adding cell type {cell_name} with gids {ll} to {self._n_gids}")
         self.gid_ranges[cell_name] = range(ll, self._n_gids)
         self.pos_dict[cell_name] = pos
         if cell_template is not None:
