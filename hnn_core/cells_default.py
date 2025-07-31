@@ -62,10 +62,12 @@ def _get_basal(params, cell_type, section_names, v_init = {'all': -65}):
         dend_prop = dict()
         middle = section_name.replace('_', '')
         for key in prop_names:
-            if key == 'Ra' or key == 'cm':
-                dend_prop[key] = params[f'{cell_type}_dend_{key}']
+            if key in ['Ra', 'cm']:
+                middle = 'basal'
             else:
-                dend_prop[key] = params[f'{cell_type}_{middle}_{key}']
+                # map apicaltrunk -> apical_trunk etc.
+                middle = section_name.replace('_', '')
+            dend_prop[key] = params[f'{cell_type}_{middle}_{key}']
             if len(v_init) == 1:
                 v = v_init['all']
             else:
