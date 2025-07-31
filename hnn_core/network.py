@@ -20,7 +20,7 @@ from .drives import _drive_cell_event_times
 from .drives import _get_target_properties, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
 from .cells_default import pyramidal, basket
-from .params import _long_name, _short_name
+from .params import _long_name
 from .viz import plot_cells
 from .externals.mne import _validate_type, _check_option
 from .extracellular import ExtracellularArray
@@ -472,10 +472,10 @@ class Network:
         else:
             # Default behavior - create standard network
             cell_types_default = {
-                "L2_basket": basket(cell_name=_short_name("L2_basket")),
-                "L2_pyramidal": pyramidal(cell_name=_short_name("L2_pyramidal")),
-                "L5_basket": basket(cell_name=_short_name("L5_basket")),
-                "L5_pyramidal": pyramidal(cell_name=_short_name("L5_pyramidal")),
+                "L2_basket": basket(cell_name="L2_basket"),
+                "L2_pyramidal": pyramidal(cell_name="L2_pyramidal"),
+                "L5_basket": basket(cell_name="L5_basket"),
+                "L5_pyramidal": pyramidal(cell_name="L5_pyramidal"),
             }
 
             self.set_cell_positions(
