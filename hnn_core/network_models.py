@@ -5,14 +5,18 @@
 import os.path as op
 import hnn_core
 from hnn_core import read_params
-from .network import Network
+from .network import Network, _create_cell_coords
 from .params import _short_name
-from .cells_default import pyramidal_ca
+from .cells_default import pyramidal_ca, pyramidal, basket
 from .externals.mne import _validate_type
 
 
 def jones_2009_model(
-    params=None, add_drives_from_params=False, legacy_mode=False, mesh_shape=(10, 10)
+    params=None,
+    add_drives_from_params=False,
+    legacy_mode=False,
+    mesh_shape=(10, 10),
+    custom_positions=None,
 ):
     """Instantiate the network model described in Jones et al. 2009 [1]_
 
@@ -68,11 +72,39 @@ def jones_2009_model(
     if isinstance(params, str):
         params = read_params(params)
 
+    # Define cell types for Jones 2009 model
+    cell_types = {
+        "L2_basket": basket(cell_name=_short_name("L2_basket")),
+        "L2_pyramidal": pyramidal(cell_name=_short_name("L2_pyramidal")),
+        "L5_basket": basket(cell_name=_short_name("L5_basket")),
+        "L5_pyramidal": pyramidal(cell_name=_short_name("L5_pyramidal")),
+    }
+
+    # Create layer positions
+    layer_dict = _create_cell_coords(
+        n_pyr_x=mesh_shape[0],
+        n_pyr_y=mesh_shape[1],
+        zdiff=1307.4,  # Default layer separation
+        inplane_distance=1.0,  # Default in-plane distance
+    )
+
+    # Map cell types to layer positions
+    pos_dict = {
+        "L5_pyramidal": layer_dict["L5_bottom"],
+        "L2_pyramidal": layer_dict["L2_bottom"],
+        "L5_basket": layer_dict["L5_mid"],
+        "L2_basket": layer_dict["L2_mid"],
+        "origin": layer_dict["origin"],
+    }
+
+    # Create network with cell types and positions
     net = Network(
         params,
         add_drives_from_params=add_drives_from_params,
         legacy_mode=legacy_mode,
         mesh_shape=mesh_shape,
+        pos_dict=pos_dict,
+        cell_types=cell_types,
     )
 
     delay = net.delay
