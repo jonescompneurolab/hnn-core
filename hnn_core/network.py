@@ -63,16 +63,16 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
     Sort of a hack because of redundancy.
     """
 
-    def _calc_pyramidal_coord(xxrange, yyrange, zdiff):
-        list_coords = [pos for pos in it.product(xxrange, yyrange, [zdiff])]
+    def _calc_pyramidal_coord(xxrange, yyrange, z_coord):
+        list_coords = [pos for pos in it.product(xxrange, yyrange, [z_coord])]
         return list_coords
 
-    def _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff, inplane_distance, weight):
-        xzero = np.arange(0, n_pyr_x, 3) * inplane_distance
-        xone = np.arange(1, n_pyr_x, 3) * inplane_distance
+    def _calc_basket_coord(n_x, n_y, z_coord, inplane_distance, weight):
+        xzero = np.arange(0, n_x, 3) * inplane_distance
+        xone = np.arange(1, n_x, 3) * inplane_distance
         # split even and odd y vals
-        yeven = np.arange(0, n_pyr_y, 2) * inplane_distance
-        yodd = np.arange(1, n_pyr_y, 2) * inplane_distance
+        yeven = np.arange(0, n_y, 2) * inplane_distance
+        yodd = np.arange(1, n_y, 2) * inplane_distance
         # create general list of x,y coords and sort it
         coords = [pos for pos in it.product(xzero, yeven)] + [
             pos for pos in it.product(xone, yodd)
@@ -83,7 +83,6 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
         list_coords = [
             (pos_xy[0], pos_xy[1], weight * zdiff) for pos_xy in coords_sorted
         ]
-
         return list_coords
 
     def _calc_origin(xxrange, yyrange, zdiff):
@@ -99,19 +98,20 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
     xxrange = np.arange(n_pyr_x) * inplane_distance
     yyrange = np.arange(n_pyr_y) * inplane_distance
 
-    pos_dict = {
-        "L5_pyramidal": _calc_pyramidal_coord(xxrange, yyrange, zdiff=0),
-        "L2_pyramidal": _calc_pyramidal_coord(xxrange, yyrange, zdiff=zdiff),
-        "L5_basket": _calc_basket_coord(
-            n_pyr_x, n_pyr_y, zdiff, inplane_distance, weight=0.2
+    # Create layer dictionary with anatomical layer positions
+    layer_dict = {
+        "L5_bottom": _calc_pyramidal_coord(xxrange, yyrange, z_coord=0),
+        "L2_bottom": _calc_pyramidal_coord(xxrange, yyrange, z_coord=zdiff),
+        "L5_mid": _calc_basket_coord(
+            n_pyr_x, n_pyr_y, z_coord=0, inplane_distance=inplane_distance, weight=0.2
         ),
-        "L2_basket": _calc_basket_coord(
-            n_pyr_x, n_pyr_y, zdiff, inplane_distance, weight=0.8
+        "L2_mid": _calc_basket_coord(
+            n_pyr_x, n_pyr_y, z_coord=0, inplane_distance=inplane_distance, weight=0.8
         ),
         "origin": _calc_origin(xxrange, yyrange, zdiff),
     }
 
-    return pos_dict
+    return layer_dict
 
 
 def _compare_lists(s, t):
@@ -376,6 +376,8 @@ class Network:
         add_drives_from_params=False,
         legacy_mode=False,
         mesh_shape=(10, 10),
+        pos_dict=None,
+        cell_types=None,
     ):
         # Save the parameters used to create the Network
         _validate_type(params, dict, "params")
@@ -401,14 +403,6 @@ class Network:
                 DeprecationWarning,
                 stacklevel=1,
             )
-
-        # Source dict of names, first real ones only!
-        cell_types = {
-            "L2_basket": basket(cell_name=_short_name("L2_basket")),
-            "L2_pyramidal": pyramidal(cell_name=_short_name("L2_pyramidal")),
-            "L5_basket": basket(cell_name=_short_name("L5_basket")),
-            "L5_pyramidal": pyramidal(cell_name=_short_name("L5_pyramidal")),
-        }
 
         self.cell_response = None
         # external drives and biases
@@ -444,17 +438,42 @@ class Network:
 
         self._inplane_distance = 1.0  # XXX hard-coded default
         self._layer_separation = 1307.4  # XXX hard-coded default
-        self.set_cell_positions(
-            inplane_distance=self._inplane_distance,
-            layer_separation=self._layer_separation,
-        )
 
-        # populates self.gid_ranges for the 1st time: order matters for
-        # NetworkBuilder!
-        for cell_name in cell_types:
-            self._add_cell_type(
-                cell_name, self.pos_dict[cell_name], cell_template=cell_types[cell_name]
+        # Handle positions and cell types
+        if pos_dict is not None and cell_types is not None:
+            # Use provided positions and cell types
+            _validate_type(pos_dict, dict, "pos_dict")
+            _validate_type(cell_types, dict, "cell_types")
+            self.pos_dict = deepcopy(pos_dict)
+
+            # Add cell types from provided dictionary
+            for cell_name, cell_template in cell_types.items():
+                if cell_name in self.pos_dict:
+                    self._add_cell_type(
+                        cell_name, self.pos_dict[cell_name], cell_template=cell_template
+                    )
+        else:
+            # Default behavior - create standard network
+            cell_types_default = {
+                "L2_basket": basket(cell_name=_short_name("L2_basket")),
+                "L2_pyramidal": pyramidal(cell_name=_short_name("L2_pyramidal")),
+                "L5_basket": basket(cell_name=_short_name("L5_basket")),
+                "L5_pyramidal": pyramidal(cell_name=_short_name("L5_pyramidal")),
+            }
+
+            self.set_cell_positions(
+                inplane_distance=self._inplane_distance,
+                layer_separation=self._layer_separation,
             )
+
+            # populates self.gid_ranges for the 1st time: order matters for
+            # NetworkBuilder!
+            for cell_name in cell_types_default:
+                self._add_cell_type(
+                    cell_name,
+                    self.pos_dict[cell_name],
+                    cell_template=cell_types_default[cell_name],
+                )
 
         if add_drives_from_params:
             _add_drives_from_params(self)
@@ -531,15 +550,22 @@ class Network:
                 f"Layer separation must be positive, got: {layer_separation}"
             )
 
-        pos = _create_cell_coords(
+        # Get layer positions using layer dict
+        layer_dict = _create_cell_coords(
             n_pyr_x=self._N_pyr_x,
             n_pyr_y=self._N_pyr_y,
             zdiff=layer_separation,
             inplane_distance=inplane_distance,
         )
-        # update positions of the real cells
-        for key in pos.keys():
-            self.pos_dict[key] = pos[key]
+
+        # Map layers to cell types, for default mapping
+        self.pos_dict = {
+            "L5_pyramidal": layer_dict["L5_bottom"],
+            "L2_pyramidal": layer_dict["L2_bottom"],
+            "L5_basket": layer_dict["L5_mid"],
+            "L2_basket": layer_dict["L2_mid"],
+            "origin": layer_dict["origin"],
+        }
 
         # update drives to be positioned at network origin
         for drive_name, drive in self.external_drives.items():
@@ -1608,7 +1634,6 @@ class Network:
         """
         conn = _Connectivity()
         threshold = self.threshold
-
         _validate_type(
             target_gids,
             (int, list, range, str),
