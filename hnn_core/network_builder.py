@@ -496,7 +496,7 @@ class NetworkBuilder(object):
         connectivity = self.net.connectivity
 
         assert len(self._cells) == len(self._gid_list) - len(self._drive_cells)
-        srctype_target_type = set()
+        # srctype_target_type = set() #DEBUG statement
         for conn in connectivity:
             loc, receptor = conn["loc"], conn["receptor"]
             nc_dict = deepcopy(conn["nc_dict"])
@@ -525,7 +525,7 @@ class NetworkBuilder(object):
                     src_type = self.net.gid_to_type(src_gid)
                     # print("Debug:src_gid, target_gid:", src_gid, target_gid)
                     target_type = self.net.gid_to_type(target_gid)
-                    srctype_target_type.add((src_type, target_type))
+                    # srctype_target_type.add((src_type, target_type)) #DEBUG statement
                     # print("Debug: src_type, target_type:", src_type, target_type)
                     target_cell = self._cells[target_filter[target_gid]]
                     connection_name = f"{_short_name(self.get_base_type(src_type))}_{_short_name(self.get_base_type(target_type))}_{receptor}"
@@ -554,7 +554,7 @@ class NetworkBuilder(object):
                             net._inplane_distance,
                         )
                         self.ncs[connection_name].append(nc)
-        print("Debug: srctype_target_type:", srctype_target_type)
+        # print("Debug: srctype_target_type:", srctype_target_type)
 
     def _record_extracellular(self):
         for arr_name, arr in self.net.rec_arrays.items():
