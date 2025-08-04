@@ -382,18 +382,21 @@ class NetworkBuilder(object):
             self._rank = rank
         if n_hosts is None:
             n_hosts = _get_nhosts()
-        print("Assigning gids for cell type,gid range:", self.net.gid_ranges.items())
+        print(
+            "Debug: Assigning gids for cell type,gid range:",
+            self.net.gid_ranges.items(),
+        )
         # round robin assignment of cell gids
         for cell_type, gid_range in self.net.gid_ranges.items():
             # Only assign real cell types (not drives) here
             if cell_type in self.net.cell_types:
                 gids = list(gid_range)
-                # print("GIDS:", gids, "RANK", self._rank, "Host:", n_hosts)
+                # print("Debug: GIDS:", gids, "RANK", self._rank, "Host:", n_hosts)
                 for gid_idx in range(self._rank, len(gids), n_hosts):
-                    # print("GID idx:", gid_idx)
+                    # print("Debug: GID idx:", gid_idx)
                     gid = gids[gid_idx]
-                    # print("GID:", gid)
-                    # print("GID:", gid, "RANK", self._rank, "Host:", n_hosts)
+                    # print("Debug: GID:", gid)
+                    # print("Debug: GID:", gid, "RANK", self._rank, "Host:", n_hosts)
                     self._gid_list.append(gid)
 
         for drive in self.net.external_drives.values():
@@ -443,7 +446,7 @@ class NetworkBuilder(object):
         # loop through ALL gids
         # have to loop over self._gid_list, since this is what we got
         # on this rank (MPI)
-        print("gid_list:", self._gid_list)
+        print("Debug: gid_list:", self._gid_list)
         for gid in self._gid_list:
             src_type = self.net.gid_to_type(gid)
             gid_idx = gid - self.net.gid_ranges[src_type][0]
@@ -493,7 +496,7 @@ class NetworkBuilder(object):
         connectivity = self.net.connectivity
 
         assert len(self._cells) == len(self._gid_list) - len(self._drive_cells)
-
+        srctype_target_type = set()
         for conn in connectivity:
             loc, receptor = conn["loc"], conn["receptor"]
             nc_dict = deepcopy(conn["nc_dict"])
@@ -507,24 +510,26 @@ class NetworkBuilder(object):
                         filtered_targets.append(target_gid)
                         valid_targets.add(target_gid)
                 conn["gid_pairs"][src_gid] = filtered_targets
-            # print("valid targets:", valid_targets)
+            # print("Debug: valid targets:", valid_targets)
             target_filter = dict()
             for idx in range(len(self._cells)):
                 gid = self._gid_list[idx]
                 # print("gid, idx:", gid, idx)
                 if gid in valid_targets:
                     target_filter[gid] = idx
-
+            # print("Debug: gidpairs",conn["gid_pairs"].items())
             # Iterate over src/target pairs and connect cells
+
             for src_gid, target_gids in conn["gid_pairs"].items():
                 for target_gid in target_gids:
                     src_type = self.net.gid_to_type(src_gid)
-                    # print("src_gid, target_gid:", src_gid, target_gid)
+                    # print("Debug:src_gid, target_gid:", src_gid, target_gid)
                     target_type = self.net.gid_to_type(target_gid)
-                    # print("src_type, target_type:", src_type, target_type)
+                    srctype_target_type.add((src_type, target_type))
+                    # print("Debug: src_type, target_type:", src_type, target_type)
                     target_cell = self._cells[target_filter[target_gid]]
                     connection_name = f"{_short_name(self.get_base_type(src_type))}_{_short_name(self.get_base_type(target_type))}_{receptor}"
-                    # print("Connection name",connection_name)
+                    # print("Debug: Connection name",connection_name)
                     if connection_name not in self.ncs:
                         self.ncs[connection_name] = list()
                     pos_idx = src_gid - net.gid_ranges[_long_name(src_type)][0]
@@ -549,6 +554,7 @@ class NetworkBuilder(object):
                             net._inplane_distance,
                         )
                         self.ncs[connection_name].append(nc)
+        print("Debug: srctype_target_type:", srctype_target_type)
 
     def _record_extracellular(self):
         for arr_name, arr in self.net.rec_arrays.items():

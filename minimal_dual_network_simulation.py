@@ -3,11 +3,11 @@ Minimal Dual Network Simulation
 
 Simulates two smallest possible HNN-Core networks (one cell per type) and analyzes results.
 """
-
 import copy
 from collections import OrderedDict
-from hnn_core import jones_2009_model, simulate_dipole
+from hnn_core import jones_2009_model, simulate_dipole, Network
 import matplotlib.pyplot as plt
+from hnn_core.hnn_io import write_network_configuration
 
 def create_minimal_network(cell_type_suffix=None, gid_start=0, network_separation=0):
     """Create a minimal network with one cell per type and shift positions."""
@@ -28,19 +28,59 @@ def create_minimal_network(cell_type_suffix=None, gid_start=0, network_separatio
             n_cells = len(net.pos_dict[ct])
             net.gid_ranges[ct] = range(current_gid, current_gid + n_cells)
             current_gid += n_cells
-        # Shift all cell positions in x-direction by network_separation
-        for cell_type, positions in net.pos_dict.items():
-            shifted_positions = []
-            for pos in positions:
-                # Only shift if not origin
-                if isinstance(pos, (tuple, list)) and len(pos) == 3:
-                    shifted_pos = (pos[0] + network_separation, pos[1], pos[2])
-                else:
-                    shifted_pos = pos  # leave unchanged
-                shifted_positions.append(shifted_pos)
-            net.pos_dict[cell_type] = shifted_positions
+        # # Shift all cell positions in x-direction by network_separation
+        # for cell_type, positions in net.pos_dict.items():
+        #     shifted_positions = []
+        #     for pos in positions:
+        #         # Only shift if not origin
+        #         if isinstance(pos, (tuple, list)) and len(pos) == 3:
+        #             shifted_pos = (pos[0] + network_separation, pos[1], pos[2])
+        #         else:
+        #             shifted_pos = pos  # leave unchanged
+        #         shifted_positions.append(shifted_pos)
+        #     net.pos_dict[cell_type] = shifted_positions
 
     return net
+def combine_networks(net1, net2):
+    """Combine two HNN-Core networks into a single network."""
+    combined = Network()
+    # Merge cell_types, pos_dict, gid_ranges, and external_drives
+    combined.cell_types = {**net1.cell_types, **net2.cell_types}
+    combined.pos_dict = {**net1.pos_dict, **net2.pos_dict}
+    combined.gid_ranges = OrderedDict({**net1.gid_ranges, **net2.gid_ranges})
+    combined.external_drives = {**net1.external_drives, **net2.external_drives}
+    # Update _n_gids
+    combined._n_gids = max(
+        [max(rng) for rng in combined.gid_ranges.values() if len(rng) > 0]
+    ) + 1
+    return combined
+def connect_pyramidal_to_all(net1, net2, weight=0.001, delay=1.0, receptor='gabaa'):
+    """Connect all pyramidal cells in net1 to all cells in net2."""
+    # Get pyramidal cell types in net1
+    pyr_types_net1 = [ct for ct in net1.cell_types if 'pyramidal' in ct]
+    # Get all cell types in net2
+    all_types_net2 = list(net2.cell_types.keys())
+
+    # For each pyramidal cell in net1
+    for src_type in pyr_types_net1:
+        for src_gid in net1.gid_ranges[src_type]:
+            src_pos = net1.pos_dict[src_type][src_gid - net1.gid_ranges[src_type][0]]
+            # For each cell in net2
+            for target_type in all_types_net2:
+                for target_gid in net2.gid_ranges[target_type]:
+                    target_pos = net2.pos_dict[target_type][target_gid - net2.gid_ranges[target_type][0]]
+                    # Add connection: you may need to adjust location and receptor for your model
+                    net2.add_connection(
+                        src_gids=[src_gid],
+                        target_gids=[target_gid],
+                        loc='soma',  # or appropriate section
+                        receptor=receptor,
+                        weight=weight,
+                        delay=delay,
+                        lamtha=3.0,
+                        allow_autapses=False
+                    )
+
 
 def plot_combined_spike_raster(net1, net2, title="Combined Spike Raster",plot_net1=True, plot_net2=True):
     """Plot spikes from both networks on a single raster plot."""
@@ -86,32 +126,7 @@ def plot_combined_spike_raster(net1, net2, title="Combined Spike Raster",plot_ne
     plt.tight_layout()
     plt.show()
 
-def connect_pyramidal_to_all(net1, net2, weight=0.001, delay=1.0, receptor='gabaa'):
-    """Connect all pyramidal cells in net1 to all cells in net2."""
-    # Get pyramidal cell types in net1
-    pyr_types_net1 = [ct for ct in net1.cell_types if 'pyramidal' in ct]
-    # Get all cell types in net2
-    all_types_net2 = list(net2.cell_types.keys())
 
-    # For each pyramidal cell in net1
-    for src_type in pyr_types_net1:
-        for src_gid in net1.gid_ranges[src_type]:
-            src_pos = net1.pos_dict[src_type][src_gid - net1.gid_ranges[src_type][0]]
-            # For each cell in net2
-            for target_type in all_types_net2:
-                for target_gid in net2.gid_ranges[target_type]:
-                    target_pos = net2.pos_dict[target_type][target_gid - net2.gid_ranges[target_type][0]]
-                    # Add connection: you may need to adjust location and receptor for your model
-                    net2.add_connection(
-                        src_gids=[src_gid],
-                        target_gids=[target_gid],
-                        loc='soma',  # or appropriate section
-                        receptor=receptor,
-                        weight=weight,
-                        delay=delay,
-                        lamtha=3.0,
-                        allow_autapses=False
-                    )
 
 def get_next_gid(net):
     max_gid = -1
@@ -123,14 +138,15 @@ def get_next_gid(net):
 def main():
     print("Minimal dual network simulation...")
 
-    net1 = create_minimal_network()
+    net1 = create_minimal_network(cell_type_suffix=None, gid_start=0)
+    next_gid = get_next_gid(net1)
     net1.add_evoked_drive(
         'evdist1', mu=5.0, sigma=1.0, numspikes=1, location='distal',
-        weights_ampa={'L2_pyramidal': 0.1, 'L5_pyramidal': 0.1}
+        weights_ampa={'L2_pyramidal': 0.1, 'L5_pyramidal': 0.1},gid_start=next_gid
     )
     next_gid = get_next_gid(net1)
-    net2 = create_minimal_network(cell_type_suffix='_net2', gid_start=next_gid)
-
+    net2 = create_minimal_network(cell_type_suffix="_net2",gid_start=next_gid)    
+   
     # Only call get_next_gid(net2) here, before adding any drives!
     next_gid_net2 = get_next_gid(net2)
     
@@ -138,6 +154,12 @@ def main():
         'evdist2', mu=5.0, sigma=1.0, numspikes=1, location='distal',
         weights_ampa={'L2_pyramidal_net2': 0.1, 'L5_pyramidal_net2': 0.1},gid_start=next_gid_net2
     )
+    # After creating net1 and net2, or after combining:
+    write_network_configuration(net1, "net1_config.json")
+    write_network_configuration(net2, "net2_config.json")
+    # Combine networks after adding drives
+    # combined_net = combine_networks(net1, net2)
+
     net_1=net1.copy()
     net_2=net2.copy()
     print("Simulating net1...")
@@ -152,8 +174,16 @@ def main():
     print("Net2 dipole peak:", max(abs(dpl_2[0].data['agg'])))
     print("Net1 spikes:", len(net_1.cell_response.spike_times[0]))
     print("Net2 spikes:", len(net_2.cell_response.spike_times[0]))
+    for ct in net_1.cell_types:
+        gids = list(net_1.gid_ranges[ct])
+        spikes = [gid for gid in gids if gid in net_1.cell_response.spike_gids[0]]
+        print(f"{ct}: {len(spikes)} spiking cells out of {len(gids)}")
 
-    plot_combined_spike_raster(net_1, net_2, title="Net 1 + Net 2 before connection",plot_net1=False,plot_net2=True)
+    for ct in net_2.cell_types:
+        gids = list(net_2.gid_ranges[ct])
+        spikes = [gid for gid in gids if gid in net_2.cell_response.spike_gids[0]]
+        print(f"{ct}: {len(spikes)} spiking cells out of {len(gids)}")
+    plot_combined_spike_raster(net_1, net_2, title="Net 1 + Net 2 (when only net2 with suffix)",plot_net1=True,plot_net2=True)
 
     # # Connect net1 pyramidal cells to all net2 cells
     # connect_pyramidal_to_all(net1, net2, weight=0.001, delay=1.0, receptor='gabaa')
