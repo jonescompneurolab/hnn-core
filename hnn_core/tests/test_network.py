@@ -92,6 +92,77 @@ def base_network():
     )
     return net, params
 
+def test_network_models_mod():
+    from hnn_core.network import _create_cell_coords
+    from hnn_core.cells_default import pyramidal, basket
+    from hnn_core.params import _short_name
+
+    params = read_params(params_fname)
+
+    # layer_dict change
+    layer_dict = _create_cell_coords(n_pyr_x=3, n_pyr_y=3, z_coord=1307.4, inplane_distance=1.0)
+    assert set(layer_dict.keys()) == {'L5_bottom', 'L2_bottom', 'L5_mid', 'L2_mid', 'origin'}
+
+    net_default = jones_2009_model(params)
+    assert len(net_default.pos_dict['L5_pyramidal']) == 100
+    assert len(net_default.pos_dict['L2_pyramidal']) == 100
+
+    n_conn_before_drives = len(net_default.connectivity)
+    add_erp_drives_to_jones_model(net_default)
+    for drive_name in ["evdist1", "evprox1", "evprox2"]:
+        assert drive_name in net_default.external_drives
+    assert len(net_default.connectivity) == n_conn_before_drives + 14
+
+    # seeing jones_2009_model with different custom mesh_shape
+    net_custom_mesh = jones_2009_model(params, mesh_shape=(5, 5))
+    assert len(net_custom_mesh.pos_dict['L2_pyramidal']) == 25
+    assert len(net_custom_mesh.pos_dict['L5_pyramidal']) == 25
+
+    # testing a network with custom cell types and positions
+    custom_cell_types = {
+        'L2_pyramidal': pyramidal(cell_name=_short_name('L2_pyramidal')),
+        'L5_pyramidal': pyramidal(cell_name=_short_name('L5_pyramidal'))
+    }
+    custom_layer_dict = _create_cell_coords(n_pyr_x=2, n_pyr_y=2, z_coord=1307.4, inplane_distance=1.0)
+    custom_pos_dict = {
+        'L2_pyramidal': custom_layer_dict['L2_bottom'],
+        'L5_pyramidal': custom_layer_dict['L5_bottom'],
+        'origin': custom_layer_dict['origin']
+    }
+    custom_net = Network(params, pos_dict=custom_pos_dict, cell_types=custom_cell_types)
+    assert 'L2_pyramidal' in custom_net.cell_types
+    assert 'L5_pyramidal' in custom_net.cell_types
+    assert len(custom_net.pos_dict['L2_pyramidal']) == 4
+    assert custom_net.gid_ranges['L2_pyramidal'] == range(0, 4)
+    assert custom_net.gid_ranges['L5_pyramidal'] == range(4, 8)
+
+    # seeing if i add a spike train drive
+    spike_data = {
+        'drive_cell_1': [10.0, 20.0, 30.0],
+        'drive_cell_2': [15.0, 25.0, 35.0]
+    }
+    weights_ampa = {'L2_pyramidal': 0.5, 'L5_pyramidal': 0.5}
+    custom_net.add_spike_train_drive('test_drive',
+                                     spike_data=spike_data,
+                                     location='proximal',
+                                     weights_ampa=weights_ampa,
+                                     synaptic_delays=0.1,
+                                     conn_seed=42)
+
+    # are drive properties and connectivity for custom
+    assert 'test_drive' in custom_net.external_drives
+    drive = custom_net.external_drives['test_drive']
+    assert drive['type'] == 'spike_train'
+    assert drive['n_drive_cells'] == 2
+    
+    # pick_connection check in custom_net
+    conn_indices = pick_connection(net=custom_net, src_gids='test_drive')
+    assert len(conn_indices) > 0
+
+    # checking drives and check events
+    custom_net._instantiate_drives(tstop=40.0)
+    assert len(custom_net.external_drives['test_drive']['events']) > 0
+    assert len(custom_net.external_drives['test_drive']['events'][0]) == 2
 
 def test_network_models():
     """ "Test instantiations of the network object"""
