@@ -84,7 +84,7 @@ def jones_2009_model(
     layer_dict = _create_cell_coords(
         n_pyr_x=mesh_shape[0],
         n_pyr_y=mesh_shape[1],
-        zdiff=1307.4,  # Default layer separation
+        z_coord=1307.4,  # Default layer separation
         inplane_distance=1.0,  # Default in-plane distance
     )
 

@@ -30,7 +30,7 @@ from .externals.mne import copy_doc
 from .utils import _replace_dict_identifier
 
 
-def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
+def _create_cell_coords(n_pyr_x, n_pyr_y, z_coord, inplane_distance):
     """Creates coordinate grid and place cells in it.
 
     Parameters
@@ -81,16 +81,16 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
 
         # append the z value for position
         list_coords = [
-            (pos_xy[0], pos_xy[1], weight * zdiff) for pos_xy in coords_sorted
+            (pos_xy[0], pos_xy[1], weight * z_coord) for pos_xy in coords_sorted
         ]
         return list_coords
 
-    def _calc_origin(xxrange, yyrange, zdiff):
+    def _calc_origin(xxrange, yyrange, z_coord):
         # origin's z component isn't used in calculating distance functions.
         # will be used for adding external drives.
         origin_x = xxrange[int((len(xxrange) - 1) // 2)]
         origin_y = yyrange[int((len(yyrange) - 1) // 2)]
-        origin_z = np.floor(zdiff / 2)
+        origin_z = np.floor(z_coord / 2)
         origin = (origin_x, origin_y, origin_z)
         return origin
 
@@ -101,14 +101,22 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
     # Create layer dictionary with anatomical layer positions
     layer_dict = {
         "L5_bottom": _calc_pyramidal_coord(xxrange, yyrange, z_coord=0),
-        "L2_bottom": _calc_pyramidal_coord(xxrange, yyrange, z_coord=zdiff),
+        "L2_bottom": _calc_pyramidal_coord(xxrange, yyrange, z_coord=z_coord),
         "L5_mid": _calc_basket_coord(
-            n_pyr_x, n_pyr_y, z_coord=0, inplane_distance=inplane_distance, weight=0.2
+            n_pyr_x,
+            n_pyr_y,
+            z_coord=z_coord,
+            inplane_distance=inplane_distance,
+            weight=0.2,
         ),
         "L2_mid": _calc_basket_coord(
-            n_pyr_x, n_pyr_y, z_coord=0, inplane_distance=inplane_distance, weight=0.8
+            n_pyr_x,
+            n_pyr_y,
+            z_coord=z_coord,
+            inplane_distance=inplane_distance,
+            weight=0.8,
         ),
-        "origin": _calc_origin(xxrange, yyrange, zdiff),
+        "origin": _calc_origin(xxrange, yyrange, z_coord),
     }
 
     return layer_dict
@@ -554,7 +562,7 @@ class Network:
         layer_dict = _create_cell_coords(
             n_pyr_x=self._N_pyr_x,
             n_pyr_y=self._N_pyr_y,
-            zdiff=layer_separation,
+            z_coord=layer_separation,
             inplane_distance=inplane_distance,
         )
 
