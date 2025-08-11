@@ -382,10 +382,10 @@ class NetworkBuilder(object):
             self._rank = rank
         if n_hosts is None:
             n_hosts = _get_nhosts()
-        print(
-            "Debug: Assigning gids for cell type,gid range:",
-            self.net.gid_ranges.items(),
-        )
+        # print(
+        #     "Debug: Assigning gids for cell type,gid range:",
+        #     self.net.gid_ranges.items(),
+        # )
         # round robin assignment of cell gids
         for cell_type, gid_range in self.net.gid_ranges.items():
             # Only assign real cell types (not drives) here
@@ -446,7 +446,7 @@ class NetworkBuilder(object):
         # loop through ALL gids
         # have to loop over self._gid_list, since this is what we got
         # on this rank (MPI)
-        print("Debug: gid_list:", self._gid_list)
+        # print("Debug: gid_list:", self._gid_list)
         for gid in self._gid_list:
             src_type = self.net.gid_to_type(gid)
             gid_idx = gid - self.net.gid_ranges[src_type][0]
@@ -522,7 +522,6 @@ class NetworkBuilder(object):
             # Iterate over src/target pairs and connect cells
 
             for src_gid, target_gids in conn["gid_pairs"].items():
-                src_gid, target_gid = int(src_gid), int(target_gid)
                 for target_gid in target_gids:
                     src_type = self.net.gid_to_type(src_gid)
                     target_type = self.net.gid_to_type(target_gid)

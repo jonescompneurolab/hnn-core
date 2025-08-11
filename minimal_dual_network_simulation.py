@@ -71,7 +71,7 @@ def create_minimal_network(cell_type_suffix=None, gid_start=0, network_separatio
                 for src_gid, tgt_gids in conn['gid_pairs'].items():
                     new_src_gid = int(src_gid) + src_offset
                     new_tgt_gids = [int(tg) + tgt_offset for tg in tgt_gids]
-                    new_gid_pairs[str(new_src_gid)] = new_tgt_gids
+                    new_gid_pairs[new_src_gid] = new_tgt_gids
                 conn['gid_pairs'] = new_gid_pairs
 
             print(f"Debug: Connection from {conn['src_type']} to {conn['target_type']}")
