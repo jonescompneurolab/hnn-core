@@ -496,7 +496,7 @@ class NetworkBuilder(object):
         connectivity = self.net.connectivity
 
         assert len(self._cells) == len(self._gid_list) - len(self._drive_cells)
-        # srctype_target_type = set() #DEBUG statement
+        srctype_target_type = set() #DEBUG statement
         for conn in connectivity:
             loc, receptor = conn["loc"], conn["receptor"]
             nc_dict = deepcopy(conn["nc_dict"])
@@ -517,16 +517,19 @@ class NetworkBuilder(object):
                 # print("gid, idx:", gid, idx)
                 if gid in valid_targets:
                     target_filter[gid] = idx
-            # print("Debug: gidpairs",conn["gid_pairs"].items())
+            # if self.net.suffix: #Debug
+            #     print("Debug: gidpairs",conn["gid_pairs"].items())
             # Iterate over src/target pairs and connect cells
 
             for src_gid, target_gids in conn["gid_pairs"].items():
+                src_gid,target_gid = int(src_gid), int(target_gid)
                 for target_gid in target_gids:
                     src_type = self.net.gid_to_type(src_gid)
-                    # print("Debug:src_gid, target_gid:", src_gid, target_gid)
                     target_type = self.net.gid_to_type(target_gid)
-                    # srctype_target_type.add((src_type, target_type)) #DEBUG statement
-                    # print("Debug: src_type, target_type:", src_type, target_type)
+                    srctype_target_type.add((src_type, target_type)) #DEBUG statement
+                    # if self.net.suffix: #Debug
+                    #     print(f"Debug: src_gid,src_type: {src_gid}, {src_type}, targte_gid,target_type: {target_gid},{target_type}")
+                    #     print(f"Debug: gid ranges: {net.gid_ranges}")
                     target_cell = self._cells[target_filter[target_gid]]
                     connection_name = f"{_short_name(self.get_base_type(src_type))}_{_short_name(self.get_base_type(target_type))}_{receptor}"
                     # print("Debug: Connection name",connection_name)
@@ -545,7 +548,9 @@ class NetworkBuilder(object):
                     # Targeting individual section like soma or apical_tuft
                     else:
                         syn_keys = [f"{loc}_{receptor}"]
-
+                    if self.net.suffix: #Debug
+                        print(f"Debug: syn_keys: {syn_keys} /n Srctype,target type {srctype_target_type}/nConnection name: {connection_name}")
+                        # print("Debug: Target cell synapses: ",target_cell._nrn_synapses)
                     for syn_key in syn_keys:
                         nc = target_cell.parconnect_from_src(
                             src_gid,
