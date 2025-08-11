@@ -216,7 +216,7 @@ def plot_laminar_lfp(
             ax.set_xlim(left=times[0], right=times[-1])
     if voltage_offset is not None:
         ax.set_ylim(-voltage_offset, n_offsets * voltage_offset)
-        ylabel = "Individual contact traces"
+        ylabel = 'Individual contact traces'
         if len(contact_labels) != n_offsets:
             raise ValueError(
                 f"contact_labels is length {len(contact_labels)},"
@@ -481,7 +481,7 @@ def plot_spikes_hist(
     spike_types_mask = {
         s_type: np.isin(spike_types_data, s_type) for s_type in unique_types
     }
-    cell_types = ["L5_pyramidal", "L5_basket", "L2_pyramidal", "L2_basket"]
+    cell_types = cell_response._cell_type_names
     input_types = np.setdiff1d(unique_types, cell_types)
 
     if isinstance(spike_types, str):
@@ -640,10 +640,6 @@ def plot_spikes_raster(
     show=True,
     cell_types=None,
     colors=None,
-    show_legend=True,
-    marker_size=1.0,
-    dpl=None,
-    overlay_dipoles=False,
 ):
     """Plot the aggregate spiking activity according to cell type.
 
@@ -657,22 +653,10 @@ def plot_spikes_raster(
         An axis object from matplotlib. If None, a new figure is created.
     show : bool
         If True, show the figure.
-    cell_types : list of str
+    cell_types: list of str
         List of cell types to plot
-    colors : list of str | None
+    colors: list of str | None
         Optional custom colors to plot. Default will use the color cycler.
-    show_legend : bool
-        If True, show the legend with colors for cell types
-    marker_size : float
-        Optional marker size to use when plotting spikes. Uses
-        "linelengths" argument of ax.eventplot, which accepts positive
-        numeric values only
-    dpl : instance of Dipole | list
-        The Dipole object containing layer-specific dipole data
-        to overlay on the raster plot
-    overlay_dipoles : bool
-        If True, overlay the layer-specific dipole data on the
-        raster plot
 
     Returns
     -------
@@ -681,7 +665,6 @@ def plot_spikes_raster(
     """
 
     import matplotlib.pyplot as plt
-    from .dipole import Dipole, average_dipoles
 
     n_trials = len(cell_response.spike_times)
     if trial_idx is None:
@@ -705,8 +688,9 @@ def plot_spikes_raster(
                 f"Got {cell_types}"
             )
     else:
-        # Use default cell types
-        cell_types = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
+        # dynamically use the cell types from the simulation data
+        # instead of a hard-coded list.
+        cell_types = cell_response._cell_type_names
 
     # Set default colors
     default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
@@ -735,16 +719,6 @@ def plot_spikes_raster(
                     f"Got {colors.keys()}"
                 )
             cell_colors.update(colors)
-
-    # validate show_legend argument
-    _validate_type(show_legend, bool, "show_legend", "bool")
-
-    # validate marker_size
-    _validate_type(marker_size, (float, int), "marker_size", "float or int")
-
-    # if marker_size is <= 0, set it to the default value of 1.0
-    if marker_size <= 0:
-        marker_size = 1.0
 
     # Extract desired trials
     spike_times = np.concatenate(
@@ -887,7 +861,7 @@ def plot_spikes_raster(
     return ax.get_figure()
 
 
-def plot_cells(net, ax=None, show=True):
+def plot_cells(net, ax=None, show=True, cell_colors=None, cell_markers=None):
     """Plot the cells using Network.pos_dict.
 
     Parameters
@@ -907,6 +881,8 @@ def plot_cells(net, ax=None, show=True):
     """
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
+    from matplotlib.lines import Line2D
+    import numpy as np
 
     if ax is None:
         fig = plt.figure()
@@ -917,27 +893,83 @@ def plot_cells(net, ax=None, show=True):
             f"Expected 'ax' to be an instance of Axes3D, but got {type(ax).__name__}"
         )
 
-    colors = {
-        "L5_pyramidal": "b",
-        "L2_pyramidal": "c",
-        "L5_basket": "r",
-        "L2_basket": "m",
-    }
-    markers = {
-        "L5_pyramidal": "^",
-        "L2_pyramidal": "^",
-        "L5_basket": "x",
-        "L2_basket": "x",
-    }
+    # Default colors and markers using SHORT NAMES
+    default_colors = {"L5Pyr": "b", "L2Pyr": "c", "L5Basket": "r", "L2Basket": "m"}
+    default_markers = {"L5Pyr": "^", "L2Pyr": "^", "L5Basket": "x", "L2Basket": "x"}
 
+    # Start with defaults
+    colors = default_colors.copy()
+    markers = default_markers.copy()
+
+    # If custom colors/markers provided, update
+    if cell_colors is not None:
+        colors.update(cell_colors)
+
+    if cell_markers is not None:
+        markers.update(cell_markers)
+
+    # Get color cycle for unknown cell types
+    color_cycle = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+    available_colors = [c for c in color_cycle if c not in colors.values()]
+    color_iter = iter(available_colors)
+
+    # Marker options for different cell types
+    basket_markers = ["x", "+", "*"]
+    pyramidal_markers = ["^", "v", "<", ">"]
+    other_markers = ["o", "s", "D", "p", "h"]
+
+    # Plot all cell types
     for cell_type in net.cell_types:
         x = [pos[0] for pos in net.pos_dict[cell_type]]
         y = [pos[1] for pos in net.pos_dict[cell_type]]
         z = [pos[2] for pos in net.pos_dict[cell_type]]
-        if cell_type in colors:
-            color = colors[cell_type]
-            marker = markers[cell_type]
-            ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
+
+        # choose color
+        if cell_type not in colors:
+            try:
+                colors[cell_type] = next(color_iter)
+            except StopIteration:
+                color_iter = iter(color_cycle)
+                colors[cell_type] = next(color_iter)
+
+        # marker based on cell type pattern
+        if cell_type not in markers:
+            if (
+                "basket" in cell_type.lower()
+                or "interneuron" in cell_type.lower()
+                or cell_type == "L2Random"
+            ):
+                # markers for inhibitory cells
+                markers[cell_type] = basket_markers[
+                    len(
+                        [
+                            k
+                            for k in markers
+                            if "basket" in k.lower() or "interneuron" in k.lower()
+                        ]
+                    )
+                    % len(basket_markers)
+                ]
+            elif "pyramidal" in cell_type.lower() or "pyr" in cell_type.lower():
+                # Use pyramidal markers (check for both 'pyramidal' and 'pyr')
+                markers[cell_type] = pyramidal_markers[
+                    len(
+                        [
+                            k
+                            for k in markers
+                            if "pyramidal" in k.lower() or "pyr" in k.lower()
+                        ]
+                    )
+                    % len(pyramidal_markers)
+                ]
+            else:
+                # Use other markers for unknown types
+                used_other = len([k for k in markers if k not in default_markers])
+                markers[cell_type] = other_markers[used_other % len(other_markers)]
+
+        color = colors[cell_type]
+        marker = markers[cell_type]
+        ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
 
     if net.rec_arrays:
         cols = plt.get_cmap("inferno", len(net.rec_arrays) + 2)
