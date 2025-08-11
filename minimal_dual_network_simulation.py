@@ -180,7 +180,7 @@ def main():
     next_gid = get_next_gid(net1)
     net1.add_evoked_drive(
         'evdist1', mu=5.0, sigma=1.0, numspikes=1, location='distal',
-        weights_ampa={'L2_pyramidal': 0.1, 'L5_pyramidal': 0.1}
+        weights_ampa={'L2_pyramidal': 0.1, 'L5_pyramidal': 0.1},gid_start=next_gid
     )
     next_gid = get_next_gid(net1)
     net2 = create_minimal_network(cell_type_suffix="_net2",gid_start=next_gid)    
