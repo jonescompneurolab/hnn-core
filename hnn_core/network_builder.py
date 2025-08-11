@@ -367,7 +367,7 @@ class NetworkBuilder(object):
             print("[Done]")
 
     def _gid_assign(self, rank=None, n_hosts=None):
-        """Assign cell IDs to this noder
+        """Assign cell IDs to this node
 
         Parameters
         ----------
@@ -496,7 +496,7 @@ class NetworkBuilder(object):
         connectivity = self.net.connectivity
 
         assert len(self._cells) == len(self._gid_list) - len(self._drive_cells)
-        srctype_target_type = set()  # DEBUG statement
+        # srctype_target_type = set()  # DEBUG statement
         for conn in connectivity:
             loc, receptor = conn["loc"], conn["receptor"]
             nc_dict = deepcopy(conn["nc_dict"])
@@ -520,12 +520,11 @@ class NetworkBuilder(object):
             # if self.net.suffix: #Debug
             #     print("Debug: gidpairs",conn["gid_pairs"].items())
             # Iterate over src/target pairs and connect cells
-
             for src_gid, target_gids in conn["gid_pairs"].items():
                 for target_gid in target_gids:
                     src_type = self.net.gid_to_type(src_gid)
                     target_type = self.net.gid_to_type(target_gid)
-                    srctype_target_type.add((src_type, target_type))  # DEBUG statement
+                    # srctype_target_type.add((src_type, target_type))  # DEBUG statement
                     # if self.net.suffix: #Debug
                     #     print(f"Debug: src_gid,src_type: {src_gid}, {src_type}, targte_gid,target_type: {target_gid},{target_type}")
                     #     print(f"Debug: gid ranges: {net.gid_ranges}")
