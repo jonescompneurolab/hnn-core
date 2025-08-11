@@ -10,6 +10,8 @@ from .params import _short_name
 from .cells_default import pyramidal_ca, pyramidal, basket
 from .externals.mne import _validate_type
 
+# ToDO -> direct _cell_L2Pyr calling
+
 
 def jones_2009_model(
     params=None,
@@ -72,6 +74,7 @@ def jones_2009_model(
     if isinstance(params, str):
         params = read_params(params)
 
+    # ToDo: use longNames here and otherinstanaces if needed
     # Define cell types for Jones 2009 model
     cell_types = {
         "L2_basket": basket(cell_name=_short_name("L2_basket")),
