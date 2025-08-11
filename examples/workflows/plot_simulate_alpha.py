@@ -40,8 +40,8 @@ net = jones_2009_model()
 
 location = 'proximal'
 burst_std = 20
-weights_ampa_p = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
-syn_delays_p = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.}
+weights_ampa_p = {'L2Pyr': 5.4e-5, 'L5Pyr': 5.4e-5}
+syn_delays_p = {'L2Pyr': 0.1, 'L5Pyr': 1.0}
 
 net.add_bursty_drive(
     'alpha_prox', tstart=50., burst_rate=10, burst_std=burst_std, numspikes=2,
@@ -89,8 +89,8 @@ plt.tight_layout()
 # as beta frequency events.
 location = 'distal'
 burst_std = 15
-weights_ampa_d = {'L2_pyramidal': 5.4e-5, 'L5_pyramidal': 5.4e-5}
-syn_delays_d = {'L2_pyramidal': 5., 'L5_pyramidal': 5.}
+weights_ampa_d = {'L2Pyr': 5.4e-5, 'L5Pyr': 5.4e-5}
+syn_delays_d = {'L2Pyr': 5., 'L5Pyr': 5.}
 net.add_bursty_drive(
     'alpha_dist', tstart=50., burst_rate=10, burst_std=burst_std, numspikes=2,
     spike_isi=10, n_drive_cells=10, location=location,

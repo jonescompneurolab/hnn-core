@@ -92,7 +92,6 @@ def base_network():
     )
     return net, params
 
-
 def test_network_models():
     """ "Test instantiations of the network object"""
     # Make sure critical biophysics for Law model are updated

@@ -5,14 +5,18 @@
 import os.path as op
 import hnn_core
 from hnn_core import read_params
-from .network import Network
+from .network import Network, _create_cell_coords
 from .params import _short_name
-from .cells_default import pyramidal_ca
+from .cells_default import pyramidal_ca, pyramidal, basket
 from .externals.mne import _validate_type
 
 
 def jones_2009_model(
-    params=None, add_drives_from_params=False, legacy_mode=False, mesh_shape=(10, 10)
+    params=None,
+    add_drives_from_params=False,
+    legacy_mode=False,
+    mesh_shape=(10, 10),
+    custom_positions=None,
 ):
     """Instantiate the network model described in Jones et al. 2009 [1]_
 
@@ -68,11 +72,76 @@ def jones_2009_model(
     if isinstance(params, str):
         params = read_params(params)
 
+    # Define cell types for Jones 2009 model
+    # data is here in metaData format
+    cell_types = {
+        "L2Basket": {
+            "object": basket(cell_name="L2Basket"),
+            "metadata": {
+                "morpho_type": "basket",
+                "electro_type": "inhibitory",
+                "layer": "2",
+                "measure_dipole": False,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+        "L2Pyr": {
+            "object": pyramidal(cell_name="L2Pyr"),
+            "metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "2",
+                "measure_dipole": True,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+        "L5Basket": {
+            "object": basket(cell_name="L5Basket"),
+            "metadata": {
+                "morpho_type": "basket",
+                "electro_type": "inhibitory",
+                "layer": "5",
+                "measure_dipole": False,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+        "L5Pyr": {
+            "object": pyramidal(cell_name="L5Pyr"),
+            "metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "5",
+                "measure_dipole": True,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+    }
+
+    # Create layer positions
+    layer_dict = _create_cell_coords(
+        n_pyr_x=mesh_shape[0],
+        n_pyr_y=mesh_shape[1],
+        z_coord=1307.4,  # Default layer separation
+        inplane_distance=1.0,  # Default in-plane distance
+    )
+
+    # Map cell types to layer positions
+    pos_dict = {
+        "L5Pyr": layer_dict["L5_bottom"],
+        "L2Pyr": layer_dict["L2_bottom"],
+        "L5Basket": layer_dict["L5_mid"],
+        "L2Basket": layer_dict["L2_mid"],
+        "origin": layer_dict["origin"],
+    }
+
+    # Create network with cell types and positions
     net = Network(
         params,
         add_drives_from_params=add_drives_from_params,
         legacy_mode=legacy_mode,
         mesh_shape=mesh_shape,
+        pos_dict=pos_dict,
+        cell_types=cell_types,
     )
 
     delay = net.delay
@@ -83,11 +152,9 @@ def jones_2009_model(
     # layer5 Pyr -> layer5 Pyr
     lamtha = 3.0
     loc = "proximal"
-    for target_cell in ["L2_pyramidal", "L5_pyramidal"]:
+    for target_cell in ["L2Pyr", "L5Pyr"]:  # short names directly
         for receptor in ["nmda", "ampa"]:
-            key = (
-                f"gbar_{_short_name(target_cell)}_{_short_name(target_cell)}_{receptor}"
-            )
+            key = f"gbar_{target_cell}_{target_cell}_{receptor}"
             weight = net._params[key]
             net.add_connection(
                 target_cell,
@@ -101,68 +168,71 @@ def jones_2009_model(
             )
 
     # layer2 Basket -> layer2 Pyr
-    src_cell = "L2_basket"
-    target_cell = "L2_pyramidal"
+    src_cell = "L2Basket"
+    target_cell = "L2Pyr"
     lamtha = 50.0
     loc = "soma"
     for receptor in ["gabaa", "gabab"]:
-        key = f"gbar_L2Basket_L2Pyr_{receptor}"
+        key = f"gbar_{src_cell}_{target_cell}_{receptor}"
         weight = net._params[key]
         net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # layer5 Basket -> layer5 Pyr
-    src_cell = "L5_basket"
-    target_cell = "L5_pyramidal"
+    src_cell = "L5Basket"
+    target_cell = "L5Pyr"
     lamtha = 70.0
     loc = "soma"
     for receptor in ["gabaa", "gabab"]:
-        key = f"gbar_L5Basket_{_short_name(target_cell)}_{receptor}"
+        key = f"gbar_{src_cell}_{target_cell}_{receptor}"
         weight = net._params[key]
         net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # layer2 Pyr -> layer5 Pyr
-    src_cell = "L2_pyramidal"
+    src_cell = "L2Pyr"
+    target_cell = "L5Pyr"
     lamtha = 3.0
     receptor = "ampa"
     for loc in ["proximal", "distal"]:
-        key = f"gbar_L2Pyr_{_short_name(target_cell)}"
+        key = f"gbar_{src_cell}_{target_cell}"
         weight = net._params[key]
         net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # layer2 Basket -> layer5 Pyr
-    src_cell = "L2_basket"
+    src_cell = "L2Basket"
+    target_cell = "L5Pyr"
     lamtha = 50.0
-    key = f"gbar_L2Basket_{_short_name(target_cell)}"
+    key = f"gbar_{src_cell}_{target_cell}"
     weight = net._params[key]
     loc = "distal"
     receptor = "gabaa"
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # xx -> layer2 Basket
-    src_cell = "L2_pyramidal"
-    target_cell = "L2_basket"
+    src_cell = "L2Pyr"
+    target_cell = "L2Basket"
     lamtha = 3.0
-    key = f"gbar_L2Pyr_{_short_name(target_cell)}"
+    key = f"gbar_{src_cell}_{target_cell}"
     weight = net._params[key]
     loc = "soma"
     receptor = "ampa"
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
-    src_cell = "L2_basket"
+    src_cell = "L2Basket"
+    target_cell = "L2Basket"
     lamtha = 20.0
-    key = f"gbar_L2Basket_{_short_name(target_cell)}"
+    key = f"gbar_{src_cell}_{target_cell}"
     weight = net._params[key]
     loc = "soma"
     receptor = "gabaa"
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # xx -> layer5 Basket
-    src_cell = "L5_basket"
-    target_cell = "L5_basket"
+    src_cell = "L5Basket"
+    target_cell = "L5Basket"
     lamtha = 20.0
     loc = "soma"
     receptor = "gabaa"
-    key = f"gbar_L5Basket_{_short_name(target_cell)}"
+    key = f"gbar_{src_cell}_{target_cell}"
     weight = net._params[key]
     net.add_connection(
         src_cell,
@@ -175,24 +245,25 @@ def jones_2009_model(
         allow_autapses=False,
     )
 
-    src_cell = "L5_pyramidal"
+    src_cell = "L5Pyr"
+    target_cell = "L5Basket"
     lamtha = 3.0
-    key = f"gbar_L5Pyr_{_short_name(target_cell)}"
+    key = f"gbar_{src_cell}_{target_cell}"
     weight = net._params[key]
     loc = "soma"
     receptor = "ampa"
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
-    src_cell = "L2_pyramidal"
+    src_cell = "L2Pyr"
+    target_cell = "L5Basket"
     lamtha = 3.0
-    key = f"gbar_L2Pyr_{_short_name(target_cell)}"
+    key = f"gbar_{src_cell}_{target_cell}"
     weight = net._params[key]
     loc = "soma"
     receptor = "ampa"
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     return net
-
 
 def law_2021_model(
     params=None, add_drives_from_params=False, legacy_mode=False, mesh_shape=(10, 10)
@@ -235,10 +306,10 @@ def law_2021_model(
     )
 
     # Update biophysics (increase gabab duration of inhibition)
-    net.cell_types["L2_pyramidal"].synapses["gabab"]["tau1"] = 45.0
-    net.cell_types["L2_pyramidal"].synapses["gabab"]["tau2"] = 200.0
-    net.cell_types["L5_pyramidal"].synapses["gabab"]["tau1"] = 45.0
-    net.cell_types["L5_pyramidal"].synapses["gabab"]["tau2"] = 200.0
+    net.cell_types["L2Pyr"]["object"].synapses["gabab"]["tau1"] = 45.0
+    net.cell_types["L2Pyr"]["object"].synapses["gabab"]["tau2"] = 200.0
+    net.cell_types["L5Pyr"]["object"].synapses["gabab"]["tau1"] = 45.0
+    net.cell_types["L5Pyr"]["object"].synapses["gabab"]["tau2"] = 200.0
 
     # Decrease L5_pyramidal -> L5_pyramidal nmda weight
     net.connectivity[2]["nc_dict"]["A_weight"] = 0.0004
@@ -249,15 +320,14 @@ def law_2021_model(
 
     # Remove L5 pyramidal somatic and basal dendrite calcium channels
     for sec in ["soma", "basal_1", "basal_2", "basal_3"]:
-        del net.cell_types["L5_pyramidal"].sections[sec].mechs["ca"]
-
+        del net.cell_types["L5Pyr"]["object"].sections[sec].mechs["ca"]
     # Remove L2_basket -> L5_pyramidal gabaa connection
     del net.connectivity[10]  # Original paper simply sets gbar to 0.0
 
     # Add L2_basket -> L5_pyramidal gabab connection
     delay = net.delay
-    src_cell = "L2_basket"
-    target_cell = "L5_pyramidal"
+    src_cell = "L2Basket"
+    target_cell = "L5Pyr"
     lamtha = 50.0
     weight = 0.0002
     loc = "distal"
@@ -266,8 +336,8 @@ def law_2021_model(
 
     # Add L5_basket -> L5_pyramidal distal connection
     # ("Martinotti-like recurrent tuft connection")
-    src_cell = "L5_basket"
-    target_cell = "L5_pyramidal"
+    src_cell = "L2Basket"
+    target_cell = "L5Pyr"
     lamtha = 70.0
     loc = "distal"
     receptor = "gabaa"
@@ -349,17 +419,9 @@ def add_erp_drives_to_jones_model(net, tstart=0.0):
     _validate_type(tstart, (float, int), "tstart", "float or int")
 
     # Add distal drive
-    weights_ampa_d1 = {
-        "L2_basket": 0.006562,
-        "L2_pyramidal": 7e-6,
-        "L5_pyramidal": 0.142300,
-    }
-    weights_nmda_d1 = {
-        "L2_basket": 0.019482,
-        "L2_pyramidal": 0.004317,
-        "L5_pyramidal": 0.080074,
-    }
-    synaptic_delays_d1 = {"L2_basket": 0.1, "L2_pyramidal": 0.1, "L5_pyramidal": 0.1}
+    weights_ampa_d1 = {"L2Basket": 0.006562, "L2Pyr": 7e-6, "L5Pyr": 0.142300}
+    weights_nmda_d1 = {"L2Basket": 0.019482, "L2Pyr": 0.004317, "L5Pyr": 0.080074}
+    synaptic_delays_d1 = {"L2Basket": 0.1, "L2Pyr": 0.1, "L5Pyr": 0.1}
     net.add_evoked_drive(
         "evdist1",
         mu=63.53 + tstart,
@@ -374,16 +436,16 @@ def add_erp_drives_to_jones_model(net, tstart=0.0):
 
     # Add proximal drives
     weights_ampa_p1 = {
-        "L2_basket": 0.08831,
-        "L2_pyramidal": 0.01525,
-        "L5_basket": 0.19934,
-        "L5_pyramidal": 0.00865,
+        "L2Basket": 0.08831,
+        "L2Pyr": 0.01525,
+        "L5Basket": 0.19934,
+        "L5Pyr": 0.00865,
     }
     synaptic_delays_prox = {
-        "L2_basket": 0.1,
-        "L2_pyramidal": 0.1,
-        "L5_basket": 1.0,
-        "L5_pyramidal": 1.0,
+        "L2Basket": 0.1,
+        "L2Pyr": 0.1,
+        "L5Basket": 1.0,
+        "L5Pyr": 1.0,
     }
     net.add_evoked_drive(
         "evprox1",
@@ -398,10 +460,10 @@ def add_erp_drives_to_jones_model(net, tstart=0.0):
     )
 
     weights_ampa_p2 = {
-        "L2_basket": 0.000003,
-        "L2_pyramidal": 1.438840,
-        "L5_basket": 0.008958,
-        "L5_pyramidal": 0.684013,
+        "L2Basket": 0.000003,
+        "L2Pyr": 1.438840,
+        "L5Basket": 0.008958,
+        "L5Pyr": 0.684013,
     }
     net.add_evoked_drive(
         "evprox2",
