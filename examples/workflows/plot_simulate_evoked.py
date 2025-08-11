@@ -53,16 +53,20 @@ net.cell_types['L5Pyr']['object'].plot_morphology()
 ###############################################################################
 # First, we add a distal evoked drive
 weights_ampa_d1 = {
-    "L2_basket": 0.006562,
-    "L2_pyramidal": 0.000007,
-    "L5_pyramidal": 0.142300,
+    "L2Basket": 0.006562,
+    "L2Pyr": 0.000007,
+    "L5Pyr": 0.142300,
 }
 weights_nmda_d1 = {
-    "L2_basket": 0.019482,
-    "L2_pyramidal": 0.004317,
-    "L5_pyramidal": 0.080074,
+    "L2Basket": 0.019482,
+    "L2Pyr": 0.004317,
+    "L5Pyr": 0.080074,
 }
-synaptic_delays_d1 = {"L2_basket": 0.1, "L2_pyramidal": 0.1, "L5_pyramidal": 0.1}
+synaptic_delays_d1 = {
+    "L2Basket": 0.1,
+    "L2Pyr": 0.1,
+    "L5Pyr": 0.1
+}
 net.add_evoked_drive(
     "evdist1",
     mu=63.53,
@@ -78,16 +82,16 @@ net.add_evoked_drive(
 ###############################################################################
 # Then, we add two proximal drives
 weights_ampa_p1 = {
-    "L2_basket": 0.08831,
-    "L2_pyramidal": 0.01525,
-    "L5_basket": 0.19934,
-    "L5_pyramidal": 0.00865,
+    "L2Basket": 0.08831,
+    "L2Pyr": 0.01525,
+    "L5Basket": 0.19934,
+    "L5Pyr": 0.00865,
 }
 synaptic_delays_prox = {
-    "L2_basket": 0.1,
-    "L2_pyramidal": 0.1,
-    "L5_basket": 1.0,
-    "L5_pyramidal": 1.0,
+    "L2Basket": 0.1,
+    "L2Pyr": 0.1,
+    "L5Basket": 1.0,
+    "L5Pyr": 1.0,
 }
 # all NMDA weights are zero; pass None explicitly
 net.add_evoked_drive(
@@ -104,10 +108,10 @@ net.add_evoked_drive(
 
 # Second proximal evoked drive. NB: only AMPA weights differ from first
 weights_ampa_p2 = {
-    "L2_basket": 0.000003,
-    "L2_pyramidal": 1.438840,
-    "L5_basket": 0.008958,
-    "L5_pyramidal": 0.684013,
+    "L2Basket": 0.000003,
+    "L2Pyr": 1.438840,
+    "L5Basket": 0.008958,
+    "L5Pyr": 0.684013,
 }
 # all NMDA weights are zero; omit weights_nmda (defaults to None)
 net.add_evoked_drive(

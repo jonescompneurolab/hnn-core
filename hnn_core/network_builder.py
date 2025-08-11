@@ -532,9 +532,9 @@ class NetworkBuilder(object):
                     )
                     if connection_name not in self.ncs:
                         self.ncs[connection_name] = list()
-                    pos_idx = src_gid - net.gid_ranges[_long_name(src_type)][0]
+                    pos_idx = src_gid - net.gid_ranges[(src_type)][0]
                     # NB pos_dict for this drive must include ALL cell types!
-                    nc_dict["pos_src"] = net.pos_dict[_long_name(src_type)][pos_idx]
+                    nc_dict["pos_src"] = net.pos_dict[(src_type)][pos_idx]
 
                     # get synapse locations
                     syn_keys = list()
@@ -602,7 +602,7 @@ class NetworkBuilder(object):
                         f"Got n_samples={n_samples}, {cell.name}."
                         f"dipole.size()={cell.dipole.size()}."
                     )
-                nrn_dpl = self._nrn_dipoles[_long_name(cell.name)]
+                nrn_dpl = self._nrn_dipoles[(cell.name)]
                 nrn_dpl.add(cell.dipole)
 
             self._vsec[cell.gid] = cell.vsec
