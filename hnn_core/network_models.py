@@ -127,10 +127,10 @@ def jones_2009_model(
 
     # Map cell types to layer positions
     pos_dict = {
-        "L5_pyramidal": layer_dict["L5_bottom"],
-        "L2_pyramidal": layer_dict["L2_bottom"],
-        "L5_basket": layer_dict["L5_mid"],
-        "L2_basket": layer_dict["L2_mid"],
+        "L5Pyr": layer_dict["L5_bottom"],
+        "L2Pyr": layer_dict["L2_bottom"],
+        "L5Basket": layer_dict["L5_mid"],
+        "L2Basket": layer_dict["L2_mid"],
         "origin": layer_dict["origin"],
     }
 
@@ -152,11 +152,9 @@ def jones_2009_model(
     # layer5 Pyr -> layer5 Pyr
     lamtha = 3.0
     loc = "proximal"
-    for target_cell in ["L2_pyramidal", "L5_pyramidal"]:
+    for target_cell in ["L2Pyr", "L5Pyr"]:  # short names directly
         for receptor in ["nmda", "ampa"]:
-            key = (
-                f"gbar_{_short_name(target_cell)}_{_short_name(target_cell)}_{receptor}"
-            )
+            key = f"gbar_{target_cell}_{target_cell}_{receptor}"
             weight = net._params[key]
             net.add_connection(
                 target_cell,
@@ -170,68 +168,71 @@ def jones_2009_model(
             )
 
     # layer2 Basket -> layer2 Pyr
-    src_cell = "L2_basket"
-    target_cell = "L2_pyramidal"
+    src_cell = "L2Basket"
+    target_cell = "L2Pyr"
     lamtha = 50.0
     loc = "soma"
     for receptor in ["gabaa", "gabab"]:
-        key = f"gbar_L2Basket_L2Pyr_{receptor}"
+        key = f"gbar_{src_cell}_{target_cell}_{receptor}"
         weight = net._params[key]
         net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # layer5 Basket -> layer5 Pyr
-    src_cell = "L5_basket"
-    target_cell = "L5_pyramidal"
+    src_cell = "L5Basket"
+    target_cell = "L5Pyr"
     lamtha = 70.0
     loc = "soma"
     for receptor in ["gabaa", "gabab"]:
-        key = f"gbar_L5Basket_{_short_name(target_cell)}_{receptor}"
+        key = f"gbar_{src_cell}_{target_cell}_{receptor}"
         weight = net._params[key]
         net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # layer2 Pyr -> layer5 Pyr
-    src_cell = "L2_pyramidal"
+    src_cell = "L2Pyr"
+    target_cell = "L5Pyr"
     lamtha = 3.0
     receptor = "ampa"
     for loc in ["proximal", "distal"]:
-        key = f"gbar_L2Pyr_{_short_name(target_cell)}"
+        key = f"gbar_{src_cell}_{target_cell}"
         weight = net._params[key]
         net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # layer2 Basket -> layer5 Pyr
-    src_cell = "L2_basket"
+    src_cell = "L2Basket"
+    target_cell = "L5Pyr"
     lamtha = 50.0
-    key = f"gbar_L2Basket_{_short_name(target_cell)}"
+    key = f"gbar_{src_cell}_{target_cell}"
     weight = net._params[key]
     loc = "distal"
     receptor = "gabaa"
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # xx -> layer2 Basket
-    src_cell = "L2_pyramidal"
-    target_cell = "L2_basket"
+    src_cell = "L2Pyr"
+    target_cell = "L2Basket"
     lamtha = 3.0
-    key = f"gbar_L2Pyr_{_short_name(target_cell)}"
+    key = f"gbar_{src_cell}_{target_cell}"
     weight = net._params[key]
     loc = "soma"
     receptor = "ampa"
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
-    src_cell = "L2_basket"
+    src_cell = "L2Basket"
+    target_cell = "L2Basket"
     lamtha = 20.0
-    key = f"gbar_L2Basket_{_short_name(target_cell)}"
+    key = f"gbar_{src_cell}_{target_cell}"
     weight = net._params[key]
     loc = "soma"
     receptor = "gabaa"
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # xx -> layer5 Basket
-    src_cell = "L5_basket"
-    target_cell = "L5_basket"
+    src_cell = "L5Basket"
+    target_cell = "L5Basket"
     lamtha = 20.0
     loc = "soma"
     receptor = "gabaa"
-    key = f"gbar_L5Basket_{_short_name(target_cell)}"
+    key = f"gbar_{src_cell}_{target_cell}"
     weight = net._params[key]
     net.add_connection(
         src_cell,
@@ -244,24 +245,25 @@ def jones_2009_model(
         allow_autapses=False,
     )
 
-    src_cell = "L5_pyramidal"
+    src_cell = "L5Pyr"
+    target_cell = "L5Basket"
     lamtha = 3.0
-    key = f"gbar_L5Pyr_{_short_name(target_cell)}"
+    key = f"gbar_{src_cell}_{target_cell}"
     weight = net._params[key]
     loc = "soma"
     receptor = "ampa"
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
-    src_cell = "L2_pyramidal"
+    src_cell = "L2Pyr"
+    target_cell = "L5Basket"
     lamtha = 3.0
-    key = f"gbar_L2Pyr_{_short_name(target_cell)}"
+    key = f"gbar_{src_cell}_{target_cell}"
     weight = net._params[key]
     loc = "soma"
     receptor = "ampa"
     net.add_connection(src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     return net
-
 
 def law_2021_model(
     params=None, add_drives_from_params=False, legacy_mode=False, mesh_shape=(10, 10)
