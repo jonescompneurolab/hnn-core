@@ -1260,8 +1260,8 @@ class Network:
                 weights_nmda,
                 synaptic_delays,
                 location,
-                probability,
-                self.cell_types,
+                self.cell_types, 
+                probability,   
             )
         )
 
@@ -1704,10 +1704,20 @@ class Network:
             target_gids = [[target_gids] for _ in range(len(src_gids))]
         elif isinstance(target_gids, str):
             _check_option("target_gids", target_gids, valid_target_cells)
-            target_gids = [
-                list(self.gid_ranges[_long_name(target_gids)])
-                for _ in range(len(src_gids))
-            ]
+            # checking if target_gids exists directly in gid_ranges
+            if target_gids in self.gid_ranges:
+                target_gids = [
+                    list(self.gid_ranges[target_gids])
+                    for _ in range(len(src_gids))
+                ]
+            # if not... try the long name version for backward compatibility
+            elif _long_name(target_gids) in self.gid_ranges:
+                target_gids = [
+                    list(self.gid_ranges[_long_name(target_gids)])
+                    for _ in range(len(src_gids))
+                ]
+            else:
+                raise KeyError(f"target_gids '{target_gids}' not found in gid_ranges")        
         elif isinstance(target_gids, range):
             target_gids = [list(target_gids) for _ in range(len(src_gids))]
         elif isinstance(target_gids, list) and all(
