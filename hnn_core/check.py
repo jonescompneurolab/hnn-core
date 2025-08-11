@@ -19,10 +19,25 @@ def _check_gids(gids, gid_ranges, valid_cells, arg_name, same_type=True):
         gids = [gids]
     elif isinstance(gids, str):
         _check_option(arg_name, gids, valid_cells)
-        gids = gid_ranges[_long_name(gids)]
+        # Check if the name exists directly in gid_ranges first
+        if gids in gid_ranges:
+            gids = gid_ranges[gids]
+        # If not, try converting to long name (for backward compatibility)
+        elif _long_name(gids) in gid_ranges:
+            gids = gid_ranges[_long_name(gids)]
+        else:
+            raise KeyError(f"{arg_name} '{gids}' not found in gid_ranges")
 
     if all(isinstance(gid, str) for gid in gids):
-        gids = [gid for cell_type in gids for gid in gid_ranges[cell_type]]
+        processed_gids = []
+        for cell_type in gids:
+            if cell_type in gid_ranges:
+                processed_gids.extend(gid_ranges[cell_type])
+            elif _long_name(cell_type) in gid_ranges:
+                processed_gids.extend(gid_ranges[_long_name(cell_type)])
+            else:
+                raise KeyError(f"Cell type '{cell_type}' not found in gid_ranges")
+        gids = processed_gids
 
     cell_type = _gid_to_type(gids[0], gid_ranges)
     for gid in gids:
