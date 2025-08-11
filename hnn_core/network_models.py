@@ -75,7 +75,7 @@ def jones_2009_model(
     # Define cell types for Jones 2009 model
     # data is here in metaData format
     cell_types = {
-        "L2_basket": {
+        "L2Basket": {
             "object": basket(cell_name="L2Basket"),
             "metadata": {
                 "morpho_type": "basket",
@@ -85,8 +85,8 @@ def jones_2009_model(
                 "reference": "https://doi.org/10.7554/eLife.51214",
             },
         },
-        "L2_pyramidal": {
-            "object": pyramidal(cell_name="L2_pyramidal"),
+        "L2Pyr": {
+            "object": pyramidal(cell_name="L2Pyr"),
             "metadata": {
                 "morpho_type": "pyramidal",
                 "electro_type": "excitatory",
@@ -95,8 +95,8 @@ def jones_2009_model(
                 "reference": "https://doi.org/10.7554/eLife.51214",
             },
         },
-        "L5_basket": {
-            "object": basket(cell_name="L5_basket"),
+        "L5Basket": {
+            "object": basket(cell_name="L5Basket"),
             "metadata": {
                 "morpho_type": "basket",
                 "electro_type": "inhibitory",
@@ -105,8 +105,8 @@ def jones_2009_model(
                 "reference": "https://doi.org/10.7554/eLife.51214",
             },
         },
-        "L5_pyramidal": {
-            "object": pyramidal(cell_name="L5_pyramidal"),
+        "L5Pyr": {
+            "object": pyramidal(cell_name="L5Pyr"),
             "metadata": {
                 "morpho_type": "pyramidal",
                 "electro_type": "excitatory",
