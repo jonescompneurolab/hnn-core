@@ -117,7 +117,8 @@ def test_create_cell_coords():
     assert len(layer_dict["L5_bottom"]) == 9
 
 
-def test_network_models_mod():
+@pytest.mark.parametrize("mesh_shape", [(2, 2), (2, 3)])
+def test_custom_network_coords(mesh_shape):
     params = read_params(params_fname)
 
     # network with custom cell types and positions (an irregular one)
@@ -126,7 +127,10 @@ def test_network_models_mod():
         "L5_pyramidal": pyramidal(cell_name=_short_name("L5_pyramidal")),
     }
     custom_layer_dict = _create_cell_coords(
-        n_pyr_x=2, n_pyr_y=2, z_coord=1307.4, inplane_distance=1.0
+        n_pyr_x=mesh_shape[0],
+        n_pyr_y=mesh_shape[1],
+        z_coord=1307.4,
+        inplane_distance=1.0,
     )
     custom_pos_dict = {
         "L2_pyramidal": custom_layer_dict["L2_bottom"],
@@ -136,9 +140,12 @@ def test_network_models_mod():
     custom_net = Network(params, pos_dict=custom_pos_dict, cell_types=custom_cell_types)
     assert "L2_pyramidal" in custom_net.cell_types
     assert "L5_pyramidal" in custom_net.cell_types
-    assert len(custom_net.pos_dict["L2_pyramidal"]) == 4
-    assert custom_net.gid_ranges["L2_pyramidal"] == range(0, 4)
-    assert custom_net.gid_ranges["L5_pyramidal"] == range(4, 8)
+    total_mesh_size = mesh_shape[0] * mesh_shape[1]
+    assert len(custom_net.pos_dict["L2_pyramidal"]) == total_mesh_size
+    assert custom_net.gid_ranges["L2_pyramidal"] == range(0, total_mesh_size)
+    assert custom_net.gid_ranges["L5_pyramidal"] == range(
+        total_mesh_size, 2 * total_mesh_size
+    )
 
     # ALL types of drives to test interactions
     spike_data = {
