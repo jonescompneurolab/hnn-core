@@ -110,10 +110,10 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
                 ca_py[gid][sec_name] = ca.to_python()
 
     dpl_data = np.c_[
-        neuron_net._nrn_dipoles["L2_pyramidal"].as_numpy()
-        + neuron_net._nrn_dipoles["L5_pyramidal"].as_numpy(),
-        neuron_net._nrn_dipoles["L2_pyramidal"].as_numpy(),
-        neuron_net._nrn_dipoles["L5_pyramidal"].as_numpy(),
+        neuron_net._nrn_dipoles["L2_pyramidal_net2"].as_numpy()
+        + neuron_net._nrn_dipoles["L5_pyramidal_net2"].as_numpy(),
+        neuron_net._nrn_dipoles["L2_pyramidal_net2"].as_numpy(),
+        neuron_net._nrn_dipoles["L5_pyramidal_net2"].as_numpy(),
     ]
 
     rec_arr_py = dict()
@@ -332,8 +332,8 @@ class NetworkBuilder(object):
 
         self._clear_last_network_objects()
 
-        self._nrn_dipoles["L5_pyramidal"] = h.Vector()
-        self._nrn_dipoles["L2_pyramidal"] = h.Vector()
+        self._nrn_dipoles["L5_pyramidal_net2"] = h.Vector()
+        self._nrn_dipoles["L2_pyramidal_net2"] = h.Vector()
 
         self._gid_assign()
 
@@ -457,7 +457,7 @@ class NetworkBuilder(object):
                 cell.pos = self.net.pos_dict[src_type][gid_idx]
 
                 # instantiate NEURON object
-                if src_type in ("L2_pyramidal", "L5_pyramidal"):
+                if src_type in ("L2_pyramidal_net2", "L5_pyramidal_net2"):
                     cell.build(sec_name_apical="apical_trunk")
                 else:
                     cell.build()
@@ -615,7 +615,7 @@ class NetworkBuilder(object):
                         f"Got n_samples={n_samples}, {cell.name}."
                         f"dipole.size()={cell.dipole.size()}."
                     )
-                nrn_dpl = self._nrn_dipoles[_long_name(cell.name)]
+                nrn_dpl = self._nrn_dipoles[_long_name(cell.name) + "_net2"]
                 nrn_dpl.add(cell.dipole)
 
             self._vsec[cell.gid] = cell.vsec
