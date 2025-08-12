@@ -1,19 +1,28 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 
-from hnn_core.dipole import simulate_dipole
 import os.path as op
+import tempfile
+
 import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 import matplotlib.pyplot as plt
-import tempfile
 
 import hnn_core
-from hnn_core import read_params, CellResponse, Network
-from hnn_core import jones_2009_model, law_2021_model, calcium_model
-from hnn_core.network_models import add_erp_drives_to_jones_model
+from hnn_core import (
+    CellResponse,
+    Network,
+    calcium_model,
+    jones_2009_model,
+    law_2021_model,
+    read_params,
+    simulate_dipole,
+)
+from hnn_core.cells_default import pyramidal, basket
+from hnn_core.network import _create_cell_coords, pick_connection
 from hnn_core.network_builder import NetworkBuilder
-from hnn_core.network import pick_connection
+from hnn_core.network_models import add_erp_drives_to_jones_model
+from hnn_core.params import _short_name
 from hnn_core.viz import plot_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
@@ -94,8 +103,6 @@ def base_network():
 
 
 def test_create_cell_coords():
-    from hnn_core.network import _create_cell_coords
-
     layer_dict = _create_cell_coords(
         n_pyr_x=3, n_pyr_y=3, z_coord=1307.4, inplane_distance=1.0
     )
@@ -111,13 +118,6 @@ def test_create_cell_coords():
 
 
 def test_network_models_mod():
-    from hnn_core.network import Network, _create_cell_coords, pick_connection
-    from hnn_core.cells_default import pyramidal, basket
-    from hnn_core.params import _short_name
-    from hnn_core import simulate_dipole, jones_2009_model, read_params
-    from hnn_core.network_models import add_erp_drives_to_jones_model
-    import numpy as np
-
     params = read_params(params_fname)
 
     # Test default jones model
