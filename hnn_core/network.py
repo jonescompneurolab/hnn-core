@@ -39,7 +39,7 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, z_coord, inplane_distance):
         The number of Pyramidal cells in x direction.
     n_pyr_y : int
         The number of Pyramidal cells in y direction.
-    zdiff : float
+    z_coord : float
         Expressed as a positive DEPTH of L2 relative to L5 pyramidal cell
         somas, where L5 is defined to lie at z==0. Interlaminar weight/delay
         calculations (lamtha) are not affected. The basket cells are
@@ -52,10 +52,11 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, z_coord, inplane_distance):
 
     Returns
     -------
-    pos_dict : dict of list of tuple (x, y, z)
-        Dictionary containing coordinate positions.
-        Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
-        'common', or any of the elements of the list p_unique_keys
+    layer_dict : dict of list of tuple (x, y, z)
+        Dictionary containing coordinate positions of 'layers'. After calling
+        '_create_cell_coords', user can create their 'Network.pos_dict' by mapping
+        'origin' and their celltypes onto the different layers in 'layer_dict'. Keys are
+        'L2_bottom', 'L2_mid', 'L5_bottom', 'L5_mid', and 'origin'.
 
     Notes
     -----
