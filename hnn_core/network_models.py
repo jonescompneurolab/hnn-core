@@ -18,7 +18,6 @@ def jones_2009_model(
     add_drives_from_params=False,
     legacy_mode=False,
     mesh_shape=(10, 10),
-    custom_positions=None,
 ):
     """Instantiate the network model described in Jones et al. 2009 [1]_
 
