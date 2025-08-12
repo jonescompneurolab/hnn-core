@@ -120,27 +120,6 @@ def test_create_cell_coords():
 def test_network_models_mod():
     params = read_params(params_fname)
 
-    # jones_2009_model with different custom mesh_shape
-    net_custom_mesh = jones_2009_model(params, mesh_shape=(5, 5))
-    assert len(net_custom_mesh.pos_dict["L2_pyramidal"]) == 25
-    assert len(net_custom_mesh.pos_dict["L5_pyramidal"]) == 25
-
-    # can the custom mesh network run sims?
-    net_custom_mesh.add_evoked_drive(
-        "test_evprox",
-        mu=20.0,
-        sigma=2.0,
-        numspikes=1,
-        location="proximal",
-        weights_ampa={"L2_pyramidal": 0.01, "L5_pyramidal": 0.01},
-        synaptic_delays=0.1,
-        event_seed=100,
-    )
-    dipole_mesh = simulate_dipole(net_custom_mesh, tstop=50.0, dt=0.5, n_trials=1)
-    assert dipole_mesh is not None
-    assert len(dipole_mesh[0].times) > 0
-    assert np.all(np.isfinite(dipole_mesh[0].data["agg"]))
-
     # network with custom cell types and positions (an irregular one)
     custom_cell_types = {
         "L2_pyramidal": pyramidal(cell_name=_short_name("L2_pyramidal")),
@@ -1264,12 +1243,15 @@ def test_network_mesh():
     assert net._N_pyr_x == mesh_shape[0]
     assert net._N_pyr_y == mesh_shape[1]
     assert net.gid_ranges["L2_basket"] == range(0, 3)
+    assert len(net.pos_dict["L2_pyramidal"]) == (mesh_shape[0] * mesh_shape[1])
+    del net
 
     # Test default mesh_shape loaded
     net = Network(params)
     assert net._N_pyr_x == 10
     assert net._N_pyr_y == 10
     assert net.gid_ranges["L2_basket"] == range(0, 35)
+    del net
 
     with pytest.raises(ValueError, match="mesh_shape must be"):
         net = Network(params, mesh_shape=(-2, 3))
@@ -1278,12 +1260,20 @@ def test_network_mesh():
         net = Network(params, mesh_shape=(2.0, 3))
 
     with pytest.raises(TypeError, match="mesh_shape must be"):
-        net = Network(params, mesh_shape="abc")
+        net = Network(params, mesh_shape="abc")  # noqa: F841
 
-    # Smoke test for all models
-    _ = jones_2009_model(mesh_shape=mesh_shape)
-    _ = calcium_model(mesh_shape=mesh_shape)
-    _ = law_2021_model(mesh_shape=mesh_shape)
+
+@pytest.mark.parametrize(
+    "network_model", [jones_2009_model, calcium_model, law_2021_model]
+)
+def test_network_models_mesh(network_model):
+    mesh_shape = (2, 3)
+    net = network_model(mesh_shape=mesh_shape)
+    dp = simulate_dipole(net, tstop=20.0)
+    assert dp is not None
+    assert len(dp[0].times) > 0
+    assert np.all(np.isfinite(dp[0].data["agg"]))
+    del net, dp
 
 
 def test_synaptic_gains():
