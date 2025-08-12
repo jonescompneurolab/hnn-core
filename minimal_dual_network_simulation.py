@@ -187,11 +187,17 @@ def main():
    
     # Only call get_next_gid(net2) here, before adding any drives!
     next_gid_net2 = get_next_gid(net2)
-    
+
+    # AES
+    # net2.add_evoked_drive(
+    #     'evdist2', mu=5.0, sigma=1.0, numspikes=1, location='distal',
+    #     weights_ampa={'L2_pyramidal_net2': 0.1,'L5_pyramidal_net2': 0.1,'L2_basket_net2':0.1,'L5_basket_net2':0.5},gid_start=next_gid_net2
+    # )
     net2.add_evoked_drive(
         'evdist2', mu=5.0, sigma=1.0, numspikes=1, location='distal',
-        weights_ampa={'L2_pyramidal_net2': 0.1,'L5_pyramidal_net2': 0.1,'L2_basket_net2':0.1,'L5_basket_net2':0.5},gid_start=next_gid_net2
+        weights_ampa={'L2_pyramidal_net2': 0.1,'L5_pyramidal_net2': 0.1},gid_start=next_gid_net2
     )
+    
     # After creating net1 and net2, or after combining:
     write_network_configuration(net1, "net1_config.json")
     write_network_configuration(net2, "net2_config.json")
@@ -221,7 +227,13 @@ def main():
         gids = list(net2.gid_ranges[ct])
         spikes = [gid for gid in gids if gid in net2.cell_response.spike_gids[0]]
         print(f"{ct}: {len(spikes)} spiking cells out of {len(gids)}")
-    plot_combined_spike_raster(net1,net2, title="Net 1 + Net 2 ",plot_net1=True,plot_net2=True)
+
+    # plot_combined_spike_raster(net1,net2, title="Net 1 + Net 2 ",plot_net1=True,plot_net2=True)
+
+    # Plot dipoles next to each other
+    dpls = [dpl_1[0], dpl_2[0]]
+    from hnn_core.viz import plot_dipole
+    plot_dipole(dpls, show=True)
 
     # # Connect net1 pyramidal cells to all net2 cells
     # connect_pyramidal_to_all(net1, net2, weight=0.001, delay=1.0, receptor='gabaa')
