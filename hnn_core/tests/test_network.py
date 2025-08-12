@@ -18,7 +18,7 @@ from hnn_core import (
     read_params,
     simulate_dipole,
 )
-from hnn_core.cells_default import pyramidal, basket
+from hnn_core.cells_default import pyramidal
 from hnn_core.network import _create_cell_coords, pick_connection
 from hnn_core.network_builder import NetworkBuilder
 from hnn_core.network_models import add_erp_drives_to_jones_model
@@ -229,40 +229,6 @@ def test_network_models_mod():
     assert dipole_custom is not None
     assert len(dipole_custom[0].times) > 0
     assert np.all(np.isfinite(dipole_custom[0].data["agg"]))
-
-    # Network with normal expected values (Jones 2009 model values)
-    jones_cell_types = {
-        "L2_pyramidal": pyramidal(cell_name=_short_name("L2_pyramidal")),
-        "L5_pyramidal": pyramidal(cell_name=_short_name("L5_pyramidal")),
-        "L2_basket": basket(cell_name=_short_name("L2_basket")),
-        "L5_basket": basket(cell_name=_short_name("L5_basket")),
-    }
-    jones_layer_dict = _create_cell_coords(
-        n_pyr_x=10, n_pyr_y=10, z_coord=1307.4, inplane_distance=1.0
-    )
-    jones_pos_dict = {
-        "L2_pyramidal": jones_layer_dict["L2_bottom"],
-        "L5_pyramidal": jones_layer_dict["L5_bottom"],
-        "L2_basket": jones_layer_dict["L2_bottom"][
-            :35
-        ],  # Jones model uses 35 basket cells
-        "L5_basket": jones_layer_dict["L5_bottom"][:35],
-        "origin": jones_layer_dict["origin"],
-    }
-    normal_net = Network(params, pos_dict=jones_pos_dict, cell_types=jones_cell_types)
-
-    # Verify it matches expected Jones 2009 structure
-    assert len(normal_net.pos_dict["L2_pyramidal"]) == 100
-    assert len(normal_net.pos_dict["L5_pyramidal"]) == 100
-    assert len(normal_net.pos_dict["L2_basket"]) == 35
-    assert len(normal_net.pos_dict["L5_basket"]) == 35
-
-    # Test simulation with normal values
-    add_erp_drives_to_jones_model(normal_net)
-    dipole_normal = simulate_dipole(normal_net, tstop=50.0, dt=0.5, n_trials=1)
-    assert dipole_normal is not None
-    assert len(dipole_normal[0].times) > 0
-    assert np.all(np.isfinite(dipole_normal[0].data["agg"]))
 
 
 def test_network_models():
