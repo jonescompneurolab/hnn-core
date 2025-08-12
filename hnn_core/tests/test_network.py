@@ -120,17 +120,6 @@ def test_create_cell_coords():
 def test_network_models_mod():
     params = read_params(params_fname)
 
-    # Test default jones model
-    net_default = jones_2009_model(params)
-    assert len(net_default.pos_dict["L5_pyramidal"]) == 100
-    assert len(net_default.pos_dict["L2_pyramidal"]) == 100
-
-    n_conn_before_drives = len(net_default.connectivity)
-    add_erp_drives_to_jones_model(net_default)
-    for drive_name in ["evdist1", "evprox1", "evprox2"]:
-        assert drive_name in net_default.external_drives
-    assert len(net_default.connectivity) == n_conn_before_drives + 14
-
     # jones_2009_model with different custom mesh_shape
     net_custom_mesh = jones_2009_model(params, mesh_shape=(5, 5))
     assert len(net_custom_mesh.pos_dict["L2_pyramidal"]) == 25
@@ -317,6 +306,8 @@ def test_network_models():
     with pytest.raises(TypeError, match="tstart must be"):
         add_erp_drives_to_jones_model(net=net_default, tstart="invalid_input")
     n_conn = len(net_default.connectivity)
+    for cell_name in ["L5_pyramidal", "L2_pyramidal"]:
+        assert len(net_default.pos_dict[cell_name]) == 100
     add_erp_drives_to_jones_model(net_default)
     for drive_name in ["evdist1", "evprox1", "evprox2"]:
         assert drive_name in net_default.external_drives.keys()
