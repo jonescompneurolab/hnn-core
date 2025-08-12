@@ -320,20 +320,28 @@ class Network:
     ----------
     params : dict
         The parameters to use for constructing the network.
-    add_drives_from_params : bool
+    add_drives_from_params : bool, default=False
         If True, add drives as defined in the params-dict. NB this is mainly
         for backward-compatibility with HNN GUI, and will be deprecated in a
-        future release. Default: False
-    legacy_mode : bool
+        future release.
+    legacy_mode : bool, default=False
         Set to True by default to enable matching HNN GUI output when drives
         are added suitably. Will be deprecated in a future release.
     mesh_shape : tuple of int (default: (10, 10))
         Defines the (n_x, n_y) shape of the grid of pyramidal cells.
-
+    pos_dict : dict of list of tuple (x, y, z), optional
+        Dictionary containing the coordinate positions of all cells.
+        Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
+        or any external drive name.
+    cell_types : dict of Cell, optional
+        Dictionary containing names of real cell types in the network
+        (e.g. 'L2_basket') as keys and corresponding Cell instances as values.
+        The Cell instance associated with a given key is used as a template
+        for the other cells of its type in the population.
 
     Attributes
     ----------
-    cell_types : dict
+    cell_types : dict of Cell
         Dictionary containing names of real cell types in the network
         (e.g. 'L2_basket') as keys and corresponding Cell instances as values.
         The Cell instance associated with a given key is used as a template
@@ -344,10 +352,10 @@ class Network:
         cell_types, followed by keys read from external_drives. The value
         of each key is a range of ints, one for each cell in given category.
         Examples: 'L2_basket': range(0, 270), 'evdist1': range(272, 542), etc
-    pos_dict : dict
+    pos_dict : dict of list of tuple (x, y, z)
         Dictionary containing the coordinate positions of all cells.
         Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
-        or any external drive name
+        or any external drive name.
     cell_response : CellResponse
         An instance of the CellResponse object.
     external_drives : dict (keys: drive names) of dict (keys: parameters)
