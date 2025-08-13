@@ -184,7 +184,8 @@ def main():
     )
     next_gid = get_next_gid(net1)
     net2 = create_minimal_network(cell_type_suffix="_net2",gid_start=next_gid)    
-   
+    # Specify which cell types to use for dipole calculation
+    net2.dipole_cell_types = ['L2_pyramidal_net2', 'L5_pyramidal_net2']
     # Only call get_next_gid(net2) here, before adding any drives!
     next_gid_net2 = get_next_gid(net2)
 
@@ -208,9 +209,9 @@ def main():
     # net_2=net2.copy()
     print("Simulating net1...")
     print("Net1 gid ranges:", net1.gid_ranges)
-    print("Net2 gid ranges:", net2.gid_ranges)
     dpl_1 = simulate_dipole(net1, tstop=20, dt=0.025, n_trials=1)
     print("Simulating net2...")
+    print("Net2 gid ranges:", net2.gid_ranges)
     dpl_2 = simulate_dipole(net2, tstop=20, dt=0.025, n_trials=1)
     print("before connection")
 

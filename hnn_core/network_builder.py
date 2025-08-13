@@ -109,12 +109,12 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
             if ca is not None:
                 ca_py[gid][sec_name] = ca.to_python()
 
-    dpl_data = np.c_[
-        neuron_net._nrn_dipoles["L2_pyramidal_net2"].as_numpy()
-        + neuron_net._nrn_dipoles["L5_pyramidal_net2"].as_numpy(),
-        neuron_net._nrn_dipoles["L2_pyramidal_net2"].as_numpy(),
-        neuron_net._nrn_dipoles["L5_pyramidal_net2"].as_numpy(),
-    ]
+    dipole_cell_types = getattr(net, "dipole_cell_types", ["L2_pyramidal", "L5_pyramidal"])
+    dpl_arrays = [neuron_net._nrn_dipoles[ct].as_numpy() for ct in dipole_cell_types]
+    if len(dpl_arrays) == 0:
+        raise RuntimeError("No dipole cell types found for dipole calculation.")
+    dpl_sum = np.sum(dpl_arrays, axis=0)
+    dpl_data = np.column_stack([dpl_sum] + dpl_arrays)
 
     rec_arr_py = dict()
     rec_times_py = dict()
@@ -332,9 +332,11 @@ class NetworkBuilder(object):
 
         self._clear_last_network_objects()
 
-        self._nrn_dipoles["L5_pyramidal_net2"] = h.Vector()
-        self._nrn_dipoles["L2_pyramidal_net2"] = h.Vector()
-
+        # self._nrn_dipoles["L5_pyramidal"] = h.Vector()
+        # self._nrn_dipoles["L2_pyramidal"] = h.Vector()
+        dipole_cell_types = getattr(self.net, "dipole_cell_types", ["L2_pyramidal", "L5_pyramidal"])
+        for ct in dipole_cell_types:
+            self._nrn_dipoles[ct] = h.Vector()
         self._gid_assign()
 
         record_vsec = self.net._params["record_vsec"]
@@ -601,6 +603,7 @@ class NetworkBuilder(object):
         # ensure that the shape of this rank's nrn_dpl h.Vector() object is
         # initialized consistently across all MPI ranks regardless of whether
         # this rank contains cells contributing to the net dipole calculation
+        dipole_cell_types = getattr(self.net, "dipole_cell_types", ["L2_pyramidal", "L5_pyramidal"])
         for nrn_dpl in self._nrn_dipoles.values():
             if nrn_dpl.size() != n_samples:
                 nrn_dpl.append(h.Vector(n_samples, 0))
@@ -615,7 +618,9 @@ class NetworkBuilder(object):
                         f"Got n_samples={n_samples}, {cell.name}."
                         f"dipole.size()={cell.dipole.size()}."
                     )
-                nrn_dpl = self._nrn_dipoles[_long_name(cell.name) + "_net2"]
+                if cell.name in dipole_cell_types:
+                    self._nrn_dipoles[cell.name].add(cell.dipole)
+                nrn_dpl = self._nrn_dipoles[_long_name(cell.name) + self.net.suffix]
                 nrn_dpl.add(cell.dipole)
 
             self._vsec[cell.gid] = cell.vsec
@@ -625,6 +630,7 @@ class NetworkBuilder(object):
         # reduce across threads
         for nrn_dpl in self._nrn_dipoles.values():
             _PC.allreduce(nrn_dpl, 1)
+        print("Debug: nrn dipoles: ",self._nrn_dipoles)
         for nrn_arr in self._nrn_rec_arrays.values():
             _PC.allreduce(nrn_arr._nrn_voltages, 1)
 
