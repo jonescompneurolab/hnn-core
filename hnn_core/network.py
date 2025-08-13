@@ -719,6 +719,7 @@ class Network:
         probability=1.0,
         event_seed=2,
         conn_seed=3,
+        gid_start=None,
     ):
         """Add a Poisson-distributed external drive to the network
 
@@ -837,6 +838,7 @@ class Network:
             n_drive_cells,
             cell_specific,
             probability,
+            gid_start=gid_start,
         )
 
     def add_bursty_drive(
@@ -860,6 +862,7 @@ class Network:
         probability=1.0,
         event_seed=2,
         conn_seed=3,
+        gid_start=None,
     ):
         """Add a bursty (rhythmic) external drive to all cells of the network
 
@@ -986,6 +989,7 @@ class Network:
             n_drive_cells,
             cell_specific,
             probability,
+            gid_start=gid_start,
         )
 
     def add_spike_train_drive(
@@ -1000,6 +1004,7 @@ class Network:
         space_constant=3.0,
         probability=1.0,
         conn_seed=None,
+        gid_start=None,
     ):
         """Add an external drive from explicitly defined spike trains.
 
@@ -1110,6 +1115,7 @@ class Network:
             n_drive_cells=drive["n_drive_cells"],
             cell_specific=False,
             probability=probability,
+            gid_start=gid_start,
         )
 
     def _attach_drive(
