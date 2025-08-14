@@ -1,19 +1,28 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 
-from hnn_core.dipole import simulate_dipole
 import os.path as op
+import tempfile
+
 import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 import matplotlib.pyplot as plt
-import tempfile
 
 import hnn_core
-from hnn_core import read_params, CellResponse, Network
-from hnn_core import jones_2009_model, law_2021_model, calcium_model
-from hnn_core.network_models import add_erp_drives_to_jones_model
+from hnn_core import (
+    CellResponse,
+    Network,
+    calcium_model,
+    jones_2009_model,
+    law_2021_model,
+    read_params,
+    simulate_dipole,
+)
+from hnn_core.cells_default import pyramidal
+from hnn_core.network import _create_cell_coords, pick_connection
 from hnn_core.network_builder import NetworkBuilder
-from hnn_core.network import pick_connection
+from hnn_core.network_models import add_erp_drives_to_jones_model
+from hnn_core.params import _short_name
 from hnn_core.viz import plot_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
@@ -94,8 +103,6 @@ def base_network():
 
 
 def test_create_cell_coords():
-    from hnn_core.network import _create_cell_coords
-
     layer_dict = _create_cell_coords(
         n_pyr_x=3, n_pyr_y=3, z_coord=1307.4, inplane_distance=1.0
     )
@@ -110,47 +117,9 @@ def test_create_cell_coords():
     assert len(layer_dict["L5_bottom"]) == 9
 
 
-def test_network_models_mod():
-    from hnn_core.network import Network, _create_cell_coords, pick_connection
-    from hnn_core.cells_default import pyramidal, basket
-    from hnn_core.params import _short_name
-    from hnn_core import simulate_dipole, jones_2009_model, read_params
-    from hnn_core.network_models import add_erp_drives_to_jones_model
-    import numpy as np
-
+@pytest.mark.parametrize("mesh_shape", [(2, 2), (2, 3)])
+def test_custom_network_coords(mesh_shape):
     params = read_params(params_fname)
-
-    # Test default jones model
-    net_default = jones_2009_model(params)
-    assert len(net_default.pos_dict["L5_pyramidal"]) == 100
-    assert len(net_default.pos_dict["L2_pyramidal"]) == 100
-
-    n_conn_before_drives = len(net_default.connectivity)
-    add_erp_drives_to_jones_model(net_default)
-    for drive_name in ["evdist1", "evprox1", "evprox2"]:
-        assert drive_name in net_default.external_drives
-    assert len(net_default.connectivity) == n_conn_before_drives + 14
-
-    # jones_2009_model with different custom mesh_shape
-    net_custom_mesh = jones_2009_model(params, mesh_shape=(5, 5))
-    assert len(net_custom_mesh.pos_dict["L2_pyramidal"]) == 25
-    assert len(net_custom_mesh.pos_dict["L5_pyramidal"]) == 25
-
-    # can the custom mesh network run sims?
-    net_custom_mesh.add_evoked_drive(
-        "test_evprox",
-        mu=20.0,
-        sigma=2.0,
-        numspikes=1,
-        location="proximal",
-        weights_ampa={"L2_pyramidal": 0.01, "L5_pyramidal": 0.01},
-        synaptic_delays=0.1,
-        event_seed=100,
-    )
-    dipole_mesh = simulate_dipole(net_custom_mesh, tstop=50.0, dt=0.5, n_trials=1)
-    assert dipole_mesh is not None
-    assert len(dipole_mesh[0].times) > 0
-    assert np.all(np.isfinite(dipole_mesh[0].data["agg"]))
 
     # network with custom cell types and positions (an irregular one)
     custom_cell_types = {
@@ -158,7 +127,10 @@ def test_network_models_mod():
         "L5_pyramidal": pyramidal(cell_name=_short_name("L5_pyramidal")),
     }
     custom_layer_dict = _create_cell_coords(
-        n_pyr_x=2, n_pyr_y=2, z_coord=1307.4, inplane_distance=1.0
+        n_pyr_x=mesh_shape[0],
+        n_pyr_y=mesh_shape[1],
+        z_coord=1307.4,
+        inplane_distance=1.0,
     )
     custom_pos_dict = {
         "L2_pyramidal": custom_layer_dict["L2_bottom"],
@@ -168,9 +140,12 @@ def test_network_models_mod():
     custom_net = Network(params, pos_dict=custom_pos_dict, cell_types=custom_cell_types)
     assert "L2_pyramidal" in custom_net.cell_types
     assert "L5_pyramidal" in custom_net.cell_types
-    assert len(custom_net.pos_dict["L2_pyramidal"]) == 4
-    assert custom_net.gid_ranges["L2_pyramidal"] == range(0, 4)
-    assert custom_net.gid_ranges["L5_pyramidal"] == range(4, 8)
+    total_mesh_size = mesh_shape[0] * mesh_shape[1]
+    assert len(custom_net.pos_dict["L2_pyramidal"]) == total_mesh_size
+    assert custom_net.gid_ranges["L2_pyramidal"] == range(0, total_mesh_size)
+    assert custom_net.gid_ranges["L5_pyramidal"] == range(
+        total_mesh_size, 2 * total_mesh_size
+    )
 
     # ALL types of drives to test interactions
     spike_data = {
@@ -262,40 +237,6 @@ def test_network_models_mod():
     assert len(dipole_custom[0].times) > 0
     assert np.all(np.isfinite(dipole_custom[0].data["agg"]))
 
-    # Network with normal expected values (Jones 2009 model values)
-    jones_cell_types = {
-        "L2_pyramidal": pyramidal(cell_name=_short_name("L2_pyramidal")),
-        "L5_pyramidal": pyramidal(cell_name=_short_name("L5_pyramidal")),
-        "L2_basket": basket(cell_name=_short_name("L2_basket")),
-        "L5_basket": basket(cell_name=_short_name("L5_basket")),
-    }
-    jones_layer_dict = _create_cell_coords(
-        n_pyr_x=10, n_pyr_y=10, z_coord=1307.4, inplane_distance=1.0
-    )
-    jones_pos_dict = {
-        "L2_pyramidal": jones_layer_dict["L2_bottom"],
-        "L5_pyramidal": jones_layer_dict["L5_bottom"],
-        "L2_basket": jones_layer_dict["L2_bottom"][
-            :35
-        ],  # Jones model uses 35 basket cells
-        "L5_basket": jones_layer_dict["L5_bottom"][:35],
-        "origin": jones_layer_dict["origin"],
-    }
-    normal_net = Network(params, pos_dict=jones_pos_dict, cell_types=jones_cell_types)
-
-    # Verify it matches expected Jones 2009 structure
-    assert len(normal_net.pos_dict["L2_pyramidal"]) == 100
-    assert len(normal_net.pos_dict["L5_pyramidal"]) == 100
-    assert len(normal_net.pos_dict["L2_basket"]) == 35
-    assert len(normal_net.pos_dict["L5_basket"]) == 35
-
-    # Test simulation with normal values
-    add_erp_drives_to_jones_model(normal_net)
-    dipole_normal = simulate_dipole(normal_net, tstop=50.0, dt=0.5, n_trials=1)
-    assert dipole_normal is not None
-    assert len(dipole_normal[0].times) > 0
-    assert np.all(np.isfinite(dipole_normal[0].data["agg"]))
-
 
 def test_network_models():
     """ "Test instantiations of the network object"""
@@ -317,6 +258,8 @@ def test_network_models():
     with pytest.raises(TypeError, match="tstart must be"):
         add_erp_drives_to_jones_model(net=net_default, tstart="invalid_input")
     n_conn = len(net_default.connectivity)
+    for cell_name in ["L5_pyramidal", "L2_pyramidal"]:
+        assert len(net_default.pos_dict[cell_name]) == 100
     add_erp_drives_to_jones_model(net_default)
     for drive_name in ["evdist1", "evprox1", "evprox2"]:
         assert drive_name in net_default.external_drives.keys()
@@ -1273,12 +1216,15 @@ def test_network_mesh():
     assert net._N_pyr_x == mesh_shape[0]
     assert net._N_pyr_y == mesh_shape[1]
     assert net.gid_ranges["L2_basket"] == range(0, 3)
+    assert len(net.pos_dict["L2_pyramidal"]) == (mesh_shape[0] * mesh_shape[1])
+    del net
 
     # Test default mesh_shape loaded
     net = Network(params)
     assert net._N_pyr_x == 10
     assert net._N_pyr_y == 10
     assert net.gid_ranges["L2_basket"] == range(0, 35)
+    del net
 
     with pytest.raises(ValueError, match="mesh_shape must be"):
         net = Network(params, mesh_shape=(-2, 3))
@@ -1287,12 +1233,20 @@ def test_network_mesh():
         net = Network(params, mesh_shape=(2.0, 3))
 
     with pytest.raises(TypeError, match="mesh_shape must be"):
-        net = Network(params, mesh_shape="abc")
+        net = Network(params, mesh_shape="abc")  # noqa: F841
 
-    # Smoke test for all models
-    _ = jones_2009_model(mesh_shape=mesh_shape)
-    _ = calcium_model(mesh_shape=mesh_shape)
-    _ = law_2021_model(mesh_shape=mesh_shape)
+
+@pytest.mark.parametrize(
+    "network_model", [jones_2009_model, calcium_model, law_2021_model]
+)
+def test_network_models_mesh(network_model):
+    mesh_shape = (2, 3)
+    net = network_model(mesh_shape=mesh_shape)
+    dp = simulate_dipole(net, tstop=20.0)
+    assert dp is not None
+    assert len(dp[0].times) > 0
+    assert np.all(np.isfinite(dp[0].data["agg"]))
+    del net, dp
 
 
 def test_synaptic_gains():
