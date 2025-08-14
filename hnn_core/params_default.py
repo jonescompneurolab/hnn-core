@@ -410,7 +410,7 @@ def get_L5PyrET_params():
         'L5Pyr_dend_cm': 1,
         'L5Pyr_dend_Ra': 100, #Rich 495.73, Hay: 100
         'L5Pyr_basal_cm': 1,
-        'L5Pyr_basal_Ra': 200, #Rich 495.73, Hay: 100
+        'L5Pyr_basal_Ra': 100, #Rich 495.73, Hay: 100
 
         'L5Pyr_apicaltrunk_L': 102.,
         'L5Pyr_apicaltrunk_diam': 10.2,
@@ -472,8 +472,8 @@ def get_L5PyrET_params():
         # Biophysics basal
         'L5Pyr_basal_gbar_NaTs2_t': 20_400e-4/2,
         'L5Pyr_basal_gbar_SKv3_1': 0.000261/2,
-        'L5Pyr_basal_gbar_Ih': 5.14e-5/2,
-        'L5Pyr_basal_g_pas': 1.75e-5/2,
+        'L5Pyr_basal_gbar_Ih': 5.14e-5/2*2,
+        'L5Pyr_basal_g_pas': 1.75e-5/2*2,
         'L5Pyr_basal_e_pas': -90,
 
         # Biophysics dends
@@ -482,7 +482,7 @@ def get_L5PyrET_params():
         'L5Pyr_dend_gbar_SK_E2': 0.0012/2*4,
         'L5Pyr_dend_gbar_Ca_HVA': 2.78e-5/2,
         'L5Pyr_dend_gbar_Ca_LVAst': 93.5e-6/2,
-        'L5Pyr_dend_gbar_Ih': 1e-4/2,
+        'L5Pyr_dend_gbar_Ih': 1e-4/2*1.2,
         'L5Pyr_dend_gbar_Im': 0.0000675/2,
         'L5Pyr_dend_gbar_K_Pst': 0,
         'L5Pyr_dend_gbar_K_Tst': 0,
