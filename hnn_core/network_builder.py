@@ -339,6 +339,7 @@ class NetworkBuilder(object):
         dipole_cell_types = getattr(
             self.net, "dipole_cell_types", ["L2_pyramidal", "L5_pyramidal"]
         )
+        # print("Debug: dipole cell types : ", dipole_cell_types)
         for ct in dipole_cell_types:
             self._nrn_dipoles[ct] = h.Vector()
         self._gid_assign()
@@ -463,7 +464,12 @@ class NetworkBuilder(object):
                 cell.pos = self.net.pos_dict[src_type][gid_idx]
 
                 # instantiate NEURON object
-                if src_type in ("L2_pyramidal_net2", "L5_pyramidal_net2"):
+                if src_type in (
+                    "L2_pyramidal_net2",
+                    "L5_pyramidal_net2",
+                    "L2_pyramidal",
+                    "L5_pyramidal",
+                ):
                     cell.build(sec_name_apical="apical_trunk")
                 else:
                     cell.build()
@@ -607,10 +613,7 @@ class NetworkBuilder(object):
         # ensure that the shape of this rank's nrn_dpl h.Vector() object is
         # initialized consistently across all MPI ranks regardless of whether
         # this rank contains cells contributing to the net dipole calculation
-        dipole_cell_types = getattr(
-            self.net, "dipole_cell_types", ["L2_pyramidal", "L5_pyramidal"]
-        )
-        print(f"Debug:  dipoles cell types : {dipole_cell_types}")
+        print("Debug: dipole cell types : ", self._nrn_dipoles)
         for nrn_dpl in self._nrn_dipoles.values():
             if nrn_dpl.size() != n_samples:
                 nrn_dpl.append(h.Vector(n_samples, 0))
@@ -626,7 +629,10 @@ class NetworkBuilder(object):
                         f"Got n_samples={n_samples}, {cell.name}."
                         f"dipole.size()={cell.dipole.size()}."
                     )
-                nrn_dpl = self._nrn_dipoles[_long_name(cell.name) + self.net.suffix]
+                if self.net.suffix is not None:
+                    nrn_dpl = self._nrn_dipoles[_long_name(cell.name) + self.net.suffix]
+                else:
+                    nrn_dpl = self._nrn_dipoles[_long_name(cell.name)]
                 nrn_dpl.add(cell.dipole)
 
             self._vsec[cell.gid] = cell.vsec
