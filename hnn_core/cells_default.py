@@ -447,7 +447,7 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
         raise ValueError(f'Unknown pyramidal cell type: {cell_name}')
 
 
-def _linear_g_at_dist(x, gsoma, gdend, xkink, hotzone_factor=1):
+def _linear_g_at_dist(x, gsoma, gdend, xkink, hotzone_factor=1, hotzone=[0, 0]):
     """Compute linear distance-dependent ionic conductance.
 
     Parameters
@@ -470,8 +470,15 @@ def _linear_g_at_dist(x, gsoma, gdend, xkink, hotzone_factor=1):
     Returns gdend when x > xkink.
     """
     gbar = gsoma + np.min([xkink, x]) * (gdend - gsoma) / xkink
-    if x > xkink:
+    if x>hotzone[0] and x<hotzone[1]:
         gbar *= hotzone_factor
+
+    return gbar
+
+def _increase_step(x, gbar, xkink, factor):
+
+    if x > xkink:
+        gbar *= factor
 
     return gbar
 
@@ -508,10 +515,11 @@ def pyramidal_l5ET(cell_name,pos, gid=None):
     p_all = get_L5PyrET_params()
 
     # override params according to function
-    gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_HVA']*1., gdend=p_all['L5Pyr_dend_gbar_Ca_HVA']*6.6, xkink=1500, hotzone_factor=3.9)
-    gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_LVAst'], gdend=p_all['L5Pyr_dend_gbar_Ca_LVAst']*2.75, xkink=1500, hotzone_factor=3)
+    gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_HVA']*1., gdend=p_all['L5Pyr_dend_gbar_Ca_HVA']*15.5, xkink=1500, hotzone=[1400, 1500], hotzone_factor=3.9)
+    gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_LVAst'], gdend=p_all['L5Pyr_dend_gbar_Ca_LVAst']*7.75, xkink=1500, hotzone=[1400, 1500], hotzone_factor=3)
     gbar_Ih = partial(_exp_g_at_dist, zero_val=p_all['L5Pyr_dend_gbar_Ih'],exp_term = 1./323, slope=2.087, offset=-.8696)
-    
+    gbar_pas = partial(_increase_step, gbar=p_all['L5Pyr_dend_g_pas'], xkink = 1500, factor=1.2)
+
     # basal dendrites
     gbar_NaTs2_t = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_basal_gbar_NaTs2_t']*0.01, gdend=0, xkink=255)
     gbar_SKv3_1 = partial(_linear_g_at_dist, gsoma=0, gdend=p_all['L5Pyr_basal_gbar_SKv3_1'], xkink=255)
@@ -523,8 +531,7 @@ def pyramidal_l5ET(cell_name,pos, gid=None):
     override_params['L5Pyr_dend_gbar_Ih'] = gbar_Ih
     override_params['L5Pyr_basal_gbar_NaTs2_t'] = gbar_NaTs2_t
     override_params['L5Pyr_basal_gbar_SKv3_1'] = gbar_SKv3_1
-
-
+    override_params['L5Pyr_dend_g_pas'] = gbar_pas
 
     p_all = compare_dictionaries(p_all, override_params)
 
@@ -562,15 +569,15 @@ def pyramidal_l5ET(cell_name,pos, gid=None):
     section_names = list(end_pts.keys())
 
     # initialize section voltage
-    v_init = {'soma': -64,
-                'basal_1': -64,
-                'basal_2': -64,
-                'basal_3': -64,
-                'apical_oblique': -64,
-                'apical_trunk': -64,
-                'apical_1': -64,
-                'apical_2': -60,
-                'apical_tuft': -58}
+    v_init = {'soma': -69,
+            'basal_1': -70,
+            'basal_2': -70,
+            'basal_3': -70,
+            'apical_oblique': -69,
+            'apical_trunk': -69,
+            'apical_1': -66,
+            'apical_2': -64,
+            'apical_tuft': -60}
 
     sections_apcl = _get_dends(p_all, 'L5Pyr', section_names=['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft'], v_init=v_init)
     sections_basal = _get_basal(p_all, 'L5Pyr', section_names=['basal_1', 'basal_2', 'basal_3', 'apical_oblique'], v_init=v_init)
