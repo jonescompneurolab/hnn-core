@@ -471,9 +471,43 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 <!-- ### Deprecations -->
 <!-- ### Upcoming Deprecations -->
 <!-- ### Bug Fixes -->
-<!-- ### API Changes -->
+<!-- ### Public API Changes -->
 <!-- ### People who contributed to this release (in alphabetical order of family name): -->
 <!-- ### Changelog -->
+<section id="in-progress-development-changes">
+<h2>0.4.3 in-progress development changes<a class="headerlink" href="#in-progress-development-changes" title="Link to this heading">#</a></h2>
+<!-- ### New Features -->
+<!-- ### Deprecations -->
+<!-- ### Upcoming Deprecations -->
+<!-- ### Bug Fixes -->
+<section id="public-api-changes">
+<h3>Public API Changes<a class="headerlink" href="#public-api-changes" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> now accepts optional arguments for its position dictionary  attribute <code class="docutils literal notranslate"><span class="pre">pos_dict</span></code> and cell type dictionary attribute <code class="docutils literal notranslate"><span class="pre">cell_types</span></code>,
+by <a class="reference external" href="https://github.com/Chetank99">Chetan Kandpal</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1095">#1095</a>.</p></li>
+</ul>
+</section>
+<section id="people-who-contributed-to-this-release-in-alphabetical-order-of-family-name">
+<h3>People who contributed to this release (in alphabetical order of family name):<a class="headerlink" href="#people-who-contributed-to-this-release-in-alphabetical-order-of-family-name" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/Chetank99">Chetan Kandpal</a></p></li>
+</ul>
+</section>
+<section id="changelog">
+<h3>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Add support for <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> to calculate a “layer dictionary”
+<code class="docutils literal notranslate"><span class="pre">layer_dict</span></code> attribute whose layers can be mapped as desired to an object’s
+<code class="docutils literal notranslate"><span class="pre">cell_types</span></code> attribute. This mapping can then be used to make a more flexible position
+dictionary <code class="docutils literal notranslate"><span class="pre">pos_dict</span></code> attribute of the object. This also adds support for optional
+<code class="docutils literal notranslate"><span class="pre">pos_dict</span></code> and <code class="docutils literal notranslate"><span class="pre">cell_types</span></code> arguments to the <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a>
+constructor. This also begins the process of moving some model-specific celltype-usage
+from <code class="docutils literal notranslate"><span class="pre">network.py</span></code> to <code class="docutils literal notranslate"><span class="pre">network_models.py</span></code>. This is the first in a series of code
+changes meant to allow for more flexible cell types to be used.
+By <a class="reference external" href="https://github.com/Chetank99">Chetan Kandpal</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1095">#1095</a>.</p></li>
+</ul>
+</section>
+</section>
 <section id="patch-notes">
 <h2>0.4.2 Patch Notes<a class="headerlink" href="#patch-notes" title="Link to this heading">#</a></h2>
 <p>Version 0.4.2 is a patch release that fixes two important bugs: one affecting LFP and CSD output (<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1062">#1062</a>) and another preventing users from upgrading to the recently released NEURON 8.2.7 (<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1058">#1058</a>), which also enables use of HNN-Core with Python 3.13. This also includes other, smaller bug fixes and changes.</p>
@@ -555,8 +589,8 @@ number of iterations, twelve (12). This is a temporary, possibly permanent, fix
 introduced in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1076">#1076</a>.</p></li>
 </ul>
 </section>
-<section id="people-who-contributed-to-this-release-in-alphabetical-order-of-family-name">
-<h3>People who contributed to this release (in alphabetical order of family name):<a class="headerlink" href="#people-who-contributed-to-this-release-in-alphabetical-order-of-family-name" title="Link to this heading">#</a></h3>
+<section id="id1">
+<h3>People who contributed to this release (in alphabetical order of family name):<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/dylansdaniels">Dylan Daniels</a></p></li>
 <li><p><a class="reference external" href="https://github.com/katduecker">Katharina Duecker</a></p></li>
@@ -565,8 +599,8 @@ introduced in <a class="reference external" href="https://github.com/jonescompne
 <li><p><a class="reference external" href="https://github.com/Myrausman">Maira Usman</a></p></li>
 </ul>
 </section>
-<section id="changelog">
-<h3>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">#</a></h3>
+<section id="id2">
+<h3>Changelog<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fix tiny typo in <code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI install documentation,
 by <a class="reference external" href="https://github.com/asoplata">Austin E. Soplata</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1072">#1072</a>. (he’s also responsible for the original typo…)</p></li>
@@ -620,8 +654,8 @@ by <a class="reference external" href="https://github.com/wagdy88">Mohamed W. El
 </ul>
 </section>
 </section>
-<section id="id1">
-<h2>0.4.1 Patch Notes<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<section id="id3">
+<h2>0.4.1 Patch Notes<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p>Version 0.4.1 is a bug-fixing patch release for version 0.4. This includes changes to importing of <code class="docutils literal notranslate"><span class="pre">BatchSimulate</span></code> due to previously-undetected install/import issues (<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1034">#1034</a>), configuration of packaging metadata format (same PR), and elimination of a discrepancy in our method of cleaning local compiled files that led to architecture-specific files being included in the Pypi 0.4 release, which caused simulations on some platforms to fail (<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/1035">#1035</a>). The public Pypi version has already been updated to 0.4.1.</p></li>
 </ul>
@@ -629,8 +663,8 @@ by <a class="reference external" href="https://github.com/wagdy88">Mohamed W. El
 <section id="release-notes">
 <h2>0.4 Release Notes<a class="headerlink" href="#release-notes" title="Link to this heading">#</a></h2>
 <p>v0.4 represents a major milestone in development of <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> and the HNN ecosystem as a whole. v0.4 includes over <em>two years</em> of active development work by many people (&gt;800 commits!), and brings with it many new and exciting features, including significant improvements to robustness, testing, and bug-fixing.</p>
-<section id="id2">
-<h3>New Features<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<section id="id4">
+<h3>New Features<a class="headerlink" href="#id4" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> now includes a fully-tested and robust GUI of its own. The <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> GUI was present as a prototype in v0.3, but it is now ready for production. New features and visual improvements will still be coming to it in the future, such as the ability to use optimization. See our new <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/install.html">Install page</a> for ways to install it, and we have already begun incorporating it into a new, fresh series of tutorials for our upcoming revamp of the HNN website. If you have installed it, you can start the GUI using <code class="docutils literal notranslate"><span class="pre">hnn-gui</span></code> in your terminal/command prompt window.</p></li>
 <li><p>The <code class="docutils literal notranslate"><span class="pre">BatchSimulate</span></code> class: Thanks to <a class="reference external" href="https://github.com/samadpls">Abdul Samad Siddiqui</a> and Google Summer of Code 2024, there is now the capability to run “batches” of simulations across multiple parameter sets, enabling easy analysis and simulation of behavior across parameter sweeps. See our <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_batch_simulate.html#sphx-glr-auto-examples-howto-plot-batch-simulate-py">example for more details</a>. Note that currently, only its <code class="docutils literal notranslate"><span class="pre">loky</span></code> backend is supported, and the <code class="docutils literal notranslate"><span class="pre">&quot;hnn-core[parallel]&quot;</span></code> dependencies must be installed for it to be used.</p></li>
@@ -650,8 +684,8 @@ or all sections, are enabled by setting <code class="docutils literal notranslat
 <li><p>The new Python 3.13 is <strong>not</strong> supported by <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> at this time, due to <a class="reference external" href="https://nrn.readthedocs.io/en/8.2.6/">NEURON</a>’s current lack of support for it. This will change in the near future. We still support 3.8 through 3.12 (inclusively).</p></li>
 </ul>
 </section>
-<section id="id3">
-<h3>Upcoming Deprecations<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<section id="id5">
+<h3>Upcoming Deprecations<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Both <a class="reference internal" href="generated/hnn_core.viz.plot_laminar_lfp.html#hnn_core.viz.plot_laminar_lfp" title="hnn_core.viz.plot_laminar_lfp"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_laminar_lfp()</span></code></a> and <a class="reference internal" href="generated/hnn_core.viz.plot_dipole.html#hnn_core.viz.plot_dipole" title="hnn_core.viz.plot_dipole"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_dipole()</span></code></a> will have their <code class="docutils literal notranslate"><span class="pre">tmin</span></code> and <code class="docutils literal notranslate"><span class="pre">tmax</span></code> arguments removed in the future. Please set the x-axis limits using methods called directly on the existing <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> objects, or using <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.xlim.html#matplotlib.pyplot.xlim"><code class="docutils literal notranslate"><span class="pre">matplotlib.pyplot.xlim</span></code></a>.</p></li>
 <li><p><a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a>’s argument of <code class="docutils literal notranslate"><span class="pre">legacy_mode</span></code> for importing old param files will be removed in the future.</p></li>
@@ -659,8 +693,8 @@ or all sections, are enabled by setting <code class="docutils literal notranslat
 <li><p><a class="reference internal" href="generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole"><code class="xref py py-func docutils literal notranslate"><span class="pre">simulate_dipole()</span></code></a>’s argument of <code class="docutils literal notranslate"><span class="pre">postproc</span></code> for post-processing will be removed in the future. Instead, use explicit smoothing and scaling via <code class="xref py py-class docutils literal notranslate"><span class="pre">Dipole</span></code> methods.</p></li>
 </ul>
 </section>
-<section id="id4">
-<h3>API Changes<a class="headerlink" href="#id4" title="Link to this heading">#</a></h3>
+<section id="id6">
+<h3>API Changes<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>New argument to <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> initialization: you can now set <code class="docutils literal notranslate"><span class="pre">mesh_shape</span></code> to easily make a grid of different sizes of <code class="docutils literal notranslate"><span class="pre">Network</span></code>s.</p></li>
 <li><p><a class="reference internal" href="generated/hnn_core.Cell.html#hnn_core.Cell" title="hnn_core.Cell"><code class="xref py py-class docutils literal notranslate"><span class="pre">Cell</span></code></a> initialization argument <code class="docutils literal notranslate"><span class="pre">topology</span></code> has had both its name changed to <code class="docutils literal notranslate"><span class="pre">cell_tree</span></code> and its data type significantly changed; see <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/dev/generated/hnn_core.Cell.html#hnn_core.Cell">the API docs of <code class="docutils literal notranslate"><span class="pre">Cell</span></code> for details</a>.</p></li>
@@ -674,8 +708,8 @@ or all sections, are enabled by setting <code class="docutils literal notranslat
 <li><p><a class="reference internal" href="generated/hnn_core.read_params.html#hnn_core.read_params" title="hnn_core.read_params"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_params()</span></code></a> now accepts a new argument <code class="docutils literal notranslate"><span class="pre">file_contents</span></code> which lets you pass in network configuration contents using a string.</p></li>
 </ul>
 </section>
-<section id="id5">
-<h3>People who contributed to this release (in alphabetical order of family name):<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
+<section id="id7">
+<h3>People who contributed to this release (in alphabetical order of family name):<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/chenghuzi">Huzi Cheng</a></p></li>
 <li><p><a class="reference external" href="https://github.com/tianqi-cheng">Tianqi Cheng</a></p></li>
@@ -950,10 +984,10 @@ in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-
 </ul>
 </section>
 </section>
-<section id="id6">
-<h2>0.3<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
-<section id="id7">
-<h3>Changelog<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
+<section id="id8">
+<h2>0.3<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<section id="id9">
+<h3>Changelog<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Add option to select drives using argument ‘which_drives’ in
 <code class="xref py py-func docutils literal notranslate"><span class="pre">optimize_evoked()</span></code>, by <a class="reference external" href="https://github.com/mohdsherif/">Mohamed A. Sherif</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/478">#478</a></p></li>
@@ -1050,8 +1084,8 @@ in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-
 </ul>
 </section>
 </section>
-<section id="id8">
-<h2>0.2<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<section id="id10">
+<h2>0.2<a class="headerlink" href="#id10" title="Link to this heading">#</a></h2>
 </section>
 <section id="notable-changes">
 <h2>Notable Changes<a class="headerlink" href="#notable-changes" title="Link to this heading">#</a></h2>
@@ -1064,8 +1098,8 @@ in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-
 <a class="reference internal" href="auto_examples/howto/plot_connectivity.html#sphx-glr-auto-examples-howto-plot-connectivity-py"><span class="std std-ref">[Example]</span></a></p></li>
 <li><p>Improved visualization including spectral analysis, connectivity, and cell morphology</p></li>
 </ul>
-<section id="id9">
-<h3>Changelog<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
+<section id="id11">
+<h3>Changelog<a class="headerlink" href="#id11" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Store all connectivity information under <code class="xref py py-attr docutils literal notranslate"><span class="pre">connectivity</span></code> before building
 the network, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/276">#276</a></p></li>
@@ -1108,8 +1142,8 @@ inputs for simulating evoked responses, by <a class="reference external" href="h
 Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/416">#416</a></p></li>
 </ul>
 </section>
-<section id="id10">
-<h3>Bug<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
+<section id="id12">
+<h3>Bug<a class="headerlink" href="#id12" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Remove rounding error caused by repositioning of NEURON cell sections, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> and <a class="reference external" href="https://github.com/rythorpe">Ryan
 Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/314">#314</a></p></li>
@@ -1128,8 +1162,8 @@ instead of the intended times, by <a class="reference external" href="http://jas
 and <code class="docutils literal notranslate"><span class="pre">data</span></code>), by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/421">#421</a></p></li>
 </ul>
 </section>
-<section id="id11">
-<h3>API<a class="headerlink" href="#id11" title="Link to this heading">#</a></h3>
+<section id="id13">
+<h3>API<a class="headerlink" href="#id13" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>New API for defining cell-cell connections. Custom connections can be added with
 <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network.add_connection" title="hnn_core.Network.add_connection"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_connection()</span></code></a>, by <a class="reference external" href="https://github.com/ntolley">Nick Tolley</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/276">#276</a></p></li>
@@ -1161,8 +1195,8 @@ weight and delay dictionaries assigned in <code class="docutils literal notransl
 <code class="xref py py-attr docutils literal notranslate"><span class="pre">cells</span></code> attribute has been removed, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/436">#436</a></p></li>
 </ul>
 </section>
-<section id="id12">
-<h3>People who contributed to this release (in alphabetical order):<a class="headerlink" href="#id12" title="Link to this heading">#</a></h3>
+<section id="id14">
+<h3>People who contributed to this release (in alphabetical order):<a class="headerlink" href="#id14" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/alexrockhill">Alex Rockhill</a></p></li>
 <li><p><a class="reference external" href="https://github.com/blakecaldwell">Blake Caldwell</a></p></li>
@@ -1177,10 +1211,10 @@ weight and delay dictionaries assigned in <code class="docutils literal notransl
 </ul>
 </section>
 </section>
-<section id="id13">
-<h2>0.1<a class="headerlink" href="#id13" title="Link to this heading">#</a></h2>
-<section id="id14">
-<h3>Changelog<a class="headerlink" href="#id14" title="Link to this heading">#</a></h3>
+<section id="id15">
+<h2>0.1<a class="headerlink" href="#id15" title="Link to this heading">#</a></h2>
+<section id="id16">
+<h3>Changelog<a class="headerlink" href="#id16" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Add ability to simulate multiple trials in parallel using joblibs, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/44">#44</a></p></li>
 <li><p>Rhythmic inputs can now be turned off by setting their conductance weights to 0 instead of setting
@@ -1220,8 +1254,8 @@ copied from <code class="docutils literal notranslate"><span class="pre">mne-pyt
 <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/264">#264</a></p></li>
 </ul>
 </section>
-<section id="id15">
-<h3>Bug<a class="headerlink" href="#id15" title="Link to this heading">#</a></h3>
+<section id="id17">
+<h3>Bug<a class="headerlink" href="#id17" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Fix missing autapses in network construction, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/50">#50</a></p></li>
 <li><p>Fix rhythmic input feed, by <a class="reference external" href="https://github.com/rythorpe">Ryan Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/98">#98</a></p></li>
@@ -1238,8 +1272,8 @@ Jas</a> in <a class="reference external" href="https://github.com/jonescompneuro
 Thorpe</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/207">#207</a></p></li>
 </ul>
 </section>
-<section id="id16">
-<h3>API<a class="headerlink" href="#id16" title="Link to this heading">#</a></h3>
+<section id="id18">
+<h3>API<a class="headerlink" href="#id18" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p>Make a context manager for Network class, by <a class="reference external" href="http://jasmainak.github.io/">Mainak Jas</a> and <a class="reference external" href="https://github.com/blakecaldwell">Blake Caldwell</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/86">#86</a></p></li>
 <li><p>Create Spikes class, add write methods and read functions for Spikes and Dipole classes, by <a class="reference external" href="https://github.com/rythorpe">Ryan
@@ -1259,8 +1293,8 @@ regardless of <code class="docutils literal notranslate"><span class="pre">postp
 scaling, by <a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a> in <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/264">#264</a></p></li>
 </ul>
 </section>
-<section id="id17">
-<h3>People who contributed to this release (in alphabetical order):<a class="headerlink" href="#id17" title="Link to this heading">#</a></h3>
+<section id="id19">
+<h3>People who contributed to this release (in alphabetical order):<a class="headerlink" href="#id19" title="Link to this heading">#</a></h3>
 <ul class="simple">
 <li><p><a class="reference external" href="https://github.com/blakecaldwell">Blake Caldwell</a></p></li>
 <li><p><a class="reference external" href="https://github.com/cjayb">Christopher Bailey</a></p></li>
@@ -1322,49 +1356,55 @@ scaling, by <a class="reference external" href="https://github.com/cjayb">Christ
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#in-progress-development-changes">0.4.3 in-progress development changes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#public-api-changes">Public API Changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#people-who-contributed-to-this-release-in-alphabetical-order-of-family-name">People who contributed to this release (in alphabetical order of family name):</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changelog">Changelog</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#patch-notes">0.4.2 Patch Notes</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#new-features">New Features</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#upcoming-deprecations">Upcoming Deprecations</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bug-fixes">Bug Fixes</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#development-workflow-changes">Development Workflow Changes</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#api-changes">API Changes</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#people-who-contributed-to-this-release-in-alphabetical-order-of-family-name">People who contributed to this release (in alphabetical order of family name):</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changelog">Changelog</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">People who contributed to this release (in alphabetical order of family name):</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Changelog</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">0.4.1 Patch Notes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">0.4.1 Patch Notes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-notes">0.4 Release Notes</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">New Features</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">New Features</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deprecations">Deprecations</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">Upcoming Deprecations</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">API Changes</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">People who contributed to this release (in alphabetical order of family name):</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">Upcoming Deprecations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">API Changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">People who contributed to this release (in alphabetical order of family name):</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prs-merged-api">PRs merged (API)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prs-merged-bug-fixes-and-corrections">PRs merged (Bug fixes and corrections)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prs-merged-gui-changes">PRs merged (GUI changes)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prs-merged-other">PRs merged (Other)</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">0.3</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">Changelog</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">0.3</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Changelog</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bug">Bug</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#api">API</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#people-who-contributed-to-this-release-in-alphabetical-order">People who contributed to this release (in alphabetical order):</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">0.2</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">0.2</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notable-changes">Notable Changes</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">Changelog</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">Bug</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">API</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">People who contributed to this release (in alphabetical order):</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">Changelog</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">Bug</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">API</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">People who contributed to this release (in alphabetical order):</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">0.1</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">Changelog</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">Bug</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">API</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">People who contributed to this release (in alphabetical order):</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">0.1</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">Changelog</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">Bug</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">API</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">People who contributed to this release (in alphabetical order):</a></li>
 </ul>
 </li>
 </ul>

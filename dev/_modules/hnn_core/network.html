@@ -492,7 +492,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_replace_dict_identifier</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_create_cell_coords</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_create_cell_coords</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="n">z_coord</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates coordinate grid and place cells in it.</span>
 
 <span class="sd">    Parameters</span>
@@ -501,7 +501,7 @@
 <span class="sd">        The number of Pyramidal cells in x direction.</span>
 <span class="sd">    n_pyr_y : int</span>
 <span class="sd">        The number of Pyramidal cells in y direction.</span>
-<span class="sd">    zdiff : float</span>
+<span class="sd">    z_coord : float</span>
 <span class="sd">        Expressed as a positive DEPTH of L2 relative to L5 pyramidal cell</span>
 <span class="sd">        somas, where L5 is defined to lie at z==0. Interlaminar weight/delay</span>
 <span class="sd">        calculations (lamtha) are not affected. The basket cells are</span>
@@ -514,10 +514,11 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    pos_dict : dict of list of tuple (x, y, z)</span>
-<span class="sd">        Dictionary containing coordinate positions.</span>
-<span class="sd">        Keys are &#39;L2_pyramidal&#39;, &#39;L5_pyramidal&#39;, &#39;L2_basket&#39;, &#39;L5_basket&#39;,</span>
-<span class="sd">        &#39;common&#39;, or any of the elements of the list p_unique_keys</span>
+<span class="sd">    layer_dict : dict of list of tuple (x, y, z)</span>
+<span class="sd">        Dictionary containing coordinate positions of &#39;layers&#39;. After calling</span>
+<span class="sd">        &#39;_create_cell_coords&#39;, user can create their &#39;Network.pos_dict&#39; by mapping</span>
+<span class="sd">        &#39;origin&#39; and their celltypes onto the different layers in &#39;layer_dict&#39;. Keys are</span>
+<span class="sd">        &#39;L2_bottom&#39;, &#39;L2_mid&#39;, &#39;L5_bottom&#39;, &#39;L5_mid&#39;, and &#39;origin&#39;.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -525,16 +526,16 @@
 <span class="sd">    Sort of a hack because of redundancy.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_calc_pyramidal_coord</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">):</span>
-        <span class="n">list_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">pos</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="p">[</span><span class="n">zdiff</span><span class="p">])]</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calc_pyramidal_coord</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">z_coord</span><span class="p">):</span>
+        <span class="n">list_coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">pos</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="p">[</span><span class="n">z_coord</span><span class="p">])]</span>
         <span class="k">return</span> <span class="n">list_coords</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_calc_basket_coord</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
-        <span class="n">xzero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_pyr_x</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
-        <span class="n">xone</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_pyr_x</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calc_basket_coord</span><span class="p">(</span><span class="n">n_x</span><span class="p">,</span> <span class="n">n_y</span><span class="p">,</span> <span class="n">z_coord</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
+        <span class="n">xzero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_x</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
+        <span class="n">xone</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_x</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
         <span class="c1"># split even and odd y vals</span>
-        <span class="n">yeven</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
-        <span class="n">yodd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
+        <span class="n">yeven</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
+        <span class="n">yodd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_y</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
         <span class="c1"># create general list of x,y coords and sort it</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">pos</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">xzero</span><span class="p">,</span> <span class="n">yeven</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span>
             <span class="n">pos</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">it</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">xone</span><span class="p">,</span> <span class="n">yodd</span><span class="p">)</span>
@@ -543,17 +544,16 @@
 
         <span class="c1"># append the z value for position</span>
         <span class="n">list_coords</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="p">(</span><span class="n">pos_xy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pos_xy</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">weight</span> <span class="o">*</span> <span class="n">zdiff</span><span class="p">)</span> <span class="k">for</span> <span class="n">pos_xy</span> <span class="ow">in</span> <span class="n">coords_sorted</span>
+            <span class="p">(</span><span class="n">pos_xy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pos_xy</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">weight</span> <span class="o">*</span> <span class="n">z_coord</span><span class="p">)</span> <span class="k">for</span> <span class="n">pos_xy</span> <span class="ow">in</span> <span class="n">coords_sorted</span>
         <span class="p">]</span>
-
         <span class="k">return</span> <span class="n">list_coords</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_calc_origin</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calc_origin</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">z_coord</span><span class="p">):</span>
         <span class="c1"># origin&#39;s z component isn&#39;t used in calculating distance functions.</span>
         <span class="c1"># will be used for adding external drives.</span>
         <span class="n">origin_x</span> <span class="o">=</span> <span class="n">xxrange</span><span class="p">[</span><span class="nb">int</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">xxrange</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)]</span>
         <span class="n">origin_y</span> <span class="o">=</span> <span class="n">yyrange</span><span class="p">[</span><span class="nb">int</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">yyrange</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)]</span>
-        <span class="n">origin_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">zdiff</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">origin_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">z_coord</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
         <span class="n">origin</span> <span class="o">=</span> <span class="p">(</span><span class="n">origin_x</span><span class="p">,</span> <span class="n">origin_y</span><span class="p">,</span> <span class="n">origin_z</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">origin</span>
 
@@ -561,19 +561,28 @@
     <span class="n">xxrange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_pyr_x</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
     <span class="n">yyrange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n_pyr_y</span><span class="p">)</span> <span class="o">*</span> <span class="n">inplane_distance</span>
 
-    <span class="n">pos_dict</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">:</span> <span class="n">_calc_pyramidal_coord</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">zdiff</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-        <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">:</span> <span class="n">_calc_pyramidal_coord</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">zdiff</span><span class="o">=</span><span class="n">zdiff</span><span class="p">),</span>
-        <span class="s2">&quot;L5_basket&quot;</span><span class="p">:</span> <span class="n">_calc_basket_coord</span><span class="p">(</span>
-            <span class="n">n_pyr_x</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">0.2</span>
+    <span class="c1"># Create layer dictionary with anatomical layer positions</span>
+    <span class="n">layer_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;L5_bottom&quot;</span><span class="p">:</span> <span class="n">_calc_pyramidal_coord</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">z_coord</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="s2">&quot;L2_bottom&quot;</span><span class="p">:</span> <span class="n">_calc_pyramidal_coord</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">z_coord</span><span class="o">=</span><span class="n">z_coord</span><span class="p">),</span>
+        <span class="s2">&quot;L5_mid&quot;</span><span class="p">:</span> <span class="n">_calc_basket_coord</span><span class="p">(</span>
+            <span class="n">n_pyr_x</span><span class="p">,</span>
+            <span class="n">n_pyr_y</span><span class="p">,</span>
+            <span class="n">z_coord</span><span class="o">=</span><span class="n">z_coord</span><span class="p">,</span>
+            <span class="n">inplane_distance</span><span class="o">=</span><span class="n">inplane_distance</span><span class="p">,</span>
+            <span class="n">weight</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
         <span class="p">),</span>
-        <span class="s2">&quot;L2_basket&quot;</span><span class="p">:</span> <span class="n">_calc_basket_coord</span><span class="p">(</span>
-            <span class="n">n_pyr_x</span><span class="p">,</span> <span class="n">n_pyr_y</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">,</span> <span class="n">inplane_distance</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mf">0.8</span>
+        <span class="s2">&quot;L2_mid&quot;</span><span class="p">:</span> <span class="n">_calc_basket_coord</span><span class="p">(</span>
+            <span class="n">n_pyr_x</span><span class="p">,</span>
+            <span class="n">n_pyr_y</span><span class="p">,</span>
+            <span class="n">z_coord</span><span class="o">=</span><span class="n">z_coord</span><span class="p">,</span>
+            <span class="n">inplane_distance</span><span class="o">=</span><span class="n">inplane_distance</span><span class="p">,</span>
+            <span class="n">weight</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
         <span class="p">),</span>
-        <span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="n">_calc_origin</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">zdiff</span><span class="p">),</span>
+        <span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="n">_calc_origin</span><span class="p">(</span><span class="n">xxrange</span><span class="p">,</span> <span class="n">yyrange</span><span class="p">,</span> <span class="n">z_coord</span><span class="p">),</span>
     <span class="p">}</span>
 
-    <span class="k">return</span> <span class="n">pos_dict</span>
+    <span class="k">return</span> <span class="n">layer_dict</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_compare_lists</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
@@ -778,20 +787,28 @@
 <span class="sd">    ----------</span>
 <span class="sd">    params : dict</span>
 <span class="sd">        The parameters to use for constructing the network.</span>
-<span class="sd">    add_drives_from_params : bool</span>
+<span class="sd">    add_drives_from_params : bool, default=False</span>
 <span class="sd">        If True, add drives as defined in the params-dict. NB this is mainly</span>
 <span class="sd">        for backward-compatibility with HNN GUI, and will be deprecated in a</span>
-<span class="sd">        future release. Default: False</span>
-<span class="sd">    legacy_mode : bool</span>
+<span class="sd">        future release.</span>
+<span class="sd">    legacy_mode : bool, default=False</span>
 <span class="sd">        Set to True by default to enable matching HNN GUI output when drives</span>
 <span class="sd">        are added suitably. Will be deprecated in a future release.</span>
 <span class="sd">    mesh_shape : tuple of int (default: (10, 10))</span>
 <span class="sd">        Defines the (n_x, n_y) shape of the grid of pyramidal cells.</span>
-
+<span class="sd">    pos_dict : dict of list of tuple (x, y, z), optional</span>
+<span class="sd">        Dictionary containing the coordinate positions of all cells.</span>
+<span class="sd">        Keys are &#39;L2_pyramidal&#39;, &#39;L5_pyramidal&#39;, &#39;L2_basket&#39;, &#39;L5_basket&#39;,</span>
+<span class="sd">        or any external drive name.</span>
+<span class="sd">    cell_types : dict of Cell, optional</span>
+<span class="sd">        Dictionary containing names of real cell types in the network</span>
+<span class="sd">        (e.g. &#39;L2_basket&#39;) as keys and corresponding Cell instances as values.</span>
+<span class="sd">        The Cell instance associated with a given key is used as a template</span>
+<span class="sd">        for the other cells of its type in the population.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    cell_types : dict</span>
+<span class="sd">    cell_types : dict of Cell</span>
 <span class="sd">        Dictionary containing names of real cell types in the network</span>
 <span class="sd">        (e.g. &#39;L2_basket&#39;) as keys and corresponding Cell instances as values.</span>
 <span class="sd">        The Cell instance associated with a given key is used as a template</span>
@@ -802,10 +819,10 @@
 <span class="sd">        cell_types, followed by keys read from external_drives. The value</span>
 <span class="sd">        of each key is a range of ints, one for each cell in given category.</span>
 <span class="sd">        Examples: &#39;L2_basket&#39;: range(0, 270), &#39;evdist1&#39;: range(272, 542), etc</span>
-<span class="sd">    pos_dict : dict</span>
+<span class="sd">    pos_dict : dict of list of tuple (x, y, z)</span>
 <span class="sd">        Dictionary containing the coordinate positions of all cells.</span>
 <span class="sd">        Keys are &#39;L2_pyramidal&#39;, &#39;L5_pyramidal&#39;, &#39;L2_basket&#39;, &#39;L5_basket&#39;,</span>
-<span class="sd">        or any external drive name</span>
+<span class="sd">        or any external drive name.</span>
 <span class="sd">    cell_response : CellResponse</span>
 <span class="sd">        An instance of the CellResponse object.</span>
 <span class="sd">    external_drives : dict (keys: drive names) of dict (keys: parameters)</span>
@@ -843,6 +860,8 @@
         <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+        <span class="n">pos_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">cell_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="c1"># Save the parameters used to create the Network</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="s2">&quot;params&quot;</span><span class="p">)</span>
@@ -868,14 +887,6 @@
                 <span class="ne">DeprecationWarning</span><span class="p">,</span>
                 <span class="n">stacklevel</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="p">)</span>
-
-        <span class="c1"># Source dict of names, first real ones only!</span>
-        <span class="n">cell_types</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;L2_basket&quot;</span><span class="p">:</span> <span class="n">basket</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="n">_short_name</span><span class="p">(</span><span class="s2">&quot;L2_basket&quot;</span><span class="p">)),</span>
-            <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">:</span> <span class="n">pyramidal</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="n">_short_name</span><span class="p">(</span><span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">)),</span>
-            <span class="s2">&quot;L5_basket&quot;</span><span class="p">:</span> <span class="n">basket</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="n">_short_name</span><span class="p">(</span><span class="s2">&quot;L5_basket&quot;</span><span class="p">)),</span>
-            <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">:</span> <span class="n">pyramidal</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="n">_short_name</span><span class="p">(</span><span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">)),</span>
-        <span class="p">}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">cell_response</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># external drives and biases</span>
@@ -911,17 +922,42 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_inplane_distance</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># XXX hard-coded default</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_layer_separation</span> <span class="o">=</span> <span class="mf">1307.4</span>  <span class="c1"># XXX hard-coded default</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_cell_positions</span><span class="p">(</span>
-            <span class="n">inplane_distance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_inplane_distance</span><span class="p">,</span>
-            <span class="n">layer_separation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_separation</span><span class="p">,</span>
-        <span class="p">)</span>
 
-        <span class="c1"># populates self.gid_ranges for the 1st time: order matters for</span>
-        <span class="c1"># NetworkBuilder!</span>
-        <span class="k">for</span> <span class="n">cell_name</span> <span class="ow">in</span> <span class="n">cell_types</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_add_cell_type</span><span class="p">(</span>
-                <span class="n">cell_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">cell_name</span><span class="p">],</span> <span class="n">cell_template</span><span class="o">=</span><span class="n">cell_types</span><span class="p">[</span><span class="n">cell_name</span><span class="p">]</span>
+        <span class="c1"># Handle positions and cell types</span>
+        <span class="k">if</span> <span class="n">pos_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">cell_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Use provided positions and cell types</span>
+            <span class="n">_validate_type</span><span class="p">(</span><span class="n">pos_dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="s2">&quot;pos_dict&quot;</span><span class="p">)</span>
+            <span class="n">_validate_type</span><span class="p">(</span><span class="n">cell_types</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="s2">&quot;cell_types&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">pos_dict</span><span class="p">)</span>
+
+            <span class="c1"># Add cell types from provided dictionary</span>
+            <span class="k">for</span> <span class="n">cell_name</span><span class="p">,</span> <span class="n">cell_template</span> <span class="ow">in</span> <span class="n">cell_types</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">cell_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_add_cell_type</span><span class="p">(</span>
+                        <span class="n">cell_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">cell_name</span><span class="p">],</span> <span class="n">cell_template</span><span class="o">=</span><span class="n">cell_template</span>
+                    <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Default behavior - create standard network</span>
+            <span class="n">cell_types_default</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;L2_basket&quot;</span><span class="p">:</span> <span class="n">basket</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="n">_short_name</span><span class="p">(</span><span class="s2">&quot;L2_basket&quot;</span><span class="p">)),</span>
+                <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">:</span> <span class="n">pyramidal</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="n">_short_name</span><span class="p">(</span><span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">)),</span>
+                <span class="s2">&quot;L5_basket&quot;</span><span class="p">:</span> <span class="n">basket</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="n">_short_name</span><span class="p">(</span><span class="s2">&quot;L5_basket&quot;</span><span class="p">)),</span>
+                <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">:</span> <span class="n">pyramidal</span><span class="p">(</span><span class="n">cell_name</span><span class="o">=</span><span class="n">_short_name</span><span class="p">(</span><span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">)),</span>
+            <span class="p">}</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_cell_positions</span><span class="p">(</span>
+                <span class="n">inplane_distance</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_inplane_distance</span><span class="p">,</span>
+                <span class="n">layer_separation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_separation</span><span class="p">,</span>
             <span class="p">)</span>
+
+            <span class="c1"># populates self.gid_ranges for the 1st time: order matters for</span>
+            <span class="c1"># NetworkBuilder!</span>
+            <span class="k">for</span> <span class="n">cell_name</span> <span class="ow">in</span> <span class="n">cell_types_default</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_add_cell_type</span><span class="p">(</span>
+                    <span class="n">cell_name</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">cell_name</span><span class="p">],</span>
+                    <span class="n">cell_template</span><span class="o">=</span><span class="n">cell_types_default</span><span class="p">[</span><span class="n">cell_name</span><span class="p">],</span>
+                <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">add_drives_from_params</span><span class="p">:</span>
             <span class="n">_add_drives_from_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -1003,15 +1039,22 @@
                 <span class="sa">f</span><span class="s2">&quot;Layer separation must be positive, got: </span><span class="si">{</span><span class="n">layer_separation</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
-        <span class="n">pos</span> <span class="o">=</span> <span class="n">_create_cell_coords</span><span class="p">(</span>
+        <span class="c1"># Get layer positions using layer dict</span>
+        <span class="n">layer_dict</span> <span class="o">=</span> <span class="n">_create_cell_coords</span><span class="p">(</span>
             <span class="n">n_pyr_x</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_N_pyr_x</span><span class="p">,</span>
             <span class="n">n_pyr_y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_N_pyr_y</span><span class="p">,</span>
-            <span class="n">zdiff</span><span class="o">=</span><span class="n">layer_separation</span><span class="p">,</span>
+            <span class="n">z_coord</span><span class="o">=</span><span class="n">layer_separation</span><span class="p">,</span>
             <span class="n">inplane_distance</span><span class="o">=</span><span class="n">inplane_distance</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="c1"># update positions of the real cells</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">pos</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="c1"># Map layers to cell types, for default mapping</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">&quot;L5_bottom&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">&quot;L2_bottom&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;L5_basket&quot;</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">&quot;L5_mid&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;L2_basket&quot;</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">&quot;L2_mid&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">&quot;origin&quot;</span><span class="p">],</span>
+        <span class="p">}</span>
 
         <span class="c1"># update drives to be positioned at network origin</span>
         <span class="k">for</span> <span class="n">drive_name</span><span class="p">,</span> <span class="n">drive</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">external_drives</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -2104,7 +2147,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">conn</span> <span class="o">=</span> <span class="n">_Connectivity</span><span class="p">()</span>
         <span class="n">threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span>
-
         <span class="n">_validate_type</span><span class="p">(</span>
             <span class="n">target_gids</span><span class="p">,</span>
             <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>

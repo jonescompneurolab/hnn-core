@@ -20,11 +20,42 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 <!-- ### Bug Fixes -->
 
-<!-- ### API Changes -->
+<!-- ### Public API Changes -->
 
 <!-- ### People who contributed to this release (in alphabetical order of family name): -->
 
 <!-- ### Changelog -->
+
+## 0.4.3 in-progress development changes
+
+<!-- ### New Features -->
+
+<!-- ### Deprecations -->
+
+<!-- ### Upcoming Deprecations -->
+
+<!-- ### Bug Fixes -->
+
+### Public API Changes
+
+- {class}`~hnn_core.Network` now accepts optional arguments for its position dictionary  attribute `pos_dict` and cell type dictionary attribute `cell_types`,
+  by [Chetan Kandpal][] in {gh}`1095`.
+
+### People who contributed to this release (in alphabetical order of family name):
+
+- [Chetan Kandpal][]
+
+### Changelog
+
+- Add support for {class}`~hnn_core.Network` to calculate a "layer dictionary"
+  `layer_dict` attribute whose layers can be mapped as desired to an object's
+  `cell_types` attribute. This mapping can then be used to make a more flexible position
+  dictionary `pos_dict` attribute of the object. This also adds support for optional
+  `pos_dict` and `cell_types` arguments to the {class}`~hnn_core.Network`
+  constructor. This also begins the process of moving some model-specific celltype-usage
+  from `network.py` to `network_models.py`. This is the first in a series of code
+  changes meant to allow for more flexible cell types to be used.
+  By [Chetan Kandpal][] in {gh}`1095`.
 
 ## 0.4.2 Patch Notes
 
