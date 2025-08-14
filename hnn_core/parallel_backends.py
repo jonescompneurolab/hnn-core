@@ -119,7 +119,6 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     timeout_cycles = timeout / 0.02
 
     pickled_obj = base64.b64encode(pickle.dumps(obj))
-    
 
     # non-blocking adapted from https://stackoverflow.com/questions/375427/non-blocking-read-on-a-subprocess-pipe-in-python#4896288  # noqa: E501
     out_q = Queue()
