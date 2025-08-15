@@ -363,7 +363,7 @@ def _get_mechanisms(p_all, cell_type, section_names, mechanisms):
     return mech_props
 
 
-def _exp_g_at_dist(x, zero_val, exp_term, offset, slope=1):
+def _exp_g_at_dist(x, zero_val, exp_term, offset, slope=1, xkink=3000):
     """Compute exponential distance-dependent ionic conductance.
 
     Parameters
@@ -378,6 +378,9 @@ def _exp_g_at_dist(x, zero_val, exp_term, offset, slope=1):
         Offset value added to output
 
     """
+
+    if x > xkink:
+        x = xkink
 
     return zero_val * (slope * np.exp(exp_term * x)  + offset)
 
@@ -515,10 +518,10 @@ def pyramidal_l5ET(cell_name,pos, gid=None):
     p_all = get_L5PyrET_params()
 
     # override params according to function
-    gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_HVA']*1., gdend=p_all['L5Pyr_dend_gbar_Ca_HVA']*15.5, xkink=1500, hotzone=[1400, 1500], hotzone_factor=3.9)
-    gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_LVAst'], gdend=p_all['L5Pyr_dend_gbar_Ca_LVAst']*7.75, xkink=1500, hotzone=[1400, 1500], hotzone_factor=3)
-    gbar_Ih = partial(_exp_g_at_dist, zero_val=p_all['L5Pyr_dend_gbar_Ih'],exp_term = 1./323, slope=2.087, offset=-.8696)
-    gbar_pas = partial(_increase_step, gbar=p_all['L5Pyr_dend_g_pas'], xkink = 1500, factor=1.2)
+    gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_HVA']*1., gdend=p_all['L5Pyr_dend_gbar_Ca_HVA']*13.5, xkink=1500, hotzone=[1500, 1700], hotzone_factor=3.9)
+    gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_LVAst'], gdend=p_all['L5Pyr_dend_gbar_Ca_LVAst']*5.75, xkink=1500, hotzone=[1500, 1700], hotzone_factor=3)
+    gbar_Ih = partial(_exp_g_at_dist, zero_val=p_all['L5Pyr_dend_gbar_Ih'],exp_term = 1./323, slope=2.087, offset=-.8696, xkink=3000)
+    gbar_pas = partial(_increase_step, gbar=p_all['L5Pyr_dend_g_pas'], xkink = 1500, factor=2)
 
     # basal dendrites
     gbar_NaTs2_t = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_basal_gbar_NaTs2_t']*0.01, gdend=0, xkink=255)
