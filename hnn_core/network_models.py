@@ -76,10 +76,10 @@ def jones_2009_model(
     # ToDo: use longNames here and otherinstanaces if needed
     # Define cell types for Jones 2009 model
     cell_types = {
-        "L2_basket": basket(cell_name=_short_name("L2_basket")),
-        "L2_pyramidal": pyramidal(cell_name=_short_name("L2_pyramidal")),
-        "L5_basket": basket(cell_name=_short_name("L5_basket")),
-        "L5_pyramidal": pyramidal(cell_name=_short_name("L5_pyramidal")),
+        "L2_basket": basket(cell_name=("L2_basket")),
+        "L2_pyramidal": pyramidal(cell_name="L2_pyramidal"),
+        "L5_basket": basket(cell_name=("L5_basket")),
+        "L5_pyramidal": pyramidal(cell_name="L5_pyramidal"),
     }
 
     # Create layer positions
@@ -357,7 +357,7 @@ def calcium_model(
     # Replace L5 pyramidal cell template with updated calcium
     cell_name = "L5_pyramidal"
     pos = net.cell_types[cell_name].pos
-    net.cell_types[cell_name] = pyramidal_ca(cell_name=_short_name(cell_name), pos=pos)
+    net.cell_types[cell_name] = pyramidal_ca(cell_name=cell_name, pos=pos)
 
     return net
 

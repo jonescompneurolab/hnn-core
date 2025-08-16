@@ -341,9 +341,9 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
     cell : instance of BasketSingle
         The basket cell.
     """
-    if cell_name == "L2Basket":
+    if cell_name == "L2_basket":
         sect_loc = dict(proximal=["soma"], distal=["soma"])
-    elif cell_name == "L5Basket":
+    elif cell_name == "L5_basket":
         sect_loc = dict(proximal=["soma"], distal=[])
     else:
         raise ValueError(f"Unknown basket cell type: {cell_name}")
@@ -382,9 +382,9 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
         The GID is an integer from 0 to n_cells, or None if the cell is not
         yet attached to a network. Once the GID is set, it cannot be changed.
     """
-    if cell_name == "L2Pyr":
+    if cell_name == "L2_pyramidal":
         return _cell_L2Pyr(override_params, pos=pos, gid=gid)
-    elif cell_name == "L5Pyr":
+    elif cell_name == "L5_pyramidal":
         return _cell_L5Pyr(override_params, pos=pos, gid=gid)
     else:
         raise ValueError(f"Unknown pyramidal cell type: {cell_name}")
