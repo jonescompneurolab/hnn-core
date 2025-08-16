@@ -472,10 +472,46 @@ class Network:
         else:
             # Default behavior - create standard network
             cell_types_default = {
-                "L2_basket": basket(cell_name="L2_basket"),
-                "L2_pyramidal": pyramidal(cell_name="L2_pyramidal"),
-                "L5_basket": basket(cell_name="L5_basket"),
-                "L5_pyramidal": pyramidal(cell_name="L5_pyramidal"),
+                "L2_basket": {
+                    "object": basket(cell_name="L2_basket"),
+                    "metadata": {
+                        "morpho_type": "basket",
+                        "electro_type": "inhibitory",
+                        "layer": "2",
+                        "measure_dipole": False,
+                        "reference": "https://doi.org/10.7554/eLife.51214",
+                    },
+                },
+                "L2_pyramidal": {
+                    "object": pyramidal(cell_name="L2_pyramidal"),
+                    "metadata": {
+                        "morpho_type": "pyramidal",
+                        "electro_type": "excitatory",
+                        "layer": "2",
+                        "measure_dipole": True,
+                        "reference": "https://doi.org/10.7554/eLife.51214",
+                    },
+                },
+                "L5_basket": {
+                    "object": basket(cell_name="L5_basket"),
+                    "metadata": {
+                        "morpho_type": "basket",
+                        "electro_type": "inhibitory",
+                        "layer": "5",
+                        "measure_dipole": False,
+                        "reference": "https://doi.org/10.7554/eLife.51214",
+                    },
+                },
+                "L5_pyramidal": {
+                    "object": pyramidal(cell_name="L5_pyramidal"),
+                    "metadata": {
+                        "morpho_type": "pyramidal",
+                        "electro_type": "excitatory",
+                        "layer": "5",
+                        "measure_dipole": True,
+                        "reference": "https://doi.org/10.7554/eLife.51214",
+                    },
+                },
             }
 
             self.set_cell_positions(
@@ -485,7 +521,7 @@ class Network:
 
             # populates self.gid_ranges for the 1st time: order matters for
             # NetworkBuilder!
-            for cell_name in cell_types_default:
+            for cell_name in cell_types_default.items():
                 self._add_cell_type(
                     cell_name,
                     self.pos_dict[cell_name],
@@ -502,9 +538,10 @@ class Network:
         class_name = self.__class__.__name__
         # Dynamically create the description based on the current cell types
         descriptions = list()
-        for cell_name in self.cell_types:
-            count = len(self.pos_dict.get(cell_name, []))
-            descriptions.append(f"{count} {cell_name} cells")
+        for cell_name, cell_data in self.cell_types.items():
+            if cell_data["metadata"].get("morpho_type") == "basket":
+                count = len(self.pos_dict.get(cell_name, []))
+                descriptions.append(f"{count} {cell_name} cells")
 
         # Combine all descriptions into a single string
         description_str = "\n".join(descriptions)
@@ -1228,8 +1265,12 @@ class Network:
         # allow passing weights as None, convert to dict here
         (target_populations, weights_by_type, delays_by_type, probability_by_type) = (
             _get_target_properties(
-                weights_ampa, weights_nmda, synaptic_delays, location, probability
-            )
+                weights_ampa,
+                weights_nmda,
+                synaptic_delays,
+                location,
+                probability,
+                self.cell_types,            )
         )
 
         # weights passed must correspond to cells in the network
@@ -1248,11 +1289,11 @@ class Network:
 
         # Ensure location exists for all target cells
         cell_sections = [
-            set(self.cell_types[cell_type].sections.keys())
+            set(self.cell_types[cell_type]["object"].sections.keys())
             for cell_type in target_populations
         ]
         sect_locs = [
-            set(self.cell_types[cell_type].sect_loc.keys())
+            set(self.cell_types[cell_type]["object"].sect_loc.keys())
             for cell_type in target_populations
         ]
 
@@ -1723,8 +1764,8 @@ class Network:
         _validate_type(loc, str, "loc")
         _validate_type(receptor, str, "receptor")
 
-        target_sect_loc = self.cell_types[target_type].sect_loc
-        target_sections = self.cell_types[target_type].sections
+        target_sect_loc = self.cell_types[target_type]["object"].sect_loc
+        target_sections = self.cell_types[target_type]["object"].sections
         valid_loc = list(target_sect_loc.keys()) + list(target_sections.keys())
 
         _check_option(
@@ -1889,23 +1930,24 @@ class Network:
 
         net = self.copy() if copy else self
 
-        e_conns = pick_connection(self, receptor=["ampa", "nmda"])
-        e_cells = np.concatenate(
-            [list(net.connectivity[conn_idx]["src_gids"]) for conn_idx in e_conns]
-        ).tolist()
+        # Identify excitatory and inhibitory GIDs based on metadata
+        e_gids = list()
+        i_gids = list()
+        for cell_type_name, cell_data in self.cell_types.items():
+            if cell_data["metadata"].get("electro_type") == "excitatory":
+                e_gids.extend(self.gid_ranges[cell_type_name])
+            elif cell_data["metadata"].get("electro_type") == "inhibitory":
+                i_gids.extend(self.gid_ranges[cell_type_name])
 
-        i_conns = pick_connection(self, receptor=["gabaa", "gabab"])
-        i_cells = np.concatenate(
-            [list(net.connectivity[conn_idx]["src_gids"]) for conn_idx in i_conns]
-        ).tolist()
+        # Define the connection types to modify
         conn_types = {
-            "e_e": (e_e, e_cells, e_cells),
-            "e_i": (e_i, e_cells, i_cells),
-            "i_e": (i_e, i_cells, e_cells),
-            "i_i": (i_i, i_cells, i_cells),
+            "e_e": (e_e, e_gids, e_gids),
+            "e_i": (e_i, e_gids, i_gids),
+            "i_e": (i_e, i_gids, e_gids),
+            "i_i": (i_i, i_gids, i_gids),
         }
 
-        for conn_type, (gain, e_vals, i_vals) in conn_types.items():
+        for conn_type, (gain, src_gids, target_gids) in conn_types.items():
             if gain is None:
                 continue
 
@@ -1915,7 +1957,9 @@ class Network:
                     f"Synaptic gains must be non-negative.Got {gain} for '{conn_type}'."
                 )
 
-            conn_indices = pick_connection(net, src_gids=e_vals, target_gids=i_vals)
+            conn_indices = pick_connection(
+                net, src_gids=src_gids, target_gids=target_gids
+            )
             for conn_idx in conn_indices:
                 net.connectivity[conn_idx]["nc_dict"]["gain"] = gain
 
@@ -1946,6 +1990,22 @@ class Network:
     @copy_doc(write_network_configuration)
     def write_configuration(self, fname, overwrite=True):
         write_network_configuration(self, fname, overwrite)
+
+    def filter_cell_types(self, **metadata_filters):
+        """
+        Filter cell types based on metadata criteria
+        """
+        filtered_types = []
+        for cell_type_name, cell_type_data in self.cell_types.items():
+            metadata = cell_type_data["metadata"]
+            match = True
+            for key, value in metadata_filters.items():
+                if key not in metadata or metadata[key] != value:
+                    match = False
+                    break
+            if match:
+                filtered_types.append(cell_type_name)
+        return filtered_types
 
     def _standardize_spike_data(self, spike_data):
         """Standardize spike data to internal format with 'times' and 'gids' keys.
@@ -2262,7 +2322,7 @@ def _add_cell_type_bias(
         "section": section,
     }
 
-    sections = list(network.cell_types[cell_type].sections.keys())
+    sections = list(network.cell_types[cell_type]["object"].sections.keys())
 
     # error when section is defined that doesn't exist.
     if section not in sections:
