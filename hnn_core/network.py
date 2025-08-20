@@ -521,11 +521,11 @@ class Network:
 
             # populates self.gid_ranges for the 1st time: order matters for
             # NetworkBuilder!
-            for cell_name in cell_types_default.items():
+            for cell_name, cell_template in cell_types_default.items():
                 self._add_cell_type(
                     cell_name,
                     self.pos_dict[cell_name],
-                    cell_template=cell_types_default[cell_name],
+                    cell_template=cell_template,
                 )
 
         if add_drives_from_params:
@@ -868,9 +868,15 @@ class Network:
         """
 
         _check_drive_parameter_values("Poisson", tstart=tstart, tstop=tstop)
-        target_populations = _get_target_properties(
-            weights_ampa, weights_nmda, synaptic_delays, location
-        )[0]
+        target_populations, _, _, _ = _get_target_properties(
+            weights_ampa,
+            weights_nmda,
+            synaptic_delays,
+            location,
+            self.cell_types,
+            probability=probability,
+        )
+
         _check_poisson_rates(rate_constant, target_populations, self.cell_types.keys())
         if isinstance(rate_constant, dict):
             if not cell_specific:
@@ -1269,8 +1275,9 @@ class Network:
                 weights_nmda,
                 synaptic_delays,
                 location,
-                probability,
-                self.cell_types,            )
+                self.cell_types,
+                probability=probability,
+            )
         )
 
         # weights passed must correspond to cells in the network

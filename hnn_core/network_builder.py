@@ -647,7 +647,7 @@ class NetworkBuilder(object):
             seclist.wholetree(sec=cell._nrn_sections["soma"])
             src_type = self.net.gid_to_type(cell.gid)
             metadata = self.net.cell_types[src_type]["metadata"]
-            # initializing segment voltages from metadata            
+            # initializing segment voltages from metadata
             for sect in seclist:
                 for seg in sect:
                     if (

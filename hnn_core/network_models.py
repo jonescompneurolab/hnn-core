@@ -73,13 +73,49 @@ def jones_2009_model(
     if isinstance(params, str):
         params = read_params(params)
 
-    # ToDo: use longNames here and otherinstanaces if needed
     # Define cell types for Jones 2009 model
+    # data is here in metaData format
     cell_types = {
-        "L2_basket": basket(cell_name=("L2_basket")),
-        "L2_pyramidal": pyramidal(cell_name="L2_pyramidal"),
-        "L5_basket": basket(cell_name=("L5_basket")),
-        "L5_pyramidal": pyramidal(cell_name="L5_pyramidal"),
+        "L2_basket": {
+            "object": basket(cell_name="L2_basket"),
+            "metadata": {
+                "morpho_type": "basket",
+                "electro_type": "inhibitory",
+                "layer": "2",
+                "measure_dipole": False,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+        "L2_pyramidal": {
+            "object": pyramidal(cell_name="L2_pyramidal"),
+            "metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "2",
+                "measure_dipole": True,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+        "L5_basket": {
+            "object": basket(cell_name="L5_basket"),
+            "metadata": {
+                "morpho_type": "basket",
+                "electro_type": "inhibitory",
+                "layer": "5",
+                "measure_dipole": False,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+        "L5_pyramidal": {
+            "object": pyramidal(cell_name="L5_pyramidal"),
+            "metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "5",
+                "measure_dipole": True,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
     }
 
     # Create layer positions
