@@ -52,32 +52,20 @@ def _get_target_properties(
     if location == "distal":
         for cell_name in target_populations:
             # check if the cell exists in metadata and matches criteria
-            if cell_name in cell_types:
-                cell_data = cell_types[cell_name]
-
-                # Handle both possible structures
-                if isinstance(cell_data, dict) and "metadata" in cell_data:
-                    metadata = cell_data["metadata"]
-                else:
-                    metadata = {}
-                    if hasattr(cell_data, "metadata"):
-                        metadata = getattr(cell_data, "metadata", {})
-                    elif "L5_basket" in cell_name:
-                        metadata = {"morpho_type": "basket", "layer": "5"}
-
-                if (
-                    metadata.get("morpho_type") == "basket"
-                    and metadata.get("layer") == "5"
-                ):
-                    raise ValueError(
-                        "Due to physiological/anatomical constraints, "
-                        "a distal drive cannot target L5_basket cell types. "
-                        "L5_basket cell types must remain undefined by "
-                        "the user in all synaptic weights dictionaries "
-                        "for this drive. "
-                        "Therefore, please remove the L5_basket entries "
-                        "from the corresponding dictionaries."
-                    )
+            if (
+                cell_name in cell_types
+                and cell_types[cell_name]["metadata"].get("morpho_type") == "basket"
+                and cell_types[cell_name]["metadata"].get("layer") == "5"
+            ):
+                raise ValueError(
+                    "Due to physiological/anatomical constraints, "
+                    "a distal drive cannot target L5_basket cell types. "
+                    "L5_basket cell types must remain undefined by "
+                    "the user in all synaptic weights dictionaries "
+                    "for this drive. "
+                    "Therefore, please remove the L5_basket entries "
+                    "from the corresponding dictionaries."
+                )
 
     if isinstance(synaptic_delays, float):
         delays_by_type = {

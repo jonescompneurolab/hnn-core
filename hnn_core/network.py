@@ -537,14 +537,14 @@ class Network:
     def __repr__(self):
         class_name = self.__class__.__name__
         # Dynamically create the description based on the current cell types
-        descriptions = list()
-        for cell_name, cell_data in self.cell_types.items():
-            if cell_data["metadata"].get("morpho_type") == "basket":
-                count = len(self.pos_dict.get(cell_name, []))
-                descriptions.append(f"{count} {cell_name} cells")
+        descriptions = []
+        for cell_name in self.cell_types:
+            cell_count = len(self.pos_dict.get(cell_name, []))
+            descriptions.append(f"{cell_count} {cell_name} cells")
 
         # Combine all descriptions into a single string
         description_str = "\n".join(descriptions)
+
         return f"<{class_name} | {description_str}>"
 
     def __eq__(self, other):
@@ -1295,20 +1295,14 @@ class Network:
         ]
 
         # Ensure location exists for all target cells
-        cell_sections = []
-        sect_locs = []
-
-        for cell_type in target_populations:
-            cell_data = self.cell_types[cell_type]
-
-            # Handle both possible cell_types structures
-            if isinstance(cell_data, dict) and "object" in cell_data:
-                cell_object = cell_data["object"]
-            else:
-                cell_object = cell_data
-
-            cell_sections.append(set(cell_object.sections.keys()))
-            sect_locs.append(set(cell_object.sect_loc.keys()))
+        cell_sections = [
+            set(self.cell_types[cell_type]["object"].sections.keys())
+            for cell_type in target_populations
+        ]
+        sect_locs = [
+            set(self.cell_types[cell_type]["object"].sect_loc.keys())
+            for cell_type in target_populations
+        ]
 
         valid_cell_sections = set.intersection(*cell_sections)
         valid_sect_locs = set.intersection(*sect_locs)
@@ -1619,6 +1613,14 @@ class Network:
             elif new_name in self.cell_types.keys():
                 raise ValueError(f"'{new_name}' is already in cell_types!")
             elif original_name in self.cell_types.keys():
+                # Updating the cell object's name attribute BEFORE updating dictionaries
+                if (
+                    isinstance(self.cell_types[original_name], dict)
+                    and "object" in self.cell_types[original_name]
+                ):
+                    self.cell_types[original_name]["object"].name = new_name
+
+                # Update network-level dictionaries
                 for attr_name in [
                     "cell_types",
                     "pos_dict",
@@ -1777,15 +1779,8 @@ class Network:
         _validate_type(loc, str, "loc")
         _validate_type(receptor, str, "receptor")
 
-        # Handle both possible cell_types structures
-        target_cell_data = self.cell_types[target_type]
-        if isinstance(target_cell_data, dict) and "object" in target_cell_data:
-            target_cell_object = target_cell_data["object"]
-        else:
-            target_cell_object = target_cell_data
-
-        target_sect_loc = target_cell_object.sect_loc
-        target_sections = target_cell_object.sections
+        target_sect_loc = self.cell_types[target_type]["object"].sect_loc
+        target_sections = self.cell_types[target_type]["object"].sections
         valid_loc = list(target_sect_loc.keys()) + list(target_sections.keys())
 
         _check_option(
@@ -2342,14 +2337,7 @@ def _add_cell_type_bias(
         "section": section,
     }
 
-    # Handle both possible cell_types structures
-    cell_data = network.cell_types[cell_type]
-    if isinstance(cell_data, dict) and "object" in cell_data:
-        cell_object = cell_data["object"]
-    else:
-        cell_object = cell_data
-
-    sections = list(cell_object.sections.keys())
+    sections = list(network.cell_types[cell_type]["object"].sections.keys())
 
     # error when section is defined that doesn't exist.
     if section not in sections:

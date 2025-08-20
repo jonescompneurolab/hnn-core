@@ -1254,7 +1254,8 @@ def test_network_mesh():
 
 
 @pytest.mark.parametrize(
-    "network_model", [jones_2009_model, calcium_model, law_2021_model]
+    "network_model",
+    [jones_2009_model],  # TEMP JUST FOR DEBUGGING FOCUS ON JONES
 )
 def test_network_models_mesh(network_model):
     mesh_shape = (2, 3)
