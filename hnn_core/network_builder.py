@@ -344,11 +344,9 @@ class NetworkBuilder(object):
             print("Building the NEURON model")
 
         self._clear_last_network_objects()
-        import pdb
-        #pdb.set_trace()
-        # initialized dipole vectors based on cell metadata
+
         for cell_type, cell_data in self.net.cell_types.items():
-            if cell_data["metadata"].get("measure_dipole", False):
+            if cell_data['metadata'].get('measure_dipole', False):
                 self._nrn_dipoles[cell_type] = h.Vector()
 
         self._gid_assign()

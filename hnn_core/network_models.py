@@ -393,7 +393,7 @@ def calcium_model(
     # Replace L5 pyramidal cell template with updated calcium
     cell_name = "L5_pyramidal"
     pos = net.cell_types[cell_name]["object"].pos
-    net.cell_types[cell_name] = pyramidal_ca(cell_name=cell_name, pos=pos)
+    net.cell_types[cell_name]["object"] = pyramidal_ca(cell_name=cell_name, pos=pos)
 
     return net
 

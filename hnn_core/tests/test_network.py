@@ -266,7 +266,9 @@ def test_network_models():
 
     for cell_name in ["L5_pyramidal", "L2_pyramidal"]:
         assert net_law.cell_types[cell_name]["object"].synapses["gabab"]["tau1"] == 45.0
-        assert net_law.cell_types[cell_name]["object"].synapses["gabab"]["tau2"] == 200.0
+        assert (
+            net_law.cell_types[cell_name]["object"].synapses["gabab"]["tau2"] == 200.0
+        )
 
     # Check add_default_erp()
     net_default = jones_2009_model()
