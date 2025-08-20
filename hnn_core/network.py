@@ -1295,14 +1295,20 @@ class Network:
         ]
 
         # Ensure location exists for all target cells
-        cell_sections = [
-            set(self.cell_types[cell_type]["object"].sections.keys())
-            for cell_type in target_populations
-        ]
-        sect_locs = [
-            set(self.cell_types[cell_type]["object"].sect_loc.keys())
-            for cell_type in target_populations
-        ]
+        cell_sections = []
+        sect_locs = []
+
+        for cell_type in target_populations:
+            cell_data = self.cell_types[cell_type]
+
+            # Handle both possible cell_types structures
+            if isinstance(cell_data, dict) and "object" in cell_data:
+                cell_object = cell_data["object"]
+            else:
+                cell_object = cell_data
+
+            cell_sections.append(set(cell_object.sections.keys()))
+            sect_locs.append(set(cell_object.sect_loc.keys()))
 
         valid_cell_sections = set.intersection(*cell_sections)
         valid_sect_locs = set.intersection(*sect_locs)
@@ -1771,8 +1777,15 @@ class Network:
         _validate_type(loc, str, "loc")
         _validate_type(receptor, str, "receptor")
 
-        target_sect_loc = self.cell_types[target_type]["object"].sect_loc
-        target_sections = self.cell_types[target_type]["object"].sections
+        # Handle both possible cell_types structures
+        target_cell_data = self.cell_types[target_type]
+        if isinstance(target_cell_data, dict) and "object" in target_cell_data:
+            target_cell_object = target_cell_data["object"]
+        else:
+            target_cell_object = target_cell_data
+
+        target_sect_loc = target_cell_object.sect_loc
+        target_sections = target_cell_object.sections
         valid_loc = list(target_sect_loc.keys()) + list(target_sections.keys())
 
         _check_option(
@@ -2329,7 +2342,14 @@ def _add_cell_type_bias(
         "section": section,
     }
 
-    sections = list(network.cell_types[cell_type]["object"].sections.keys())
+    # Handle both possible cell_types structures
+    cell_data = network.cell_types[cell_type]
+    if isinstance(cell_data, dict) and "object" in cell_data:
+        cell_object = cell_data["object"]
+    else:
+        cell_object = cell_data
+
+    sections = list(cell_object.sections.keys())
 
     # error when section is defined that doesn't exist.
     if section not in sections:

@@ -122,7 +122,7 @@ plot_psd(dpls[trial_idx], fmin=20., fmax=100., tmin=tmin)
 # we decrease `tau2` from 5 to 2 ms. This will shorten the effective
 # refactory period between L5 pyramidal cell spikes and increase the PING
 # frequency from ~50 to ~65 Hz.
-net.cell_types['L5_pyramidal'].synapses['gabaa']['tau2'] = 2
+net.cell_types['L5_pyramidal']["object"].synapses['gabaa']['tau2'] = 2
 dpls = simulate_dipole(net, tstop=250., n_trials=1)
 dpls = [dpl.scale(scaling_factor) for dpl in dpls]  # scale in place
 
