@@ -319,7 +319,7 @@ def law_2021_model(
 
     # Remove L5 pyramidal somatic and basal dendrite calcium channels
     for sec in ["soma", "basal_1", "basal_2", "basal_3"]:
-        del net.cell_types["L5_pyramidal"].sections[sec].mechs["ca"]
+        del net.cell_types["L5_pyramidal"]["object"].sections[sec].mechs["ca"]
 
     # Remove L2_basket -> L5_pyramidal gabaa connection
     del net.connectivity[10]  # Original paper simply sets gbar to 0.0

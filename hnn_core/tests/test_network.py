@@ -265,8 +265,8 @@ def test_network_models():
     )
 
     for cell_name in ["L5_pyramidal", "L2_pyramidal"]:
-        assert net_law.cell_types[cell_name].synapses["gabab"]["tau1"] == 45.0
-        assert net_law.cell_types[cell_name].synapses["gabab"]["tau2"] == 200.0
+        assert net_law.cell_types[cell_name]["object"].synapses["gabab"]["tau1"] == 45.0
+        assert net_law.cell_types[cell_name]["object"].synapses["gabab"]["tau2"] == 200.0
 
     # Check add_default_erp()
     net_default = jones_2009_model()
@@ -1056,7 +1056,7 @@ def test_add_cell_type():
     new_cell = net.cell_types["L2_basket"].copy()
     net._add_cell_type("new_type", pos=pos, cell_template=new_cell)
     assert "new_type" in net.cell_types.keys()
-    net.cell_types["new_type"].synapses["gabaa"]["tau1"] = tau1
+    net.cell_types["new_type"]["object"].synapses["gabaa"]["tau1"] = tau1
 
     n_new_type = len(net.gid_ranges["new_type"])
     assert n_new_type == len(pos)

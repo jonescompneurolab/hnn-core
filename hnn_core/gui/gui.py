@@ -2306,8 +2306,10 @@ def _init_network_from_widgets(
                 break  # update needed only once per vbox_key
 
     for cell_type in single_simulation_data["net"].cell_types.keys():
-        single_simulation_data["net"].cell_types[cell_type]._update_end_pts()
-        single_simulation_data["net"].cell_types[cell_type]._compute_section_mechs()
+        single_simulation_data["net"].cell_types[cell_type]["object"]._update_end_pts()
+        single_simulation_data["net"].cell_types[cell_type][
+            "object"
+        ]._compute_section_mechs()
 
     if add_drive is False:
         return
@@ -2506,7 +2508,7 @@ def _update_L2_geometry_cell_params(net, cell_param_key, param_list):
     cell_params = param_list
     cell_type = f"{cell_param_key.split('_')[0]}_pyramidal"
 
-    sections = net.cell_types[cell_type].sections
+    sections = net.cell_types[cell_type]["object"].sections
     # Soma
     sections["soma"]._L = cell_params[0].value
     sections["soma"]._diam = cell_params[1].value
@@ -2533,7 +2535,7 @@ def _update_L5_geometry_cell_params(net, cell_param_key, param_list):
     cell_params = param_list
     cell_type = f"{cell_param_key.split('_')[0]}_pyramidal"
 
-    sections = net.cell_types[cell_type].sections
+    sections = net.cell_types[cell_type]["object"].sections
     # Soma
     sections["soma"]._L = cell_params[0].value
     sections["soma"]._diam = cell_params[1].value
@@ -2568,7 +2570,7 @@ def _update_L5_geometry_cell_params(net, cell_param_key, param_list):
 def _update_synapse_cell_params(net, cell_param_key, param_list):
     cell_params = param_list
     cell_type = f"{cell_param_key.split('_')[0]}_pyramidal"
-    network_synapses = net.cell_types[cell_type].synapses
+    network_synapses = net.cell_types[cell_type]["object"].synapses
     synapse_sections = ["ampa", "nmda", "gabaa", "gabab"]
 
     param_indices = [(0, 1, 2), (3, 4, 5), (6, 7, 8), (9, 10, 11)]
@@ -2582,7 +2584,7 @@ def _update_synapse_cell_params(net, cell_param_key, param_list):
 
 def _update_L2_biophysics_cell_params(net, cell_param_key, param_list):
     cell_type = f"{cell_param_key.split('_')[0]}_pyramidal"
-    sections = net.cell_types[cell_type].sections
+    sections = net.cell_types[cell_type]["object"].sections
     # Soma
     mechs_params = {
         "hh2": {
@@ -2610,7 +2612,7 @@ def _update_L2_biophysics_cell_params(net, cell_param_key, param_list):
 
 def _update_L5_biophysics_cell_params(net, cell_param_key, param_list):
     cell_type = f"{cell_param_key.split('_')[0]}_pyramidal"
-    sections = net.cell_types[cell_type].sections
+    sections = net.cell_types[cell_type]["object"].sections
     # Soma
     mechs_params = {
         "hh2": {
