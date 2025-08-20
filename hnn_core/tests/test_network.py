@@ -122,8 +122,26 @@ def test_custom_network_coords(mesh_shape):
 
     # network with custom cell types and positions (an irregular one)
     custom_cell_types = {
-        "L2_pyramidal": pyramidal(cell_name="L2_pyramidal"),
-        "L5_pyramidal": pyramidal(cell_name="L5_pyramidal"),
+        "L2_pyramidal": {
+            "object": pyramidal(cell_name="L2_pyramidal"),
+            "metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "2",
+                "measure_dipole": True,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+        "L5_pyramidal": {
+            "object": pyramidal(cell_name="L5_pyramidal"),
+            "metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "5",
+                "measure_dipole": True,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
     }
     custom_layer_dict = _create_cell_coords(
         n_pyr_x=mesh_shape[0],
