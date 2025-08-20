@@ -6,1215 +6,1251 @@
     "celsius": 37.0,
     "cell_types": {
         "L2_basket": {
-            "name": "L2_basket",
-            "pos": [
-                0,
-                0,
-                0
-            ],
-            "sections": {
-                "soma": {
-                    "L": 39.0,
-                    "diam": 20.0,
-                    "cm": 0.85,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0,
-                            0,
-                            0
-                        ],
-                        [
-                            0,
-                            0,
-                            39.0
-                        ]
-                    ],
-                    "nseg": 1,
-                    "mechs": {
-                        "hh2": {}
-                    },
-                    "syns": [
-                        "ampa",
-                        "gabaa",
-                        "nmda"
-                    ]
-                }
-            },
-            "synapses": {
-                "ampa": {
-                    "e": 0,
-                    "tau1": 0.5,
-                    "tau2": 5.0
-                },
-                "gabaa": {
-                    "e": -80,
-                    "tau1": 0.5,
-                    "tau2": 5.0
-                },
-                "nmda": {
-                    "e": 0,
-                    "tau1": 1.0,
-                    "tau2": 20.0
-                }
-            },
-            "cell_tree": null,
-            "sect_loc": {
-                "proximal": [
-                    "soma"
+            "cell_data": {
+                "name": "L2_basket",
+                "pos": [
+                    0,
+                    0,
+                    0
                 ],
-                "distal": [
-                    "soma"
-                ]
+                "sections": {
+                    "soma": {
+                        "L": 39.0,
+                        "diam": 20.0,
+                        "cm": 0.85,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0,
+                                0,
+                                0
+                            ],
+                            [
+                                0,
+                                0,
+                                39.0
+                            ]
+                        ],
+                        "nseg": 1,
+                        "mechs": {
+                            "hh2": {}
+                        },
+                        "syns": [
+                            "ampa",
+                            "gabaa",
+                            "nmda"
+                        ]
+                    }
+                },
+                "synapses": {
+                    "ampa": {
+                        "e": 0,
+                        "tau1": 0.5,
+                        "tau2": 5.0
+                    },
+                    "gabaa": {
+                        "e": -80,
+                        "tau1": 0.5,
+                        "tau2": 5.0
+                    },
+                    "nmda": {
+                        "e": 0,
+                        "tau1": 1.0,
+                        "tau2": 20.0
+                    }
+                },
+                "cell_tree": null,
+                "sect_loc": {
+                    "proximal": [
+                        "soma"
+                    ],
+                    "distal": [
+                        "soma"
+                    ]
+                },
+                "gid": null,
+                "dipole_pp": [],
+                "vsec": {},
+                "isec": {},
+                "ca": {},
+                "tonic_biases": []
             },
-            "gid": null,
-            "dipole_pp": [],
-            "vsec": {},
-            "isec": {},
-            "ca": {},
-            "tonic_biases": []
+            "metadata": {
+                "morpho_type": "basket",
+                "electro_type": "inhibitory",
+                "layer": "2",
+                "measure_dipole": false,
+                "reference": "https://doi.org/10.7554/eLife.51214"
+            }
         },
         "L2_pyramidal": {
-            "name": "L2Pyr",
-            "pos": [
-                0,
-                0,
-                0
-            ],
-            "sections": {
-                "apical_trunk": {
-                    "L": 59.5,
-                    "diam": 4.25,
-                    "cm": 0.6195,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0.0,
-                            0.0,
-                            22.099999999999987
+            "cell_data": {
+                "name": "L2Pyr",
+                "pos": [
+                    0,
+                    0,
+                    0
+                ],
+                "sections": {
+                    "apical_trunk": {
+                        "L": 59.5,
+                        "diam": 4.25,
+                        "cm": 0.6195,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0.0,
+                                0.0,
+                                22.099999999999987
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                81.59999999999998
+                            ]
                         ],
-                        [
-                            0.0,
-                            0.0,
-                            81.59999999999998
-                        ]
-                    ],
-                    "nseg": 1,
-                    "mechs": {
-                        "km": {
-                            "gbar_km": 250.0
+                        "nseg": 1,
+                        "mechs": {
+                            "km": {
+                                "gbar_km": 250.0
+                            },
+                            "hh2": {
+                                "gkbar_hh2": 0.01,
+                                "gnabar_hh2": 0.15,
+                                "gl_hh2": 4.26e-05,
+                                "el_hh2": -65.0
+                            }
                         },
-                        "hh2": {
-                            "gkbar_hh2": 0.01,
-                            "gnabar_hh2": 0.15,
-                            "gl_hh2": 4.26e-05,
-                            "el_hh2": -65.0
-                        }
+                        "syns": [
+                            "ampa",
+                            "nmda",
+                            "gabaa",
+                            "gabab"
+                        ]
                     },
-                    "syns": [
-                        "ampa",
-                        "nmda",
-                        "gabaa",
-                        "gabab"
+                    "apical_1": {
+                        "L": 306.0,
+                        "diam": 4.08,
+                        "cm": 0.6195,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0.0,
+                                0.0,
+                                81.59999999999997
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                387.59999999999997
+                            ]
+                        ],
+                        "nseg": 7,
+                        "mechs": {
+                            "km": {
+                                "gbar_km": 250.0
+                            },
+                            "hh2": {
+                                "gkbar_hh2": 0.01,
+                                "gnabar_hh2": 0.15,
+                                "gl_hh2": 4.26e-05,
+                                "el_hh2": -65.0
+                            }
+                        },
+                        "syns": [
+                            "ampa",
+                            "nmda",
+                            "gabaa",
+                            "gabab"
+                        ]
+                    },
+                    "apical_tuft": {
+                        "L": 238.0,
+                        "diam": 3.4,
+                        "cm": 0.6195,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0.0,
+                                0.0,
+                                387.5999999999999
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                625.5999999999999
+                            ]
+                        ],
+                        "nseg": 5,
+                        "mechs": {
+                            "km": {
+                                "gbar_km": 250.0
+                            },
+                            "hh2": {
+                                "gkbar_hh2": 0.01,
+                                "gnabar_hh2": 0.15,
+                                "gl_hh2": 4.26e-05,
+                                "el_hh2": -65.0
+                            }
+                        },
+                        "syns": [
+                            "ampa",
+                            "nmda",
+                            "gabaa",
+                            "gabab"
+                        ]
+                    },
+                    "apical_oblique": {
+                        "L": 340.0,
+                        "diam": 3.91,
+                        "cm": 0.6195,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0.0,
+                                0.0,
+                                81.59999999999998
+                            ],
+                            [
+                                -340.0,
+                                0.0,
+                                81.59999999999998
+                            ]
+                        ],
+                        "nseg": 7,
+                        "mechs": {
+                            "km": {
+                                "gbar_km": 250.0
+                            },
+                            "hh2": {
+                                "gkbar_hh2": 0.01,
+                                "gnabar_hh2": 0.15,
+                                "gl_hh2": 4.26e-05,
+                                "el_hh2": -65.0
+                            }
+                        },
+                        "syns": [
+                            "ampa",
+                            "nmda",
+                            "gabaa",
+                            "gabab"
+                        ]
+                    },
+                    "basal_1": {
+                        "L": 85.0,
+                        "diam": 4.25,
+                        "cm": 0.6195,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                -85.0
+                            ]
+                        ],
+                        "nseg": 1,
+                        "mechs": {
+                            "km": {
+                                "gbar_km": 250.0
+                            },
+                            "hh2": {
+                                "gkbar_hh2": 0.01,
+                                "gnabar_hh2": 0.15,
+                                "gl_hh2": 4.26e-05,
+                                "el_hh2": -65.0
+                            }
+                        },
+                        "syns": [
+                            "ampa",
+                            "nmda",
+                            "gabaa",
+                            "gabab"
+                        ]
+                    },
+                    "basal_2": {
+                        "L": 255.0,
+                        "diam": 2.72,
+                        "cm": 0.6195,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0.0,
+                                0.0,
+                                -85.0
+                            ],
+                            [
+                                -180.31222920256963,
+                                0.0,
+                                -265.3122292025696
+                            ]
+                        ],
+                        "nseg": 5,
+                        "mechs": {
+                            "km": {
+                                "gbar_km": 250.0
+                            },
+                            "hh2": {
+                                "gkbar_hh2": 0.01,
+                                "gnabar_hh2": 0.15,
+                                "gl_hh2": 4.26e-05,
+                                "el_hh2": -65.0
+                            }
+                        },
+                        "syns": [
+                            "ampa",
+                            "nmda",
+                            "gabaa",
+                            "gabab"
+                        ]
+                    },
+                    "basal_3": {
+                        "L": 255.0,
+                        "diam": 2.72,
+                        "cm": 0.6195,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0.0,
+                                0.0,
+                                -85.0
+                            ],
+                            [
+                                180.31222920256963,
+                                0.0,
+                                -265.3122292025696
+                            ]
+                        ],
+                        "nseg": 5,
+                        "mechs": {
+                            "km": {
+                                "gbar_km": 250.0
+                            },
+                            "hh2": {
+                                "gkbar_hh2": 0.01,
+                                "gnabar_hh2": 0.15,
+                                "gl_hh2": 4.26e-05,
+                                "el_hh2": -65.0
+                            }
+                        },
+                        "syns": [
+                            "ampa",
+                            "nmda",
+                            "gabaa",
+                            "gabab"
+                        ]
+                    },
+                    "soma": {
+                        "L": 22.1,
+                        "diam": 23.4,
+                        "cm": 0.6195,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                22.1
+                            ]
+                        ],
+                        "nseg": 1,
+                        "mechs": {
+                            "km": {
+                                "gbar_km": 250.0
+                            },
+                            "hh2": {
+                                "gkbar_hh2": 0.01,
+                                "gnabar_hh2": 0.18,
+                                "gl_hh2": 4.26e-05,
+                                "el_hh2": -65.0
+                            }
+                        },
+                        "syns": [
+                            "gabaa",
+                            "gabab"
+                        ]
+                    }
+                },
+                "synapses": {
+                    "ampa": {
+                        "e": 0.0,
+                        "tau1": 0.5,
+                        "tau2": 5.0
+                    },
+                    "nmda": {
+                        "e": 0.0,
+                        "tau1": 1.0,
+                        "tau2": 20.0
+                    },
+                    "gabaa": {
+                        "e": -80.0,
+                        "tau1": 0.5,
+                        "tau2": 5.0
+                    },
+                    "gabab": {
+                        "e": -80.0,
+                        "tau1": 1.0,
+                        "tau2": 20.0
+                    }
+                },
+                "cell_tree": {
+                    "apical_trunk,0": [
+                        "apical_trunk,1"
+                    ],
+                    "apical_1,0": [
+                        "apical_1,1"
+                    ],
+                    "apical_tuft,0": [
+                        "apical_tuft,1"
+                    ],
+                    "apical_oblique,0": [
+                        "apical_oblique,1"
+                    ],
+                    "basal_1,0": [
+                        "basal_1,1"
+                    ],
+                    "basal_2,0": [
+                        "basal_2,1"
+                    ],
+                    "basal_3,0": [
+                        "basal_3,1"
+                    ],
+                    "soma,0": [
+                        "soma,1",
+                        "basal_1,0"
+                    ],
+                    "soma,1": [
+                        "apical_trunk,0"
+                    ],
+                    "apical_trunk,1": [
+                        "apical_1,0",
+                        "apical_oblique,0"
+                    ],
+                    "apical_1,1": [
+                        "apical_tuft,0"
+                    ],
+                    "basal_1,1": [
+                        "basal_2,0",
+                        "basal_3,0"
                     ]
                 },
-                "apical_1": {
-                    "L": 306.0,
-                    "diam": 4.08,
-                    "cm": 0.6195,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0.0,
-                            0.0,
-                            81.59999999999997
-                        ],
-                        [
-                            0.0,
-                            0.0,
-                            387.59999999999997
-                        ]
+                "sect_loc": {
+                    "proximal": [
+                        "apical_oblique",
+                        "basal_2",
+                        "basal_3"
                     ],
-                    "nseg": 7,
-                    "mechs": {
-                        "km": {
-                            "gbar_km": 250.0
-                        },
-                        "hh2": {
-                            "gkbar_hh2": 0.01,
-                            "gnabar_hh2": 0.15,
-                            "gl_hh2": 4.26e-05,
-                            "el_hh2": -65.0
-                        }
-                    },
-                    "syns": [
-                        "ampa",
-                        "nmda",
-                        "gabaa",
-                        "gabab"
+                    "distal": [
+                        "apical_tuft"
                     ]
                 },
-                "apical_tuft": {
-                    "L": 238.0,
-                    "diam": 3.4,
-                    "cm": 0.6195,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0.0,
-                            0.0,
-                            387.5999999999999
-                        ],
-                        [
-                            0.0,
-                            0.0,
-                            625.5999999999999
-                        ]
-                    ],
-                    "nseg": 5,
-                    "mechs": {
-                        "km": {
-                            "gbar_km": 250.0
-                        },
-                        "hh2": {
-                            "gkbar_hh2": 0.01,
-                            "gnabar_hh2": 0.15,
-                            "gl_hh2": 4.26e-05,
-                            "el_hh2": -65.0
-                        }
-                    },
-                    "syns": [
-                        "ampa",
-                        "nmda",
-                        "gabaa",
-                        "gabab"
-                    ]
-                },
-                "apical_oblique": {
-                    "L": 340.0,
-                    "diam": 3.91,
-                    "cm": 0.6195,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0.0,
-                            0.0,
-                            81.59999999999998
-                        ],
-                        [
-                            -340.0,
-                            0.0,
-                            81.59999999999998
-                        ]
-                    ],
-                    "nseg": 7,
-                    "mechs": {
-                        "km": {
-                            "gbar_km": 250.0
-                        },
-                        "hh2": {
-                            "gkbar_hh2": 0.01,
-                            "gnabar_hh2": 0.15,
-                            "gl_hh2": 4.26e-05,
-                            "el_hh2": -65.0
-                        }
-                    },
-                    "syns": [
-                        "ampa",
-                        "nmda",
-                        "gabaa",
-                        "gabab"
-                    ]
-                },
-                "basal_1": {
-                    "L": 85.0,
-                    "diam": 4.25,
-                    "cm": 0.6195,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.0,
-                            -85.0
-                        ]
-                    ],
-                    "nseg": 1,
-                    "mechs": {
-                        "km": {
-                            "gbar_km": 250.0
-                        },
-                        "hh2": {
-                            "gkbar_hh2": 0.01,
-                            "gnabar_hh2": 0.15,
-                            "gl_hh2": 4.26e-05,
-                            "el_hh2": -65.0
-                        }
-                    },
-                    "syns": [
-                        "ampa",
-                        "nmda",
-                        "gabaa",
-                        "gabab"
-                    ]
-                },
-                "basal_2": {
-                    "L": 255.0,
-                    "diam": 2.72,
-                    "cm": 0.6195,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0.0,
-                            0.0,
-                            -85.0
-                        ],
-                        [
-                            -180.31222920256963,
-                            0.0,
-                            -265.3122292025696
-                        ]
-                    ],
-                    "nseg": 5,
-                    "mechs": {
-                        "km": {
-                            "gbar_km": 250.0
-                        },
-                        "hh2": {
-                            "gkbar_hh2": 0.01,
-                            "gnabar_hh2": 0.15,
-                            "gl_hh2": 4.26e-05,
-                            "el_hh2": -65.0
-                        }
-                    },
-                    "syns": [
-                        "ampa",
-                        "nmda",
-                        "gabaa",
-                        "gabab"
-                    ]
-                },
-                "basal_3": {
-                    "L": 255.0,
-                    "diam": 2.72,
-                    "cm": 0.6195,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0.0,
-                            0.0,
-                            -85.0
-                        ],
-                        [
-                            180.31222920256963,
-                            0.0,
-                            -265.3122292025696
-                        ]
-                    ],
-                    "nseg": 5,
-                    "mechs": {
-                        "km": {
-                            "gbar_km": 250.0
-                        },
-                        "hh2": {
-                            "gkbar_hh2": 0.01,
-                            "gnabar_hh2": 0.15,
-                            "gl_hh2": 4.26e-05,
-                            "el_hh2": -65.0
-                        }
-                    },
-                    "syns": [
-                        "ampa",
-                        "nmda",
-                        "gabaa",
-                        "gabab"
-                    ]
-                },
-                "soma": {
-                    "L": 22.1,
-                    "diam": 23.4,
-                    "cm": 0.6195,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.0,
-                            22.1
-                        ]
-                    ],
-                    "nseg": 1,
-                    "mechs": {
-                        "km": {
-                            "gbar_km": 250.0
-                        },
-                        "hh2": {
-                            "gkbar_hh2": 0.01,
-                            "gnabar_hh2": 0.18,
-                            "gl_hh2": 4.26e-05,
-                            "el_hh2": -65.0
-                        }
-                    },
-                    "syns": [
-                        "gabaa",
-                        "gabab"
-                    ]
-                }
+                "gid": null,
+                "dipole_pp": [],
+                "vsec": {},
+                "isec": {},
+                "ca": {},
+                "tonic_biases": []
             },
-            "synapses": {
-                "ampa": {
-                    "e": 0.0,
-                    "tau1": 0.5,
-                    "tau2": 5.0
-                },
-                "nmda": {
-                    "e": 0.0,
-                    "tau1": 1.0,
-                    "tau2": 20.0
-                },
-                "gabaa": {
-                    "e": -80.0,
-                    "tau1": 0.5,
-                    "tau2": 5.0
-                },
-                "gabab": {
-                    "e": -80.0,
-                    "tau1": 1.0,
-                    "tau2": 20.0
-                }
-            },
-            "cell_tree": {
-                "apical_trunk,0": [
-                    "apical_trunk,1"
-                ],
-                "apical_1,0": [
-                    "apical_1,1"
-                ],
-                "apical_tuft,0": [
-                    "apical_tuft,1"
-                ],
-                "apical_oblique,0": [
-                    "apical_oblique,1"
-                ],
-                "basal_1,0": [
-                    "basal_1,1"
-                ],
-                "basal_2,0": [
-                    "basal_2,1"
-                ],
-                "basal_3,0": [
-                    "basal_3,1"
-                ],
-                "soma,0": [
-                    "soma,1",
-                    "basal_1,0"
-                ],
-                "soma,1": [
-                    "apical_trunk,0"
-                ],
-                "apical_trunk,1": [
-                    "apical_1,0",
-                    "apical_oblique,0"
-                ],
-                "apical_1,1": [
-                    "apical_tuft,0"
-                ],
-                "basal_1,1": [
-                    "basal_2,0",
-                    "basal_3,0"
-                ]
-            },
-            "sect_loc": {
-                "proximal": [
-                    "apical_oblique",
-                    "basal_2",
-                    "basal_3"
-                ],
-                "distal": [
-                    "apical_tuft"
-                ]
-            },
-            "gid": null,
-            "dipole_pp": [],
-            "vsec": {},
-            "isec": {},
-            "ca": {},
-            "tonic_biases": []
+            "metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "2",
+                "measure_dipole": true,
+                "reference": "https://doi.org/10.7554/eLife.51214"
+            }
         },
         "L5_basket": {
-            "name": "L5_basket",
-            "pos": [
-                0,
-                0,
-                0
-            ],
-            "sections": {
-                "soma": {
-                    "L": 39.0,
-                    "diam": 20.0,
-                    "cm": 0.85,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0,
-                            0,
-                            0
-                        ],
-                        [
-                            0,
-                            0,
-                            39.0
-                        ]
-                    ],
-                    "nseg": 1,
-                    "mechs": {
-                        "hh2": {}
-                    },
-                    "syns": [
-                        "ampa",
-                        "gabaa",
-                        "nmda"
-                    ]
-                }
-            },
-            "synapses": {
-                "ampa": {
-                    "e": 0,
-                    "tau1": 0.5,
-                    "tau2": 5.0
-                },
-                "gabaa": {
-                    "e": -80,
-                    "tau1": 0.5,
-                    "tau2": 5.0
-                },
-                "nmda": {
-                    "e": 0,
-                    "tau1": 1.0,
-                    "tau2": 20.0
-                }
-            },
-            "cell_tree": null,
-            "sect_loc": {
-                "proximal": [
-                    "soma"
+            "cell_data": {
+                "name": "L5_basket",
+                "pos": [
+                    0,
+                    0,
+                    0
                 ],
-                "distal": []
+                "sections": {
+                    "soma": {
+                        "L": 39.0,
+                        "diam": 20.0,
+                        "cm": 0.85,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0,
+                                0,
+                                0
+                            ],
+                            [
+                                0,
+                                0,
+                                39.0
+                            ]
+                        ],
+                        "nseg": 1,
+                        "mechs": {
+                            "hh2": {}
+                        },
+                        "syns": [
+                            "ampa",
+                            "gabaa",
+                            "nmda"
+                        ]
+                    }
+                },
+                "synapses": {
+                    "ampa": {
+                        "e": 0,
+                        "tau1": 0.5,
+                        "tau2": 5.0
+                    },
+                    "gabaa": {
+                        "e": -80,
+                        "tau1": 0.5,
+                        "tau2": 5.0
+                    },
+                    "nmda": {
+                        "e": 0,
+                        "tau1": 1.0,
+                        "tau2": 20.0
+                    }
+                },
+                "cell_tree": null,
+                "sect_loc": {
+                    "proximal": [
+                        "soma"
+                    ],
+                    "distal": []
+                },
+                "gid": null,
+                "dipole_pp": [],
+                "vsec": {},
+                "isec": {},
+                "ca": {},
+                "tonic_biases": []
             },
-            "gid": null,
-            "dipole_pp": [],
-            "vsec": {},
-            "isec": {},
-            "ca": {},
-            "tonic_biases": []
+            "metadata": {
+                "morpho_type": "basket",
+                "electro_type": "inhibitory",
+                "layer": "5",
+                "measure_dipole": false,
+                "reference": "https://doi.org/10.7554/eLife.51214"
+            }
         },
         "L5_pyramidal": {
-            "name": "L5Pyr",
-            "pos": [
-                0,
-                0,
-                0
-            ],
-            "sections": {
-                "apical_trunk": {
-                    "L": 102.0,
-                    "diam": 10.2,
-                    "cm": 0.85,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0.0,
-                            0.0,
-                            39.0
-                        ],
-                        [
-                            0.0,
-                            0.0,
-                            141.0
-                        ]
-                    ],
-                    "nseg": 3,
-                    "mechs": {
-                        "hh2": {
-                            "gkbar_hh2": 0.01,
-                            "gnabar_hh2": 0.14,
-                            "gl_hh2": 4.26e-05,
-                            "el_hh2": -71.0
-                        },
-                        "ca": {
-                            "gbar_ca": 60.0
-                        },
-                        "cad": {
-                            "taur_cad": 20.0
-                        },
-                        "kca": {
-                            "gbar_kca": 0.0002
-                        },
-                        "km": {
-                            "gbar_km": 200.0
-                        },
-                        "cat": {
-                            "gbar_cat": 0.0002
-                        },
-                        "ar": {
-                            "gbar_ar": [
-                                [
-                                    0.16666666666666666,
-                                    0.5,
-                                    0.8333333333333333
-                                ],
-                                [
-                                    1.1829366106478108e-06,
-                                    1.3099644507332472e-06,
-                                    1.4506329812931586e-06
-                                ]
+            "cell_data": {
+                "name": "L5Pyr",
+                "pos": [
+                    0,
+                    0,
+                    0
+                ],
+                "sections": {
+                    "apical_trunk": {
+                        "L": 102.0,
+                        "diam": 10.2,
+                        "cm": 0.85,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0.0,
+                                0.0,
+                                39.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                141.0
                             ]
-                        }
+                        ],
+                        "nseg": 3,
+                        "mechs": {
+                            "hh2": {
+                                "gkbar_hh2": 0.01,
+                                "gnabar_hh2": 0.14,
+                                "gl_hh2": 4.26e-05,
+                                "el_hh2": -71.0
+                            },
+                            "ca": {
+                                "gbar_ca": 60.0
+                            },
+                            "cad": {
+                                "taur_cad": 20.0
+                            },
+                            "kca": {
+                                "gbar_kca": 0.0002
+                            },
+                            "km": {
+                                "gbar_km": 200.0
+                            },
+                            "cat": {
+                                "gbar_cat": 0.0002
+                            },
+                            "ar": {
+                                "gbar_ar": [
+                                    [
+                                        0.16666666666666666,
+                                        0.5,
+                                        0.8333333333333333
+                                    ],
+                                    [
+                                        1.1829366106478108e-06,
+                                        1.3099644507332472e-06,
+                                        1.4506329812931586e-06
+                                    ]
+                                ]
+                            }
+                        },
+                        "syns": [
+                            "ampa",
+                            "nmda",
+                            "gabaa",
+                            "gabab"
+                        ]
                     },
-                    "syns": [
-                        "ampa",
-                        "nmda",
-                        "gabaa",
-                        "gabab"
+                    "apical_1": {
+                        "L": 680.0,
+                        "diam": 7.48,
+                        "cm": 0.85,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0.0,
+                                0.0,
+                                141.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                821.0
+                            ]
+                        ],
+                        "nseg": 13,
+                        "mechs": {
+                            "hh2": {
+                                "gkbar_hh2": 0.01,
+                                "gnabar_hh2": 0.14,
+                                "gl_hh2": 4.26e-05,
+                                "el_hh2": -71.0
+                            },
+                            "ca": {
+                                "gbar_ca": 60.0
+                            },
+                            "cad": {
+                                "taur_cad": 20.0
+                            },
+                            "kca": {
+                                "gbar_kca": 0.0002
+                            },
+                            "km": {
+                                "gbar_km": 200.0
+                            },
+                            "cat": {
+                                "gbar_cat": 0.0002
+                            },
+                            "ar": {
+                                "gbar_ar": [
+                                    [
+                                        0.038461538461538464,
+                                        0.11538461538461539,
+                                        0.19230769230769232,
+                                        0.2692307692307693,
+                                        0.34615384615384615,
+                                        0.42307692307692313,
+                                        0.5,
+                                        0.576923076923077,
+                                        0.6538461538461539,
+                                        0.7307692307692308,
+                                        0.8076923076923077,
+                                        0.8846153846153847,
+                                        0.9615384615384616
+                                    ],
+                                    [
+                                        1.65113270202017e-06,
+                                        1.931669423661152e-06,
+                                        2.2598709102800053e-06,
+                                        2.6438356732128095e-06,
+                                        3.0930382063666464e-06,
+                                        3.6185627733882756e-06,
+                                        4.233376916586103e-06,
+                                        4.952651436554499e-06,
+                                        5.7941347381338055e-06,
+                                        6.7785907798519655e-06,
+                                        7.930311433436494e-06,
+                                        9.27771589608585e-06,
+                                        1.0854051946253036e-05
+                                    ]
+                                ]
+                            }
+                        },
+                        "syns": [
+                            "ampa",
+                            "nmda",
+                            "gabaa",
+                            "gabab"
+                        ]
+                    },
+                    "apical_2": {
+                        "L": 680.0,
+                        "diam": 4.93,
+                        "cm": 0.85,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0.0,
+                                0.0,
+                                821.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1501.0
+                            ]
+                        ],
+                        "nseg": 13,
+                        "mechs": {
+                            "hh2": {
+                                "gkbar_hh2": 0.01,
+                                "gnabar_hh2": 0.14,
+                                "gl_hh2": 4.26e-05,
+                                "el_hh2": -71.0
+                            },
+                            "ca": {
+                                "gbar_ca": 60.0
+                            },
+                            "cad": {
+                                "taur_cad": 20.0
+                            },
+                            "kca": {
+                                "gbar_kca": 0.0002
+                            },
+                            "km": {
+                                "gbar_km": 200.0
+                            },
+                            "cat": {
+                                "gbar_cat": 0.0002
+                            },
+                            "ar": {
+                                "gbar_ar": [
+                                    [
+                                        0.038461538461538464,
+                                        0.11538461538461539,
+                                        0.19230769230769232,
+                                        0.2692307692307693,
+                                        0.34615384615384615,
+                                        0.42307692307692313,
+                                        0.5,
+                                        0.576923076923077,
+                                        0.6538461538461539,
+                                        0.7307692307692308,
+                                        0.8076923076923077,
+                                        0.8846153846153847,
+                                        0.9615384615384616
+                                    ],
+                                    [
+                                        1.2698216346726254e-05,
+                                        1.485571463880175e-05,
+                                        1.7379784010878467e-05,
+                                        2.0332706948734884e-05,
+                                        2.378734808236754e-05,
+                                        2.782895215174096e-05,
+                                        3.25572474570191e-05,
+                                        3.8088906696807314e-05,
+                                        4.456042591663622e-05,
+                                        5.213149260696589e-05,
+                                        6.098892605996203e-05,
+                                        7.135128721502373e-05,
+                                        8.347427174296413e-05
+                                    ]
+                                ]
+                            }
+                        },
+                        "syns": [
+                            "ampa",
+                            "nmda",
+                            "gabaa",
+                            "gabab"
+                        ]
+                    },
+                    "apical_tuft": {
+                        "L": 425.0,
+                        "diam": 3.4,
+                        "cm": 0.85,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0.0,
+                                0.0,
+                                1501.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                1926.0
+                            ]
+                        ],
+                        "nseg": 9,
+                        "mechs": {
+                            "hh2": {
+                                "gkbar_hh2": 0.01,
+                                "gnabar_hh2": 0.14,
+                                "gl_hh2": 4.26e-05,
+                                "el_hh2": -71.0
+                            },
+                            "ca": {
+                                "gbar_ca": 60.0
+                            },
+                            "cad": {
+                                "taur_cad": 20.0
+                            },
+                            "kca": {
+                                "gbar_kca": 0.0002
+                            },
+                            "km": {
+                                "gbar_km": 200.0
+                            },
+                            "cat": {
+                                "gbar_cat": 0.0002
+                            },
+                            "ar": {
+                                "gbar_ar": [
+                                    [
+                                        0.05555555555555555,
+                                        0.16666666666666666,
+                                        0.2777777777777778,
+                                        0.38888888888888884,
+                                        0.5,
+                                        0.611111111111111,
+                                        0.7222222222222222,
+                                        0.8333333333333333,
+                                        0.9444444444444444
+                                    ],
+                                    [
+                                        9.691490576523929e-05,
+                                        0.00011166462953272171,
+                                        0.00012865915093478097,
+                                        0.00014824011138108928,
+                                        0.00017080114754851162,
+                                        0.0001967958046718656,
+                                        0.00022674665417834631,
+                                        0.0002612557989577143,
+                                        0.0003010169774560311
+                                    ]
+                                ]
+                            }
+                        },
+                        "syns": [
+                            "ampa",
+                            "nmda",
+                            "gabaa",
+                            "gabab"
+                        ]
+                    },
+                    "apical_oblique": {
+                        "L": 255.0,
+                        "diam": 5.1,
+                        "cm": 0.85,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0.0,
+                                0.0,
+                                141.0
+                            ],
+                            [
+                                -255.0,
+                                0.0,
+                                141.0
+                            ]
+                        ],
+                        "nseg": 5,
+                        "mechs": {
+                            "hh2": {
+                                "gkbar_hh2": 0.01,
+                                "gnabar_hh2": 0.14,
+                                "gl_hh2": 4.26e-05,
+                                "el_hh2": -71.0
+                            },
+                            "ca": {
+                                "gbar_ca": 60.0
+                            },
+                            "cad": {
+                                "taur_cad": 20.0
+                            },
+                            "kca": {
+                                "gbar_kca": 0.0002
+                            },
+                            "km": {
+                                "gbar_km": 200.0
+                            },
+                            "cat": {
+                                "gbar_cat": 0.0002
+                            },
+                            "ar": {
+                                "gbar_ar": [
+                                    [
+                                        0.1,
+                                        0.30000000000000004,
+                                        0.5,
+                                        0.7000000000000001,
+                                        0.9
+                                    ],
+                                    [
+                                        1.6478971161205928e-06,
+                                        1.920335672143028e-06,
+                                        2.2378151267030628e-06,
+                                        2.607781865402987e-06,
+                                        3.0389133473879894e-06
+                                    ]
+                                ]
+                            }
+                        },
+                        "syns": [
+                            "ampa",
+                            "nmda",
+                            "gabaa",
+                            "gabab"
+                        ]
+                    },
+                    "basal_1": {
+                        "L": 85.0,
+                        "diam": 6.8,
+                        "cm": 0.85,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                -85.0
+                            ]
+                        ],
+                        "nseg": 1,
+                        "mechs": {
+                            "hh2": {
+                                "gkbar_hh2": 0.01,
+                                "gnabar_hh2": 0.14,
+                                "gl_hh2": 4.26e-05,
+                                "el_hh2": -71.0
+                            },
+                            "ca": {
+                                "gbar_ca": 60.0
+                            },
+                            "cad": {
+                                "taur_cad": 20.0
+                            },
+                            "kca": {
+                                "gbar_kca": 0.0002
+                            },
+                            "km": {
+                                "gbar_km": 200.0
+                            },
+                            "cat": {
+                                "gbar_cat": 0.0002
+                            },
+                            "ar": {
+                                "gbar_ar": [
+                                    [
+                                        0.5
+                                    ],
+                                    [
+                                        1.1359848682411619e-06
+                                    ]
+                                ]
+                            }
+                        },
+                        "syns": [
+                            "ampa",
+                            "nmda",
+                            "gabaa",
+                            "gabab"
+                        ]
+                    },
+                    "basal_2": {
+                        "L": 255.0,
+                        "diam": 8.5,
+                        "cm": 0.85,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0.0,
+                                0.0,
+                                -85.0
+                            ],
+                            [
+                                -180.31222920256963,
+                                0.0,
+                                -265.3122292025696
+                            ]
+                        ],
+                        "nseg": 5,
+                        "mechs": {
+                            "hh2": {
+                                "gkbar_hh2": 0.01,
+                                "gnabar_hh2": 0.14,
+                                "gl_hh2": 4.26e-05,
+                                "el_hh2": -71.0
+                            },
+                            "ca": {
+                                "gbar_ca": 60.0
+                            },
+                            "cad": {
+                                "taur_cad": 20.0
+                            },
+                            "kca": {
+                                "gbar_kca": 0.0002
+                            },
+                            "km": {
+                                "gbar_km": 200.0
+                            },
+                            "cat": {
+                                "gbar_cat": 0.0002
+                            },
+                            "ar": {
+                                "gbar_ar": [
+                                    [
+                                        0.1,
+                                        0.30000000000000004,
+                                        0.5,
+                                        0.7000000000000001,
+                                        0.9
+                                    ],
+                                    [
+                                        1.3930561462783335e-06,
+                                        1.6233631243278505e-06,
+                                        1.8917455986737699e-06,
+                                        2.2044983999395277e-06,
+                                        2.568957051488829e-06
+                                    ]
+                                ]
+                            }
+                        },
+                        "syns": [
+                            "ampa",
+                            "nmda",
+                            "gabaa",
+                            "gabab"
+                        ]
+                    },
+                    "basal_3": {
+                        "L": 255.0,
+                        "diam": 8.5,
+                        "cm": 0.85,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0.0,
+                                0.0,
+                                -85.0
+                            ],
+                            [
+                                180.31222920256963,
+                                0.0,
+                                -265.3122292025696
+                            ]
+                        ],
+                        "nseg": 5,
+                        "mechs": {
+                            "hh2": {
+                                "gkbar_hh2": 0.01,
+                                "gnabar_hh2": 0.14,
+                                "gl_hh2": 4.26e-05,
+                                "el_hh2": -71.0
+                            },
+                            "ca": {
+                                "gbar_ca": 60.0
+                            },
+                            "cad": {
+                                "taur_cad": 20.0
+                            },
+                            "kca": {
+                                "gbar_kca": 0.0002
+                            },
+                            "km": {
+                                "gbar_km": 200.0
+                            },
+                            "cat": {
+                                "gbar_cat": 0.0002
+                            },
+                            "ar": {
+                                "gbar_ar": [
+                                    [
+                                        0.1,
+                                        0.30000000000000004,
+                                        0.5,
+                                        0.7000000000000001,
+                                        0.9
+                                    ],
+                                    [
+                                        1.3930561462783335e-06,
+                                        1.6233631243278505e-06,
+                                        1.8917455986737699e-06,
+                                        2.2044983999395277e-06,
+                                        2.568957051488829e-06
+                                    ]
+                                ]
+                            }
+                        },
+                        "syns": [
+                            "ampa",
+                            "nmda",
+                            "gabaa",
+                            "gabab"
+                        ]
+                    },
+                    "soma": {
+                        "L": 39.0,
+                        "diam": 28.9,
+                        "cm": 0.85,
+                        "Ra": 200.0,
+                        "end_pts": [
+                            [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                39.0
+                            ]
+                        ],
+                        "nseg": 1,
+                        "mechs": {
+                            "hh2": {
+                                "gkbar_hh2": 0.01,
+                                "gnabar_hh2": 0.16,
+                                "gl_hh2": 4.26e-05,
+                                "el_hh2": -65.0
+                            },
+                            "ca": {
+                                "gbar_ca": 60.0
+                            },
+                            "cad": {
+                                "taur_cad": 20.0
+                            },
+                            "kca": {
+                                "gbar_kca": 0.0002
+                            },
+                            "km": {
+                                "gbar_km": 200.0
+                            },
+                            "cat": {
+                                "gbar_cat": 0.0002
+                            },
+                            "ar": {
+                                "gbar_ar": 1e-06
+                            }
+                        },
+                        "syns": [
+                            "gabaa",
+                            "gabab"
+                        ]
+                    }
+                },
+                "synapses": {
+                    "ampa": {
+                        "e": 0.0,
+                        "tau1": 0.5,
+                        "tau2": 5.0
+                    },
+                    "nmda": {
+                        "e": 0.0,
+                        "tau1": 1.0,
+                        "tau2": 20.0
+                    },
+                    "gabaa": {
+                        "e": -80.0,
+                        "tau1": 0.5,
+                        "tau2": 5.0
+                    },
+                    "gabab": {
+                        "e": -80.0,
+                        "tau1": 1.0,
+                        "tau2": 20.0
+                    }
+                },
+                "cell_tree": {
+                    "apical_trunk,0": [
+                        "apical_trunk,1"
+                    ],
+                    "apical_1,0": [
+                        "apical_1,1"
+                    ],
+                    "apical_2,0": [
+                        "apical_2,1"
+                    ],
+                    "apical_tuft,0": [
+                        "apical_tuft,1"
+                    ],
+                    "apical_oblique,0": [
+                        "apical_oblique,1"
+                    ],
+                    "basal_1,0": [
+                        "basal_1,1"
+                    ],
+                    "basal_2,0": [
+                        "basal_2,1"
+                    ],
+                    "basal_3,0": [
+                        "basal_3,1"
+                    ],
+                    "soma,0": [
+                        "soma,1",
+                        "basal_1,0"
+                    ],
+                    "soma,1": [
+                        "apical_trunk,0"
+                    ],
+                    "apical_trunk,1": [
+                        "apical_1,0",
+                        "apical_oblique,0"
+                    ],
+                    "apical_1,1": [
+                        "apical_2,0"
+                    ],
+                    "apical_2,1": [
+                        "apical_tuft,0"
+                    ],
+                    "basal_1,1": [
+                        "basal_2,0",
+                        "basal_3,0"
                     ]
                 },
-                "apical_1": {
-                    "L": 680.0,
-                    "diam": 7.48,
-                    "cm": 0.85,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0.0,
-                            0.0,
-                            141.0
-                        ],
-                        [
-                            0.0,
-                            0.0,
-                            821.0
-                        ]
+                "sect_loc": {
+                    "proximal": [
+                        "apical_oblique",
+                        "basal_2",
+                        "basal_3"
                     ],
-                    "nseg": 13,
-                    "mechs": {
-                        "hh2": {
-                            "gkbar_hh2": 0.01,
-                            "gnabar_hh2": 0.14,
-                            "gl_hh2": 4.26e-05,
-                            "el_hh2": -71.0
-                        },
-                        "ca": {
-                            "gbar_ca": 60.0
-                        },
-                        "cad": {
-                            "taur_cad": 20.0
-                        },
-                        "kca": {
-                            "gbar_kca": 0.0002
-                        },
-                        "km": {
-                            "gbar_km": 200.0
-                        },
-                        "cat": {
-                            "gbar_cat": 0.0002
-                        },
-                        "ar": {
-                            "gbar_ar": [
-                                [
-                                    0.038461538461538464,
-                                    0.11538461538461539,
-                                    0.19230769230769232,
-                                    0.2692307692307693,
-                                    0.34615384615384615,
-                                    0.42307692307692313,
-                                    0.5,
-                                    0.576923076923077,
-                                    0.6538461538461539,
-                                    0.7307692307692308,
-                                    0.8076923076923077,
-                                    0.8846153846153847,
-                                    0.9615384615384616
-                                ],
-                                [
-                                    1.65113270202017e-06,
-                                    1.931669423661152e-06,
-                                    2.2598709102800053e-06,
-                                    2.6438356732128095e-06,
-                                    3.0930382063666464e-06,
-                                    3.6185627733882756e-06,
-                                    4.233376916586103e-06,
-                                    4.952651436554499e-06,
-                                    5.7941347381338055e-06,
-                                    6.7785907798519655e-06,
-                                    7.930311433436494e-06,
-                                    9.27771589608585e-06,
-                                    1.0854051946253036e-05
-                                ]
-                            ]
-                        }
-                    },
-                    "syns": [
-                        "ampa",
-                        "nmda",
-                        "gabaa",
-                        "gabab"
+                    "distal": [
+                        "apical_tuft"
                     ]
                 },
-                "apical_2": {
-                    "L": 680.0,
-                    "diam": 4.93,
-                    "cm": 0.85,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0.0,
-                            0.0,
-                            821.0
-                        ],
-                        [
-                            0.0,
-                            0.0,
-                            1501.0
-                        ]
-                    ],
-                    "nseg": 13,
-                    "mechs": {
-                        "hh2": {
-                            "gkbar_hh2": 0.01,
-                            "gnabar_hh2": 0.14,
-                            "gl_hh2": 4.26e-05,
-                            "el_hh2": -71.0
-                        },
-                        "ca": {
-                            "gbar_ca": 60.0
-                        },
-                        "cad": {
-                            "taur_cad": 20.0
-                        },
-                        "kca": {
-                            "gbar_kca": 0.0002
-                        },
-                        "km": {
-                            "gbar_km": 200.0
-                        },
-                        "cat": {
-                            "gbar_cat": 0.0002
-                        },
-                        "ar": {
-                            "gbar_ar": [
-                                [
-                                    0.038461538461538464,
-                                    0.11538461538461539,
-                                    0.19230769230769232,
-                                    0.2692307692307693,
-                                    0.34615384615384615,
-                                    0.42307692307692313,
-                                    0.5,
-                                    0.576923076923077,
-                                    0.6538461538461539,
-                                    0.7307692307692308,
-                                    0.8076923076923077,
-                                    0.8846153846153847,
-                                    0.9615384615384616
-                                ],
-                                [
-                                    1.2698216346726254e-05,
-                                    1.485571463880175e-05,
-                                    1.7379784010878467e-05,
-                                    2.0332706948734884e-05,
-                                    2.378734808236754e-05,
-                                    2.782895215174096e-05,
-                                    3.25572474570191e-05,
-                                    3.8088906696807314e-05,
-                                    4.456042591663622e-05,
-                                    5.213149260696589e-05,
-                                    6.098892605996203e-05,
-                                    7.135128721502373e-05,
-                                    8.347427174296413e-05
-                                ]
-                            ]
-                        }
-                    },
-                    "syns": [
-                        "ampa",
-                        "nmda",
-                        "gabaa",
-                        "gabab"
-                    ]
-                },
-                "apical_tuft": {
-                    "L": 425.0,
-                    "diam": 3.4,
-                    "cm": 0.85,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0.0,
-                            0.0,
-                            1501.0
-                        ],
-                        [
-                            0.0,
-                            0.0,
-                            1926.0
-                        ]
-                    ],
-                    "nseg": 9,
-                    "mechs": {
-                        "hh2": {
-                            "gkbar_hh2": 0.01,
-                            "gnabar_hh2": 0.14,
-                            "gl_hh2": 4.26e-05,
-                            "el_hh2": -71.0
-                        },
-                        "ca": {
-                            "gbar_ca": 60.0
-                        },
-                        "cad": {
-                            "taur_cad": 20.0
-                        },
-                        "kca": {
-                            "gbar_kca": 0.0002
-                        },
-                        "km": {
-                            "gbar_km": 200.0
-                        },
-                        "cat": {
-                            "gbar_cat": 0.0002
-                        },
-                        "ar": {
-                            "gbar_ar": [
-                                [
-                                    0.05555555555555555,
-                                    0.16666666666666666,
-                                    0.2777777777777778,
-                                    0.38888888888888884,
-                                    0.5,
-                                    0.611111111111111,
-                                    0.7222222222222222,
-                                    0.8333333333333333,
-                                    0.9444444444444444
-                                ],
-                                [
-                                    9.691490576523929e-05,
-                                    0.00011166462953272171,
-                                    0.00012865915093478097,
-                                    0.00014824011138108928,
-                                    0.00017080114754851162,
-                                    0.0001967958046718656,
-                                    0.00022674665417834631,
-                                    0.0002612557989577143,
-                                    0.0003010169774560311
-                                ]
-                            ]
-                        }
-                    },
-                    "syns": [
-                        "ampa",
-                        "nmda",
-                        "gabaa",
-                        "gabab"
-                    ]
-                },
-                "apical_oblique": {
-                    "L": 255.0,
-                    "diam": 5.1,
-                    "cm": 0.85,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0.0,
-                            0.0,
-                            141.0
-                        ],
-                        [
-                            -255.0,
-                            0.0,
-                            141.0
-                        ]
-                    ],
-                    "nseg": 5,
-                    "mechs": {
-                        "hh2": {
-                            "gkbar_hh2": 0.01,
-                            "gnabar_hh2": 0.14,
-                            "gl_hh2": 4.26e-05,
-                            "el_hh2": -71.0
-                        },
-                        "ca": {
-                            "gbar_ca": 60.0
-                        },
-                        "cad": {
-                            "taur_cad": 20.0
-                        },
-                        "kca": {
-                            "gbar_kca": 0.0002
-                        },
-                        "km": {
-                            "gbar_km": 200.0
-                        },
-                        "cat": {
-                            "gbar_cat": 0.0002
-                        },
-                        "ar": {
-                            "gbar_ar": [
-                                [
-                                    0.1,
-                                    0.30000000000000004,
-                                    0.5,
-                                    0.7000000000000001,
-                                    0.9
-                                ],
-                                [
-                                    1.6478971161205928e-06,
-                                    1.920335672143028e-06,
-                                    2.2378151267030628e-06,
-                                    2.607781865402987e-06,
-                                    3.0389133473879894e-06
-                                ]
-                            ]
-                        }
-                    },
-                    "syns": [
-                        "ampa",
-                        "nmda",
-                        "gabaa",
-                        "gabab"
-                    ]
-                },
-                "basal_1": {
-                    "L": 85.0,
-                    "diam": 6.8,
-                    "cm": 0.85,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.0,
-                            -85.0
-                        ]
-                    ],
-                    "nseg": 1,
-                    "mechs": {
-                        "hh2": {
-                            "gkbar_hh2": 0.01,
-                            "gnabar_hh2": 0.14,
-                            "gl_hh2": 4.26e-05,
-                            "el_hh2": -71.0
-                        },
-                        "ca": {
-                            "gbar_ca": 60.0
-                        },
-                        "cad": {
-                            "taur_cad": 20.0
-                        },
-                        "kca": {
-                            "gbar_kca": 0.0002
-                        },
-                        "km": {
-                            "gbar_km": 200.0
-                        },
-                        "cat": {
-                            "gbar_cat": 0.0002
-                        },
-                        "ar": {
-                            "gbar_ar": [
-                                [
-                                    0.5
-                                ],
-                                [
-                                    1.1359848682411619e-06
-                                ]
-                            ]
-                        }
-                    },
-                    "syns": [
-                        "ampa",
-                        "nmda",
-                        "gabaa",
-                        "gabab"
-                    ]
-                },
-                "basal_2": {
-                    "L": 255.0,
-                    "diam": 8.5,
-                    "cm": 0.85,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0.0,
-                            0.0,
-                            -85.0
-                        ],
-                        [
-                            -180.31222920256963,
-                            0.0,
-                            -265.3122292025696
-                        ]
-                    ],
-                    "nseg": 5,
-                    "mechs": {
-                        "hh2": {
-                            "gkbar_hh2": 0.01,
-                            "gnabar_hh2": 0.14,
-                            "gl_hh2": 4.26e-05,
-                            "el_hh2": -71.0
-                        },
-                        "ca": {
-                            "gbar_ca": 60.0
-                        },
-                        "cad": {
-                            "taur_cad": 20.0
-                        },
-                        "kca": {
-                            "gbar_kca": 0.0002
-                        },
-                        "km": {
-                            "gbar_km": 200.0
-                        },
-                        "cat": {
-                            "gbar_cat": 0.0002
-                        },
-                        "ar": {
-                            "gbar_ar": [
-                                [
-                                    0.1,
-                                    0.30000000000000004,
-                                    0.5,
-                                    0.7000000000000001,
-                                    0.9
-                                ],
-                                [
-                                    1.3930561462783335e-06,
-                                    1.6233631243278505e-06,
-                                    1.8917455986737699e-06,
-                                    2.2044983999395277e-06,
-                                    2.568957051488829e-06
-                                ]
-                            ]
-                        }
-                    },
-                    "syns": [
-                        "ampa",
-                        "nmda",
-                        "gabaa",
-                        "gabab"
-                    ]
-                },
-                "basal_3": {
-                    "L": 255.0,
-                    "diam": 8.5,
-                    "cm": 0.85,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0.0,
-                            0.0,
-                            -85.0
-                        ],
-                        [
-                            180.31222920256963,
-                            0.0,
-                            -265.3122292025696
-                        ]
-                    ],
-                    "nseg": 5,
-                    "mechs": {
-                        "hh2": {
-                            "gkbar_hh2": 0.01,
-                            "gnabar_hh2": 0.14,
-                            "gl_hh2": 4.26e-05,
-                            "el_hh2": -71.0
-                        },
-                        "ca": {
-                            "gbar_ca": 60.0
-                        },
-                        "cad": {
-                            "taur_cad": 20.0
-                        },
-                        "kca": {
-                            "gbar_kca": 0.0002
-                        },
-                        "km": {
-                            "gbar_km": 200.0
-                        },
-                        "cat": {
-                            "gbar_cat": 0.0002
-                        },
-                        "ar": {
-                            "gbar_ar": [
-                                [
-                                    0.1,
-                                    0.30000000000000004,
-                                    0.5,
-                                    0.7000000000000001,
-                                    0.9
-                                ],
-                                [
-                                    1.3930561462783335e-06,
-                                    1.6233631243278505e-06,
-                                    1.8917455986737699e-06,
-                                    2.2044983999395277e-06,
-                                    2.568957051488829e-06
-                                ]
-                            ]
-                        }
-                    },
-                    "syns": [
-                        "ampa",
-                        "nmda",
-                        "gabaa",
-                        "gabab"
-                    ]
-                },
-                "soma": {
-                    "L": 39.0,
-                    "diam": 28.9,
-                    "cm": 0.85,
-                    "Ra": 200.0,
-                    "end_pts": [
-                        [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        [
-                            0.0,
-                            0.0,
-                            39.0
-                        ]
-                    ],
-                    "nseg": 1,
-                    "mechs": {
-                        "hh2": {
-                            "gkbar_hh2": 0.01,
-                            "gnabar_hh2": 0.16,
-                            "gl_hh2": 4.26e-05,
-                            "el_hh2": -65.0
-                        },
-                        "ca": {
-                            "gbar_ca": 60.0
-                        },
-                        "cad": {
-                            "taur_cad": 20.0
-                        },
-                        "kca": {
-                            "gbar_kca": 0.0002
-                        },
-                        "km": {
-                            "gbar_km": 200.0
-                        },
-                        "cat": {
-                            "gbar_cat": 0.0002
-                        },
-                        "ar": {
-                            "gbar_ar": 1e-06
-                        }
-                    },
-                    "syns": [
-                        "gabaa",
-                        "gabab"
-                    ]
-                }
+                "gid": null,
+                "dipole_pp": [],
+                "vsec": {},
+                "isec": {},
+                "ca": {},
+                "tonic_biases": []
             },
-            "synapses": {
-                "ampa": {
-                    "e": 0.0,
-                    "tau1": 0.5,
-                    "tau2": 5.0
-                },
-                "nmda": {
-                    "e": 0.0,
-                    "tau1": 1.0,
-                    "tau2": 20.0
-                },
-                "gabaa": {
-                    "e": -80.0,
-                    "tau1": 0.5,
-                    "tau2": 5.0
-                },
-                "gabab": {
-                    "e": -80.0,
-                    "tau1": 1.0,
-                    "tau2": 20.0
-                }
-            },
-            "cell_tree": {
-                "apical_trunk,0": [
-                    "apical_trunk,1"
-                ],
-                "apical_1,0": [
-                    "apical_1,1"
-                ],
-                "apical_2,0": [
-                    "apical_2,1"
-                ],
-                "apical_tuft,0": [
-                    "apical_tuft,1"
-                ],
-                "apical_oblique,0": [
-                    "apical_oblique,1"
-                ],
-                "basal_1,0": [
-                    "basal_1,1"
-                ],
-                "basal_2,0": [
-                    "basal_2,1"
-                ],
-                "basal_3,0": [
-                    "basal_3,1"
-                ],
-                "soma,0": [
-                    "soma,1",
-                    "basal_1,0"
-                ],
-                "soma,1": [
-                    "apical_trunk,0"
-                ],
-                "apical_trunk,1": [
-                    "apical_1,0",
-                    "apical_oblique,0"
-                ],
-                "apical_1,1": [
-                    "apical_2,0"
-                ],
-                "apical_2,1": [
-                    "apical_tuft,0"
-                ],
-                "basal_1,1": [
-                    "basal_2,0",
-                    "basal_3,0"
-                ]
-            },
-            "sect_loc": {
-                "proximal": [
-                    "apical_oblique",
-                    "basal_2",
-                    "basal_3"
-                ],
-                "distal": [
-                    "apical_tuft"
-                ]
-            },
-            "gid": null,
-            "dipole_pp": [],
-            "vsec": {},
-            "isec": {},
-            "ca": {},
-            "tonic_biases": []
+            "metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "5",
+                "measure_dipole": true,
+                "reference": "https://doi.org/10.7554/eLife.51214"
+            }
         }
     },
     "gid_ranges": {
