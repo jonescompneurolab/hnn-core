@@ -22,7 +22,6 @@ from hnn_core.cells_default import pyramidal
 from hnn_core.network import _create_cell_coords, pick_connection
 from hnn_core.network_builder import NetworkBuilder
 from hnn_core.network_models import add_erp_drives_to_jones_model
-from hnn_core.params import _short_name
 from hnn_core.viz import plot_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
@@ -123,8 +122,8 @@ def test_custom_network_coords(mesh_shape):
 
     # network with custom cell types and positions (an irregular one)
     custom_cell_types = {
-        "L2_pyramidal": pyramidal(cell_name=_short_name("L2_pyramidal")),
-        "L5_pyramidal": pyramidal(cell_name=_short_name("L5_pyramidal")),
+        "L2_pyramidal": pyramidal(cell_name="L2_pyramidal"),
+        "L5_pyramidal": pyramidal(cell_name="L5_pyramidal"),
     }
     custom_layer_dict = _create_cell_coords(
         n_pyr_x=mesh_shape[0],
