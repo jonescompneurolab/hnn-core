@@ -1864,6 +1864,7 @@ def test_offline_spike_replay():
 
     plt.close(fig)
 
+
 def test_filter_cell_types():
     """Test filtering of cell types based on metadata."""
     net = jones_2009_model()
