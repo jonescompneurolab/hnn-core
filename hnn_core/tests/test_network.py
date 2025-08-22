@@ -1610,25 +1610,6 @@ def test_rename_cell_types(base_network):
         assert original_name in net3.cell_types.keys()
         assert original_name in net3.pos_dict.keys()
 
-    #temp debug code
-    for k, v in vars(net3).items():
-        other_v = getattr(net1, k)
-        if v != other_v:
-            print(f"Difference in {k}:")
-            print("  net3:   ", v)
-            print("  net1:   ", other_v)
-        if k == "cell_types":
-            for cell_name in v:
-                cell1 = v[cell_name]["object"]
-                cell2 = other_v[cell_name]["object"]
-                print(f"--- Differences inside Cell object for {cell_name} ---")
-                for attr in vars(cell1):
-                    val1 = getattr(cell1, attr)
-                    val2 = getattr(cell2, attr)
-                    if val1 != val2:
-                        print(f"{attr}:")
-                        print("  net3:   ", val1)
-                        print("  net1:   ", val2)
     assert net3 == net1
 
     #
