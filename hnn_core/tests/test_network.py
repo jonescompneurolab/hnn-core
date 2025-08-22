@@ -1863,3 +1863,46 @@ def test_offline_spike_replay():
     axes[3].set_title("Target Network: Spike Raster")
 
     plt.close(fig)
+
+def test_filter_cell_types():
+    """Test filtering of cell types based on metadata."""
+    net = jones_2009_model()
+
+    # Test filtering by a single attribute: layer
+    filtered_types = net.filter_cell_types(layer="5")
+    assert sorted(filtered_types) == ["L5_basket", "L5_pyramidal"]
+
+    # Test filtering by multiple attributes: layer and electro_type
+    filtered_types = net.filter_cell_types(layer="2", electro_type="excitatory")
+    assert filtered_types == ["L2_pyramidal"]
+
+    # Test a filter that should return an empty list
+    filtered_types = net.filter_cell_types(
+        layer="5", electro_type="inhibitory", measure_dipole=True
+    )
+    assert filtered_types == []
+
+    # Test filtering with a non-existent metadata key
+    filtered_types = net.filter_cell_types(non_existent_key="some_value")
+    assert filtered_types == []
+
+
+def test_update_weights_metadata():
+    """Test update_weights with new metadata logic."""
+    net = jones_2009_model()
+    e_cell_names = net.filter_cell_types(electro_type="excitatory")
+    i_cell_names = net.filter_cell_types(electro_type="inhibitory")
+
+    # Test updating excitatory to inhibitory connections
+    net.update_weights(e_i=2.0)
+
+    for conn in net.connectivity:
+        is_e_to_i = (
+            conn["src_type"] in e_cell_names and conn["target_type"] in i_cell_names
+        )
+        if is_e_to_i:
+            # Assert that the gain was updated only for E->I connections
+            assert conn["nc_dict"]["gain"] == 2.0
+        else:
+            # Assert that all other gains remain unchanged
+            assert conn["nc_dict"]["gain"] == 1.0

@@ -11,13 +11,36 @@ def test_cells_default():
     """Test default cell objects."""
     load_custom_mechanisms()
 
+    # Test that an invalid name raises an error
     with pytest.raises(ValueError, match="Unknown pyramidal cell type"):
-        l5p = pyramidal(cell_name="blah")
+        pyramidal(cell_name="blah")
 
+    # Test all new valid cell names
     l5p = pyramidal(cell_name="L5_pyramidal")
     l5p.build(sec_name_apical="apical_trunk")
     assert len(l5p.sections) == 9
     assert "apical_2" in l5p.sections
+
+    l2p = pyramidal(cell_name="L2_pyramidal")
+    assert len(l2p.sections) == 8
+    assert "apical_2" not in l2p.sections
+
+    l5b = basket(cell_name="L5_basket")
+    assert len(l5b.sections) == 1
+
+    l2b = basket(cell_name="L2_basket")
+    assert len(l2b.sections) == 1
+
+    # Test that old names now raise errors
+    old_pyr_names = ["L2Pyr", "L5Pyr"]
+    for name in old_pyr_names:
+        with pytest.raises(ValueError, match="Unknown pyramidal cell type"):
+            pyramidal(cell_name=name)
+
+    old_basket_names = ["L2Basket", "L5Basket"]
+    for name in old_basket_names:
+        with pytest.raises(ValueError, match="Unknown basket cell type"):
+            basket(cell_name=name)
 
     # check that after building, the vertical sections have the length
     # specified in get_L5Pyr_params_default (or overridden in a params file).
@@ -60,4 +83,4 @@ def test_cells_default():
     assert len(times) == len(vsoma)
 
     with pytest.raises(ValueError, match="Unknown basket cell type"):
-        l5p = basket(cell_name="blah")
+        basket(cell_name="blah")
