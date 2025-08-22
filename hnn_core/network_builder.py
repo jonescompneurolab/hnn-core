@@ -346,7 +346,7 @@ class NetworkBuilder(object):
         self._clear_last_network_objects()
 
         for cell_type, cell_data in self.net.cell_types.items():
-            if cell_data['metadata'].get('measure_dipole', False):
+            if cell_data["metadata"].get("measure_dipole", False):
                 self._nrn_dipoles[cell_type] = h.Vector()
 
         self._gid_assign()
@@ -601,7 +601,8 @@ class NetworkBuilder(object):
                         f"Got n_samples={n_samples}, {cell.name}."
                         f"dipole.size()={cell.dipole.size()}."
                     )
-                nrn_dpl = self._nrn_dipoles[_long_name(cell.name)]
+                cell_type = self.net.gid_to_type(cell.gid)
+                nrn_dpl = self._nrn_dipoles[cell_type]
                 nrn_dpl.add(cell.dipole)
 
             self._vsec[cell.gid] = cell.vsec
