@@ -1607,20 +1607,24 @@ class Network:
             strings.
         """
         _validate_type(name_mapping, dict, "name_mapping")
+
+        # Store original cell object names to preserve them
+        original_cell_names = {}
+        for original_name in name_mapping.keys():
+            if (
+                isinstance(self.cell_types.get(original_name), dict)
+                and "object" in self.cell_types[original_name]
+            ):
+                original_cell_names[original_name] = self.cell_types[original_name][
+                    "object"
+                ].name
+
         for original_name, new_name in name_mapping.items():
             if original_name not in self.cell_types.keys():
                 raise ValueError(f"'{original_name}' is not in cell_types!")
             elif new_name in self.cell_types.keys():
                 raise ValueError(f"'{new_name}' is already in cell_types!")
             elif original_name in self.cell_types.keys():
-                # Updating the cell object's name attribute BEFORE updating dictionaries
-                if (
-                    isinstance(self.cell_types[original_name], dict)
-                    and "object" in self.cell_types[original_name]
-                ):
-                    self.cell_types[original_name]["object"].name = new_name
-
-                # Update network-level dictionaries
                 for attr_name in [
                     "cell_types",
                     "pos_dict",
@@ -1641,6 +1645,17 @@ class Network:
                         connection["src_type"] = new_name
                     if connection["target_type"] == original_name:
                         connection["target_type"] = new_name
+
+                # Restore original cell object name to preserve cell template identity
+                if (
+                    new_name in self.cell_types
+                    and isinstance(self.cell_types[new_name], dict)
+                    and "object" in self.cell_types[new_name]
+                    and original_name in original_cell_names
+                ):
+                    self.cell_types[new_name]["object"].name = original_cell_names[
+                        original_name
+                    ]
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
