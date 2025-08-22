@@ -2030,7 +2030,7 @@ class NetworkPlotter:
         for cell_type in self.net.cell_types:
             gid_range = self.net.gid_ranges[cell_type]
             for gid in gid_range:
-                cell = self.net.cell_types[cell_type]
+                cell = self.net.cell_types[cell_type]["object"]
                 for sec_name in cell.sections.keys():
                     if self._vsec_recorded is True:
                         vsec = np.array(
@@ -2064,7 +2064,7 @@ class NetworkPlotter:
                 pos = self.net.pos_dict[cell_type][gid_idx]
                 pos = (float(pos[0]), float(pos[2]), float(pos[1]))
 
-                cell.plot_morphology(
+                cell["object"].plot_morphology(
                     ax=self.ax,
                     show=False,
                     pos=pos,

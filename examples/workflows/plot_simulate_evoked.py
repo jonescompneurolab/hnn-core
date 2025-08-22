@@ -38,7 +38,7 @@ from hnn_core.viz import plot_dipole
 # inside it.
 net = jones_2009_model()
 net.plot_cells()
-net.cell_types['L5_pyramidal'].plot_morphology()
+net.cell_types['L5_pyramidal']['object'].plot_morphology()
 
 ###############################################################################
 # The network of cells is now defined, to which we add external drives as

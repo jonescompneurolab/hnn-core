@@ -345,3 +345,30 @@ def test_read_incorrect_format(tmp_path):
 
     with pytest.raises(ValueError, match="The json should encode a Network object."):
         read_network_configuration(file_path)
+
+
+def test_network_serialization_metadata(jones_2009_network, tmp_path):
+    """Test saving and loading a network with the metadata structure."""
+    net_original = jones_2009_network
+    net_original.add_evoked_drive(
+        "evd1",
+        mu=5,
+        sigma=1,
+        numspikes=1,
+        location="distal",
+        weights_ampa={"L2_pyramidal": 0.1},
+    )
+
+    json_path = tmp_path / "net_metadata.json"
+
+    net_original.write_configuration(json_path)
+
+    net_loaded = read_network_configuration(json_path)
+
+    assert net_loaded == net_original
+
+    # checking the nested structure in the loaded network
+    assert isinstance(net_loaded.cell_types["L2_pyramidal"], dict)
+    assert "object" in net_loaded.cell_types["L2_pyramidal"]
+    assert "metadata" in net_loaded.cell_types["L2_pyramidal"]
+    assert net_loaded.cell_types["L2_pyramidal"]["metadata"]["layer"] == "2"

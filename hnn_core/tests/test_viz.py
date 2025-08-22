@@ -56,7 +56,7 @@ def test_network_visualization(setup_net):
     """Test network visualisations."""
     net = setup_net
     plot_cells(net)
-    ax = net.cell_types["L2_pyramidal"].plot_morphology()
+    ax = net.cell_types["L2_pyramidal"]["object"].plot_morphology()
     assert len(ax.lines) == 8
 
     conn_idx = 0
@@ -86,20 +86,21 @@ def test_network_visualization(setup_net):
 
     # Test morphology plotting
     for cell_type in net.cell_types.values():
-        cell_type.plot_morphology()
-        cell_type.plot_morphology(color="r")
+        cell_type["object"].plot_morphology()
+        cell_type["object"].plot_morphology(color="r")
 
-        sections = list(cell_type.sections.keys())
+        # FIX: Access sections through the cell object
+        sections = list(cell_type["object"].sections.keys())
         section_color = {sect_name: f"C{idx}" for idx, sect_name in enumerate(sections)}
-        cell_type.plot_morphology(color=section_color)
+        cell_type["object"].plot_morphology(color=section_color)
 
     cell_type = net.cell_types["L2_basket"]
     with pytest.raises(ValueError):
-        cell_type.plot_morphology(color="z")
+        cell_type["object"].plot_morphology(color="z")
     with pytest.raises(ValueError):
-        cell_type.plot_morphology(color={"soma": "z"})
+        cell_type["object"].plot_morphology(color={"soma": "z"})
     with pytest.raises(TypeError, match="color must be"):
-        cell_type.plot_morphology(color=123)
+        cell_type["object"].plot_morphology(color=123)
 
     # test for invalid Axes object to plot_cells
     fig, axes = plt.subplots(1, 1)
@@ -107,13 +108,13 @@ def test_network_visualization(setup_net):
         TypeError, match="'ax' to be an instance of Axes3D, but got Axes"
     ):
         plot_cells(net, ax=axes, show=False)
-    cell_type.plot_morphology(pos=(1.0, 2.0, 3.0))
+    cell_type["object"].plot_morphology(pos=(1.0, 2.0, 3.0))
     with pytest.raises(TypeError, match="pos must be"):
-        cell_type.plot_morphology(pos=123)
+        cell_type["object"].plot_morphology(pos=123)
     with pytest.raises(ValueError, match="pos must be a tuple of 3 elements"):
-        cell_type.plot_morphology(pos=(1, 2, 3, 4))
+        cell_type["object"].plot_morphology(pos=(1, 2, 3, 4))
     with pytest.raises(TypeError, match="pos\\[idx\\] must be"):
-        cell_type.plot_morphology(pos=(1, "2", 3))
+        cell_type["object"].plot_morphology(pos=(1, "2", 3))
 
     plt.close("all")
 
