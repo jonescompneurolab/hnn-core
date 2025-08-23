@@ -390,7 +390,7 @@ def get_L2Pyr_params_new():
         'L2Pyr_dend_gbar_SKv3_1': 0.000513/2,
         'L2Pyr_dend_gbar_Ca_HVA': 0.000374e-2/2,
         'L2Pyr_dend_gbar_Ca_LVAst': 0.000778e-2/2,
-        'L2Pyr_dend_gbar_Ih': 0.000080/2*5,
+        'L2Pyr_dend_gbar_Ih': 0.000080/2,
         'L2Pyr_dend_gbar_Im': 8e-3/2,
         'L2Pyr_dend_g_pas': 1.0 / 12000.0,
         'L2Pyr_dend_e_pas': -85,
@@ -454,7 +454,7 @@ def get_L5PyrET_params():
         'L5Pyr_gabab_tau2': 200.,
 
         # Biophysics soma
-        'L5Pyr_soma_gbar_NaTs2_t': 20_400e-4/2*1.2,
+        'L5Pyr_soma_gbar_NaTs2_t': 20_400e-4/2*1.4,
         'L5Pyr_soma_gbar_SKv3_1': 6_930e-4/2,
         'L5Pyr_soma_gbar_Nap_Et2': 17.2e-4/2*0.11,
         'L5Pyr_soma_gbar_SK_E2': (441e-4)*10,
@@ -472,7 +472,7 @@ def get_L5PyrET_params():
         # Biophysics basal
         'L5Pyr_basal_gbar_NaTs2_t': 20_400e-4/2,
         'L5Pyr_basal_gbar_SKv3_1': 0.000261/2,
-        'L5Pyr_basal_gbar_Ih': 5.14e-5/2*2,
+        'L5Pyr_basal_gbar_Ih': 5.14e-5/4*2,
         'L5Pyr_basal_g_pas': 1.75e-5/2*2,
         'L5Pyr_basal_e_pas': -90,
 
@@ -483,6 +483,7 @@ def get_L5PyrET_params():
         'L5Pyr_dend_gbar_Ca_HVA': 2.78e-5/2,
         'L5Pyr_dend_gbar_Ca_LVAst': 93.5e-6/2,
         'L5Pyr_dend_gbar_Ih': 1e-4/2*1.2,
+
         'L5Pyr_dend_gbar_Im': 0.0000675/2,
         'L5Pyr_dend_gbar_K_Pst': 0,
         'L5Pyr_dend_gbar_K_Tst': 0,
