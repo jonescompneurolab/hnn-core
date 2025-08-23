@@ -363,7 +363,7 @@ def _get_mechanisms(p_all, cell_type, section_names, mechanisms):
     return mech_props
 
 
-def _exp_g_at_dist(x, zero_val, exp_term, offset, slope=1, xkink=3000):
+def _exp_g_at_dist(x, zero_val, exp_term, offset, slope=1):
     """Compute exponential distance-dependent ionic conductance.
 
     Parameters
@@ -378,9 +378,6 @@ def _exp_g_at_dist(x, zero_val, exp_term, offset, slope=1, xkink=3000):
         Offset value added to output
 
     """
-
-    if x > xkink:
-        x = xkink
 
     return zero_val * (slope * np.exp(exp_term * x)  + offset)
 
@@ -518,10 +515,10 @@ def pyramidal_l5ET(cell_name,pos, gid=None):
     p_all = get_L5PyrET_params()
 
     # override params according to function
-    gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_HVA']*1., gdend=p_all['L5Pyr_dend_gbar_Ca_HVA']*13.5, xkink=1500, hotzone=[1500, 1700], hotzone_factor=3.9)
-    gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_LVAst'], gdend=p_all['L5Pyr_dend_gbar_Ca_LVAst']*5.75, xkink=1500, hotzone=[1500, 1700], hotzone_factor=3)
-    gbar_Ih = partial(_exp_g_at_dist, zero_val=p_all['L5Pyr_dend_gbar_Ih'],exp_term = 1./323, slope=2.087, offset=-.8696, xkink=3000)
-    gbar_pas = partial(_increase_step, gbar=p_all['L5Pyr_dend_g_pas'], xkink = 1500, factor=2)
+    gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_HVA']*1., gdend=p_all['L5Pyr_dend_gbar_Ca_HVA']*12.9, xkink=1500, hotzone=[1500, 1700], hotzone_factor=3.9)
+    gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_dend_gbar_Ca_LVAst'], gdend=p_all['L5Pyr_dend_gbar_Ca_LVAst']*2.25, xkink=1500, hotzone=[1500, 1700], hotzone_factor=3)
+    gbar_Ih = partial(_exp_g_at_dist, zero_val=p_all['L5Pyr_dend_gbar_Ih'],exp_term = 1./323, slope=2.087, offset=-.8696)
+    gbar_pas = partial(_increase_step, gbar=p_all['L5Pyr_dend_g_pas'], xkink = 1500, factor=1.6)
 
     # basal dendrites
     gbar_NaTs2_t = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_basal_gbar_NaTs2_t']*0.01, gdend=0, xkink=255)
@@ -572,15 +569,15 @@ def pyramidal_l5ET(cell_name,pos, gid=None):
     section_names = list(end_pts.keys())
 
     # initialize section voltage
-    v_init = {'soma': -69,
-            'basal_1': -70,
-            'basal_2': -70,
-            'basal_3': -70,
-            'apical_oblique': -69,
-            'apical_trunk': -69,
-            'apical_1': -66,
-            'apical_2': -64,
-            'apical_tuft': -60}
+    v_init = {'soma': -69.72316110770498,
+            'basal_1': -69.78629396031342,
+            'basal_2': -69.88018961833787,
+            'basal_3': -69.88018961833787,
+            'apical_oblique': -69.68267886817998,
+            'apical_trunk': -69.67068315078,
+            'apical_1': -68.69347989468767,
+            'apical_2': -65.03769011511882,
+            'apical_tuft': -61.06428465773297}
 
     sections_apcl = _get_dends(p_all, 'L5Pyr', section_names=['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft'], v_init=v_init)
     sections_basal = _get_basal(p_all, 'L5Pyr', section_names=['basal_1', 'basal_2', 'basal_3', 'apical_oblique'], v_init=v_init)
