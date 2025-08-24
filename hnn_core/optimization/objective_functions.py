@@ -50,6 +50,7 @@ def _rmse_evoked(
     new_net = initial_net.copy()
     set_params(new_net, params)
     dpl = simulate_dipole(new_net, tstop=tstop, n_trials=1)[0]
+    del new_net
 
     # smooth & scale
     if "scale_factor" in obj_fun_kwargs:
@@ -119,6 +120,7 @@ def _maximize_psd(
     new_net = initial_net.copy()
     set_params(new_net, params)
     dpl = simulate_dipole(new_net, tstop=tstop, n_trials=1)[0]
+    del new_net
 
     # smooth & scale
     if "scale_factor" in obj_fun_kwargs:
