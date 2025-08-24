@@ -210,11 +210,11 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     # wait for the process to terminate. we need use proc.communicate to
     # read any output at its end of life.
     try:
-        outs, errs = proc.communicate(timeout=1)
+        outs, errs = proc.communicate(timeout=2)
     except TimeoutExpired:
         proc.kill()
         # wait for output again after kill signal
-        outs, errs = proc.communicate(timeout=1)
+        outs, errs = proc.communicate(timeout=2)
 
     sys.stdout.write(outs)
     sys.stdout.write(errs)
@@ -419,12 +419,12 @@ def _kill_procs(procs):
             p.terminate()
         except NoSuchProcess:
             pass
-    _, alive = wait_procs(procs, timeout=3)
+    _, alive = wait_procs(procs, timeout=6)
 
     # now try kill
     for p in alive:
         p.kill()
-    _, alive = wait_procs(procs, timeout=3)
+    _, alive = wait_procs(procs, timeout=6)
 
     return alive
 
@@ -996,7 +996,7 @@ class MPIBackend(object):
         self.proc, sim_data = run_subprocess(
             command=self.mpi_cmd,
             obj=[net, tstop, dt, n_trials],
-            timeout=30,
+            timeout=60,
             proc_queue=self.proc_queue,
             env=env,
             cwd=os.getcwd(),
@@ -1014,13 +1014,13 @@ class MPIBackend(object):
         """
         proc = None
         try:
-            proc = self.proc_queue.get(timeout=1)
+            proc = self.proc_queue.get(timeout=2)
         except Empty:
             warn("No currently running process to terminate")
 
         if proc is not None:
             proc.terminate()
             try:
-                proc.wait(5)  # wait maximum of 5s
+                proc.wait(10)  # wait maximum of 10s
             except TimeoutExpired:
                 warn("Could not kill python subprocess: PID %d" % proc.pid)
