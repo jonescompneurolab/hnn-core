@@ -3,10 +3,9 @@
 ```{toctree}
 :hidden:
 
-Install <install>
+Install (HNN Textbook) <install>
 Examples <auto_examples/index>
 API <api>
-glossary
 whats_new
 Contributing <contributing>
 ```

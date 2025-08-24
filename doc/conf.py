@@ -133,12 +133,20 @@ html_theme_options = {
             "name": "GitHub (Code)",
         },
         {
-            "url": "https://pypi.org/project/hnn-core/",
-            "name": "PyPI",
-        },
-        {
             "url": "https://hnn.brown.edu/",
             "name": "HNN Frontpage",
+        },
+        {
+            "url": "https://jonescompneurolab.github.io/textbook/content/preface.html",
+            "name": "HNN Textbook",
+        },
+        {
+            "url": "https://pypi.org/project/hnn-core/",
+            "name": "PyPI package",
+        },
+        {
+            "url": "https://anaconda.org/jonescompneurolab/repo",
+            "name": "Conda packages",
         },
     ],
     "header_links_before_dropdown": 7,
