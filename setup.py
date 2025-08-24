@@ -82,11 +82,11 @@ if __name__ == "__main__":
         'docs': ['mne', 'myst-parser', 'nibabel', 'numpydoc', 'pillow',
                  'pooch', 'pydata-sphinx-theme', 'sphinx', 'sphinx-gallery',
                  'sphinx-copybutton', 'tdqm'],
+        'sbi': ['sbi'],
         'gui': ['ipywidgets>=8.0.0', 'ipykernel', 'ipympl', 'voila'],
     }
     extras['dev'] = (extras['opt'] + extras['parallel'] + extras['test'] +
-                     extras['docs'] + extras['gui'])
-
+                     extras['docs'] + extras['gui']) + extras['sbi']
 
     setup(name=DISTNAME,
           maintainer=MAINTAINER,
