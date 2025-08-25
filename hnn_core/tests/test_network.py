@@ -1,19 +1,27 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 
-from hnn_core.dipole import simulate_dipole
 import os.path as op
+import tempfile
+
 import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 import matplotlib.pyplot as plt
-import tempfile
 
 import hnn_core
-from hnn_core import read_params, CellResponse, Network
-from hnn_core import jones_2009_model, law_2021_model, calcium_model
-from hnn_core.network_models import add_erp_drives_to_jones_model
+from hnn_core import (
+    CellResponse,
+    Network,
+    calcium_model,
+    jones_2009_model,
+    law_2021_model,
+    read_params,
+    simulate_dipole,
+)
+from hnn_core.cells_default import pyramidal
+from hnn_core.network import _create_cell_coords, pick_connection
 from hnn_core.network_builder import NetworkBuilder
-from hnn_core.network import pick_connection
+from hnn_core.network_models import add_erp_drives_to_jones_model
 from hnn_core.viz import plot_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
@@ -93,6 +101,142 @@ def base_network():
     return net, params
 
 
+def test_create_cell_coords():
+    layer_dict = _create_cell_coords(
+        n_pyr_x=3, n_pyr_y=3, z_coord=1307.4, inplane_distance=1.0
+    )
+    assert set(layer_dict.keys()) == {
+        "L5_bottom",
+        "L2_bottom",
+        "L5_mid",
+        "L2_mid",
+        "origin",
+    }
+    assert len(layer_dict["L2_bottom"]) == 9
+    assert len(layer_dict["L5_bottom"]) == 9
+
+
+@pytest.mark.parametrize("mesh_shape", [(2, 2), (2, 3)])
+def test_custom_network_coords(mesh_shape):
+    params = read_params(params_fname)
+
+    # network with custom cell types and positions (an irregular one)
+    custom_cell_types = {
+        "L2_pyramidal": pyramidal(cell_name="L2_pyramidal"),
+        "L5_pyramidal": pyramidal(cell_name="L5_pyramidal"),
+    }
+    custom_layer_dict = _create_cell_coords(
+        n_pyr_x=mesh_shape[0],
+        n_pyr_y=mesh_shape[1],
+        z_coord=1307.4,
+        inplane_distance=1.0,
+    )
+    custom_pos_dict = {
+        "L2_pyramidal": custom_layer_dict["L2_bottom"],
+        "L5_pyramidal": custom_layer_dict["L5_bottom"],
+        "origin": custom_layer_dict["origin"],
+    }
+    custom_net = Network(params, pos_dict=custom_pos_dict, cell_types=custom_cell_types)
+    assert "L2_pyramidal" in custom_net.cell_types
+    assert "L5_pyramidal" in custom_net.cell_types
+    total_mesh_size = mesh_shape[0] * mesh_shape[1]
+    assert len(custom_net.pos_dict["L2_pyramidal"]) == total_mesh_size
+    assert custom_net.gid_ranges["L2_pyramidal"] == range(0, total_mesh_size)
+    assert custom_net.gid_ranges["L5_pyramidal"] == range(
+        total_mesh_size, 2 * total_mesh_size
+    )
+
+    # ALL types of drives to test interactions
+    spike_data = {
+        "drive_cell_1": [10.0, 20.0, 30.0],
+        "drive_cell_2": [15.0, 25.0, 35.0],
+    }
+    weights_ampa = {"L2_pyramidal": 0.5, "L5_pyramidal": 0.5}
+    custom_net.add_spike_train_drive(
+        "test_drive",
+        spike_data=spike_data,
+        location="proximal",
+        weights_ampa=weights_ampa,
+        synaptic_delays=0.1,
+        conn_seed=42,
+    )
+
+    # evoked drives
+    custom_net.add_evoked_drive(
+        "test_evprox",
+        mu=40.0,
+        sigma=5.0,
+        numspikes=1,
+        location="proximal",
+        weights_ampa={"L2_pyramidal": 0.01, "L5_pyramidal": 0.01},
+        synaptic_delays=0.1,
+        event_seed=43,
+    )
+
+    custom_net.add_evoked_drive(
+        "test_evdist",
+        mu=60.0,
+        sigma=5.0,
+        numspikes=1,
+        location="distal",
+        weights_nmda={"L2_pyramidal": 0.01, "L5_pyramidal": 0.01},
+        synaptic_delays=0.1,
+        event_seed=44,
+    )
+
+    # poisson drive
+    custom_net.add_poisson_drive(
+        "test_poisson",
+        tstart=0,
+        tstop=40.0,
+        rate_constant=10.0,
+        location="proximal",
+        weights_ampa={"L2_pyramidal": 0.001, "L5_pyramidal": 0.001},
+        synaptic_delays=0.1,
+        event_seed=45,
+    )
+
+    # bursty drive
+    custom_net.add_bursty_drive(
+        "test_bursty",
+        tstart=0,
+        tstop=40.0,
+        location="proximal",
+        burst_rate=1.0,
+        burst_std=10.0,
+        numspikes=2,
+        spike_isi=10.0,
+        weights_ampa={"L2_pyramidal": 0.001, "L5_pyramidal": 0.001},
+        synaptic_delays=0.1,
+        event_seed=46,
+    )
+
+    # drive properties and connectivity for custom
+    assert "test_drive" in custom_net.external_drives
+    drive = custom_net.external_drives["test_drive"]
+    assert drive["type"] == "spike_train"
+    assert drive["n_drive_cells"] == 2
+
+    # checking if all new drives were added
+    for drive_name in ["test_evprox", "test_evdist", "test_poisson", "test_bursty"]:
+        assert drive_name in custom_net.external_drives
+
+    # Pick_connection check in custom_net
+    conn_indices = pick_connection(net=custom_net, src_gids="test_drive")
+    assert len(conn_indices) > 0
+
+    # checking drives and check events
+    custom_net._instantiate_drives(tstop=40.0)
+    assert len(custom_net.external_drives["test_drive"]["events"]) > 0
+    assert len(custom_net.external_drives["test_drive"]["events"][0]) == 2
+
+    # seeing if custom network can run simulations
+    dipole_custom = simulate_dipole(custom_net, tstop=50.0, dt=0.5, n_trials=1)
+    assert dipole_custom is not None
+    assert len(dipole_custom[0].times) > 0
+    assert np.all(np.isfinite(dipole_custom[0].data["agg"]))
+
+
 def test_network_models():
     """ "Test instantiations of the network object"""
     # Make sure critical biophysics for Law model are updated
@@ -113,6 +257,8 @@ def test_network_models():
     with pytest.raises(TypeError, match="tstart must be"):
         add_erp_drives_to_jones_model(net=net_default, tstart="invalid_input")
     n_conn = len(net_default.connectivity)
+    for cell_name in ["L5_pyramidal", "L2_pyramidal"]:
+        assert len(net_default.pos_dict[cell_name]) == 100
     add_erp_drives_to_jones_model(net_default)
     for drive_name in ["evdist1", "evprox1", "evprox2"]:
         assert drive_name in net_default.external_drives.keys()
@@ -1069,12 +1215,15 @@ def test_network_mesh():
     assert net._N_pyr_x == mesh_shape[0]
     assert net._N_pyr_y == mesh_shape[1]
     assert net.gid_ranges["L2_basket"] == range(0, 3)
+    assert len(net.pos_dict["L2_pyramidal"]) == (mesh_shape[0] * mesh_shape[1])
+    del net
 
     # Test default mesh_shape loaded
     net = Network(params)
     assert net._N_pyr_x == 10
     assert net._N_pyr_y == 10
     assert net.gid_ranges["L2_basket"] == range(0, 35)
+    del net
 
     with pytest.raises(ValueError, match="mesh_shape must be"):
         net = Network(params, mesh_shape=(-2, 3))
@@ -1083,12 +1232,20 @@ def test_network_mesh():
         net = Network(params, mesh_shape=(2.0, 3))
 
     with pytest.raises(TypeError, match="mesh_shape must be"):
-        net = Network(params, mesh_shape="abc")
+        net = Network(params, mesh_shape="abc")  # noqa: F841
 
-    # Smoke test for all models
-    _ = jones_2009_model(mesh_shape=mesh_shape)
-    _ = calcium_model(mesh_shape=mesh_shape)
-    _ = law_2021_model(mesh_shape=mesh_shape)
+
+@pytest.mark.parametrize(
+    "network_model", [jones_2009_model, calcium_model, law_2021_model]
+)
+def test_network_models_mesh(network_model):
+    mesh_shape = (2, 3)
+    net = network_model(mesh_shape=mesh_shape)
+    dp = simulate_dipole(net, tstop=20.0)
+    assert dp is not None
+    assert len(dp[0].times) > 0
+    assert np.all(np.isfinite(dp[0].data["agg"]))
+    del net, dp
 
 
 def test_synaptic_gains():
