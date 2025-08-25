@@ -8,6 +8,7 @@ from collections import OrderedDict
 from hnn_core import jones_2009_model, simulate_dipole, Network
 import matplotlib.pyplot as plt
 from hnn_core.hnn_io import write_network_configuration
+from hnn_core.viz import plot_dipole
 
 def create_minimal_network(cell_type_suffix=None, gid_start=0, network_separation=0):
     """Create a minimal network with one cell per type and shift positions."""
@@ -25,8 +26,8 @@ def create_minimal_network(cell_type_suffix=None, gid_start=0, network_separatio
             ('L5_pyramidal', f'L5_pyramidal{cell_type_suffix}'),
         ])
         net._rename_cell_types(mapping)
-        print("DEBUG: net pos dict: ", net.pos_dict)
-        print("Debug: cell types: ",net.cell_types)
+        # print("DEBUG: net pos dict: ", net.pos_dict)
+        # print("Debug: cell types: ",net.cell_types)
         # Update GID ranges to start at gid_start and avoid overlap
         current_gid = gid_start
         net.gid_ranges = OrderedDict()
@@ -34,7 +35,7 @@ def create_minimal_network(cell_type_suffix=None, gid_start=0, network_separatio
             n_cells = len(net.pos_dict[ct])
             net.gid_ranges[ct] = range(current_gid, current_gid + n_cells)
             current_gid += n_cells
-        print("Debug: net gid ranges: ",net.gid_ranges)
+        # print("Debug: net gid ranges: ",net.gid_ranges)
                 # Update connectivity GIDs to match new gid_ranges
         for conn in net.connectivity:
             # Update target_gids if target_type is in mapping
@@ -62,10 +63,10 @@ def create_minimal_network(cell_type_suffix=None, gid_start=0, network_separatio
                 src_offset = net.gid_ranges[src_type][0] - original_gid_ranges[orig_src_type][0]
                 tgt_offset = net.gid_ranges[tgt_type][0] - original_gid_ranges[orig_tgt_type][0]
 
-                print(f"Debug: Updating gid_pairs for {src_type} -> {tgt_type}")
-                print(f"Debug: Original src range: {original_gid_ranges[orig_src_type]}")
-                print(f"Debug: New src range: {net.gid_ranges[src_type]}")
-                print(f"Debug: src_offset: {src_offset}, tgt_offset: {tgt_offset}")
+                # print(f"Debug: Updating gid_pairs for {src_type} -> {tgt_type}")
+                # print(f"Debug: Original src range: {original_gid_ranges[orig_src_type]}")
+                # print(f"Debug: New src range: {net.gid_ranges[src_type]}")
+                # print(f"Debug: src_offset: {src_offset}, tgt_offset: {tgt_offset}")
                 
                 new_gid_pairs = {}
                 for src_gid, tgt_gids in conn['gid_pairs'].items():
@@ -74,23 +75,76 @@ def create_minimal_network(cell_type_suffix=None, gid_start=0, network_separatio
                     new_gid_pairs[new_src_gid] = new_tgt_gids
                 conn['gid_pairs'] = new_gid_pairs
 
-            print(f"Debug: Connection from {conn['src_type']} to {conn['target_type']}")
-            print(f"Debug: Receptor: {conn.get('receptor', 'not specified')}")
-            print(f"Debug: Location: {conn.get('loc', 'not specified')}")
+            # print(f"Debug: Connection from {conn['src_type']} to {conn['target_type']}")
+            # print(f"Debug: Receptor: {conn.get('receptor', 'not specified')}")
+            # print(f"Debug: Location: {conn.get('loc', 'not specified')}")
 
     return net
 def combine_networks(net1, net2):
     """Combine two HNN-Core networks into a single network."""
-    combined = Network()
+    import copy
+    combined = Network(params=net1._params)
     # Merge cell_types, pos_dict, gid_ranges, and external_drives
     combined.cell_types = {**net1.cell_types, **net2.cell_types}
     combined.pos_dict = {**net1.pos_dict, **net2.pos_dict}
     combined.gid_ranges = OrderedDict({**net1.gid_ranges, **net2.gid_ranges})
     combined.external_drives = {**net1.external_drives, **net2.external_drives}
-    # Update _n_gids
     combined._n_gids = max(
         [max(rng) for rng in combined.gid_ranges.values() if len(rng) > 0]
     ) + 1
+
+    # Merge connectivity
+    all_conns = copy.deepcopy(net1.connectivity) + copy.deepcopy(net2.connectivity)
+
+    valid_keys = {
+        'src_gids', 'target_gids', 'loc', 'receptor', 'weight', 'delay', 'lamtha', 'allow_autapses'
+    }
+    required_keys_defaults = {
+        'weight': 0.0,
+        'delay': 1.0,
+        'lamtha': 3.0,
+        'allow_autapses': False
+    }
+
+    # Remap GIDs in connectivity to match combined.gid_ranges
+    for conn in all_conns:
+        # Remap target_gids
+        if 'target_type' in conn and conn['target_type'] in combined.gid_ranges:
+            ct = conn['target_type']
+            gid_range = list(combined.gid_ranges[ct])
+            n_targets = len(conn['target_gids'])
+            conn['target_gids'] = gid_range[:n_targets]
+        # Remap src_gids
+        if 'src_type' in conn and conn['src_type'] in combined.gid_ranges:
+            ct = conn['src_type']
+            gid_range = list(combined.gid_ranges[ct])
+            n_srcs = len(conn['src_gids'])
+            conn['src_gids'] = gid_range[:n_srcs]
+        # Remap gid_pairs
+        if 'gid_pairs' in conn and conn['gid_pairs']:
+            src_type = conn['src_type']
+            tgt_type = conn['target_type']
+            orig_src_gids = sorted(set([int(k) for k in conn['gid_pairs'].keys()]))
+            orig_tgt_gids = sorted(set(int(tg) for v in conn['gid_pairs'].values() for tg in v))
+            new_src_gids = list(combined.gid_ranges[src_type])
+            new_tgt_gids = list(combined.gid_ranges[tgt_type])
+            src_gid_map = dict(zip(orig_src_gids, new_src_gids))
+            tgt_gid_map = dict(zip(orig_tgt_gids, new_tgt_gids))
+            new_gid_pairs = {}
+            for src_gid, tgt_gids in conn['gid_pairs'].items():
+                if int(src_gid) in src_gid_map:
+                    new_src_gid = src_gid_map[int(src_gid)]
+                    new_tgt_gids = [tgt_gid_map[int(tg)] for tg in tgt_gids if int(tg) in tgt_gid_map]
+                    new_gid_pairs[new_src_gid] = new_tgt_gids
+            conn['gid_pairs'] = new_gid_pairs
+
+        # Now filter and fill defaults for add_connection
+        filtered_conn = {k: v for k, v in conn.items() if k in valid_keys}
+        for k, default in required_keys_defaults.items():
+            if k not in filtered_conn:
+                filtered_conn[k] = default
+        combined.add_connection(**filtered_conn)
+
     return combined
 def connect_pyramidal_to_all(net1, net2, weight=0.001, delay=1.0, receptor='gabaa'):
     """Connect all pyramidal cells in net1 to all cells in net2."""
@@ -188,12 +242,6 @@ def main():
     net2.dipole_cell_types = ['L2_pyramidal_net2', 'L5_pyramidal_net2']
     # Only call get_next_gid(net2) here, before adding any drives!
     next_gid_net2 = get_next_gid(net2)
-
-    # AES
-    # net2.add_evoked_drive(
-    #     'evdist2', mu=5.0, sigma=1.0, numspikes=1, location='distal',
-    #     weights_ampa={'L2_pyramidal_net2': 0.1,'L5_pyramidal_net2': 0.1,'L2_basket_net2':0.1,'L5_basket_net2':0.5},gid_start=next_gid_net2
-    # )
     net2.add_evoked_drive(
         'evdist2', mu=5.0, sigma=1.0, numspikes=1, location='distal',
         weights_ampa={'L2_pyramidal_net2': 0.1,'L5_pyramidal_net2': 0.1},gid_start=next_gid_net2
@@ -203,13 +251,13 @@ def main():
     write_network_configuration(net1, "net1_config.json")
     write_network_configuration(net2, "net2_config.json")
     # Combine networks after adding drives
-    # combined_net = combine_networks(net1, net2) , 'L5_pyramidal_net2': 0.1,'L2_basket_net2':0.1,'L5_basket_net2':0.5
-
-    # net_1=net1.copy()
-    # net_2=net2.copy()
+    # combined_net = combine_networks(net1, net2) 
+    net_1=net1.copy()
+    net_2=net2.copy()
     print("Simulating net1...")
     print("Net1 gid ranges:", net1.gid_ranges)
     dpl_1 = simulate_dipole(net1, tstop=20, dt=0.025, n_trials=1)
+    print("debug dipole net1  type: ",type(dpl_1[0]))
     print("Simulating net2...")
     print("Net2 gid ranges:", net2.gid_ranges)
     dpl_2 = simulate_dipole(net2, tstop=20, dt=0.025, n_trials=1)
@@ -235,6 +283,49 @@ def main():
     dpls = [dpl_1[0], dpl_2[0]]
     from hnn_core.viz import plot_dipole
     plot_dipole(dpls, show=True)
+
+    combined_net = combine_networks(net1, net2)
+    combined_net.dipole_cell_types = [
+        'L2_pyramidal', 'L5_pyramidal',
+        'L2_pyramidal_net2', 'L5_pyramidal_net2'
+    ]
+
+    # write_network_configuration(combined_net, "combined_net_config.json")
+    # print("Simulating combined networks")
+    # combined_dpl= simulate_dipole(combined_net, tstop=20, dt=0.025, n_trials=1)
+    # combined_dpl1 , combined_dpl2 = combined_dpl[0],combined_dpl[1]
+    # print("combined network dipole peak:", max(abs(combined_dpl1.data['agg'])))
+    # print("combined network dipole peak net2:", max(abs(combined_dpl2.data['agg'])))
+    # print(f"Net1 GID ranges: {net1.gid_ranges}")
+    # print(f"Net2 GID ranges: {net2.gid_ranges}")
+    # print(f"Combined GID ranges: {combined_net.gid_ranges}")
+    # print(f"Combined cell types: {list(combined_net.cell_types.keys())}")
+    # print("Combined external drives:", list(combined_net.external_drives.keys()))
+    # for drive_name, drive in combined_net.external_drives.items():
+    #     print(f"Drive {drive_name} targets: {drive['target_types']}")
+    # for ct in combined_net.cell_types:
+    #     print(f"{ct}: {len(combined_net.gid_ranges[ct])} cells")
+    # print("Dipole cell types:", combined_net.dipole_cell_types)
+    # print("Net1 dipole (individual) L2:", dpl_1[0].data['L2'][:10])
+    # print("Combined net1 dipole L2:", combined_dpl1.data['L2'][:10])
+
+    # print("\nNet1 dipole (individual) L5:", dpl_1[0].data['L5'][:10])
+    # print("Combined net1 dipole L5:", combined_dpl1.data['L5'][:10])
+
+    # print("\nNet2 dipole (individual) L2:", dpl_2[0].data['L2'][:10])
+    # print("Combined net2 dipole L2:", combined_dpl2.data['L2'][:10])
+
+    # print("\nNet2 dipole (individual) L5:", dpl_2[0].data['L5'][:10])
+    # print("Combined net2 dipole L5:", combined_dpl2.data['L5'][:10])
+
+    # dpls = [combined_dpl1,combined_dpl2]
+    # plot_dipole(dpls, show=True)
+
+    
+
+
+    # Optionally, plot combined raster
+    # plot_combined_spike_raster(combined_net, combined_net, title="Combined Raster", plot_net1=True, plot_net2=True)
 
     # # Connect net1 pyramidal cells to all net2 cells
     # connect_pyramidal_to_all(net1, net2, weight=0.001, delay=1.0, receptor='gabaa')

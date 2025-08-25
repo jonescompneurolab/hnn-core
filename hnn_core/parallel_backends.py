@@ -16,7 +16,7 @@ from queue import Queue, Empty
 from threading import Thread, Event
 
 from typing import Union
-
+import numpy as np
 from .cell_response import CellResponse
 from .dipole import Dipole
 from .network_builder import _simulate_single_trial
@@ -63,21 +63,60 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
             arr._times = sim_data[idx]["rec_times"][arr_name]
 
         # dipole
-        dpl = Dipole(times=sim_data[idx]["times"], data=sim_data[idx]["dpl_data"])
-
-        N_pyr_x = net._N_pyr_x
-        N_pyr_y = net._N_pyr_y
-        dpl._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
-        dpl._convert_fAm_to_nAm()  # always applied, cf. #264
-        if postproc:
-            window_len = net._params["dipole_smooth_win"]  # specified in ms
-            fctr = net._params["dipole_scalefctr"]
-            if window_len > 0:  # param files set this to zero for no smoothing
-                dpl.smooth(window_len=window_len)
-            if fctr > 0:
-                dpl.scale(fctr)
-        dpls.append(dpl)
-
+        # print(f"Debug: Dipole data for trial {idx}: {sim_data[idx]['dpl_data']}")
+        dpl_data = sim_data[idx]["dpl_data"]
+        times = sim_data[idx]["times"]
+        
+        if isinstance(dpl_data, np.ndarray) and dpl_data.shape[1] == 5:
+            data_net1 = {
+                "agg": dpl_data[:, 1] + dpl_data[:, 2],
+                "L2": dpl_data[:, 1],
+                "L5": dpl_data[:, 2],
+            }
+            data_net2 = {
+                "agg": dpl_data[:, 3] + dpl_data[:, 4],
+                "L2": dpl_data[:, 3],
+                "L5": dpl_data[:, 4],
+            }
+            print(f"Debug dpl data for network 1 L2: {data_net1['L2'][:10]}")
+            print(f"Debug dpl data for network 1 L5: {data_net1['L5'][:10]}")
+            print(f"Debug dpl data for network 2 L2: {data_net2['L2'][:10]}")
+            print(f"Debug dpl data for network 2 L5: {data_net2['L5'][:10]}")
+            dpl_net1 = Dipole(times=times, data=data_net1)
+            dpl_net2 = Dipole(times=times, data=data_net2)
+            dpls_object= [dpl_net1, dpl_net2]
+            N_pyr_x = net._N_pyr_x
+            N_pyr_y = net._N_pyr_y
+            # print(f"Debug: combined: N_pyr_x: {N_pyr_x}, N_pyr_y: {N_pyr_y}")
+            for dpl in dpls_object:
+                dpl._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
+                dpl._convert_fAm_to_nAm()  # always applied, cf. #264
+                if postproc:
+                    window_len = net._params["dipole_smooth_win"]  # specified in ms
+                    fctr = net._params["dipole_scalefctr"]
+                    if window_len > 0:  # param files set this to zero for no smoothing
+                        dpl.smooth(window_len=window_len)
+                    if fctr > 0:
+                        dpl.scale(fctr)
+                dpls.append(dpl)
+        else:
+            # Standard case (3 columns or dict)
+            print(f"Debug dpl data seperated networks L2: {dpl_data[:, 1][:10]}")
+            print(f"Debug dpl data seperated networks L5: {dpl_data[:,2][:10]}")
+            dpl = Dipole(times=times, data=dpl_data)
+            N_pyr_x = net._N_pyr_x
+            N_pyr_y = net._N_pyr_y
+            dpl._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
+            dpl._convert_fAm_to_nAm()  # always applied, cf. #264
+            if postproc:
+                window_len = net._params["dipole_smooth_win"]  # specified in ms
+                fctr = net._params["dipole_scalefctr"]
+                if window_len > 0:  # param files set this to zero for no smoothing
+                    dpl.smooth(window_len=window_len)
+                if fctr > 0:
+                    dpl.scale(fctr)
+            dpls.append(dpl)
+    print(f"Debug: dpls: {dpls}")
     return dpls
 
 
