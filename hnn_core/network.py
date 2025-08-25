@@ -391,10 +391,12 @@ class Network:
         self,
         params,
         add_drives_from_params=False,
+        suffix="",
         legacy_mode=False,
         mesh_shape=(10, 10),
         pos_dict=None,
         cell_types=None,
+        dipole_cell_types=["L2_pyramidal", "L5_pyramidal"],
     ):
         # Save the parameters used to create the Network
         _validate_type(params, dict, "params")
@@ -408,7 +410,8 @@ class Network:
         # artificial drive cells
         self.gid_ranges = OrderedDict()
         self._n_gids = 0  # utility: keep track of last GID
-
+        self.suffix = suffix
+        self.dipole_cell_types = dipole_cell_types
         # XXX this can be removed once tests are made independent of HNN GUI
         # creates nc_dict-entries for ALL cell types
         self._legacy_mode = legacy_mode
@@ -631,6 +634,7 @@ class Network:
         probability=1.0,
         event_seed=2,
         conn_seed=3,
+        gid_start=None,
     ):
         """Add an 'evoked' external drive to the network
 
@@ -740,6 +744,7 @@ class Network:
             n_drive_cells,
             cell_specific,
             probability,
+            gid_start=gid_start,
         )
 
     def add_poisson_drive(
@@ -759,6 +764,7 @@ class Network:
         probability=1.0,
         event_seed=2,
         conn_seed=3,
+        gid_start=None,
     ):
         """Add a Poisson-distributed external drive to the network
 
@@ -877,6 +883,7 @@ class Network:
             n_drive_cells,
             cell_specific,
             probability,
+            gid_start=gid_start,
         )
 
     def add_bursty_drive(
@@ -900,6 +907,7 @@ class Network:
         probability=1.0,
         event_seed=2,
         conn_seed=3,
+        gid_start=None,
     ):
         """Add a bursty (rhythmic) external drive to all cells of the network
 
@@ -1026,6 +1034,7 @@ class Network:
             n_drive_cells,
             cell_specific,
             probability,
+            gid_start=gid_start,
         )
 
     def add_spike_train_drive(
@@ -1040,6 +1049,7 @@ class Network:
         space_constant=3.0,
         probability=1.0,
         conn_seed=None,
+        gid_start=None,
     ):
         """Add an external drive from explicitly defined spike trains.
 
@@ -1150,6 +1160,7 @@ class Network:
             n_drive_cells=drive["n_drive_cells"],
             cell_specific=False,
             probability=probability,
+            gid_start=gid_start,
         )
 
     def _attach_drive(
@@ -1164,6 +1175,7 @@ class Network:
         n_drive_cells,
         cell_specific,
         probability,
+        gid_start=None,
     ):
         """Attach a drive to network based on connectivity information
 
@@ -1317,7 +1329,7 @@ class Network:
         self.external_drives[name] = drive
 
         pos = [self.pos_dict["origin"]] * n_drive_cells
-        self._add_cell_type(name, pos)
+        self._add_cell_type(name, pos, gid_start=gid_start)
 
         # Set the starting index for cell-specific source gids
         # This will be updated depending on the number of target cells
@@ -1535,10 +1547,11 @@ class Network:
                     t_stop=tstop,
                 )
 
-    def _add_cell_type(self, cell_name, pos, cell_template=None):
+    def _add_cell_type(self, cell_name, pos, cell_template=None, gid_start=None):
         """Add cell type by updating pos_dict and gid_ranges."""
-        ll = self._n_gids
-        self._n_gids += len(pos)
+        ll = self._n_gids if (gid_start is None) else gid_start
+        self._n_gids = ll + len(pos)
+        # print(f"Debug: Adding cell type {cell_name} with gids {ll} to {self._n_gids}")
         self.gid_ranges[cell_name] = range(ll, self._n_gids)
         self.pos_dict[cell_name] = pos
         if cell_template is not None:
