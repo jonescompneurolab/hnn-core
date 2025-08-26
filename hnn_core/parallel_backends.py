@@ -16,7 +16,6 @@ from queue import Queue, Empty
 from threading import Thread, Event
 
 from typing import Union
-import numpy as np
 from .cell_response import CellResponse
 from .dipole import Dipole
 from .network_builder import _simulate_single_trial

@@ -525,7 +525,9 @@ class NetworkBuilder(object):
                 conn["gid_pairs"][src_gid] = filtered_targets
             print(f"Debug: gid ranges: {net.gid_ranges}")
             print("Debug: valid targets:", valid_targets)
-            print(f"Debug: length of cell = {len(self._cells)}, length of gid list = {len(self._gid_list)}")
+            print(
+                f"Debug: length of cell = {len(self._cells)}, length of gid list = {len(self._gid_list)}"
+            )
             target_filter = dict()
             for idx in range(len(self._cells)):
                 gid = self._gid_list[idx]
@@ -544,7 +546,7 @@ class NetworkBuilder(object):
                     srctype_target_type.add((src_type, target_type))  # DEBUG statement
                     # if self.net.suffix: #Debug
                     # print(f"Debug: src_gid,src_type: {src_gid}, {src_type}, targte_gid,target_type: {target_gid},{target_type}")
-                    
+
                     key = target_filter[target_gid]
                     target_cell = self._cells[key]
                     connection_name = f"{_short_name(self.get_base_type(src_type))}_{_short_name(self.get_base_type(target_type))}_{receptor}"
