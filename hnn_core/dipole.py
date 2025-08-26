@@ -382,8 +382,6 @@ class Dipole(object):
                 self.data = {"agg": data[:, 0], "L2": data[:, 1], "L5": data[:, 2]}
             elif data.shape[1] == 1:
                 self.data = {"agg": data[:, 0]}
-            elif data.shape[1] == 5:
-                self.data = {"agg": data[:, 0], "L2": data[:, 1]+data[:, 3], "L5": data[:, 4]+data[:, 5]}
 
         self.nave = nave
         self.sfreq = 1000.0 / (times[1] - times[0])  # NB assumes len > 1
