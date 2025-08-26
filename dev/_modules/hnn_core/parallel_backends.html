@@ -672,11 +672,11 @@
     <span class="c1"># wait for the process to terminate. we need use proc.communicate to</span>
     <span class="c1"># read any output at its end of life.</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">outs</span><span class="p">,</span> <span class="n">errs</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">outs</span><span class="p">,</span> <span class="n">errs</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">TimeoutExpired</span><span class="p">:</span>
         <span class="n">proc</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
         <span class="c1"># wait for output again after kill signal</span>
-        <span class="n">outs</span><span class="p">,</span> <span class="n">errs</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">outs</span><span class="p">,</span> <span class="n">errs</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">outs</span><span class="p">)</span>
     <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">errs</span><span class="p">)</span>
@@ -881,12 +881,12 @@
             <span class="n">p</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
         <span class="k">except</span> <span class="n">NoSuchProcess</span><span class="p">:</span>
             <span class="k">pass</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">alive</span> <span class="o">=</span> <span class="n">wait_procs</span><span class="p">(</span><span class="n">procs</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">alive</span> <span class="o">=</span> <span class="n">wait_procs</span><span class="p">(</span><span class="n">procs</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
 
     <span class="c1"># now try kill</span>
     <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">alive</span><span class="p">:</span>
         <span class="n">p</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">alive</span> <span class="o">=</span> <span class="n">wait_procs</span><span class="p">(</span><span class="n">procs</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">alive</span> <span class="o">=</span> <span class="n">wait_procs</span><span class="p">(</span><span class="n">procs</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">alive</span>
 
@@ -1468,7 +1468,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">proc</span><span class="p">,</span> <span class="n">sim_data</span> <span class="o">=</span> <span class="n">run_subprocess</span><span class="p">(</span>
             <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mpi_cmd</span><span class="p">,</span>
             <span class="n">obj</span><span class="o">=</span><span class="p">[</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">],</span>
-            <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
             <span class="n">proc_queue</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">proc_queue</span><span class="p">,</span>
             <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span>
             <span class="n">cwd</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
@@ -1489,14 +1489,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">proc</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">proc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">proc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proc_queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">Empty</span><span class="p">:</span>
             <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No currently running process to terminate&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">proc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">proc</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># wait maximum of 5s</span>
+                <span class="n">proc</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>  <span class="c1"># wait maximum of 10s</span>
             <span class="k">except</span> <span class="n">TimeoutExpired</span><span class="p">:</span>
                 <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Could not kill python subprocess: PID </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">proc</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span></div>
 </div>
