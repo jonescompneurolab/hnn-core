@@ -127,28 +127,23 @@ def plot_combined_spike_raster(net1, net2, title="Combined Spike Raster",plot_ne
 
 
 
-def get_next_gid(net):
-    max_gid = -1
-    for rng in net.gid_ranges.values():
-        if len(rng) > 0:
-            max_gid = max(max_gid, max(rng))
-    return max_gid + 1
+
 
 def main():
     print("Minimal dual network simulation...")
 
     net1 = create_minimal_network(cell_type_suffix=None, gid_start=0)
-    next_gid = get_next_gid(net1)
+    next_gid = net1.get_next_gid()
     net1.add_evoked_drive(
         'evdist1', mu=5.0, sigma=1.0, numspikes=1, location='distal',
         weights_ampa={'L2_pyramidal': 0.1, 'L5_pyramidal': 0.1},gid_start=next_gid
     )
-    next_gid = get_next_gid(net1)
+    next_gid = net1.get_next_gid()
     net2 = create_minimal_network(cell_type_suffix="_net2",gid_start=next_gid)    
     # Specify which cell types to use for dipole calculation
     net2.dipole_cell_types = ['L2_pyramidal_net2', 'L5_pyramidal_net2']
     # Only call get_next_gid(net2) here, before adding any drives!
-    next_gid_net2 = get_next_gid(net2)
+    next_gid_net2 = net2.get_next_gid()
     net2.add_evoked_drive(
         'evdist2', mu=5.0, sigma=1.0, numspikes=1, location='distal',
         weights_ampa={'L2_pyramidal_net2': 0.1,'L5_pyramidal_net2': 0.1},gid_start=next_gid_net2
@@ -180,7 +175,7 @@ def main():
         spikes = [gid for gid in gids if gid in net2.cell_response.spike_gids[0]]
         print(f"{ct}: {len(spikes)} spiking cells out of {len(gids)}")
 
-    # plot_combined_spike_raster(net1,net2, title="Net 1 + Net 2 ",plot_net1=True,plot_net2=True)
+    plot_combined_spike_raster(net1,net2, title="Net 1 + Net 2 ",plot_net1=True,plot_net2=True)
 
     # Plot dipoles next to each other
     dpls = [dpl_1[0], dpl_2[0]]

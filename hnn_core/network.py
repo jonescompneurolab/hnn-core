@@ -2098,6 +2098,13 @@ class Network:
 
         return standardized_data, n_drive_cells, source_to_gid_map
 
+    def get_next_gid(self):
+        max_gid = -1
+        for rng in self.gid_ranges.values():
+            if len(rng) > 0:
+                max_gid = max(max_gid, max(rng))
+        return max_gid + 1
+
 
 class _Connectivity(dict):
     """A class for containing the connectivity details of the network
