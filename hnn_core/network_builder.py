@@ -109,25 +109,33 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
             if ca is not None:
                 ca_py[gid][sec_name] = ca.to_python()
 
-    l2_pyramidal_name = [
+    dipole_cell_types = [
         name
         for name, data in neuron_net.net.cell_types.items()
-        if data["metadata"].get("layer") == "2"
-        and data["metadata"].get("morpho_type") == "pyramidal"
-    ][0]
-    l5_pyramidal_name = [
-        name
-        for name, data in neuron_net.net.cell_types.items()
-        if data["metadata"].get("layer") == "5"
-        and data["metadata"].get("morpho_type") == "pyramidal"
-    ][0]
-
-    dpl_data = np.c_[
-        neuron_net._nrn_dipoles[l2_pyramidal_name].as_numpy()
-        + neuron_net._nrn_dipoles[l5_pyramidal_name].as_numpy(),
-        neuron_net._nrn_dipoles[l2_pyramidal_name].as_numpy(),
-        neuron_net._nrn_dipoles[l5_pyramidal_name].as_numpy(),
+        if data["metadata"].get("measure_dipole", False)
     ]
+
+    dpl_data = None
+
+    # Process each cell type that contributes to the dipole
+    for cell_type_name in dipole_cell_types:
+        if cell_type_name in neuron_net._nrn_dipoles:
+            cell_dipole = neuron_net._nrn_dipoles[cell_type_name].as_numpy()
+
+            if dpl_data is None:
+                dpl_data = np.zeros((len(cell_dipole), len(dipole_cell_types) + 1))
+
+            cell_idx = dipole_cell_types.index(cell_type_name)
+
+            # Add to total dipole
+            dpl_data[:, 0] += cell_dipole
+
+            # Store individual cell type dipole
+            dpl_data[:, cell_idx + 1] = cell_dipole
+
+    # If no dipole data was collected, create empty array
+    if dpl_data is None:
+        dpl_data = np.array([])
 
     rec_arr_py = dict()
     rec_times_py = dict()
