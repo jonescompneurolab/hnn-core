@@ -97,14 +97,14 @@ def _read_cell_types(cell_types_data):
     for cell_name in cell_types_data:
         cell_data = cell_types_data[cell_name]
 
-        # Handle the case where cell_data contains both 'cell_data' and 'metadata'
-        if "cell_data" in cell_data and "metadata" in cell_data:
+        # Handle the case where cell_data contains both 'cell_data' and 'cell_metadata'
+        if "cell_data" in cell_data and "cell_metadata" in cell_data:
             actual_cell_data = cell_data["cell_data"]
-            metadata = cell_data["metadata"]
+            cell_metadata = cell_data["cell_metadata"]
         else:
             # Legacy format, treat the entire cell_data as the cell information
             actual_cell_data = cell_data
-            metadata = {}
+            cell_metadata = {}
 
         sections = dict()
         sections_data = actual_cell_data["sections"]
@@ -147,8 +147,8 @@ def _read_cell_types(cell_types_data):
         cell_object.isec = actual_cell_data["isec"]
         cell_object.tonic_biases = actual_cell_data["tonic_biases"]
 
-        # Store in the new format with metadata
-        cell_types[cell_name] = {"object": cell_object, "metadata": metadata}
+        # Store in the new format with cell_metadata
+        cell_types[cell_name] = {"object": cell_object, "cell_metadata": cell_metadata}
 
     return cell_types
 
@@ -320,10 +320,10 @@ def network_to_dict(net, write_output=False):
     cell_types_data = {}
     for name, template in net.cell_types.items():
         if isinstance(template, dict) and "object" in template:
-            # New format with metadata
+            # New format with cell_metadata
             cell_types_data[name] = {
                 "cell_data": template["object"].to_dict(),
-                "metadata": template["metadata"],
+                "cell_metadata": template["cell_metadata"],
             }
         else:
             # Legacy format, template is a Cell object directly

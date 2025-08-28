@@ -348,7 +348,7 @@ def test_read_incorrect_format(tmp_path):
 
 
 def test_network_serialization_metadata(jones_2009_network, tmp_path):
-    """Test saving and loading a network with the metadata structure."""
+    """Test saving and loading a network with the cell_metadata structure."""
     net_original = jones_2009_network
     net_original.add_evoked_drive(
         "evd1",
@@ -370,5 +370,5 @@ def test_network_serialization_metadata(jones_2009_network, tmp_path):
     # checking the nested structure in the loaded network
     assert isinstance(net_loaded.cell_types["L2_pyramidal"], dict)
     assert "object" in net_loaded.cell_types["L2_pyramidal"]
-    assert "metadata" in net_loaded.cell_types["L2_pyramidal"]
-    assert net_loaded.cell_types["L2_pyramidal"]["metadata"]["layer"] == "2"
+    assert "cell_metadata" in net_loaded.cell_types["L2_pyramidal"]
+    assert net_loaded.cell_types["L2_pyramidal"]["cell_metadata"]["layer"] == "2"

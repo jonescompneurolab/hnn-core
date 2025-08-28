@@ -124,7 +124,7 @@ def test_custom_network_coords(mesh_shape):
     custom_cell_types = {
         "L2_pyramidal": {
             "object": pyramidal(cell_name="L2_pyramidal"),
-            "metadata": {
+            "cell_metadata": {
                 "morpho_type": "pyramidal",
                 "electro_type": "excitatory",
                 "layer": "2",
@@ -134,7 +134,7 @@ def test_custom_network_coords(mesh_shape):
         },
         "L5_pyramidal": {
             "object": pyramidal(cell_name="L5_pyramidal"),
-            "metadata": {
+            "cell_metadata": {
                 "morpho_type": "pyramidal",
                 "electro_type": "excitatory",
                 "layer": "5",
@@ -1866,7 +1866,7 @@ def test_offline_spike_replay():
 
 
 def test_filter_cell_types():
-    """Test filtering of cell types based on metadata."""
+    """Test filtering of cell types based on cell_metadata."""
     net = jones_2009_model()
 
     # Test filtering by a single attribute: layer
@@ -1883,13 +1883,13 @@ def test_filter_cell_types():
     )
     assert filtered_types == []
 
-    # Test filtering with a non-existent metadata key
+    # Test filtering with a non-existent cell_metadata key
     filtered_types = net.filter_cell_types(non_existent_key="some_value")
     assert filtered_types == []
 
 
 def test_update_weights_metadata():
-    """Test update_weights with new metadata logic."""
+    """Test update_weights with new cell_metadata logic."""
     net = jones_2009_model()
     e_cell_names = net.filter_cell_types(electro_type="excitatory")
     i_cell_names = net.filter_cell_types(electro_type="inhibitory")

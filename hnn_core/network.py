@@ -474,7 +474,7 @@ class Network:
             cell_types_default = {
                 "L2_basket": {
                     "object": basket(cell_name="L2_basket"),
-                    "metadata": {
+                    "cell_metadata": {
                         "morpho_type": "basket",
                         "electro_type": "inhibitory",
                         "layer": "2",
@@ -484,7 +484,7 @@ class Network:
                 },
                 "L2_pyramidal": {
                     "object": pyramidal(cell_name="L2_pyramidal"),
-                    "metadata": {
+                    "cell_metadata": {
                         "morpho_type": "pyramidal",
                         "electro_type": "excitatory",
                         "layer": "2",
@@ -494,7 +494,7 @@ class Network:
                 },
                 "L5_basket": {
                     "object": basket(cell_name="L5_basket"),
-                    "metadata": {
+                    "cell_metadata": {
                         "morpho_type": "basket",
                         "electro_type": "inhibitory",
                         "layer": "5",
@@ -504,7 +504,7 @@ class Network:
                 },
                 "L5_pyramidal": {
                     "object": pyramidal(cell_name="L5_pyramidal"),
-                    "metadata": {
+                    "cell_metadata": {
                         "morpho_type": "pyramidal",
                         "electro_type": "excitatory",
                         "layer": "5",
@@ -1960,13 +1960,13 @@ class Network:
 
         net = self.copy() if copy else self
 
-        # Identify excitatory and inhibitory GIDs based on metadata
+        # Identify excitatory and inhibitory GIDs based on cell_metadata
         e_gids = list()
         i_gids = list()
         for cell_type_name, cell_data in self.cell_types.items():
-            if cell_data["metadata"].get("electro_type") == "excitatory":
+            if cell_data["cell_metadata"].get("electro_type") == "excitatory":
                 e_gids.extend(self.gid_ranges[cell_type_name])
-            elif cell_data["metadata"].get("electro_type") == "inhibitory":
+            elif cell_data["cell_metadata"].get("electro_type") == "inhibitory":
                 i_gids.extend(self.gid_ranges[cell_type_name])
 
         # Define the connection types to modify
@@ -2023,14 +2023,14 @@ class Network:
 
     def filter_cell_types(self, **metadata_filters):
         """
-        Filter cell types based on metadata criteria
+        Filter cell types based on cell_metadata criteria
         """
         filtered_types = []
         for cell_type_name, cell_type_data in self.cell_types.items():
-            metadata = cell_type_data["metadata"]
+            cell_metadata = cell_type_data["cell_metadata"]
             match = True
             for key, value in metadata_filters.items():
-                if key not in metadata or metadata[key] != value:
+                if key not in cell_metadata or cell_metadata[key] != value:
                     match = False
                     break
             if match:

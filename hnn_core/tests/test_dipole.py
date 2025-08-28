@@ -350,7 +350,7 @@ def test_dipole_simulation_with_renamed_cells():
     """Test dipole simulation works with renamed pyramidal cells."""
     net = jones_2009_model()
 
-    # renaming the pyramidal cells (their metadata should remeain the same)
+    # renaming the pyramidal cells (their cell_metadata should remeain the same)
     rename_mapping = {"L2_pyramidal": "My_L2_Pyr", "L5_pyramidal": "My_L5_Pyr"}
     net._rename_cell_types(rename_mapping)
 
@@ -365,7 +365,7 @@ def test_dipole_simulation_with_renamed_cells():
     )
 
     # Simulate the dipole. This will fail if the backend can't find
-    #    the pyramidal cells by their metadata.
+    #    the pyramidal cells by their cell_metadata.
     dpls = simulate_dipole(net, tstop=40.0, n_trials=1)
 
     # 5. Assert that a valid Dipole object was returned

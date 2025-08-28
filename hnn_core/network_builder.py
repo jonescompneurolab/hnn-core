@@ -112,7 +112,7 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
     dipole_cell_types = [
         name
         for name, data in neuron_net.net.cell_types.items()
-        if data["metadata"].get("measure_dipole", False)
+        if data["cell_metadata"].get("measure_dipole", False)
     ]
 
     dpl_data = None
@@ -354,7 +354,7 @@ class NetworkBuilder(object):
         self._clear_last_network_objects()
 
         for cell_type, cell_data in self.net.cell_types.items():
-            if cell_data["metadata"].get("measure_dipole", False):
+            if cell_data["cell_metadata"].get("measure_dipole", False):
                 self._nrn_dipoles[cell_type] = h.Vector()
 
         self._gid_assign()
@@ -467,7 +467,7 @@ class NetworkBuilder(object):
 
                 # instantiate NEURON object
                 # using meta data style
-                src_type_metadata = self.net.cell_types[src_type]["metadata"]
+                src_type_metadata = self.net.cell_types[src_type]["cell_metadata"]
                 if src_type_metadata.get("measure_dipole", False):
                     cell.build(sec_name_apical="apical_trunk")
                 else:
@@ -654,18 +654,18 @@ class NetworkBuilder(object):
             seclist = h.SectionList()
             seclist.wholetree(sec=cell._nrn_sections["soma"])
             src_type = self.net.gid_to_type(cell.gid)
-            metadata = self.net.cell_types[src_type]["metadata"]
-            # initializing segment voltages from metadata
+            cell_metadata = self.net.cell_types[src_type]["cell_metadata"]
+            # initializing segment voltages from cell_metadata
             for sect in seclist:
                 for seg in sect:
                     if (
-                        metadata.get("morpho_type") == "pyramidal"
-                        and metadata.get("layer") == "2"
+                        cell_metadata.get("morpho_type") == "pyramidal"
+                        and cell_metadata.get("layer") == "2"
                     ):
                         seg.v = -71.46
                     elif (
-                        metadata.get("morpho_type") == "pyramidal"
-                        and metadata.get("layer") == "5"
+                        cell_metadata.get("morpho_type") == "pyramidal"
+                        and cell_metadata.get("layer") == "5"
                     ):
                         if sect.name() == f"{_short_name(src_type)}_apical_1":
                             seg.v = -71.32
@@ -675,7 +675,7 @@ class NetworkBuilder(object):
                             seg.v = -67.30
                         else:
                             seg.v = -72.0
-                    elif metadata.get("morpho_type") == "basket":
+                    elif cell_metadata.get("morpho_type") == "basket":
                         seg.v = -64.9737
 
     def _clear_neuron_objects(self):

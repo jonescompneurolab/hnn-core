@@ -48,14 +48,15 @@ def _get_target_properties(
         )
     # Distal drives should not target L5 basket cells according to the
     # canonical Jones model
-    # check using metadata
+    # check using cell_metadata
     if location == "distal":
         for cell_name in target_populations:
-            # check if the cell exists in metadata and matches criteria
+            # check if the cell exists in cell_metadata and matches criteria
             if (
                 cell_name in cell_types
-                and cell_types[cell_name]["metadata"].get("morpho_type") == "basket"
-                and cell_types[cell_name]["metadata"].get("layer") == "5"
+                and cell_types[cell_name]["cell_metadata"].get("morpho_type")
+                == "basket"
+                and cell_types[cell_name]["cell_metadata"].get("layer") == "5"
             ):
                 raise ValueError(
                     "Due to physiological/anatomical constraints, "

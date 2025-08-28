@@ -78,7 +78,7 @@ def jones_2009_model(
     cell_types = {
         "L2_basket": {
             "object": basket(cell_name="L2_basket"),
-            "metadata": {
+            "cell_metadata": {
                 "morpho_type": "basket",
                 "electro_type": "inhibitory",
                 "layer": "2",
@@ -88,7 +88,7 @@ def jones_2009_model(
         },
         "L2_pyramidal": {
             "object": pyramidal(cell_name="L2_pyramidal"),
-            "metadata": {
+            "cell_metadata": {
                 "morpho_type": "pyramidal",
                 "electro_type": "excitatory",
                 "layer": "2",
@@ -98,7 +98,7 @@ def jones_2009_model(
         },
         "L5_basket": {
             "object": basket(cell_name="L5_basket"),
-            "metadata": {
+            "cell_metadata": {
                 "morpho_type": "basket",
                 "electro_type": "inhibitory",
                 "layer": "5",
@@ -108,7 +108,7 @@ def jones_2009_model(
         },
         "L5_pyramidal": {
             "object": pyramidal(cell_name="L5_pyramidal"),
-            "metadata": {
+            "cell_metadata": {
                 "morpho_type": "pyramidal",
                 "electro_type": "excitatory",
                 "layer": "5",
