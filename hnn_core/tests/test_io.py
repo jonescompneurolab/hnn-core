@@ -369,6 +369,6 @@ def test_network_serialization_metadata(jones_2009_network, tmp_path):
 
     # checking the nested structure in the loaded network
     assert isinstance(net_loaded.cell_types["L2_pyramidal"], dict)
-    assert "object" in net_loaded.cell_types["L2_pyramidal"]
+    assert "cell_object" in net_loaded.cell_types["L2_pyramidal"]
     assert "cell_metadata" in net_loaded.cell_types["L2_pyramidal"]
     assert net_loaded.cell_types["L2_pyramidal"]["cell_metadata"]["layer"] == "2"

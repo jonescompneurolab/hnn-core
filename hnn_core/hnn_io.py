@@ -148,7 +148,10 @@ def _read_cell_types(cell_types_data):
         cell_object.tonic_biases = actual_cell_data["tonic_biases"]
 
         # Store in the new format with cell_metadata
-        cell_types[cell_name] = {"object": cell_object, "cell_metadata": cell_metadata}
+        cell_types[cell_name] = {
+            "cell_object": cell_object,
+            "cell_metadata": cell_metadata,
+        }
 
     return cell_types
 
@@ -319,10 +322,10 @@ def network_to_dict(net, write_output=False):
     # cell_types serialization, support both old and new formats
     cell_types_data = {}
     for name, template in net.cell_types.items():
-        if isinstance(template, dict) and "object" in template:
+        if isinstance(template, dict) and "cell_object" in template:
             # New format with cell_metadata
             cell_types_data[name] = {
-                "cell_data": template["object"].to_dict(),
+                "cell_data": template["cell_object"].to_dict(),
                 "cell_metadata": template["cell_metadata"],
             }
         else:

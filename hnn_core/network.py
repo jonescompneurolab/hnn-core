@@ -473,7 +473,7 @@ class Network:
             # Default behavior - create standard network
             cell_types_default = {
                 "L2_basket": {
-                    "object": basket(cell_name="L2_basket"),
+                    "cell_object": basket(cell_name="L2_basket"),
                     "cell_metadata": {
                         "morpho_type": "basket",
                         "electro_type": "inhibitory",
@@ -483,7 +483,7 @@ class Network:
                     },
                 },
                 "L2_pyramidal": {
-                    "object": pyramidal(cell_name="L2_pyramidal"),
+                    "cell_object": pyramidal(cell_name="L2_pyramidal"),
                     "cell_metadata": {
                         "morpho_type": "pyramidal",
                         "electro_type": "excitatory",
@@ -493,7 +493,7 @@ class Network:
                     },
                 },
                 "L5_basket": {
-                    "object": basket(cell_name="L5_basket"),
+                    "cell_object": basket(cell_name="L5_basket"),
                     "cell_metadata": {
                         "morpho_type": "basket",
                         "electro_type": "inhibitory",
@@ -503,7 +503,7 @@ class Network:
                     },
                 },
                 "L5_pyramidal": {
-                    "object": pyramidal(cell_name="L5_pyramidal"),
+                    "cell_object": pyramidal(cell_name="L5_pyramidal"),
                     "cell_metadata": {
                         "morpho_type": "pyramidal",
                         "electro_type": "excitatory",
@@ -1296,11 +1296,11 @@ class Network:
 
         # Ensure location exists for all target cells
         cell_sections = [
-            set(self.cell_types[cell_type]["object"].sections.keys())
+            set(self.cell_types[cell_type]["cell_object"].sections.keys())
             for cell_type in target_populations
         ]
         sect_locs = [
-            set(self.cell_types[cell_type]["object"].sect_loc.keys())
+            set(self.cell_types[cell_type]["cell_object"].sect_loc.keys())
             for cell_type in target_populations
         ]
 
@@ -1613,10 +1613,10 @@ class Network:
         for original_name in name_mapping.keys():
             if (
                 isinstance(self.cell_types.get(original_name), dict)
-                and "object" in self.cell_types[original_name]
+                and "cell_object" in self.cell_types[original_name]
             ):
                 original_cell_names[original_name] = self.cell_types[original_name][
-                    "object"
+                    "cell_object"
                 ].name
 
         for original_name, new_name in name_mapping.items():
@@ -1650,10 +1650,10 @@ class Network:
                 if (
                     new_name in self.cell_types
                     and isinstance(self.cell_types[new_name], dict)
-                    and "object" in self.cell_types[new_name]
+                    and "cell_object" in self.cell_types[new_name]
                     and original_name in original_cell_names
                 ):
-                    self.cell_types[new_name]["object"].name = original_cell_names[
+                    self.cell_types[new_name]["cell_object"].name = original_cell_names[
                         original_name
                     ]
 
@@ -1794,8 +1794,8 @@ class Network:
         _validate_type(loc, str, "loc")
         _validate_type(receptor, str, "receptor")
 
-        target_sect_loc = self.cell_types[target_type]["object"].sect_loc
-        target_sections = self.cell_types[target_type]["object"].sections
+        target_sect_loc = self.cell_types[target_type]["cell_object"].sect_loc
+        target_sections = self.cell_types[target_type]["cell_object"].sections
         valid_loc = list(target_sect_loc.keys()) + list(target_sections.keys())
 
         _check_option(
@@ -2352,7 +2352,7 @@ def _add_cell_type_bias(
         "section": section,
     }
 
-    sections = list(network.cell_types[cell_type]["object"].sections.keys())
+    sections = list(network.cell_types[cell_type]["cell_object"].sections.keys())
 
     # error when section is defined that doesn't exist.
     if section not in sections:

@@ -461,7 +461,7 @@ class NetworkBuilder(object):
             gid_idx = gid - self.net.gid_ranges[src_type][0]
             if src_type in self.net.cell_types:
                 # copy cell object from template cell type in Network
-                cell = self.net.cell_types[src_type]["object"].copy()
+                cell = self.net.cell_types[src_type]["cell_object"].copy()
                 cell.gid = gid
                 cell.pos = self.net.pos_dict[src_type][gid_idx]
 

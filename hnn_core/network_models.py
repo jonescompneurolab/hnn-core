@@ -77,7 +77,7 @@ def jones_2009_model(
     # data is here in metaData format
     cell_types = {
         "L2_basket": {
-            "object": basket(cell_name="L2_basket"),
+            "cell_object": basket(cell_name="L2_basket"),
             "cell_metadata": {
                 "morpho_type": "basket",
                 "electro_type": "inhibitory",
@@ -87,7 +87,7 @@ def jones_2009_model(
             },
         },
         "L2_pyramidal": {
-            "object": pyramidal(cell_name="L2_pyramidal"),
+            "cell_object": pyramidal(cell_name="L2_pyramidal"),
             "cell_metadata": {
                 "morpho_type": "pyramidal",
                 "electro_type": "excitatory",
@@ -97,7 +97,7 @@ def jones_2009_model(
             },
         },
         "L5_basket": {
-            "object": basket(cell_name="L5_basket"),
+            "cell_object": basket(cell_name="L5_basket"),
             "cell_metadata": {
                 "morpho_type": "basket",
                 "electro_type": "inhibitory",
@@ -107,7 +107,7 @@ def jones_2009_model(
             },
         },
         "L5_pyramidal": {
-            "object": pyramidal(cell_name="L5_pyramidal"),
+            "cell_object": pyramidal(cell_name="L5_pyramidal"),
             "cell_metadata": {
                 "morpho_type": "pyramidal",
                 "electro_type": "excitatory",
@@ -305,10 +305,10 @@ def law_2021_model(
     )
 
     # Update biophysics (increase gabab duration of inhibition)
-    net.cell_types["L2_pyramidal"]["object"].synapses["gabab"]["tau1"] = 45.0
-    net.cell_types["L2_pyramidal"]["object"].synapses["gabab"]["tau2"] = 200.0
-    net.cell_types["L5_pyramidal"]["object"].synapses["gabab"]["tau1"] = 45.0
-    net.cell_types["L5_pyramidal"]["object"].synapses["gabab"]["tau2"] = 200.0
+    net.cell_types["L2_pyramidal"]["cell_object"].synapses["gabab"]["tau1"] = 45.0
+    net.cell_types["L2_pyramidal"]["cell_object"].synapses["gabab"]["tau2"] = 200.0
+    net.cell_types["L5_pyramidal"]["cell_object"].synapses["gabab"]["tau1"] = 45.0
+    net.cell_types["L5_pyramidal"]["cell_object"].synapses["gabab"]["tau2"] = 200.0
 
     # Decrease L5_pyramidal -> L5_pyramidal nmda weight
     net.connectivity[2]["nc_dict"]["A_weight"] = 0.0004
@@ -319,7 +319,7 @@ def law_2021_model(
 
     # Remove L5 pyramidal somatic and basal dendrite calcium channels
     for sec in ["soma", "basal_1", "basal_2", "basal_3"]:
-        del net.cell_types["L5_pyramidal"]["object"].sections[sec].mechs["ca"]
+        del net.cell_types["L5_pyramidal"]["cell_object"].sections[sec].mechs["ca"]
 
     # Remove L2_basket -> L5_pyramidal gabaa connection
     del net.connectivity[10]  # Original paper simply sets gbar to 0.0
@@ -392,8 +392,10 @@ def calcium_model(
 
     # Replace L5 pyramidal cell template with updated calcium
     cell_name = "L5_pyramidal"
-    pos = net.cell_types[cell_name]["object"].pos
-    net.cell_types[cell_name]["object"] = pyramidal_ca(cell_name=cell_name, pos=pos)
+    pos = net.cell_types[cell_name]["cell_object"].pos
+    net.cell_types[cell_name]["cell_object"] = pyramidal_ca(
+        cell_name=cell_name, pos=pos
+    )
 
     return net
 
