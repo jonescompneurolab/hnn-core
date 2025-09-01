@@ -126,7 +126,6 @@ def simulate_dipole(
             DeprecationWarning,
         )
     dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc)
-    print(f"Debug: dpls in simulate_dipole: {dpls}")
     return dpls
 
 
@@ -369,10 +368,6 @@ class Dipole(object):
 
     def __init__(self, times, data, nave=1):  # noqa: D102
         self.times = np.array(times)
-        if isinstance(data, np.ndarray):
-            print("Debug: Dipole data shape:", data.shape)
-            # If you know the column names you used:
-
         if isinstance(data, dict):
             self.data = data
         else:

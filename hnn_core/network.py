@@ -1551,7 +1551,6 @@ class Network:
         """Add cell type by updating pos_dict and gid_ranges."""
         ll = self._n_gids if (gid_start is None) else gid_start
         self._n_gids = ll + len(pos)
-        # print(f"Debug: Adding cell type {cell_name} with gids {ll} to {self._n_gids}")
         self.gid_ranges[cell_name] = range(ll, self._n_gids)
         self.pos_dict[cell_name] = pos
         if cell_template is not None:

@@ -339,7 +339,6 @@ class NetworkBuilder(object):
         dipole_cell_types = getattr(
             self.net, "dipole_cell_types", ["L2_pyramidal", "L5_pyramidal"]
         )
-        # print("Debug: dipole cell types : ", dipole_cell_types)
         for ct in dipole_cell_types:
             self._nrn_dipoles[ct] = h.Vector()
         self._gid_assign()
@@ -389,21 +388,14 @@ class NetworkBuilder(object):
             self._rank = rank
         if n_hosts is None:
             n_hosts = _get_nhosts()
-        # print(
-        #     "Debug: Assigning gids for cell type,gid range:",
-        #     self.net.gid_ranges.items(),
-        # )
+
         # round robin assignment of cell gids
         for cell_type, gid_range in self.net.gid_ranges.items():
             # Only assign real cell types (not drives) here
             if cell_type in self.net.cell_types:
                 gids = list(gid_range)
-                # print("Debug: GIDS:", gids, "RANK", self._rank, "Host:", n_hosts)
                 for gid_idx in range(self._rank, len(gids), n_hosts):
-                    # print("Debug: GID idx:", gid_idx)
                     gid = gids[gid_idx]
-                    # print("Debug: GID:", gid)
-                    # print("Debug: GID:", gid, "RANK", self._rank, "Host:", n_hosts)
                     self._gid_list.append(gid)
 
         for drive in self.net.external_drives.values():
@@ -453,7 +445,6 @@ class NetworkBuilder(object):
         # loop through ALL gids
         # have to loop over self._gid_list, since this is what we got
         # on this rank (MPI)
-        # print("Debug: gid_list:", self._gid_list)
         for gid in self._gid_list:
             src_type = self.net.gid_to_type(gid)
             gid_idx = gid - self.net.gid_ranges[src_type][0]
@@ -506,10 +497,7 @@ class NetworkBuilder(object):
         """Connect two cell types for a particular receptor."""
         net = self.net
         connectivity = self.net.connectivity
-        print(f"Debug: len of drive cells = {len(self._drive_cells)} ")
         assert len(self._cells) == len(self._gid_list) - len(self._drive_cells)
-        srctype_target_type = set()  # DEBUG statement
-        print(f"Debug Gid list: {self._gid_list}")
         for conn in connectivity:
             loc, receptor = conn["loc"], conn["receptor"]
             nc_dict = deepcopy(conn["nc_dict"])
@@ -523,34 +511,19 @@ class NetworkBuilder(object):
                         filtered_targets.append(target_gid)
                         valid_targets.add(target_gid)
                 conn["gid_pairs"][src_gid] = filtered_targets
-            print(f"Debug: gid ranges: {net.gid_ranges}")
-            print("Debug: valid targets:", valid_targets)
-            print(
-                f"Debug: length of cell = {len(self._cells)}, length of gid list = {len(self._gid_list)}"
-            )
             target_filter = dict()
             for idx in range(len(self._cells)):
                 gid = self._gid_list[idx]
-                # print("gid, idx:", gid, idx)
                 if gid in valid_targets:
                     target_filter[gid] = idx
-            print(f"Debug: length of target filter : {len(target_filter)}")
-            # print(f"Debug: cells: {self._cells}")
-            # if self.net.suffix: #Debug
-            #     print("Debug: gidpairs",conn["gid_pairs"].items())
             # Iterate over src/target pairs and connect cells
             for src_gid, target_gids in conn["gid_pairs"].items():
                 for target_gid in target_gids:
                     src_type = self.net.gid_to_type(src_gid)
                     target_type = self.net.gid_to_type(target_gid)
-                    srctype_target_type.add((src_type, target_type))  # DEBUG statement
-                    # if self.net.suffix: #Debug
-                    # print(f"Debug: src_gid,src_type: {src_gid}, {src_type}, targte_gid,target_type: {target_gid},{target_type}")
-
                     key = target_filter[target_gid]
                     target_cell = self._cells[key]
                     connection_name = f"{_short_name(self.get_base_type(src_type))}_{_short_name(self.get_base_type(target_type))}_{receptor}"
-                    # print("Debug: Connection name",connection_name)
                     if connection_name not in self.ncs:
                         self.ncs[connection_name] = list()
                     pos_idx = src_gid - net.gid_ranges[_long_name(src_type)][0]
@@ -566,11 +539,7 @@ class NetworkBuilder(object):
                     # Targeting individual section like soma or apical_tuft
                     else:
                         syn_keys = [f"{loc}_{receptor}"]
-                    # if self.net.suffix:  # Debug
-                    #     print(
-                    #         f"Debug: syn_keys: {syn_keys} /n Srctype,target type {srctype_target_type}/nConnection name: {connection_name}"
-                    #     )
-                    # print("Debug: Target cell synapses: ",target_cell._nrn_synapses)
+
                     for syn_key in syn_keys:
                         nc = target_cell.parconnect_from_src(
                             src_gid,
@@ -579,7 +548,6 @@ class NetworkBuilder(object):
                             net._inplane_distance,
                         )
                         self.ncs[connection_name].append(nc)
-        print("Debug: srctype_target_type:", srctype_target_type)
 
     def _record_extracellular(self):
         for arr_name, arr in self.net.rec_arrays.items():
@@ -621,7 +589,6 @@ class NetworkBuilder(object):
         # ensure that the shape of this rank's nrn_dpl h.Vector() object is
         # initialized consistently across all MPI ranks regardless of whether
         # this rank contains cells contributing to the net dipole calculation
-        print("Debug: dipole cell types : ", self._nrn_dipoles)
         for nrn_dpl in self._nrn_dipoles.values():
             if nrn_dpl.size() != n_samples:
                 nrn_dpl.append(h.Vector(n_samples, 0))
@@ -629,7 +596,6 @@ class NetworkBuilder(object):
         for cell in self._cells:
             # add dipoles across neurons on the current thread
             if hasattr(cell, "dipole"):
-                # print(f"Debug: {cell.name} dipole size: {cell.dipole.size()}")
                 if cell.dipole.size() != n_samples:
                     raise ValueError(
                         f"n_samples does not match the size "
