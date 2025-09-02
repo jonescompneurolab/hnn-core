@@ -56,7 +56,7 @@ linkcheck:
 	@$(SPHINXBUILD) -b linkcheck -D nitpicky=0 -D plot_gallery=0 -d _build/doctrees . _build/linkcheck
 
 linkcheck-all:
-	@$(SPHINXBUILD) -b linkcheck -D nitpicky=0 -D plot_gallery=0 -D linkcheck_ignore='https://doi.org/10.1152/jn.00535.2009','https://doi.org/10.1152/jn.00122.2010','https://doi.org/10.1101/2021.04.16.440210','(http|https):\/\/localhost:\d+' -d _build/doctrees . _build/linkcheck
+	@$(SPHINXBUILD) -b linkcheck -D nitpicky=0 -D plot_gallery=0 -D linkcheck_ignore='https://doi.org/10.1152/jn.00535.2009','https://doi.org/10.1152/jn.00122.2010','https://doi.org/10.1101/2021.04.16.440210','https://doi.org/10.7554/eLife.51214','(http|https):\/\/localhost:\d+' -d _build/doctrees . _build/linkcheck
 
 view:
 	@python -c "import webbrowser; webbrowser.open_new_tab('file://$(PWD)/_build/html/index.html')"
