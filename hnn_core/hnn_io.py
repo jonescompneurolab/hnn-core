@@ -92,10 +92,43 @@ def _str_to_node(node_string):
 
 
 def _read_cell_types(cell_types_data):
-    """Returns a dict of Cell objects from json encoded data"""
+    """Returns a dict of Cell objects from json encoded data
+
+    This function handles both legacy format (direct cell data) and
+    new format (cell object with metadata) for backwards compatibility.
+
+    Parameters
+    ----------
+    cell_types_data : dict
+        Dictionary containing cell type information in either:
+        - Legacy format: {cell_name: cell_dict} where cell_dict contains
+          cell properties directly
+        - New format: {cell_name: {"cell_object": cell_dict, "cell_metadata": metadata}}
+          where cell_dict contains cell properties and metadata contains additional info
+
+    Returns
+    -------
+    cell_types : dict
+        Dictionary with cell names as keys and dicts containing:
+        - "cell_object": Cell instance
+        - "cell_metadata": dict of metadata (empty dict for legacy format)
+    """
     cell_types = dict()
     for cell_name in cell_types_data:
-        cell_data = cell_types_data[cell_name]
+        # Determine format and extract cell_data and metadata accordingly
+        if (
+            "cell_object" in cell_types_data[cell_name]
+            and "cell_metadata" in cell_types_data[cell_name]
+        ):
+            # New format: extract cell properties from nested "cell_object"
+            cell_data = cell_types_data[cell_name]["cell_object"]
+            cell_metadata = cell_types_data[cell_name]["cell_metadata"]
+        else:
+            # Legacy format, treat the entire cell_data as the cell information
+            cell_data = cell_types_data[cell_name]
+            cell_metadata = {}
+
+        # Now cell_data contains the cell properties regardless of format
         sections = dict()
         sections_data = cell_data["sections"]
         for section_name in sections_data:
@@ -110,6 +143,7 @@ def _read_cell_types(cell_types_data):
             # Set section attributes
             sections[section_name].syns = section_data["syns"]
             sections[section_name].mechs = section_data["mechs"]
+
         # cell_tree
         cell_tree = None
         if cell_data["cell_tree"] is not None:
@@ -121,7 +155,7 @@ def _read_cell_types(cell_types_data):
                     value.append(_str_to_node(child))
                 cell_tree[key] = value
 
-        cell_types[cell_name] = Cell(
+        cell_object = Cell(
             name=cell_data["name"],
             pos=tuple(cell_data["pos"]),
             sections=sections,
@@ -130,11 +164,18 @@ def _read_cell_types(cell_types_data):
             sect_loc=cell_data["sect_loc"],
             gid=cell_data["gid"],
         )
-        # Setting cell attributes
-        cell_types[cell_name].dipole_pp = cell_data["dipole_pp"]
-        cell_types[cell_name].vsec = cell_data["vsec"]
-        cell_types[cell_name].isec = cell_data["isec"]
-        cell_types[cell_name].tonic_biases = cell_data["tonic_biases"]
+
+        # Set additional cell attributes
+        cell_object.dipole_pp = cell_data["dipole_pp"]
+        cell_object.vsec = cell_data["vsec"]
+        cell_object.isec = cell_data["isec"]
+        cell_object.tonic_biases = cell_data["tonic_biases"]
+
+        # Store in the unified format with cell_metadata
+        cell_types[cell_name] = {
+            "cell_object": cell_object,
+            "cell_metadata": cell_metadata,
+        }
 
     return cell_types
 
@@ -302,15 +343,26 @@ def network_to_dict(net, write_output=False):
     dict
     """
 
+    # cell_types serialization, support both old and new formats
+    cell_types_data = {}
+    for name, template in net.cell_types.items():
+        if isinstance(template, dict) and "cell_object" in template:
+            # New format with cell_metadata
+            cell_types_data[name] = {
+                "cell_object": template["cell_object"].to_dict(),
+                "cell_metadata": template["cell_metadata"],
+            }
+        else:
+            # Legacy format, template is a Cell object directly
+            cell_types_data[name] = template.to_dict()
+
     net_data = {
         "object_type": "Network",
         "legacy_mode": net._legacy_mode,
         "N_pyr_x": net._N_pyr_x,
         "N_pyr_y": net._N_pyr_y,
         "celsius": net._params["celsius"],
-        "cell_types": {
-            name: template.to_dict() for name, template in net.cell_types.items()
-        },
+        "cell_types": cell_types_data,
         "gid_ranges": {
             cell: {"start": c_range.start, "stop": c_range.stop}
             for cell, c_range in net.gid_ranges.items()
