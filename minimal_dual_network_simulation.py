@@ -9,6 +9,7 @@ from hnn_core import jones_2009_model, simulate_dipole, Network
 import matplotlib.pyplot as plt
 from hnn_core.hnn_io import write_network_configuration
 from hnn_core.viz import plot_dipole
+from hnn_core.viz import plot_dipole
 
 def create_minimal_network(cell_type_suffix=None, gid_start=0, network_separation=0):
     """Create a minimal network with one cell per type and shift positions."""
@@ -26,8 +27,8 @@ def create_minimal_network(cell_type_suffix=None, gid_start=0, network_separatio
             ('L5_pyramidal', f'L5_pyramidal{cell_type_suffix}'),
         ])
         net._rename_cell_types(mapping)
-        # print("DEBUG: net pos dict: ", net.pos_dict)
-        # print("Debug: cell types: ",net.cell_types)
+        # # print("DEBUG: net pos dict: ", net.pos_dict)
+        # # print("Debug: cell types: ",net.cell_types)
         # Update GID ranges to start at gid_start and avoid overlap
         current_gid = gid_start
         net.gid_ranges = OrderedDict()
@@ -35,7 +36,7 @@ def create_minimal_network(cell_type_suffix=None, gid_start=0, network_separatio
             n_cells = len(net.pos_dict[ct])
             net.gid_ranges[ct] = range(current_gid, current_gid + n_cells)
             current_gid += n_cells
-        # print("Debug: net gid ranges: ",net.gid_ranges)
+        # # print("Debug: net gid ranges: ",net.gid_ranges)
                 # Update connectivity GIDs to match new gid_ranges
         for conn in net.connectivity:
             # Update target_gids if target_type is in mapping
@@ -67,6 +68,10 @@ def create_minimal_network(cell_type_suffix=None, gid_start=0, network_separatio
                 # print(f"Debug: Original src range: {original_gid_ranges[orig_src_type]}")
                 # print(f"Debug: New src range: {net.gid_ranges[src_type]}")
                 # print(f"Debug: src_offset: {src_offset}, tgt_offset: {tgt_offset}")
+                # print(f"Debug: Updating gid_pairs for {src_type} -> {tgt_type}")
+                # print(f"Debug: Original src range: {original_gid_ranges[orig_src_type]}")
+                # print(f"Debug: New src range: {net.gid_ranges[src_type]}")
+                # print(f"Debug: src_offset: {src_offset}, tgt_offset: {tgt_offset}")
                 
                 new_gid_pairs = {}
                 for src_gid, tgt_gids in conn['gid_pairs'].items():
@@ -75,6 +80,9 @@ def create_minimal_network(cell_type_suffix=None, gid_start=0, network_separatio
                     new_gid_pairs[new_src_gid] = new_tgt_gids
                 conn['gid_pairs'] = new_gid_pairs
 
+            # print(f"Debug: Connection from {conn['src_type']} to {conn['target_type']}")
+            # print(f"Debug: Receptor: {conn.get('receptor', 'not specified')}")
+            # print(f"Debug: Location: {conn.get('loc', 'not specified')}")
             # print(f"Debug: Connection from {conn['src_type']} to {conn['target_type']}")
             # print(f"Debug: Receptor: {conn.get('receptor', 'not specified')}")
             # print(f"Debug: Location: {conn.get('loc', 'not specified')}")
@@ -155,6 +163,7 @@ def main():
     print("Simulating net1...")
     print("Net1 gid ranges:", net1.gid_ranges)
     dpl_1 = simulate_dipole(net1, tstop=20, dt=0.025, n_trials=1)
+    print("debug dipole net1  type: ",type(dpl_1[0]))
     print("debug dipole net1  type: ",type(dpl_1[0]))
     print("Simulating net2...")
     print("Net2 gid ranges:", net2.gid_ranges)

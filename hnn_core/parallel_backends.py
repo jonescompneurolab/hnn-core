@@ -62,8 +62,10 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
             arr._times = sim_data[idx]["rec_times"][arr_name]
 
         # dipole
-        dpl = Dipole(times=sim_data[idx]["times"], data=sim_data[idx]["dpl_data"])
+        dpl_data = sim_data[idx]["dpl_data"]
+        times = sim_data[idx]["times"]
 
+        dpl = Dipole(times=times, data=dpl_data)
         N_pyr_x = net._N_pyr_x
         N_pyr_y = net._N_pyr_y
         dpl._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
@@ -76,7 +78,6 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
             if fctr > 0:
                 dpl.scale(fctr)
         dpls.append(dpl)
-
     return dpls
 
 
