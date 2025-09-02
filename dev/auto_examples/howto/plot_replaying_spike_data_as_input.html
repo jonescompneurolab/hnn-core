@@ -550,7 +550,7 @@ Trial 1: 130.0 ms...
 Trial 1: 140.0 ms...
 Trial 1: 150.0 ms...
 Trial 1: 160.0 ms...
-Writing file /tmp/tmp190z2kyx/spk_0.txt
+Writing file /tmp/tmpt9szgx7k/spk_0.txt
 /home/circleci/project/examples/howto/plot_replaying_spike_data_as_input.py:59: DeprecationWarning: Reading cell response from txt files is deprecated and will be removed in future versions. Please load cell response along with simulated network
   cell_response = read_spikes(op.join(tmp_dir, &#39;spk_*.txt&#39;))
 Extracted 616 spikes from Network A
@@ -620,7 +620,7 @@ B’s layers, ensuring a realistic interaction.</p>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Creating and configuring Network B...
 Number of valid pyramidal cells with spikes to be used for input: 139
-/home/circleci/miniconda/envs/testenv/lib/python3.13/site-packages/hnn_core/network.py:1108: UserWarning: Spike train drives can only target sections defined in `Cell.sect_loc` when `legacy_mode=False`.
+/home/circleci/miniconda/envs/testenv/lib/python3.13/site-packages/hnn_core/network.py:1151: UserWarning: Spike train drives can only target sections defined in `Cell.sect_loc` when `legacy_mode=False`.
   warnings.warn(
 </pre></div>
 </div>
@@ -708,7 +708,7 @@ distributed computing—allowing you to experiment with multiple networks or adj
 parameters like weights and delays to explore different dynamics. Try modifying the
 <em class="xref py py-obj">weights_ampa</em> or <em class="xref py py-obj">synaptic_delays</em> values in Step 2 to see how they affect the
 results!</p>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 9.569 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 7.618 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-replaying-spike-data-as-input-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_replaying_spike_data_as_input.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" style="width: 150px;" />

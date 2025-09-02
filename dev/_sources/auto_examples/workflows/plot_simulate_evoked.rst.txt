@@ -87,7 +87,7 @@ inside it.
 
     net = jones_2009_model()
     net.plot_cells()
-    net.cell_types['L5_pyramidal'].plot_morphology()
+    net.cell_types['L5_pyramidal']['cell_object'].plot_morphology()
 
 
 
@@ -453,7 +453,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 0.116 seconds)
+   **Total running time of the script:** (0 minutes 58.222 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_evoked.py:
