@@ -20,7 +20,7 @@ class Optimizer:
         initial_params=None,
         solver="bayesian",
         obj_fun="dipole_rmse",
-        max_iter=200
+        max_iter=200,
     ):
         """Parameter optimization.
 
@@ -145,8 +145,7 @@ class Optimizer:
             The smooth window length.
         """
         if self.obj_fun_name == "dipole_rmse" and (
-            "target" not in obj_fun_kwargs
-            or "n_trials" not in obj_fun_kwargs
+            "target" not in obj_fun_kwargs or "n_trials" not in obj_fun_kwargs
         ):
             raise Exception("target and n_trials must be specified")
         elif self.obj_fun_name == "maximize_psd" and (
@@ -231,8 +230,7 @@ def _get_initial_params(constraints):
     initial_params = dict()
     for cons_key in constraints:
         initial_params.update(
-            {cons_key: (constraints[cons_key][0] +
-                        constraints[cons_key][1]) / 2}
+            {cons_key: (constraints[cons_key][0] + constraints[cons_key][1]) / 2}
         )
 
     return initial_params
@@ -274,10 +272,8 @@ def _assemble_constraints_cobyla(constraints):
     # assemble constraints in solver-specific format
     cons_cobyla = list()
     for idx, cons_key in enumerate(constraints):
-        cons_cobyla.append(lambda x, idx=idx: float(
-            constraints[cons_key][1]) - x[idx])
-        cons_cobyla.append(
-            lambda x, idx=idx: x[idx] - float(constraints[cons_key][0]))
+        cons_cobyla.append(lambda x, idx=idx: float(constraints[cons_key][1]) - x[idx])
+        cons_cobyla.append(lambda x, idx=idx: x[idx] - float(constraints[cons_key][0]))
 
     return cons_cobyla
 
