@@ -7,7 +7,7 @@ import hnn_core
 from hnn_core import read_params
 from .network import Network, _create_cell_coords
 from .params import _short_name
-from .cells_default import pyramidal_ca, pyramidal, basket
+from .cells_default import pyramidal_ca, pyramidal, basket, L5_pyramidal_cell
 from .externals.mne import _validate_type
 
 # ToDO -> direct _cell_L2Pyr calling
@@ -107,7 +107,8 @@ def jones_2009_model(
             },
         },
         "L5_pyramidal": {
-            "cell_object": pyramidal(cell_name="L5_pyramidal"),
+            # "cell_object": pyramidal(cell_name="L5_pyramidal"),
+            "cell_object": L5_pyramidal_cell(),
             "cell_metadata": {
                 "morpho_type": "pyramidal",
                 "electro_type": "excitatory",
