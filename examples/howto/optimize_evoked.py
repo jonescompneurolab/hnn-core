@@ -105,9 +105,8 @@ net_initial.add_evoked_drive('evdist1',
                              cell_specific=cell_specific)
 
 # Proximal 2
-L5_pyramidal_weight = 0.1
 weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
-                   'L5_basket': 0.008958, 'L5_pyramidal': L5_pyramidal_weight}
+                   'L5_basket': 0.008958, 'L5_pyramidal': 0.1}
 net_initial.add_evoked_drive('evprox2',
                              mu=120.,
                              sigma=1.,
@@ -119,9 +118,11 @@ net_initial.add_evoked_drive('evprox2',
                              cell_specific=cell_specific)
 
 # Simulate initial dipole
+n_trials = 10
 tstop = dipole_experimental.times[-1]
 with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
-    dipoles_initial = simulate_dipole(net_initial, tstop=tstop, n_trials=3)
+    dipoles_initial = simulate_dipole(
+        net_initial, tstop=tstop, n_trials=n_trials)
 
 # Smooth and scale
 window_length = 30
@@ -207,14 +208,28 @@ def set_params(net, params):
 # realistic model behavior, rather than solely relying on existing literature values.
 
 
-lower_bound = 10**-1 * L5_pyramidal_weight
-upper_bound = 10 * L5_pyramidal_weight
+lower_bound = 0.1 * 10**-1
+upper_bound = 0.1 * 10
 constraints = dict({'evprox2_ampa_L5_pyramidal': (lower_bound, upper_bound),
                     'evprox2_mu': (100., 150.),
                     'evprox2_sigma': (1., 20.)})
 
 ###############################################################################
-# 6. Initialize and run the optimizer
+# 6. Define the initial parameters
+# --------------------------------
+#
+# For optimal results, set initial_params to your hand-tuned values since they
+# already provide a good fit.
+#
+# This step is optional; if not provided, the optimizer will use the midpoint
+# of the constraints as the initial parameters.
+
+initial_params = dict({'evprox2_ampa_L5_pyramidal': 0.1,
+                       'evprox2_mu': 120.,
+                       'evprox2_sigma': 1.})
+
+###############################################################################
+# 7. Initialize and run the optimizer
 # -----------------------------------
 #
 # Finally, let's initialize and run the optimizer. We'll instantiate the Optimizer
@@ -224,31 +239,32 @@ constraints = dict({'evprox2_ampa_L5_pyramidal': (lower_bound, upper_bound),
 # By default, the optimizer aims to minimize the Root Mean Square Error (RMSE)
 # between the simulated and experimental dipoles.
 #
-# .. note:: It is worth noting that a custom objective function and initial weights can be supplied.
+# .. note:: It is worth noting that a custom objective function can be supplied.
 
 net = jones_2009_model()
 optim = Optimizer(net, tstop=tstop, constraints=constraints,
-                  set_params=set_params)
+                  set_params=set_params, initial_params=initial_params)
 with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
-    optim.fit(target=dipole_experimental, scale_factor=scaling_factor,
+    optim.fit(target=dipole_experimental, n_trials=n_trials, scale_factor=scaling_factor,
               smooth_window_len=window_length)
 
 ###############################################################################
-# 7. Simulate the optimized dipole
+# 8. Simulate the optimized dipole
 # --------------------------------
 #
 # Now, we can simulate the dipole using the newly found optimized parameters
 # to see how well they match the experimental data.
 
 with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
-    dipoles_optimized = simulate_dipole(optim.net_, tstop=tstop, n_trials=3)
+    dipoles_optimized = simulate_dipole(
+        optim.net_, tstop=tstop, n_trials=n_trials)
 
 # Smooth and scale
 for dipole in dipoles_optimized:
     dipole.smooth(window_length).scale(scaling_factor)
 
 ###############################################################################
-# 8. Visualize the results
+# 9. Visualize the results
 # ------------------------
 #
 # Finally, we can compare the experimental, initial, and optimized dipoles.
