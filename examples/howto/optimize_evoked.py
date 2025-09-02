@@ -221,8 +221,8 @@ constraints = dict({'evprox2_ampa_L5_pyramidal': (lower_bound, upper_bound),
 # For optimal results, set initial_params to your hand-tuned values since they
 # already provide a good fit.
 #
-# This step is optional; if not provided, the optimizer will use the midpoint
-# of the constraints as the initial parameters.
+# If initial_params is not set, the optimizer will use the midpoint of the
+# constraints as the initial parameters.
 
 initial_params = dict({'evprox2_ampa_L5_pyramidal': 0.1,
                        'evprox2_mu': 120.,
