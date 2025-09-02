@@ -37,6 +37,8 @@ def _rmse_evoked(
         The simulated dipole's duration.
     target : instance of Dipole
         A dipole object with experimental data.
+    n_trials : int
+        Number of trials to simulate and average.
 
     Returns
     -------
@@ -49,7 +51,9 @@ def _rmse_evoked(
     # simulate dpl with predicted params
     new_net = initial_net.copy()
     set_params(new_net, params)
-    dpls = simulate_dipole(new_net, tstop=tstop, n_trials=3)
+
+    dpls = simulate_dipole(new_net, tstop=tstop,
+                           n_trials=obj_fun_kwargs["n_trials"])
 
     # smooth & scale
     if "scale_factor" in obj_fun_kwargs:
@@ -133,12 +137,17 @@ def _maximize_psd(
 
     # for each f band
     f_bands_psds = list()
+    relative_bandpower = obj_fun_kwargs["relative_bandpower"]
+    if not isinstance(relative_bandpower, (list, np.ndarray)):
+        relative_bandpower = [relative_bandpower] * \
+            len(obj_fun_kwargs["f_bands"])
     for idx, f_band in enumerate(obj_fun_kwargs["f_bands"]):
         f_band_idx = np.where(
-            np.logical_and(freqs_simulated >= f_band[0], freqs_simulated <= f_band[1])
+            np.logical_and(freqs_simulated >=
+                           f_band[0], freqs_simulated <= f_band[1])
         )[0]
         f_bands_psds.append(
-            -obj_fun_kwargs["relative_bandpower"][idx] * sum(psd_simulated[f_band_idx])
+            -relative_bandpower[idx] * sum(psd_simulated[f_band_idx])
         )
 
     # grand sum

@@ -17,10 +17,10 @@ class Optimizer:
         tstop,
         constraints,
         set_params,
+        initial_params=None,
         solver="bayesian",
         obj_fun="dipole_rmse",
-        max_iter=200,
-        initial_params=None,
+        max_iter=200
     ):
         """Parameter optimization.
 
@@ -39,6 +39,10 @@ class Optimizer:
 
             where ``net`` is a Network object and ``params`` is a dictionary
             of the parameters that will be set inside the function.
+        initial_params : dict, optional
+            Initial parameters for the objective function. Keys are parameter
+            names, values are initial parameters. The default is None.
+            If None, the parameters will be set to the midpoints of parameter ranges.
         solver : str
             The optimizer, 'bayesian' or 'cobyla'.
         obj_fun : str | func
@@ -48,15 +52,13 @@ class Optimizer:
         max_iter : int, optional
             The max number of calls to the objective function. The default is
             200.
-        initial_params : dict, optional
-            Initial parameters for the objective function. Keys are parameter
-            names, values are initial parameters. The default is None.
-            If None, the parameters will be set to the midpoints of parameter ranges.
 
         Attributes
         ----------
         constraints : dict
             The user-defined constraints.
+        initial_params : dict
+            Initial parameters for the objective function.
         max_iter : int
             The max number of calls to the objective function.
         solver : func
@@ -73,8 +75,6 @@ class Optimizer:
             The objective function values.
         opt_params_ : list
             The list of optimized parameter values.
-        initial_params : dict
-            Initial parameters for the objective function.
         """
 
         if initial_net.external_drives:
@@ -133,6 +133,8 @@ class Optimizer:
         ----------
         target : instance of Dipole (if obj_fun='dipole_rmse')
             A dipole object with experimental data.
+        n_trials : int (if obj_fun='dipole_rmse')
+            Number of trials to simulate and average.
         f_bands : list of tuples (if obj_fun='maximize_psd')
             Lower and higher limit for each frequency band.
         relative_bandpower : tuple (if obj_fun='maximize_psd')
@@ -142,8 +144,11 @@ class Optimizer:
         smooth_window_len : float, optional
             The smooth window length.
         """
-        if self.obj_fun_name == "dipole_rmse" and "target" not in obj_fun_kwargs:
-            raise Exception("target must be specified")
+        if self.obj_fun_name == "dipole_rmse" and (
+            "target" not in obj_fun_kwargs
+            or "n_trials" not in obj_fun_kwargs
+        ):
+            raise Exception("target and n_trials must be specified")
         elif self.obj_fun_name == "maximize_psd" and (
             "f_bands" not in obj_fun_kwargs
             or "relative_bandpower" not in obj_fun_kwargs
@@ -157,8 +162,8 @@ class Optimizer:
             self.tstop,
             constraints,
             self._set_params,
-            self.obj_fun,
             self.initial_params,
+            self.obj_fun,
             self.max_iter,
             obj_fun_kwargs,
         )
@@ -202,8 +207,11 @@ class Optimizer:
         axis.set_ylabel("Objective value")
         axis.grid(visible=True)
 
-        fig.show(show)
-        return axis.get_figure()
+        if ax is None:
+            fig.show(show)
+            return axis.get_figure()
+        else:
+            return ax.get_figure()
 
 
 def _get_initial_params(constraints):
@@ -223,7 +231,8 @@ def _get_initial_params(constraints):
     initial_params = dict()
     for cons_key in constraints:
         initial_params.update(
-            {cons_key: (constraints[cons_key][0] + constraints[cons_key][1]) / 2}
+            {cons_key: (constraints[cons_key][0] +
+                        constraints[cons_key][1]) / 2}
         )
 
     return initial_params
@@ -265,8 +274,10 @@ def _assemble_constraints_cobyla(constraints):
     # assemble constraints in solver-specific format
     cons_cobyla = list()
     for idx, cons_key in enumerate(constraints):
-        cons_cobyla.append(lambda x, idx=idx: float(constraints[cons_key][1]) - x[idx])
-        cons_cobyla.append(lambda x, idx=idx: x[idx] - float(constraints[cons_key][0]))
+        cons_cobyla.append(lambda x, idx=idx: float(
+            constraints[cons_key][1]) - x[idx])
+        cons_cobyla.append(
+            lambda x, idx=idx: x[idx] - float(constraints[cons_key][0]))
 
     return cons_cobyla
 
@@ -299,8 +310,8 @@ def _run_opt_bayesian(
     tstop,
     constraints,
     set_params,
-    obj_fun,
     initial_params,
+    obj_fun,
     max_iter,
     obj_fun_kwargs,
 ):
@@ -316,10 +327,10 @@ def _run_opt_bayesian(
         Parameter constraints in solver-specific format.
     set_params : func
         User-defined function that sets parameters in network drives.
-    obj_fun : func
-        The objective function.
     initial_params : dict
         Keys are parameter names, values are initial parameters.
+    obj_fun : func
+        The objective function.
     max_iter : int
         Number of calls the optimizer makes.
 
@@ -376,8 +387,8 @@ def _run_opt_cobyla(
     tstop,
     constraints,
     set_params,
-    obj_fun,
     initial_params,
+    obj_fun,
     max_iter,
     obj_fun_kwargs,
 ):
@@ -393,10 +404,10 @@ def _run_opt_cobyla(
         Parameter constraints in solver-specific format.
     set_params : func
         User-defined function that sets parameters in network drives.
-    obj_fun : func
-        The objective function.
     initial_params : dict
         Keys are parameter names, values are initial parameters.
+    obj_fun : func
+        The objective function.
     max_iter : int
         Number of calls the optimizer makes.
 
