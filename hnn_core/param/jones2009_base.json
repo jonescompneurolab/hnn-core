@@ -6,7 +6,7 @@
     "celsius": 37.0,
     "cell_types": {
         "L2_basket": {
-            "cell_data": {
+            "cell_object": {
                 "name": "L2_basket",
                 "pos": [
                     0,
@@ -84,7 +84,7 @@
             }
         },
         "L2_pyramidal": {
-            "cell_data": {
+            "cell_object": {
                 "name": "L2Pyr",
                 "pos": [
                     0,
@@ -468,7 +468,7 @@
             }
         },
         "L5_basket": {
-            "cell_data": {
+            "cell_object": {
                 "name": "L5_basket",
                 "pos": [
                     0,
@@ -544,7 +544,7 @@
             }
         },
         "L5_pyramidal": {
-            "cell_data": {
+            "cell_object": {
                 "name": "L5Pyr",
                 "pos": [
                     0,

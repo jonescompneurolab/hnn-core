@@ -92,22 +92,45 @@ def _str_to_node(node_string):
 
 
 def _read_cell_types(cell_types_data):
-    """Returns a dict of Cell objects from json encoded data"""
+    """Returns a dict of Cell objects from json encoded data
+
+    This function handles both legacy format (direct cell data) and
+    new format (cell object with metadata) for backwards compatibility.
+
+    Parameters
+    ----------
+    cell_types_data : dict
+        Dictionary containing cell type information in either:
+        - Legacy format: {cell_name: cell_dict} where cell_dict contains
+          cell properties directly
+        - New format: {cell_name: {"cell_object": cell_dict, "cell_metadata": metadata}}
+          where cell_dict contains cell properties and metadata contains additional info
+
+    Returns
+    -------
+    cell_types : dict
+        Dictionary with cell names as keys and dicts containing:
+        - "cell_object": Cell instance
+        - "cell_metadata": dict of metadata (empty dict for legacy format)
+    """
     cell_types = dict()
     for cell_name in cell_types_data:
-        cell_data = cell_types_data[cell_name]
-
-        # Handle the case where cell_data contains both 'cell_data' and 'cell_metadata'
-        if "cell_data" in cell_data and "cell_metadata" in cell_data:
-            actual_cell_data = cell_data["cell_data"]
-            cell_metadata = cell_data["cell_metadata"]
+        # Determine format and extract cell_data and metadata accordingly
+        if (
+            "cell_object" in cell_types_data[cell_name]
+            and "cell_metadata" in cell_types_data[cell_name]
+        ):
+            # New format: extract cell properties from nested "cell_object"
+            cell_data = cell_types_data[cell_name]["cell_object"]
+            cell_metadata = cell_types_data[cell_name]["cell_metadata"]
         else:
             # Legacy format, treat the entire cell_data as the cell information
-            actual_cell_data = cell_data
+            cell_data = cell_types_data[cell_name]
             cell_metadata = {}
 
+        # Now cell_data contains the cell properties regardless of format
         sections = dict()
-        sections_data = actual_cell_data["sections"]
+        sections_data = cell_data["sections"]
         for section_name in sections_data:
             section_data = sections_data[section_name]
             sections[section_name] = Section(
@@ -123,9 +146,9 @@ def _read_cell_types(cell_types_data):
 
         # cell_tree
         cell_tree = None
-        if actual_cell_data["cell_tree"] is not None:
+        if cell_data["cell_tree"] is not None:
             cell_tree = dict()
-            for parent, children in actual_cell_data["cell_tree"].items():
+            for parent, children in cell_data["cell_tree"].items():
                 key = _str_to_node(parent)
                 value = list()
                 for child in children:
@@ -133,21 +156,22 @@ def _read_cell_types(cell_types_data):
                 cell_tree[key] = value
 
         cell_object = Cell(
-            name=actual_cell_data["name"],
-            pos=tuple(actual_cell_data["pos"]),
+            name=cell_data["name"],
+            pos=tuple(cell_data["pos"]),
             sections=sections,
-            synapses=actual_cell_data["synapses"],
+            synapses=cell_data["synapses"],
             cell_tree=cell_tree,
-            sect_loc=actual_cell_data["sect_loc"],
-            gid=actual_cell_data["gid"],
+            sect_loc=cell_data["sect_loc"],
+            gid=cell_data["gid"],
         )
-        # Setting cell attributes
-        cell_object.dipole_pp = actual_cell_data["dipole_pp"]
-        cell_object.vsec = actual_cell_data["vsec"]
-        cell_object.isec = actual_cell_data["isec"]
-        cell_object.tonic_biases = actual_cell_data["tonic_biases"]
 
-        # Store in the new format with cell_metadata
+        # Set additional cell attributes
+        cell_object.dipole_pp = cell_data["dipole_pp"]
+        cell_object.vsec = cell_data["vsec"]
+        cell_object.isec = cell_data["isec"]
+        cell_object.tonic_biases = cell_data["tonic_biases"]
+
+        # Store in the unified format with cell_metadata
         cell_types[cell_name] = {
             "cell_object": cell_object,
             "cell_metadata": cell_metadata,
@@ -325,7 +349,7 @@ def network_to_dict(net, write_output=False):
         if isinstance(template, dict) and "cell_object" in template:
             # New format with cell_metadata
             cell_types_data[name] = {
-                "cell_data": template["cell_object"].to_dict(),
+                "cell_object": template["cell_object"].to_dict(),
                 "cell_metadata": template["cell_metadata"],
             }
         else:
