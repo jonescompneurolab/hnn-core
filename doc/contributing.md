@@ -279,7 +279,10 @@ means making *new* commits for the purpose of making two different branches comp
 with each other. In contrast,
 ["rebasing"](https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History) can be thought
 of as *editing previous, existing commits* in order to make two different branches
-compatible.
+compatible. We do **not** recommend using merging or "merge commits" to bring changes
+from `master` into your feature branch, since using "merge commits" makes the git
+history *significantly* more difficult to manage and rebase for us! (Note that "*merge
+conflicts*" and "*merge commits*" are very different things.)
 
 Rebasing can be a **destructive** operation, meaning that if you make a mistake, you can
 **accidentally erase code that you didn't intend to!** It is therefore important to make
@@ -396,7 +399,7 @@ to date.
    `cool-feature-2` commits so that there is no conflict. How to deal with conflicts in
    a rebase it outside the scope of our help, but here is some guidance:
     - Read this:
-      <https://docs.github.com/en/get-started/using-git/resolving-merge-conflicts-after-a-git-rebase>
+      <https://docs.github.com/en/get-started/using-git/resolving-merge-conflicts-after-a-git-rebase>
     - As the above article says, since the rebase is stopped mid-way, you can "abort" the rebase
       using:
 
@@ -415,7 +418,8 @@ to date.
       instructions for how you handle a "merge conflict" where you need to go into
       individual files and edit the indicated lines to resolve the conflict. The
       terminology is a bit weird: these are called "merge conflicts", but they can arise
-      when you are either "merging" two branches OR "rebasing" two branches (as we are).
+      when you are either "merging" two branches (which are are not doing) OR "rebasing"
+      two branches (which we are doing).
     - For how to use rebase to make changes to `cool-feature-2`'s commits (including
       "dropping" commits, "squashing" two commits into one, etc.), see
       <https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History>. It is often helpful
