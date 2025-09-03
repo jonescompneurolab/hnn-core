@@ -109,14 +109,33 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
             if ca is not None:
                 ca_py[gid][sec_name] = ca.to_python()
 
-    dipole_cell_types = getattr(
-        net, "dipole_cell_types", ["L2_pyramidal", "L5_pyramidal"]
-    )
-    dpl_arrays = [neuron_net._nrn_dipoles[ct].as_numpy() for ct in dipole_cell_types]
-    if len(dpl_arrays) == 0:
-        raise RuntimeError("No dipole cell types found for dipole calculation.")
-    dpl_sum = np.sum(dpl_arrays, axis=0)
-    dpl_data = np.column_stack([dpl_sum] + dpl_arrays)
+    dipole_cell_types = [
+        name
+        for name, data in neuron_net.net.cell_types.items()
+        if data["cell_metadata"].get("measure_dipole", False)
+    ]
+
+    dpl_data = None
+
+    # Process each cell type that contributes to the dipole
+    for cell_type_name in dipole_cell_types:
+        if cell_type_name in neuron_net._nrn_dipoles:
+            cell_dipole = neuron_net._nrn_dipoles[cell_type_name].as_numpy()
+
+            if dpl_data is None:
+                dpl_data = np.zeros((len(cell_dipole), len(dipole_cell_types) + 1))
+
+            cell_idx = dipole_cell_types.index(cell_type_name)
+
+            # Add to total dipole
+            dpl_data[:, 0] += cell_dipole
+
+            # Store individual cell type dipole
+            dpl_data[:, cell_idx + 1] = cell_dipole
+
+    # If no dipole data was collected, create empty array
+    if dpl_data is None:
+        dpl_data = np.array([])
 
     rec_arr_py = dict()
     rec_times_py = dict()
@@ -334,13 +353,10 @@ class NetworkBuilder(object):
 
         self._clear_last_network_objects()
 
-        # self._nrn_dipoles["L5_pyramidal"] = h.Vector()
-        # self._nrn_dipoles["L2_pyramidal"] = h.Vector()
-        dipole_cell_types = getattr(
-            self.net, "dipole_cell_types", ["L2_pyramidal", "L5_pyramidal"]
-        )
-        for ct in dipole_cell_types:
-            self._nrn_dipoles[ct] = h.Vector()
+        for cell_type, cell_data in self.net.cell_types.items():
+            if cell_data["cell_metadata"].get("measure_dipole", False):
+                self._nrn_dipoles[cell_type] = h.Vector()
+
         self._gid_assign()
 
         record_vsec = self.net._params["record_vsec"]
@@ -450,17 +466,14 @@ class NetworkBuilder(object):
             gid_idx = gid - self.net.gid_ranges[src_type][0]
             if src_type in self.net.cell_types:
                 # copy cell object from template cell type in Network
-                cell = self.net.cell_types[src_type].copy()
+                cell = self.net.cell_types[src_type]["cell_object"].copy()
                 cell.gid = gid
                 cell.pos = self.net.pos_dict[src_type][gid_idx]
 
                 # instantiate NEURON object
-                if src_type in (
-                    "L2_pyramidal_net2",
-                    "L5_pyramidal_net2",
-                    "L2_pyramidal",
-                    "L5_pyramidal",
-                ):
+                # using meta data style
+                src_type_metadata = self.net.cell_types[src_type]["cell_metadata"]
+                if src_type_metadata.get("measure_dipole", False):
                     cell.build(sec_name_apical="apical_trunk")
                 else:
                     cell.build()
@@ -603,10 +616,8 @@ class NetworkBuilder(object):
                         f"Got n_samples={n_samples}, {cell.name}."
                         f"dipole.size()={cell.dipole.size()}."
                     )
-                if self.net.suffix is not None:
-                    nrn_dpl = self._nrn_dipoles[_long_name(cell.name) + self.net.suffix]
-                else:
-                    nrn_dpl = self._nrn_dipoles[_long_name(cell.name)]
+                cell_type = self.net.gid_to_type(cell.gid)
+                nrn_dpl = self._nrn_dipoles[cell_type]
                 nrn_dpl.add(cell.dipole)
 
             self._vsec[cell.gid] = cell.vsec
@@ -649,22 +660,29 @@ class NetworkBuilder(object):
         for cell in self._cells:
             seclist = h.SectionList()
             seclist.wholetree(sec=cell._nrn_sections["soma"])
+            src_type = self.net.gid_to_type(cell.gid)
+            cell_metadata = self.net.cell_types[src_type]["cell_metadata"]
+            # initializing segment voltages from cell_metadata
             for sect in seclist:
                 for seg in sect:
-                    if cell.name == "L2Pyr":
+                    if (
+                        cell_metadata.get("morpho_type") == "pyramidal"
+                        and cell_metadata.get("layer") == "2"
+                    ):
                         seg.v = -71.46
-                    elif cell.name == "L5Pyr":
-                        if sect.name() == "L5Pyr_apical_1":
+                    elif (
+                        cell_metadata.get("morpho_type") == "pyramidal"
+                        and cell_metadata.get("layer") == "5"
+                    ):
+                        if sect.name() == f"{_short_name(src_type)}_apical_1":
                             seg.v = -71.32
-                        elif sect.name() == "L5Pyr_apical_2":
+                        elif sect.name() == f"{_short_name(src_type)}_apical_2":
                             seg.v = -69.08
-                        elif sect.name() == "L5Pyr_apical_tuft":
+                        elif sect.name() == f"{_short_name(src_type)}_apical_tuft":
                             seg.v = -67.30
                         else:
                             seg.v = -72.0
-                    elif cell.name == "L2Basket":
-                        seg.v = -64.9737
-                    elif cell.name == "L5Basket":
+                    elif cell_metadata.get("morpho_type") == "basket":
                         seg.v = -64.9737
 
     def _clear_neuron_objects(self):

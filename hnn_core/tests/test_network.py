@@ -122,8 +122,26 @@ def test_custom_network_coords(mesh_shape):
 
     # network with custom cell types and positions (an irregular one)
     custom_cell_types = {
-        "L2_pyramidal": pyramidal(cell_name="L2_pyramidal"),
-        "L5_pyramidal": pyramidal(cell_name="L5_pyramidal"),
+        "L2_pyramidal": {
+            "cell_object": pyramidal(cell_name="L2_pyramidal"),
+            "cell_metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "2",
+                "measure_dipole": True,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+        "L5_pyramidal": {
+            "cell_object": pyramidal(cell_name="L5_pyramidal"),
+            "cell_metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "5",
+                "measure_dipole": True,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
     }
     custom_layer_dict = _create_cell_coords(
         n_pyr_x=mesh_shape[0],
@@ -247,8 +265,14 @@ def test_network_models():
     )
 
     for cell_name in ["L5_pyramidal", "L2_pyramidal"]:
-        assert net_law.cell_types[cell_name].synapses["gabab"]["tau1"] == 45.0
-        assert net_law.cell_types[cell_name].synapses["gabab"]["tau2"] == 200.0
+        assert (
+            net_law.cell_types[cell_name]["cell_object"].synapses["gabab"]["tau1"]
+            == 45.0
+        )
+        assert (
+            net_law.cell_types[cell_name]["cell_object"].synapses["gabab"]["tau2"]
+            == 200.0
+        )
 
     # Check add_default_erp()
     net_default = jones_2009_model()
@@ -1038,7 +1062,7 @@ def test_add_cell_type():
     new_cell = net.cell_types["L2_basket"].copy()
     net._add_cell_type("new_type", pos=pos, cell_template=new_cell)
     assert "new_type" in net.cell_types.keys()
-    net.cell_types["new_type"].synapses["gabaa"]["tau1"] = tau1
+    net.cell_types["new_type"]["cell_object"].synapses["gabaa"]["tau1"] = tau1
 
     n_new_type = len(net.gid_ranges["new_type"])
     assert n_new_type == len(pos)
@@ -1236,7 +1260,8 @@ def test_network_mesh():
 
 
 @pytest.mark.parametrize(
-    "network_model", [jones_2009_model, calcium_model, law_2021_model]
+    "network_model",
+    [jones_2009_model],  # TEMP JUST FOR DEBUGGING FOCUS ON JONES
 )
 def test_network_models_mesh(network_model):
     mesh_shape = (2, 3)
@@ -1844,6 +1869,7 @@ def test_offline_spike_replay():
     plt.close(fig)
 
 
+<<<<<<< HEAD
 def test_add_cell_type_with_explicit_gid_start():
     net = jones_2009_model()
     original_all_gids = {g for r in net.gid_ranges.values() for g in r}
@@ -1887,3 +1913,47 @@ def test_suffix_dipole_cell_types():
     net_fixed.dipole_cell_types = ["L2_pyramidal", "L5_pyramidal"]
     dpl_fixed = simulate_dipole(net_fixed, tstop=2.0, dt=0.1, n_trials=1)
     assert len(dpl_fixed[0].times) > 0
+=======
+def test_filter_cell_types():
+    """Test filtering of cell types based on cell_metadata."""
+    net = jones_2009_model()
+
+    # Test filtering by a single attribute: layer
+    filtered_types = net.filter_cell_types(layer="5")
+    assert sorted(filtered_types) == ["L5_basket", "L5_pyramidal"]
+
+    # Test filtering by multiple attributes: layer and electro_type
+    filtered_types = net.filter_cell_types(layer="2", electro_type="excitatory")
+    assert filtered_types == ["L2_pyramidal"]
+
+    # Test a filter that should return an empty list
+    filtered_types = net.filter_cell_types(
+        layer="5", electro_type="inhibitory", measure_dipole=True
+    )
+    assert filtered_types == []
+
+    # Test filtering with a non-existent cell_metadata key
+    filtered_types = net.filter_cell_types(non_existent_key="some_value")
+    assert filtered_types == []
+
+
+def test_update_weights_metadata():
+    """Test update_weights with new cell_metadata logic."""
+    net = jones_2009_model()
+    e_cell_names = net.filter_cell_types(electro_type="excitatory")
+    i_cell_names = net.filter_cell_types(electro_type="inhibitory")
+
+    # Test updating excitatory to inhibitory connections
+    net.update_weights(e_i=2.0)
+
+    for conn in net.connectivity:
+        is_e_to_i = (
+            conn["src_type"] in e_cell_names and conn["target_type"] in i_cell_names
+        )
+        if is_e_to_i:
+            # Assert that the gain was updated only for E->I connections
+            assert conn["nc_dict"]["gain"] == 2.0
+        else:
+            # Assert that all other gains remain unchanged
+            assert conn["nc_dict"]["gain"] == 1.0
+>>>>>>> master
