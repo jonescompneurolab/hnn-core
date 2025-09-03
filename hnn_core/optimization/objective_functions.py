@@ -137,8 +137,14 @@ def _maximize_psd(
     # for each f band
     f_bands_psds = list()
     relative_bandpower = obj_fun_kwargs["relative_bandpower"]
+
+    # Convert tuple to list
+    if isinstance(relative_bandpower, tuple):
+        relative_bandpower = list(relative_bandpower)
+    # If a single number is intended to be applied to all bands
     if not isinstance(relative_bandpower, (list, np.ndarray)):
         relative_bandpower = [relative_bandpower] * len(obj_fun_kwargs["f_bands"])
+
     for idx, f_band in enumerate(obj_fun_kwargs["f_bands"]):
         f_band_idx = np.where(
             np.logical_and(freqs_simulated >= f_band[0], freqs_simulated <= f_band[1])
