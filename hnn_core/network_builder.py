@@ -472,6 +472,8 @@ class NetworkBuilder(object):
 
                 # instantiate NEURON object
                 # using meta data style
+                # AES: the 'net2' vs 'null/net1' was never finished being implemented
+                # here in Maira's branch
                 src_type_metadata = self.net.cell_types[src_type]["cell_metadata"]
                 if src_type_metadata.get("measure_dipole", False):
                     cell.build(sec_name_apical="apical_trunk")
@@ -616,8 +618,16 @@ class NetworkBuilder(object):
                         f"Got n_samples={n_samples}, {cell.name}."
                         f"dipole.size()={cell.dipole.size()}."
                     )
+                # AES: unsure if net.gid_to_type actually works with new cell_metadata
+                # schema, and/or with Maira suffix attempt
+                # Chetan version:
                 cell_type = self.net.gid_to_type(cell.gid)
                 nrn_dpl = self._nrn_dipoles[cell_type]
+                # Maira version:
+                # if self.net.suffix is not None:
+                #     nrn_dpl = self._nrn_dipoles[_long_name(cell.name) + self.net.suffix]
+                # else:
+                #     nrn_dpl = self._nrn_dipoles[_long_name(cell.name)]
                 nrn_dpl.add(cell.dipole)
 
             self._vsec[cell.gid] = cell.vsec

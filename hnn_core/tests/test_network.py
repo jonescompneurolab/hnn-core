@@ -1868,52 +1868,50 @@ def test_offline_spike_replay():
 
     plt.close(fig)
 
+# # AES ignoring for now
+# def test_add_cell_type_with_explicit_gid_start():
+#     net = jones_2009_model()
+#     original_all_gids = {g for r in net.gid_ranges.values() for g in r}
+#     max_gid = max(original_all_gids)
+#     gid_start = max_gid + 100  # gap to ensure no overlap
+#     pos = [(0.0, 0.0, 0.0), (1.0, 2.0, 0.0)]
+#     template = net.cell_types["L2_basket"].copy()
+#     net._add_cell_type("new_ct_A", pos=pos, cell_template=template, gid_start=gid_start)
+#     assert "new_ct_A" in net.cell_types
+#     assert net.gid_ranges["new_ct_A"].start == gid_start
+#     # Ensure no overlap
+#     for ct, rg in net.gid_ranges.items():
+#         if ct != "new_ct_A":
+#             assert set(rg).isdisjoint(net.gid_ranges["new_ct_A"])
+#     # get_next_gid should be above new range
+#     assert net.get_next_gid() > net.gid_ranges["new_ct_A"].stop - 1
 
-<<<<<<< HEAD
-def test_add_cell_type_with_explicit_gid_start():
-    net = jones_2009_model()
-    original_all_gids = {g for r in net.gid_ranges.values() for g in r}
-    max_gid = max(original_all_gids)
-    gid_start = max_gid + 100  # gap to ensure no overlap
-    pos = [(0.0, 0.0, 0.0), (1.0, 2.0, 0.0)]
-    template = net.cell_types["L2_basket"].copy()
-    net._add_cell_type("new_ct_A", pos=pos, cell_template=template, gid_start=gid_start)
-    assert "new_ct_A" in net.cell_types
-    assert net.gid_ranges["new_ct_A"].start == gid_start
-    # Ensure no overlap
-    for ct, rg in net.gid_ranges.items():
-        if ct != "new_ct_A":
-            assert set(rg).isdisjoint(net.gid_ranges["new_ct_A"])
-    # get_next_gid should be above new range
-    assert net.get_next_gid() > net.gid_ranges["new_ct_A"].stop - 1
+# def test_suffix_dipole_cell_types():
+#     """Validate dipole behavior under (a) rename only, (b) suffix only (failure), (c) corrected usage."""
+#     # (a) Rename cell type dict keys only: should still work
+#     net_renamed = jones_2009_model()
+#     rename_map = {ct: f"{ct}_R" for ct in net_renamed.cell_types}
+#     net_renamed._rename_cell_types(rename_map)
+#     # Provide dipole_cell_types matching renamed pyramidal labels
+#     net_renamed.dipole_cell_types = [k for k in rename_map.values() if "pyramidal" in k]
+#     dpl_ok = simulate_dipole(net_renamed, tstop=2.0, dt=0.1, n_trials=1)
+#     assert len(dpl_ok[0].times) > 0
 
+#     # (b) Suffix only (no rename) reproduces script KeyError scenario
+#     net_suffix_only = jones_2009_model()
+#     # Set a suffix without rebuilding dipole dict entries
+#     net_suffix_only.suffix = "_SFX"
+#     # Do NOT set dipole_cell_types: expect KeyError (or RuntimeError depending on backend)
+#     with pytest.raises((KeyError, RuntimeError)):
+#         simulate_dipole(net_suffix_only, tstop=2.0, dt=0.1, n_trials=1)
 
-def test_suffix_dipole_cell_types():
-    """Validate dipole behavior under (a) rename only, (b) suffix only (failure), (c) corrected usage."""
-    # (a) Rename cell type dict keys only: should still work
-    net_renamed = jones_2009_model()
-    rename_map = {ct: f"{ct}_R" for ct in net_renamed.cell_types}
-    net_renamed._rename_cell_types(rename_map)
-    # Provide dipole_cell_types matching renamed pyramidal labels
-    net_renamed.dipole_cell_types = [k for k in rename_map.values() if "pyramidal" in k]
-    dpl_ok = simulate_dipole(net_renamed, tstop=2.0, dt=0.1, n_trials=1)
-    assert len(dpl_ok[0].times) > 0
+#     # (c) Workaround: clear suffix or explicitly align dipole cell types then simulate
+#     net_fixed = jones_2009_model()
+#     # Explicitly supply base (unsuffixed) pyramidal names so aggregation falls back correctly
+#     net_fixed.dipole_cell_types = ["L2_pyramidal", "L5_pyramidal"]
+#     dpl_fixed = simulate_dipole(net_fixed, tstop=2.0, dt=0.1, n_trials=1)
+#     assert len(dpl_fixed[0].times) > 0
 
-    # (b) Suffix only (no rename) reproduces script KeyError scenario
-    net_suffix_only = jones_2009_model()
-    # Set a suffix without rebuilding dipole dict entries
-    net_suffix_only.suffix = "_SFX"
-    # Do NOT set dipole_cell_types: expect KeyError (or RuntimeError depending on backend)
-    with pytest.raises((KeyError, RuntimeError)):
-        simulate_dipole(net_suffix_only, tstop=2.0, dt=0.1, n_trials=1)
-
-    # (c) Workaround: clear suffix or explicitly align dipole cell types then simulate
-    net_fixed = jones_2009_model()
-    # Explicitly supply base (unsuffixed) pyramidal names so aggregation falls back correctly
-    net_fixed.dipole_cell_types = ["L2_pyramidal", "L5_pyramidal"]
-    dpl_fixed = simulate_dipole(net_fixed, tstop=2.0, dt=0.1, n_trials=1)
-    assert len(dpl_fixed[0].times) > 0
-=======
 def test_filter_cell_types():
     """Test filtering of cell types based on cell_metadata."""
     net = jones_2009_model()
@@ -1956,4 +1954,3 @@ def test_update_weights_metadata():
         else:
             # Assert that all other gains remain unchanged
             assert conn["nc_dict"]["gain"] == 1.0
->>>>>>> master
