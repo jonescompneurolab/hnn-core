@@ -1868,6 +1868,7 @@ def test_offline_spike_replay():
 
     plt.close(fig)
 
+
 # # AES ignoring for now
 # def test_add_cell_type_with_explicit_gid_start():
 #     net = jones_2009_model()
@@ -1911,6 +1912,7 @@ def test_offline_spike_replay():
 #     net_fixed.dipole_cell_types = ["L2_pyramidal", "L5_pyramidal"]
 #     dpl_fixed = simulate_dipole(net_fixed, tstop=2.0, dt=0.1, n_trials=1)
 #     assert len(dpl_fixed[0].times) > 0
+
 
 def test_filter_cell_types():
     """Test filtering of cell types based on cell_metadata."""
