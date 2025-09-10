@@ -512,7 +512,9 @@ class NetworkBuilder(object):
         """Connect two cell types for a particular receptor."""
         net = self.net
         connectivity = self.net.connectivity
+
         assert len(self._cells) == len(self._gid_list) - len(self._drive_cells)
+
         for conn in connectivity:
             loc, receptor = conn["loc"], conn["receptor"]
             nc_dict = deepcopy(conn["nc_dict"])
@@ -526,11 +528,13 @@ class NetworkBuilder(object):
                         filtered_targets.append(target_gid)
                         valid_targets.add(target_gid)
                 conn["gid_pairs"][src_gid] = filtered_targets
+
             target_filter = dict()
             for idx in range(len(self._cells)):
                 gid = self._gid_list[idx]
                 if gid in valid_targets:
                     target_filter[gid] = idx
+
             # Iterate over src/target pairs and connect cells
             for src_gid, target_gids in conn["gid_pairs"].items():
                 for target_gid in target_gids:

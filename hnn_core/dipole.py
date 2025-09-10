@@ -126,6 +126,7 @@ def simulate_dipole(
             DeprecationWarning,
         )
     dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc)
+
     return dpls
 
 
@@ -368,6 +369,7 @@ class Dipole(object):
 
     def __init__(self, times, data, nave=1):  # noqa: D102
         self.times = np.array(times)
+
         if isinstance(data, dict):
             self.data = data
         else:
