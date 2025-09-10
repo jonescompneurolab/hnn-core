@@ -396,7 +396,6 @@ class Network:
         mesh_shape=(10, 10),
         pos_dict=None,
         cell_types=None,
-        dipole_cell_types=["L2_pyramidal", "L5_pyramidal"],
     ):
         # Save the parameters used to create the Network
         _validate_type(params, dict, "params")
@@ -411,7 +410,6 @@ class Network:
         self.gid_ranges = OrderedDict()
         self._n_gids = 0  # utility: keep track of last GID
         self.suffix = suffix
-        self.dipole_cell_types = dipole_cell_types
         # XXX this can be removed once tests are made independent of HNN GUI
         # creates nc_dict-entries for ALL cell types
         self._legacy_mode = legacy_mode
