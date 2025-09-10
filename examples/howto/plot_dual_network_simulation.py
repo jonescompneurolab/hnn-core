@@ -33,8 +33,6 @@ Notes
 # Step 1: Imports
 # ---------------
 
-from collections import OrderedDict
-import copy
 import matplotlib.pyplot as plt
 
 from hnn_core import jones_2009_model, simulate_dipole
@@ -54,46 +52,7 @@ def create_minimal_network(gid_start=0):
     """Create a minimal network with one cell per type and shift positions."""
     print("Network creation start")
     net = jones_2009_model()
-    if gid_start > 0:
-        original_gid_ranges = copy.deepcopy(net.gid_ranges)
-        # Update GID ranges to start at gid_start and avoid overlap
-        current_gid = gid_start
-        net.gid_ranges = OrderedDict()
-        for ct in net.cell_types.keys():
-            n_cells = len(net.pos_dict[ct])
-            net.gid_ranges[ct] = range(current_gid, current_gid + n_cells)
-            current_gid += n_cells
-
-        # Update connectivity GIDs to match new gid_ranges
-        for conn in net.connectivity:
-            # Update target_gids if target_type is in mapping
-            if 'target_type' in conn and conn['target_type'] in net.cell_types.keys():
-                ct = conn['target_type']
-                gid_range = list(net.gid_ranges[ct])
-                n_targets = len(conn['target_gids'])
-                # Replace with correct GIDs from gid_ranges
-                conn['target_gids'] = gid_range[:n_targets]
-            # Update src_gids if src_type is in mapping
-            if 'src_type' in conn and conn['src_type'] in net.cell_types.keys():
-                ct = conn['src_type']
-                gid_range = list(net.gid_ranges[ct])
-                n_srcs = len(conn['src_gids'])
-                conn['src_gids'] = gid_range[:n_srcs]
-
-            if 'gid_pairs' in conn and conn['gid_pairs']:
-                src_type = conn['src_type']
-                tgt_type = conn['target_type']
-
-                # Calculate offsets using original and new GID ranges
-                src_offset = net.gid_ranges[src_type][0] - original_gid_ranges[src_type][0]
-                tgt_offset = net.gid_ranges[tgt_type][0] - original_gid_ranges[tgt_type][0]
-                new_gid_pairs = {}
-                for src_gid, tgt_gids in conn['gid_pairs'].items():
-                    new_src_gid = int(src_gid) + src_offset
-                    new_tgt_gids = [int(tg) + tgt_offset for tg in tgt_gids]
-                    new_gid_pairs[new_src_gid] = new_tgt_gids
-                conn['gid_pairs'] = new_gid_pairs
-
+    net.shift_gid_ranges(gid_start)
     return net
 
 
@@ -109,7 +68,7 @@ net1 = create_minimal_network(gid_start=0)
 # Each network receives a single distal evoked drive with matching timing
 # parameters but distinct names.
 
-drive_gid_1 = net1.get_next_gid()
+drive_gid_1 = net1.get_next_available_gid()
 net1.add_evoked_drive(
     'evdist1', mu=5.0, sigma=1.0, numspikes=1, location='distal',
     weights_ampa={'L2_pyramidal': 0.1, 'L5_pyramidal': 0.1},
@@ -119,13 +78,13 @@ net1.add_evoked_drive(
 ###############################################################################
 # Step 5: Build Second Network Using Disjoint GIDs
 # ------------------------------------------------
-next_gid = net1.get_next_gid()
+next_gid = net1.get_next_available_gid()
 net2 = create_minimal_network(gid_start=next_gid)
 
 ###############################################################################
 # Step 6: Add An Evoked Drive to net2
 # -----------------------------------
-drive_gid_2 = net2.get_next_gid()
+drive_gid_2 = net2.get_next_available_gid()
 net2.add_evoked_drive(
     'evdist2', mu=5.0, sigma=1.0, numspikes=1, location='distal',
     weights_ampa={'L2_pyramidal': 0.1, 'L5_pyramidal': 0.1},
@@ -135,7 +94,7 @@ net2.add_evoked_drive(
 print("Net1 gid ranges:", net1.gid_ranges)
 print("Net2 gid ranges:", net2.gid_ranges)
 
-print("Next GIDs after drives:", net1.get_next_gid(), net2.get_next_gid())
+print("Next GIDs after drives:", net1.get_next_available_gid(), net2.get_next_available_gid())
 
 ###############################################################################
 # Step 7: (Optional) Export Configurations

@@ -2184,12 +2184,64 @@ class Network:
 
         return standardized_data, n_drive_cells, source_to_gid_map
 
-    def get_next_gid(self):
+    def get_next_available_gid(self):
+        """Return the next unused GID number, equal to current max GID + 1."""
         max_gid = -1
         for rng in self.gid_ranges.values():
             if len(rng) > 0:
                 max_gid = max(max_gid, max(rng))
         return max_gid + 1
+
+    def shift_gid_ranges(self, gid_start=0):
+        """AES TODO"""
+        # Update GID ranges to start at gid_start and avoid overlap
+        current_gid = gid_start
+
+        original_gid_ranges = deepcopy(self.gid_ranges)
+        self.gid_ranges = OrderedDict()
+
+        # Update individual cell GIDs to match new gid_ranges
+        for ct in self.cell_types.keys():
+            n_cells = len(self.pos_dict[ct])
+            self.gid_ranges[ct] = range(current_gid, current_gid + n_cells)
+            current_gid += n_cells
+
+        # Update connectivity GIDs to match new gid_ranges
+        for conn in self.connectivity:
+            # Update target_gids if target_type is in mapping
+            if (
+                "target_type" in conn
+                and conn["target_type"] in self.cell_types.keys()
+            ):
+                ct = conn["target_type"]
+                gid_range = list(self.gid_ranges[ct])
+                n_targets = len(conn["target_gids"])
+                # Replace with correct GIDs from gid_ranges
+                conn["target_gids"] = gid_range[:n_targets]
+            # Update src_gids if src_type is in mapping
+            if "src_type" in conn and conn["src_type"] in self.cell_types.keys():
+                ct = conn["src_type"]
+                gid_range = list(self.gid_ranges[ct])
+                n_srcs = len(conn["src_gids"])
+                conn["src_gids"] = gid_range[:n_srcs]
+
+            if "gid_pairs" in conn and conn["gid_pairs"]:
+                src_type = conn["src_type"]
+                tgt_type = conn["target_type"]
+
+                # Calculate offsets using original and new GID ranges
+                src_offset = (
+                    self.gid_ranges[src_type][0] - original_gid_ranges[src_type][0]
+                )
+                tgt_offset = (
+                    self.gid_ranges[tgt_type][0] - original_gid_ranges[tgt_type][0]
+                )
+                new_gid_pairs = {}
+                for src_gid, tgt_gids in conn["gid_pairs"].items():
+                    new_src_gid = int(src_gid) + src_offset
+                    new_tgt_gids = [int(tg) + tgt_offset for tg in tgt_gids]
+                    new_gid_pairs[new_src_gid] = new_tgt_gids
+                conn["gid_pairs"] = new_gid_pairs
 
 
 class _Connectivity(dict):
