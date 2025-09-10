@@ -408,6 +408,7 @@ class Network:
         # artificial drive cells
         self.gid_ranges = OrderedDict()
         self._n_gids = 0  # utility: keep track of last GID
+
         # XXX this can be removed once tests are made independent of HNN GUI
         # creates nc_dict-entries for ALL cell types
         self._legacy_mode = legacy_mode

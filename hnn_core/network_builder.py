@@ -406,13 +406,14 @@ class NetworkBuilder(object):
             n_hosts = _get_nhosts()
 
         # round robin assignment of cell gids
+        gids = list()
         for cell_type, gid_range in self.net.gid_ranges.items():
             # Only assign real cell types (not drives) here
             if cell_type in self.net.cell_types:
-                gids = list(gid_range)
-                for gid_idx in range(self._rank, len(gids), n_hosts):
-                    gid = gids[gid_idx]
-                    self._gid_list.append(gid)
+                gids.extend(list(gid_range))
+        for gid_idx in range(self._rank, len(gids), n_hosts):
+            gid = gids[gid_idx]
+            self._gid_list.append(gid)
 
         for drive in self.net.external_drives.values():
             if drive["cell_specific"]:
