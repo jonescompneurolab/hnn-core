@@ -472,8 +472,6 @@ class NetworkBuilder(object):
 
                 # instantiate NEURON object
                 # using meta data style
-                # AES: the 'net2' vs 'null/net1' was never finished being implemented
-                # here in Maira's branch
                 src_type_metadata = self.net.cell_types[src_type]["cell_metadata"]
                 if src_type_metadata.get("measure_dipole", False):
                     cell.build(sec_name_apical="apical_trunk")
@@ -540,9 +538,10 @@ class NetworkBuilder(object):
                 for target_gid in target_gids:
                     src_type = self.net.gid_to_type(src_gid)
                     target_type = self.net.gid_to_type(target_gid)
-                    key = target_filter[target_gid]
-                    target_cell = self._cells[key]
-                    connection_name = f"{_short_name(self.get_base_type(src_type))}_{_short_name(self.get_base_type(target_type))}_{receptor}"
+                    target_cell = self._cells[target_filter[target_gid]]
+                    connection_name = (
+                        f"{_short_name(src_type)}_{_short_name(target_type)}_{receptor}"
+                    )
                     if connection_name not in self.ncs:
                         self.ncs[connection_name] = list()
                     pos_idx = src_gid - net.gid_ranges[_long_name(src_type)][0]
@@ -573,13 +572,6 @@ class NetworkBuilder(object):
             nrn_arr = _ExtracellularArrayBuilder(arr)
             nrn_arr._build(cvode=_CVODE)
             self._nrn_rec_arrays.update({arr_name: nrn_arr})
-
-    def get_base_type(self, cell_type):
-        # Handles any suffix after the base type
-        for base in ["L2_pyramidal", "L5_pyramidal", "L2_basket", "L5_basket"]:
-            if cell_type.startswith(base):
-                return base
-        return cell_type  # fallback
 
     def _record_spikes(self):
         """Setup spike recording for this node"""
@@ -622,16 +614,8 @@ class NetworkBuilder(object):
                         f"Got n_samples={n_samples}, {cell.name}."
                         f"dipole.size()={cell.dipole.size()}."
                     )
-                # AES: unsure if net.gid_to_type actually works with new cell_metadata
-                # schema, and/or with Maira suffix attempt
-                # Chetan version:
                 cell_type = self.net.gid_to_type(cell.gid)
                 nrn_dpl = self._nrn_dipoles[cell_type]
-                # Maira version:
-                # if self.net.suffix is not None:
-                #     nrn_dpl = self._nrn_dipoles[_long_name(cell.name) + self.net.suffix]
-                # else:
-                #     nrn_dpl = self._nrn_dipoles[_long_name(cell.name)]
                 nrn_dpl.add(cell.dipole)
 
             self._vsec[cell.gid] = cell.vsec
