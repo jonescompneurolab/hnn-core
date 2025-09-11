@@ -2184,7 +2184,7 @@ class Network:
 
         return standardized_data, n_drive_cells, source_to_gid_map
 
-    def get_next_available_gid(self):
+    def _get_next_available_gid(self):
         """Return the next unused GID number, equal to current max GID + 1."""
         max_gid = -1
         for rng in self.gid_ranges.values():
@@ -2192,7 +2192,7 @@ class Network:
                 max_gid = max(max_gid, max(rng))
         return max_gid + 1
 
-    def shift_gid_ranges(self, gid_start=0):
+    def _shift_gid_ranges(self, gid_start=0):
         """Reset cell and non-drive GIDs to begin at a different number.
 
         Parameters

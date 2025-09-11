@@ -6,7 +6,9 @@
 This how-to demonstrates constructing and running two *independent* minimal
 HNN-Core networks side-by-side. Each network contains one cell per canonical
 cell type from ``jones_2009_model``. The second network is the same, except it uses
-disjoint GID ranges and remapped connectivity indices.
+disjoint GID ranges and remapped connectivity indices. This how-to is intended for
+*future development* on simulating multiple `Network`s simultaneously, inside the same
+simulation; hence, this uses non-public methods of `Network`.
 
 Overview
 --------
@@ -52,7 +54,7 @@ def create_minimal_network(gid_start=0):
     """Create a minimal network with one cell per type and shift positions."""
     print("Network creation start")
     net = jones_2009_model()
-    net.shift_gid_ranges(gid_start)
+    net._shift_gid_ranges(gid_start)
     return net
 
 
@@ -68,7 +70,7 @@ net1 = create_minimal_network(gid_start=0)
 # Each network receives a single distal evoked drive with matching timing
 # parameters but distinct names.
 
-drive_gid_1 = net1.get_next_available_gid()
+drive_gid_1 = net1._get_next_available_gid()
 net1.add_evoked_drive(
     'evdist1', mu=5.0, sigma=1.0, numspikes=1, location='distal',
     weights_ampa={'L2_pyramidal': 0.1, 'L5_pyramidal': 0.1},
@@ -78,7 +80,7 @@ net1.add_evoked_drive(
 ###############################################################################
 # Step 5: Build Second Network Using Disjoint GIDs
 # ------------------------------------------------
-next_gid = net1.get_next_available_gid()
+next_gid = net1._get_next_available_gid()
 net2 = create_minimal_network(gid_start=next_gid)
 
 ###############################################################################
@@ -94,7 +96,7 @@ net2.add_evoked_drive(
 print("Net1 gid ranges:", net1.gid_ranges)
 print("Net2 gid ranges:", net2.gid_ranges)
 
-print("Next GIDs after drives:", net1.get_next_available_gid(), net2.get_next_available_gid())
+print("Next GIDs after drives:", net1._get_next_available_gid(), net2.get_next_available_gid())
 
 ###############################################################################
 # Step 7: (Optional) Export Configurations
