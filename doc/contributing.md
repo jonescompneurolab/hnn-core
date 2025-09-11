@@ -154,16 +154,11 @@ contribution to `doc/whats_new.md` so that you can can publicly receive credit.
 
 11. If you have not already done so, now is the time to install HNN. However, **you need
     to install using the ["`pip` Source Installation" section of our Installation
-    Guide][]. You should read the instructions carefully**! This includes following
-    **all** the instructions in the "`pip` Package Installation" section for your
-    platform **except** the final `pip` command, and then running the following:
-
-    ```
-    pip install --editable ".[dev]"
-    ```
+    Guide][]. You should read the instructions carefully**!
 
     - Note: You do **not** need to run the `git clone` command listed in the Install
     guide, since you already did this above in step 5.
+
     - The fact that you included the `--editable` flag means that your fork's code has
     been installed to your Python environment in a live, "editable" state. What this
     means that if you make a code change to a file, save that file, then start a new
@@ -172,6 +167,7 @@ contribution to `doc/whats_new.md` so that you can can publicly receive credit.
     to reinstall using `pip` when you change versions of your code. The only exceptions
     to this are if you're changing the NEURON MOD files, our package dependencies, our
     package's "entry points", or if your installation had an error.
+
     - It is recommended, but not required, that you follow the additional instructions
     required for MPI installation, if you are on a supported platform (i.e. MacOS,
     Linux, and Windows using "Windows Subsystem for Linux").
