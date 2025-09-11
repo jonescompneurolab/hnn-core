@@ -689,7 +689,7 @@ class Network:
             'apical_tuft' (defined in `Cell.sections` for all targeted cells).
             The parameter `legacy_mode` of the `Network` must be set to `False`
             to target specific sections.
-        n_drive_cells : int | 'n_cells'
+        n_drive_cells : int | 'n_cells', default: 'n_cells'
             The number of drive cells that each contribute an independently
             sampled synaptic spike to the network according to the Gaussian
             time distribution (mu, sigma). If n_drive_cells='n_cells'
@@ -699,23 +699,19 @@ class Network:
             all-to-all connectivity. If you wish to synchronize the timing of
             this evoked drive across the network in a given trial with one
             spike, set n_drive_cells=1 and cell_specific=False.
-        cell_specific : bool
+        cell_specific : bool, default: True
             Whether each artificial drive cell has 1-to-1 (True, default) or
             all-to-all (False) connection parameters. Note that 1-to-1
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
             denotes the number of all available cells that this drive can
             target in the network.
-        weights_ampa : dict or None
+        weights_ampa : dict or None, default: None
             Synaptic weights (in uS) of AMPA receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
-        weights_nmda : dict or None
+        weights_nmda : dict or None, default: None
             Synaptic weights (in uS) of NMDA receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
-        synaptic_delays : dict or float
-            Synaptic delay (in ms) at the column origin, dispersed laterally as
-            a function of the space_constant. If float, applies to all target
-            cell types. Use dict to create delay->cell mapping.
-        space_constant : float
+        space_constant : float, default: 3.0
             Describes lateral dispersion (from the column origin) of synaptic
             weights and delays within the simulated column. The constant is
             measured in the units of ``inplane_distance`` of
@@ -724,18 +720,26 @@ class Network:
             ``exp(-(x / (3 * inplane_distance)) ** 2)``, where x is the
             physical distance (in um) between the connected cells in the xy
             plane (delays are modulated by the inverse of this factor).
-        probability : dict or float (default: 1.0)
+        synaptic_delays : dict or float, default: 0.1
+            Synaptic delay (in ms) at the column origin, dispersed laterally as
+            a function of the space_constant. If float, applies to all target
+            cell types. Use dict to create delay->cell mapping.
+        probability : dict or float, default: 1.0
             Probability of connection between any src-target pair.
             Use dict to create probability->cell mapping. If float, applies to
             all target cell types
-        event_seed : int
+        event_seed : int, default: 2
             Optional initial seed for random number generator (default: 2).
             Used to generate event times for drive cells.
             Not fixed across trials (see Notes)
-        conn_seed : int
+        conn_seed : int, default: 3
             Optional initial seed for random number generator (default: 3).
             Used to randomly remove connections when probability < 1.0.
             Fixed across trials (see Notes)
+        gid_start : int, default: None
+            Optional number to use as the starting index for the drive's GID range,
+            instead of the default. Default case (None) builds the GID range of the
+            drive starting from the Network's max GID + 1.
 
         Notes
         -----
@@ -806,9 +810,9 @@ class Network:
         ----------
         name : str
             Unique name for the drive
-        tstart : float
+        tstart : float, default: 0
             Start time of Poisson-distributed spike train (default: 0)
-        tstop : float
+        tstop : float, default: None
             End time of the spike train (defaults to None: tstop is set to the
             end of the simulation)
         rate_constant : float or dict of floats
@@ -824,7 +828,7 @@ class Network:
             'apical_tuft' (defined in `Cell.sections` for all targeted cells).
             The parameter `legacy_mode` of the `Network` must be set to `False`
             to target specific sections.
-        n_drive_cells : int | 'n_cells'
+        n_drive_cells : int | 'n_cells', default: 'n_cells'
             The number of drive cells that each contribute an independently
             sampled synaptic spike to the network according to a Poisson
             process. If n_drive_cells='n_cells' (default) and
@@ -833,23 +837,19 @@ class Network:
             drive cells are assigned with all-to-all connectivity. If you wish
             to synchronize the timing of Poisson drive across the network in a
             given trial, set n_drive_cells=1 and cell_specific=False.
-        cell_specific : bool
+        cell_specific : bool, default: True
             Whether each artificial drive cell has 1-to-1 (True, default) or
             all-to-all (False) connection parameters. Note that 1-to-1
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
             denotes the number of all available cells that this drive can
             target in the network.
-        weights_ampa : dict or None
+        weights_ampa : dict or None, default: None
             Synaptic weights (in uS) of AMPA receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
-        weights_nmda : dict or None
+        weights_nmda : dict or None, default: None
             Synaptic weights (in uS) of NMDA receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
-        synaptic_delays : dict or float
-            Synaptic delay (in ms) at the column origin, dispersed laterally as
-            a function of the space_constant. If float, applies to all target
-            cell types. Use dict to create delay->cell mapping.
-        space_constant : float
+        space_constant : float, default: 100.0
             Describes lateral dispersion (from the column origin) of synaptic
             weights and delays within the simulated column. The constant is
             measured in the units of ``inplane_distance`` of
@@ -858,16 +858,24 @@ class Network:
             ``exp(-(x / (3 * inplane_distance)) ** 2)``, where ``x`` is the
             physical distance (in um) between the connected cells in the xy
             plane.
-        probability : dict or float (default: 1.0)
+        synaptic_delays : dict or float, default: 0.1
+            Synaptic delay (in ms) at the column origin, dispersed laterally as
+            a function of the space_constant. If float, applies to all target
+            cell types. Use dict to create delay->cell mapping.
+        probability : dict or float, default: 1.0
             Probability of connection between any src-target pair.
             Use dict to create probability->cell mapping. If float, applies to
             all target cell types.
-        event_seed : int
+        event_seed : int, default: 2
             Optional initial seed for random number generator (default: 2).
             Used to generate event times for drive cells.
-        conn_seed : int
+        conn_seed : int, default: 3
             Optional initial seed for random number generator (default: 3).
             Used to randomly remove connections when probability < 1.0.
+        gid_start : int, default: None
+            Optional number to use as the starting index for the drive's GID range,
+            instead of the default. Default case (None) builds the GID range of the
+            drive starting from the Network's max GID + 1.
         """
 
         _check_drive_parameter_values("Poisson", tstart=tstart, tstop=tstop)
@@ -955,13 +963,13 @@ class Network:
         ----------
         name : str
             Unique name for the drive
-        tstart : float
+        tstart : float, default: 0
             Start time of the burst trains (default: 0)
-        tstart_std : float
+        tstart_std : float, default: 0
             If greater than 0, randomize start time with standard deviation
             tstart_std (unit: ms). Effectively jitters start time across
             multiple trials.
-        tstop : float
+        tstop : float, default: None
             End time of burst trains (defaults to None: tstop is set to the
             end of the simulation)
         location : str
@@ -973,15 +981,15 @@ class Network:
             to target specific sections.
         burst_rate : float
             The mean rate at which cyclic bursts occur (unit: Hz)
-        burst_std : float
+        burst_std : float, default: 0
             The standard deviation of the burst occurrence on each cycle
             (unit: ms). Default: 0 ms
-        numspikes : int
+        numspikes : int, default: 2
             The number of spikes in a burst. This is the spikes/burst parameter
             in the GUI. Default: 2 (doublet)
-        spike_isi : float
+        spike_isi : float, default: 10
             Time between spike events within a cycle (ISI). Default: 10 ms
-        n_drive_cells : int | 'n_cells'
+        n_drive_cells : int | 'n_cells', default: 1
             The number of drive cells that contribute an independently sampled
             burst at each cycle. If n_drive_cells='n_cells' and
             cell_specific=True, a drive cell gets assigned to
@@ -989,23 +997,23 @@ class Network:
             connectivity. Otherwise (default: 1), drive cells are assigned with
             all-to-all connectivity and provide synchronous input to cells in
             the network.
-        cell_specific : bool
+        cell_specific : bool, default: False
             Whether each artificial drive cell has 1-to-1 (True) or all-to-all
             (False, default) connection parameters. Note that 1-to-1
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
             denotes the number of all available cells that this drive can
             target in the network.
-        weights_ampa : dict or None
+        weights_ampa : dict or None, default: None
             Synaptic weights (in uS) of AMPA receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
-        weights_nmda : dict or None
+        weights_nmda : dict or None, default: None
             Synaptic weights (in uS) of NMDA receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
-        synaptic_delays : dict or float
+        synaptic_delays : dict or float, default: 0.1
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant. If float, applies to all target
             cell types. Use dict to create delay->cell mapping.
-        space_constant : float
+        space_constant : float, default: 100.0
             Describes lateral dispersion (from the column origin) of synaptic
             weights and delays within the simulated column. The constant is
             measured in the units of ``inplane_distance`` of
@@ -1014,16 +1022,20 @@ class Network:
             ``exp(-(x / (3 * inplane_distance)) ** 2)``, where ``x`` is the
             physical distance (in um) between the connected cells in the xy
             plane.
-        probability : dict or float (default: 1.0)
+        probability : dict or float, default: 1.0
             Probability of connection between any src-target pair.
             Use dict to create probability->cell mapping. If float, applies to
             all target cell types.
-        event_seed : int
+        event_seed : int, default: 2
             Optional initial seed for random number generator (default: 2).
             Used to generate event times for drive cells.
-        conn_seed : int
+        conn_seed : int, default: 3
             Optional initial seed for random number generator (default: 3).
             Used to randomly remove connections when probability < 1.0.
+        gid_start : int, default: None
+            Optional number to use as the starting index for the drive's GID range,
+            instead of the default. Default case (None) builds the GID range of the
+            drive starting from the Network's max GID + 1.
         """
         if not self._legacy_mode:
             _check_drive_parameter_values(
@@ -1110,7 +1122,10 @@ class Network:
             can be any string that helps identify the source.
             Example:
             ```
-            {"NetA_L2_pyramidal_GID0": [10.2, 25.3], "NetA_L5_pyramidal_GID1": [15.1, 30.4]}
+            {
+                "NetA_L2_pyramidal_GID0": [10.2, 25.3],
+                "NetA_L5_pyramidal_GID1": [15.1, 30.4],
+            }
             ```
 
             - *Format 2 (tuples)*: A list of (time, gid) tuples, where each tuple
@@ -1129,30 +1144,32 @@ class Network:
             remapped internally to sequential drive cell IDs (0 to n-1) in the target
             network. Different GIDs should be used for different source cells.
         location : str
-            Target location of synapses in the target network. Must be 'proximal', 'distal', or
-            'soma', or a specific section name (when legacy_mode=False).
-        weights_ampa : dict or None
-            Synaptic weights (in uS) of AMPA receptors for each targeted cell type (dict keys).
+            Target location of synapses in the target network. Must be 'proximal',
+            'distal', or 'soma', or a specific section name (when legacy_mode=False).
+        weights_ampa : dict or None, default: None
+            Synaptic weights (in uS) of AMPA receptors for each targeted cell type (dict
+            keys).
             Cell types omitted are set to zero.
-        weights_nmda : dict or None
-            Synaptic weights (in uS) of NMDA receptors for each targeted cell type (dict keys).
+        weights_nmda : dict or None, default: None
+            Synaptic weights (in uS) of NMDA receptors for each targeted cell type (dict
+            keys).
             Cell types omitted are set to zero.
-        synaptic_delays : dict or float
+        synaptic_delays : dict or float, default: 0.1
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant. If float, applies to all target
             cell types. Use dict to create delay->cell mapping.
-        space_constant : float
-            Lateral dispersion constant (in units of inplane_distance) for synaptic weights and
-            delays within the target network. Default: 3.0
-        probability : float or dict
-            Connection probability between source and target cells. Default: 1.0 (all-to-all).
-        conn_seed : int
+        space_constant : float, default: 3.0
+            Lateral dispersion constant (in units of inplane_distance) for synaptic
+            weights and delays within the target network. Default: 3.0
+        probability : float or dict, default: 1.0
+            Connection probability between source and target cells. Default: 1.0
+            (all-to-all).
+        conn_seed : int, default: None
             Optional seed for random number generator for connectivity (default: None).
-        cell_specific : bool
-            If True, enables cell-specific connectivity (e.g., for 1-to-1 mapping). Default: False.
-        n_drive_cells : str or int
-            Number of drive cells. Use 'n_cells' for 1-to-1 mapping with target cell types,
-            or an integer for a fixed number. Default: None (inferred from spike_data).
+        gid_start : int, default: None
+            Optional number to use as the starting index for the drive's GID range,
+            instead of the default. Default case (None) builds the GID range of the
+            drive starting from the Network's max GID + 1.
         """
         if not self._legacy_mode:
             warnings.warn(
@@ -1265,11 +1282,17 @@ class Network:
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
             denotes the number of all available cells that this drive can
             target in the network.
-        probability : dict or float (default: 1.0)
+        probability : dict or float
             Probability of connection between any src-target pair.
             Use dict to create probability->cell mapping. If float, applies to
             all target cell types
+        gid_start : int, default: None
+            Optional number to use as the starting index for the drive's GID range,
+            instead of the default. Default case (None) builds the GID range of the
+            drive starting from the Network's max GID + 1.
 
+        Notes
+        -----
         Attached drive is stored in self.external_drives[name]
         self.pos_dict is updated, and self._update_gid_ranges() called
         """
@@ -1593,7 +1616,22 @@ class Network:
                 )
 
     def _add_cell_type(self, cell_name, pos, cell_template=None, gid_start=None):
-        """Add cell type by updating pos_dict and gid_ranges."""
+        """Add cell type by updating pos_dict and gid_ranges.
+
+        Parameters
+        ----------
+        cell_name : str
+            The name of the cell type to add.
+        pos : tuple
+            Coordinates of cell soma in xyz-space.
+        cell_template : Instance of Cell object, default: None
+            Previously-instantiated `Cell` object to add for corresponding `cell_name`.
+        gid_start : int, default: None
+            Optional number to use as the starting index for the drive's GID range,
+            instead of the default. Default case (None) builds the GID range of the
+            drive starting from the Network's max GID + 1.
+
+        """
         ll = self._n_gids if (gid_start is None) else gid_start
         self._n_gids = ll + len(pos)
         self.gid_ranges[cell_name] = range(ll, self._n_gids)
@@ -2192,12 +2230,12 @@ class Network:
                 max_gid = max(max_gid, max(rng))
         return max_gid + 1
 
-    def _shift_gid_ranges(self, gid_start=0):
+    def _shift_gid_ranges(self, gid_start):
         """Reset cell and non-drive GIDs to begin at a different number.
 
         Parameters
         ----------
-        gid_start : int, default 0
+        gid_start : int
             Number to begin the Network's non-drive GIDs at, instead of the default
             value of 0. This number will be used to reconstruct both
             `Network.gid_ranges` and some entries in `Network.connectivity`.
@@ -2227,10 +2265,7 @@ class Network:
         # Shift connectivity GIDs to match new gid_ranges
         for conn in self.connectivity:
             # Shift target_gids if target_type is in mapping
-            if (
-                "target_type" in conn
-                and conn["target_type"] in self.cell_types.keys()
-            ):
+            if "target_type" in conn and conn["target_type"] in self.cell_types.keys():
                 ct = conn["target_type"]
                 gid_range = list(self.gid_ranges[ct])
                 n_targets = len(conn["target_gids"])
