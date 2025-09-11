@@ -3,7 +3,7 @@
 
 Please read the contribution guide **until the end** before beginning contributions.
 
-Contributions are welcome in the form of pull requests. You must abide by our [Code of
+Contributions are welcome in the form of Pull Requests. You must abide by our [Code of
 Conduct, found
 here](https://github.com/jonescompneurolab/hnn-core/blob/master/CODE_OF_CONDUCT.md). Our
 {doc}`Governance Model can be found here <governance>`.
@@ -17,9 +17,9 @@ To contribute to `hnn-core` development, you need a special kind of installation
 
 ## How to contribute code
 
-We use the ["fork and pull
-model"](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/getting-started/about-collaborative-development-models)
-on [Github][] to incorporate changes onto our `master` branch. We want commits in `hnn-core`
+We use the ["fork and pull model" on
+Github](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/getting-started/about-collaborative-development-models)
+to incorporate changes onto our `master` branch. We want commits in `hnn-core`
 to follow a linear history, therefore we use a "rebase" workflow instead of "merge
 commits" to incorporate work. See [this
 article](https://www.atlassian.com/git/tutorials/merging-vs-rebasing) for more details
@@ -41,9 +41,7 @@ Fortunately, there is a large amount of helpful guidance online for learning how
 - <https://git-scm.com/doc/ext> (often more technical, but also more informative)
 
 Finally, whenever you make a Pull Request, we recommend that you add mention of your
-contribution to `doc/whats_new.md` so that you can can publicly receive credit. However,
-even if you don't do this, rest assured that on every release, we go through all new
-commits and do our best to credit all contributors.
+contribution to `doc/whats_new.md` so that you can can publicly receive credit.
 
 ### Making your first Pull Request, including *installing for development*
 
@@ -91,9 +89,8 @@ commits and do our best to credit all contributors.
 
 7. Next, let's look at our
    ["remotes"](https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes). You can
-   loosely think of remotes as "the URL I use to access different versions of the code
-   which are *primarily* stored on Github's servers". That said, you also have your own
-   version of each remote's code. Run the following command:
+   loosely think of remotes as "my backup copy of the versions of the code stored on
+   Github's servers". To view your remotes, run the following command:
 
     ```
     git remote -v
@@ -106,14 +103,19 @@ commits and do our best to credit all contributors.
     origin      https://github.com/asoplata/hnn-core (push)
     ```
 
-    Your `origin` remote URL is the same that you used to "clone" the repo, i.e. your
-    fork. This is the the remote that you will primarily be "pushing" (aka uploading)
-    code "commits" to.
+    Your `origin` remote is essentially your local "cloud backup" of your fork sitting
+    on Github's servers. This is the same remote that you used to "clone" your fork repo
+    from. This is the the remote that you will primarily "`push`" (a.k.a. upload)
+    your code "`commits`" (a.k.a. changes or versions) to.
 
-8. Add a new remote that points to the version of the code that you created your fork
-   *from*. This remote (and the code version) is called the "upstream". This is the
-   remote you will primarily be using when you want to "fetch" (aka download) new
-   commits that other people have made to the upstream. Run the following command:
+8. Add a new "remote" that points to the version of the code that you created your fork
+   *from*. This remote (and the code version) is commonly called the "`upstream`". This is
+   the remote you will primarily be using when you want to "`fetch`" (a.k.a. download) new
+   commits that other people have made to the "`upstream`" (a.k.a. original) version of the
+   code. To be explicit, this is so you can manage changes that other people make to the
+   "upstream" code at <https://github.com/jonescompneurolab/hnn-core>, including
+   eventually integrating those changes to both your local git repo and your fork at
+   <https://github.com/asoplata/hnn-core>. Run the following command:
 
     ```
     git remote add upstream https://github.com/jonescompneurolab/hnn-core
@@ -134,14 +136,15 @@ commits and do our best to credit all contributors.
     upstream    https://github.com/jonescompneurolab/hnn-core (push)
     ```
 
-10. You should **never** write code to the `master` branch (this is important for the
-    [next section on Rebasing](#keeping-your-code-up-to-date-by-rebasing)). Instead, all
-    of your new work should be organized on new "feature branches" that descend from
-    `master`. To start a new feature branch, we will copy the existing `master` branch
-    from the `upstream` remote and give it a specific name. [See here for a guide on
-    working with different
+10. You should **never** write code directly to the `master` branch (this is important
+    for the [next section on
+    Rebasing](#keeping-your-code-up-to-date-by-rebasing)). Instead, all of your new work
+    should be organized on new, separate "feature branches", which themselves are built
+    off of the `master` version of the code. To start a new feature branch, we will copy
+    the existing `master` branch from the `upstream` remote and give it a specific
+    name. [See here for a guide on working with different
     branches](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging). You
-    can use the following commands to do this, which will create and "checkout" (aka
+    can use the following commands to do this, which will create and "`checkout`" (a.k.a.
     switch to) a feature branch called `cool-feature`:
 
     ```
@@ -162,13 +165,13 @@ commits and do our best to credit all contributors.
     - Note: You do **not** need to run the `git clone` command listed in the Install
     guide, since you already did this above in step 5.
     - The fact that you included the `--editable` flag means that your fork's code has
-    been installed "live" to your Python environment. This means that if you make a code
-    change to a file, save that file, then start a new Python process, your code changes
-    will have already taken effect. This is true even if you switch between `git`
-    branches or commits. In other words, you do not need to reinstall using `pip` when
-    you change versions of your code. The only exceptions to this are if you're changing
-    the NEURON MOD files, our package dependencies, our package's "entry points", or if
-    your installation had an error.
+    been installed to your Python environment in a live, "editable" state. What this
+    means that if you make a code change to a file, save that file, then start a new
+    Python process, your code changes will *immediately* take effect. This is true even
+    if you switch between `git` branches or commits. In other words, you do *not* need
+    to reinstall using `pip` when you change versions of your code. The only exceptions
+    to this are if you're changing the NEURON MOD files, our package dependencies, our
+    package's "entry points", or if your installation had an error.
     - It is recommended, but not required, that you follow the additional instructions
     required for MPI installation, if you are on a supported platform (i.e. MacOS,
     Linux, and Windows using "Windows Subsystem for Linux").
@@ -199,7 +202,7 @@ commits and do our best to credit all contributors.
        for commit messages, as this **greatly** helps us understand your changes. This
        includes things like beginning each commit with an acronym to indicate what kind
        of work it involves (see the link for a list). This also includes trying to keep
-       the "title" (aka first line) of the commit message under 51 characters, and the
+       the "title" (a.k.a. first line) of the commit message under 51 characters, and the
        "body" (subsequent lines) of the commit message under 72 characters.
      - In general, "more frequent commits with fewer code changes inside each commit" is preferable
        to "fewer commits with more code changes in each commit."
@@ -225,16 +228,17 @@ commits and do our best to credit all contributors.
     next step.
 
 15. Once your feature branch is ready for other developers to look at it, you need to
-    "push" (aka upload) your feature branch to Github's copy of your fork (i.e. your
+    "push" (a.k.a. upload) your feature branch to Github's copy of your fork (i.e. your
     `origin` remote):
 
     ```
     git push origin cool-feature
     ```
 
-16. Now, if go to the webpage for your fork (e.g. <https://github.com/asoplata/hnn-core> )
-    and click `master` on the left, you should see that your new branch is now
-    viewable. Github is aware of your branch, but there is no Pull Request yet.
+16. Now, if you go to the webpage for your fork
+    (e.g. <https://github.com/asoplata/hnn-core> ) and click `master` on the left, you
+    should see that your new branch is now viewable. Github is aware of your branch, but
+    there is no Pull Request yet.
 
 17. Let's finally create the Pull Request: go to
     <https://github.com/jonescompneurolab/hnn-core/compare>, then click "compare across
@@ -242,36 +246,37 @@ commits and do our best to credit all contributors.
     `jonescompneurolab/hnn-core`) and don't change `base` (it should say
     `master`). Instead, click on the `head repository` dropdown button and select your
     fork. Then, click on the `compare` dropdown and select your new feature
-    branch. Finally, click the green `Create pull request` to make it!
+    branch. Finally, click the green `Create Pull Request` to make it!
     - If your feature branch is "complete" and you are happy with it, add `[MRG]` to the
       beginning of your Pull Request's title to indicate that it is ready for merge into
       `master`.
     - If your feature branch is incomplete, add `[WIP]` to the beginning of your Pull
       Request's title to indicate that it is a Work In Progress.
-    - There are also other, more convenient ways to create the pull request, but it must
+    - There are also other, more convenient ways to create the Pull Request, but it must
       always be done on the website. For example, if you have pushed a feature branch
       recently, if you navigate to the webpage for your fork, there will often be a
       highlighted box at the top that says something similar to "Compare & Pull Request"
       which you can click. When you push, your terminal may also print a link that you
-      can click on to quickly bring you to the pull requestpage.
+      can click on to quickly bring you to the Pull Request page.
 
-18. After your pull request is reviewed, repeat steps 13, 14, and 15 based on changes
+18. After your Pull Request is reviewed, repeat steps 13, 14, and 15 based on changes
     that the developers request. The webpage for the Pull Request is automatically
     updated whenever you push new commits, so you only need to make new commits and then
     `push` them for everyone else to see the updates.
 
-19. Once your changes are Pull Request is accepted and merged, congratulations! However,
-    your work is not yet over...keep reading below...
+19. Once your Pull Request is accepted and merged, congratulations! However, your work
+    is not yet over...keep reading below...
 
 ### Keeping your code up-to-date by rebasing
 
-Imagine the following scenario: you just successfully got your Pull Request merged into
-`master`. Additionally, someone else got their own Pull Request also merged into
-`master`. Also, you had already started work on a second feature called
-`cool-feature-2`. However, from your fork's perspective, both `master` and
-`cool-feature-2` are now "out of date" with respect to the `upstream` remote (aka the
-`master` version of the code at <https://github.com/jonescompneurolab/hnn-core> ). What do
-you do? Use the magic of `git rebase` to rewrite history!
+Imagine the following scenario: you just successfully got your Pull Request for
+`cool-feature` merged into `master`, and you start work on a second feature called
+`cool-feature-2`. However, while you're working on `cool-feature-2`, someone *else* got
+their own Pull Request, called `other-persons-feature`, also merged into `master`. Now,
+from your fork's perspective, both `master` and `cool-feature-2` are "out of date" with
+respect to the `upstream` remote (a.k.a. the `master` version of the code at
+<https://github.com/jonescompneurolab/hnn-core> ). What do you do? Use the magic of `git
+rebase` to rewrite history! Great Scott!
 
 Usually,
 ["merging"](https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging)
@@ -298,12 +303,11 @@ Here are some useful guides that discuss "rebasing", including how it is differe
 - <https://docs.github.com/en/get-started/using-git/about-git-rebase>
 - <https://docs.github.com/en/get-started/using-git/resolving-merge-conflicts-after-a-git-rebase>
 
-To rebase, we do the following steps. To summarize, we're going to download the latest
-commits from `upstream` remote's `master` branch (also called `upstream/master`). Then
-we're going to rebase both our local and `origin` remote's `master` branch (also called
-`origin/master`) onto `upstream/master`. Then, finally, we're going to rebase our local
-`cool-feature-2` branch onto our newly-updated `master` branch, bringing everything up
-to date.
+To rebase, we're going to download the latest commits from `upstream` remote's `master`
+branch (also called `upstream/master`). Then we're going to rebase both our local and
+`origin` remote's `master` branch (also called `origin/master`) onto
+`upstream/master`. Then, finally, we're going to rebase our local `cool-feature-2`
+branch onto our newly-updated `master` branch, bringing everything up to date.
 
 1. First, make a **backup copy** of your code repository somewhere else on your
    computer. Until you are very confident with rebasing and altering `git` history, you
@@ -340,9 +344,9 @@ to date.
     git fetch upstream master
     ```
 
-    This downloads the latest commits to `upstream`'s `master` branch (aka
+    This downloads the latest commits to `upstream`'s `master` branch (a.k.a.
     `upstream/master`), but **does not change** any other branches, including our copy
-    of `origin`'s `master` branch (aka `origin/master`) or our local
+    of `origin`'s `master` branch (a.k.a. `origin/master`) or our local
     `cool-feature-2`. This only downloads the commits "in the background", so to speak.
 
 4. Let's checkout our local `master` branch:
@@ -382,9 +386,11 @@ to date.
     ```
 
 8. Next, we want to rebase our new commits in `cool-feature-2` "onto" the latest commits
-   in `master`. This is sort of like "replaying" our `cool-feature-2` commits, but
-   pretending that we wrote them AFTER we had already written the latest commits in
-   `master`. Let's begin the rebase:
+   in `master`. At this point, our `master` branch is up-to-date and includes the work
+   from both prior feature branches, including both `cool-feature` and
+   `other-persons-feature`. When we rebase, it will be as if we're "replaying" our
+   `cool-feature-2` commits, but pretending that we wrote them AFTER the latest commit
+   in `master`. Let's begin the rebase:
 
     ```
     git rebase master
@@ -451,41 +457,50 @@ to date.
     `cool-feature-2` are now up to date against the latest commits, and you can continue
     developing on `cool-feature-2`. Note that you only strictly need to do this process
     if your Github Pull Request explicitly says that your changes cannot automatically
-    be merged. However, it is best practice to keep your feature branches up to date,
-    since just because there are no "merge conflicts" doesn't mean that there aren't
-    conflicts with actual code behavior.
+    be merged. However, it is best practice to keep your feature branches up to
+    date. Just because there are no "merge conflicts" doesn't mean that there aren't
+    problems with the code itself (e.g. failing tests) due to your branch being out of
+    date!
 
 ### Troubleshooting `git` problems
 
 - Here's a very helpful website with how to fix or reverse your changes, if you get your
   `git` repository in a confusing or broken state: <https://dangitgit.com/en>
 
-- If you have accidentally written new code commits to your local `master` or `origin`'s
-  `master` branch (aka it is "out-of-sync" with `upstream/master`), you should you do
-  the following:
+- If you have accidentally written *new* code commits to your local `master` or
+  `origin`'s `master` branch (a.k.a. it is "out-of-sync" with `upstream/master`), below
+  you will find one way that you can fix the problem. These steps will show you how to
+  make a second branch that points to your current `master` branch's latest commit (a
+  backup of your work), delete your `master` branch, then re-download the "upstream"
+  version of `master`. At the end, your work will still be available on a separate
+  branch, but your `master` branch should be identical to that of `upstream`'s `master`
+  branch. Do the following:
 
-    1. Checkout `master`. This will bring you to the latest of your new commits.
+    1. First, make a backup of your git repo somewhere else on your computer, just in
+       case!
 
-    2. Create and checkout a new branch at that commit (let's call the new branch
+    2. Checkout `master`. This will bring you to the latest of your new commits.
+
+    3. Create and checkout a new branch at that commit (let's call the new branch
        `cool-feature-3`), for example by using:
 
     ```
     git checkout -b cool-feature-3
     ```
 
-    3. Ensure the upstream of this new branch to `origin` just in case:
+    4. Set the upstream of this new branch to `origin` just in case:
 
     ```
     git branch --set-upstream-to=origin cool-feature-3
     ```
 
-    4. **Delete** your `master` branch, using the following:
+    5. **Delete** your local `master` branch, using the following:
 
     ```
     git branch -D master
     ```
 
-    5. Download the latest version of `upstream`'s `master` branch, AND make a new
+    6. Download the latest version of `upstream`'s `master` branch, AND make a new
        `master` branch locally that is the same as `upstream`'s `master`, using the
        following:
 
@@ -493,7 +508,7 @@ to date.
     git fetch upstream master:master
     ```
 
-    6. **Only if** you already pushed your out-of-sync commits to `origin`, you should
+    7. **Only if** you already pushed your out-of-sync commits to `origin`, you should
        force `origin`'s `master` to use your new, local `master` branch, using the
        following. **Note: You should NEVER `git push --force upstream` to your
        `upstream` remote.** The `--set-upstream` option is fine, but always make sure
@@ -506,7 +521,7 @@ to date.
     git push --force origin
     ```
 
-    7. The situation should now be resolved: the code you had on `master` is now on
+    8. The situation should now be resolved: the code you had on `master` is now on
        `cool-feature-3`. Your local and `origin` `master` branch is now fully
        synchronized with `upstream`'s `master`. You can now continue your work
        developing on feature branches, but never the `master` branch.
@@ -679,7 +694,7 @@ tests before they can be merged. If you used the above install instructions, the
 everything you need to run these should already be installed. We *strongly recommend*
 that Contributors first run all quality checks and tests *locally*, and *before* you
 push new code to any Pull Requests. These same checks and tests are run automatically by
-our Continuous Integration suite, and and if any of them fail on your local machine,
+our Continuous Integration suite, and if any of them fail on your local machine,
 then *they will fail* in the automated tests run on Github, and your contributions will
 not be merge-able (until the errors are fixed). That said, if you have trouble getting
 the tests to pass using your new code changes and you need help, feel free open a Pull
@@ -816,7 +831,7 @@ is outlined below.
     would be simulation progress messages as well as any MPI warnings/errors during the
     simulation.
 3.  Once the simulation has completed, the rank 0 of the child process sends back the
-    simulation data by base64 encoding and and pickling the data object. It also adds
+    simulation data by base64 encoding and pickling the data object. It also adds
     markings for the start and end of the encoded data, including the expected length of
     data (in bytes) in the end of data marking. Finally rank 0 writes the whole string
     with markings and encoded data to `stderr`.
@@ -858,11 +873,11 @@ If you ever need to make scientific or technical changes to the default network
     make regenerate-networks
     ```
 
-    This command runs two scripts, each of which rebuild a particular "hierarchical
-    JSON" network file which are used in HNN-Core. These two files are described
-    below. Note that you do **not** need to make manual changes to these files; running
-    the above command is sufficient. However, you **do** need to commit the new versions
-    of these files. The two files:
+    This command runs two scripts, each of which rebuild one of the "hierarchical JSON"
+    network file used in HNN-Core. These two files are described below. Note that you do
+    **not** need to make manual changes to these files; running the above command is
+    sufficient. However, you **do** need to commit the new versions of these files. The
+    two files:
 
     A. `hnn_core/param/jones2009_base.json`: This is the base file used for the
        GUI. This file has been built using the code in

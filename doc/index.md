@@ -3,7 +3,7 @@
 ```{toctree}
 :hidden:
 
-Install (HNN Textbook) <install>
+Install (Textbook) <install>
 Examples <auto_examples/index>
 API <api>
 whats_new

@@ -20,24 +20,24 @@ The [Human Neocortical Neurosolver (HNN)](https://hnn.brown.edu) is an open-sour
 neural modeling tool designed to help researchers/clinicians interpret human brain
 imaging data. This repository, called **HNN-core**, houses the source code for HNN.
 
-HNN provides a convenient way to run simulations of an anatomically- and
-biophysically-detailed dynamical system model of human thalamocortical brain circuits
-with only a few lines of code. Given its modular, object-oriented design, HNN makes
-it easy to generate and evaluate hypotheses on the mechanistic origin of signals
-measured with magnetoencephalography (MEG), electroencephalography (EEG), or
-intracranial electrocorticography (ECoG). A unique feature of the HNN model is that it
-accounts for the biophysics generating the primary electric currents underlying such
-data. Simulation results are *directly* comparable to source localized data (current
-dipoles in units of nano-Ampere-meters), enabling precise tuning of model parameters
-to match characteristics of recorded signals. Multimodal neurophysiology data such as
-local field potential (LFP), current-source density (CSD), and spiking dynamics can also
-be simulated simultaneously with current dipoles.
+With only a few lines of code, HNN provides a convenient way to run simulations of an
+anatomically- and biophysically-detailed dynamical system model of human thalamocortical
+brain circuits. Given its modular, object-oriented design, HNN makes it easy to generate
+and evaluate hypotheses on the mechanistic origin of signals measured with
+magnetoencephalography (MEG), electroencephalography (EEG), or intracranial
+electrocorticography (ECoG). A unique feature of the HNN model is that it accounts for
+the biophysics generating the primary electric currents underlying such data. Simulation
+results are *directly* comparable to source-localized data (current dipoles in units of
+nano-Ampere-meters), enabling precise tuning of model parameters to match
+characteristics of recorded signals. Multimodal neurophysiology data such as local field
+potential (LFP), current-source density (CSD), and spiking dynamics can also be
+simulated simultaneously with current dipoles.
 
 You can view [HNN's frontpage here](https://hnn.brown.edu) for an overview of all that
 HNN can do. For how to use HNN, we provide scientific documentation, tutorials, and
 examples aplenty on our [HNN Textbook website][]. There, we describe the use of HNN in
 studying the circuit-level origin of some of the most commonly measured MEG/EEG and ECoG
-signals: event related potentials (ERPs) and low frequency rhythms (alpha/beta/gamma).
+signals: event related potentials (ERPs) and low-frequency rhythms (alpha/beta/gamma).
 
 The HNN API, written in Python and built on top of
 [NEURON](https://www.neuron.yale.edu/neuron/), is designed to be flexible and serve
