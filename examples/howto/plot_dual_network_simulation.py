@@ -86,7 +86,7 @@ net2 = create_minimal_network(gid_start=next_gid)
 ###############################################################################
 # Step 6: Add An Evoked Drive to net2
 # -----------------------------------
-drive_gid_2 = net2.get_next_available_gid()
+drive_gid_2 = net2._get_next_available_gid()
 net2.add_evoked_drive(
     'evdist2', mu=5.0, sigma=1.0, numspikes=1, location='distal',
     weights_ampa={'L2_pyramidal': 0.1, 'L5_pyramidal': 0.1},
@@ -96,7 +96,7 @@ net2.add_evoked_drive(
 print("Net1 gid ranges:", net1.gid_ranges)
 print("Net2 gid ranges:", net2.gid_ranges)
 
-print("Next GIDs after drives:", net1._get_next_available_gid(), net2.get_next_available_gid())
+print("Next GIDs after drives:", net1._get_next_available_gid(), net2._get_next_available_gid())
 
 ###############################################################################
 # Step 7: (Optional) Export Configurations
