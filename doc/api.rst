@@ -101,7 +101,7 @@ Parallel backends (:py:mod:`hnn_core.parallel_backends`):
    JoblibBackend
 
 Input and Output (hierarchical JSON) (:py:mod:`hnn_core.hnn_io`):
----------------------------------------------------------
+-----------------------------------------------------------------
 .. currentmodule:: hnn_core.hnn_io
 
 .. autosummary::
@@ -113,7 +113,7 @@ Input and Output (hierarchical JSON) (:py:mod:`hnn_core.hnn_io`):
    write_network_configuration
 
 Input and Output (non-hierarchical JSON):
------------------
+-----------------------------------------
 
 .. currentmodule:: hnn_core
 
