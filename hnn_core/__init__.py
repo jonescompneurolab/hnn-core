@@ -12,5 +12,11 @@ from .cell import Cell
 from .cell_response import CellResponse, read_spikes
 from .cells_default import pyramidal, basket
 from .parallel_backends import MPIBackend, JoblibBackend
+from .hnn_io import (
+    dict_to_network,
+    network_to_dict,
+    read_network_configuration,
+    write_network_configuration,
+)
 
 __version__ = "0.4.3dev2"
