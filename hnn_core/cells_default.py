@@ -18,6 +18,7 @@ from .params_default import (get_L2Pyr_params_default,
 # units for taur: ms
 
 
+"""KD: comment: initialize membrane potential here as it's not overriden by h.finitialize unless called as h.finitialize(-65)"""
 def _get_dends(params, cell_type, section_names, v_init = {'all': -65}):
     """Convert a flat dictionary to a nested dictionary.
 
@@ -48,6 +49,8 @@ def _get_dends(params, cell_type, section_names, v_init = {'all': -65}):
                                          v = v)
     return sections
 
+
+# In the new model, the basal dendrites are differently tuned from the apical dendrites.
 def _get_basal(params, cell_type, section_names, v_init = {'all': -65}):
     """Convert a flat dictionary to a nested dictionary.
 
@@ -93,6 +96,8 @@ def _get_pyr_soma(p_all, cell_type, v_init = -65):
 
 def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
     """The geometry of the default sections in L2Pyr neuron."""
+
+    # I think p_all should be an input
     p_all = get_L2Pyr_params_default()
     if override_params is not None:
         assert isinstance(override_params, dict)

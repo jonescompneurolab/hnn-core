@@ -48,7 +48,7 @@ INITIAL{
 
 PROCEDURE rates(){
 	LOCAL qt
-  	qt = 2.3^((34-21)/10)
+  	qt = 2.3^((22-21)/10)
 		mInf =  1/(1+exp(((v -(18.700(mV)))/(-9.700(mV)))))
 		mTau =  0.2*20.000(ms)/(1+exp(((v -(-46.560(mV)))/(-44.140(mV)))))/qt
 	UNITSOFF
