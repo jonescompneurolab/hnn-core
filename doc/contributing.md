@@ -105,7 +105,7 @@ contribution to `doc/whats_new.md` so that you can can publicly receive credit.
 
     Your `origin` remote is essentially your local "cloud backup" of your fork sitting
     on Github's servers. This is the same remote that you used to "clone" your fork repo
-    from. This is the the remote that you will primarily "`push`" (a.k.a. upload)
+    from. This is the remote that you will primarily "`push`" (a.k.a. upload)
     your code "`commits`" (a.k.a. changes or versions) to.
 
 8. Add a new "remote" that points to the version of the code that you created your fork
@@ -870,7 +870,7 @@ If you ever need to make scientific or technical changes to the default network
     ```
 
     This command runs two scripts, each of which rebuild one of the "hierarchical JSON"
-    network file used in HNN-Core. These two files are described below. Note that you do
+    network files used in HNN-Core. These two files are described below. Note that you do
     **not** need to make manual changes to these files; running the above command is
     sufficient. However, you **do** need to commit the new versions of these files. The
     two files:
