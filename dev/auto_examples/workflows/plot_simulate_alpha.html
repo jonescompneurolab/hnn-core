@@ -158,7 +158,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../install.html">
-    Install
+    Install (Textbook)
   </a>
 </li>
 
@@ -173,13 +173,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../api.html">
     API
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../glossary.html">
-    Glossary
   </a>
 </li>
 
@@ -204,6 +197,13 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
             <li class="nav-item dropdown">
                 <button class="btn dropdown-toggle nav-item" type="button"
                 data-bs-toggle="dropdown" aria-expanded="false"
@@ -213,15 +213,22 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
-    PyPI
+  <a class="nav-link dropdown-item nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
   </a>
 </li>
 
 
 <li class=" ">
-  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
-    HNN Frontpage
+  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI package
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://anaconda.org/jonescompneurolab/repo">
+    Conda packages
   </a>
 </li>
 
@@ -315,7 +322,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../install.html">
-    Install
+    Install (Textbook)
   </a>
 </li>
 
@@ -330,13 +337,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../api.html">
     API
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../glossary.html">
-    Glossary
   </a>
 </li>
 
@@ -363,15 +363,29 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
-    PyPI
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
-    HNN Frontpage
+  <a class="nav-link nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://anaconda.org/jonescompneurolab/repo">
+    Conda packages
   </a>
 </li>
 
@@ -501,7 +515,7 @@ simulation. Each burst consists of a pair (2) of spikes, spaced 10 ms apart.
 The occurrence of each burst is jittered by a random, normally distributed
 amount (20 ms standard deviation). We repeat the burst train 10 times, each
 time with unique randomization. The drive is only connected to the
-<a class="reference internal" href="../../glossary.html#term-proximal"><span class="xref std std-term">proximal</span></a> (dendritic) AMPA synapses on L2/3 and L5 pyramidal neurons.</p>
+<span class="xref std std-term">proximal</span> (dendritic) AMPA synapses on L2/3 and L5 pyramidal neurons.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">()</span>
 
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">location</span></a> <span class="o">=</span> <span class="s1">&#39;proximal&#39;</span>
@@ -591,7 +605,7 @@ indeed 10 Hz activity by plotting the power spectral density (PSD).</p>
   plt.tight_layout()
 </pre></div>
 </div>
-<p>The next step is to add a simultaneous 10 Hz <a class="reference internal" href="../../glossary.html#term-distal"><span class="xref std std-term">distal</span></a> drive with a
+<p>The next step is to add a simultaneous 10 Hz <span class="xref std std-term">distal</span> drive with a
 lower within-burst spread of spike times (<code class="docutils literal notranslate"><span class="pre">burst_std</span></code>) compared with the
 proximal one. The different arrival times of spikes at opposite ends of
 the pyramidal cells will tend to produce bursts of 15-30 Hz power known

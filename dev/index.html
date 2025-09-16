@@ -58,7 +58,7 @@
         </script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Installation Guide" href="install.html" />
+    <link rel="next" title="Install" href="install.html" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -157,7 +157,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="install.html">
-    Install
+    Install (Textbook)
   </a>
 </li>
 
@@ -172,13 +172,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="api.html">
     API
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="glossary.html">
-    Glossary
   </a>
 </li>
 
@@ -203,6 +196,13 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
             <li class="nav-item dropdown">
                 <button class="btn dropdown-toggle nav-item" type="button"
                 data-bs-toggle="dropdown" aria-expanded="false"
@@ -212,15 +212,22 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
-    PyPI
+  <a class="nav-link dropdown-item nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
   </a>
 </li>
 
 
 <li class=" ">
-  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
-    HNN Frontpage
+  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI package
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://anaconda.org/jonescompneurolab/repo">
+    Conda packages
   </a>
 </li>
 
@@ -316,7 +323,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="install.html">
-    Install
+    Install (Textbook)
   </a>
 </li>
 
@@ -331,13 +338,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="api.html">
     API
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="glossary.html">
-    Glossary
   </a>
 </li>
 
@@ -364,15 +364,29 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
-    PyPI
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
-    HNN Frontpage
+  <a class="nav-link nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://anaconda.org/jonescompneurolab/repo">
+    Conda packages
   </a>
 </li>
 
@@ -456,90 +470,85 @@
 </section>
 <section id="about">
 <h1>About<a class="headerlink" href="#about" title="Link to this heading">#</a></h1>
-<p>This is a leaner and cleaner version of the code based off the <a class="reference external" href="https://github.com/jonescompneurolab/hnn">HNN
-repository</a>.</p>
-<p>The <strong>Human Neocortical Neurosolver (HNN)</strong> is an open-source neural modeling
-tool designed to help researchers/clinicians interpret human brain imaging
-data. Based off the original <a class="reference external" href="https://github.com/jonescompneurolab/hnn">HNN
-repository</a>, <strong>HNN-core</strong> provides a
-convenient way to run simulations of an anatomically and biophysically detailed
-dynamical system model of human thalamocortical brain circuits with only a few
-lines of code. Given its modular, object-oriented design, HNN-core makes it
-easy to generate and evaluate hypotheses on the mechanistic origin of signals
-measured with magnetoencephalography (MEG), electroencephalography (EEG), or
-intracranial electrocorticography (ECoG). A unique feature of the HNN model is
-that it accounts for the biophysics generating the primary electric currents
-underlying such data, so simulation results are directly comparable to source
-localized data (current dipoles in units of nano-Ampere-meters); this enables
-precise tuning of model parameters to match characteristics of recorded
-signals. Multimodal neurophysiology data such as local field potential (LFP),
-current-source density (CSD), and spiking dynamics can also be simulated
-simultaneously with current dipoles.</p>
-<p>While the HNN-core API is designed to be flexible and serve users with varying
-levels of coding expertise, the HNN-core GUI is designed to be useful to
-researchers with no formal computational neural modeling or coding experience.</p>
-<p>For more information visit <a class="reference external" href="https://hnn.brown.edu">https://hnn.brown.edu</a>. There, we describe the use
-of HNN in studying the circuit-level origin of some of the most commonly
-measured MEG/EEG and ECoG signals: event related potentials (ERPs) and low
-frequency rhythms (alpha/beta/gamma).</p>
-<p>Contributors are very welcome! Please read our <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/contributing.html">Contributing Guide</a> if you are interested.</p>
-<p>Please consider supporting HNN development efforts by voluntarily <a class="reference external" href="https://docs.google.com/forms/d/e/1FAIpQLSfN2F4IkGATs6cy1QBO78C6QJqvm9y14TqsCUsuR4Rrkmr1Mg/viewform">providing your demographic information here</a>! Note that any demographic information we collect is anonymized and aggregated for reporting on the grants that fund the continued development of HNN. All questions are voluntary.</p>
+<p>The <a class="reference external" href="https://hnn.brown.edu">Human Neocortical Neurosolver (HNN)</a> is an open-source
+neural modeling tool designed to help researchers/clinicians interpret human brain
+imaging data. This repository, called <strong>HNN-core</strong>, houses the source code for HNN.</p>
+<p>With only a few lines of code, HNN provides a convenient way to run simulations of an
+anatomically- and biophysically-detailed dynamical system model of human thalamocortical
+brain circuits. Given its modular, object-oriented design, HNN makes it easy to generate
+and evaluate hypotheses on the mechanistic origin of signals measured with
+magnetoencephalography (MEG), electroencephalography (EEG), or intracranial
+electrocorticography (ECoG). A unique feature of the HNN model is that it accounts for
+the biophysics generating the primary electric currents underlying such data. Simulation
+results are <em>directly</em> comparable to source-localized data (current dipoles in units of
+nano-Ampere-meters), enabling precise tuning of model parameters to match
+characteristics of recorded signals. Multimodal neurophysiology data such as local field
+potential (LFP), current-source density (CSD), and spiking dynamics can also be
+simulated simultaneously with current dipoles.</p>
+<p>You can view <a class="reference external" href="https://hnn.brown.edu">HNN’s frontpage here</a> for an overview of all that
+HNN can do. For how to use HNN, we provide scientific documentation, tutorials, and
+examples aplenty on our <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">HNN Textbook website</a>. There, we describe the use of HNN in
+studying the circuit-level origin of some of the most commonly measured MEG/EEG and ECoG
+signals: event related potentials (ERPs) and low-frequency rhythms (alpha/beta/gamma).</p>
+<p>The HNN API, written in Python and built on top of
+<a class="reference external" href="https://www.neuron.yale.edu/neuron/">NEURON</a>, is designed to be flexible and serve
+users with varying levels of coding expertise, while the <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/04_using_hnn_gui/gui_quickstart.html">HNN
+GUI</a>
+is designed to be useful to researchers with no formal computational neural modeling or
+coding experience.</p>
+<p>The terms HNN, HNN-core, and <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> are effectively equivalent, as they are all
+different names for the same codebase. Historically, HNN-core was developed based on
+the <a class="reference external" href="https://github.com/jonescompneurolab/hnn">original, deprecated HNN repository</a>, however that
+repository is <strong>no longer supported or developed</strong>. It is kept online only for the sake
+of scientific reproducibility.</p>
+<p>Please consider supporting HNN development efforts by voluntarily <a class="reference external" href="https://docs.google.com/forms/d/e/1FAIpQLSfN2F4IkGATs6cy1QBO78C6QJqvm9y14TqsCUsuR4Rrkmr1Mg/viewform">providing your
+demographic information
+here</a>!
+Note that any demographic information we collect is anonymized and aggregated for
+reporting on the grants that fund the continued development of HNN. All questions are
+voluntary.</p>
 </section>
 <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h1>
-<p>See <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/install.html">Installation Guide</a>. To install <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> with the minimum dependencies
-on Mac or Linux, simply do:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pip install hnn_core
+<p>You can try HNN <strong>in your browser for free, with no local installation required!</strong> At
+the top of our <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html">Installation Guide</a>, you can find links that describe how to run HNN
+online in the cloud, either using Google CoLab notebooks or using the <a class="reference external" href="https://www.nsgportal.org/">Neuroscience Gateway
+Portal</a>.</p>
+<p>To install HNN locally, see our <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html">Installation Guide</a> located at the <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">HNN Textbook
+website</a>. The easiest way to install <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> with the all its dependencies on Mac,
+Linux, or Windows (using “Windows Subsystem for Linux”), is to first install the
+<a class="reference external" href="https://www.anaconda.com/download/success">Anaconda Python Distribution</a> and then run
+the following commands:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">y</span> <span class="o">-</span><span class="n">q</span> <span class="o">-</span><span class="n">n</span> <span class="n">hnn</span><span class="o">-</span><span class="n">core</span><span class="o">-</span><span class="n">env</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.12</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">hnn</span><span class="o">-</span><span class="n">core</span><span class="o">-</span><span class="n">env</span>
+<span class="n">conda</span> <span class="n">install</span> <span class="n">hnn</span><span class="o">-</span><span class="n">core</span><span class="o">-</span><span class="nb">all</span> <span class="o">-</span><span class="n">c</span> <span class="n">jonescompneurolab</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> currently supports Python 3.9 through 3.13, inclusively.</p>
-<p>If you want to track the latest developments of <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>, you can
-install the current version of the code (nightly) with:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ pip install --upgrade https://api.github.com/repos/jonescompneurolab/hnn-core/zipball/master
-</pre></div>
-</div>
-<p>If you are interested in features like GUI, Optimization, or Parallel support, or are on Windows, then please see our <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/install.html">Installation Guide</a>.</p>
+<p>Our Anaconda packages currently only support Python 3.12. However, installing <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>
+through <code class="docutils literal notranslate"><span class="pre">pip</span></code> currently supports <strong>Python 3.9 through 3.13</strong>, inclusively. Please see
+our <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html">Installation Guide</a> for detailed instructions on the various ways you can install
+HNN.</p>
 </section>
-<section id="documentation-and-examples">
-<h1>Documentation and examples<a class="headerlink" href="#documentation-and-examples" title="Link to this heading">#</a></h1>
-<p>Once you have installed <code class="docutils literal notranslate"><span class="pre">hnn_core</span></code> and the dependencies for the features you
-want, we recommend downloading and executing the <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/auto_examples/index.html">example
-scripts</a>
-provided on the <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/">documentation
-pages</a> (as well as in the
-<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core">GitHub repository</a>).</p>
-<p>Note that <code class="docutils literal notranslate"><span class="pre">python</span></code> plots are by default non-interactive (blocking): each
-plot must thus be closed before the code execution continues. We
-recommend using and ‘interactive’ python interpreter such as
-<code class="docutils literal notranslate"><span class="pre">ipython</span></code>:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>$ ipython --matplotlib
-</pre></div>
-</div>
-<p>and executing the scripts using the <code class="docutils literal notranslate"><span class="pre">%run</span></code>-magic:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>%run plot_simulate_evoked.py
-</pre></div>
-</div>
-<p>When executed in this manner, the scripts will execute entirely, after
-which all plots will be shown. For an even more interactive experience,
-in which you execute code and interrogate plots in sequential blocks, we
-recommend editors such as <a class="reference external" href="https://code.visualstudio.com">VS Code</a> and
-<a class="reference external" href="https://docs.spyder-ide.org/current/index.html">Spyder</a>.</p>
+<section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading">#</a></h1>
+<p>Once you have installed <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> and the dependencies for the features you want, you
+can find tutorials, examples, and scientific documentation at our <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">HNN Textbook
+website</a>.</p>
 </section>
-<section id="bug-reports">
-<h1>Bug reports<a class="headerlink" href="#bug-reports" title="Link to this heading">#</a></h1>
-<p>Use the <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues">GitHub Issues
-tracker</a> to report
-bugs. For user questions and scientific discussions, please see our
-<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/discussions">GitHub Discussions
-page</a>.</p>
+<section id="problems">
+<h1>Problems?<a class="headerlink" href="#problems" title="Link to this heading">#</a></h1>
+<p>You can use the <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues">GitHub Issues
+tracker</a> to report bugs. For user
+questions, installation help, and scientific discussions, please see our <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/discussions">GitHub
+Discussions page</a>.</p>
 </section>
 <section id="interested-in-contributing">
 <h1>Interested in Contributing?<a class="headerlink" href="#interested-in-contributing" title="Link to this heading">#</a></h1>
-<p>Please read our <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/contributing.html">Contributing Guide</a> and make sure to abide by our <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/blob/master/CODE_OF_CONDUCT.md">Code of Conduct</a>.</p>
-</section>
-<section id="governance-structure">
-<h1>Governance Structure<a class="headerlink" href="#governance-structure" title="Link to this heading">#</a></h1>
-<p>Our <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/governance.html">governance structure can be found here</a>.</p>
+<p>Contributors are always welcome! Please read our <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/contributing.html">Contributing Guide</a> and make sure to
+abide by our <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/blob/master/CODE_OF_CONDUCT.md">Code of
+Conduct</a>. Our
+<a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/governance.html">governance structure can be found
+here</a>.</p>
 </section>
 <section id="citing">
 <h1>Citing<a class="headerlink" href="#citing" title="Link to this heading">#</a></h1>
@@ -567,7 +576,7 @@ Software</em>, 8(92), 5848, <a class="reference external" href="https://doi.org/
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Installation Guide</p>
+        <p class="prev-next-title">Install</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -593,10 +602,9 @@ Software</em>, 8(92), 5848, <a class="reference external" href="https://doi.org/
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">hnn-core</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#about">About</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation-and-examples">Documentation and examples</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#bug-reports">Bug reports</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#usage">Usage</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#problems">Problems?</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#interested-in-contributing">Interested in Contributing?</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#governance-structure">Governance Structure</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#citing">Citing</a></li>
 </ul>
 

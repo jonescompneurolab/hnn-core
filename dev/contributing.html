@@ -157,7 +157,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="install.html">
-    Install
+    Install (Textbook)
   </a>
 </li>
 
@@ -172,13 +172,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="api.html">
     API
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="glossary.html">
-    Glossary
   </a>
 </li>
 
@@ -203,6 +196,13 @@
   </a>
 </li>
 
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
             <li class="nav-item dropdown">
                 <button class="btn dropdown-toggle nav-item" type="button"
                 data-bs-toggle="dropdown" aria-expanded="false"
@@ -212,15 +212,22 @@
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
 <li class=" ">
-  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
-    PyPI
+  <a class="nav-link dropdown-item nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
   </a>
 </li>
 
 
 <li class=" ">
-  <a class="nav-link dropdown-item nav-external" href="https://hnn.brown.edu/">
-    HNN Frontpage
+  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI package
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://anaconda.org/jonescompneurolab/repo">
+    Conda packages
   </a>
 </li>
 
@@ -314,7 +321,7 @@
     
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="install.html">
-    Install
+    Install (Textbook)
   </a>
 </li>
 
@@ -329,13 +336,6 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="api.html">
     API
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="glossary.html">
-    Glossary
   </a>
 </li>
 
@@ -362,15 +362,29 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
-    PyPI
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
   </a>
 </li>
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
-    HNN Frontpage
+  <a class="nav-link nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://anaconda.org/jonescompneurolab/repo">
+    Conda packages
   </a>
 </li>
 
@@ -462,53 +476,109 @@
                   
   <section id="contributing-guide">
 <span id="contributing"></span><h1>Contributing Guide<a class="headerlink" href="#contributing-guide" title="Link to this heading">#</a></h1>
-<p>Please read the contribution guide <strong>until the end</strong> before beginning
-contributions.</p>
-<p>Contributions are welcome in the form of pull requests.</p>
-<p>Once the implementation of a piece of functionality is considered to be
-bug free and properly documented (both API docs and an example script),
-it can be incorporated into the master branch.</p>
-<p>To help developing <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>, you will need a few adjustments to your
-installation as shown below.</p>
-<p>If your contributions will make use of parallel backends for using more
-than one core, please see the additional installation steps for either Joblib or MPI in our <a class="reference internal" href="install.html"><span class="doc">Installation Guide</span></a>.</p>
-<section id="setting-up-your-local-development-environment">
-<h2>Setting up your local development environment<a class="headerlink" href="#setting-up-your-local-development-environment" title="Link to this heading">#</a></h2>
-<section id="configuring-git">
-<h3>Configuring git<a class="headerlink" href="#configuring-git" title="Link to this heading">#</a></h3>
-<p>Instructions for how to configure git can be found on the git book
-<a class="reference external" href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration">configuration</a>
-page.</p>
-</section>
-</section>
-<section id="making-your-first-pull-request">
-<h2>Making your first pull request<a class="headerlink" href="#making-your-first-pull-request" title="Link to this heading">#</a></h2>
-<p>Changes to hnn-core are typically made by “forking” the hnn-core
-repository, making changes to your fork (usually by “cloning” it to
-your personal computer, making the changes locally, and then “pushing”
-the local changes up to your fork on GitHub), and finally creating a
-“pull request” to incorporate your changes back into the shared
-“upstream” version of the codebase.</p>
-<p>In general you’ll be working with three different copies of the
-hnn-core codebase: the official remote copy at
-<a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core">jonescompneurolab/hnn-core</a> (usually called
-<code class="docutils literal notranslate"><span class="pre">upstream</span></code>), your remote fork of the upstream repository (similar URL,
-but with your username in place of <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>, and usually called
-<code class="docutils literal notranslate"><span class="pre">origin</span></code>), and the local copy of the codebase on your computer. The
-typical contribution process is to</p>
+<p>Please read the contribution guide <strong>until the end</strong> before beginning contributions.</p>
+<p>Contributions are welcome in the form of Pull Requests. You must abide by our <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/blob/master/CODE_OF_CONDUCT.md">Code of
+Conduct, found
+here</a>. Our
+<a class="reference internal" href="governance.html"><span class="doc">Governance Model can be found here</span></a>.</p>
+<p>Once the implementation of a piece of functionality is considered to be bug free and
+properly documented (both API docs and an example script), it can be incorporated into
+the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch, which is where our releases come from.</p>
+<p>To contribute to <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> development, you need a special kind of installation, see the
+<a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html#local-installation">“<code class="docutils literal notranslate"><span class="pre">pip</span></code> Source Installation” section of our Installation Guide</a> on our <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">Textbook website</a>.</p>
+<section id="how-to-contribute-code">
+<h2>How to contribute code<a class="headerlink" href="#how-to-contribute-code" title="Link to this heading">#</a></h2>
+<p>We use the <a class="reference external" href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/getting-started/about-collaborative-development-models">“fork and pull model” on
+Github</a>
+to incorporate changes onto our <code class="docutils literal notranslate"><span class="pre">master</span></code> branch. We want commits in <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>
+to follow a linear history, therefore we use a “rebase” workflow instead of “merge
+commits” to incorporate work. See <a class="reference external" href="https://www.atlassian.com/git/tutorials/merging-vs-rebasing">this
+article</a> for more details
+on the differences between these workflows. Importantly, we also usually “squash and
+rebase” so that each Pull Request is tied to a single commit immediately before it is merged.</p>
+<p>If these terms are unfamiliar, or you are new to open-source development using
+<a class="reference external" href="https://git-scm.com/"><code class="docutils literal notranslate"><span class="pre">git</span></code></a> and <a class="reference external" href="https://github.com">Github</a>, don’t worry. A complete guide to using
+both <a class="reference external" href="https://git-scm.com/">the <code class="docutils literal notranslate"><span class="pre">git</span></code> program</a> and <a class="reference external" href="https://github.com">the Github
+website</a> is outside the scope of our documentation, but we strive to
+provide you with the minimum commands necessary to get everything working.</p>
+<p>Fortunately, there is a large amount of helpful guidance online for learning how to use
+<code class="docutils literal notranslate"><span class="pre">git</span></code> and, through it, Github:</p>
+<ul class="simple">
+<li><p><a class="github reference external" href="https://github.com/git-guides">git-guides</a> (recommended for beginners)</p></li>
+<li><p><a class="reference external" href="https://docs.github.com/en/get-started">https://docs.github.com/en/get-started</a> (recommended for beginners)</p></li>
+<li><p><a class="reference external" href="https://swcarpentry.github.io/git-novice/">https://swcarpentry.github.io/git-novice/</a></p></li>
+<li><p><a class="reference external" href="https://git-scm.com/doc/ext">https://git-scm.com/doc/ext</a> (often more technical, but also more informative)</p></li>
+</ul>
+<p>Finally, whenever you make a Pull Request, we recommend that you add mention of your
+contribution to <code class="docutils literal notranslate"><span class="pre">doc/whats_new.md</span></code> so that you can can publicly receive credit.</p>
+<section id="making-your-first-pull-request-including-installing-for-development">
+<h3>Making your first Pull Request, including <em>installing for development</em><a class="headerlink" href="#making-your-first-pull-request-including-installing-for-development" title="Link to this heading">#</a></h3>
 <ol class="arabic">
-<li><p>Make a fork of the
-<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core">hnn-core</a> repository
-to your own account on github. Look for the Fork button in the top
-right corner</p></li>
-<li><p>On the terminal of your local computer clone the fork:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/&lt;</span><span class="n">username</span><span class="o">&gt;/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span>
+<li><p>Go to <a class="github reference external" href="https://github.com">github</a> and create an account. For the sake of an example, let’s
+pretend your new account is <a class="github reference external" href="https://github.com/asoplata">asoplata</a> and your username is
+<code class="docutils literal notranslate"><span class="pre">asoplata</span></code>. (For all subsequent steps, you should replace where it says <code class="docutils literal notranslate"><span class="pre">asoplata</span></code>
+with your username.)</p></li>
+<li><p>On the Github webpage for the <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core"><code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>
+repository</a>, create a new Fork. Look
+for the Fork button in the top right corner. Click that, and make a new Fork under
+your new Github account.</p></li>
+<li><p>On your computer, <a class="reference external" href="https://docs.github.com/en/get-started/git-basics/set-up-git">setup <code class="docutils literal notranslate"><span class="pre">git</span></code> using the instructions
+here</a>. Note that this
+involves two steps:</p>
+<p>A. Install the <code class="docutils literal notranslate"><span class="pre">git</span></code> program <a class="reference external" href="https://docs.github.com/en/get-started/git-basics/set-up-git#setting-up-git">using these
+steps</a>.</p>
+<p>B. Configure <code class="docutils literal notranslate"><span class="pre">git</span></code> to know who you are and to <strong>authenticate</strong> with Github <a class="reference external" href="https://docs.github.com/en/get-started/git-basics/set-up-git#authenticating-with-github-from-git">using
+these
+steps</a>.</p>
+</li>
+<li><p>On your computer, open a “terminal” or “command line” program:</p>
+<ul class="simple">
+<li><p>On Linux, you probably have a program named “Terminal Emulator” or similar.</p></li>
+<li><p>On MacOS, you can use the program called Terminal.</p></li>
+<li><p>On Windows (native), you can use the program called “Git Bash”, which was
+installed when you installed <code class="docutils literal notranslate"><span class="pre">git</span></code> above.</p></li>
+<li><p>On Windows (Windows Subsystem for Linux), you can use the WSL app that you
+installed, probably called “Ubuntu”.</p></li>
+</ul>
+</li>
+<li><p>“Clone” your new fork. You can do this using the following command, but replacing
+<code class="docutils literal notranslate"><span class="pre">asoplata</span></code> with your username:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">asoplata</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span>
 </pre></div>
 </div>
 </li>
-<li><p>On the terminal of your local computer set up the remotes:</p>
+<li><p>You have just downloaded (“cloned”) the code of your fork (the “repository” or
+“repo”) into a new directory. Enter that directory using the following command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">hnn</span><span class="o">-</span><span class="n">core</span>
-<span class="n">git</span> <span class="n">remote</span> <span class="n">add</span> <span class="n">upstream</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">jonescompneurolab</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span>
+</pre></div>
+</div>
+</li>
+<li><p>Next, let’s look at our
+<a class="reference external" href="https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes">“remotes”</a>. You can
+loosely think of remotes as “my backup copy of the versions of the code stored on
+Github’s servers”. To view your remotes, run the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">remote</span> <span class="o">-</span><span class="n">v</span>
+</pre></div>
+</div>
+<p>You should see:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">origin</span>      <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">asoplata</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">fetch</span><span class="p">)</span>
+<span class="n">origin</span>      <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">asoplata</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">push</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Your <code class="docutils literal notranslate"><span class="pre">origin</span></code> remote is essentially your local “cloud backup” of your fork sitting
+on Github’s servers. This is the same remote that you used to “clone” your fork repo
+from. This is the remote that you will primarily “<code class="docutils literal notranslate"><span class="pre">push</span></code>” (a.k.a. upload)
+your code “<code class="docutils literal notranslate"><span class="pre">commits</span></code>” (a.k.a. changes or versions) to.</p>
+</li>
+<li><p>Add a new “remote” that points to the version of the code that you created your fork
+<em>from</em>. This remote (and the code version) is commonly called the “<code class="docutils literal notranslate"><span class="pre">upstream</span></code>”. This is
+the remote you will primarily be using when you want to “<code class="docutils literal notranslate"><span class="pre">fetch</span></code>” (a.k.a. download) new
+commits that other people have made to the “<code class="docutils literal notranslate"><span class="pre">upstream</span></code>” (a.k.a. original) version of the
+code. To be explicit, this is so you can manage changes that other people make to the
+“upstream” code at <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core">jonescompneurolab/hnn-core</a>, including
+eventually integrating those changes to both your local git repo and your fork at
+<a class="github reference external" href="https://github.com/asoplata/hnn-core">asoplata/hnn-core</a>. Run the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">remote</span> <span class="n">add</span> <span class="n">upstream</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">jonescompneurolab</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span>
 </pre></div>
 </div>
 </li>
@@ -516,87 +586,543 @@ right corner</p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">remote</span> <span class="o">-</span><span class="n">v</span>
 </pre></div>
 </div>
-<p>You should see:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">origin</span>      <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/&lt;</span><span class="n">username</span><span class="o">&gt;/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">fetch</span><span class="p">)</span>
-<span class="n">origin</span>      <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/&lt;</span><span class="n">username</span><span class="o">&gt;/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">push</span><span class="p">)</span>
+<p>You should now see:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">origin</span>      <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">asoplata</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">fetch</span><span class="p">)</span>
+<span class="n">origin</span>      <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">asoplata</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">push</span><span class="p">)</span>
 <span class="n">upstream</span>    <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">jonescompneurolab</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">fetch</span><span class="p">)</span>
 <span class="n">upstream</span>    <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">jonescompneurolab</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">push</span><span class="p">)</span>
 </pre></div>
 </div>
 </li>
-<li><p>To start a new feature branch, we will copy the existing <code class="docutils literal notranslate"><span class="pre">master</span></code>
-branch from the <code class="docutils literal notranslate"><span class="pre">upstream</span></code> remote and give it a specific name:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">fetch</span> <span class="n">upstream</span> <span class="n">master</span><span class="p">:</span><span class="n">cool_feature</span>
-<span class="n">git</span> <span class="n">checkout</span> <span class="n">cool_feature</span>
+<li><p>You should <strong>never</strong> write code directly to the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch (this is important
+for the <a class="reference internal" href="#keeping-your-code-up-to-date-by-rebasing"><span class="xref myst">next section on
+Rebasing</span></a>). Instead, all of your new work
+should be organized on new, separate “feature branches”, which themselves are built
+off of the <code class="docutils literal notranslate"><span class="pre">master</span></code> version of the code. To start a new feature branch, we will copy
+the existing <code class="docutils literal notranslate"><span class="pre">master</span></code> branch from the <code class="docutils literal notranslate"><span class="pre">upstream</span></code> remote and give it a specific
+name. <a class="reference external" href="https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging">See here for a guide on working with different
+branches</a>. You
+can use the following commands to do this, which will create and “<code class="docutils literal notranslate"><span class="pre">checkout</span></code>” (a.k.a.
+switch to) a feature branch called <code class="docutils literal notranslate"><span class="pre">cool-feature</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">fetch</span> <span class="n">upstream</span> <span class="n">master</span><span class="p">:</span><span class="n">cool</span><span class="o">-</span><span class="n">feature</span>
+<span class="n">git</span> <span class="n">checkout</span> <span class="n">cool</span><span class="o">-</span><span class="n">feature</span>
 </pre></div>
 </div>
 </li>
-<li><p>If you have not already done so, install the editable version of hnn-core <a class="reference internal" href="#installing-editable-hnn-core"><span class="xref myst">using the
-instructions below</span></a>, so that you can execute and test
-your changes as you make them.</p></li>
-<li><p>Make your changes relevant to the pull request.</p></li>
-<li><p>To make a commit, you first have to add the files you have changed
-to the staging area:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">add</span> <span class="o">-</span><span class="n">u</span>
-</pre></div>
-</div>
-<p>ensure they have been added correctly:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">status</span>
-</pre></div>
-</div>
-<p>make a commit:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">commit</span> <span class="o">-</span><span class="n">m</span> <span class="s2">&quot;your commit message&quot;</span>
-</pre></div>
-</div>
-<p>and finally check that the commit has been added:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">log</span>
-</pre></div>
-</div>
-<p>Note: see the <a class="reference external" href="https://numpy.org/doc/stable/dev/development_workflow.html#writing-the-commit-message">numpy contributing
+<li><p>If you have not already done so, now is the time to install HNN. However, <strong>you need
+to install using the <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html#local-installation">“<code class="docutils literal notranslate"><span class="pre">pip</span></code> Source Installation” section of our Installation
+Guide</a>. You should read the instructions carefully</strong>!</p>
+<ul class="simple">
+<li><p>Note: You do <strong>not</strong> need to run the <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span></code> command listed in the Install
+guide, since you already did this above in step 5.</p></li>
+<li><p>The fact that you included the <code class="docutils literal notranslate"><span class="pre">--editable</span></code> flag means that your fork’s code has
+been installed to your Python environment in a live, “editable” state. What this
+means that if you make a code change to a file, save that file, then start a new
+Python process, your code changes will <em>immediately</em> take effect. This is true even
+if you switch between <code class="docutils literal notranslate"><span class="pre">git</span></code> branches or commits. In other words, you do <em>not</em> need
+to reinstall using <code class="docutils literal notranslate"><span class="pre">pip</span></code> when you change versions of your code. The only exceptions
+to this are if you’re changing the NEURON MOD files, our package dependencies, our
+package’s “entry points”, or if your installation had an error.</p></li>
+<li><p>It is recommended, but not required, that you follow the additional instructions
+required for MPI installation, if you are on a supported platform (i.e. MacOS,
+Linux, and Windows using “Windows Subsystem for Linux”).</p></li>
+</ul>
+</li>
+<li><p>Make sure you test that <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> has been installed correctly by following the
+section “Testing Your Installation” at the bottom of our <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html#local-installation">Installation Guide</a>. If
+these commands fail, then stop and reach out to us for installation help at <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/discussions">our
+Github Discussions page</a>. Installing HNN for development is the most complex
+install, but we should be able to help you solve your install issues.</p></li>
+<li><p>Once your installation has been successful, it’s time to start coding! Make your
+code changes and <a class="reference external" href="https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository">“add”
+them</a>
+(for example, using <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">add</span> <span class="pre">-u</span></code>), then <a class="reference external" href="https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository">create
+“commits”</a>
+on your branch (for example, using <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">-m</span> <span class="pre">&quot;your</span> <span class="pre">commit</span> <span class="pre">message&quot;</span></code>). Helpful
+tips:</p>
+<ul class="simple">
+<li><p>If you are very new to using git, then before you run any git commands that you
+don’t understand, it is recommended to make a backup copy of the directory
+containing your code somewhere else on your computer, just in case you mess
+something up. Unfortunately, it can be easy to get your git repository into a
+complex state (e.g. “merge conflicts”) that makes it difficult to undo.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">git</span></code> is extremely powerful and has <em>many</em> tools to make your life easier. In
+particular, <a class="reference external" href="https://git-scm.com/docs/git-stash"><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">stash</span></code></a>, <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">status</span></code> and
+<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">log</span></code> are your friends!</p></li>
+<li><p>Please try to follow the <a class="reference external" href="https://numpy.org/doc/stable/dev/development_workflow.html#writing-the-commit-message">Numpy contributing
 guide</a>
-for tips on informative commit messages.</p>
+for commit messages, as this <strong>greatly</strong> helps us understand your changes. This
+includes things like beginning each commit with an acronym to indicate what kind
+of work it involves (see the link for a list). This also includes trying to keep
+the “title” (a.k.a. first line) of the commit message under 51 characters, and the
+“body” (subsequent lines) of the commit message under 72 characters.</p></li>
+<li><p>In general, “more frequent commits with fewer code changes inside each commit” is preferable
+to “fewer commits with more code changes in each commit.”</p></li>
+<li><p>You can either use the command line to do these <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">add</span></code> and <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span></code>
+commands, or you can use plugins and features available in your code editor like
+<a class="reference external" href="https://code.visualstudio.com/download">VS Code</a> that will do the same
+thing. Both ways are good. Code editors often have more visualization to show you
+changes, but it can also be helpful to use the command line to know <strong>exactly</strong>
+which commands do which things.</p></li>
+</ul>
 </li>
-<li><p>Now push the feature branch to your fork:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">push</span> <span class="n">origin</span> <span class="n">cool_feature</span>
+<li><p>Test your code: go to the “top-level” directory of your repository (i.e. <code class="docutils literal notranslate"><span class="pre">cd</span></code> into
+the folder that has the file <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> in it), then run the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">test</span>
+</pre></div>
+</div>
+<p>This will perform all the checks and run all the tests described below in <a class="reference internal" href="#quality-control"><span class="xref myst">Quality
+control</span></a>. If there are any errors or failures, try to fix them
+before the next step. You will likely need to run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">format-overwrite</span></code> at some
+point; see <a class="reference internal" href="#formatting"><span class="xref myst">Formatting</span></a> for more details. If you have tried your best
+but you don’t know how to resolve your errors, that is fine, you can proceed to the
+next step.</p>
+</li>
+<li><p>Once your feature branch is ready for other developers to look at it, you need to
+“push” (a.k.a. upload) your feature branch to Github’s copy of your fork (i.e. your
+<code class="docutils literal notranslate"><span class="pre">origin</span></code> remote):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">push</span> <span class="n">origin</span> <span class="n">cool</span><span class="o">-</span><span class="n">feature</span>
 </pre></div>
 </div>
 </li>
-<li><p>Go to <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core/compare">jonescompneurolab/hnn-core</a> to
-open the pull request by selecting your feature branch. You should
-also see this link on the terminal when you make the push.</p></li>
-<li><p>After your pull request is reviewed, repeat steps 6-8 to update the
-pull request.</p></li>
-<li><p>Once the pull request is ready to be merged, add the prefix [MRG]
-to the title.</p></li>
+<li><p>Now, if you go to the webpage for your fork
+(e.g. <a class="github reference external" href="https://github.com/asoplata/hnn-core">asoplata/hnn-core</a> ) and click <code class="docutils literal notranslate"><span class="pre">master</span></code> on the left, you
+should see that your new branch is now viewable. Github is aware of your branch, but
+there is no Pull Request yet.</p></li>
+<li><p>Let’s finally create the Pull Request: go to
+<a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core/compare">jonescompneurolab/hnn-core</a>, then click “compare across
+forks”. Don’t change the <code class="docutils literal notranslate"><span class="pre">base</span> <span class="pre">repository</span></code> dropdown button (it should say
+<code class="docutils literal notranslate"><span class="pre">jonescompneurolab/hnn-core</span></code>) and don’t change <code class="docutils literal notranslate"><span class="pre">base</span></code> (it should say
+<code class="docutils literal notranslate"><span class="pre">master</span></code>). Instead, click on the <code class="docutils literal notranslate"><span class="pre">head</span> <span class="pre">repository</span></code> dropdown button and select your
+fork. Then, click on the <code class="docutils literal notranslate"><span class="pre">compare</span></code> dropdown and select your new feature
+branch. Finally, click the green <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">Pull</span> <span class="pre">Request</span></code> to make it!</p>
+<ul class="simple">
+<li><p>If your feature branch is “complete” and you are happy with it, add <code class="docutils literal notranslate"><span class="pre">[MRG]</span></code> to the
+beginning of your Pull Request’s title to indicate that it is ready for merge into
+<code class="docutils literal notranslate"><span class="pre">master</span></code>.</p></li>
+<li><p>If your feature branch is incomplete, add <code class="docutils literal notranslate"><span class="pre">[WIP]</span></code> to the beginning of your Pull
+Request’s title to indicate that it is a Work In Progress.</p></li>
+<li><p>There are also other, more convenient ways to create the Pull Request, but it must
+always be done on the website. For example, if you have pushed a feature branch
+recently, if you navigate to the webpage for your fork, there will often be a
+highlighted box at the top that says something similar to “Compare &amp; Pull Request”
+which you can click. When you push, your terminal may also print a link that you
+can click on to quickly bring you to the Pull Request page.</p></li>
+</ul>
+</li>
+<li><p>After your Pull Request is reviewed, repeat steps 13, 14, and 15 based on changes
+that the developers request. The webpage for the Pull Request is automatically
+updated whenever you push new commits, so you only need to make new commits and then
+<code class="docutils literal notranslate"><span class="pre">push</span></code> them for everyone else to see the updates.</p></li>
+<li><p>Once your Pull Request is accepted and merged, congratulations! However, your work
+is not yet over…keep reading below…</p></li>
 </ol>
-<p>See the <a class="reference external" href="https://git-scm.com/book/en/v2">git book</a> for a more general
-guide on using git.</p>
 </section>
-<section id="installing-editable-hnn-core">
-<h2>Installing editable hnn-core<a class="headerlink" href="#installing-editable-hnn-core" title="Link to this heading">#</a></h2>
-<p>For making changes to hnn-core, you will need to install an editable
-version of hnn-core. For that you need to have the git cloned <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>
-repository and use pip with the editable (<code class="docutils literal notranslate"><span class="pre">-e</span></code>) flag:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">jonescompneurolab</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span>
-<span class="n">cd</span> <span class="n">hnn</span><span class="o">-</span><span class="n">core</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="s1">&#39;.[dev]&#39;</span>
-<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build_mod</span>
+<section id="keeping-your-code-up-to-date-by-rebasing">
+<h3>Keeping your code up-to-date by rebasing<a class="headerlink" href="#keeping-your-code-up-to-date-by-rebasing" title="Link to this heading">#</a></h3>
+<p>Imagine the following scenario: you just successfully got your Pull Request for
+<code class="docutils literal notranslate"><span class="pre">cool-feature</span></code> merged into <code class="docutils literal notranslate"><span class="pre">master</span></code>, and you start work on a second feature called
+<code class="docutils literal notranslate"><span class="pre">cool-feature-2</span></code>. However, while you’re working on <code class="docutils literal notranslate"><span class="pre">cool-feature-2</span></code>, someone <em>else</em> got
+their own Pull Request, called <code class="docutils literal notranslate"><span class="pre">other-persons-feature</span></code>, also merged into <code class="docutils literal notranslate"><span class="pre">master</span></code>. Now,
+from your fork’s perspective, both <code class="docutils literal notranslate"><span class="pre">master</span></code> and <code class="docutils literal notranslate"><span class="pre">cool-feature-2</span></code> are “out of date” with
+respect to the <code class="docutils literal notranslate"><span class="pre">upstream</span></code> remote (a.k.a. the <code class="docutils literal notranslate"><span class="pre">master</span></code> version of the code at
+<a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core">jonescompneurolab/hnn-core</a> ). What do you do? Use the magic of <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">rebase</span></code> to rewrite history! Great Scott!</p>
+<p>Usually,
+<a class="reference external" href="https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging">“merging”</a>
+means making <em>new</em> commits for the purpose of making two different branches compatible
+with each other. In contrast,
+<a class="reference external" href="https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History">“rebasing”</a> can be thought
+of as <em>editing previous, existing commits</em> in order to make two different branches
+compatible. We do <strong>not</strong> recommend using merging or “merge commits” to bring changes
+from <code class="docutils literal notranslate"><span class="pre">master</span></code> into your feature branch, since using “merge commits” makes the git
+history <em>significantly</em> more difficult to manage and rebase for us! (Note that “<em>merge
+conflicts</em>” and “<em>merge commits</em>” are very different things.)</p>
+<p>Rebasing can be a <strong>destructive</strong> operation, meaning that if you make a mistake, you can
+<strong>accidentally erase code that you didn’t intend to!</strong> It is therefore important to make
+backups of your repository before you start doing it if you are unsure, and it is
+important to understand what’s going on. However, rebasing is extremely powerful and
+makes for much cleaner commit histories.</p>
+<p>Here are some useful guides that discuss “rebasing”, including how it is different than
+“merging” code:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.atlassian.com/git/tutorials/merging-vs-rebasing">https://www.atlassian.com/git/tutorials/merging-vs-rebasing</a></p></li>
+<li><p><a class="reference external" href="https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History">https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History</a> (strongly recommended
+reading for understanding rebasing)</p></li>
+<li><p><a class="reference external" href="https://docs.github.com/en/get-started/using-git/about-git-rebase">https://docs.github.com/en/get-started/using-git/about-git-rebase</a></p></li>
+<li><p><a class="reference external" href="https://docs.github.com/en/get-started/using-git/resolving-merge-conflicts-after-a-git-rebase">https://docs.github.com/en/get-started/using-git/resolving-merge-conflicts-after-a-git-rebase</a></p></li>
+</ul>
+<p>To rebase, we’re going to download the latest commits from <code class="docutils literal notranslate"><span class="pre">upstream</span></code> remote’s <code class="docutils literal notranslate"><span class="pre">master</span></code>
+branch (also called <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code>). Then we’re going to rebase both our local and
+<code class="docutils literal notranslate"><span class="pre">origin</span></code> remote’s <code class="docutils literal notranslate"><span class="pre">master</span></code> branch (also called <code class="docutils literal notranslate"><span class="pre">origin/master</span></code>) onto
+<code class="docutils literal notranslate"><span class="pre">upstream/master</span></code>. Then, finally, we’re going to rebase our local <code class="docutils literal notranslate"><span class="pre">cool-feature-2</span></code>
+branch onto our newly-updated <code class="docutils literal notranslate"><span class="pre">master</span></code> branch, bringing everything up to date.</p>
+<ol class="arabic">
+<li><p>First, make a <strong>backup copy</strong> of your code repository somewhere else on your
+computer. Until you are very confident with rebasing and altering <code class="docutils literal notranslate"><span class="pre">git</span></code> history, you
+should always do this! If you get your <code class="docutils literal notranslate"><span class="pre">git</span></code> repository into a very confusing state
+and want to start over, you can delete the repository and copy over from your backup
+copy (this only helps with your local files, however, and not the state of your
+<code class="docutils literal notranslate"><span class="pre">origin</span></code> remote). That said, we’ll see later you <strong>can</strong> abort a rebase while it’s in
+progress.</p></li>
+<li><p>As a reminder, let’s view our <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">remotes</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">remote</span> <span class="o">-</span><span class="n">v</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">'.[dev]'</span></code> step will install all extra packages used
-by developers to access all features and to perform testing and building
-of documentation.</p>
-<p>The last step builds <code class="docutils literal notranslate"><span class="pre">mod</span></code> files which specifies the dynamics of
-specific cellular mechanisms. These are converted to C, and hence
-require a compilation step. In the normal course of development, you
-will not have to edit these files. However, if you do have to update
-them, they will need to be rebuilt using the command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build_mod</span>
+<p>You should see:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">origin</span>      <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">asoplata</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">fetch</span><span class="p">)</span>
+<span class="n">origin</span>      <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">asoplata</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">push</span><span class="p">)</span>
+<span class="n">upstream</span>    <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">jonescompneurolab</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">fetch</span><span class="p">)</span>
+<span class="n">upstream</span>    <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">jonescompneurolab</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span> <span class="p">(</span><span class="n">push</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>We highly encourage contributors to also follow the <code class="docutils literal notranslate"><span class="pre">pip</span></code> MPI portion of the
-<a class="reference internal" href="install.html"><span class="doc">Installation Guide</span></a> so that
-they can run the entire test suite locally on their computer.</p>
+<p>In the current situation, the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch of our <code class="docutils literal notranslate"><span class="pre">upstream</span></code> remote has new work
+on it that we want to incorporate. This new work is not present on our local
+<code class="docutils literal notranslate"><span class="pre">master</span></code> branch, the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch of our <code class="docutils literal notranslate"><span class="pre">origin</span></code> remote (i.e. Github’s copy of
+our fork), nor on our local <code class="docutils literal notranslate"><span class="pre">cool-feature-2</span></code> branch.</p>
+</li>
+<li><p>We need to download those new commits from <code class="docutils literal notranslate"><span class="pre">upstream</span></code>. We can do this using the
+following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">fetch</span> <span class="n">upstream</span> <span class="n">master</span>
+</pre></div>
+</div>
+<p>This downloads the latest commits to <code class="docutils literal notranslate"><span class="pre">upstream</span></code>’s <code class="docutils literal notranslate"><span class="pre">master</span></code> branch (a.k.a.
+<code class="docutils literal notranslate"><span class="pre">upstream/master</span></code>), but <strong>does not change</strong> any other branches, including our copy
+of <code class="docutils literal notranslate"><span class="pre">origin</span></code>’s <code class="docutils literal notranslate"><span class="pre">master</span></code> branch (a.k.a. <code class="docutils literal notranslate"><span class="pre">origin/master</span></code>) or our local
+<code class="docutils literal notranslate"><span class="pre">cool-feature-2</span></code>. This only downloads the commits “in the background”, so to speak.</p>
+</li>
+<li><p>Let’s checkout our local <code class="docutils literal notranslate"><span class="pre">master</span></code> branch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">checkout</span> <span class="n">master</span>
+</pre></div>
+</div>
+</li>
+<li><p>Now that we’re on our local <code class="docutils literal notranslate"><span class="pre">master</span></code> branch, we need to rebase this branch “onto”
+<code class="docutils literal notranslate"><span class="pre">upstream</span></code>’s <code class="docutils literal notranslate"><span class="pre">master</span></code> branch (also called <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code>). We can do this with the
+following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">rebase</span> <span class="n">upstream</span><span class="o">/</span><span class="n">master</span>
+</pre></div>
+</div>
+<p>This should work automatically, without any other changes needed. If there are
+problems, then see <a class="reference internal" href="#troubleshooting-git-problems"><span class="xref myst">Troubleshooting <code class="docutils literal notranslate"><span class="pre">git</span></code> problems</span></a>
+below. You have probably added additional, local commits onto your local <code class="docutils literal notranslate"><span class="pre">master</span></code>
+branch, which you shouldn’t do in the future.</p>
+</li>
+<li><p>Now that our local <code class="docutils literal notranslate"><span class="pre">master</span></code> is fully synchronized with the latest <code class="docutils literal notranslate"><span class="pre">upstream</span></code> commits,
+we also need to update <code class="docutils literal notranslate"><span class="pre">origin</span></code>’s <code class="docutils literal notranslate"><span class="pre">master</span></code> branch on Github’s servers. This is easily
+doable with a typical push command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">push</span> <span class="n">origin</span> <span class="n">master</span>
+</pre></div>
+</div>
+</li>
+<li><p>At this point, all of the <code class="docutils literal notranslate"><span class="pre">master</span></code> branches (local, <code class="docutils literal notranslate"><span class="pre">origin</span></code>, and <code class="docutils literal notranslate"><span class="pre">upstream</span></code>) are now
+successfully synchronized with <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code>. That’s the easy part, however. The
+next, second rebase often (but not always) requires some real work. Let’s checkout
+our <code class="docutils literal notranslate"><span class="pre">cool-feature-2</span></code> branch:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">checkout</span> <span class="n">cool</span><span class="o">-</span><span class="n">feature</span><span class="o">-</span><span class="mi">2</span>
+</pre></div>
+</div>
+</li>
+<li><p>Next, we want to rebase our new commits in <code class="docutils literal notranslate"><span class="pre">cool-feature-2</span></code> “onto” the latest commits
+in <code class="docutils literal notranslate"><span class="pre">master</span></code>. At this point, our <code class="docutils literal notranslate"><span class="pre">master</span></code> branch is up-to-date and includes the work
+from both prior feature branches, including both <code class="docutils literal notranslate"><span class="pre">cool-feature</span></code> and
+<code class="docutils literal notranslate"><span class="pre">other-persons-feature</span></code>. When we rebase, it will be as if we’re “replaying” our
+<code class="docutils literal notranslate"><span class="pre">cool-feature-2</span></code> commits, but pretending that we wrote them AFTER the latest commit
+in <code class="docutils literal notranslate"><span class="pre">master</span></code>. Let’s begin the rebase:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">rebase</span> <span class="n">master</span>
+</pre></div>
+</div>
+</li>
+<li><p>If you’re lucky, the rebase will work automatically. If you’re not, then there will
+be a “merge conflict”, due to the fact that some code change in the new <code class="docutils literal notranslate"><span class="pre">master</span></code>
+commits is “conflicting” with one or more code changes in your <code class="docutils literal notranslate"><span class="pre">cool-feature-2</span></code>
+commits. In this case, the rebase will stop mid-way, and your entire <code class="docutils literal notranslate"><span class="pre">git</span></code> repository
+will be in a special kind of “merge conflict” state that prevents some normal <code class="docutils literal notranslate"><span class="pre">git</span></code>
+commands from working. This is because you need to rewrite / edit your
+<code class="docutils literal notranslate"><span class="pre">cool-feature-2</span></code> commits so that there is no conflict. How to deal with conflicts in
+a rebase it outside the scope of our help, but here is some guidance:</p>
+<ul>
+<li><p>Read this:
+<a class="reference external" href="https://docs.github.com/en/get-started/using-git/resolving-merge-conflicts-after-a-git-rebase">https://docs.github.com/en/get-started/using-git/resolving-merge-conflicts-after-a-git-rebase</a></p></li>
+<li><p>As the above article says, since the rebase is stopped mid-way, you can “abort” the rebase
+using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">rebase</span> <span class="o">--</span><span class="n">abort</span>
+</pre></div>
+</div>
+<p>This will return the git repo to the state it was before you ran <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">rebase</span> <span class="pre">master</span></code>
+in case you want to try a different solution.</p>
+</li>
+<li><p>For how to fix the conflicts in the files themselves, one helpful link from the
+above page is
+<a class="reference external" href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line">https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-using-the-command-line</a>.</p></li>
+<li><p>Another guide is here
+<a class="reference external" href="https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging">https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging</a>.</p></li>
+<li><p>Your code editor (such as <a class="reference external" href="https://code.visualstudio.com/download">VS Code</a>) will
+often have great features that help you resolve the conflicts easily. These are
+instructions for how you handle a “merge conflict” where you need to go into
+individual files and edit the indicated lines to resolve the conflict. The
+terminology is a bit weird: these are called “merge conflicts”, but they can arise
+when you are either “merging” two branches (which are are not doing) OR “rebasing”
+two branches (which we are doing).</p></li>
+<li><p>For how to use rebase to make changes to <code class="docutils literal notranslate"><span class="pre">cool-feature-2</span></code>’s commits (including
+“dropping” commits, “squashing” two commits into one, etc.), see
+<a class="reference external" href="https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History">https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History</a>. It is often helpful
+to “squash” multiple commits that have merge conflicts into a single commit
+<em>before</em> rebasing. Most of what you can do in the rebasing process can also be done
+using commands before starting a rebase.</p></li>
+<li><p>As the above guides say, once you have resolved the “merge conflicts”, you can add
+the files that are fixed to the index/stage and then continue the rebase from
+where it stopped, using the following commands. This allows the rebase to
+progress, and it will stop again if there are more merge conflicts with a later
+commit.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">add</span> <span class="o">-</span><span class="n">u</span>
+<span class="n">git</span> <span class="n">rebase</span> <span class="o">--</span><span class="k">continue</span>
+</pre></div>
+</div>
+</li>
+<li><p>To make something clear: yes, this means that you are responsible for making sure
+your proposed, un-merged code changes are compatible with <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code> before
+we are willing to merge them, even if <code class="docutils literal notranslate"><span class="pre">upstream</span></code> is being updated as you are
+developing your own code. We are happy to help you with this process as well; for
+example, you are free to make a Pull Request that has merge conflicts with
+<code class="docutils literal notranslate"><span class="pre">upstream/master</span></code> or our tests, and ask for help in fixing the
+incompatibilities. But we will never rebase <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code> itself – <em>all
+rebasing and merge conflicts need to be handled on the feature-branches, not on
+<code class="docutils literal notranslate"><span class="pre">master</span></code>.</em></p></li>
+</ul>
+</li>
+<li><p>Assuming the last rebase succeeded, that’s it! Your <code class="docutils literal notranslate"><span class="pre">master</span></code> branches and your
+<code class="docutils literal notranslate"><span class="pre">cool-feature-2</span></code> are now up to date against the latest commits, and you can continue
+developing on <code class="docutils literal notranslate"><span class="pre">cool-feature-2</span></code>. Note that you only strictly need to do this process
+if your Github Pull Request explicitly says that your changes cannot automatically
+be merged. However, it is best practice to keep your feature branches up to
+date. Just because there are no “merge conflicts” doesn’t mean that there aren’t
+problems with the code itself (e.g. failing tests) due to your branch being out of
+date!</p></li>
+</ol>
+</section>
+<section id="troubleshooting-git-problems">
+<h3>Troubleshooting <code class="docutils literal notranslate"><span class="pre">git</span></code> problems<a class="headerlink" href="#troubleshooting-git-problems" title="Link to this heading">#</a></h3>
+<ul>
+<li><p>Here’s a very helpful website with how to fix or reverse your changes, if you get your
+<code class="docutils literal notranslate"><span class="pre">git</span></code> repository in a confusing or broken state: <a class="reference external" href="https://dangitgit.com/en">https://dangitgit.com/en</a></p></li>
+<li><p>If you have accidentally written <em>new</em> code commits to your local <code class="docutils literal notranslate"><span class="pre">master</span></code> or
+<code class="docutils literal notranslate"><span class="pre">origin</span></code>’s <code class="docutils literal notranslate"><span class="pre">master</span></code> branch (a.k.a. it is “out-of-sync” with <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code>), below
+you will find one way that you can fix the problem. These steps will show you how to
+make a second branch that points to your current <code class="docutils literal notranslate"><span class="pre">master</span></code> branch’s latest commit (a
+backup of your work), delete your <code class="docutils literal notranslate"><span class="pre">master</span></code> branch, then re-download the “upstream”
+version of <code class="docutils literal notranslate"><span class="pre">master</span></code>. At the end, your work will still be available on a separate
+branch, but your <code class="docutils literal notranslate"><span class="pre">master</span></code> branch should be identical to that of <code class="docutils literal notranslate"><span class="pre">upstream</span></code>’s <code class="docutils literal notranslate"><span class="pre">master</span></code>
+branch. Do the following:</p>
+<ol class="arabic simple">
+<li><p>First, make a backup of your git repo somewhere else on your computer, just in
+case!</p></li>
+<li><p>Checkout <code class="docutils literal notranslate"><span class="pre">master</span></code>. This will bring you to the latest of your new commits.</p></li>
+<li><p>Create and checkout a new branch at that commit (let’s call the new branch
+<code class="docutils literal notranslate"><span class="pre">cool-feature-3</span></code>), for example by using:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">checkout</span> <span class="o">-</span><span class="n">b</span> <span class="n">cool</span><span class="o">-</span><span class="n">feature</span><span class="o">-</span><span class="mi">3</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>Set the upstream of this new branch to <code class="docutils literal notranslate"><span class="pre">origin</span></code> just in case:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">branch</span> <span class="o">--</span><span class="nb">set</span><span class="o">-</span><span class="n">upstream</span><span class="o">-</span><span class="n">to</span><span class="o">=</span><span class="n">origin</span> <span class="n">cool</span><span class="o">-</span><span class="n">feature</span><span class="o">-</span><span class="mi">3</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="5">
+<li><p><strong>Delete</strong> your local <code class="docutils literal notranslate"><span class="pre">master</span></code> branch, using the following:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">branch</span> <span class="o">-</span><span class="n">D</span> <span class="n">master</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="6">
+<li><p>Download the latest version of <code class="docutils literal notranslate"><span class="pre">upstream</span></code>’s <code class="docutils literal notranslate"><span class="pre">master</span></code> branch, AND make a new
+<code class="docutils literal notranslate"><span class="pre">master</span></code> branch locally that is the same as <code class="docutils literal notranslate"><span class="pre">upstream</span></code>’s <code class="docutils literal notranslate"><span class="pre">master</span></code>, using the
+following:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">fetch</span> <span class="n">upstream</span> <span class="n">master</span><span class="p">:</span><span class="n">master</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="7">
+<li><p><strong>Only if</strong> you already pushed your out-of-sync commits to <code class="docutils literal notranslate"><span class="pre">origin</span></code>, you should
+force <code class="docutils literal notranslate"><span class="pre">origin</span></code>’s <code class="docutils literal notranslate"><span class="pre">master</span></code> to use your new, local <code class="docutils literal notranslate"><span class="pre">master</span></code> branch, using the
+following. <strong>Note: You should NEVER <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">--force</span> <span class="pre">upstream</span></code> to your
+<code class="docutils literal notranslate"><span class="pre">upstream</span></code> remote.</strong> The <code class="docutils literal notranslate"><span class="pre">--set-upstream</span></code> option is fine, but always make sure
+you only <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">--force</span> <span class="pre">origin</span></code>, and never <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">--force</span> <span class="pre">upstream</span></code>! You
+probably will not be allowed to, but you still need to be cautious.</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">checkout</span> <span class="n">master</span>
+<span class="n">git</span> <span class="n">branch</span> <span class="o">--</span><span class="nb">set</span><span class="o">-</span><span class="n">upstream</span><span class="o">-</span><span class="n">to</span><span class="o">=</span><span class="n">origin</span> <span class="n">master</span>
+<span class="n">git</span> <span class="n">push</span> <span class="o">--</span><span class="n">force</span> <span class="n">origin</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="8">
+<li><p>The situation should now be resolved: the code you had on <code class="docutils literal notranslate"><span class="pre">master</span></code> is now on
+<code class="docutils literal notranslate"><span class="pre">cool-feature-3</span></code>. Your local and <code class="docutils literal notranslate"><span class="pre">origin</span></code> <code class="docutils literal notranslate"><span class="pre">master</span></code> branch is now fully
+synchronized with <code class="docutils literal notranslate"><span class="pre">upstream</span></code>’s <code class="docutils literal notranslate"><span class="pre">master</span></code>. You can now continue your work
+developing on feature branches, but never the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch.</p></li>
+</ol>
+</li>
+</ul>
+</section>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h2>
+<p>We provide multiple sources of documentation (including websites) for HNN:</p>
+<ol class="arabic simple">
+<li><p><strong>Docstrings</strong> for the code itself. These are inside the appropriate code blocks, but
+they are incorporated automatically into webpages on the HNN Developer Portal
+(described below). We use <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard">NumPy conventions for our
+docstrings</a>.</p></li>
+<li><p>The <a class="reference external" href="https://hnn.brown.edu/">HNN Frontpage website</a>. You probably do
+not have to worry about this. Changes to the Frontpage are handled by the source code
+at <a class="github reference external" href="https://github.com/GitHub-at-Brown/hnn-front-website">GitHub-at-Brown/hnn-front-website</a>, not on
+<a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core">jonescompneurolab/hnn-core</a>.</p></li>
+<li><p>The <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">HNN Textbook
+website</a>. Changes
+to the Textbook are handled by the source code at
+<a class="github reference external" href="https://github.com/jonescompneurolab/textbook">jonescompneurolab/textbook</a>, not on
+<a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core">jonescompneurolab/hnn-core</a>. The Textbook is the <strong>main guide to
+HNN for users</strong>, and includes both scientific explanations and <strong>example Jupyter
+notebook tutorials</strong>. If you are contributing a new public feature to HNN, then it
+needs to be explained in a tutorial Jupyter notebook on the Textbook.</p></li>
+<li><p>The <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/index.html">HNN Developer Portal
+website</a>, where you
+currently are. Changes to the Developer Portal are handled by the source code at the
+<code class="docutils literal notranslate"><span class="pre">doc</span></code> subdirectory of <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> located here:
+<a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core/tree/master/doc">jonescompneurolab/hnn-core</a>. This includes
+written content helpful for developers, but also the “Public API Documentation”
+available here: <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/api.html">https://jonescompneurolab.github.io/hnn-core/stable/api.html</a>. The
+API documentation is <em>automatically generated</em> from the <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard">NumPy-style
+docstrings</a>
+in our Python code by <a class="reference external" href="https://www.sphinx-doc.org/en/master/index.html"><code class="docutils literal notranslate"><span class="pre">sphinx</span></code></a>,
+which creates nice-looking webpages to display the docstrings. This also
+automatically executes the scripts in our <code class="docutils literal notranslate"><span class="pre">examples</span></code> directory, subsequently and
+automatically creating webpages for the scripts (including executed output) and
+Jupyter notebooks for the scripts (not including executed output). We are currently
+in the process of moving this notebook execution to the Textbook repo. You can build
+a local version of the Developer Portal (including the Public API Documentation) for
+inspection by following <a class="reference internal" href="#building-developer-documentation-locally"><span class="xref myst">this section
+below</span></a>.</p></li>
+</ol>
+<section id="updating-the-public-api-documentation">
+<h3>Updating the Public API Documentation<a class="headerlink" href="#updating-the-public-api-documentation" title="Link to this heading">#</a></h3>
+<p>If you ever add, remove, or rename a function or class from the Public API
+(i.e. anything that is explicitly expected to be used by typical users), you must make
+sure you update <code class="docutils literal notranslate"><span class="pre">doc/api.rst</span></code>. You should then <a class="reference internal" href="#building-developer-documentation-locally"><span class="xref myst">build the documentation locally (see
+below)</span></a> with your API changes and inspect the
+HTML output.</p>
+</section>
+<section id="updating-the-developer-portal">
+<h3>Updating the Developer Portal<a class="headerlink" href="#updating-the-developer-portal" title="Link to this heading">#</a></h3>
+<p>You are welcome to edit or write new documentation pages for the HNN Developer Portal
+website using
+<a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#rst-primer">reStructuredText</a>
+(RST). However, you are also welcome to write using Sphinx’s support for <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/markdown.html#markdown">MyST
+Markdown</a>, which
+employs <a class="reference external" href="https://myst-parser.readthedocs.io/en/latest/"><code class="docutils literal notranslate"><span class="pre">myst-parser</span></code></a>. This gives you
+the power of RST with the readability of Markdown.</p>
+<p>If you want to take advantage of <a class="reference external" href="https://myst-parser.readthedocs.io/en/latest/syntax/roles-and-directives.html#roles-directives">Roles and Directives inside your Markdown
+files</a>,
+it is fairly straightforward to use them via <a class="reference external" href="https://myst-parser.readthedocs.io/en/latest/syntax/roles-and-directives.html#roles-directives">“MyST Markdown”
+syntax</a>. For
+example:</p>
+<ul>
+<li><p>If you want to refer to another local document like this: <a class="reference internal" href="#"><span class="doc">Contributing Guide</span></a> (corresponding to the content in the file <code class="docutils literal notranslate"><span class="pre">doc/contributing.md</span></code>), then:</p>
+<ul>
+<li><p>In RST, write:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>:doc:`Contributing Guide &lt;contributing&gt;`
+</pre></div>
+</div>
+</li>
+<li><p>In Markdown, write:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>{doc}`Contributing Guide &lt;contributing&gt;`
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>If you want to refer to a part of the HNN-Core API like this:
+<a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network.add_electrode_array" title="hnn_core.Network.add_electrode_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_electrode_array()</span></code></a>, then:</p>
+<ul>
+<li><p>In RST, write:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>:func:`~hnn_core.Network.add_electrode_array`
+</pre></div>
+</div>
+</li>
+<li><p>In Markdown, write:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>{func}`~hnn_core.Network.add_electrode_array`
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p>For convenience, to quickly insert a link to any specific GitHub issue at
+<a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core">jonescompneurolab/hnn-core</a>, like this: <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/705">#705</a>, then:</p>
+<ul>
+<li><p>In RST, write:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>:gh:`705`
+</pre></div>
+</div>
+</li>
+<li><p>In Markdown, write:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>{gh}`705`
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+<p>Once you have made your changes, you should then <a class="reference internal" href="#building-developer-documentation-locally"><span class="xref myst">build the documentation locally (see
+below)</span></a> and inspect the HTML output.</p>
+</section>
+<section id="building-developer-documentation-locally">
+<h3>Building developer documentation locally<a class="headerlink" href="#building-developer-documentation-locally" title="Link to this heading">#</a></h3>
+<p>The Developer Portal website, including the Public API Documentation, can be built using
+<code class="docutils literal notranslate"><span class="pre">sphinx</span></code> and some related extensions. These are already installed if you used the
+<code class="docutils literal notranslate"><span class="pre">[doc]</span></code> or <code class="docutils literal notranslate"><span class="pre">[dev]</span></code> feature sets during your <code class="docutils literal notranslate"><span class="pre">pip</span></code> install (see the <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html#local-installation">“<code class="docutils literal notranslate"><span class="pre">pip</span></code> Source
+Installation” section of our Installation Guide</a>), which you already did if you used
+the above installation instructions.</p>
+<p>You can build a local version of the Developer Portal, <strong>including execution of most
+<code class="docutils literal notranslate"><span class="pre">examples</span></code> scripts</strong>, using the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">doc</span><span class="o">/</span>  <span class="c1"># Unnecessary if you&#39;re already in the &quot;hnn-core/doc&quot; directory</span>
+<span class="n">make</span> <span class="n">html</span>
+</pre></div>
+</div>
+<p>Alternatively, if you want to build the Developer Portal website locally <strong>without
+executing</strong> any <code class="docutils literal notranslate"><span class="pre">examples</span></code> scripts, use the command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">doc</span><span class="o">/</span>  <span class="c1"># Unnecessary if you&#39;re already in the &quot;hnn-core/doc&quot; directory</span>
+<span class="n">make</span> <span class="n">html</span><span class="o">-</span><span class="n">noplot</span>
+</pre></div>
+</div>
+<p>Finally, to view the website, do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">doc</span><span class="o">/</span>  <span class="c1"># Unnecessary if you&#39;re already in the &quot;hnn-core/doc&quot; directory</span>
+<span class="n">make</span> <span class="n">view</span>
+</pre></div>
+</div>
+<p>If you’ve made documentation changes and you want to force a full local website rebuild
+from scratch, you can delete all the local output files (such as HTML, script execution
+output, etc.) by running the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">doc</span><span class="o">/</span>  <span class="c1"># Unnecessary if you&#39;re already in the &quot;hnn-core/doc&quot; directory</span>
+<span class="n">make</span> <span class="n">clean</span>
+</pre></div>
+</div>
+<p>By default, our automated website deployment checks many, but not all, external URL
+links using a command similar to the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">doc</span><span class="o">/</span>  <span class="c1"># Unnecessary if you&#39;re already in the &quot;hnn-core/doc&quot; directory</span>
+<span class="n">make</span> <span class="n">linkcheck</span>
+</pre></div>
+</div>
+<p>However, we exclude certain kinds of link checks from this such as the very, very many
+Github-Issue specific links in <code class="docutils literal notranslate"><span class="pre">doc/whats_new.md</span></code>. If you want to manually do an
+external link check for <strong>all valid URLs</strong> (excluding a handful that never work with
+<code class="docutils literal notranslate"><span class="pre">sphinx</span></code>’s <code class="docutils literal notranslate"><span class="pre">linkcheck</span></code>), then you can use the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">doc</span><span class="o">/</span>  <span class="c1"># Unnecessary if you&#39;re already in the &quot;hnn-core/doc&quot; directory</span>
+<span class="n">make</span> <span class="n">linkcheck</span><span class="o">-</span><span class="nb">all</span>
+</pre></div>
+</div>
+<p>Note that running too many local linkchecks will get your IP address temporarily
+throttled, especially by Github, so be cautious.</p>
+</section>
 </section>
 <section id="quality-control">
 <h2>Quality control<a class="headerlink" href="#quality-control" title="Link to this heading">#</a></h2>
@@ -605,9 +1131,11 @@ tests before they can be merged. If you used the above install instructions, the
 everything you need to run these should already be installed. We <em>strongly recommend</em>
 that Contributors first run all quality checks and tests <em>locally</em>, and <em>before</em> you
 push new code to any Pull Requests. These same checks and tests are run automatically by
-our Continuous Integration suite, and and if any of them fail on your local machine,
+our Continuous Integration suite, and if any of them fail on your local machine,
 then <em>they will fail</em> in the automated tests run on Github, and your contributions will
-not be merge-able (until the errors are fixed).</p>
+not be merge-able (until the errors are fixed). That said, if you have trouble getting
+the tests to pass using your new code changes and you need help, feel free open a Pull
+Request using the broken code and then ask us for assistance.</p>
 <p>How to run these checks and tests locally is described below.</p>
 <section id="linting">
 <h3>Linting<a class="headerlink" href="#linting" title="Link to this heading">#</a></h3>
@@ -616,13 +1144,13 @@ using the following command, which uses the <code class="docutils literal notran
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">lint</span>
 </pre></div>
 </div>
-<p>If the above command prints any errors, then you will <em>need to fix</em> those errors
-before your code will pass our Continuous Integration testing, which is required for it
-to be merged. How to fix the error is up to you: the above command does not change your
-code, but will often provide suggestions on potential fixes.</p>
-<p>Note that linting is also done as part of the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code> command (see
-“Testing” section below), which means that you do not need to run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">lint</span></code> by
-itself unless you wish to.</p>
+<p>If the above command prints any errors, then you will <em>need to fix</em> those errors before
+your code will pass our Continuous Integration testing, which is required for it to be
+merged. How to fix the error is up to you: the above command does not change your code,
+but will often provide suggestions on potential fixes.</p>
+<p>Note that linting is also done as part of the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code> command (see “Testing” section
+below), which means that you do not need to run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">lint</span></code> by itself unless you wish
+to.</p>
 </section>
 <section id="spell-checking">
 <h3>Spell-checking<a class="headerlink" href="#spell-checking" title="Link to this heading">#</a></h3>
@@ -631,25 +1159,26 @@ command also only checks your code, but does not make changes to it:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">spell</span>
 </pre></div>
 </div>
-<p>Note that spell-checking is also done as part of the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code> command (see
-“Testing” section below), which means that you do not need to run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">spell</span></code> by
-itself unless you wish to.</p>
+<p>Note that spell-checking is also done as part of the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code> command (see “Testing”
+section below), which means that you do not need to run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">spell</span></code> by itself unless
+you wish to.</p>
 </section>
 <section id="formatting">
 <h3>Formatting<a class="headerlink" href="#formatting" title="Link to this heading">#</a></h3>
-<p>Formatting is handled differently, through two commands. The first command,
-below, is used to check if your code is consistent with our enforced formatting style,
-which is currently the default <code class="docutils literal notranslate"><span class="pre">ruff</span></code> style. This command does not change your code:</p>
+<p>Formatting is handled differently, through two commands. The first command, below, is
+used to check if your code is consistent with our enforced formatting style, which is
+currently the <a class="reference external" href="https://docs.astral.sh/ruff/formatter/">default <code class="docutils literal notranslate"><span class="pre">ruff</span></code> style</a>. This
+command does not change your code:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="nb">format</span><span class="o">-</span><span class="n">check</span>
 </pre></div>
 </div>
-<p>Note that format-checking is also done as part of the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code> command (see
-“Testing” section below), which means that you do not need to run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">format-check</span></code>
-by itself unless you wish to.</p>
+<p>Note that format-checking is also done as part of the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code> command (see “Testing”
+section below), which means that you do not need to run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">format-check</span></code> by itself
+unless you wish to.</p>
 <p>However, most of the code you write will probably need to be re-formatted to pass <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">format-check</span></code>. Fortunately, <code class="docutils literal notranslate"><span class="pre">ruff</span></code> provides a tool for safe, <em>automatic</em> formatting of
 your code. If <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">format-check</span></code> returns any errors and tells you that any number of
-files “would be reformatted”, and if you are ready to make a git commit, then you
-should run the following command. This command <strong>will almost always change your code
+files “would be reformatted”, and if you are ready to make a git commit, then you should
+run the following command. This command <strong>will almost always change your code
 automatically</strong>, since it re-formats your code:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="nb">format</span><span class="o">-</span><span class="n">overwrite</span>
 </pre></div>
@@ -671,218 +1200,80 @@ trailing comma” in question (i.e., continuing the example, changing it back to
 <p>Tests are extremely important and help ensure integrity of the code functionality after
 your changes have been made. We use the <a class="reference external" href="https://docs.pytest.org/en/stable/"><code class="docutils literal notranslate"><span class="pre">pytest</span></code> testing
 framework</a>, and use the <a class="reference external" href="https://pytest-xdist.readthedocs.io/en/stable/"><code class="docutils literal notranslate"><span class="pre">pytest-xdist</span></code>
-extension</a> to speed up your local test
-runs as fast as possible. To run the tests, run the following command:</p>
+extension</a> to run most tests in parallel
+and as fast as possible. To run the tests, run the following command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">test</span>
 </pre></div>
 </div>
 <p>Running tests will not change your code, but may download some additional files. MPI
-tests are skipped if the <code class="docutils literal notranslate"><span class="pre">mpi4py</span></code> module is not installed. See <a class="reference internal" href="install.html"><span class="doc">Installation Guide</span></a> for how to install MPI and <code class="docutils literal notranslate"><span class="pre">mpi4py</span></code>.</p>
+tests are skipped if the <code class="docutils literal notranslate"><span class="pre">mpi4py</span></code> module is not installed. See our <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html#local-installation">Installation
+Guide</a> for how to install MPI and <code class="docutils literal notranslate"><span class="pre">mpi4py</span></code>.</p>
 <p>Note that <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code> first runs the checks above for linting, spell-checking, and
 formatting, and then runs the test suite only <em>after</em> your code successfully passes
 those initial checks.</p>
 </section>
-</section>
-<section id="updating-documentation">
-<h2>Updating documentation<a class="headerlink" href="#updating-documentation" title="Link to this heading">#</a></h2>
-<p>When you update the documentation, it is recommended to build it locally
-to check whether the documentation renders correctly in HTML.</p>
-<p>Certain documentation files require explicit updates by the contributor
-of a given change (i.e., you). These are:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">doc/api.rst</span></code> if you added a new function.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">doc/whats_new.rst</span></code> to document the fix or change so you can be
-credited on the next release.</p></li>
-</ul>
-<p>Please update these documents once your pull request is ready to merge
-to avoid rebase conflicts with other pull requests.</p>
-<section id="building-the-documentation">
-<h3>Building the documentation<a class="headerlink" href="#building-the-documentation" title="Link to this heading">#</a></h3>
-<p>The documentation can be built using sphinx.</p>
-<p>You can build the documentation locally using the command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">doc</span><span class="o">/</span>
-<span class="n">make</span> <span class="n">html</span>
-</pre></div>
-</div>
-<p>If you want to build the documentation locally without running all the
-examples, use the command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">html</span><span class="o">-</span><span class="n">noplot</span>
-</pre></div>
-</div>
-<p>Finally, to view the documentation, do:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">view</span>
-</pre></div>
-</div>
-</section>
-<section id="writing-the-documentation">
-<h3>Writing the documentation<a class="headerlink" href="#writing-the-documentation" title="Link to this heading">#</a></h3>
-<p>You are welcome to write documentation pages using
-<a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#rst-primer">reStructuredText</a> (RST). However,
-you are also welcome to write using Sphinx’s support for <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/markdown.html#markdown">MyST
-Markdown</a>, which employs
-<a class="reference external" href="https://myst-parser.readthedocs.io/en/latest/"><code class="docutils literal notranslate"><span class="pre">myst-parser</span></code></a>. This gives you the power of RST with
-the readability of Markdown.</p>
-<p>If you want to take advantage of <a class="reference external" href="https://myst-parser.readthedocs.io/en/latest/syntax/roles-and-directives.html#roles-directives">Roles and Directives inside your Markdown files</a>, it is fairly straightforward to use them via <a class="reference external" href="https://myst-parser.readthedocs.io/en/latest/syntax/roles-and-directives.html#roles-directives">“MyST Markdown” syntax</a>. For example:</p>
-<ul>
-<li><p>If you want to refer to another local document like this: <a class="reference internal" href="install.html"><span class="doc">Installation Guide</span></a>, then:</p>
-<ul>
-<li><p>In RST, write:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>:doc:`Installation Guide &lt;install&gt;`
-</pre></div>
-</div>
-</li>
-<li><p>In Markdown, write:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>{doc}`Installation Guide &lt;install&gt;`
-</pre></div>
-</div>
-</li>
-</ul>
-</li>
-<li><p>If you want to refer to a part of the HNN-Core API like this: <a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network.add_electrode_array" title="hnn_core.Network.add_electrode_array"><code class="xref py py-func docutils literal notranslate"><span class="pre">add_electrode_array()</span></code></a>, then:</p>
-<ul>
-<li><p>In RST, write:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>:func:`~hnn_core.Network.add_electrode_array`
-</pre></div>
-</div>
-</li>
-<li><p>In Markdown, write:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>{func}`~hnn_core.Network.add_electrode_array`
-</pre></div>
-</div>
-</li>
-</ul>
-</li>
-<li><p>For convenience, to quickly insert a link to any specific GitHub issue at <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core">jonescompneurolab/hnn-core</a>, like this: <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/705">#705</a>, then:</p>
-<ul>
-<li><p>In RST, write:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>:gh:`705`
-</pre></div>
-</div>
-</li>
-<li><p>In Markdown, write:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>{gh}`705`
-</pre></div>
-</div>
-</li>
-</ul>
-</li>
-</ul>
-</section>
-</section>
-<section id="how-to-rebase">
-<h2>How to rebase<a class="headerlink" href="#how-to-rebase" title="Link to this heading">#</a></h2>
-<p>Commits in hnn-core follow a linear history, therefore we use a
-“rebase” workflow instead of “merge” to resolve commits. See <a class="reference external" href="https://www.atlassian.com/git/tutorials/merging-vs-rebasing">this
-article</a>
-for more details on the differences between these workflows.</p>
-<p>To rebase, we do the following:</p>
-<ol class="arabic simple">
-<li><p>Checkout the feature branch:</p></li>
-</ol>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">checkout</span> <span class="n">cool_feature</span>
-</pre></div>
-</div>
-<ol class="arabic simple" start="2">
-<li><p>Delete the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch and fetch a new copy:</p></li>
-</ol>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">branch</span> <span class="o">-</span><span class="n">D</span> <span class="n">master</span>
-<span class="n">git</span> <span class="n">fetch</span> <span class="n">upstream</span> <span class="n">master</span><span class="p">:</span><span class="n">master</span>
-</pre></div>
-</div>
-<ol class="arabic simple" start="3">
-<li><p>Start the rebase:</p></li>
-</ol>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">rebase</span> <span class="n">master</span>
-</pre></div>
-</div>
-<ol class="arabic simple" start="4">
-<li><p>If there are conflicts, the easiest approach is to resolve them in
-an editor like VS code. See <a class="reference external" href="https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging">this
-guide</a>
-for more general information on resolve merge conflicts</p></li>
-<li><p>Once the conflicts have been resolved, add the resolved files to the
-staging area:</p></li>
-</ol>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">add</span> <span class="o">-</span><span class="n">u</span>
-<span class="n">git</span> <span class="n">rebase</span> <span class="o">--</span><span class="k">continue</span>
-</pre></div>
-</div>
-<p>In general it is best to rebase frequently if you are aware of pull
-requests being merged into the <code class="docutils literal notranslate"><span class="pre">master</span></code> base.</p>
-<p>If you face a lot of difficulting resolving merge conflicts, it may be
-easier to
-<a class="reference external" href="https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History">squash</a>
-before rebasing.</p>
-</section>
 <section id="continuous-integration">
-<h2>Continuous Integration<a class="headerlink" href="#continuous-integration" title="Link to this heading">#</a></h2>
-<p>The repository is tested via continuous integration with GitHub Actions
-and Circle. The automated tests run on GitHub Actions while the
-documentation is built on Circle.</p>
-<p>To speed up the documentation-building process on CircleCI, we enabled
-versioned <a class="reference external" href="https://circleci.com/docs/caching/">caching</a>.</p>
-<p>Usually, you don’t need to worry about it. But in case a complete
-rebuild is necessary for a new version of the doc, you can modify the
-content in <code class="docutils literal notranslate"><span class="pre">.circleci/build_cache</span></code>, as CircleCI uses the MD5 of that
-file as the key for previously cached content. For consistency, we
-recommend you to monotonically increase the version number in that file,
-e.g., from “v2”-&gt;”v3”.</p>
+<h3>Continuous Integration<a class="headerlink" href="#continuous-integration" title="Link to this heading">#</a></h3>
+<p>The repository is tested via continuous integration with GitHub Actions and
+CircleCI. All the above checks and tests run on GitHub Actions, while the Developer
+Portal website is built on CircleCI.</p>
+<p>To speed up the website-building process on CircleCI, we enabled versioned
+<a class="reference external" href="https://circleci.com/docs/caching/">caching</a>.</p>
+<p>Usually, you don’t need to worry about it. But in case a complete rebuild is necessary
+for a new version of the doc, you can modify the content in <code class="docutils literal notranslate"><span class="pre">.circleci/build_cache</span></code>, as
+CircleCI uses the MD5 of that file as the key for previously cached content. For
+consistency, we recommend you to monotonically increase the version number in that file,
+e.g., from <code class="docutils literal notranslate"><span class="pre">v2</span></code> to <code class="docutils literal notranslate"><span class="pre">v3</span></code>.</p>
+</section>
 </section>
 <section id="notes-on-mpi-for-contributors">
 <h2>Notes on MPI for contributors<a class="headerlink" href="#notes-on-mpi-for-contributors" title="Link to this heading">#</a></h2>
-<p>MPI parallelization with NEURON requires that the simulation be launched
-with the <code class="docutils literal notranslate"><span class="pre">nrniv</span></code> binary from the command-line. The <code class="docutils literal notranslate"><span class="pre">mpiexec</span></code> command is
-used to launch multiple <code class="docutils literal notranslate"><span class="pre">nrniv</span></code> processes which communicate via MPI.
-This is done using <code class="docutils literal notranslate"><span class="pre">subprocess.Popen()</span></code> in <code class="docutils literal notranslate"><span class="pre">MPIBackend.simulate()</span></code> to
-launch parallel child processes (<code class="docutils literal notranslate"><span class="pre">MPISimulation</span></code>) to carry out the
-simulation. The communication sequence between <code class="docutils literal notranslate"><span class="pre">MPIBackend</span></code> and
-<code class="docutils literal notranslate"><span class="pre">MPISimulation</span></code> is outlined below.</p>
+<p>MPI parallelization with NEURON requires that the simulation be launched with the
+<code class="docutils literal notranslate"><span class="pre">nrniv</span></code> binary from the command-line. The <code class="docutils literal notranslate"><span class="pre">mpiexec</span></code> command is used to launch multiple
+<code class="docutils literal notranslate"><span class="pre">nrniv</span></code> processes which communicate via MPI.  This is done using <code class="docutils literal notranslate"><span class="pre">subprocess.Popen()</span></code> in
+<code class="docutils literal notranslate"><span class="pre">MPIBackend.simulate()</span></code> to launch parallel child processes (<code class="docutils literal notranslate"><span class="pre">MPISimulation</span></code>) to carry
+out the simulation. The communication sequence between <code class="docutils literal notranslate"><span class="pre">MPIBackend</span></code> and <code class="docutils literal notranslate"><span class="pre">MPISimulation</span></code>
+is outlined below.</p>
 <ol class="arabic simple">
-<li><p>In order to pass the network to simulate from <code class="docutils literal notranslate"><span class="pre">MPIBackend</span></code>, the
-child <code class="docutils literal notranslate"><span class="pre">MPISimulation</span></code> processes’ <code class="docutils literal notranslate"><span class="pre">stdin</span></code> is used. The ready-to-use
-<a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> object is base64 encoded and pickled before
-being written to the child processes’ <code class="docutils literal notranslate"><span class="pre">stdin</span></code> by way of a Queue in
-a non-blocking way. See how it is <a class="reference external" href="https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#L124-L132">used in MNE-Python</a>.
-The data is marked by start and end signals that are used to extract
-the pickled net object. After being unpickled, the parallel
+<li><p>In order to pass the network to simulate from <code class="docutils literal notranslate"><span class="pre">MPIBackend</span></code>, the child
+<code class="docutils literal notranslate"><span class="pre">MPISimulation</span></code> processes’ <code class="docutils literal notranslate"><span class="pre">stdin</span></code> is used. The ready-to-use
+<a class="reference internal" href="generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network"><code class="xref py py-class docutils literal notranslate"><span class="pre">Network</span></code></a> object is base64 encoded and pickled before being written
+to the child processes’ <code class="docutils literal notranslate"><span class="pre">stdin</span></code> by way of a Queue in a non-blocking way. See how it
+is <a class="reference external" href="https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#L124-L132">used in MNE-Python</a>.  The data is marked by start and end signals that are
+used to extract the pickled net object. After being unpickled, the parallel
 simulation begins.</p></li>
-<li><p>Output from the simulation (either to <code class="docutils literal notranslate"><span class="pre">stdout</span></code> or <code class="docutils literal notranslate"><span class="pre">stderr</span></code>) is
-communicated back to <code class="docutils literal notranslate"><span class="pre">MPIBackend</span></code>, where it will be printed to the
-console. Typical output at this point would be simulation progress
-messages as well as any MPI warnings/errors during the simulation.</p></li>
-<li><p>Once the simulation has completed, the rank 0 of the child process
-sends back the simulation data by base64 encoding and and pickling
-the data object. It also adds markings for the start and end of the
-encoded data, including the expected length of data (in bytes) in
-the end of data marking. Finally rank 0 writes the whole string with
-markings and encoded data to <code class="docutils literal notranslate"><span class="pre">stderr</span></code>.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">MPIBackend</span></code> will look for these markings to know that data is being
-sent (and will not print this). It will verify the length of data it
-receives, printing a <code class="docutils literal notranslate"><span class="pre">UserWarning</span></code> if the data length received
-doesn’t match the length part of the marking.</p></li>
-<li><p>To signal that the child process should terminate, <code class="docutils literal notranslate"><span class="pre">MPIBackend</span></code>
-sends a signal to the child proccesses’ <code class="docutils literal notranslate"><span class="pre">stdin</span></code>. After sending the
-simulation data, rank 0 waits for this completion signal before
-continuing and letting all ranks of the MPI process exit
-successfully.</p></li>
-<li><p>At this point, <code class="docutils literal notranslate"><span class="pre">MPIBackend.simulate()</span></code> decodes and unpickles the
-data, populates the network’s CellResponse object, and returns the
-simulation dipoles to the caller.</p></li>
+<li><p>Output from the simulation (either to <code class="docutils literal notranslate"><span class="pre">stdout</span></code> or <code class="docutils literal notranslate"><span class="pre">stderr</span></code>) is communicated back to
+<code class="docutils literal notranslate"><span class="pre">MPIBackend</span></code>, where it will be printed to the console. Typical output at this point
+would be simulation progress messages as well as any MPI warnings/errors during the
+simulation.</p></li>
+<li><p>Once the simulation has completed, the rank 0 of the child process sends back the
+simulation data by base64 encoding and pickling the data object. It also adds
+markings for the start and end of the encoded data, including the expected length of
+data (in bytes) in the end of data marking. Finally rank 0 writes the whole string
+with markings and encoded data to <code class="docutils literal notranslate"><span class="pre">stderr</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MPIBackend</span></code> will look for these markings to know that data is being sent (and will
+not print this). It will verify the length of data it receives, printing a
+<code class="docutils literal notranslate"><span class="pre">UserWarning</span></code> if the data length received doesn’t match the length part of the
+marking.</p></li>
+<li><p>To signal that the child process should terminate, <code class="docutils literal notranslate"><span class="pre">MPIBackend</span></code> sends a signal to
+the child proccesses’ <code class="docutils literal notranslate"><span class="pre">stdin</span></code>. After sending the simulation data, rank 0 waits for
+this completion signal before continuing and letting all ranks of the MPI process
+exit successfully.</p></li>
+<li><p>At this point, <code class="docutils literal notranslate"><span class="pre">MPIBackend.simulate()</span></code> decodes and unpickles the data, populates the
+network’s CellResponse object, and returns the simulation dipoles to the caller.</p></li>
 </ol>
-<p>It is important that <code class="docutils literal notranslate"><span class="pre">flush()</span></code> is used whenever data is written to stdin
-or stderr to ensure that the signal will immediately be available for
-reading by the other side.</p>
-<p>Tests for parallel backends utilize a special <code class="docutils literal notranslate"><span class="pre">&#64;pytest.mark.incremental</span></code>
-decorator (defined in <code class="docutils literal notranslate"><span class="pre">conftest.py</span></code>) that causes a test failure to skip
-subsequent tests in the incremental block. For example, if a test
-running a simple MPI simulation fails, subsequent tests that compare
-simulation output between different backends will be skipped. These
-types of failures will be marked as a failure in CI.</p>
+<p>It is important that <code class="docutils literal notranslate"><span class="pre">flush()</span></code> is used whenever data is written to stdin or stderr to
+ensure that the signal will immediately be available for reading by the other side.</p>
+<p>Tests for parallel backends utilize a special <code class="docutils literal notranslate"><span class="pre">&#64;pytest.mark.incremental</span></code> decorator
+(defined in <code class="docutils literal notranslate"><span class="pre">conftest.py</span></code>) that causes a test failure to skip subsequent tests in the
+incremental block. For example, if a test running a simple MPI simulation fails,
+subsequent tests that compare simulation output between different backends will be
+skipped. These types of failures will be marked as a failure in CI.</p>
 </section>
 <section id="making-changes-to-the-default-network">
 <h2>Making changes to the default network<a class="headerlink" href="#making-changes-to-the-default-network" title="Link to this heading">#</a></h2>
-<p>If you ever need to make scientific or technical changes to the default network, you
-need to do three things:</p>
+<p>If you ever need to make scientific or technical changes to the default network
+(i.e. the <code class="docutils literal notranslate"><span class="pre">jones_2009_model</span></code> network), you need to do three things:</p>
 <ol class="arabic">
 <li><p>Step 1: If needed, manually make changes to <code class="docutils literal notranslate"><span class="pre">hnn_core/param/default.json</span></code>. This is
 the base file used for the important <code class="docutils literal notranslate"><span class="pre">jones_2009_model()</span></code> function. Make sure that if
@@ -894,11 +1285,11 @@ file.</p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">regenerate</span><span class="o">-</span><span class="n">networks</span>
 </pre></div>
 </div>
-<p>This command runs two scripts, each of which rebuild a particular “hierarchical
-JSON” network file which are used in HNN-Core. These two files are described
-below. Note that you do <strong>not</strong> need to make manual changes to these files; running
-the above command is sufficient. However, you <strong>do</strong> need to commit the new
-versions of these files. The two files:</p>
+<p>This command runs two scripts, each of which rebuild one of the “hierarchical JSON”
+network files used in HNN-Core. These two files are described below. Note that you do
+<strong>not</strong> need to make manual changes to these files; running the above command is
+sufficient. However, you <strong>do</strong> need to commit the new versions of these files. The
+two files:</p>
 <p>A. <code class="docutils literal notranslate"><span class="pre">hnn_core/param/jones2009_base.json</span></code>: This is the base file used for the
 GUI. This file has been built using the code in
 <code class="docutils literal notranslate"><span class="pre">hnn_core/params.py::convert_to_json</span></code> by way of
@@ -956,26 +1347,26 @@ that breakage needs to be fixed before we can merge your updates.</p></li>
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-up-your-local-development-environment">Setting up your local development environment</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#configuring-git">Configuring git</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-contribute-code">How to contribute code</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#making-your-first-pull-request-including-installing-for-development">Making your first Pull Request, including <em>installing for development</em></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#keeping-your-code-up-to-date-by-rebasing">Keeping your code up-to-date by rebasing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#troubleshooting-git-problems">Troubleshooting <code class="docutils literal notranslate"><span class="pre">git</span></code> problems</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#making-your-first-pull-request">Making your first pull request</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-editable-hnn-core">Installing editable hnn-core</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#updating-the-public-api-documentation">Updating the Public API Documentation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#updating-the-developer-portal">Updating the Developer Portal</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-developer-documentation-locally">Building developer documentation locally</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quality-control">Quality control</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#linting">Linting</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spell-checking">Spell-checking</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#formatting">Formatting</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#testing">Testing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#continuous-integration">Continuous Integration</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#updating-documentation">Updating documentation</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-documentation">Building the documentation</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-the-documentation">Writing the documentation</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-rebase">How to rebase</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#continuous-integration">Continuous Integration</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes-on-mpi-for-contributors">Notes on MPI for contributors</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#making-changes-to-the-default-network">Making changes to the default network</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#publishing-new-releases">Publishing new releases</a></li>
