@@ -684,7 +684,7 @@ def pyramidal_l23(cell_name,pos, gid=None):
 
     gbar_Ih = partial(_exp_g_at_dist, zero_val=p_all['L2Pyr_dend_gbar_Ih'],exp_term = 1./323, slope=2.087, offset=-.8696)
     gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=0.00001, gdend=0.002, xkink=200, hotzone=[200, 400], hotzone_factor=4)
-    gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=0.0000001, gdend=0.002, xkink=200, hotzone=[200, 400], hotzone_factor=4)
+    gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=0.0000001, gdend=0.001, xkink=200, hotzone=[200, 400], hotzone_factor=4)
     gbar_SK_E2 = partial(_linear_g_at_dist, gsoma=3.e-06, gdend=3.e-03, xkink=200, hotzone=[200, 400], hotzone_factor=10)
 
     override_params = dict()
@@ -724,14 +724,14 @@ def pyramidal_l23(cell_name,pos, gid=None):
     # build sections
     section_names = list(end_pts.keys())
 
-    v_init = {'soma': -73.63541874650068,
-                'basal_1': -73.66130880853413,
-                'basal_2': -73.73613654456929,
-                'basal_3': -73.73613654456929,
-                'apical_oblique': -73.6439771442675,
-                'apical_trunk': -73.60138524024191,
-                'apical_1': -73.30030044167597,
-                'apical_tuft': -72.8807767701062}
+    v_init = {'soma': -73.91534035708573,
+            'basal_1': -73.93352687563383,
+            'basal_2': -73.98646383934111,
+            'basal_3': -73.98646383934111,
+            'apical_oblique': -73.91421209292815,
+            'apical_trunk': -73.88877758950657,
+            'apical_1': -73.64560269252748,
+            'apical_tuft': -73.27793049058045}
     
     sections = _get_dends(p_all, 'L2Pyr', section_names, v_init=v_init)
     sections['soma'] = _get_pyr_soma(p_all, 'L2Pyr', v_init=v_init['soma'])
