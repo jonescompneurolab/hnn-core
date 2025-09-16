@@ -105,15 +105,17 @@ dpl1 = simulate_dipole(net1, tstop=20.0, dt=0.025, n_trials=1)
 dpl2 = simulate_dipole(net2, tstop=20.0, dt=0.025, n_trials=1)
 
 print("""
-If the plotting and statistics of the output dipoles and spikes are identical between
+--> If the plotting and statistics of the output dipoles and spikes are identical between
 net1 and net2, then we can be sure that our Networks and our drives function the same
 regardless of where they are allocated in the GID array.
 """)
 
 print("Net1 dipole peak:", max(abs(dpl1[0].data['agg'])))
 print("Net2 dipole peak:", max(abs(dpl2[0].data['agg'])))
+print("Difference in dipole peaks:", (abs(max(abs(dpl1[0].data['agg']))) - max(abs(dpl2[0].data['agg']))))
 print("Net1 spikes (trial 0):", len(net1.cell_response.spike_times[0]))
 print("Net2 spikes (trial 0):", len(net2.cell_response.spike_times[0]))
+print("Difference in spike totals:", abs(len(net1.cell_response.spike_times[0]) - len(net2.cell_response.spike_times[0])))
 
 ###############################################################################
 # Step 8: Plot Dipoles
