@@ -427,8 +427,8 @@ def get_L2Pyr_params_new():
         'L2Pyr_soma_gamma_CaDynamics_E2' : 0.000533,
 
         # Biophysics basal
-        'L2Pyr_basal_gbar_NaTs2_t_32d': 0.008009*0.01,
-        'L2Pyr_basal_gbar_SKv3_1': 0.000513*0.01,
+        'L2Pyr_basal_gbar_NaTs2_t_32d': 0.008009,
+        'L2Pyr_basal_gbar_SKv3_1': 0.000513,
         'L2Pyr_basal_gbar_Ih': 0.00008,
         'L2Pyr_basal_g_pas': 1.0 / 10000.0,         # default read out from neuron
         'L2Pyr_basal_e_pas': -75, 
