@@ -38,7 +38,6 @@ Notes
 import matplotlib.pyplot as plt
 
 from hnn_core import jones_2009_model, simulate_dipole
-from hnn_core.hnn_io import write_network_configuration
 from hnn_core.viz import plot_dipole
 
 
@@ -99,19 +98,17 @@ print("Net2 gid ranges:", net2.gid_ranges)
 print("Next GIDs after drives:", net1._get_next_available_gid(), net2._get_next_available_gid())
 
 ###############################################################################
-# Step 7: (Optional) Export Configurations
-# ----------------------------------------
-
-write_network_configuration(net1, "net1_config.json")
-write_network_configuration(net2, "net2_config.json")
-print("Configuration files written (net1_config.json, net2_config.json).")
-
-###############################################################################
-# Step 8: Simulate Networks Independently
+# Step 7: Simulate Networks Independently
 # ---------------------------------------
 
 dpl1 = simulate_dipole(net1, tstop=20.0, dt=0.025, n_trials=1)
 dpl2 = simulate_dipole(net2, tstop=20.0, dt=0.025, n_trials=1)
+
+print("""
+If the plotting and statistics of the output dipoles and spikes are identical between
+net1 and net2, then we can be sure that our Networks and our drives function the same
+regardless of where they are allocated in the GID array.
+""")
 
 print("Net1 dipole peak:", max(abs(dpl1[0].data['agg'])))
 print("Net2 dipole peak:", max(abs(dpl2[0].data['agg'])))
@@ -119,13 +116,13 @@ print("Net1 spikes (trial 0):", len(net1.cell_response.spike_times[0]))
 print("Net2 spikes (trial 0):", len(net2.cell_response.spike_times[0]))
 
 ###############################################################################
-# Step 9: Plot Dipoles
+# Step 8: Plot Dipoles
 # --------------------
 dpls = [dpl1[0], dpl2[0]]
 plot_dipole(dpls, show=True)
 
 ###############################################################################
-# Step 10: Combined Spike Raster
+# Step 9: Combined Spike Raster
 # ------------------------------
 
 def plot_combined_spike_raster(net_a, net_b, title="Combined Spike Raster"):
