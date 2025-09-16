@@ -40,7 +40,7 @@ studying the circuit-level origin of some of the most commonly measured MEG/EEG 
 signals: event related potentials (ERPs) and low-frequency rhythms (alpha/beta/gamma).
 
 The HNN API, written in Python and built on top of
-[NEURON](https://www.neuron.yale.edu/neuron/), is designed to be flexible and serve
+[NEURON](https://nrn.readthedocs.io), is designed to be flexible and serve
 users with varying levels of coding expertise, while the [HNN
 GUI](https://jonescompneurolab.github.io/textbook/content/04_using_hnn_gui/gui_quickstart.html)
 is designed to be useful to researchers with no formal computational neural modeling or
