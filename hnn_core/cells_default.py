@@ -52,7 +52,7 @@ def _get_pyr_soma(p_all, cell_type):
         Ra=p_all[f"{cell_type}_soma_Ra"],
     )
 
-
+'''
 def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
     """The geometry of the default sections in L2Pyr neuron."""
     p_all = get_L2Pyr_params_default()
@@ -132,7 +132,7 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
         cell_tree=cell_tree,
         gid=gid,
     )
-
+'''
 
 # def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
 #     """The geometry of the default sections in L5Pyr Neuron."""
@@ -342,28 +342,11 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
         The basket cell.
     """
     if cell_name == "L2_basket":
-        sect_loc = dict(proximal=["soma"], distal=["soma"])
+        return L2_basket_cell(pos=pos, gid=gid)
     elif cell_name == "L5_basket":
-        sect_loc = dict(proximal=["soma"], distal=[])
+        return L5_basket_cell(pos=pos, gid=gid)
     else:
         raise ValueError(f"Unknown basket cell type: {cell_name}")
-
-    sections = dict()
-    sections["soma"] = _get_basket_soma(cell_name)
-    synapses = _get_basket_syn_props()
-    sections["soma"].syns = list(synapses.keys())
-    sections["soma"].mechs = {"hh2": dict()}
-
-    cell_tree = None
-    return Cell(
-        cell_name,
-        pos,
-        sections=sections,
-        synapses=synapses,
-        sect_loc=sect_loc,
-        cell_tree=cell_tree,
-        gid=gid,
-    )
 
 
 def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
@@ -383,9 +366,9 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
         yet attached to a network. Once the GID is set, it cannot be changed.
     """
     if cell_name == "L2_pyramidal":
-        return _cell_L2Pyr(override_params, pos=pos, gid=gid)
-    # elif cell_name == "L5_pyramidal":
-    #     return _cell_L5Pyr(override_params, pos=pos, gid=gid)
+        return L2_pyramidal_cell(override_params, pos=pos, gid=gid)
+    elif cell_name == "L5_pyramidal":
+        return L5_pyramidal_cell(override_params=override_params, pos=pos, gid=gid)
     else:
         raise ValueError(f"Unknown pyramidal cell type: {cell_name}")
 
@@ -443,21 +426,28 @@ def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
 
     return cell
 
-
 class L5_pyramidal_cell(Cell):
-    # AES: arguments were changed to match that of `pyramidal` function, NOT
-    # `_cell_L5pyr`, which were invalid!
-    def __init__(self, override_params=None, pos=(0, 0, 0), gid=None):
-        """TODO: This child-class of Cell can act as a full replacement for `pyramidal(cell_name='L5_pyramidal')`."""
-
-        # AES: Everything below, until said otherwise, has been copied without
-        # modification from function `_cell_L5Pyr` above:
-
+    """L5 pyramidal cell implemented as a Cell subclass."""
+    
+    def __init__(self, override_params=None, pos=(0.0, 0.0, 0), gid=None):
+        """Initialize L5 pyramidal cell.
+        
+        Parameters
+        ----------
+        override_params : dict or None
+            Parameters to override the default set
+        pos : tuple
+            Coordinates of cell soma in xyz-space
+        gid : int or None
+            Global ID of the cell
+        """
+        # Get default parameters
         p_all = get_L5Pyr_params_default()
         if override_params is not None:
             assert isinstance(override_params, dict)
             p_all = compare_dictionaries(p_all, override_params)
-
+        
+        # Define sections
         section_names = [
             "apical_trunk",
             "apical_1",
@@ -468,10 +458,11 @@ class L5_pyramidal_cell(Cell):
             "basal_2",
             "basal_3",
         ]
-
+        
         sections = _get_dends(p_all, cell_type="L5Pyr", section_names=section_names)
         sections["soma"] = _get_pyr_soma(p_all, "L5Pyr")
-
+        
+        # Define endpoints
         end_pts = {
             "soma": [[0, 0, 0], [0, 0, 23]],
             "apical_trunk": [[0, 0, 23], [0, 0, 83]],
@@ -483,8 +474,8 @@ class L5_pyramidal_cell(Cell):
             "basal_2": [[0, 0, -50], [-106, 0, -156]],
             "basal_3": [[0, 0, -50], [106, 0, -156]],
         }
-
-        # units = ['pS/um^2', 'S/cm^2', 'pS/um^2', '??', 'tau', '??']
+        
+        # Define mechanisms
         mechanisms = {
             "hh2": ["gkbar_hh2", "gnabar_hh2", "gl_hh2", "el_hh2"],
             "ca": ["gbar_ca"],
@@ -495,22 +486,24 @@ class L5_pyramidal_cell(Cell):
             "ar": ["gbar_ar"],
         }
         p_mech = _get_mechanisms(p_all, "L5Pyr", ["soma"] + section_names, mechanisms)
-
+        
+        # Configure sections
         for sec_name, section in sections.items():
             section._end_pts = end_pts[sec_name]
-
+            
             if sec_name == "soma":
                 section.syns = ["gabaa", "gabab"]
             else:
                 section.syns = ["ampa", "nmda", "gabaa", "gabab"]
-
+            
             section.mechs = p_mech[sec_name]
-
+            
             if sec_name != "soma":
                 sections[sec_name].mechs["ar"]["gbar_ar"] = partial(
                     _exp_g_at_dist, zero_val=1e-6, exp_term=3e-3, offset=0.0
                 )
-
+        
+        # Define cell tree
         cell_tree = {
             ("apical_trunk", 0): [("apical_trunk", 1)],
             ("apical_1", 0): [("apical_1", 1)],
@@ -528,60 +521,158 @@ class L5_pyramidal_cell(Cell):
             ("apical_2", 1): [("apical_tuft", 0)],
             ("basal_1", 1): [("basal_2", 0), ("basal_3", 0)],
         }
-
+        
+        # Define section locations
         sect_loc = {
             "proximal": ["apical_oblique", "basal_2", "basal_3"],
             "distal": ["apical_tuft"],
         }
-
+        
+        # Get synapses
         synapses = _get_pyr_syn_props(p_all, "L5Pyr")
-        # return Cell(
-        #     "L5Pyr",
-        #     pos,
-        #     sections=sections,
-        #     synapses=synapses,
-        #     sect_loc=sect_loc,
-        #     cell_tree=cell_tree,
-        #     gid=gid,
-        # )
+        
+        # Call parent constructor
+        super().__init__(
+            "L5Pyr",
+            pos,
+            sections=sections,
+            synapses=synapses,
+            sect_loc=sect_loc,
+            cell_tree=cell_tree,
+            gid=gid
+        )
 
-        # AES: This is the end of the copied body of `_cell_L5Pyr`.
+class L2_pyramidal_cell(Cell):
+    """L2 pyramidal cell implemented as a Cell subclass."""
+    
+    def __init__(self, override_params=None, pos=(0.0, 0.0, 0), gid=None):
+        """Initialize L2 pyramidal cell."""
+        
+        p_all = get_L2Pyr_params_default()
+        if override_params is not None:
+            assert isinstance(override_params, dict)
+            p_all = compare_dictionaries(p_all, override_params)
+        
+        section_names = [
+            "apical_trunk",
+            "apical_1",
+            "apical_tuft",
+            "apical_oblique",
+            "basal_1",
+            "basal_2",
+            "basal_3",
+        ]
+        
+        sections = _get_dends(p_all, cell_type="L2Pyr", section_names=section_names)
+        sections["soma"] = _get_pyr_soma(p_all, "L2Pyr")
+        
+        end_pts = {
+            "soma": [[-50, 0, 765], [-50, 0, 778]],
+            "apical_trunk": [[-50, 0, 778], [-50, 0, 813]],
+            "apical_oblique": [[-50, 0, 813], [-250, 0, 813]],
+            "apical_1": [[-50, 0, 813], [-50, 0, 993]],
+            "apical_tuft": [[-50, 0, 993], [-50, 0, 1133]],
+            "basal_1": [[-50, 0, 765], [-50, 0, 715]],
+            "basal_2": [[-50, 0, 715], [-156, 0, 609]],
+            "basal_3": [[-50, 0, 715], [56, 0, 609]],
+        }
+        
+        mechanisms = {
+            "km": ["gbar_km"],
+            "hh2": ["gkbar_hh2", "gnabar_hh2", "gl_hh2", "el_hh2"],
+        }
+        p_mech = _get_mechanisms(p_all, "L2Pyr", ["soma"] + section_names, mechanisms)
+        
+        for sec_name, section in sections.items():
+            section._end_pts = end_pts[sec_name]
+            
+            if sec_name == "soma":
+                section.syns = ["gabaa", "gabab"]
+            else:
+                section.syns = ["ampa", "nmda", "gabaa", "gabab"]
+            
+            section.mechs = p_mech[sec_name]
+        
+        cell_tree = {
+            ("apical_trunk", 0): [("apical_trunk", 1)],
+            ("apical_1", 0): [("apical_1", 1)],
+            ("apical_tuft", 0): [("apical_tuft", 1)],
+            ("apical_oblique", 0): [("apical_oblique", 1)],
+            ("basal_1", 0): [("basal_1", 1)],
+            ("basal_2", 0): [("basal_2", 1)],
+            ("basal_3", 0): [("basal_3", 1)],
+            ("soma", 0): [("soma", 1), ("basal_1", 0)],
+            ("soma", 1): [("apical_trunk", 0)],
+            ("apical_trunk", 1): [("apical_1", 0), ("apical_oblique", 0)],
+            ("apical_1", 1): [("apical_tuft", 0)],
+            ("basal_1", 1): [("basal_2", 0), ("basal_3", 0)],
+        }
+        
+        sect_loc = {
+            "proximal": ["apical_oblique", "basal_2", "basal_3"],
+            "distal": ["apical_tuft"],
+        }
+        
+        synapses = _get_pyr_syn_props(p_all, "L2Pyr")
+        
+        super().__init__(
+            "L2Pyr",
+            pos,
+            sections=sections,
+            synapses=synapses,
+            sect_loc=sect_loc,
+            cell_tree=cell_tree,
+            gid=gid
+        )
 
-        name = "L5Pyr"  # AES: This is the only new line needed
+class L2_basket_cell(Cell):
+    """L2 basket cell implemented as a Cell subclass."""
+    
+    def __init__(self, pos=(0, 0, 0), gid=None):
+        """Initialize L2 basket cell."""
+        
+        sections = dict()
+        sections["soma"] = _get_basket_soma("L2_basket")
+        synapses = _get_basket_syn_props()
+        sections["soma"].syns = list(synapses.keys())
+        sections["soma"].mechs = {"hh2": dict()}
+        
+        sect_loc = dict(proximal=["soma"], distal=["soma"])
+        cell_tree = None
+        
+        super().__init__(
+            "L2_basket",
+            pos,
+            sections=sections,
+            synapses=synapses,
+            sect_loc=sect_loc,
+            cell_tree=cell_tree,
+            gid=gid
+        )
 
-        # AES: This is the beginning of the body of `Cell.__init__` copied without
-        # modification:
-        self.name = name
-        self.pos = pos
-        for section in sections.values():
-            if not isinstance(section, Section):
-                raise ValueError(
-                    f"Items in section must be instances"
-                    f" of Section. Got {type(section)}"
-                )
-        self.sections = sections
-        self.synapses = synapses
-        self.sect_loc = sect_loc
-        self._nrn_sections = dict()
-        self._nrn_synapses = dict()
-        self.dipole_pp = list()
-        self.vsec = dict()
-        self.isec = dict()
-        self.ca = dict()
-        # insert iclamp
-        self.list_IClamp = list()
-        self._gid = None
-        self.tonic_biases = list()
-        if gid is not None:
-            self.gid = gid  # use setter method to check input argument gid
 
-        # Store the tree representation of the cell
-        self.cell_tree = cell_tree
-
-        self._update_end_pts()  # New implementation
-
-        self._compute_section_mechs()  # Set mech values of all sections
-
-        # AES: This is the end of the body of `Cell.__init__` copied without
-        # modification.
+class L5_basket_cell(Cell):
+    """L5 basket cell implemented as a Cell subclass."""
+    
+    def __init__(self, pos=(0, 0, 0), gid=None):
+        """Initialize L5 basket cell."""
+        
+        sections = dict()
+        sections["soma"] = _get_basket_soma("L5_basket")
+        synapses = _get_basket_syn_props()
+        sections["soma"].syns = list(synapses.keys())
+        sections["soma"].mechs = {"hh2": dict()}
+        
+        sect_loc = dict(proximal=["soma"], distal=[])
+        cell_tree = None
+        
+        super().__init__(
+            "L5_basket",
+            pos,
+            sections=sections,
+            synapses=synapses,
+            sect_loc=sect_loc,
+            cell_tree=cell_tree,
+            gid=gid
+        )
 
