@@ -19,7 +19,7 @@ def jones_2009_model(
     legacy_mode=False,
     mesh_shape=(10, 10),
 ):
-    """Instantiate the network model described in Jones et al. 2009 [1]_
+    """Instantiate the network model described in Jones et al. 2009
 
     Parameters
     ----------
