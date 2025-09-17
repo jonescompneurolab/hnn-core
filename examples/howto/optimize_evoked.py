@@ -118,7 +118,7 @@ net_initial.add_evoked_drive('evprox2',
                              cell_specific=cell_specific)
 
 # Simulate initial dipole
-n_trials = 10
+n_trials = 3
 tstop = dipole_experimental.times[-1]
 with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
     dipoles_initial = simulate_dipole(
@@ -208,9 +208,7 @@ def set_params(net, params):
 # realistic model behavior, rather than solely relying on existing literature values.
 
 
-lower_bound = 0.1 * 10**-1
-upper_bound = 0.1 * 10
-constraints = dict({'evprox2_ampa_L5_pyramidal': (lower_bound, upper_bound),
+constraints = dict({'evprox2_ampa_L5_pyramidal': (0.01, 1.0),
                     'evprox2_mu': (100., 150.),
                     'evprox2_sigma': (1., 20.)})
 
@@ -221,7 +219,7 @@ constraints = dict({'evprox2_ampa_L5_pyramidal': (lower_bound, upper_bound),
 # For optimal results, set initial_params to your hand-tuned values since they
 # already provide a good fit.
 #
-# If initial_params is not set, the optimizer will use the midpoint of the
+# If ``initial_params`` is not set, the optimizer will use the midpoint of the
 # constraints as the initial parameters.
 
 initial_params = dict({'evprox2_ampa_L5_pyramidal': 0.1,
@@ -236,14 +234,21 @@ initial_params = dict({'evprox2_ampa_L5_pyramidal': 0.1,
 # class, providing our network, simulation time, constraints, and the ``set_params``
 # function.
 #
-# By default, the optimizer aims to minimize the Root Mean Square Error (RMSE)
+# By default, the Optimizer aims to minimize the Root Mean Square Error (RMSE)
 # between the simulated and experimental dipoles.
 #
-# .. note:: It is worth noting that a custom objective function can be supplied.
+# To capture the model's average behavior, it's recommended to set ``n_trials``
+# to a value greater than 1. Using ``n_trials=1`` might find a parameter set that
+# works well for a single, specific simulation run but performs poorly on average.
+#
+# Additionally, while ``max_iter`` is set to 50 in this example for a quicker
+# demonstration, you can set it to any value. The default is 200.
+#
+# .. note:: A custom objective function can also be supplied.
 
 net = jones_2009_model()
 optim = Optimizer(net, tstop=tstop, constraints=constraints,
-                  set_params=set_params, initial_params=initial_params)
+                  set_params=set_params, initial_params=initial_params, max_iter=50)
 with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
     optim.fit(target=dipole_experimental, n_trials=n_trials, scale_factor=scaling_factor,
               smooth_window_len=window_length)
@@ -287,3 +292,4 @@ ax.legend(legend_handles, ['experimental', 'initial', 'optimized'])
 
 # Convergence plot
 optim.plot_convergence()
+plt.show()

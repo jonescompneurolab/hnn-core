@@ -224,7 +224,7 @@ def test_rhythmic(solver):
     # test repr before fitting
     assert "fit=False" in repr(optim), "optimizer is already fit"
 
-    optim.fit(f_bands=[(8, 12), (18, 22)], relative_bandpower=(1, 2))
+    optim.fit(f_bands=[(8, 12), (18, 22)], relative_bandpower=[1, 2])
 
     # test repr after fitting
     assert "fit=True" in repr(optim), "optimizer was not fit"
@@ -389,3 +389,91 @@ def test_user_obj_fun(solver):
             <= param
             <= list(constraints.values())[param_idx][1]
         ), "Optimized parameter is not in user-defined range"
+
+
+@pytest.mark.parametrize("solver", ["bayesian", "cobyla"])
+def test_initial_params(solver):
+    """Test optimization routines with user-defined initial parameters."""
+
+    max_iter = 2
+    tstop = 10.0
+    n_trials = 1
+
+    # simulate a dipole to establish ground-truth drive parameters
+    net_orig = jones_2009_model(mesh_shape=(3, 3))
+
+    mu_orig = 2.0
+    sigma_orig = 1.0
+    weights_ampa = {
+        "L2_basket": 0.5,
+        "L2_pyramidal": 0.5,
+        "L5_basket": 0.5,
+        "L5_pyramidal": 0.5,
+    }
+    synaptic_delays = {
+        "L2_basket": 0.1,
+        "L2_pyramidal": 0.1,
+        "L5_basket": 1.0,
+        "L5_pyramidal": 1.0,
+    }
+    net_orig.add_evoked_drive(
+        "evprox",
+        mu=mu_orig,
+        sigma=sigma_orig,
+        numspikes=1,
+        location="proximal",
+        weights_ampa=weights_ampa,
+        synaptic_delays=synaptic_delays,
+    )
+    dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
+
+    # define set_params function and constraints
+    net_offset = jones_2009_model(mesh_shape=(3, 3))
+
+    def set_params(net_offset, params):
+        weights_ampa = {
+            "L2_basket": 0.5,
+            "L2_pyramidal": 0.5,
+            "L5_basket": 0.5,
+            "L5_pyramidal": 0.5,
+        }
+        synaptic_delays = {
+            "L2_basket": 0.1,
+            "L2_pyramidal": 0.1,
+            "L5_basket": 1.0,
+            "L5_pyramidal": 1.0,
+        }
+        net_offset.add_evoked_drive(
+            "evprox",
+            mu=params["mu"],
+            sigma=params["sigma"],
+            numspikes=1,
+            location="proximal",
+            weights_ampa=weights_ampa,
+            synaptic_delays=synaptic_delays,
+        )
+
+    # define constraints
+    constraints = dict()
+    constraints.update({"mu": (1, 10), "sigma": (1, 10)})
+    initial_params = {"mu": 5, "sigma": 5}
+
+    optim = Optimizer(
+        net_offset,
+        tstop=tstop,
+        constraints=constraints,
+        set_params=set_params,
+        solver=solver,
+        obj_fun="dipole_rmse",
+        max_iter=max_iter,
+        initial_params=initial_params,
+    )
+
+    optim.fit(target=dpl_orig, n_trials=3)
+
+    # Test that the initial_params were correctly set by the user
+    assert optim.initial_params == initial_params
+    assert optim.initial_params["mu"] == 5
+    assert optim.initial_params["sigma"] == 5
+
+    optim.fit(target=dpl_orig, n_trials=3)

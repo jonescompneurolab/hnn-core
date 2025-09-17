@@ -95,8 +95,9 @@ def _maximize_psd(
         The simulated dipole's duration.
     f_bands : list of tuples
         Lower and higher limit for each frequency band.
-    relative_bandpower : tuple
-        Weight for each frequency band.
+    relative_bandpower : list of float | float
+        Weight for each frequency band in f_bands. If a single float is provided,
+        the same weight is applied to all frequency bands.
 
     Returns
     -------
@@ -138,21 +139,21 @@ def _maximize_psd(
     f_bands_psds = list()
     relative_bandpower = obj_fun_kwargs["relative_bandpower"]
 
-    # Convert tuple to list
-    if isinstance(relative_bandpower, tuple):
-        relative_bandpower = list(relative_bandpower)
-    # If a single number is intended to be applied to all bands
-    if not isinstance(relative_bandpower, (list, np.ndarray)):
+    # Handle float and list inputs for relative_bandpower
+    if isinstance(relative_bandpower, float):
         relative_bandpower = [relative_bandpower] * len(obj_fun_kwargs["f_bands"])
+    elif len(relative_bandpower) != len(obj_fun_kwargs["f_bands"]):
+        raise ValueError("Length of relative_bandpower must match length of f_bands.")
 
     for idx, f_band in enumerate(obj_fun_kwargs["f_bands"]):
         f_band_idx = np.where(
             np.logical_and(freqs_simulated >= f_band[0], freqs_simulated <= f_band[1])
         )[0]
-        f_bands_psds.append(-relative_bandpower[idx] * sum(psd_simulated[f_band_idx]))
+        f_bands_psds.append(relative_bandpower[idx] * sum(psd_simulated[f_band_idx]))
 
-    # grand sum
-    obj = sum(f_bands_psds) / sum(psd_simulated)
+    # The optimizer is designed to minimize the objective function.
+    # Maximizing the relative band power is equivalent to minimizing its negative.
+    obj = -sum(f_bands_psds) / sum(psd_simulated)
 
     obj_values.append(obj)
 
