@@ -110,9 +110,19 @@ class Optimizer:
             self.obj_fun_name = None
         # Initial weights for the objective function
         if initial_params is not None:
+            # Check if initial_params is a dict
+            if not isinstance(initial_params, dict):
+                raise ValueError("initial_params must be a dictionary.")
             self.initial_params = initial_params
         else:
             self.initial_params = _get_initial_params(constraints)
+
+        # Check if initial_params keys match constraints keys
+        if set(self.initial_params.keys()) != set(self.constraints.keys()):
+            raise ValueError(
+                "The keys of initial_params must match the keys of constraints."
+            )
+
         self.tstop = tstop
         self.net_ = None
         self.obj_ = list()
@@ -137,8 +147,9 @@ class Optimizer:
             Number of trials to simulate and average.
         f_bands : list of tuples (if obj_fun='maximize_psd')
             Lower and higher limit for each frequency band.
-        relative_bandpower : tuple (if obj_fun='maximize_psd')
-            Weight for each frequency band.
+        relative_bandpower : list of float | float (if obj_fun='maximize_psd')
+            Weight for each frequency band in f_bands. If a single float is provided,
+            the same weight is applied to all frequency bands.
         scale_factor : float, optional
             The dipole scale factor.
         smooth_window_len : float, optional
@@ -329,6 +340,9 @@ def _run_opt_bayesian(
         The objective function.
     max_iter : int
         Number of calls the optimizer makes.
+    obj_fun_kwargs : dict
+        Additional arguments along with their respective values to be passed
+        to the objective function.
 
     Returns
     -------
@@ -406,6 +420,9 @@ def _run_opt_cobyla(
         The objective function.
     max_iter : int
         Number of calls the optimizer makes.
+    obj_fun_kwargs : dict
+        Additional arguments along with their respective values to be passed
+        to the objective function.
 
     Returns
     -------
