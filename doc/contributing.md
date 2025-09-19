@@ -893,6 +893,18 @@ If you ever need to make scientific or technical changes to the default network
 For an updated version of how we make releases, {doc}`see our guide here
 <how_to_create_releases>`.
 
+## Tips & Tricks
+
+- You can run only specific tests (such a single test inside a single file) by invoking
+  the `pytest` command with particular arguments, see
+  <https://docs.pytest.org/en/6.2.x/usage.html#specifying-tests-selecting-tests>.
+    - Furthermore, if you want to investigate an test failure, you can pass the `--pdb`
+      argument to `pytest` ([see
+      here](https://docs.pytest.org/en/6.2.x/usage.html#dropping-to-pdb-python-debugger-on-failures))
+      which will open the Python Debugger `pdb` ([see
+      here](https://docs.python.org/3/library/pdb.html#module-pdb)) at the point where
+      the tests are first failing.
+
 ["`pip` Source Installation" section of our Installation Guide]: https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html#local-installation
 [Github]: https://github.com
 [Installation Guide]: https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html#local-installation
