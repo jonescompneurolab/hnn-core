@@ -471,8 +471,8 @@ def get_L5PyrET_params():
         'L5Pyr_soma_gamma_CaDynamics_E2' : .000501,#*1e-10,
 
         # Biophysics basal
-        'L5Pyr_basal_gbar_NaTs2_t': 20_400e-4/2,
-        'L5Pyr_basal_gbar_SKv3_1': 0.000261/2,
+        'L5Pyr_basal_gbar_NaTs2_t': 0.0102,
+        'L5Pyr_basal_gbar_SKv3_1': 0.0001305,
         'L5Pyr_basal_gbar_Ih': 5.14e-5/4*2,
         'L5Pyr_basal_g_pas': 1.75e-5/2*2,
         'L5Pyr_basal_e_pas': -90,

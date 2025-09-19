@@ -531,7 +531,7 @@ def pyramidal_l5ET(cell_name,pos, gid=None):
     gbar_Ih = partial(_exp_g_at_dist, zero_val=p_all['L5Pyr_dend_gbar_Ih'],exp_term = 1./323, slope=2.087, offset=-.8696)
 
     # basal dendrites
-    gbar_NaTs2_t = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_basal_gbar_NaTs2_t']*0.01, gdend=0, xkink=255)
+    gbar_NaTs2_t = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_basal_gbar_NaTs2_t'], gdend=0, xkink=255)
     gbar_SKv3_1 = partial(_linear_g_at_dist, gsoma=0, gdend=p_all['L5Pyr_basal_gbar_SKv3_1'], xkink=255)
 
 
