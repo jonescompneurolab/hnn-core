@@ -1307,6 +1307,23 @@ that breakage needs to be fixed before we can merge your updates.</p></li>
 <h2>Publishing new releases<a class="headerlink" href="#publishing-new-releases" title="Link to this heading">#</a></h2>
 <p>For an updated version of how we make releases, <a class="reference internal" href="how_to_create_releases.html"><span class="doc">see our guide here</span></a>.</p>
 </section>
+<section id="tips-tricks">
+<h2>Tips &amp; Tricks<a class="headerlink" href="#tips-tricks" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>You can run only specific tests (such a single test inside a single file) by invoking
+the <code class="docutils literal notranslate"><span class="pre">pytest</span></code> command with particular arguments, see
+<a class="reference external" href="https://docs.pytest.org/en/6.2.x/usage.html#specifying-tests-selecting-tests">https://docs.pytest.org/en/6.2.x/usage.html#specifying-tests-selecting-tests</a>.</p>
+<ul>
+<li><p>Furthermore, if you want to investigate an test failure, you can pass the <code class="docutils literal notranslate"><span class="pre">--pdb</span></code>
+argument to <code class="docutils literal notranslate"><span class="pre">pytest</span></code> (<a class="reference external" href="https://docs.pytest.org/en/6.2.x/usage.html#dropping-to-pdb-python-debugger-on-failures">see
+here</a>)
+which will open the Python Debugger <code class="docutils literal notranslate"><span class="pre">pdb</span></code> (<a class="reference external" href="https://docs.python.org/3/library/pdb.html#module-pdb">see
+here</a>) at the point where
+the tests are first failing.</p></li>
+</ul>
+</li>
+</ul>
+</section>
 </section>
 
 
@@ -1370,6 +1387,7 @@ that breakage needs to be fixed before we can merge your updates.</p></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes-on-mpi-for-contributors">Notes on MPI for contributors</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#making-changes-to-the-default-network">Making changes to the default network</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#publishing-new-releases">Publishing new releases</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tips-tricks">Tips &amp; Tricks</a></li>
 </ul>
   </nav></div>
 
