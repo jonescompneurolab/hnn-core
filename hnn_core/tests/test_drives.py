@@ -737,3 +737,85 @@ def test_add_poisson_drive(setup_net, rate_constant, cell_specific, n_drive_cell
     )
 
     simulate_dipole(net, tstop=5)
+
+
+def test_shifted_drive_gid_starts(setup_net):
+    """Test that custom `gid_start` works across drives/biases."""
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, "param", "default.json")
+    params = read_params(params_fname)
+    net = Network(params, legacy_mode=False)
+    gid_offset = 13
+    net._shift_gid_ranges(gid_start=gid_offset)  # Just trying to break things.
+
+    ######################
+    # Begin adding drives.
+
+    # Ensure weights and delays are updated
+    weights_ampa = {"L2_basket": 1.0, "L2_pyramidal": 3.0, "L5_pyramidal": 4.0}
+    syn_delays = {"L2_basket": 1.0, "L2_pyramidal": 2.0, "L5_pyramidal": 4.0}
+
+    n_drive_cells = 10
+    cell_specific = False  # default for bursty drive
+    gid_drive_offset = net._get_next_available_gid() + 7
+    net.add_bursty_drive(
+        "bursty",
+        location="distal",
+        burst_rate=10,
+        cell_specific=cell_specific,
+        weights_ampa=weights_ampa,
+        synaptic_delays=syn_delays,
+        n_drive_cells=n_drive_cells,
+        gid_start=gid_drive_offset,
+    )
+
+    # At this point, there should now be a GAP in the gid ranges between the 0, the
+    # cells, and the new drive!
+
+    n_drive_cells = "n_cells"  # default for evoked drive
+    cell_specific = True
+    gid_drive_offset = net._get_next_available_gid() + 19
+    net.add_evoked_drive(
+        "evoked_dist",
+        mu=1.0,
+        sigma=1.0,
+        numspikes=1,
+        weights_ampa=weights_ampa,
+        location="distal",
+        synaptic_delays=syn_delays,
+        cell_specific=True,
+        gid_start=gid_drive_offset,
+    )
+
+    n_drive_cells = "n_cells"  # default for poisson drive
+    cell_specific = True
+    gid_drive_offset = net._get_next_available_gid() + 37
+    net.add_poisson_drive(
+        "poisson",
+        rate_constant=1.0,
+        weights_ampa=weights_ampa,
+        location="distal",
+        synaptic_delays=syn_delays,
+        cell_specific=cell_specific,
+        gid_start=gid_drive_offset,
+    )
+
+    spike_data = {
+        "drive_cell_1": [2.0, 8.0, 12.0],
+        "drive_cell_2": [7.0, 15.0, 19.0],
+    }
+    weights_ampa = {"L2_pyramidal": 0.5, "L5_pyramidal": 0.5}
+    gid_drive_offset = net._get_next_available_gid() + 17
+    net.add_spike_train_drive(
+        "test_drive",
+        spike_data=spike_data,
+        location="proximal",
+        weights_ampa=weights_ampa,
+        synaptic_delays=0.1,
+        conn_seed=42,
+        gid_start=gid_drive_offset,
+    )
+
+    # Finally, test that we are able to simulate, even with the drives' GIDs far from
+    # each other.
+    _ = simulate_dipole(net, tstop=20.0, n_trials=1)

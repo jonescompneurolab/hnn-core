@@ -1911,3 +1911,98 @@ def test_update_weights_metadata():
         else:
             # Assert that all other gains remain unchanged
             assert conn["nc_dict"]["gain"] == 1.0
+
+
+def test_get_next_available_gid(base_network):
+    """Test that `Network._get_next_available_gid` returns correctly."""
+    # "Base" has many connections and drives, but for now we're only interested in the
+    # non-drive params config
+    net_base, params = base_network
+
+    # Let's start with a simpler network
+    mesh_shape = (3, 3)
+    net1 = jones_2009_model(
+        params,
+        add_drives_from_params=False,
+        mesh_shape=mesh_shape,
+    )
+    # 2 * (9) pyramidals + 2 * (3) baskets = 24 total cells.
+    # 24 cells without any drives etc. should mean our max used GID is 23 (aka
+    # `_n_cells` - 1), since GIDs start with and include 0.
+    # Therefore, the next available GID should be 24.
+    assert net1._get_next_available_gid() == 24
+
+    # Next, let's do the default network, but with no drives
+    # 2 * (100) pyramidals + 2 * (35) baskets = 270 total cells.
+    # Therefore, max used GID is 269, so next available GID should be 270:
+    net2 = jones_2009_model(params, add_drives_from_params=False)
+    assert net2._get_next_available_gid() == 270
+
+    # Different drives add different numbers of GIDs. Therefore, this next test is
+    # testing the main function of this test, but is also heavily dependent on the
+    # defaults of the drives themselves and Network construction.
+    assert net_base._get_next_available_gid() == 540
+
+
+def test_shift_gid_ranges(base_network):
+    """Test that `Network._shift_gid_ranges` works and simulates as expected."""
+    # "Base" has many connections and drives, but for now we're only interested in the
+    # non-drive params config
+    net_base, params = base_network
+
+    ######################################
+    # Let's start with the default network
+    net1 = jones_2009_model(params, add_drives_from_params=False)
+    assert net1._get_next_available_gid() == 270  # See previous test function.
+    net1._shift_gid_ranges(gid_start=100)
+    # GIDs of this network should now start at 100 instead of 0.
+    # Therefore, next available GID should be 370:
+    assert net1._get_next_available_gid() == 370
+
+    # Next, let's test that our successful GID shift doesn't break the ability to
+    # simulate:
+    _ = simulate_dipole(net1, tstop=20.0, n_trials=1)
+
+    ######################################
+    # Now, let's do the same, but test that we can shift multiple times:
+    net2 = jones_2009_model(params, add_drives_from_params=False)
+    gid_offset = 42
+    net2._shift_gid_ranges(gid_start=gid_offset)
+    assert net2._get_next_available_gid() == (270 + gid_offset)
+
+    gid_offset = 37
+    net2._shift_gid_ranges(gid_start=gid_offset)
+    assert net2._get_next_available_gid() == (270 + gid_offset)
+    _ = simulate_dipole(net2, tstop=20.0, n_trials=1)
+
+    ######################################
+    # Now, let's make a new network, but add drives after the GID shift:
+    net3 = jones_2009_model(params, add_drives_from_params=False)
+    gid_offset = 69
+    net3._shift_gid_ranges(gid_start=gid_offset)
+    assert net3._get_next_available_gid() == (270 + gid_offset)
+    drive_new_gid = net3._get_next_available_gid()
+    net3.add_evoked_drive(
+        "evdist1",
+        mu=5.0,
+        sigma=1.0,
+        numspikes=1,
+        location="distal",
+        weights_ampa={"L2_pyramidal": 0.1, "L5_pyramidal": 0.1},
+        gid_start=drive_new_gid,
+    )
+    assert net3._get_next_available_gid() == (270 + gid_offset + 200)
+    drive_new_gid = net3._get_next_available_gid()
+    net3.add_evoked_drive(
+        "evdist2",
+        mu=5.0,
+        sigma=2.0,
+        numspikes=2,
+        location="distal",
+        weights_ampa={"L2_pyramidal": 0.1, "L5_pyramidal": 0.1},
+        gid_start=drive_new_gid,
+    )
+    assert net3._get_next_available_gid() == (270 + gid_offset + 200 + 200)
+
+    # Finally, let's test that our GID-shifted network and drives can still simulate:
+    _ = simulate_dipole(net3, tstop=20.0, n_trials=1)
