@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>hnn_core.viz.NetworkPlotter &#8212; hnn-core 0.4.3dev2 documentation</title>
+    <title>hnn_core.hnn_io.dict_to_network &#8212; hnn-core 0.4.3dev2 documentation</title>
   
   
   
@@ -48,7 +48,7 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=fd10adb8"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/hnn_core.viz.NetworkPlotter';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/hnn_core.hnn_io.dict_to_network';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
@@ -58,8 +58,8 @@
         </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="hnn_core.parallel_backends.MPIBackend" href="hnn_core.parallel_backends.MPIBackend.html" />
-    <link rel="prev" title="hnn_core.viz.plot_drive_strength" href="hnn_core.viz.plot_drive_strength.html" />
+    <link rel="next" title="hnn_core.hnn_io.network_to_dict" href="hnn_core.hnn_io.network_to_dict.html" />
+    <link rel="prev" title="hnn_core.parallel_backends.JoblibBackend" href="hnn_core.parallel_backends.JoblibBackend.html" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -461,7 +461,7 @@
     
     <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API Documentation</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">hnn_core.viz.NetworkPlotter</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">hnn_core.hnn_io.dict_to_network</span></li>
   </ul>
 </nav>
 </div>
@@ -478,109 +478,29 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="hnn-core-viz-networkplotter">
-<h1>hnn_core.viz.NetworkPlotter<a class="headerlink" href="#hnn-core-viz-networkplotter" title="Link to this heading">#</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="hnn_core.viz.NetworkPlotter">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hnn_core.viz.</span></span><span class="sig-name descname"><span class="pre">NetworkPlotter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bg_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colorbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">voltage_colormap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">azim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-200,</span> <span class="pre">3100)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-200,</span> <span class="pre">3100)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(-300,</span> <span class="pre">2200)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trial_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#NetworkPlotter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.NetworkPlotter" title="Link to this definition">#</a></dt>
-<dd><p>Helper class to visualize full morphology of HNN model.</p>
+  <section id="hnn-core-hnn-io-dict-to-network">
+<h1>hnn_core.hnn_io.dict_to_network<a class="headerlink" href="#hnn-core-hnn-io-dict-to-network" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="hnn_core.hnn_io.dict_to_network">
+<span class="sig-prename descclassname"><span class="pre">hnn_core.hnn_io.</span></span><span class="sig-name descname"><span class="pre">dict_to_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_drives</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_external_biases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/hnn_io.html#dict_to_network"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.hnn_io.dict_to_network" title="Link to this definition">#</a></dt>
+<dd><p>Converts a dict of network configurations to a Network</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>net</strong><span class="classifier">Instance of Network object</span></dt><dd><p>The Network object</p>
+<dt><strong>net_data</strong><span class="classifier">dict</span></dt><dd><p>Dictionary containing network configurations.</p>
 </dd>
-<dt><strong>ax</strong><span class="classifier">instance of matplotlib Axes3D | None</span></dt><dd><p>An axis object from matplotlib. If None,
-a new figure is created.</p>
+<dt><strong>read_drives</strong><span class="classifier">bool, optional</span></dt><dd><p>Read-in drives to Network object. Default is True.</p>
 </dd>
-<dt><strong>vmin</strong><span class="classifier">int | float</span></dt><dd><p>Lower limit of colormap for plotting voltage
-Default: -100 mV</p>
+<dt><strong>read_external_biases</strong><span class="classifier">bool, optional</span></dt><dd><p>Read-in external biases to Network object. Default is True.</p>
 </dd>
-<dt><strong>vmax</strong><span class="classifier">int | float</span></dt><dd><p>Upper limit of colormap for plotting voltage
-Default: 50 mV</p>
-</dd>
-<dt><strong>bg_color</strong><span class="classifier">str</span></dt><dd><p>Background color of ax. Default: ‘black’</p>
-</dd>
-<dt><strong>colorbar</strong><span class="classifier">bool</span></dt><dd><p>If True (default), adjust figure to include colorbar.</p>
-</dd>
-<dt><strong>voltage_colormap</strong><span class="classifier">str</span></dt><dd><p>Colormap used for plotting voltages
-Default: ‘viridis’</p>
-</dd>
-<dt><strong>elev</strong><span class="classifier">int | float</span></dt><dd><p>Elevation 3D plot viewpoint, default: 10</p>
-</dd>
-<dt><strong>azim</strong><span class="classifier">int | float</span></dt><dd><p>Azimuth of 3D plot view point, default: 20</p>
-</dd>
-<dt><strong>xlim</strong><span class="classifier">tuple of int | tuple of float</span></dt><dd><p>x limits of plot window. Default (-200, 3100)</p>
-</dd>
-<dt><strong>ylim</strong><span class="classifier">tuple of int | tuple of float</span></dt><dd><p>y limits of plot window. Default (-200, 3100)</p>
-</dd>
-<dt><strong>zlim</strong><span class="classifier">tuple of int | tuple of float</span></dt><dd><p>z limits of plot window. Default (-300, 2200)</p>
-</dd>
-<dt><strong>trial_idx</strong><span class="classifier">int</span></dt><dd><p>Index of simulation trial plotted. Default: 0</p>
-</dd>
-<dt><strong>time_idx</strong><span class="classifier">int</span></dt><dd><p>Index of time point plotted. Default: 0</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Attributes<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt><strong>azim</strong></dt><dd></dd>
-<dt><strong>bg_color</strong></dt><dd></dd>
-<dt><strong>colorbar</strong></dt><dd></dd>
-<dt><strong>elev</strong></dt><dd></dd>
-<dt><strong>time_idx</strong></dt><dd></dd>
-<dt><strong>trial_idx</strong></dt><dd></dd>
-<dt><strong>vmax</strong></dt><dd></dd>
-<dt><strong>vmin</strong></dt><dd></dd>
-<dt><strong>voltage_colormap</strong></dt><dd></dd>
-<dt><strong>xlim</strong></dt><dd></dd>
-<dt><strong>ylim</strong></dt><dd></dd>
-<dt><strong>zlim</strong></dt><dd></dd>
-</dl>
-</dd>
-</dl>
-<p class="rubric">Methods</p>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.viz.NetworkPlotter.export_movie" title="hnn_core.viz.NetworkPlotter.export_movie"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export_movie</span></code></a>(fname[, fps, dpi, decim, ...])</p></td>
-<td><p>Export movie of network activity</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="hnn_core.viz.NetworkPlotter.export_movie">
-<span class="sig-name descname"><span class="pre">export_movie</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pillow'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/viz.html#NetworkPlotter.export_movie"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.viz.NetworkPlotter.export_movie" title="Link to this definition">#</a></dt>
-<dd><p>Export movie of network activity</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>fname</strong><span class="classifier">str</span></dt><dd><p>Filename of exported movie</p>
-</dd>
-<dt><strong>fps</strong><span class="classifier">int</span></dt><dd><p>Frames per second, default: 30</p>
-</dd>
-<dt><strong>dpi</strong><span class="classifier">int</span></dt><dd><p>Dots per inch, default: 300</p>
-</dd>
-<dt><strong>decim</strong><span class="classifier">int</span></dt><dd><p>Decimation factor for frames, default: 10</p>
-</dd>
-<dt><strong>interval</strong><span class="classifier">int</span></dt><dd><p>Delay between frames, default: 30</p>
-</dd>
-<dt><strong>frame_start</strong><span class="classifier">int</span></dt><dd><p>Index of first frame, default: 0</p>
-</dd>
-<dt><strong>frame_stop</strong><span class="classifier">int | None</span></dt><dd><p>Index of last frame, default: None
-If None, entire simulation is animated</p>
-</dd>
-<dt><strong>writer</strong><span class="classifier">str</span></dt><dd><p>Movie writer, default: ‘pillow’.
-Alternative movie writers can be found at
-<a class="reference external" href="https://matplotlib.org/stable/api/animation_api.html">https://matplotlib.org/stable/api/animation_api.html</a></p>
-</dd>
+<dt><strong>Returns</strong><span class="classifier">Network</span></dt><dd></dd>
+<dt><strong>——-</strong></dt><dd></dd>
 </dl>
 </dd>
 </dl>
 </dd></dl>
 
-</dd></dl>
-
-<span class="target" id="sphx-glr-backreferences-hnn-core-viz-networkplotter"></span></section>
+<span class="target" id="sphx-glr-backreferences-hnn-core-hnn-io-dict-to-network"></span></section>
 
 
                 </article>
@@ -593,20 +513,20 @@ Alternative movie writers can be found at
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="hnn_core.viz.plot_drive_strength.html"
+       href="hnn_core.parallel_backends.JoblibBackend.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">hnn_core.viz.plot_drive_strength</p>
+        <p class="prev-next-title">hnn_core.parallel_backends.JoblibBackend</p>
       </div>
     </a>
     <a class="right-next"
-       href="hnn_core.parallel_backends.MPIBackend.html"
+       href="hnn_core.hnn_io.network_to_dict.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">hnn_core.parallel_backends.MPIBackend</p>
+        <p class="prev-next-title">hnn_core.hnn_io.network_to_dict</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -629,10 +549,7 @@ Alternative movie writers can be found at
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.viz.NetworkPlotter"><code class="docutils literal notranslate"><span class="pre">NetworkPlotter</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.viz.NetworkPlotter.export_movie"><code class="docutils literal notranslate"><span class="pre">NetworkPlotter.export_movie()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.hnn_io.dict_to_network"><code class="docutils literal notranslate"><span class="pre">dict_to_network()</span></code></a></li>
 </ul>
   </nav></div>
 
@@ -640,7 +557,7 @@ Alternative movie writers can be found at
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="../_sources/generated/hnn_core.viz.NetworkPlotter.rst.txt"
+      <li><a href="../_sources/generated/hnn_core.hnn_io.dict_to_network.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div></div>

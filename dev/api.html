@@ -505,7 +505,7 @@
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jones_2009_model</span></code></a>([params, ...])</p></td>
-<td><p>Instantiate the network model described in Jones et al. 2009 <a class="reference internal" href="generated/hnn_core.jones_2009_model.html#r05169645466c-1" id="id2"><span>[R05169645466c-1]</span></a>.</p></td>
+<td><p>Instantiate the network model described in Jones et al. 2009.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.law_2021_model.html#hnn_core.law_2021_model" title="hnn_core.law_2021_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">law_2021_model</span></code></a>([params, ...])</p></td>
 <td><p>Instantiate the expansion of Jones 2009 model to study beta modulated ERPs as described in Law et al. Cereb.</p></td>
@@ -614,8 +614,28 @@
 </table>
 </div>
 </section>
-<section id="input-and-output">
-<h2>Input and Output:<a class="headerlink" href="#input-and-output" title="Link to this heading">#</a></h2>
+<section id="input-and-output-hierarchical-json-hnn-core-hnn-io">
+<h2>Input and Output (hierarchical JSON) (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.hnn_io</span></code>):<a class="headerlink" href="#input-and-output-hierarchical-json-hnn-core-hnn-io" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.hnn_io.dict_to_network.html#hnn_core.hnn_io.dict_to_network" title="hnn_core.hnn_io.dict_to_network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_to_network</span></code></a>(net_data[, read_drives, ...])</p></td>
+<td><p>Converts a dict of network configurations to a Network</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.hnn_io.network_to_dict.html#hnn_core.hnn_io.network_to_dict" title="hnn_core.hnn_io.network_to_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">network_to_dict</span></code></a>(net[, write_output])</p></td>
+<td><p>Returns a dict of parameters and outputs from Network.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.hnn_io.read_network_configuration.html#hnn_core.hnn_io.read_network_configuration" title="hnn_core.hnn_io.read_network_configuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_network_configuration</span></code></a>(fname[, ...])</p></td>
+<td><p>Read network from a json configuration file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/hnn_core.hnn_io.write_network_configuration.html#hnn_core.hnn_io.write_network_configuration" title="hnn_core.hnn_io.write_network_configuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_network_configuration</span></code></a>(net, output[, ...])</p></td>
+<td><p>Writes network configuration to a json file.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="input-and-output-non-hierarchical-json">
+<h2>Input and Output (non-hierarchical JSON):<a class="headerlink" href="#input-and-output-non-hierarchical-json" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/hnn_core.read_params.html#hnn_core.read_params" title="hnn_core.read_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_params</span></code></a>(params_fname[, file_contents])</p></td>
@@ -698,7 +718,8 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extracellulararray-hnn-core-extracellular">ExtracellularArray (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.extracellular</span></code>):</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualization-hnn-core-viz">Visualization (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.viz</span></code>):</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parallel-backends-hnn-core-parallel-backends">Parallel backends (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.parallel_backends</span></code>):</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#input-and-output">Input and Output:</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#input-and-output-hierarchical-json-hnn-core-hnn-io">Input and Output (hierarchical JSON) (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.hnn_io</span></code>):</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#input-and-output-non-hierarchical-json">Input and Output (non-hierarchical JSON):</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gui-hnn-core-gui">GUI (<code class="xref py py-mod docutils literal notranslate"><span class="pre">hnn_core.gui</span></code>):</a></li>
 </ul>
   </nav></div>
