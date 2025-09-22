@@ -120,13 +120,46 @@ def _read_cell_types(cell_types_data):
             "cell_object" in cell_types_data[cell_name]
             and "cell_metadata" in cell_types_data[cell_name]
         ):
-            # New format: extract cell properties from nested "cell_object"
+            # Format post-commit-6388f9f:
+            #   Extract cell properties from nested "cell_object"
             cell_data = cell_types_data[cell_name]["cell_object"]
             cell_metadata = cell_types_data[cell_name]["cell_metadata"]
         else:
-            # Legacy format, treat the entire cell_data as the cell information
+            # Format pre-commit-6388f9f:
+            #   Treat the entire cell_data as the cell information
             cell_data = cell_types_data[cell_name]
-            cell_metadata = {}
+            if cell_name == "L2_basket":
+                cell_metadata = {
+                    "morpho_type": "basket",
+                    "electro_type": "inhibitory",
+                    "layer": "2",
+                    "measure_dipole": False,
+                    "reference": "https://doi.org/10.7554/eLife.51214",
+                }
+            elif cell_name == "L2_pyramidal":
+                cell_metadata = {
+                    "morpho_type": "pyramidal",
+                    "electro_type": "excitatory",
+                    "layer": "2",
+                    "measure_dipole": True,
+                    "reference": "https://doi.org/10.7554/eLife.51214",
+                }
+            elif cell_name == "L5_basket":
+                cell_metadata = {
+                    "morpho_type": "basket",
+                    "electro_type": "inhibitory",
+                    "layer": "5",
+                    "measure_dipole": False,
+                    "reference": "https://doi.org/10.7554/eLife.51214",
+                }
+            elif cell_name == "L5_pyramidal":
+                cell_metadata = {
+                    "morpho_type": "pyramidal",
+                    "electro_type": "excitatory",
+                    "layer": "5",
+                    "measure_dipole": True,
+                    "reference": "https://doi.org/10.7554/eLife.51214",
+                }
 
         # Now cell_data contains the cell properties regardless of format
         sections = dict()
