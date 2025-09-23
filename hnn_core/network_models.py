@@ -7,9 +7,13 @@ import hnn_core
 from hnn_core import read_params
 from .network import Network, _create_cell_coords
 from .params import _short_name
-from .cells_default import (pyramidal_ca, pyramidal, basket, 
-                            L5_pyramidal_cell, L2_pyramidal_cell,
-                            L5_basket_cell, L2_basket_cell)
+from .cells_default import (
+    pyramidal_ca,
+    L5_pyramidal_cell,
+    L2_pyramidal_cell,
+    L5_basket_cell,
+    L2_basket_cell,
+)
 from .externals.mne import _validate_type
 
 # ToDO -> direct _cell_L2Pyr calling
