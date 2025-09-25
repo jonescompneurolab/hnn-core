@@ -323,6 +323,8 @@ def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
 
     return np.sqrt((weights * ((dpl1 - dpl2) ** 2)).sum() / weights.sum())
 
+def exp_decay(t, A, C, b):
+    return ((C-A) * np.exp(-b*(t))) + A
 
 class Dipole(object):
     """Dipole class.
@@ -626,11 +628,20 @@ class Dipole(object):
         with open(op.join(hnn_core_root, 'param', 'bsl_dipole_ca.json'), 'r') as f:
             bsl_dpl = json.load(f)
 
-        # subtract baseline dipole from the current dipole
-        for i,t in enumerate(self.times):
-            bsl_idx = np.argmin(np.abs(bsl_dpl['times'] - t))
-            self.data['L2'][i] -= bsl_dpl['L2'][bsl_idx]
-            self.data['L5'][i] -= bsl_dpl['L5'][bsl_idx]
+        A_L2 = bsl_dpl['L2'][-1]
+        A_L5 = bsl_dpl['L5'][-1]
+
+        C_L2 = bsl_dpl['L2'][1]
+        C_L5 = bsl_dpl['L5'][1]
+
+        popt_l2 = np.array(bsl_dpl['popt_l2'])
+        popt_l5 = np.array(bsl_dpl['popt_l5'])
+
+        exp_fit_l2 = exp_decay(np.array(self.times[1:]), A_L2, C_L2, *popt_l2)
+        exp_fit_l5 = exp_decay(np.array(self.times[1:]), A_L5, C_L5, *popt_l5)
+
+        self.data['L2'][1:] -= exp_fit_l2
+        self.data['L5'][1:] -= exp_fit_l5
         
         self.data['agg'] = self.data['L2'] + self.data['L5']
 
