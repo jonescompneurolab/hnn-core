@@ -330,6 +330,8 @@ def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
 
     return np.sqrt((weights * ((dpl1 - dpl2) ** 2)).sum() / weights.sum())
 
+def exp_decay(t, A, C, b):
+    return ((C-A) * np.exp(-b*(t))) + A
 
 class Dipole(object):
     """Dipole class.
