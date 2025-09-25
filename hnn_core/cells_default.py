@@ -571,15 +571,15 @@ def pyramidal_l5ET(cell_name,pos, gid=None):
     section_names = list(end_pts.keys())
 
     # initialize section voltage
-    v_init = {'soma': -69.72316110770498,
-            'basal_1': -69.78629396031342,
-            'basal_2': -69.88018961833787,
-            'basal_3': -69.88018961833787,
-            'apical_oblique': -69.68267886817998,
-            'apical_trunk': -69.67068315078,
-            'apical_1': -68.69347989468767,
-            'apical_2': -65.03769011511882,
-            'apical_tuft': -61.06428465773297}
+    v_init = {'soma': -70.62820902070445,
+            'basal_1': -70.68833400623593,
+            'basal_2': -70.77775514983897,
+            'basal_3': -70.77775514983897,
+            'apical_oblique': -70.59471467725159,
+            'apical_trunk': -70.5815879670308,
+            'apical_1': -69.62883464685193,
+            'apical_2': -65.7496819357426,
+            'apical_tuft': -61.28751781712565}
 
     sections_apcl = _get_dends(p_all, 'L5Pyr', section_names=['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft'], v_init=v_init)
     sections_basal = _get_basal(p_all, 'L5Pyr', section_names=['basal_1', 'basal_2', 'basal_3', 'apical_oblique'], v_init=v_init)
@@ -717,14 +717,14 @@ def pyramidal_l23(cell_name,pos, gid=None):
     # build sections
     section_names = list(end_pts.keys())
 
-    v_init = {'soma': -73.91534035708573,
-            'basal_1': -73.93352687563383,
-            'basal_2': -73.98646383934111,
-            'basal_3': -73.98646383934111,
-            'apical_oblique': -73.91421209292815,
-            'apical_trunk': -73.88877758950657,
-            'apical_1': -73.64560269252748,
-            'apical_tuft': -73.27793049058045}
+    v_init = {'soma': -74.09814385100316,
+            'basal_1': -74.11140903446456,
+            'basal_2': -74.15004512116734,
+            'basal_3': -74.15004512116734,
+            'apical_oblique': -74.16696794178478,
+            'apical_trunk': -74.11552114522702,
+            'apical_1': -74.20225631447201,
+            'apical_tuft': -74.34999330292102}
     
     sections = _get_dends(p_all, 'L2Pyr', section_names, v_init=v_init)
     sections['soma'] = _get_pyr_soma(p_all, 'L2Pyr', v_init=v_init['soma'])
