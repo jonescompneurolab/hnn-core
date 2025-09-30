@@ -724,14 +724,14 @@ def pyramidal_l23(cell_name,pos, gid=None):
     # build sections
     section_names = list(end_pts.keys())
 
-    v_init = {'soma': -74.09814385100316,
-            'basal_1': -74.11140903446456,
-            'basal_2': -74.15004512116734,
-            'basal_3': -74.15004512116734,
-            'apical_oblique': -74.16696794178478,
-            'apical_trunk': -74.11552114522702,
-            'apical_1': -74.20225631447201,
-            'apical_tuft': -74.34999330292102}
+    v_init = {'soma': -73.91534035708573,
+            'basal_1': -73.93352687563383,
+            'basal_2': -73.98646383934111,
+            'basal_3': -73.98646383934111,
+            'apical_oblique': -73.91421209292815,
+            'apical_trunk': -73.88877758950657,
+            'apical_1': -73.64560269252748,
+            'apical_tuft': -73.27793049058045}
     
     sections = _get_dends(p_all, 'L2Pyr', section_names, v_init=v_init)
     sections['soma'] = _get_pyr_soma(p_all, 'L2Pyr', v_init=v_init['soma'])
