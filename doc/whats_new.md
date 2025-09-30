@@ -41,8 +41,12 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 - {class}`~hnn_core.Network` now accepts optional arguments for its position dictionary  attribute `pos_dict` and cell type dictionary attribute `cell_types`,
   by [Chetan Kandpal][] in {gh}`1095`.
 
+- {class}`~hnn_core.optimization.Optimizer` now accepts user-defined initial weights in the form of optional argument `initial_params` and allows the user to set the number of trials by passing `n_trials` to {func}`~hnn_core.optimization.Optimizer.fit`,
+  by [Carolina Fernandez Pujol][] in {gh}`1057`.
+
 ### People who contributed to this release (in alphabetical order of family name):
 
+- [Carolina Fernandez Pujol][]
 - [Chetan Kandpal][]
 
 ### Changelog
@@ -56,6 +60,9 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   from `network.py` to `network_models.py`. This is the first in a series of code
   changes meant to allow for more flexible cell types to be used.
   By [Chetan Kandpal][] in {gh}`1095`.
+
+- Enhance the optimization workflow for more reliable parameter fitting. This includes adding support for user-defined initial weights. For optimal results, we now recommend setting `initial_params` to hand-tuned values since they often provide a good starting fit. The default objective function ({func}`~hnn_core.optimization.objective_functions._rmse_evoked`) now averages results over 3 dipoles rather than simulating a single dipole, with the option to control this behavior by setting the `n_trials` parameter in {func}`~hnn_core.optimization.Optimizer.fit`. To capture the model's average behavior, it is recommended to set `n_trials` > 1, as using `n_trials=1` may identify parameters that work well for one simulation run but perform poorly on average. The optimization example (`examples/howto/optimize_evoked.py`) has also been enhanced with improved markdown and updated contents to better illustrate best practices.
+ By [Carolina Fernandez Pujol][] in {gh}`1057`.
 
 ## 0.4.2 Patch Notes
 
