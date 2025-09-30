@@ -8,6 +8,7 @@
 import numpy as np
 
 from .objective_functions import _rmse_evoked, _maximize_psd
+from ..externals.mne import _validate_type
 
 
 class Optimizer:
@@ -110,18 +111,32 @@ class Optimizer:
             self.obj_fun_name = None
         # Initial weights for the objective function
         if initial_params is not None:
-            # Check if initial_params is a dict
-            if not isinstance(initial_params, dict):
-                raise ValueError("initial_params must be a dictionary.")
+            # Check if initial_params is not a dict
+            _validate_type(initial_params, dict)
+
+            # Check if initial_params keys match constraints keys
+            if set(initial_params.keys()) != set(self.constraints.keys()):
+                raise ValueError(
+                    "The keys of initial_params must match the keys of constraints."
+                )
+
+            # Check if initial_params values contain only int or float
+            for val in initial_params.values():
+                _validate_type(val, (int, float))
+
+            # Check if initial_params values are within constraints
+            for key in initial_params:
+                if not (
+                    self.constraints[key][0]
+                    <= initial_params[key]
+                    <= self.constraints[key][1]
+                ):
+                    raise ValueError(
+                        f"Initial parameter '{key}' with value {initial_params[key]} is out of bounds {self.constraints[key]}."
+                    )
             self.initial_params = initial_params
         else:
-            self.initial_params = _get_initial_params(constraints)
-
-        # Check if initial_params keys match constraints keys
-        if set(self.initial_params.keys()) != set(self.constraints.keys()):
-            raise ValueError(
-                "The keys of initial_params must match the keys of constraints."
-            )
+            self.initial_params = _get_initial_params(self.constraints)
 
         self.tstop = tstop
         self.net_ = None

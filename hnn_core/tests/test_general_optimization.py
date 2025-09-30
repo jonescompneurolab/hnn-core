@@ -477,3 +477,63 @@ def test_initial_params(solver):
     assert optim.initial_params["sigma"] == 5
 
     optim.fit(target=dpl_orig, n_trials=3)
+
+
+@pytest.mark.parametrize("solver", ["bayesian", "cobyla"])
+@pytest.mark.parametrize(
+    "initial_params, error_type",
+    [
+        # initial_params is not a dict
+        ([5, 5], TypeError),
+        # initial_params keys do not match constraints keys
+        ({"mu": 5, "wrong_key": 5}, ValueError),
+        # initial_params values are not float or int
+        ({"mu": "five", "sigma": 5}, TypeError),
+        # initial_params values are outside the range of constraints
+        ({"mu": 11, "sigma": 5}, ValueError),
+    ],
+)
+def test_initial_params_validation(solver, initial_params, error_type):
+    """Test initial_params validation."""
+
+    tstop = 10.0
+    net_offset = jones_2009_model(mesh_shape=(3, 3))
+
+    def set_params(net_offset, params):
+        weights_ampa = {
+            "L2_basket": 0.5,
+            "L2_pyramidal": 0.5,
+            "L5_basket": 0.5,
+            "L5_pyramidal": 0.5,
+        }
+        synaptic_delays = {
+            "L2_basket": 0.1,
+            "L2_pyramidal": 0.1,
+            "L5_basket": 1.0,
+            "L5_pyramidal": 1.0,
+        }
+        net_offset.add_evoked_drive(
+            "evprox",
+            mu=params["mu"],
+            sigma=params["sigma"],
+            numspikes=1,
+            location="proximal",
+            weights_ampa=weights_ampa,
+            synaptic_delays=synaptic_delays,
+        )
+
+    # define constraints
+    constraints = dict()
+    constraints.update({"mu": (1, 10), "sigma": (1, 10)})
+
+    with pytest.raises(error_type):
+        Optimizer(
+            net_offset,
+            tstop=tstop,
+            constraints=constraints,
+            set_params=set_params,
+            solver=solver,
+            obj_fun="dipole_rmse",
+            max_iter=2,
+            initial_params=initial_params,
+        )
