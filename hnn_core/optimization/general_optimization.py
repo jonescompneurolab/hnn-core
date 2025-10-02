@@ -107,6 +107,15 @@ class Optimizer:
         self.opt_params_ = None
 
     def __repr__(self):
+        """
+        Print summary info about the object.
+
+        Returns
+        -------
+        str
+            Summary info about the object. Is of the form: "{name}\nsolver={solver}\nfit={is_fit}>"
+
+        """
         is_fit = False
         if self.net_ is not None:
             is_fit = True
@@ -311,7 +320,8 @@ def _run_opt_bayesian(
         Keys are parameter names, values are initial parameters.
     max_iter : int
         Number of calls the optimizer makes.
-
+    obj_fun_kwargs : dict
+        Additional arguments to be passed to the objective function.
     Returns
     -------
     opt_params : list
