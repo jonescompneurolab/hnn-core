@@ -560,7 +560,7 @@ class HNNGUI:
         self.connectivity_widgets = list()
 
         # Cell parameter dict
-        self.cell_parameters_widgets = dict()
+        self.cell_pameters_widgets = dict()
 
         # Synaptic Gains dict
         self.synaptic_gain_widgets = dict()
@@ -2041,7 +2041,7 @@ def add_connectivity_tab(
     add_network_connectivity_tab(net, connectivity_out, connectivity_textfields)
 
     # build cell parameters tab
-    add_cell_parameters_tab(cell_params_out, cell_parameters_vboxes,
+    add_cell_parameters_tab(cell_params_out, cell_pameters_vboxes,
                             cell_layer_radio_button, cell_type_radio_button,
                             layout)
 
