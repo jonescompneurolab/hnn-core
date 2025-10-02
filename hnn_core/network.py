@@ -335,13 +335,14 @@ def _get_cell_index_by_synapse_type(net):
     """
 
     def list_src_gids(indices):
-        return np.concatenate([list(net.connectivity[conn_idx]['src_gids'])
-                               for conn_idx in indices]).tolist()
+        return np.concatenate(
+            [list(net.connectivity[conn_idx]["src_gids"]) for conn_idx in indices]
+        ).tolist()
 
-    picks_e = pick_connection(net, receptor=['ampa', 'nmda'])
+    picks_e = pick_connection(net, receptor=["ampa", "nmda"])
     e_cells = list_src_gids(picks_e)
 
-    picks_i = pick_connection(net, receptor=['gabaa', 'gabab'])
+    picks_i = pick_connection(net, receptor=["gabaa", "gabab"])
     i_cells = list_src_gids(picks_i)
 
     return e_cells, i_cells
@@ -1955,8 +1956,7 @@ class Network:
             }
         )
 
-    def set_synaptic_gains(self, e_e=None, e_i=None,
-                           i_e=None, i_i=None, copy=False):
+    def set_synaptic_gains(self, e_e=None, e_i=None, i_e=None, i_i=None, copy=False):
         """Update synaptic weights of the network.
 
         Parameters
@@ -2055,23 +2055,19 @@ class Network:
 
         # Define the connection types and source/target cell indexes
         conn_types = {
-            'e_e': (e_cells, e_cells),
-            'e_i': (e_cells, i_cells),
-            'i_e': (i_cells, e_cells),
-            'i_i': (i_cells, i_cells)
+            "e_e": (e_cells, e_cells),
+            "e_i": (e_cells, i_cells),
+            "i_e": (i_cells, e_cells),
+            "i_i": (i_cells, i_cells),
         }
 
         # Retrieve the gain value for each connection type
         for conn_type, (src_idxs, target_idxs) in conn_types.items():
-            picks = pick_connection(self,
-                                    src_gids=src_idxs,
-                                    target_gids=target_idxs)
+            picks = pick_connection(self, src_gids=src_idxs, target_gids=target_idxs)
 
             if picks:
                 # Extract the gain from the first connection
-                values[conn_type] = (
-                    self.connectivity[picks[0]]['nc_dict']['gain']
-                )
+                values[conn_type] = self.connectivity[picks[0]]["nc_dict"]["gain"]
 
         return values
 

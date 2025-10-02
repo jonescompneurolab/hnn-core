@@ -1283,14 +1283,14 @@ def test_set_synaptic_gains():
     # Type check on gains
     arg_names = ["e_e", "e_i", "i_e", "i_i"]
     for arg in arg_names:
-        with pytest.raises(TypeError, match='must be an instance of int or'):
-            net.set_synaptic_gains(**{arg: 'abc'})
+        with pytest.raises(TypeError, match="must be an instance of int or"):
+            net.set_synaptic_gains(**{arg: "abc"})
 
-        with pytest.raises(ValueError, match='must be non-negative'):
+        with pytest.raises(ValueError, match="must be non-negative"):
             net.set_synaptic_gains(**{arg: -1})
 
-    with pytest.raises(TypeError, match='must be an instance of bool'):
-        net.set_synaptic_gains(copy='True')
+    with pytest.raises(TypeError, match="must be an instance of bool"):
+        net.set_synaptic_gains(copy="True")
 
     # Single argument check with copy
     net_updated = net.set_synaptic_gains(e_e=2.0, copy=True)
@@ -1346,9 +1346,8 @@ def test_set_synaptic_gains():
 def test_get_synaptic_gains():
     """Test synaptic gains getter."""
     net = jones_2009_model()
-    assert net.get_synaptic_gains() == {'e_e': 1.0, 'e_i': 1.0,
-                                        'i_e': 1.0, 'i_i': 1.0}
-    new_gains = {'e_e': 0.5, 'e_i': 1.5, 'i_e': 0.75, 'i_i': 1.0}
+    assert net.get_synaptic_gains() == {"e_e": 1.0, "e_i": 1.0, "i_e": 1.0, "i_i": 1.0}
+    new_gains = {"e_e": 0.5, "e_i": 1.5, "i_e": 0.75, "i_i": 1.0}
     net.set_synaptic_gains(**new_gains)
     assert net.get_synaptic_gains() == new_gains
 
