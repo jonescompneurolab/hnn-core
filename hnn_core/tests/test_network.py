@@ -1908,7 +1908,7 @@ def test_update_weights_metadata():
     i_cell_names = net.filter_cell_types(electro_type="inhibitory")
 
     # Test updating excitatory to inhibitory connections
-    net.update_weights(e_i=2.0)
+    net.set_synaptic_gains(e_i=2.0)
 
     for conn in net.connectivity:
         is_e_to_i = (
