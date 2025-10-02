@@ -1205,46 +1205,6 @@ def test_delete_single_drive(setup_gui):
     )
 
 
-def test_adjust_synaptic_weights(setup_gui):
-    """Test adjusting synaptic weight widgets."""
-
-    gui = setup_gui
-    _single_simulation = {}
-    _single_simulation["net"] = dict_to_network(gui.params)
-    _init_network_from_widgets(
-        gui.params,
-        gui.widget_dt,
-        gui.widget_tstop,
-        _single_simulation,
-        gui.drive_widgets,
-        gui.connectivity_widgets,
-        gui.cell_pameters_widgets,
-        gui.synaptic_gain_widgets,
-    )
-
-    gains_default = _single_simulation["net"].get_synaptic_gains()
-    assert gains_default == {"e_e": 1.0, "e_i": 1.0, "i_e": 1.0, "i_i": 1.0}
-
-    # Change the synaptic weight widgets
-    gui.synaptic_gain_widgets["e_e"].value = 0.5
-    gui.synaptic_gain_widgets["e_i"].value = 0.5
-    gui.synaptic_gain_widgets["i_i"].value = 1.1
-    gui.synaptic_gain_widgets["i_e"].value = 1.1
-    _init_network_from_widgets(
-        gui.params,
-        gui.widget_dt,
-        gui.widget_tstop,
-        _single_simulation,
-        gui.drive_widgets,
-        gui.connectivity_widgets,
-        gui.cell_pameters_widgets,
-        gui.synaptic_gain_widgets,
-    )
-
-    gains_altered = _single_simulation["net"].get_synaptic_gains()
-    assert gains_altered == {"e_e": 0.5, "e_i": 0.5, "i_e": 1.1, "i_i": 1.1}
-
-
 def test_default_smoothing(setup_gui):
     """Tests default smoothing is inherited correctly"""
 
@@ -1335,3 +1295,43 @@ def test_default_frequencies(setup_gui):
 
     assert gui_min == viz_min == new_min
     assert gui_max == viz_max == new_max
+
+
+def test_adjust_synaptic_weights(setup_gui):
+    """Test adjusting synaptic weight widgets."""
+
+    gui = setup_gui
+    _single_simulation = {}
+    _single_simulation["net"] = dict_to_network(gui.params)
+    _init_network_from_widgets(
+        gui.params,
+        gui.widget_dt,
+        gui.widget_tstop,
+        _single_simulation,
+        gui.drive_widgets,
+        gui.connectivity_widgets,
+        gui.cell_pameters_widgets,
+        gui.synaptic_gain_widgets,
+    )
+
+    gains_default = _single_simulation["net"].get_synaptic_gains()
+    assert gains_default == {"e_e": 1.0, "e_i": 1.0, "i_e": 1.0, "i_i": 1.0}
+
+    # Change the synaptic weight widgets
+    gui.synaptic_gain_widgets["e_e"].value = 0.5
+    gui.synaptic_gain_widgets["e_i"].value = 0.5
+    gui.synaptic_gain_widgets["i_i"].value = 1.1
+    gui.synaptic_gain_widgets["i_e"].value = 1.1
+    _init_network_from_widgets(
+        gui.params,
+        gui.widget_dt,
+        gui.widget_tstop,
+        _single_simulation,
+        gui.drive_widgets,
+        gui.connectivity_widgets,
+        gui.cell_pameters_widgets,
+        gui.synaptic_gain_widgets,
+    )
+
+    gains_altered = _single_simulation["net"].get_synaptic_gains()
+    assert gains_altered == {"e_e": 0.5, "e_i": 0.5, "i_e": 1.1, "i_i": 1.1}
