@@ -916,10 +916,6 @@ class HNNGUI:
                 ),
                 VBox(
                     [
-                        HTML(
-                            "<div style='text-align:center'>"
-                            "Global Synaptic Gain Multipliers</div>"
-                        ),
                         self._syn_gain_out,
                     ]
                 ),
@@ -2186,10 +2182,51 @@ def add_network_connectivity_tab(
             layout=layout,
         )
 
-        gain_widget.layout.width = "150px"
+        gain_widget.layout.width = "220px"
         syn_gain_textfields[gain_type] = gain_widget
 
-    gain_vbox = VBox([widget for widget in syn_gain_textfields.values()])
+    title_box = HTML(
+        """
+        <div
+        style="
+            background: gray;
+            color: white;
+            width: 100%;
+            margin-bottom: 2px;
+            text-align: center;
+        ">
+        Global Synaptic Gain Multipliers
+        </div>
+        """
+    )
+
+    left_box = VBox(
+        [
+            syn_gain_textfields["e_e"],
+            syn_gain_textfields["e_i"],
+        ]
+    )
+    right_box = VBox(
+        [
+            syn_gain_textfields["i_e"],
+            syn_gain_textfields["i_i"],
+        ]
+    )
+    gain_vbox = VBox(
+        [
+            title_box,
+            HBox(
+                [
+                    left_box,
+                    right_box,
+                ]
+            ),
+        ],
+        layout=Layout(
+            border="1px solid black",  # border width, style, and color
+            padding="10px",  # optional: adds space inside the border
+        ),
+    )
 
     with syn_gain_out:
         display(gain_vbox)
