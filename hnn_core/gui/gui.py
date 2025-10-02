@@ -898,7 +898,7 @@ class HNNGUI:
             self.widget_n_jobs,
         )
 
-        network_configuration = Tab()
+        connectivity_configuration = Tab()
 
         connectivity_box = VBox(
             [
@@ -920,10 +920,10 @@ class HNNGUI:
 
         syn_gain = VBox([self._syn_gain_out])
 
-        network_configuration.children = [connectivity_box,
+        connectivity_configuration.children = [connectivity_box,
                                           cell_parameters,
                                           syn_gain]
-        network_configuration.titles = ['Connectivity',
+        connectivity_configuration.titles = ['Connectivity',
                                         'Cell parameters',
                                         'Synaptic gains']
 
