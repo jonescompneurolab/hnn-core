@@ -58,9 +58,9 @@ def bayes_opt(func, x0, cons, acquisition, maxfun=200, debug=False, random_state
         Parameter constraints in solver-specific format.
     acquisition : func
         Acquisition function we want to use to find query points.
-    maxfun : int, optional
+    maxfun : int, optional, default = 200
         Maximum number of function evaluations. The default is 200.
-    debug : bool, optional
+    debug : bool, optional, default = False
         The default is False.
     random_state : int, optional
         Random state of the GaussianProcessRegressor. The default is None.

@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 from hnn_core import (MPIBackend, jones_2009_model, simulate_dipole)
 
 # The number of cores may need modifying depending on your current machine.
-n_procs = 10
+n_procs = 4
 
 ###############################################################################
 # First, we define a function that will tell the optimization routine how to
