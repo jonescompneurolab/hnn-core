@@ -121,7 +121,7 @@ def test_gui_compose():
     gui.compose()
     assert len(gui.connectivity_widgets) == 12
     assert len(gui.synaptic_gain_widgets) == 4
-    assert len(gui.cell_parameters_widgets) == 6
+    assert len(gui.cell_pameters_widgets) == 6
     assert len(gui.drive_widgets) == 3
     plt.close("all")
 
@@ -1049,7 +1049,7 @@ def test_gui_cell_params_widgets(setup_gui):
     layers = gui.cell_layer_radio_buttons.options
     assert len(layers) == 3
 
-    keys = gui.cell_parameters_widgets.keys()
+    keys = gui.cell_pameters_widgets.keys()
     num_cell_params = 0
     for pyramid_cell_type in pyramid_cell_types:
         cell_type = pyramid_cell_type.split("_")[0]
