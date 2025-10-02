@@ -920,12 +920,16 @@ class HNNGUI:
 
         syn_gain = VBox([self._syn_gain_out])
 
-        connectivity_configuration.children = [connectivity_box,
-                                          cell_parameters,
-                                          syn_gain]
-        connectivity_configuration.titles = ['Connectivity',
-                                        'Cell parameters',
-                                        'Synaptic gains']
+        connectivity_configuration.children = [
+            connectivity_box,
+            cell_parameters,
+            syn_gain,
+        ]
+        connectivity_configuration.titles = [
+            "Connectivity",
+            "Cell parameters",
+            "Synaptic gains",
+        ]
 
         drive_selections = VBox(
             [
@@ -1316,9 +1320,11 @@ class HNNGUI:
                     self.cell_pameters_widgets,
                     self.cell_layer_radio_buttons,
                     self.cell_type_radio_buttons,
-                    self._syn_gain_out, self.synaptic_gain_widgets,
-                    layout)
-            elif load_type == 'drives':
+                    self._syn_gain_out,
+                    self.synaptic_gain_widgets,
+                    layout,
+                )
+            elif load_type == "drives":
                 self.add_drive_tab(params)
             else:
                 raise ValueError
@@ -2041,9 +2047,13 @@ def add_connectivity_tab(
     add_network_connectivity_tab(net, connectivity_out, connectivity_textfields)
 
     # build cell parameters tab
-    add_cell_parameters_tab(cell_params_out, cell_pameters_vboxes,
-                            cell_layer_radio_button, cell_type_radio_button,
-                            layout)
+    add_cell_parameters_tab(
+        cell_params_out,
+        cell_pameters_vboxes,
+        cell_layer_radio_button,
+        cell_type_radio_button,
+        layout,
+    )
 
     # build synaptic gains tab
     add_synaptic_gain_tab(net, syn_gain_out, syn_gain_textfields, layout)
@@ -2200,13 +2210,17 @@ def add_cell_parameters_tab(
 def add_synaptic_gain_tab(net, syn_gain_out, syn_gain_textfields, layout):
     """Creates widgets for global synaptic gains"""
     gain_values = net.get_synaptic_gains()
-    gain_types = ('e_e', 'e_i', 'i_e', 'i_i')
+    gain_types = ("e_e", "e_i", "i_e", "i_i")
     for gain_type in gain_types:
         gain_widget = BoundedFloatText(
             value=gain_values[gain_type],
-            description=f'{gain_type}',
-            min=0, max=1e6, step=.1,
-            disabled=False, layout=layout)
+            description=f"{gain_type}",
+            min=0,
+            max=1e6,
+            step=0.1,
+            disabled=False,
+            layout=layout,
+        )
         syn_gain_textfields[gain_type] = gain_widget
 
     gain_vbox = VBox([widget for widget in syn_gain_textfields.values()])
@@ -2347,9 +2361,8 @@ def _init_network_from_widgets(
         ]._compute_section_mechs()
 
     # Update with synaptic gains
-    syn_gain_values = {key: widget.value
-                       for key, widget in syn_gain_textfields.items()}
-    single_simulation_data['net'].set_synaptic_gains(**syn_gain_values)
+    syn_gain_values = {key: widget.value for key, widget in syn_gain_textfields.items()}
+    single_simulation_data["net"].set_synaptic_gains(**syn_gain_values)
 
     if add_drive is False:
         return
