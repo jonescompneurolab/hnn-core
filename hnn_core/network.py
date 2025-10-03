@@ -314,13 +314,12 @@ def pick_connection(net, src_gids=None, target_gids=None, loc=None, receptor=Non
 
 
 def _get_cell_index_by_synapse_type(net):
-    """Returns the indices of excitatory and inhibitory cells in the network.
+    """Returns the indices of excitatory and inhibitory cells in the Network.
 
-    This function extracts the source GIDs (cell ID) of excitatory
-    and inhibitory cells based on their connection types. Excitatory cells are
-    identified by their synaptic connections using AMPA and NMDA receptors,
-    while inhibitory cells are identified by their connections using GABAA and
-    GABAB receptors.
+    This function extracts the source GIDs (cell ID) of excitatory and inhibitory cells
+    based on their connection types. Excitatory and inhibitory cells are identified by
+    their electrophysiological metadata values. This does *not* return GIDs of external
+    drives.
 
     Parameters
     ----------
@@ -329,23 +328,20 @@ def _get_cell_index_by_synapse_type(net):
 
     Returns
     -------
-    tuple: A tuple containing two lists:
-        - e_cells (list): The source GIDs of excitatory cells.
-        - i_cells (list): The source GIDs of inhibitory cells.
+    e_cell_gids : list
+        The source GIDs of excitatory cells.
+    i_cell_gids : list
+        The source GIDs of inhibitory cells.
     """
+    e_cell_gids = list()
+    i_cell_gids = list()
+    for cell_type_name, cell_data in net.cell_types.items():
+        if cell_data["cell_metadata"].get("electro_type") == "excitatory":
+            e_cell_gids.extend(net.gid_ranges[cell_type_name])
+        elif cell_data["cell_metadata"].get("electro_type") == "inhibitory":
+            i_cell_gids.extend(net.gid_ranges[cell_type_name])
 
-    def list_src_gids(indices):
-        return np.concatenate(
-            [list(net.connectivity[conn_idx]["src_gids"]) for conn_idx in indices]
-        ).tolist()
-
-    picks_e = pick_connection(net, receptor=["ampa", "nmda"])
-    e_cells = list_src_gids(picks_e)
-
-    picks_i = pick_connection(net, receptor=["gabaa", "gabab"])
-    i_cells = list_src_gids(picks_i)
-
-    return e_cells, i_cells
+    return e_cell_gids, i_cell_gids
 
 
 class Network:
@@ -1957,7 +1953,7 @@ class Network:
         )
 
     def set_synaptic_gains(self, e_e=None, e_i=None, i_e=None, i_i=None, copy=False):
-        """Change the synaptic weights of the network.
+        """Change the synaptic gains of the celltypes in the Network.
 
         Parameters
         ----------
@@ -1983,20 +1979,14 @@ class Network:
         Synaptic gains must be non-negative. The synaptic gains will only be
         updated if a float value is provided. If None is provided
         (the default), the synaptic gain will remain unchanged.
-        """
 
+        This does **not** change the synaptic gains of external drives.
+        """
         _validate_type(copy, bool, "copy")
 
         net = self.copy() if copy else self
 
-        # Identify excitatory and inhibitory GIDs based on cell_metadata
-        e_gids = list()
-        i_gids = list()
-        for cell_type_name, cell_data in self.cell_types.items():
-            if cell_data["cell_metadata"].get("electro_type") == "excitatory":
-                e_gids.extend(self.gid_ranges[cell_type_name])
-            elif cell_data["cell_metadata"].get("electro_type") == "inhibitory":
-                i_gids.extend(self.gid_ranges[cell_type_name])
+        e_gids, i_gids = _get_cell_index_by_synapse_type(self)
 
         # Define the connection types to modify
         conn_types = {
@@ -2026,17 +2016,18 @@ class Network:
             return net
 
     def get_synaptic_gains(self):
-        """Retrieve gain values for different connection types in the network.
+        """Retrieve gain values for different celltype connections in the Network.
 
-        This function identifies excitatory and inhibitory cells in the network
+        This function identifies excitatory and inhibitory cells in the nNtwork
         and retrieves the gain value for each type of synaptic connection:
         - excitatory to excitatory (e_e)
         - excitatory to inhibitory (e_i)
         - inhibitory to excitatory (i_e)
         - inhibitory to inhibitory (i_i)
 
-        The gain is assumed to be uniform within each connection type, and only
-        the first connection's gain value is used for each type.
+        The gain is assumed to be uniform within each connection type (for example,
+        between AMPA and NMDA). Only the first connection's gain value is used for each
+        type. This does **not** return the synaptic gains of external drives.
 
         Returns
         -------
@@ -2044,18 +2035,18 @@ class Network:
              A dictionary with the connection types ('e_e', 'e_i', 'i_e',
             'i_i') as keys and their corresponding gain values.
         """
-        values = {}
-        e_cells, i_cells = _get_cell_index_by_synapse_type(self)
+        e_gids, i_gids = _get_cell_index_by_synapse_type(self)
 
         # Define the connection types and source/target cell indexes
         conn_types = {
-            "e_e": (e_cells, e_cells),
-            "e_i": (e_cells, i_cells),
-            "i_e": (i_cells, e_cells),
-            "i_i": (i_cells, i_cells),
+            "e_e": (e_gids, e_gids),
+            "e_i": (e_gids, i_gids),
+            "i_e": (i_gids, e_gids),
+            "i_i": (i_gids, i_gids),
         }
 
         # Retrieve the gain value for each connection type
+        values = {}
         for conn_type, (src_idxs, target_idxs) in conn_types.items():
             picks = pick_connection(self, src_gids=src_idxs, target_gids=target_idxs)
 
