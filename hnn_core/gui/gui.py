@@ -1465,6 +1465,16 @@ def _get_connectivity_widgets(conn_data):
             description="Weight:",
             style=style,
         )
+        gain_text_input = BoundedFloatText(
+            value=conn_data[receptor_name]["gain"],
+            disabled=False,
+            continuous_update=False,
+            min=0,
+            max=1e6,
+            step=0.01,
+            description="Gain:",
+            style=style,
+        )
 
         display_name = conn_data[receptor_name]["receptor"].upper()
 
@@ -1485,6 +1495,12 @@ def _get_connectivity_widgets(conn_data):
             Receptor: {display_name}</b></p>"""
                 ),
                 w_text_input,
+                HBox(
+                    [
+                        gain_text_input,
+                        HTML(value="TODO"),
+                    ]
+                ),
             ]
         )
 
@@ -2111,10 +2127,12 @@ def add_network_connectivity_tab(
                         conn_idx = conn_indices[0]
                         current_w = net.connectivity[conn_idx]["nc_dict"]["A_weight"]
                         current_p = net.connectivity[conn_idx]["probability"]
+                        current_g = net.connectivity[conn_idx]["nc_dict"]["gain"]
                         # valid connection
                         receptor_related_conn[receptor] = {
                             "weight": current_w,
                             "probability": current_p,
+                            "gain": current_g,
                             # info used to identify connection
                             "receptor": receptor,
                             "location": location,

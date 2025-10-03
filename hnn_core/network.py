@@ -1957,27 +1957,21 @@ class Network:
         )
 
     def set_synaptic_gains(self, e_e=None, e_i=None, i_e=None, i_i=None, copy=False):
-        """Update synaptic weights of the network.
+        """Change the synaptic weights of the network.
 
         Parameters
         ----------
-        e_e : float
+        e_e : float, default=None
             Synaptic gain of excitatory to excitatory connections
-
-            (default None)
-        e_i : float
+        e_i : float, default=None
             Synaptic gain of excitatory to inhibitory connections
-            (default None)
-        i_e : float
+        i_e : float, default=None
             Synaptic gain of inhibitory to excitatory connections
-            (default None)
-        i_i : float
+        i_i : float, default=None
             Synaptic gain of inhibitory to inhibitory connections
-            (default None)
-        copy : bool
+        copy : bool, default=False
             If True, returns a copy of the network. If False,
             the network is updated in place with a return of None.
-            (default False)
 
         Returns
         -------
@@ -1988,9 +1982,9 @@ class Network:
         -----
         Synaptic gains must be non-negative. The synaptic gains will only be
         updated if a float value is provided. If None is provided
-        (the default), the synapticgain will remain unchanged.
-
+        (the default), the synaptic gain will remain unchanged.
         """
+
         _validate_type(copy, bool, "copy")
 
         net = self.copy() if copy else self
@@ -2019,7 +2013,7 @@ class Network:
             _validate_type(gain, (int, float), conn_type, "int or float")
             if gain < 0.0:
                 raise ValueError(
-                    f"Synaptic gains must be non-negative.Got {gain} for '{conn_type}'."
+                    f"Synaptic gains must be non-negative. Got {gain} for '{conn_type}'."
                 )
 
             conn_indices = pick_connection(
@@ -2048,7 +2042,7 @@ class Network:
         -------
         values : dict
              A dictionary with the connection types ('e_e', 'e_i', 'i_e',
-        'i_i') as keys and their corresponding gain values.
+            'i_i') as keys and their corresponding gain values.
         """
         values = {}
         e_cells, i_cells = _get_cell_index_by_synapse_type(self)
