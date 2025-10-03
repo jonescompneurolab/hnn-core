@@ -313,6 +313,37 @@ def pick_connection(net, src_gids=None, target_gids=None, loc=None, receptor=Non
     return sorted(conn_set)
 
 
+def _get_cell_index_by_synapse_type(net):
+    """Returns the indices of excitatory and inhibitory cells in the Network.
+
+    This function extracts the source GIDs (cell ID) of excitatory and inhibitory cells
+    based on their connection types. Excitatory and inhibitory cells are identified by
+    their electrophysiological metadata values. This does *not* return GIDs of external
+    drives.
+
+    Parameters
+    ----------
+    net : Instance of Network object
+        The Network object
+
+    Returns
+    -------
+    e_cell_gids : list
+        The source GIDs of excitatory cells.
+    i_cell_gids : list
+        The source GIDs of inhibitory cells.
+    """
+    e_cell_gids = list()
+    i_cell_gids = list()
+    for cell_type_name, cell_data in net.cell_types.items():
+        if cell_data["cell_metadata"].get("electro_type") == "excitatory":
+            e_cell_gids.extend(net.gid_ranges[cell_type_name])
+        elif cell_data["cell_metadata"].get("electro_type") == "inhibitory":
+            i_cell_gids.extend(net.gid_ranges[cell_type_name])
+
+    return e_cell_gids, i_cell_gids
+
+
 class Network:
     """The Network class.
 
@@ -1921,28 +1952,22 @@ class Network:
             }
         )
 
-    def update_weights(self, e_e=None, e_i=None, i_e=None, i_i=None, copy=False):
-        """Update synaptic weights of the network.
+    def set_synaptic_gains(self, e_e=None, e_i=None, i_e=None, i_i=None, copy=False):
+        """Change the synaptic gains of the celltypes in the Network.
 
         Parameters
         ----------
-        e_e : float
+        e_e : float, default=None
             Synaptic gain of excitatory to excitatory connections
-
-            (default None)
-        e_i : float
+        e_i : float, default=None
             Synaptic gain of excitatory to inhibitory connections
-            (default None)
-        i_e : float
+        i_e : float, default=None
             Synaptic gain of inhibitory to excitatory connections
-            (default None)
-        i_i : float
+        i_i : float, default=None
             Synaptic gain of inhibitory to inhibitory connections
-            (default None)
-        copy : bool
+        copy : bool, default=False
             If True, returns a copy of the network. If False,
             the network is updated in place with a return of None.
-            (default False)
 
         Returns
         -------
@@ -1953,21 +1978,15 @@ class Network:
         -----
         Synaptic gains must be non-negative. The synaptic gains will only be
         updated if a float value is provided. If None is provided
-        (the default), the synapticgain will remain unchanged.
+        (the default), the synaptic gain will remain unchanged.
 
+        This does **not** change the synaptic gains of external drives.
         """
         _validate_type(copy, bool, "copy")
 
         net = self.copy() if copy else self
 
-        # Identify excitatory and inhibitory GIDs based on cell_metadata
-        e_gids = list()
-        i_gids = list()
-        for cell_type_name, cell_data in self.cell_types.items():
-            if cell_data["cell_metadata"].get("electro_type") == "excitatory":
-                e_gids.extend(self.gid_ranges[cell_type_name])
-            elif cell_data["cell_metadata"].get("electro_type") == "inhibitory":
-                i_gids.extend(self.gid_ranges[cell_type_name])
+        e_gids, i_gids = _get_cell_index_by_synapse_type(self)
 
         # Define the connection types to modify
         conn_types = {
@@ -1984,7 +2003,7 @@ class Network:
             _validate_type(gain, (int, float), conn_type, "int or float")
             if gain < 0.0:
                 raise ValueError(
-                    f"Synaptic gains must be non-negative.Got {gain} for '{conn_type}'."
+                    f"Synaptic gains must be non-negative. Got {gain} for '{conn_type}'."
                 )
 
             conn_indices = pick_connection(
@@ -1995,6 +2014,47 @@ class Network:
 
         if copy:
             return net
+
+    def get_synaptic_gains(self):
+        """Retrieve gain values for different celltype connections in the Network.
+
+        This function identifies excitatory and inhibitory cells in the nNtwork
+        and retrieves the gain value for each type of synaptic connection:
+        - excitatory to excitatory (e_e)
+        - excitatory to inhibitory (e_i)
+        - inhibitory to excitatory (i_e)
+        - inhibitory to inhibitory (i_i)
+
+        The gain is assumed to be uniform within each connection type (for example,
+        between AMPA and NMDA). Only the first connection's gain value is used for each
+        type. This does **not** return the synaptic gains of external drives.
+
+        Returns
+        -------
+        values : dict
+             A dictionary with the connection types ('e_e', 'e_i', 'i_e',
+            'i_i') as keys and their corresponding gain values.
+        """
+        e_gids, i_gids = _get_cell_index_by_synapse_type(self)
+
+        # Define the connection types and source/target cell indexes
+        conn_types = {
+            "e_e": (e_gids, e_gids),
+            "e_i": (e_gids, i_gids),
+            "i_e": (i_gids, e_gids),
+            "i_i": (i_gids, i_gids),
+        }
+
+        # Retrieve the gain value for each connection type
+        values = {}
+        for conn_type, (src_idxs, target_idxs) in conn_types.items():
+            picks = pick_connection(self, src_gids=src_idxs, target_gids=target_idxs)
+
+            if picks:
+                # Extract the gain from the first connection
+                values[conn_type] = self.connectivity[picks[0]]["nc_dict"]["gain"]
+
+        return values
 
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.

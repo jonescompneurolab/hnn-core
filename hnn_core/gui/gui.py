@@ -156,6 +156,27 @@ cell_parameters_dict = {
     ],
 }
 
+gain_type_display_dict = {
+    "e_e": "Exc-to-Exc",
+    "e_i": "Exc-to-Inh",
+    "i_e": "Inh-to-Exc",
+    "i_i": "Inh-to-Inh",
+}
+
+gain_type_lookup_dict = {
+    ("L2_pyramidal", "L2_pyramidal"): "e_e",
+    ("L2_pyramidal", "L5_pyramidal"): "e_e",
+    ("L5_pyramidal", "L5_pyramidal"): "e_e",
+    ("L2_pyramidal", "L2_basket"): "e_i",
+    ("L2_pyramidal", "L5_basket"): "e_i",
+    ("L5_pyramidal", "L5_basket"): "e_i",
+    ("L2_basket", "L2_pyramidal"): "i_e",
+    ("L2_basket", "L5_pyramidal"): "i_e",
+    ("L5_basket", "L5_pyramidal"): "i_e",
+    ("L2_basket", "L2_basket"): "i_i",
+    ("L5_basket", "L5_basket"): "i_i",
+}
+
 
 class _OutputWidgetHandler(logging.Handler):
     def __init__(self, output_widget, *args, **kwargs):
@@ -559,8 +580,11 @@ class HNNGUI:
         # Connectivity list
         self.connectivity_widgets = list()
 
-        # Cell parameter list
+        # Cell parameter dict
         self.cell_pameters_widgets = dict()
+
+        # Synaptic Gains dict
+        self.synaptic_gain_widgets = dict()
 
         self._init_ui_components()
         self.add_logging_window_logger()
@@ -621,6 +645,7 @@ class HNNGUI:
         self._drives_out = Output()  # tab to add new drives
         self._connectivity_out = Output()  # tab to tune connectivity.
         self._cell_params_out = Output()
+        self._syn_gain_out = Output()
 
         self._log_out = Output()
 
@@ -745,6 +770,7 @@ class HNNGUI:
                 self.viz_manager,
                 self.simulation_list_widget,
                 self.cell_pameters_widgets,
+                self.synaptic_gain_widgets,
             )
 
         def _simulation_list_change(value):
@@ -902,6 +928,11 @@ class HNNGUI:
                         self.load_connectivity_button,
                     ]
                 ),
+                VBox(
+                    [
+                        self._syn_gain_out,
+                    ]
+                ),
                 self._connectivity_out,
             ]
         )
@@ -913,8 +944,14 @@ class HNNGUI:
             ]
         )
 
-        connectivity_configuration.children = [connectivity_box, cell_parameters]
-        connectivity_configuration.titles = ["Connectivity", "Cell parameters"]
+        connectivity_configuration.children = [
+            connectivity_box,
+            cell_parameters,
+        ]
+        connectivity_configuration.titles = [
+            "Connectivity",
+            "Cell parameters",
+        ]
 
         drive_selections = VBox(
             [
@@ -1149,6 +1186,8 @@ class HNNGUI:
                 self.cell_pameters_widgets,
                 self.cell_layer_radio_buttons,
                 self.cell_type_radio_buttons,
+                self._syn_gain_out,
+                self.synaptic_gain_widgets,
                 self.layout,
             )
 
@@ -1303,6 +1342,8 @@ class HNNGUI:
                     self.cell_pameters_widgets,
                     self.cell_layer_radio_buttons,
                     self.cell_type_radio_buttons,
+                    self._syn_gain_out,
+                    self.synaptic_gain_widgets,
                     layout,
                 )
             elif load_type == "drives":
@@ -1422,12 +1463,19 @@ def create_expanded_button(
     )
 
 
-def _get_connectivity_widgets(conn_data):
-    """Create connectivity box widgets from specified weight and probability"""
-
+def _get_connectivity_widgets(conn_data, syn_gain_textfields):
+    """Create connectivity box widgets from specified weight and gains"""
     style = {"description_width": "100px"}
     sliders = list()
+    function_counter = 0
     for receptor_name in conn_data.keys():
+        global_gain_type = gain_type_lookup_dict[
+            (
+                conn_data[receptor_name]["src_gids"],
+                conn_data[receptor_name]["target_gids"],
+            )
+        ]
+
         w_text_input = BoundedFloatText(
             value=conn_data[receptor_name]["weight"],
             disabled=False,
@@ -1438,6 +1486,120 @@ def _get_connectivity_widgets(conn_data):
             description="Weight:",
             style=style,
         )
+
+        # gain_text_input = BoundedFloatText(
+        #     value=conn_data[receptor_name]["gain"],
+        #     disabled=False,
+        #     continuous_update=False,
+        #     min=0,
+        #     max=1e6,
+        #     step=0.01,
+        #     description="Gain:",
+        #     style=style,
+        # )
+
+        if function_counter == 0:
+            gain_text_input0 = BoundedFloatText(
+                value=conn_data[receptor_name]["gain"],
+                disabled=False,
+                continuous_update=False,
+                min=0,
+                max=1e6,
+                step=0.01,
+                description="Gain:",
+                style=style,
+            )
+            gain_indicator_output0 = HTML(value=f"""
+                <b>Total Gain={
+                (syn_gain_textfields[global_gain_type].value * gain_text_input0.value):.2f}</b>""")
+
+            def update_html0(change):
+                gain_indicator_output0.value = f"""
+                <b>Total Gain={
+                   (syn_gain_textfields[global_gain_type].value * gain_text_input0.value):.2f}</b>"""
+            syn_gain_textfields[global_gain_type].observe(update_html0, names="value")
+            gain_text_input0.observe(update_html0, names="value")
+
+        elif function_counter == 1:
+             gain_text_input1 = BoundedFloatText(
+                value=conn_data[receptor_name]["gain"],
+                disabled=False,
+                continuous_update=False,
+                min=0,
+                max=1e6,
+                step=0.01,
+                description="Gain:",
+                style=style,
+            )
+             gain_indicator_output1 = HTML(value=f"""
+                <b>Total Gain={
+                (syn_gain_textfields[global_gain_type].value * gain_text_input1.value):.2f}</b>""")
+             def update_html1(change):
+                gain_indicator_output1.value = f"""
+                <b>Total Gain={
+                   (syn_gain_textfields[global_gain_type].value * gain_text_input1.value):.2f}</b>"""
+             syn_gain_textfields[global_gain_type].observe(update_html1, names="value")
+             gain_text_input1.observe(update_html1, names="value")
+
+
+        # gain_indicator_output = HTML(value=f"""
+        #     <b>Total Gain={
+        #         (syn_gain_textfields[global_gain_type].value * gain_text_input.value):.2f}</b>""")
+
+        # def update_html(change):
+        #     gain_indicator_output.value = f"""
+        #     <b>Total Gain={
+        #         (syn_gain_textfields["e_e"].value * gain_text_input.value):.2f}</b> """
+        # syn_gain_textfields["e_e"].observe(update_html, names="value")
+        # gain_text_input.observe(update_html, names="value")
+
+        # # main one we're trying to fix
+        # def update_html(change):
+        #     gain_indicator_output.value = f"""
+        #     <b>Total Gain={
+        #        (syn_gain_textfields[global_gain_type].value * gain_text_input.value):.2f}</b>"""
+        # syn_gain_textfields[global_gain_type].observe(update_html, names="value")
+        # gain_text_input.observe(update_html, names="value")
+
+        # def update_html1(change):
+        #     gain_indicator_output.value = f"""
+        #     <b>Total Gain={
+        #        (change["new"] * gain_text_input.value):.2f}</b>"""
+        # def update_html2(change):
+        #     gain_indicator_output.value = f"""
+        #     <b>Total Gain={
+        #        (syn_gain_textfields[global_gain_type].value * change["new"]):.2f}</b>"""
+        # syn_gain_textfields[global_gain_type].observe(update_html1, names="value")
+        # gain_text_input.observe(update_html2, names="value")
+
+        # # ugh doesn't work, doesn't solve problem
+        # if function_counter == 0:
+        #     def update_html1(change):
+        #         gain_indicator_output.value = f"""
+        #         <b>Total Gain={
+        #             (syn_gain_textfields[global_gain_type].value * gain_text_input.value):.2f}</b>"""
+        #     syn_gain_textfields[global_gain_type].observe(update_html1, names="value")
+        #     gain_text_input.observe(update_html1, names="value")
+        # elif function_counter == 1:
+        #     def update_html2(change):
+        #         gain_indicator_output.value = f"""
+        #         <b>Total Gain={
+        #             (syn_gain_textfields[global_gain_type].value * gain_text_input.value):.2f}</b>"""
+        #     syn_gain_textfields[global_gain_type].observe(update_html2, names="value")
+        #     gain_text_input.observe(update_html2, names="value")
+        # function_counter += 1
+
+        # # Broken but in a different way
+        # dlink(
+        #     (syn_gain_textfields[global_gain_type], 'value'),
+        #     (gain_indicator_output, 'value'),
+        #     transform=lambda x: f"<b>Total Gain={(x * gain_text_input.value):.2f}</b>"
+        # )
+        # dlink(
+        #     (gain_text_input, 'value'),
+        #     (gain_indicator_output, 'value'),
+        #     transform=lambda x: f"<b>Total Gain={(syn_gain_textfields[global_gain_type].value * x):.2f}</b>"
+        # )
 
         display_name = conn_data[receptor_name]["receptor"].upper()
 
@@ -1451,15 +1613,38 @@ def _get_connectivity_widgets(conn_data):
 
         html_tab = "&emsp;"
 
-        conn_widget = VBox(
-            [
-                HTML(
-                    value=f"""<p style='margin:5px;'><b>{html_tab}{html_tab}
-            Receptor: {display_name}</b></p>"""
-                ),
-                w_text_input,
-            ]
-        )
+        if function_counter == 0:
+            conn_widget = VBox(
+                [
+                    HTML(
+                        value=f"""<p style='margin:5px;'><b>{html_tab}{html_tab}
+                Receptor: {display_name}</b></p>"""
+                    ),
+                    w_text_input,
+                    HBox(
+                        [
+                            gain_text_input0,
+                            gain_indicator_output0,
+                        ]
+                    ),
+                ]
+            )
+        elif function_counter == 1:
+            conn_widget = VBox(
+                [
+                    HTML(
+                        value=f"""<p style='margin:5px;'><b>{html_tab}{html_tab}
+                Receptor: {display_name}</b></p>"""
+                    ),
+                    w_text_input,
+                    HBox(
+                        [
+                            gain_text_input1,
+                            gain_indicator_output1,
+                        ]
+                    ),
+                ]
+            )
 
         #  Add class to child Vboxes for targeted CSS
         conn_widget.add_class("connectivity-subsection")
@@ -1471,6 +1656,8 @@ def _get_connectivity_widgets(conn_data):
             "target_gids": conn_data[receptor_name]["target_gids"],
         }
         sliders.append(conn_widget)
+
+        function_counter += 1
 
     return sliders
 
@@ -2017,13 +2204,22 @@ def add_connectivity_tab(
     cell_pameters_vboxes,
     cell_layer_radio_button,
     cell_type_radio_button,
+    syn_gain_out,
+    syn_gain_textfields,
     layout,
 ):
     """Add all possible connectivity boxes to connectivity tab."""
     net = dict_to_network(params)
 
     # build network connectivity tab
-    add_network_connectivity_tab(net, connectivity_out, connectivity_textfields)
+    add_network_connectivity_tab(
+        net,
+        connectivity_out,
+        connectivity_textfields,
+        syn_gain_out,
+        syn_gain_textfields,
+        layout,
+    )
 
     # build cell parameters tab
     add_cell_parameters_tab(
@@ -2033,10 +2229,88 @@ def add_connectivity_tab(
         cell_type_radio_button,
         layout,
     )
+
     return net
 
 
-def add_network_connectivity_tab(net, connectivity_out, connectivity_textfields):
+def add_network_connectivity_tab(
+    net,
+    connectivity_out,
+    connectivity_textfields,
+    syn_gain_out,
+    syn_gain_textfields,
+    layout,
+):
+    """Creates widgets for synaptic connectivity values and global synaptic gains"""
+
+    ### Global synaptic gains
+    # ---------------------------------------------------------------
+    syn_gain_out.clear_output()
+    gain_values = net.get_synaptic_gains()
+    gain_types = ("e_e", "e_i", "i_e", "i_i")
+
+    for gain_type in gain_types:
+        gain_widget = BoundedFloatText(
+            value=gain_values[gain_type],
+            description=f"{gain_type_display_dict[gain_type]}",
+            min=0,
+            max=1e6,
+            step=0.1,
+            disabled=False,
+            layout=layout,
+        )
+
+        gain_widget.layout.width = "220px"
+        syn_gain_textfields[gain_type] = gain_widget
+
+    title_box = HTML(
+        """
+        <div
+        style="
+            background: gray;
+            color: white;
+            width: 100%;
+            margin-bottom: 2px;
+            text-align: center;
+        ">
+        Global Synaptic Gain Multipliers
+        </div>
+        """
+    )
+
+    left_box = VBox(
+        [
+            syn_gain_textfields["e_e"],
+            syn_gain_textfields["e_i"],
+        ]
+    )
+    right_box = VBox(
+        [
+            syn_gain_textfields["i_e"],
+            syn_gain_textfields["i_i"],
+        ]
+    )
+    gain_vbox = VBox(
+        [
+            title_box,
+            HBox(
+                [
+                    left_box,
+                    right_box,
+                ]
+            ),
+        ],
+        layout=Layout(
+            border="1px solid black",  # border width, style, and color
+            padding="10px",  # optional: adds space inside the border
+        ),
+    )
+
+    with syn_gain_out:
+        display(gain_vbox)
+
+    ### Connectivity accordion
+    # ---------------------------------------------------------------
     cell_types = [ct for ct in net.cell_types.keys()]
     receptors = ("ampa", "nmda", "gabaa", "gabab")
     locations = ("proximal", "distal", "soma")
@@ -2065,10 +2339,12 @@ def add_network_connectivity_tab(net, connectivity_out, connectivity_textfields)
                         conn_idx = conn_indices[0]
                         current_w = net.connectivity[conn_idx]["nc_dict"]["A_weight"]
                         current_p = net.connectivity[conn_idx]["probability"]
+                        current_g = net.connectivity[conn_idx]["nc_dict"]["gain"]
                         # valid connection
                         receptor_related_conn[receptor] = {
                             "weight": current_w,
                             "probability": current_p,
+                            "gain": current_g,
                             # info used to identify connection
                             "receptor": receptor,
                             "location": location,
@@ -2078,7 +2354,9 @@ def add_network_connectivity_tab(net, connectivity_out, connectivity_textfields)
                 if len(receptor_related_conn) > 0:
                     connectivity_names.append(f"{src_gids}→{target_gids} ({location})")
                     connectivity_textfields.append(
-                        _get_connectivity_widgets(receptor_related_conn)
+                        _get_connectivity_widgets(
+                            receptor_related_conn, syn_gain_textfields
+                        )
                     )
 
     # Style the contents of the Connectivity Tab
@@ -2260,6 +2538,7 @@ def _init_network_from_widgets(
     drive_widgets,
     connectivity_textfields,
     cell_params_vboxes,
+    syn_gain_textfields,
     add_drive=True,
 ):
     """Construct network and add drives."""
@@ -2267,6 +2546,11 @@ def _init_network_from_widgets(
     single_simulation_data["net"] = dict_to_network(
         params, read_drives=False, read_external_biases=False
     )
+
+    # Update with synaptic gains
+    syn_gain_values = {key: widget.value for key, widget in syn_gain_textfields.items()}
+    # single_simulation_data["net"].set_synaptic_gains(**syn_gain_values)
+
     # adjust connectivity according to the connectivity_tab
     for connectivity_slider in connectivity_textfields:
         for vbox_key in connectivity_slider:
@@ -2285,8 +2569,22 @@ def _init_network_from_widgets(
                     "A_weight"
                 ] = vbox_key.children[1].value
 
-    # Update cell params
+                # 1. identify which case of syn_gain_textfield applies to this src/target
+                global_gain_type = gain_type_lookup_dict[
+                    (
+                        vbox_key._belongsto["src_gids"],
+                        vbox_key._belongsto["target_gids"],
+                    )
+                ]
+                applied_global_gain_value = syn_gain_values[global_gain_type]
 
+                # 2. multiply global by single synapse gain to get combined
+                single_simulation_data["net"].connectivity[conn_idx]["nc_dict"][
+                    "gain"
+                ] = applied_global_gain_value * vbox_key.children[2].children[0].value
+
+
+    # Update cell params
     update_functions = {
         "L2 Geometry": _update_L2_geometry_cell_params,
         "L5 Geometry": _update_L5_geometry_cell_params,
@@ -2409,6 +2707,7 @@ def run_button_clicked(
     viz_manager,
     simulations_list_widget,
     cell_pameters_widgets,
+    syn_gain_textfields,
 ):
     """Run the simulation and plot outputs."""
     simulation_data = all_data["simulation_data"]
@@ -2432,6 +2731,7 @@ def run_button_clicked(
             drive_widgets,
             connectivity_textfields,
             cell_pameters_widgets,
+            syn_gain_textfields,
         )
 
         print("start simulation")
