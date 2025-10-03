@@ -58,6 +58,8 @@ next version release which will come out within the next few weeks.
 
 ### Public API Changes
 
+- `Network.update_weights` has been renamed to TODO since it changes gains, not weights. Importantly, this function **no longer changes** the gains of external drives in the network, instead it ONLY changes the gains of synaptic connections between celltypes.
+
 - {class}`~hnn_core.Network` now accepts optional arguments for its position dictionary  attribute `pos_dict` and cell type dictionary attribute `cell_types`,
   by [Chetan Kandpal][] in {gh}`1095`.
 
