@@ -1,0 +1,910 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>How to create releases &#8212; hnn-core 0.4.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=5bfaad31"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'how_to_create_releases';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.3';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.4.3" />
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-199741045-1');
+</script>
+
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core 0.4.3 documentation - Home"/>
+    <img src="_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core 0.4.3 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="install.html">
+    Install (Textbook)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI package
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://anaconda.org/jonescompneurolab/repo">
+    Conda packages
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="install.html">
+    Install (Textbook)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="api.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://anaconda.org/jonescompneurolab/repo">
+    Conda packages
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">How to create releases</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="how-to-create-releases">
+<span id="id1"></span><h1>How to create releases<a class="headerlink" href="#how-to-create-releases" title="Link to this heading">#</a></h1>
+<p>Last updated: 2025-06-26</p>
+<section id="notes-before-starting">
+<h2>0. Notes before starting<a class="headerlink" href="#notes-before-starting" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>We use at least 2 types of releases:</p>
+<ol class="arabic simple">
+<li><p>“stable” releases (aka “full” version releases), which are updates to the <em>default</em> version that is publicly distributed. I.e. these are what users will install if they run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">hnn-core</span></code>, etc.</p></li>
+<li><p>“dev” releases, or development releases. These can be incremented as desired, but are mainly used to distinguish new work that is merged after the latest stable release. After any stable release, there should immediately be a follow-up PR (or commit) that begins creation of the next dev release. Dev releases <em>can</em> be pushed to Pypi as long as they are indicated as development versions. However, we typically only need to do all of the steps on this page for a stable release, not every dev release.</p></li>
+<li><p>(optional) “rc” releases, or “release candidates”. If desired, a dev version can be changed to an rc version if we want to distribute specific rc versions for “beta-testing” for an soon and upcoming stable release.</p></li>
+</ol>
+</li>
+<li><p>Version identifiers:</p>
+<ul>
+<li><p>We try our best to follow a Python-compatible “Semantic versioning” style as <a class="reference external" href="https://packaging.python.org/en/latest/discussions/versioning/">described briefly here</a> and in <a class="reference external" href="https://packaging.python.org/en/latest/specifications/version-specifiers/#version-specifiers">much greater detail here</a>.</p></li>
+<li><p>Stable release version identifiers should therefore be of the <code class="docutils literal notranslate"><span class="pre">&lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;</span></code> format. For example, <code class="docutils literal notranslate"><span class="pre">0.4.1</span></code>.</p></li>
+<li><p>Dev release version identifiers should be of the <code class="docutils literal notranslate"><span class="pre">&lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;.dev&lt;dev-version&gt;</span></code> format. For example, <code class="docutils literal notranslate"><span class="pre">0.4.2dev0</span></code>.</p></li>
+<li><p>(optional) “RC” or release candidate version identifiers should be of the <code class="docutils literal notranslate"><span class="pre">&lt;major&gt;.&lt;minor&gt;.&lt;patch&gt;.rc&lt;rc-version&gt;</span></code> format. For example, <code class="docutils literal notranslate"><span class="pre">0.4.2rc3</span></code>.</p></li>
+<li><p>For what defines major vs minor vs patch, the following is copied verbatim <a class="reference external" href="https://packaging.python.org/en/latest/discussions/versioning/">from here</a>:</p></li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<div><p><em>major</em> when they make incompatible API changes,</p>
+<p><em>minor</em> when they add functionality in a backwards-compatible manner, and</p>
+<p><em>patch</em>, when they make backwards-compatible bug fixes.</p>
+</div></blockquote>
+<ul class="simple">
+<li><p>However, in accordance with <a class="reference external" href="https://semver.org/#semantic-versioning-specification-semver">semantic versioning</a>, since HNN-Core has not yet reached 1.0, our <code class="docutils literal notranslate"><span class="pre">patch</span></code> and <code class="docutils literal notranslate"><span class="pre">minor</span></code> releases do NOT need to be backwards-compatible yet.</p></li>
+<li><p><em>Pay careful attention</em> to the use of <code class="docutils literal notranslate"><span class="pre">v</span></code> in front of the version identifier. Some commands and config values need e.g. <code class="docutils literal notranslate"><span class="pre">v0.4</span></code>, while others should <em>not</em> include the <code class="docutils literal notranslate"><span class="pre">v</span></code>, as in <code class="docutils literal notranslate"><span class="pre">0.4</span></code>.</p></li>
+<li><p>Unless said otherwise, these instructions assume you are in the “root” (aka top-level) directory of the <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> code repository.</p></li>
+<li><p>Once you push a new version to TestPypi or Pypi, we CANNOT re-upload a different package to that same version. That version will always, <em>permanently</em>, be attached to that specific package file. This is a security limitation of Pypi and cannot be bypassed. If you make a mistake and upload a broken package however, there is still a solution: uploading a newer version with a higher version number. You can always increment the <code class="docutils literal notranslate"><span class="pre">patch</span></code> part of the version, then follow the process again to have a new, fixed version pushed to both TestPypi and Pypi.</p></li>
+<li><p>Due to the rule we use to detect when to auto-publish packages (<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/blob/843ed4aaed5a09d46c49ce34b5b620ec112d4e5a/.github/workflows/publish-packages-on-tag.yml#L10">see here</a>) <em>any</em> tag pushed to <code class="docutils literal notranslate"><span class="pre">upstream</span></code> that begins with <code class="docutils literal notranslate"><span class="pre">v</span></code> will cause the workflow to run. This means that any new version tag pushed to upstream will cause a package to be built, and the version of the code inside that commit (in <code class="docutils literal notranslate"><span class="pre">hnn_core/__init__.py</span></code>, NOT the tag itself!) will be used when uploading the package to Pypi. If that is a valid version that has not been used before, Pypi will accept and publish that package according to the version in question. Because versions are immutable on Pypi, this means that that version will NOT be available again! So, double- and triple-check before you push a tag!</p></li>
+<li><p>The original “How to make a release” is <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/wiki/How-to-make-a-release">available here</a>, however it should be considered deprecated. It leaves out a few important steps (or suggests doing them out-of-order), and does not account for our new automatic Github-tag publishing workflow.</p></li>
+</ul>
+</section>
+<section id="before-making-a-release">
+<h2>1. Before making a release<a class="headerlink" href="#before-making-a-release" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Make sure all milestones are achieved or migrated to the next version.</p></li>
+<li><p>Make sure the CI passes on master.</p></li>
+<li><p>Make sure that for both TestPypi and Pypi, there are NOT already existing releases for the new version that you want to push. You can view <a class="reference external" href="https://test.pypi.org/project/hnn-core/#history">TestPypi releases here</a> and <a class="reference external" href="https://pypi.org/project/hnn-core/#history">Pypi releases here</a>.</p></li>
+</ul>
+</section>
+<section id="prepare-your-local-version-of-the-release">
+<h2>2. Prepare your local version of the release<a class="headerlink" href="#prepare-your-local-version-of-the-release" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Create and checkout a new local branch in your local <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> repository directory.</p></li>
+<li><p>Edit <code class="docutils literal notranslate"><span class="pre">doc/whats_new.md</span></code> to have a new section for the new version, including all development work done since the last release.</p>
+<ul class="simple">
+<li><p>If doing a stable release, we also add an authors section (this is not present for the “current” section).</p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">shortlog</span> <span class="pre">v0.4.1..HEAD</span> <span class="pre">--summary</span> <span class="pre">--numbered</span></code> (replace the version tag to the most recent version) to find contributor names for this release.</p></li>
+<li><p>Manually add authors who have done a lot of work (reviewing, advising, etc.) but don’t show up in the shortlog because they did not submit PRs.</p></li>
+<li><p>Then order the names alphabetically and add to the last section of the new version’s changelog.</p></li>
+<li><p>Feel free to change the sections of the release notes, but always make sure to include at minimum a brief summary, deprecations, and public API changes.</p></li>
+</ul>
+</li>
+<li><p>Increment <code class="docutils literal notranslate"><span class="pre">__version__</span></code> in <code class="docutils literal notranslate"><span class="pre">hnn_core/__init__.py</span></code>.</p></li>
+<li><p>Increment <code class="docutils literal notranslate"><span class="pre">version</span></code> and <code class="docutils literal notranslate"><span class="pre">release</span></code> in <code class="docutils literal notranslate"><span class="pre">doc/conf.py</span></code>. It is safe to update both.</p></li>
+<li><p>ONLY if you’re doing a stable release: Update <code class="docutils literal notranslate"><span class="pre">doc/_static/versions.json</span></code> which handles versions of the documentation on the code-website:</p>
+<ol class="arabic simple">
+<li><p>Add a new entry with the new version identifier to the list.</p></li>
+<li><p>For the entry with the name <code class="docutils literal notranslate"><span class="pre">Stable</span> <span class="pre">&lt;current</span> <span class="pre">stable</span> <span class="pre">version&gt;</span></code>, update the <code class="docutils literal notranslate"><span class="pre">name</span></code> (but NOT the <code class="docutils literal notranslate"><span class="pre">version</span></code>) so that Stable refers to the new version.</p></li>
+</ol>
+</li>
+</ol>
+</section>
+<section id="test-your-local-version-of-the-release">
+<h2>3. Test your local version of the release<a class="headerlink" href="#test-your-local-version-of-the-release" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Create a NEW virtual environment, however you prefer.</p></li>
+<li><p>Perform the necessary steps to install MPI inside your environment, but BEFORE you install HNN-Core, by following <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/install.html#pip-mpi-macos-or-linux">this part of the install guide</a>.</p></li>
+<li><p>Begin by installing ONLY the most basic version of HNN-Core, with NO extra features, using:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="s2">&quot;.&quot;</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>Test that it can successfully run a simulation using the following:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;from hnn_core import jones_2009_model, simulate_dipole ; simulate_dipole(jones_2009_model(), tstop=20)&quot;</span>
+</pre></div>
+</div>
+<p>Simply testing the import with <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-c</span> <span class="pre">&quot;import</span> <span class="pre">hnn_core&quot;</span></code> is NOT enough! You must test an actual simulation run. If you encounter issues with your compiled MOD files, then run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">clean</span></code> to delete the existing ones, then try running a simulation again. If you continue to have issues, then halt the release and investigate!</p>
+<ol class="arabic simple" start="5">
+<li><p>Next, install the local version of HNN-Core again, but this time with all development features, using:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="s2">&quot;.[dev]&quot;</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="6">
+<li><p>Run all tests by using:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">test</span>
+</pre></div>
+</div>
+<p>Note that this will download and create some new files into the current directory. These new files should NOT be included in any future commits, especially those for a release. Obviously, if you run into errors, then halt the release and investigate.</p>
+<ol class="arabic simple" start="7">
+<li><p>Go into your <code class="docutils literal notranslate"><span class="pre">doc</span></code> directory, clean your local copy of the docs, then run a full build of the documentation. You can use the following to do this:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">doc</span>
+<span class="n">make</span> <span class="n">clean</span>
+<span class="n">make</span> <span class="n">html</span>
+</pre></div>
+</div>
+<p>This can take a while depending on your computer speed. The build process should produce warnings but no errors. If it reports errors, investigate them.</p>
+<ol class="arabic simple" start="8">
+<li><p>Manually inspect the newly-built documentation pages to make sure there are no issues. You can do this by opening the file located at <code class="docutils literal notranslate"><span class="pre">doc/_build/html/index.html</span></code> in your web browser, and then navigating from there.</p></li>
+<li><p>Make a copy of the newly built documentation; we will be using it later. Assuming you are still in the <code class="docutils literal notranslate"><span class="pre">doc</span></code> directory, you can do this easily using:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="o">-</span><span class="n">p</span> <span class="o">~/</span><span class="n">new</span><span class="o">-</span><span class="n">docs</span>
+<span class="n">cp</span> <span class="o">-</span><span class="n">r</span> <span class="n">_build</span><span class="o">/</span><span class="n">html</span><span class="o">/*</span> <span class="o">~/</span><span class="n">new</span><span class="o">-</span><span class="n">docs</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="10">
+<li><p>Change directory back up to the “root” directory of your repository.</p></li>
+<li><p>Next, install the dependencies we need for building a local version of our package using:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">U</span> <span class="n">setuptools</span> <span class="n">twine</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="12">
+<li><p>Build our package locally using the following:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">sdist</span>
+</pre></div>
+</div>
+<p>This will create a “source tarball” package file of the new version in a new directory at <code class="docutils literal notranslate"><span class="pre">dist/hnn_core-&lt;version&gt;.tar.gz</span></code>. Note that we <em>do not build wheels</em>, we only build source tarballs.</p>
+<ol class="arabic simple" start="13">
+<li><p>Check some metadata of our package, using:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">twine</span> <span class="n">check</span> <span class="n">dist</span><span class="o">/*</span>
+</pre></div>
+</div>
+<p>After this step, you can delete the package file inside <code class="docutils literal notranslate"><span class="pre">dist</span></code> or the <code class="docutils literal notranslate"><span class="pre">dist</span></code> directory itself, we will not be using that package file.</p>
+</section>
+<section id="create-your-release-pr">
+<h2>4. Create your release PR<a class="headerlink" href="#create-your-release-pr" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">add</span></code> to add ONLY the following files to your next commit:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">hnn_core/__init__.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">doc/conf.py</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">doc/whats_new.md</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">doc/_static/versions.json</span></code> (ONLY if you are pushing a new stable release)</p></li>
+</ul>
+</li>
+</ol>
+<p>You can do this easily with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">add</span> <span class="n">hnn_core</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span> <span class="n">doc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">py</span> <span class="n">doc</span><span class="o">/</span><span class="n">whats_new</span><span class="o">.</span><span class="n">md</span> <span class="n">doc</span><span class="o">/</span><span class="n">_static</span><span class="o">/</span><span class="n">versions</span><span class="o">.</span><span class="n">json</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Make your commit, but do NOT tag it yet.</p></li>
+<li><p>Push your commit to your branch.</p></li>
+<li><p>On Github’s website, make your PR.</p></li>
+<li><p>Wait for all CI to pass successfully on your PR.</p></li>
+<li><p>Finally, when ready to merge to <code class="docutils literal notranslate"><span class="pre">master</span></code>, use “SQUASH and merge” to merge the PR as a single commit. We will refer to the commit you just pushed to <code class="docutils literal notranslate"><span class="pre">master</span></code> as the “release commit”.</p></li>
+<li><p>Note: If you have “cyclical documentation dependencies”, such as if you reference a new web-page on the <code class="docutils literal notranslate"><span class="pre">stable</span></code> version of the docs, but that page doesn’t exist yet in the <code class="docutils literal notranslate"><span class="pre">stable</span></code> doc version, then that is fine. You can do the following:</p>
+<ol class="arabic simple">
+<li><p>create this PR but don’t merge it yet,</p></li>
+<li><p>follow the next section (“5. Update the documentation”) to update the stable docs, then</p></li>
+<li><p>come back and re-run the <code class="docutils literal notranslate"><span class="pre">linkcheck</span></code> workflow, and finally</p></li>
+<li><p>merge the PR.</p></li>
+<li><p>Alternatively, you can merge your PR before you have gone to the next step while <code class="docutils literal notranslate"><span class="pre">linkcheck</span></code> is failing, but this is not recommended.</p></li>
+</ol>
+</li>
+</ol>
+</section>
+<section id="update-the-documentation">
+<h2>5. Update the documentation<a class="headerlink" href="#update-the-documentation" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>This series of steps is more easily done as commits pushed directly onto <code class="docutils literal notranslate"><span class="pre">upstream</span></code>, instead of being merged through PRs.</p></li>
+<li><p>Switch locally to the <code class="docutils literal notranslate"><span class="pre">gh-pages</span></code> branch, and make sure your branch is up to date.</p></li>
+<li><p>Delete the existing files in the <code class="docutils literal notranslate"><span class="pre">stable</span></code> directory.</p></li>
+<li><p>Take all the documentation files you previously saved (e.g. into <code class="docutils literal notranslate"><span class="pre">~/new-docs</span></code>, see previous steps about building the documentation), and copy them into the <code class="docutils literal notranslate"><span class="pre">stable</span></code> directory. You could do this with:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cp</span> <span class="o">-</span><span class="n">r</span> <span class="o">~/</span><span class="n">new</span><span class="o">-</span><span class="n">docs</span><span class="o">/*</span> <span class="n">stable</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="5">
+<li><p>Create a new folder with the version identifier, and copy the <em>same</em> files into that directory <em>too</em>.</p></li>
+<li><p>You should have two directories with identical files in them: <code class="docutils literal notranslate"><span class="pre">stable</span></code> and <code class="docutils literal notranslate"><span class="pre">v&lt;version</span> <span class="pre">identifier&gt;</span></code>. This step is necessary for the version to be indicated in the dropdown on the code-website.</p></li>
+<li><p>Create a new git commit with ALL these changes and push it to <code class="docutils literal notranslate"><span class="pre">upstream/gh-pages</span></code>. You can instead do this through a PR, but you must make sure that the PR is for merging into the <code class="docutils literal notranslate"><span class="pre">gh-pages</span></code> branch of <code class="docutils literal notranslate"><span class="pre">jonescompneurolab/hnn-core</span></code>, NOT the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch!</p></li>
+</ol>
+</section>
+<section id="push-a-git-tag-to-build-the-release">
+<h2>6. Push a git tag to build the release<a class="headerlink" href="#push-a-git-tag-to-build-the-release" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Switch back to the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch.</p></li>
+<li><p>Update your <code class="docutils literal notranslate"><span class="pre">master</span></code> branch such that it is in sync with <code class="docutils literal notranslate"><span class="pre">upstream</span></code>, and that its current commit is the “release commit” you previously merged through your PR.</p></li>
+<li><p>Create a tag for this release commit, where the tag is <code class="docutils literal notranslate"><span class="pre">v&lt;new</span> <span class="pre">version&gt;</span></code>, including the <code class="docutils literal notranslate"><span class="pre">v</span></code>. For example, if the new version that you just updated to is <code class="docutils literal notranslate"><span class="pre">0.4.4</span></code>, then you could do the following to create the tag locally:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">tag</span> <span class="n">v0</span><span class="mf">.4.4</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>Push the tag to <code class="docutils literal notranslate"><span class="pre">upstream</span></code>. Continuing the example from before, you could do this with:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">push</span> <span class="n">upstream</span> <span class="n">v0</span><span class="mf">.4.4</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="5">
+<li><p>Congrats! Github will now automatically begin building the package directly from the commit using a “Publish (etc.)” workflow (you can watch it in our <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/actions">Actions here</a>). Once Github has built the package file, it will automatically publish that package to both Pypi and TestPypi.</p>
+<ul class="simple">
+<li><p>The workflow code that Github uses to build and publish the packages is <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/blob/master/.github/workflows/publish-packages-on-tag.yml">located here</a>.</p></li>
+<li><p>Note that if you ever change the filename of the workflow, you <strong>must</strong> go to TestPypi and Pypi and add a new “Publisher” to the <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> project. The new “Publisher” must use the new filename, in addition to other metadata. You can see the Pypi and TestPypi-specific <a class="reference external" href="https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/#configuring-trusted-publishing">instructions here</a>. Note that to add a new “Publisher” to the <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> project in the first place, you must have the necessary permissions. Ask Austin or Dylan if you need to upgrade your permissions.</p></li>
+<li><p>Note that the publishing workflow uses the version exactly from <code class="docutils literal notranslate"><span class="pre">hnn_core/__init__.py</span></code>, NOT from the git tag itself. This is why it is important to double check that your tag numbers are consistent. It will not detect if there is a tag version mismatch.</p></li>
+</ul>
+</li>
+<li><p>Assuming nothing went wrong with the Github Actions “Publish (etc.)” workflow, your new version should now be live on both <a class="reference external" href="https://pypi.org/project/hnn-core/#history">Pypi</a> and <a class="reference external" href="https://test.pypi.org/project/hnn-core/#history">TestPypi</a>.</p></li>
+</ol>
+</section>
+<section id="post-publishing-tests">
+<h2>7. Post-publishing tests<a class="headerlink" href="#post-publishing-tests" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Create yet another fresh Python environment.</p></li>
+<li><p>Move somewhere outside of your <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> code repository, such as to your <code class="docutils literal notranslate"><span class="pre">~/Desktop</span></code>. We want to test that our new package installs and works correctly without relying on any code on your hard drive.</p></li>
+<li><p>Wait 10 minutes for Pypi’s stores to start distributing your new release (go grab a coffee). It may be ready instantly, or not. Maybe ponder how you can improve this package release process…</p></li>
+<li><p>Install the basic version of <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> from Pypi with:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">hnn</span><span class="o">-</span><span class="n">core</span>
+</pre></div>
+</div>
+<p>Make sure that you check that it’s the latest version that you just uploaded. If there are any issues during during installation, recoil in horror and start sweating.</p>
+<ol class="arabic simple" start="5">
+<li><p>Similar to before, test that a basic simulation runs, such as using:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;from hnn_core import jones_2009_model, simulate_dipole ; simulate_dipole(jones_2009_model(), tstop=20)&quot;</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="6">
+<li><p>You can also test the TestPypi version in yet another environment if you want, but you should note that the command shown at the top of the <a class="reference external" href="https://test.pypi.org/project/hnn-core/#history">TestPypi page</a> will NOT work, due to the <code class="docutils literal notranslate"><span class="pre">-i</span></code> argument. (The reason for this is that TestPypi does not actually provide the <code class="docutils literal notranslate"><span class="pre">setuptools</span></code> package that we need, <a class="reference external" href="https://stackoverflow.com/a/77948986">see here</a>). If you want to install the TestPypi version in a way that actually works, you should do the following:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">extra</span><span class="o">-</span><span class="n">index</span><span class="o">-</span><span class="n">url</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">test</span><span class="o">.</span><span class="n">pypi</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">simple</span><span class="o">/</span> <span class="s2">&quot;hnn-core&quot;</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="7">
+<li><p>Finally, manually download a copy of your new package directly from <a class="reference external" href="https://pypi.org/project/hnn-core/#files">https://pypi.org/project/hnn-core/#files</a>, then save it somewhere like your Downloads.</p></li>
+</ol>
+</section>
+<section id="more-github-release-steps">
+<h2>8. More Github release steps<a class="headerlink" href="#more-github-release-steps" title="Link to this heading">#</a></h2>
+<p>Only do these steps if you have made a stable release.</p>
+<ol class="arabic simple">
+<li><p>In your terminal, make a new “maintenance branch” by doing the following:</p>
+<ol class="arabic simple">
+<li><p>Return to your <code class="docutils literal notranslate"><span class="pre">hnn-code</span></code> repository on the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch in your terminal.</p></li>
+<li><p>Create a new branch matching <code class="docutils literal notranslate"><span class="pre">maint/&lt;new</span> <span class="pre">version&gt;</span></code> for the new version, beginning at the release commit.</p></li>
+<li><p>Push that new branch to <code class="docutils literal notranslate"><span class="pre">upstream</span></code>.</p></li>
+</ol>
+</li>
+<li><p>In your browser, make an official “Github Release”:</p>
+<ol class="arabic simple">
+<li><p>Go to <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core/releases">jonescompneurolab/hnn-core</a> and click “Draft a new release”.</p></li>
+<li><p>Copy and re-format the new version’s release notes (which you added in <code class="docutils literal notranslate"><span class="pre">doc/whats_new.md</span></code> previously) into the release notes for this Github release. Doing this in a text editor with “find-replace” is recommended.</p></li>
+<li><p>Where it says “Attach binaries…”, upload the package file you manually downloaded from <a class="reference external" href="https://pypi.org/project/hnn-core/#files">https://pypi.org/project/hnn-core/#files</a>.</p></li>
+<li><p>Make sure <code class="docutils literal notranslate"><span class="pre">Set</span> <span class="pre">as</span> <span class="pre">the</span> <span class="pre">latest</span> <span class="pre">release</span></code> is checked if you are indeed pushing the latest release that people should be using.</p></li>
+<li><p>Publish the release.</p></li>
+</ol>
+</li>
+</ol>
+</section>
+<section id="increment-version-again-to-a-development-version">
+<h2>9. Increment version again, to a development version<a class="headerlink" href="#increment-version-again-to-a-development-version" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Return to your <code class="docutils literal notranslate"><span class="pre">hnn-code</span></code> repository on the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch in your terminal.</p></li>
+<li><p>Start to realize that this is a lot of steps. Maybe too many.</p></li>
+<li><p>Begin incrementing the version <em>again</em> to the <em>next development version</em>. You can do this via a personal branch then PR, or just do it as a single commit that you will later push to <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code>.</p></li>
+<li><p>View the <a class="reference external" href="https://test.pypi.org/project/hnn-core/#history">TestPypi page here</a> and <a class="reference external" href="https://pypi.org/project/hnn-core/#history">Pypi here</a>, and check to make sure that the next development version you want to use has not already been taken by an existing package. It is possible for this to happen, due to the necessity to debug our package building pipeline, etc. Increment your next development version so it’s higher. For example, if you just released version <code class="docutils literal notranslate"><span class="pre">0.4.4</span></code> but there is a pre-existing package for version <code class="docutils literal notranslate"><span class="pre">0.4.5dev1</span></code>, then you should prepare to increment the next development version to <code class="docutils literal notranslate"><span class="pre">0.4.5dev2</span></code>.</p></li>
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">hnn_core/__init__.py</span></code> and <code class="docutils literal notranslate"><span class="pre">doc/conf.py</span></code> to use the next development version. You do NOT need to make any changes to <code class="docutils literal notranslate"><span class="pre">doc/_static/versions.json</span></code>.</p></li>
+<li><p>Add a new section to the top of <code class="docutils literal notranslate"><span class="pre">doc/whats_new.md</span></code> that says “Current”, pushing the most recent version release notes downwards.</p></li>
+<li><p>Git add these three files, such as using:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">add</span> <span class="n">hnn_core</span><span class="o">/</span><span class="fm">__init__</span><span class="o">.</span><span class="n">py</span> <span class="n">doc</span><span class="o">/</span><span class="n">conf</span><span class="o">.</span><span class="n">py</span> <span class="n">doc</span><span class="o">/</span><span class="n">whats_new</span><span class="o">.</span><span class="n">md</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="8">
+<li><p>Make a commit, then push. You can push this to <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code> directly. It is <em>not</em> recommended that you push a version tag for this commit, <em>unless</em> you need this development version to be available from <code class="docutils literal notranslate"><span class="pre">pip</span></code>. (If you for some reason need to be publishing a development version as a package available from pip, then you may be better off having that user install <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> from source instead).</p></li>
+</ol>
+</section>
+<section id="build-and-distribute-conda-packages-utilizing-the-new-version">
+<h2>10. Build and distribute Conda packages utilizing the new version<a class="headerlink" href="#build-and-distribute-conda-packages-utilizing-the-new-version" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>We’re done….with Github and Pypi that is! Oh, you thought that was all? Nope. Now that our new version has been released on Pypi, we need to <strong>use the new Pypi package to rebuild new Conda packages for the new version too</strong>. Do not fret however! This part may seem intimidating, but you don’t need to do that many steps.</p></li>
+<li><p>Elsewhere on your hard drive, clone our repo here <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core-conda-packaging">jonescompneurolab/hnn-core-conda-packaging</a>. We will NOT be using your local copy of <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>’s source code for this, but instead be using the Pypi package directly.</p></li>
+<li><p>Read through the that repo’s <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core-conda-packaging?tab=readme-ov-file#how-to-use-this-repo-to-build-and-upload-the-packages">“How to use this repo to build and upload the packages” section</a>. You do <em>not</em> need to read the entire README.</p></li>
+<li><p>Follow the instructions until you are told to run <code class="docutils literal notranslate"><span class="pre">00-install-build-deps.sh</span></code> to install the conda building dependencies. Execute that script.</p></li>
+<li><p>Let’s start with the more complex conda package. <code class="docutils literal notranslate"><span class="pre">cd</span></code> into <code class="docutils literal notranslate"><span class="pre">hnn-core-all/recipe</span></code>.</p></li>
+<li><p>Open the file <code class="docutils literal notranslate"><span class="pre">meta.yaml</span></code> (aka <code class="docutils literal notranslate"><span class="pre">hnn-core-all/recipe/meta.yaml</span></code>). You need to do the following:</p>
+<ol class="arabic simple">
+<li><p>Increment the <code class="docutils literal notranslate"><span class="pre">version</span></code> variable at the top to the latest version on Pypi.</p></li>
+<li><p>Go to <a class="reference external" href="https://pypi.org/project/hnn-core/#files">https://pypi.org/project/hnn-core/#files</a>, and click on <code class="docutils literal notranslate"><span class="pre">view</span> <span class="pre">details</span></code>.</p></li>
+<li><p>Copy the SHA256 Hash digest.</p></li>
+<li><p>Paste it into the value for <code class="docutils literal notranslate"><span class="pre">sha256</span></code> inside <code class="docutils literal notranslate"><span class="pre">meta.yaml</span></code>.</p></li>
+</ol>
+</li>
+<li><p>If NEURON has released a new stable version (currently, newer than 8.2.7), then you also need to edit <code class="docutils literal notranslate"><span class="pre">hnn-core-all/recipe/build.sh</span></code>. Open that file.</p>
+<ol class="arabic simple">
+<li><p>Inside that file, identify the places where <code class="docutils literal notranslate"><span class="pre">NRN_WHL_URL</span></code> values are set to URLs that provide the NEURON wheel files.</p></li>
+<li><p>Go to <a class="reference external" href="https://pypi.org/project/NEURON/#files">https://pypi.org/project/NEURON/#files</a>.</p></li>
+<li><p>For the version of Python we support in our conda packages (currently 3.12 only), you must copy the <em>full URL link</em> of the relevant NEURON wheel file, and then replace its existing value in <code class="docutils literal notranslate"><span class="pre">build.sh</span></code>. The easiest way to do this is right-click on the relevant <code class="docutils literal notranslate"><span class="pre">.whl</span></code> file link and click <code class="docutils literal notranslate"><span class="pre">Copy</span> <span class="pre">Link</span></code>. You will know you’re on the right track when the URL is long and includes a complete hash of the file, for example like: <a class="reference external" href="https://files.pythonhosted.org/packages/3e/69/5a8d498fd3096726768ab875b0e9a633cfdb68f976a6d520b6158b07ed7c/neuron-8.2.7-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl">https://files.pythonhosted.org/packages/3e/69/5a8d498fd3096726768ab875b0e9a633cfdb68f976a6d520b6158b07ed7c/neuron-8.2.7-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl</a>.</p></li>
+<li><p>Yes this is super annoying, but it is required for reasons described in our Conda package building repo’s README.</p></li>
+</ol>
+</li>
+<li><p>Once you have updated <code class="docutils literal notranslate"><span class="pre">hnn-core-all/recipe/meta.yaml</span></code> and <code class="docutils literal notranslate"><span class="pre">hnn-core-all/recipe/build.sh</span></code>, do the same for the other conda package, <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>. You should be able to make the exact same changes in the same places to <code class="docutils literal notranslate"><span class="pre">hnn-core/recipe/meta.yaml</span></code> and <code class="docutils literal notranslate"><span class="pre">hnn-core/recipe/build.sh</span></code>.</p></li>
+<li><p>Before trying to build the packages, save your work, and make a commit on your own branch of the repo or something.</p></li>
+<li><p>From here, you can continue where you left off from <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core-conda-packaging?tab=readme-ov-file#how-to-use-this-repo-to-build-and-upload-the-packages">“How to use this repo to build and upload the packages” section</a>, which should be around step 5. Details are in that repo.</p></li>
+<li><p>To summarize the rest of the instructions from that repo, assuming you have no problems, the rest of the workflow will look like this:</p>
+<ol class="arabic simple">
+<li><p>You <code class="docutils literal notranslate"><span class="pre">cd</span></code> into each Conda package’s directory.</p></li>
+<li><p>Execute <code class="docutils literal notranslate"><span class="pre">01-build-pkg.sh</span></code>, which takes a few minutes to build the package.</p></li>
+<li><p>Assuming that succeeded, you test that you can install and run the package. As always, make sure you do this from somewhere that is NOT inside your main <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> code repository, otherwise Python will sometimes use your local code instead of the package you have installed in your environment.</p></li>
+<li><p>Satisfied, you upload the package.</p></li>
+<li><p>Repeat for the other package.</p></li>
+</ol>
+</li>
+<li><p>Do something to celebrate, you’re done!</p></li>
+</ol>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes-before-starting">0. Notes before starting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#before-making-a-release">1. Before making a release</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prepare-your-local-version-of-the-release">2. Prepare your local version of the release</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#test-your-local-version-of-the-release">3. Test your local version of the release</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-your-release-pr">4. Create your release PR</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#update-the-documentation">5. Update the documentation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#push-a-git-tag-to-build-the-release">6. Push a git tag to build the release</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#post-publishing-tests">7. Post-publishing tests</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#more-github-release-steps">8. More Github release steps</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#increment-version-again-to-a-development-version">9. Increment version again, to a development version</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build-and-distribute-conda-packages-utilizing-the-new-version">10. Build and distribute Conda packages utilizing the new version</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/how_to_create_releases.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, HNN Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

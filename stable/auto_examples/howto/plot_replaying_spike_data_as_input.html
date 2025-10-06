@@ -1,0 +1,865 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>09. Replaying Spike Data as Input &#8212; hnn-core 0.4.3 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=5bfaad31"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/howto/plot_replaying_spike_data_as_input';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.4.3';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="API Documentation" href="../../api.html" />
+    <link rel="prev" title="08. Optimize simulated rhythmic responses" href="optimize_rhythmic.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.4.3" />
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-199741045-1');
+</script>
+
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core 0.4.3 documentation - Home"/>
+    <img src="../../_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core 0.4.3 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Install (Textbook)
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI package
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://anaconda.org/jonescompneurolab/repo">
+    Conda packages
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../install.html">
+    Install (Textbook)
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../api.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://anaconda.org/jonescompneurolab/repo">
+    Conda packages
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorials</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">How to</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">09. Replaying Spike Data as Input</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-auto-examples-howto-plot-replaying-spike-data-as-input-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code. or to run this example in your browser via Binder</p>
+</div>
+<section class="sphx-glr-example-title" id="replaying-spike-data-as-input">
+<span id="sphx-glr-auto-examples-howto-plot-replaying-spike-data-as-input-py"></span><h1>09. Replaying Spike Data as Input<a class="headerlink" href="#replaying-spike-data-as-input" title="Link to this heading">#</a></h1>
+<p>Welcome to this hands-on tutorial on simulating communication between two neocortical
+networks using HNN-Core! This notebook guides you through creating a source network
+(Network A), extracting its spike data, feeding it into a target network (Network B)
+using the <em class="xref py py-obj">add_spike_train_drive</em> method, simulating both, and visualizing the
+results. Let’s dive in!</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Authors: Maira Usman &lt;maira.usman5703@gmail.com&gt;</span>
+</pre></div>
+</div>
+<section id="step-1-setting-up-the-source-network-network-a">
+<h2>Step 1: Setting Up the Source Network (Network A)<a class="headerlink" href="#step-1-setting-up-the-source-network-network-a" title="Link to this heading">#</a></h2>
+<p>Our journey begins with Network A, the source of neural activity. We’ll use the
+<em class="xref py py-obj">jones_2009_model</em> to create a realistic neocortical network and simulate it with an
+evoked drive to generate spike data. This step mimics how a network might produce
+activity in a real brain region, which we’ll later transmit to another network.</p>
+<p>The simulation runs for 170 ms, and we’ll save the spike data to a temporary file for
+efficient handling.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">,</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">,</span> <a href="../../generated/hnn_core.read_spikes.html#hnn_core.read_spikes" title="hnn_core.read_spikes" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">read_spikes</span></a>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">op</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+
+<span class="c1"># Create and simulate Network A</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating and simulating Network A...&quot;</span><span class="p">)</span>
+<a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_A</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">()</span>
+<a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_A</span></a><span class="o">.</span><span class="n">_params</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;tstop&#39;</span><span class="p">:</span> <span class="mf">170.0</span><span class="p">})</span>
+
+<span class="c1"># Add a drive to generate activity</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Adding drive to Network A...&quot;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">drive_params</span></a> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;evdist1&#39;</span><span class="p">,</span> <span class="s1">&#39;mu&#39;</span><span class="p">:</span> <span class="mf">63.5</span><span class="p">,</span> <span class="s1">&#39;sigma&#39;</span><span class="p">:</span> <span class="mf">3.8</span><span class="p">,</span> <span class="s1">&#39;numspikes&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;location&#39;</span><span class="p">:</span> <span class="s1">&#39;distal&#39;</span><span class="p">,</span> <span class="s1">&#39;event_seed&#39;</span><span class="p">:</span> <span class="mi">274</span>
+<span class="p">}</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights</span></a> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;ampa&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.006</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.0005</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.14</span><span class="p">},</span>
+    <span class="s1">&#39;nmda&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.019</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.004</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.08</span><span class="p">}</span>
+<span class="p">}</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">delays</span></a> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L2_basket&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">}</span>
+<a href="../../generated/hnn_core.Network.html#hnn_core.Network.add_evoked_drive" title="hnn_core.Network.add_evoked_drive" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net_A</span><span class="o">.</span><span class="n">add_evoked_drive</span></a><span class="p">(</span>
+    <span class="o">**</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">drive_params</span></a><span class="p">,</span> <span class="n">weights_ampa</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights</span></a><span class="p">[</span><span class="s1">&#39;ampa&#39;</span><span class="p">],</span> <span class="n">weights_nmda</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">weights</span></a><span class="p">[</span><span class="s1">&#39;nmda&#39;</span><span class="p">],</span>
+    <span class="n">synaptic_delays</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">delays</span></a>
+<span class="p">)</span>
+
+<span class="c1"># Simulate and save spike data</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Simulating Network A and saving spikes...&quot;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpls_A</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">(</span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_A</span></a><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="mf">170.0</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">with</span> <a href="https://docs.python.org/3/library/tempfile.html#tempfile.TemporaryDirectory" title="tempfile.TemporaryDirectory" class="sphx-glr-backref-module-tempfile sphx-glr-backref-type-py-class"><span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span></a><span class="p">()</span> <span class="k">as</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tmp_dir</span></a><span class="p">:</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_file</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tmp_dir</span></a><span class="p">,</span> <span class="s1">&#39;spk_</span><span class="si">%d</span><span class="s1">.txt&#39;</span><span class="p">)</span>
+    <a href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.write" title="hnn_core.CellResponse.write" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net_A</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">write</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_file</span></a><span class="p">)</span>
+    <a href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse" title="hnn_core.CellResponse" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cell_response</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.read_spikes.html#hnn_core.read_spikes" title="hnn_core.read_spikes" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">read_spikes</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">op</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tmp_dir</span></a><span class="p">,</span> <span class="s1">&#39;spk_*.txt&#39;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracted </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.str_" title="numpy.str_" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.str_" title="numpy.str_" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a><span class="w"> </span><span class="ow">in</span><span class="w"> </span><a href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse" title="hnn_core.CellResponse" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cell_response</span></a><span class="o">.</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_times</span></a><span class="p">)</span><span class="si">}</span><span class="s2"> spikes from Network A&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Creating and simulating Network A...
+Adding drive to Network A...
+Simulating Network A and saving spikes...
+Joblib will run 1 trial(s) in parallel by distributing trials over 1 jobs.
+Building the NEURON model
+[Done]
+Trial 1: 0.03 ms...
+Trial 1: 10.0 ms...
+Trial 1: 20.0 ms...
+Trial 1: 30.0 ms...
+Trial 1: 40.0 ms...
+Trial 1: 50.0 ms...
+Trial 1: 60.0 ms...
+Trial 1: 70.0 ms...
+Trial 1: 80.0 ms...
+Trial 1: 90.0 ms...
+Trial 1: 100.0 ms...
+Trial 1: 110.0 ms...
+Trial 1: 120.0 ms...
+Trial 1: 130.0 ms...
+Trial 1: 140.0 ms...
+Trial 1: 150.0 ms...
+Trial 1: 160.0 ms...
+Writing file /var/folders/cs/5b2dq2192v52fd3j8ppbtcg80000gp/T/tmpds09uky3/spk_0.txt
+/Users/austinsoplata/rep/brn/hnn-core/examples/howto/plot_replaying_spike_data_as_input.py:59: DeprecationWarning: Reading cell response from txt files is deprecated and will be removed in future versions. Please load cell response along with simulated network
+  cell_response = read_spikes(op.join(tmp_dir, &#39;spk_*.txt&#39;))
+Extracted 616 spikes from Network A
+</pre></div>
+</div>
+</section>
+<section id="step-2-configuring-the-target-network-network-b">
+<h2>Step 2: Configuring the Target Network (Network B)<a class="headerlink" href="#step-2-configuring-the-target-network-network-b" title="Link to this heading">#</a></h2>
+<p>Now, let’s set up Network B, the target network that will receive spike data from
+Network A. We’ll extract spikes from the first trial of Network A, filter for
+pyramidal cells, and format them into a dictionary compatible with
+<em class="xref py py-obj">add_spike_train_drive</em>. This process is akin to distributing computed data across
+nodes in an MPI setup, where each node (here, Network B) processes a subset of the
+input.</p>
+<p>We’ll also define connection properties to map Network A’s pyramidal cells to Network
+B’s layers, ensuring a realistic interaction.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating and configuring Network B...&quot;</span><span class="p">)</span>
+<a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_B</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.jones_2009_model.html#hnn_core.jones_2009_model" title="hnn_core.jones_2009_model" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">jones_2009_model</span></a><span class="p">()</span>
+<a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_B</span></a><span class="o">.</span><span class="n">_params</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;tstop&#39;</span><span class="p">:</span> <span class="mf">225.0</span><span class="p">})</span>
+
+<span class="c1"># Extract spike data from first trial and filter for pyramidal cells</span>
+<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trial_idx</span></a> <span class="o">=</span> <span class="mi">0</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_times</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse" title="hnn_core.CellResponse" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cell_response</span></a><span class="o">.</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_times</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trial_idx</span></a><span class="p">]</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_gids</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse" title="hnn_core.CellResponse" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cell_response</span></a><span class="o">.</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_gids</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trial_idx</span></a><span class="p">]</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_types</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse" title="hnn_core.CellResponse" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cell_response</span></a><span class="o">.</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_types</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">trial_idx</span></a><span class="p">]</span>
+<a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pyramidal_mask</span></a> <span class="o">=</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.str_" title="numpy.str_" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">,</span> <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">]</span> <span class="k">for</span> <a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.str_" title="numpy.str_" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_types</span></a><span class="p">])</span>
+<a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filtered_times</span></a> <span class="o">=</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_times</span></a><span class="p">)[</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pyramidal_mask</span></a><span class="p">]</span>
+<a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filtered_gids</span></a> <span class="o">=</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_gids</span></a><span class="p">)[</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pyramidal_mask</span></a><span class="p">]</span>
+<a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filtered_types</span></a> <span class="o">=</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_types</span></a><span class="p">)[</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pyramidal_mask</span></a><span class="p">]</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_data</span></a> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;NetA_</span><span class="si">{</span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.str_" title="numpy.str_" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a><span class="si">}</span><span class="s2">_GID</span><span class="si">{</span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.int64" title="numpy.int64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">g</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.str_" title="numpy.str_" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.int64" title="numpy.int64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">g</span></a> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filtered_types</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filtered_gids</span></a><span class="p">)}</span>
+<span class="k">for</span> <a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.str_" title="numpy.str_" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.int64" title="numpy.int64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">g</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">time</span></a> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filtered_types</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filtered_gids</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">filtered_times</span></a><span class="p">):</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_id</span></a> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;NetA_</span><span class="si">{</span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.str_" title="numpy.str_" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a><span class="si">}</span><span class="s2">_GID</span><span class="si">{</span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.int64" title="numpy.int64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">g</span></a><span class="si">}</span><span class="s2">&quot;</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_data</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_id</span></a><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><a href="https://numpy.org/devdocs/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">time</span></a><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of valid pyramidal cells with spikes to be used for input: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_data</span></a><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Define target configuration</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_properties</span></a> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;L5_pyramidal&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;location&#39;</span><span class="p">:</span> <span class="s1">&#39;distal&#39;</span><span class="p">,</span> <span class="s1">&#39;weights_ampa&#39;</span><span class="p">:</span> <span class="mf">0.005</span><span class="p">,</span> <span class="s1">&#39;synaptic_delays&#39;</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">},</span>
+    <span class="s1">&#39;L2_pyramidal&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;location&#39;</span><span class="p">:</span> <span class="s1">&#39;proximal&#39;</span><span class="p">,</span> <span class="s1">&#39;weights_ampa&#39;</span><span class="p">:</span> <span class="mf">0.003</span><span class="p">,</span> <span class="s1">&#39;synaptic_delays&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}</span>
+<span class="p">}</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_config</span></a> <span class="o">=</span> <span class="p">{}</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_ids</span></a> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_data</span></a><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_id</span></a> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">source_ids</span></a><span class="p">):</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_type</span></a> <span class="o">=</span> <span class="s1">&#39;L5_pyramidal&#39;</span> <span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;L2_pyramidal&#39;</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">props</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">conn_properties</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_type</span></a><span class="p">]</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_config</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">src_id</span></a><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;target_cell_types&#39;</span><span class="p">:</span> <span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_type</span></a><span class="p">],</span>
+        <span class="s1">&#39;location&#39;</span><span class="p">:</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">props</span></a><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;weights_ampa&#39;</span><span class="p">:</span> <span class="p">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_type</span></a><span class="p">:</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">props</span></a><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">]},</span>
+        <span class="s1">&#39;synaptic_delays&#39;</span><span class="p">:</span> <span class="p">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_type</span></a><span class="p">:</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">props</span></a><span class="p">[</span><span class="s1">&#39;synaptic_delays&#39;</span><span class="p">]},</span>
+        <span class="s1">&#39;probability&#39;</span><span class="p">:</span> <span class="mf">0.7</span>
+    <span class="p">}</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_weights_ampa</span></a> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">cfg</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">target_config</span></a><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;weights_ampa&#39;</span><span class="p">]}</span>
+
+<span class="c1"># Add spike train drive to Network B</span>
+<a href="../../generated/hnn_core.Network.html#hnn_core.Network.add_spike_train_drive" title="hnn_core.Network.add_spike_train_drive" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net_B</span><span class="o">.</span><span class="n">add_spike_train_drive</span></a><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;drive_from_NetA&#39;</span><span class="p">,</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_data</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spike_data</span></a><span class="p">,</span>
+    <span class="n">location</span><span class="o">=</span><span class="s1">&#39;distal&#39;</span><span class="p">,</span>
+    <span class="n">weights_ampa</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">all_weights_ampa</span></a><span class="p">,</span>
+    <span class="n">weights_nmda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">synaptic_delays</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">conn_seed</span><span class="o">=</span><span class="mi">42</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Creating and configuring Network B...
+Number of valid pyramidal cells with spikes to be used for input: 139
+/Users/austinsoplata/rep/brn/hnn-core/hnn_core/network.py:1151: UserWarning: Spike train drives can only target sections defined in `Cell.sect_loc` when `legacy_mode=False`.
+  warnings.warn(
+</pre></div>
+</div>
+</section>
+<section id="step-3-simulating-and-visualizing-the-networks">
+<h2>Step 3: Simulating and Visualizing the Networks<a class="headerlink" href="#step-3-simulating-and-visualizing-the-networks" title="Link to this heading">#</a></h2>
+<p>With Network B configured, we’ll simulate it for 225 ms to observe the effect of
+Network A’s spikes. Visualization is key in neuroscience, so we’ll create raster plots
+for both networks. This step lets you see how the input from Network A influences
+Network B’s activity.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Simulating Network B...&quot;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">dpls_b</span></a> <span class="o">=</span> <a href="../../generated/hnn_core.simulate_dipole.html#hnn_core.simulate_dipole" title="hnn_core.simulate_dipole" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-function"><span class="n">simulate_dipole</span></a><span class="p">(</span><a href="../../generated/hnn_core.Network.html#hnn_core.Network" title="hnn_core.Network" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_B</span></a><span class="p">,</span> <span class="n">tstop</span><span class="o">=</span><span class="mf">225.0</span><span class="p">,</span> <span class="n">n_trials</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Visualize results</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a><span class="p">,</span> <a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># 1. Network A: Spike raster</span>
+<a href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_raster" title="hnn_core.CellResponse.plot_spikes_raster" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net_A</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">plot_spikes_raster</span></a><span class="p">(</span><span class="n">ax</span><span class="o">=</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Network A: Spike Raster&#39;</span><span class="p">)</span>
+<a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Cell ID&#39;</span><span class="p">)</span>
+<span class="c1"># 2. Network B: Spike raster</span>
+<a href="../../generated/hnn_core.CellResponse.html#hnn_core.CellResponse.plot_spikes_raster" title="hnn_core.CellResponse.plot_spikes_raster" class="sphx-glr-backref-module-hnn_core sphx-glr-backref-type-py-method"><span class="n">net_B</span><span class="o">.</span><span class="n">cell_response</span><span class="o">.</span><span class="n">plot_spikes_raster</span></a><span class="p">(</span><span class="n">ax</span><span class="o">=</span><a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Network B: Spike Raster&#39;</span><span class="p">)</span>
+<a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Cell ID&#39;</span><span class="p">)</span>
+<a href="https://numpy.org/devdocs/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axes</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time (ms)&#39;</span><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_plot_replaying_spike_data_as_input_001.png" srcset="../../_images/sphx_glr_plot_replaying_spike_data_as_input_001.png" alt="Network A: Spike Raster, Network B: Spike Raster" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Simulating Network B...
+Joblib will run 1 trial(s) in parallel by distributing trials over 1 jobs.
+Building the NEURON model
+[Done]
+Trial 1: 0.03 ms...
+Trial 1: 10.0 ms...
+Trial 1: 20.0 ms...
+Trial 1: 30.0 ms...
+Trial 1: 40.0 ms...
+Trial 1: 50.0 ms...
+Trial 1: 60.0 ms...
+Trial 1: 70.0 ms...
+Trial 1: 80.0 ms...
+Trial 1: 90.0 ms...
+Trial 1: 100.0 ms...
+Trial 1: 110.0 ms...
+Trial 1: 120.0 ms...
+Trial 1: 130.0 ms...
+Trial 1: 140.0 ms...
+Trial 1: 150.0 ms...
+Trial 1: 160.0 ms...
+Trial 1: 170.0 ms...
+Trial 1: 180.0 ms...
+Trial 1: 190.0 ms...
+Trial 1: 200.0 ms...
+Trial 1: 210.0 ms...
+Trial 1: 220.0 ms...
+</pre></div>
+</div>
+<p>Now that the simulation is finished, let’s verify the drive setup and ensure the
+connection was established correctly.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Verifying configuration:&quot;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">drive_name</span></a> <span class="o">=</span> <span class="s1">&#39;drive_from_NetA&#39;</span>
+<span class="k">if</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">drive_name</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_B</span><span class="o">.</span><span class="n">external_drives</span></a><span class="p">:</span>
+    <span class="n">drive</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_B</span><span class="o">.</span><span class="n">external_drives</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">drive_name</span></a><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Drive &#39;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">drive_name</span></a><span class="si">}</span><span class="s2">&#39; created with </span><span class="si">{</span><span class="n">drive</span><span class="p">[</span><span class="s1">&#39;n_drive_cells&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> cells&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">drive_name</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="collections.OrderedDict" class="sphx-glr-backref-module-collections sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_B</span><span class="o">.</span><span class="n">gid_ranges</span></a><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  GIDs assigned: </span><span class="si">{</span><a href="https://docs.python.org/3/library/collections.html#collections.OrderedDict" title="collections.OrderedDict" class="sphx-glr-backref-module-collections sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_B</span><span class="o">.</span><span class="n">gid_ranges</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">drive_name</span></a><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">drive_connections</span></a> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">conn</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">net_B</span><span class="o">.</span><span class="n">connectivity</span></a> <span class="k">if</span> <span class="n">conn</span><span class="p">[</span><span class="s1">&#39;src_type&#39;</span><span class="p">]</span> <span class="o">==</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">drive_name</span></a><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Number of connections from drive: </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">drive_connections</span></a><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ERROR: Drive &#39;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">drive_name</span></a><span class="si">}</span><span class="s2">&#39; not found&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Verifying configuration:
+  Drive &#39;drive_from_NetA&#39; created with 139 cells
+  GIDs assigned: range(270, 409)
+  Number of connections from drive: 2
+</pre></div>
+</div>
+</section>
+<section id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Link to this heading">#</a></h2>
+<p>You’ve now successfully replayed spikes from one network into another network! The
+raster plots show how Network A’s activity influences Network B, while the
+verification confirms the drive setup. This approach is scalable—similar to MPI’s
+distributed computing—allowing you to experiment with multiple networks or adjust
+parameters like weights and delays to explore different dynamics. Try modifying the
+<em class="xref py py-obj">weights_ampa</em> or <em class="xref py py-obj">synaptic_delays</em> values in Step 2 to see how they affect the
+results!</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 22.235 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-replaying-spike-data-as-input-py">
+<div class="binder-badge docutils container">
+<a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=v0.4.3/notebooks/auto_examples/howto/plot_replaying_spike_data_as_input.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" style="width: 150px;" />
+</a>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/efc93a7d3c8a2b5b604591c7598f06eb/plot_replaying_spike_data_as_input.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_replaying_spike_data_as_input.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/6c131d5bbd86decb6c8d3527451328d2/plot_replaying_spike_data_as_input.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_replaying_spike_data_as_input.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/bbd54ffe0f09417c8e03a3e59a330e7b/plot_replaying_spike_data_as_input.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">plot_replaying_spike_data_as_input.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="optimize_rhythmic.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">08. Optimize simulated rhythmic responses</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../../api.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">API Documentation</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-setting-up-the-source-network-network-a">Step 1: Setting Up the Source Network (Network A)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-configuring-the-target-network-network-b">Step 2: Configuring the Target Network (Network B)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#step-3-simulating-and-visualizing-the-networks">Step 3: Simulating and Visualizing the Networks</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conclusion">Conclusion</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/auto_examples/howto/plot_replaying_spike_data_as_input.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, HNN Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

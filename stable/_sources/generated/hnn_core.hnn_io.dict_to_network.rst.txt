@@ -1,0 +1,10 @@
+﻿hnn_core.hnn_io.dict_to_network
+===============================
+
+.. currentmodule:: hnn_core.hnn_io
+
+.. autofunction:: dict_to_network
+
+.. _sphx_glr_backreferences_hnn_core.hnn_io.dict_to_network:
+.. minigallery:: hnn_core.hnn_io.dict_to_network
+   :add-heading:
