@@ -1467,8 +1467,7 @@ def _get_connectivity_widgets(conn_data, syn_gain_textfields):
     """Create connectivity box widgets from specified weight and gains"""
     style = {"description_width": "100px"}
     sliders = list()
-    function_counter = 0
-    for receptor_name in conn_data.keys():
+    for receptor_idx, receptor_name in enumerate(conn_data.keys()):
         global_gain_type = gain_type_lookup_dict[
             (
                 conn_data[receptor_name]["src_gids"],
@@ -1487,119 +1486,41 @@ def _get_connectivity_widgets(conn_data, syn_gain_textfields):
             style=style,
         )
 
-        # gain_text_input = BoundedFloatText(
-        #     value=conn_data[receptor_name]["gain"],
-        #     disabled=False,
-        #     continuous_update=False,
-        #     min=0,
-        #     max=1e6,
-        #     step=0.01,
-        #     description="Gain:",
-        #     style=style,
-        # )
+        gain_text_input = BoundedFloatText(
+            value=conn_data[receptor_name]["gain"],
+            disabled=False,
+            continuous_update=False,
+            min=0,
+            max=1e6,
+            step=0.01,
+            description="Gain:",
+            style=style,
+        )
 
-        if function_counter == 0:
-            gain_text_input0 = BoundedFloatText(
-                value=conn_data[receptor_name]["gain"],
-                disabled=False,
-                continuous_update=False,
-                min=0,
-                max=1e6,
-                step=0.01,
-                description="Gain:",
-                style=style,
-            )
-            gain_indicator_output0 = HTML(value=f"""
+        gain_indicator_output = HTML(
+            value=f"""
+            <b>Total Gain={
+                (
+                    syn_gain_textfields[global_gain_type].value * gain_text_input.value
+                ):.2f}</b>"""
+        )
+
+        # Create closure to capture current widget references
+        def make_update_html(gain_output, gain_input, gain_type):
+            def update_html(change):
+                gain_output.value = f"""
                 <b>Total Gain={
-                (syn_gain_textfields[global_gain_type].value * gain_text_input0.value):.2f}</b>""")
+                    (
+                        syn_gain_textfields[gain_type].value * gain_input.value
+                    ):.2f}</b>"""
 
-            def update_html0(change):
-                gain_indicator_output0.value = f"""
-                <b>Total Gain={
-                   (syn_gain_textfields[global_gain_type].value * gain_text_input0.value):.2f}</b>"""
-            syn_gain_textfields[global_gain_type].observe(update_html0, names="value")
-            gain_text_input0.observe(update_html0, names="value")
+            return update_html
 
-        elif function_counter == 1:
-             gain_text_input1 = BoundedFloatText(
-                value=conn_data[receptor_name]["gain"],
-                disabled=False,
-                continuous_update=False,
-                min=0,
-                max=1e6,
-                step=0.01,
-                description="Gain:",
-                style=style,
-            )
-             gain_indicator_output1 = HTML(value=f"""
-                <b>Total Gain={
-                (syn_gain_textfields[global_gain_type].value * gain_text_input1.value):.2f}</b>""")
-             def update_html1(change):
-                gain_indicator_output1.value = f"""
-                <b>Total Gain={
-                   (syn_gain_textfields[global_gain_type].value * gain_text_input1.value):.2f}</b>"""
-             syn_gain_textfields[global_gain_type].observe(update_html1, names="value")
-             gain_text_input1.observe(update_html1, names="value")
-
-
-        # gain_indicator_output = HTML(value=f"""
-        #     <b>Total Gain={
-        #         (syn_gain_textfields[global_gain_type].value * gain_text_input.value):.2f}</b>""")
-
-        # def update_html(change):
-        #     gain_indicator_output.value = f"""
-        #     <b>Total Gain={
-        #         (syn_gain_textfields["e_e"].value * gain_text_input.value):.2f}</b> """
-        # syn_gain_textfields["e_e"].observe(update_html, names="value")
-        # gain_text_input.observe(update_html, names="value")
-
-        # # main one we're trying to fix
-        # def update_html(change):
-        #     gain_indicator_output.value = f"""
-        #     <b>Total Gain={
-        #        (syn_gain_textfields[global_gain_type].value * gain_text_input.value):.2f}</b>"""
-        # syn_gain_textfields[global_gain_type].observe(update_html, names="value")
-        # gain_text_input.observe(update_html, names="value")
-
-        # def update_html1(change):
-        #     gain_indicator_output.value = f"""
-        #     <b>Total Gain={
-        #        (change["new"] * gain_text_input.value):.2f}</b>"""
-        # def update_html2(change):
-        #     gain_indicator_output.value = f"""
-        #     <b>Total Gain={
-        #        (syn_gain_textfields[global_gain_type].value * change["new"]):.2f}</b>"""
-        # syn_gain_textfields[global_gain_type].observe(update_html1, names="value")
-        # gain_text_input.observe(update_html2, names="value")
-
-        # # ugh doesn't work, doesn't solve problem
-        # if function_counter == 0:
-        #     def update_html1(change):
-        #         gain_indicator_output.value = f"""
-        #         <b>Total Gain={
-        #             (syn_gain_textfields[global_gain_type].value * gain_text_input.value):.2f}</b>"""
-        #     syn_gain_textfields[global_gain_type].observe(update_html1, names="value")
-        #     gain_text_input.observe(update_html1, names="value")
-        # elif function_counter == 1:
-        #     def update_html2(change):
-        #         gain_indicator_output.value = f"""
-        #         <b>Total Gain={
-        #             (syn_gain_textfields[global_gain_type].value * gain_text_input.value):.2f}</b>"""
-        #     syn_gain_textfields[global_gain_type].observe(update_html2, names="value")
-        #     gain_text_input.observe(update_html2, names="value")
-        # function_counter += 1
-
-        # # Broken but in a different way
-        # dlink(
-        #     (syn_gain_textfields[global_gain_type], 'value'),
-        #     (gain_indicator_output, 'value'),
-        #     transform=lambda x: f"<b>Total Gain={(x * gain_text_input.value):.2f}</b>"
-        # )
-        # dlink(
-        #     (gain_text_input, 'value'),
-        #     (gain_indicator_output, 'value'),
-        #     transform=lambda x: f"<b>Total Gain={(syn_gain_textfields[global_gain_type].value * x):.2f}</b>"
-        # )
+        update_fn = make_update_html(
+            gain_indicator_output, gain_text_input, global_gain_type
+        )
+        syn_gain_textfields[global_gain_type].observe(update_fn, names="value")
+        gain_text_input.observe(update_fn, names="value")
 
         display_name = conn_data[receptor_name]["receptor"].upper()
 
@@ -1613,42 +1534,24 @@ def _get_connectivity_widgets(conn_data, syn_gain_textfields):
 
         html_tab = "&emsp;"
 
-        if function_counter == 0:
-            conn_widget = VBox(
-                [
-                    HTML(
-                        value=f"""<p style='margin:5px;'><b>{html_tab}{html_tab}
-                Receptor: {display_name}</b></p>"""
-                    ),
-                    w_text_input,
-                    HBox(
-                        [
-                            gain_text_input0,
-                            gain_indicator_output0,
-                        ]
-                    ),
-                ]
-            )
-        elif function_counter == 1:
-            conn_widget = VBox(
-                [
-                    HTML(
-                        value=f"""<p style='margin:5px;'><b>{html_tab}{html_tab}
-                Receptor: {display_name}</b></p>"""
-                    ),
-                    w_text_input,
-                    HBox(
-                        [
-                            gain_text_input1,
-                            gain_indicator_output1,
-                        ]
-                    ),
-                ]
-            )
+        conn_widget = VBox(
+            [
+                HTML(
+                    value=f"""<p style='margin:5px;'><b>{html_tab}{html_tab}
+            Receptor: {display_name}</b></p>"""
+                ),
+                w_text_input,
+                HBox(
+                    [
+                        gain_text_input,
+                        gain_indicator_output,
+                    ]
+                ),
+            ]
+        )
 
         #  Add class to child Vboxes for targeted CSS
         conn_widget.add_class("connectivity-subsection")
-
         conn_widget._belongsto = {
             "receptor": conn_data[receptor_name]["receptor"],
             "location": conn_data[receptor_name]["location"],
@@ -1656,8 +1559,6 @@ def _get_connectivity_widgets(conn_data, syn_gain_textfields):
             "target_gids": conn_data[receptor_name]["target_gids"],
         }
         sliders.append(conn_widget)
-
-        function_counter += 1
 
     return sliders
 
@@ -2582,7 +2483,6 @@ def _init_network_from_widgets(
                 single_simulation_data["net"].connectivity[conn_idx]["nc_dict"][
                     "gain"
                 ] = applied_global_gain_value * vbox_key.children[2].children[0].value
-
 
     # Update cell params
     update_functions = {
