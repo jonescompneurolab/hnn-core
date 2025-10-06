@@ -295,7 +295,7 @@ simulation dipole as well as the convergence plot.
     .. container:: binder-badge
 
       .. image:: images/binder_badge_logo.svg
-        :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/optimize_evoked.ipynb
+        :target: https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=v0.4.3/notebooks/auto_examples/howto/optimize_evoked.ipynb
         :alt: Launch binder
         :width: 150 px
 
