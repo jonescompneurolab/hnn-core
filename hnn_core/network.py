@@ -1952,7 +1952,9 @@ class Network:
             }
         )
 
-    def set_synaptic_gains(self, e_e=None, e_i=None, i_e=None, i_i=None, copy=False):
+    def set_global_synaptic_gains(
+        self, e_e=None, e_i=None, i_e=None, i_i=None, copy=False
+    ):
         """Change the synaptic gains of the celltypes in the Network.
 
         Parameters
@@ -2015,7 +2017,7 @@ class Network:
         if copy:
             return net
 
-    def get_synaptic_gains(self):
+    def get_global_synaptic_gains(self):
         """Retrieve gain values for different celltype connections in the Network.
 
         This function identifies excitatory and inhibitory cells in the nNtwork

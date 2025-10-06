@@ -156,14 +156,14 @@ cell_parameters_dict = {
     ],
 }
 
-gain_type_display_dict = {
+global_gain_type_display_dict = {
     "e_e": "Exc-to-Exc",
     "e_i": "Exc-to-Inh",
     "i_e": "Inh-to-Exc",
     "i_i": "Inh-to-Inh",
 }
 
-gain_type_lookup_dict = {
+global_gain_type_lookup_dict = {
     ("L2_pyramidal", "L2_pyramidal"): "e_e",
     ("L2_pyramidal", "L5_pyramidal"): "e_e",
     ("L5_pyramidal", "L5_pyramidal"): "e_e",
@@ -584,7 +584,7 @@ class HNNGUI:
         self.cell_pameters_widgets = dict()
 
         # Synaptic Gains dict
-        self.synaptic_gain_widgets = dict()
+        self.global_gain_widgets = dict()
 
         self._init_ui_components()
         self.add_logging_window_logger()
@@ -645,7 +645,7 @@ class HNNGUI:
         self._drives_out = Output()  # tab to add new drives
         self._connectivity_out = Output()  # tab to tune connectivity.
         self._cell_params_out = Output()
-        self._syn_gain_out = Output()
+        self._global_gain_out = Output()
 
         self._log_out = Output()
 
@@ -770,7 +770,7 @@ class HNNGUI:
                 self.viz_manager,
                 self.simulation_list_widget,
                 self.cell_pameters_widgets,
-                self.synaptic_gain_widgets,
+                self.global_gain_widgets,
             )
 
         def _simulation_list_change(value):
@@ -930,7 +930,7 @@ class HNNGUI:
                 ),
                 VBox(
                     [
-                        self._syn_gain_out,
+                        self._global_gain_out,
                     ]
                 ),
                 self._connectivity_out,
@@ -1186,8 +1186,8 @@ class HNNGUI:
                 self.cell_pameters_widgets,
                 self.cell_layer_radio_buttons,
                 self.cell_type_radio_buttons,
-                self._syn_gain_out,
-                self.synaptic_gain_widgets,
+                self._global_gain_out,
+                self.global_gain_widgets,
                 self.layout,
             )
 
@@ -1342,8 +1342,8 @@ class HNNGUI:
                     self.cell_pameters_widgets,
                     self.cell_layer_radio_buttons,
                     self.cell_type_radio_buttons,
-                    self._syn_gain_out,
-                    self.synaptic_gain_widgets,
+                    self._global_gain_out,
+                    self.global_gain_widgets,
                     layout,
                 )
             elif load_type == "drives":
@@ -1463,19 +1463,19 @@ def create_expanded_button(
     )
 
 
-def _get_connectivity_widgets(conn_data, syn_gain_textfields):
+def _get_connectivity_widgets(conn_data, global_gain_textfields):
     """Create connectivity box widgets from specified weight and gains"""
     style = {"description_width": "100px"}
     sliders = list()
     for receptor_idx, receptor_name in enumerate(conn_data.keys()):
-        global_gain_type = gain_type_lookup_dict[
+        global_gain_type = global_gain_type_lookup_dict[
             (
                 conn_data[receptor_name]["src_gids"],
                 conn_data[receptor_name]["target_gids"],
             )
         ]
 
-        w_text_input = BoundedFloatText(
+        weight_text_input = BoundedFloatText(
             value=conn_data[receptor_name]["weight"],
             disabled=False,
             continuous_update=False,
@@ -1486,7 +1486,7 @@ def _get_connectivity_widgets(conn_data, syn_gain_textfields):
             style=style,
         )
 
-        gain_text_input = BoundedFloatText(
+        single_gain_text_input = BoundedFloatText(
             value=conn_data[receptor_name]["gain"],
             disabled=False,
             continuous_update=False,
@@ -1497,11 +1497,12 @@ def _get_connectivity_widgets(conn_data, syn_gain_textfields):
             style=style,
         )
 
-        gain_indicator_output = HTML(
+        combined_gain_indicator_output = HTML(
             value=f"""
             <b>Total Gain={
                 (
-                    syn_gain_textfields[global_gain_type].value * gain_text_input.value
+                    global_gain_textfields[global_gain_type].value
+                    * single_gain_text_input.value
                 ):.2f}</b>"""
         )
 
@@ -1511,16 +1512,16 @@ def _get_connectivity_widgets(conn_data, syn_gain_textfields):
                 gain_output.value = f"""
                 <b>Total Gain={
                     (
-                        syn_gain_textfields[gain_type].value * gain_input.value
+                        global_gain_textfields[gain_type].value * gain_input.value
                     ):.2f}</b>"""
 
             return update_html
 
         update_fn = make_update_html(
-            gain_indicator_output, gain_text_input, global_gain_type
+            combined_gain_indicator_output, single_gain_text_input, global_gain_type
         )
-        syn_gain_textfields[global_gain_type].observe(update_fn, names="value")
-        gain_text_input.observe(update_fn, names="value")
+        global_gain_textfields[global_gain_type].observe(update_fn, names="value")
+        single_gain_text_input.observe(update_fn, names="value")
 
         display_name = conn_data[receptor_name]["receptor"].upper()
 
@@ -1540,11 +1541,11 @@ def _get_connectivity_widgets(conn_data, syn_gain_textfields):
                     value=f"""<p style='margin:5px;'><b>{html_tab}{html_tab}
             Receptor: {display_name}</b></p>"""
                 ),
-                w_text_input,
+                weight_text_input,
                 HBox(
                     [
-                        gain_text_input,
-                        gain_indicator_output,
+                        single_gain_text_input,
+                        combined_gain_indicator_output,
                     ]
                 ),
             ]
@@ -2105,8 +2106,8 @@ def add_connectivity_tab(
     cell_pameters_vboxes,
     cell_layer_radio_button,
     cell_type_radio_button,
-    syn_gain_out,
-    syn_gain_textfields,
+    global_gain_out,
+    global_gain_textfields,
     layout,
 ):
     """Add all possible connectivity boxes to connectivity tab."""
@@ -2117,8 +2118,8 @@ def add_connectivity_tab(
         net,
         connectivity_out,
         connectivity_textfields,
-        syn_gain_out,
-        syn_gain_textfields,
+        global_gain_out,
+        global_gain_textfields,
         layout,
     )
 
@@ -2138,22 +2139,22 @@ def add_network_connectivity_tab(
     net,
     connectivity_out,
     connectivity_textfields,
-    syn_gain_out,
-    syn_gain_textfields,
+    global_gain_out,
+    global_gain_textfields,
     layout,
 ):
     """Creates widgets for synaptic connectivity values and global synaptic gains"""
 
     ### Global synaptic gains
     # ---------------------------------------------------------------
-    syn_gain_out.clear_output()
-    gain_values = net.get_synaptic_gains()
+    global_gain_out.clear_output()
+    gain_values = net.get_global_synaptic_gains()
     gain_types = ("e_e", "e_i", "i_e", "i_i")
 
     for gain_type in gain_types:
         gain_widget = BoundedFloatText(
             value=gain_values[gain_type],
-            description=f"{gain_type_display_dict[gain_type]}",
+            description=f"{global_gain_type_display_dict[gain_type]}",
             min=0,
             max=1e6,
             step=0.1,
@@ -2162,7 +2163,7 @@ def add_network_connectivity_tab(
         )
 
         gain_widget.layout.width = "220px"
-        syn_gain_textfields[gain_type] = gain_widget
+        global_gain_textfields[gain_type] = gain_widget
 
     title_box = HTML(
         """
@@ -2181,14 +2182,14 @@ def add_network_connectivity_tab(
 
     left_box = VBox(
         [
-            syn_gain_textfields["e_e"],
-            syn_gain_textfields["e_i"],
+            global_gain_textfields["e_e"],
+            global_gain_textfields["e_i"],
         ]
     )
     right_box = VBox(
         [
-            syn_gain_textfields["i_e"],
-            syn_gain_textfields["i_i"],
+            global_gain_textfields["i_e"],
+            global_gain_textfields["i_i"],
         ]
     )
     gain_vbox = VBox(
@@ -2207,7 +2208,7 @@ def add_network_connectivity_tab(
         ),
     )
 
-    with syn_gain_out:
+    with global_gain_out:
         display(gain_vbox)
 
     ### Connectivity accordion
@@ -2256,7 +2257,7 @@ def add_network_connectivity_tab(
                     connectivity_names.append(f"{src_gids}→{target_gids} ({location})")
                     connectivity_textfields.append(
                         _get_connectivity_widgets(
-                            receptor_related_conn, syn_gain_textfields
+                            receptor_related_conn, global_gain_textfields
                         )
                     )
 
@@ -2439,7 +2440,7 @@ def _init_network_from_widgets(
     drive_widgets,
     connectivity_textfields,
     cell_params_vboxes,
-    syn_gain_textfields,
+    global_gain_textfields,
     add_drive=True,
 ):
     """Construct network and add drives."""
@@ -2449,8 +2450,10 @@ def _init_network_from_widgets(
     )
 
     # Update with synaptic gains
-    syn_gain_values = {key: widget.value for key, widget in syn_gain_textfields.items()}
-    # single_simulation_data["net"].set_synaptic_gains(**syn_gain_values)
+    global_gain_values = {
+        key: widget.value for key, widget in global_gain_textfields.items()
+    }
+    # single_simulation_data["net"].set_synaptic_gains(**global_gain_values)
 
     # adjust connectivity according to the connectivity_tab
     for connectivity_slider in connectivity_textfields:
@@ -2470,14 +2473,14 @@ def _init_network_from_widgets(
                     "A_weight"
                 ] = vbox_key.children[1].value
 
-                # 1. identify which case of syn_gain_textfield applies to this src/target
-                global_gain_type = gain_type_lookup_dict[
+                # 1. identify which case of global_gain_textfield applies to this src/target
+                global_gain_type = global_gain_type_lookup_dict[
                     (
                         vbox_key._belongsto["src_gids"],
                         vbox_key._belongsto["target_gids"],
                     )
                 ]
-                applied_global_gain_value = syn_gain_values[global_gain_type]
+                applied_global_gain_value = global_gain_values[global_gain_type]
 
                 # 2. multiply global by single synapse gain to get combined
                 single_simulation_data["net"].connectivity[conn_idx]["nc_dict"][
@@ -2607,7 +2610,7 @@ def run_button_clicked(
     viz_manager,
     simulations_list_widget,
     cell_pameters_widgets,
-    syn_gain_textfields,
+    global_gain_textfields,
 ):
     """Run the simulation and plot outputs."""
     simulation_data = all_data["simulation_data"]
@@ -2631,7 +2634,7 @@ def run_button_clicked(
             drive_widgets,
             connectivity_textfields,
             cell_pameters_widgets,
-            syn_gain_textfields,
+            global_gain_textfields,
         )
 
         print("start simulation")
