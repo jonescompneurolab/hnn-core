@@ -26,7 +26,7 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 <!-- ### Changelog -->
 
-## 0.4.3 in-progress development changes
+## 0.4.3 Patch Notes
 
 <!-- ### New Features -->
 
@@ -34,7 +34,17 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 <!-- ### Upcoming Deprecations -->
 
-<!-- ### Bug Fixes -->
+Please note that not all updates since 0.4.2 are documented here, since this is an
+emergency patch release. All work done since 0.4.2 will be properly documented for the
+next version release which will come out within the next few weeks.
+
+### Bug Fixes
+
+- NEURON version support is restricted to versions 7.7 through 8.2.7 (including those
+  versions). Going forward, the maximum NEURON version supported will be set explicitly
+  in our install configuration, so that new, incompatible versions of NEURON are not
+  used before testing.
+  by [Austin E. Soplata][] in {gh}`1152`.
 
 ### Public API Changes
 
