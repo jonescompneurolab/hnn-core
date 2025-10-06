@@ -1701,6 +1701,8 @@ class Network:
         weight,
         delay,
         lamtha,
+        threshold=None,
+        gain=1.0,
         allow_autapses=True,
         probability=1.0,
         conn_seed=None,
@@ -1735,12 +1737,17 @@ class Network:
             Synaptic delay in ms.
         lamtha : float
             Space constant.
-        allow_autapses : bool
+        threshold : float, default=None
+            Firing threshold of cells for connection. If None (the default), inherit the
+            threshold from the Network object.
+        gain : float, default=1.0
+            Multiplicative factor for synaptic weight.
+        allow_autapses : bool, default=True
             If True, allow connecting neuron to itself.
-        probability : float
+        probability : float, default=1.0
             Probability of connection between any src-target pair.
             Defaults to 1.0 producing an all-to-all pattern.
-        conn_seed : int
+        conn_seed : int, default=None
             Optional initial seed for random number generator (default: None).
             Used to randomly remove connections when probability < 1.0.
 
@@ -1752,7 +1759,9 @@ class Network:
         all its targets.
         """
         conn = _Connectivity()
-        threshold = self.threshold
+        # Threshold's value is validated later below with the rest of nc_dict
+        if threshold is None:
+            threshold = self.threshold
         _validate_type(
             target_gids,
             (int, list, range, str),
@@ -1866,14 +1875,12 @@ class Network:
 
         # Create and validate nc_dict
         conn["nc_dict"] = dict()
-        arg_names = ["delay", "weight", "lamtha", "threshold"]
-        nc_dict_keys = ["A_delay", "A_weight", "lamtha", "threshold"]
-        nc_conn_items = [delay, weight, lamtha, threshold]
+        arg_names = ["delay", "weight", "lamtha", "threshold", "gain"]
+        nc_dict_keys = ["A_delay", "A_weight", "lamtha", "threshold", "gain"]
+        nc_conn_items = [delay, weight, lamtha, threshold, gain]
         for key, arg_name, item in zip(nc_dict_keys, arg_names, nc_conn_items):
             _validate_type(item, (int, float), arg_name, "int or float")
             conn["nc_dict"][key] = item
-
-        conn["nc_dict"]["gain"] = 1.0
 
         # Probabilistically define connections
         if probability != 1.0:
@@ -2279,6 +2286,8 @@ class _Connectivity(dict):
             Synaptic delay in ms.
         lamtha : float
             Space constant.
+        threshold : float
+            Firing threshold of cells for connection.
         gain : float
             Multiplicative factor for synaptic weight.
     probability : float
@@ -2300,6 +2309,8 @@ class _Connectivity(dict):
         entr += f"\nweight: {self['nc_dict']['A_weight']}; "
         entr += f"delay: {self['nc_dict']['A_delay']}; "
         entr += f"lamtha: {self['nc_dict']['lamtha']}"
+        entr += f"threshold: {self['nc_dict']['threshold']}"
+        entr += f"gain: {self['nc_dict']['gain']}"
         entr += "\n "
 
         return entr

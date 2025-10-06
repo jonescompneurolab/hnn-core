@@ -1503,7 +1503,7 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
                 (
                     global_gain_textfields[global_gain_type].value
                     * single_gain_text_input.value
-                ):.2f}</b>"""
+                ):.4f}</b>"""
         )
 
         # Create closure to capture current widget references
@@ -1513,7 +1513,7 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
                 <b>Total Gain={
                     (
                         global_gain_textfields[gain_type].value * gain_input.value
-                    ):.2f}</b>"""
+                    ):.4f}</b>"""
 
             return update_html
 

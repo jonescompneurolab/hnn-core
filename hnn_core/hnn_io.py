@@ -329,6 +329,16 @@ def _read_connectivity(net, conns_data):
             weight=conn_data["nc_dict"]["A_weight"],
             delay=conn_data["nc_dict"]["A_delay"],
             lamtha=conn_data["nc_dict"]["lamtha"],
+            threshold=(
+                conn_data["nc_dict"]["threshold"]
+                if ("threshold" in conn_data["nc_dict"])
+                else None
+            ),
+            gain=(
+                conn_data["nc_dict"]["gain"]
+                if ("gain" in conn_data["nc_dict"])
+                else 1.0
+            ),
             allow_autapses=conn_data["allow_autapses"],
             probability=conn_data["probability"],
         )
