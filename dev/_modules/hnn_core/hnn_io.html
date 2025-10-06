@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>hnn_core.hnn_io &#8212; hnn-core 0.4.3dev2 documentation</title>
+    <title>hnn_core.hnn_io &#8212; hnn-core 0.4.3rc0 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=9097ff11"></script>
+    <script src="../../_static/documentation_options.js?v=88a6f77f"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -60,7 +60,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="0.4.3dev2" />
+  <meta name="docsearch:version" content="0.4.3rc0" />
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
 <script>
@@ -137,8 +137,8 @@
       
     
     
-    <img src="../../_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core 0.4.3dev2 documentation - Home"/>
-    <img src="../../_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core 0.4.3dev2 documentation - Home"/>
+    <img src="../../_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core 0.4.3rc0 documentation - Home"/>
+    <img src="../../_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core 0.4.3rc0 documentation - Home"/>
   
   
 </a></div>
@@ -596,13 +596,46 @@
             <span class="s2">&quot;cell_object&quot;</span> <span class="ow">in</span> <span class="n">cell_types_data</span><span class="p">[</span><span class="n">cell_name</span><span class="p">]</span>
             <span class="ow">and</span> <span class="s2">&quot;cell_metadata&quot;</span> <span class="ow">in</span> <span class="n">cell_types_data</span><span class="p">[</span><span class="n">cell_name</span><span class="p">]</span>
         <span class="p">):</span>
-            <span class="c1"># New format: extract cell properties from nested &quot;cell_object&quot;</span>
+            <span class="c1"># Format post-commit-6388f9f:</span>
+            <span class="c1">#   Extract cell properties from nested &quot;cell_object&quot;</span>
             <span class="n">cell_data</span> <span class="o">=</span> <span class="n">cell_types_data</span><span class="p">[</span><span class="n">cell_name</span><span class="p">][</span><span class="s2">&quot;cell_object&quot;</span><span class="p">]</span>
             <span class="n">cell_metadata</span> <span class="o">=</span> <span class="n">cell_types_data</span><span class="p">[</span><span class="n">cell_name</span><span class="p">][</span><span class="s2">&quot;cell_metadata&quot;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Legacy format, treat the entire cell_data as the cell information</span>
+            <span class="c1"># Format pre-commit-6388f9f:</span>
+            <span class="c1">#   Treat the entire cell_data as the cell information</span>
             <span class="n">cell_data</span> <span class="o">=</span> <span class="n">cell_types_data</span><span class="p">[</span><span class="n">cell_name</span><span class="p">]</span>
-            <span class="n">cell_metadata</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="n">cell_name</span> <span class="o">==</span> <span class="s2">&quot;L2_basket&quot;</span><span class="p">:</span>
+                <span class="n">cell_metadata</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;morpho_type&quot;</span><span class="p">:</span> <span class="s2">&quot;basket&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;electro_type&quot;</span><span class="p">:</span> <span class="s2">&quot;inhibitory&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;measure_dipole&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s2">&quot;reference&quot;</span><span class="p">:</span> <span class="s2">&quot;https://doi.org/10.7554/eLife.51214&quot;</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="k">elif</span> <span class="n">cell_name</span> <span class="o">==</span> <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">:</span>
+                <span class="n">cell_metadata</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;morpho_type&quot;</span><span class="p">:</span> <span class="s2">&quot;pyramidal&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;electro_type&quot;</span><span class="p">:</span> <span class="s2">&quot;excitatory&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="s2">&quot;2&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;measure_dipole&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="s2">&quot;reference&quot;</span><span class="p">:</span> <span class="s2">&quot;https://doi.org/10.7554/eLife.51214&quot;</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="k">elif</span> <span class="n">cell_name</span> <span class="o">==</span> <span class="s2">&quot;L5_basket&quot;</span><span class="p">:</span>
+                <span class="n">cell_metadata</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;morpho_type&quot;</span><span class="p">:</span> <span class="s2">&quot;basket&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;electro_type&quot;</span><span class="p">:</span> <span class="s2">&quot;inhibitory&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;measure_dipole&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s2">&quot;reference&quot;</span><span class="p">:</span> <span class="s2">&quot;https://doi.org/10.7554/eLife.51214&quot;</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="k">elif</span> <span class="n">cell_name</span> <span class="o">==</span> <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">:</span>
+                <span class="n">cell_metadata</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;morpho_type&quot;</span><span class="p">:</span> <span class="s2">&quot;pyramidal&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;electro_type&quot;</span><span class="p">:</span> <span class="s2">&quot;excitatory&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="s2">&quot;5&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;measure_dipole&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="s2">&quot;reference&quot;</span><span class="p">:</span> <span class="s2">&quot;https://doi.org/10.7554/eLife.51214&quot;</span><span class="p">,</span>
+                <span class="p">}</span>
 
         <span class="c1"># Now cell_data contains the cell properties regardless of format</span>
         <span class="n">sections</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
