@@ -1512,8 +1512,7 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
                 gain_output.value = f"""
                 <b>*Global={
                     (
-                        global_gain_textfields[gain_type].value
-                        * gain_input.value
+                        global_gain_textfields[gain_type].value * gain_input.value
                     ):.4f} Total</b>"""
 
             return update_html
@@ -2152,6 +2151,9 @@ def add_network_connectivity_tab(
     gain_values = net.get_global_synaptic_gains()
     gain_types = ("e_e", "e_i", "i_e", "i_i")
 
+    # Same as _get_connectivity_widgets
+    style = {"description_width": "100px"}
+
     for gain_type in gain_types:
         gain_widget = BoundedFloatText(
             value=gain_values[gain_type],
@@ -2160,7 +2162,7 @@ def add_network_connectivity_tab(
             max=1e6,
             step=0.1,
             disabled=False,
-            layout=layout,
+            style=style,
         )
 
         gain_widget.layout.width = "220px"
@@ -2454,7 +2456,6 @@ def _init_network_from_widgets(
     global_gain_values = {
         key: widget.value for key, widget in global_gain_textfields.items()
     }
-    # single_simulation_data["net"].set_synaptic_gains(**global_gain_values)
 
     # adjust connectivity according to the connectivity_tab
     for connectivity_slider in connectivity_textfields:
@@ -2483,7 +2484,7 @@ def _init_network_from_widgets(
                 ]
                 applied_global_gain_value = global_gain_values[global_gain_type]
 
-                # 2. Multiply global by single synapse gain to get combined
+                # 2. Multiply global by single synapse gain to get total
                 single_simulation_data["net"].connectivity[conn_idx]["nc_dict"][
                     "gain"
                 ] = applied_global_gain_value * vbox_key.children[2].children[0].value

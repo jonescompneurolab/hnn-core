@@ -2063,6 +2063,9 @@ class Network:
                 # Extract the gain from the first connection
                 values[conn_type] = self.connectivity[picks[0]]["nc_dict"]["gain"]
 
+        # This writes the warning to stdout
+        _check_global_synaptic_gains_uniformity(self)
+
         return values
 
     def plot_cells(self, ax=None, show=True):
@@ -2434,3 +2437,59 @@ def _add_cell_type_bias(
         cell_type_bias["section"] = section
 
     network.external_biases[bias_name][cell_type] = cell_type_bias
+
+
+def _check_global_synaptic_gains_uniformity(net):
+    """Check whether gain values for uniform within their type of connection.
+
+    This function identifies excitatory and inhibitory cells in the Network
+    and retrieves the gain value for each type of synaptic connection:
+
+    - excitatory to excitatory (e_e)
+    - excitatory to inhibitory (e_i)
+    - inhibitory to excitatory (i_e)
+    - inhibitory to inhibitory (i_i)
+
+    The gain is then checked to see if it is uniform for all instances within each
+    connection type (for example, between AMPA and NMDA, and between different
+    connections like L2_pyramidal->L2_pyramidal and L2_pyramidal->L5_pyramidal). This
+    does **not** check the synaptic gains of external drives.
+
+    Returns
+    -------
+    output_indicator : bool
+        A truth value indicating whether the synaptic gains are uniform within their
+        connection type (True) or non-uniform (False).
+    """
+    e_gids, i_gids = _get_cell_index_by_synapse_type(net)
+
+    # Define the connection types and source/target cell indexes
+    conn_types = {
+        "e_e": (e_gids, e_gids),
+        "e_i": (e_gids, i_gids),
+        "i_e": (i_gids, e_gids),
+        "i_i": (i_gids, i_gids),
+    }
+
+    output_indicator = False
+    # Retrieve the gain value for each connection type
+    for conn_type, (src_idxs, target_idxs) in conn_types.items():
+        picks = pick_connection(net, src_gids=src_idxs, target_gids=target_idxs)
+
+        first_value = net.connectivity[picks[0]]["nc_dict"]["gain"]
+        for other_idx in range(1, len(picks)):
+            if not bool(
+                np.isclose(
+                    net.connectivity[picks[other_idx]]["nc_dict"]["gain"],
+                    first_value,
+                )
+            ):
+                output_indicator = True
+                print(
+                    """
+                    WARNING: Your imported Network uses custom synaptic gain values. Global synaptic gain values such as "Excitatory-to-Inhibitory" etc. will NOT be read or displayed properly. This is because Global synaptic gain values assume that initially, all gains are the same. If you continue to modify your Global synaptic gain values, double-check each connection's final synaptic gain value. To stop this warning, change your synaptic weights instead of your synaptic gains.
+                    """
+                )
+                break
+
+    return output_indicator
