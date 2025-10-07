@@ -26,13 +26,23 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 <!-- ### Changelog -->
 
-## 0.4.3 Patch Notes
+## 0.4.4 In-progress Development Notes
 
 <!-- ### New Features -->
 
 <!-- ### Deprecations -->
 
 <!-- ### Upcoming Deprecations -->
+
+<!-- ### Bug Fixes -->
+
+<!-- ### Public API Changes -->
+
+<!-- ### People who contributed to this release (in alphabetical order of family name): -->
+
+<!-- ### Changelog -->
+
+## 0.4.3 Patch Notes
 
 Please note that not all updates since 0.4.2 are documented here, since this is an
 emergency patch release. All work done since 0.4.2 will be properly documented for the
