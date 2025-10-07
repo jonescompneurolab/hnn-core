@@ -33,9 +33,9 @@ author = 'HNN Developers'
 # -- Version handling --------------------------------------------------------
 
 # The short X.Y version
-version = '0.4.3'
+version = '0.4.4.dev0'
 # The full version, including alpha/beta/rc tags
-release = '0.4.3'
+release = '0.4.4.dev0'
 
 ### HTML theme version control
 # If you are making a stable release, then you should add entries to the file
