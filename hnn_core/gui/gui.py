@@ -1499,21 +1499,22 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
 
         combined_gain_indicator_output = HTML(
             value=f"""
-            <b>Total Gain={
+            <b>*Global={
                 (
                     global_gain_textfields[global_gain_type].value
                     * single_gain_text_input.value
-                ):.4f}</b>"""
+                ):.4f} Total</b>"""
         )
 
         # Create closure to capture current widget references
         def make_update_html(gain_output, gain_input, gain_type):
             def update_html(change):
                 gain_output.value = f"""
-                <b>Total Gain={
+                <b>*Global={
                     (
-                        global_gain_textfields[gain_type].value * gain_input.value
-                    ):.4f}</b>"""
+                        global_gain_textfields[gain_type].value
+                        * gain_input.value
+                    ):.4f} Total</b>"""
 
             return update_html
 
@@ -2482,7 +2483,7 @@ def _init_network_from_widgets(
                 ]
                 applied_global_gain_value = global_gain_values[global_gain_type]
 
-                # 2. multiply global by single synapse gain to get combined
+                # 2. Multiply global by single synapse gain to get combined
                 single_simulation_data["net"].connectivity[conn_idx]["nc_dict"][
                     "gain"
                 ] = applied_global_gain_value * vbox_key.children[2].children[0].value
