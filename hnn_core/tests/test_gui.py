@@ -1514,7 +1514,7 @@ def test_diff_gui_vs_api_networks_simulations():
     # --------------------------------
     # Need a fully-detailed simulation to ensure spikes present (aka good data)
     local_dt = 0.025
-    local_tstop = 40.0
+    local_tstop = 100.0
     global_custom_gain = 8.0
     single_custom_gain = 2.0
 
