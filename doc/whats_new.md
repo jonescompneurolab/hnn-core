@@ -38,7 +38,7 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### Bug Fixes
 
-- Synaptic `gain` and `threshold` values are now loaded correctly when reading in a `Network` JSON file, instead of being overriden with default values,
+- Synaptic `gain` and `threshold` values are now loaded correctly when reading in a `Network` JSON file, instead of being overridden with default values,
   by [George Dang][] and [Austin E. Soplata][] in {gh}`918`.
 
 ### Public API Changes
