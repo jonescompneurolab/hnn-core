@@ -462,17 +462,17 @@ def morlet(sfreq, freqs, n_cycles=7.0, sigma=None, zero_mean=False):
         The sampling Frequency.
     freqs : array
         Frequency range of interest (1 x Frequencies).
-    n_cycles : float | array of float, default 7.0
+    n_cycles : float | array of float, default = 7.0
         Number of cycles. Fixed number or one per frequency.
-    sigma : float, default None
+    sigma : float, optional
         It controls the width of the wavelet ie its temporal
         resolution. If sigma is None the temporal resolution
         is adapted with the frequency like for all wavelet transform.
         The higher the frequency the shorter is the wavelet.
         If sigma is fixed the temporal resolution is fixed
         like for the short time Fourier transform and the number
-        of oscillations increases with the frequency.
-    zero_mean : bool, default False
+        of oscillations increases with the frequency. By default, None. 
+    zero_mean : bool, default = False
         Make sure the wavelet has a mean of zero.
     Returns
     -------
@@ -524,14 +524,14 @@ def _cwt_gen(X, Ws, *, fsize=0, mode="same", decim=1, use_fft=True):
     fsize : int
         FFT length.
     mode : {'full', 'valid', 'same'}
-        See numpy.convolve.
-    decim : int | slice, default 1
+        Method of convolution. See numpy.convolve.
+    decim : int | slice, default = 1
         To reduce memory usage, decimation factor after time-frequency
         decomposition.
         If `int`, returns tfr[..., ::decim].
         If `slice`, returns tfr[..., decim].
         .. note:: Decimation may create aliasing artifacts.
-    use_fft : bool, default True
+    use_fft : bool, default = True
         Use the FFT for convolutions or not.
     Returns
     -------
@@ -597,7 +597,7 @@ def _time_frequency_loop(X, Ws, output, use_fft, mode, decim):
     Ws : list, shape (n_tapers, n_wavelets, n_times)
         The wavelets.
     output : str
-        * 'complex' : single trial complex.
+        * 'complex' : single trial complex containing both amplitude and phase.
         * 'power' : single trial power.
         * 'phase' : single trial phase.
         * 'avg_power' : average of single trial power.
@@ -607,9 +607,18 @@ def _time_frequency_loop(X, Ws, output, use_fft, mode, decim):
     use_fft : bool
         Use the FFT for convolutions or not.
     mode : {'full', 'valid', 'same'}
-        See numpy.convolve.
+        Method of convolution. See numpy.convolve.
     decim : slice
         The decimation slice: e.g. power[:, decim]
+
+    Returns
+    -------
+    tfrs : ndarray
+        The time-frequency transform in the selected output format. If output is in ['complex', 'phase', 'power'], the shape is
+        (n_epochs, n_freqs, n_times). If output is in ['avg_power', 'itc', 'avg_power_itc'], the shape is
+        (n_freqs, n_times). For 'avg_power_itc', the real part contains average power and the
+        imaginary part contains inter-trial coherence (ITC), i.e., out = avg_power + i * itc.
+
     """
     # Set output type
     dtype = np.float64
@@ -692,24 +701,25 @@ def _compute_tfr(
         The epochs.
     freqs : array-like of floats, shape (n_freqs)
         The frequencies.
-    sfreq : float | int, default 1.0
+    sfreq : float | int, default = 1.0
         Sampling frequency of the data.
-    method : 'morlet'
-        The time-frequency method. 'morlet' convolves a Morlet wavelet.
-    n_cycles : float | array of float, default 7.0
+    method : {'morlet', 'multitaper'}
+        The time-frequency method. 'morlet' convolves a Morlet wavelet. 'multitaper' utilizes the
+        multitaper method.
+    n_cycles : float | array of float, default = 7.0
         Number of cycles in the wavelet. Fixed number
         or one per frequency.
-    zero_mean : bool | None, default None
+    zero_mean : bool | None, optional
         None means True for method='multitaper' and False for method='morlet'.
         If True, make sure the wavelets have a mean of zero.
-    time_bandwidth : float, default None
+    time_bandwidth : float, optional
         If None and method=multitaper, will be set to 4.0 (3 tapers).
         Time x (Full) Bandwidth product. Only applies if
         method == 'multitaper'. The number of good tapers (low-bias) is
         chosen automatically based on this to equal floor(time_bandwidth - 1).
-    use_fft : bool, default True
+    use_fft : bool, default = True
         Use the FFT for convolutions or not.
-    decim : int | slice, default 1
+    decim : int | slice, default = 1
         To reduce memory usage, decimation factor after time-frequency
         decomposition.
         If `int`, returns tfr[..., ::decim].
@@ -717,8 +727,8 @@ def _compute_tfr(
         .. note::
             Decimation may create aliasing artifacts, yet decimation
             is done after the convolutions.
-    output : str, default 'complex'
-        * 'complex' : single trial complex.
+    output : str, default = 'complex'
+        * 'complex' : single trial complex containing both amplitude and phase
         * 'power' : single trial power.
         * 'phase' : single trial phase.
         * 'avg_power' : average of single trial power.
@@ -838,14 +848,14 @@ def tfr_array_morlet(
         Sampling frequency of the data.
     freqs : array-like of float, shape (n_freqs,)
         The frequencies.
-    n_cycles : float | array of float, default 7.0
+    n_cycles : float | array of float, default = 7.0
         Number of cycles in the Morlet wavelet. Fixed number or one per
         frequency.
-    zero_mean : bool | False
+    zero_mean : bool | False, default = False
         If True, make sure the wavelets have a mean of zero. default False.
-    use_fft : bool
+    use_fft : bool, default = True
         Use the FFT for convolutions or not. default True.
-    decim : int | slice
+    decim : int | slice, default = 1
         To reduce memory usage, decimation factor after time-frequency
         decomposition. default 1
         If `int`, returns tfr[..., ::decim].
@@ -853,14 +863,15 @@ def tfr_array_morlet(
         .. note::
             Decimation may create aliasing artifacts, yet decimation
             is done after the convolutions.
-    output : str, default 'complex'
-        * 'complex' : single trial complex.
+    output : str, default ='complex'
+        * 'complex' : single trial complex containing both amplitude and phase
         * 'power' : single trial power.
         * 'phase' : single trial phase.
         * 'avg_power' : average of single trial power.
         * 'itc' : inter-trial coherence.
         * 'avg_power_itc' : average of single trial power and inter-trial
           coherence across trials.
+        By default, the output is 'complex'.
     %(n_jobs)s
         The number of epochs to process at the same time. The parallelization
         is implemented across channels. Default 1.
@@ -904,6 +915,24 @@ def tfr_array_morlet(
 
 
 def _get_nfft(wavelets, X, use_fft=True, check=True):
+    """ Compute the optimal FFT length for convolving wavelets with signal X.
+
+    Parameters
+    ----------
+    wavelets : list of arrays
+        List of wavelets to be convolved with the signal.
+    X : array
+        The signal data array of shape (n_signals, n_times).
+    use_fft : bool, default = True
+        Whether FFT-based convolution will be used.
+    check : bool, default = True
+        Whether to check and warn or raise an error if wavelets are longer than the signal.
+
+    Returns
+    -------
+    nfft : int
+        The optimized FFT length to use for convolution.
+    """
     n_times = X.shape[-1]
     max_size = max(w.size for w in wavelets)
     if max_size > n_times:
@@ -925,7 +954,45 @@ def _get_nfft(wavelets, X, use_fft=True, check=True):
 def _check_tfr_param(
     freqs, sfreq, method, zero_mean, n_cycles, time_bandwidth, use_fft, decim, output
 ):
-    """Aux. function to _compute_tfr to check the params validity."""
+    """Aux. function to _compute_tfr to check the params validity.
+    freqs : array-like of floats, shape (n_freqs)
+        The frequencies.
+    sfreq : float | int
+        Sampling frequency of the data.
+    method : {'morlet', 'multitaper'}
+        The time-frequency method. 'morlet' convolves a Morlet wavelet. 'multitaper' utilizes the
+        multitaper method.
+    zero_mean : bool | None
+        Whether to apply zero-mean normalization to the wavelets.
+    n_cycles : float | array of float
+        Number of cycles in the Morlet wavelet. Fixed number or one per
+        frequency.
+    time_bandwidth : float, optional
+        If None and method=multitaper, will be set to 4.0 (3 tapers).
+        Time x (Full) Bandwidth product. Only applies if
+        method == 'multitaper'. The number of good tapers (low-bias) is
+        chosen automatically based on this to equal floor(time_bandwidth - 1).
+    use_fft : bool, default = True
+        Whether FFT-based convolution will be used.
+    decim : int | slice, default = 1
+        To reduce memory usage, decimation factor after time-frequency
+        decomposition. default 1
+        If `int`, returns tfr[..., ::decim].
+        If `slice`, returns tfr[..., decim].
+        .. note::
+            Decimation may create aliasing artifacts, yet decimation
+            is done after the convolutions.
+    output : str, default ='complex'
+        * 'complex' : single trial complex containing both amplitude and phase
+        * 'power' : single trial power.
+        * 'phase' : single trial phase.
+        * 'avg_power' : average of single trial power.
+        * 'itc' : inter-trial coherence.
+        * 'avg_power_itc' : average of single trial power and inter-trial
+          coherence across trials.
+    By default, the output is 'complex'.
+    
+    """
     # Check freqs
     if not isinstance(freqs, (list, np.ndarray)):
         raise ValueError("freqs must be an array-like, got %s instead." % type(freqs))
