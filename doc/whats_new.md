@@ -30,7 +30,7 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### New Features
 
-- Synaptic gains can now be set and retrieved for different "global" connection types (excitatory-to-excitatory, excitatory-to-inhibitory, inhibitory-to-excitatory, and inhibitory-to-inhibitory) using {meth}`~hnn_core.Network.set_global_synaptic_gains` and {meth}`~hnn_core.Network.get_global_synaptic_gains`. The GUI now includes widgets for modifying synaptic gains in the Connectivity interface, both on a "global" level and on an individual level. The multiplicative combination of global and individual gains is also always shown in the GUI.
+- Synaptic gains can now be set and retrieved for different "global" connection types (excitatory-to-excitatory, excitatory-to-inhibitory, inhibitory-to-excitatory, and inhibitory-to-inhibitory) using {meth}`~hnn_core.Network.set_global_synaptic_gains` and {meth}`~hnn_core.Network.get_global_synaptic_gains`. The GUI now includes widgets for modifying synaptic gains in the Connectivity interface, both on a "global" level and on an individual level. The multiplicative combination of global and individual gains is also always shown in the GUI. **Importantly**, all of the synaptic gain getters and setters across both the GUI and API do **not** change or reflect the gains of drives. They only change or reflect non-drive connections.
 
 <!-- ### Deprecations -->
 

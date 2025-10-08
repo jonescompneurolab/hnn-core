@@ -2027,22 +2027,26 @@ class Network:
     def get_global_synaptic_gains(self):
         """Retrieve gain values for different celltype connections in the Network.
 
-        This function identifies excitatory and inhibitory cells in the nNtwork
-        and retrieves the gain value for each type of synaptic connection:
-        - excitatory to excitatory (e_e)
-        - excitatory to inhibitory (e_i)
-        - inhibitory to excitatory (i_e)
-        - inhibitory to inhibitory (i_i)
+        This function identifies excitatory and inhibitory cells in the Network
+        and retrieves the `gain` value for each type of synaptic connection:
 
-        The gain is assumed to be uniform within each connection type (for example,
-        between AMPA and NMDA). Only the first connection's gain value is used for each
-        type. This does **not** return the synaptic gains of external drives.
+            - excitatory to excitatory (e_e)
+            - excitatory to inhibitory (e_i)
+            - inhibitory to excitatory (i_e)
+            - inhibitory to inhibitory (i_i)
+
+        The gain is assumed to be uniform across all instances of each connection type
+        (for example, between AMPA and NMDA, and between `L2_pyramidal->L2_pyramidal` and
+        `L2_pyramidal->L5_pyramidal`, etc.). Only the first connection's gain value is
+        used for each type.
+
+        This does **not** return the synaptic gains of external drives.
 
         Returns
         -------
         values : dict
-             A dictionary with the connection types ('e_e', 'e_i', 'i_e',
-            'i_i') as keys and their corresponding gain values.
+            A dictionary with the connection types ('e_e', 'e_i', 'i_e', 'i_i') as keys
+            and their corresponding gain values.
         """
         e_gids, i_gids = _get_cell_index_by_synapse_type(self)
 
