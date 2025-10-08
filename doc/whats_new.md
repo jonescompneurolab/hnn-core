@@ -28,19 +28,33 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ## 0.4.4 In-progress Development Notes
 
-<!-- ### New Features -->
+### New Features
+
+- Synaptic gains can now be set and retrieved for different "global" connection types (excitatory-to-excitatory, excitatory-to-inhibitory, inhibitory-to-excitatory, and inhibitory-to-inhibitory) using {meth}`~hnn_core.Network.set_global_synaptic_gains` and {meth}`~hnn_core.Network.get_global_synaptic_gains`. The GUI now includes widgets for modifying synaptic gains in the Connectivity interface, both on a "global" level and on an individual level. The multiplicative combination of global and individual gains is also always shown in the GUI.
 
 <!-- ### Deprecations -->
 
 <!-- ### Upcoming Deprecations -->
 
-<!-- ### Bug Fixes -->
+### Bug Fixes
 
-<!-- ### Public API Changes -->
+- Synaptic `gain` and `threshold` values are now loaded correctly when reading in a `Network` JSON file, instead of being overriden with default values,
+  by [George Dang][] and [Austin E. Soplata][] in {gh}`918`.
 
-<!-- ### People who contributed to this release (in alphabetical order of family name): -->
+### Public API Changes
 
-<!-- ### Changelog -->
+- `Network.update_weights` has been renamed to {meth}`~hnn_core.Network.set_global_synaptic_gains`.
+- {meth}`~hnn_core.Network.add_connection` now accepts optional `threshold` and `gain` arguments for setting connection-specific firing thresholds and synaptic gain values.
+
+### People who contributed to this release:
+
+- [George Dang][]
+- [Austin E. Soplata][]
+
+### Changelog
+
+- Add methods {meth}`~hnn_core.Network.set_global_synaptic_gains` and {meth}`~hnn_core.Network.get_global_synaptic_gains` to modify and retrieve synaptic gains for different cell type connections in the network. Add GUI support for modifying synaptic gains with interactive widgets in the connectivity interface, for both individual connections and "global" connections (for example, "excitatory-to-excitatory"). Add `gain` and `threshold` parameters to {meth}`~hnn_core.Network.add_connection` to allow connection-specific control of synaptic gains and firing thresholds. There is also now a warning displayed when a user loads a `Network` JSON file that has inconsistent synaptic gains, since both {meth}`~hnn_core.Network.set_global_synaptic_gains` and {meth}`~hnn_core.Network.get_global_synaptic_gains` assume that gains are uniformly equal within each "global" connection type.
+  By [George Dang][] and [Austin E. Soplata][] in {gh}`918`.
 
 ## 0.4.3 Patch Notes
 
@@ -57,8 +71,6 @@ next version release which will come out within the next few weeks.
   by [Austin E. Soplata][] in {gh}`1152`.
 
 ### Public API Changes
-
-- `Network.update_weights` has been renamed to TODO since it changes gains, not weights. Importantly, this function **no longer changes** the gains of external drives in the network, instead it ONLY changes the gains of synaptic connections between celltypes.
 
 - {class}`~hnn_core.Network` now accepts optional arguments for its position dictionary  attribute `pos_dict` and cell type dictionary attribute `cell_types`,
   by [Chetan Kandpal][] in {gh}`1095`.
