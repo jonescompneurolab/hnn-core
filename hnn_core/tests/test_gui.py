@@ -175,9 +175,19 @@ def test_gui_upload_connectivity():
 
     # check parameters with different files
     assert gui.connectivity_widgets[0][0].children[1].value == 0.02
-    # value should change when loading connectivity from file 2
+
+    # Set custom global gains
+    gui.global_gain_widgets["e_e"].value = 1.5
+    gui.global_gain_widgets["e_i"].value = 0.8
+    gui.global_gain_widgets["i_e"].value = 1.2
+    gui.global_gain_widgets["i_i"].value = 0.9
+
     gui._simulate_upload_connectivity(file2_path)
+    # value should change when loading connectivity from file 2
     assert gui.connectivity_widgets[0][0].children[1].value == 0.01
+    for gain_type in ["e_e", "e_i", "i_e", "i_i"]:
+        # The uploaded file should have default gains of 1.0
+        assert gui.global_gain_widgets[gain_type].value == 1.0
 
     # check that the gui param attribute was updated
     assert gui.params != default_params
@@ -1391,3 +1401,105 @@ def test_adjust_synaptic_weights(setup_gui):
 
     gains_altered = _single_simulation["net"].get_global_synaptic_gains()
     assert gains_altered == {"e_e": 0.5, "e_i": 0.5, "i_e": 1.1, "i_i": 1.1}
+
+
+def test_global_gain_widgets_initialization(setup_gui):
+    """Test that global gain widgets are initialized properly."""
+    gui = setup_gui
+
+    # Check that all four gain types are present
+    assert "e_e" in gui.global_gain_widgets
+    assert "e_i" in gui.global_gain_widgets
+    assert "i_e" in gui.global_gain_widgets
+    assert "i_i" in gui.global_gain_widgets
+
+    # Check initial values are 1.0
+    for gain_type in ["e_e", "e_i", "i_e", "i_i"]:
+        assert gui.global_gain_widgets[gain_type].value == 1.0
+        assert gui.global_gain_widgets[gain_type].min == 0
+        assert gui.global_gain_widgets[gain_type].max == 1e6
+        assert gui.global_gain_widgets[gain_type].step == 0.1
+
+
+def test_combined_gain_indicator_updates(setup_gui):
+    """Test that combined gain indicators update when global or single gains change."""
+    gui = setup_gui
+
+    # Get a connectivity widget that has gain indicators
+    # Find a L2_pyramidal->L2_pyramidal connection to test e_e type
+    conn_widget = None
+    for connectivity_field in gui.connectivity_widgets:
+        for widget in connectivity_field:
+            if (
+                widget._belongsto["src_gids"] == "L2_pyramidal"
+                and widget._belongsto["target_gids"] == "L2_pyramidal"
+            ):
+                conn_widget = widget
+                break
+        if conn_widget is not None:
+            break
+
+    assert conn_widget is not None, (
+        "Could not find L2_pyramidal->L2_pyramidal connection"
+    )
+
+    # Extract single gain widget and combined gain indicator
+    # Structure: children[2] is HBox containing [single_gain_input, combined_indicator]
+    single_gain_widget = conn_widget.children[2].children[0]
+    combined_indicator = conn_widget.children[2].children[1]
+    assert hasattr(single_gain_widget, "value")
+    assert single_gain_widget.value >= 0  # Non-negative gain
+
+    # Check initial combined gain indicator value includes both gains
+    initial_single_gain = single_gain_widget.value
+    initial_global_gain = 1.0  # default
+    expected_initial = initial_single_gain * initial_global_gain
+    assert f"{expected_initial:.4f}" in combined_indicator.value
+
+    # Change global gain and check that combined indicator updates
+    gui.global_gain_widgets["e_e"].value = 2.0
+    new_global_gain = 2.0
+    expected_combined = initial_single_gain * new_global_gain
+    assert f"{expected_combined:.4f}" in combined_indicator.value
+
+    # Change single gain and check that combined indicator updates
+    single_gain_widget.value = 0.5
+    expected_combined = 0.5 * new_global_gain
+    assert f"{expected_combined:.4f}" in combined_indicator.value
+
+
+def test_custom_gains_simulate_and_download(setup_gui):
+    """Test that network configurations include gain values in serialization."""
+    gui = setup_gui
+
+    # Set some non-default gains
+    gui.global_gain_widgets["i_i"].value = 0.8
+
+    # Also change a single gain, the first one: L2_B->L2_B, affected by i_i above.
+    # Yes this depends on the order of synapses in connectivity_widgets, but
+    # connectivity_widgets doesn't actually contain the text of which connection each
+    # widgets belongs to, so :shrug:
+    gui.connectivity_widgets[0][0].children[2].children[0].value = 2.0
+
+    # Run a simulation to create a network with these gains
+    sim_name = "test_gains"
+    gui.widget_simulation_name.value = sim_name
+    gui.run_button.click()
+
+    # Serialize the configuration
+    configs = serialize_config(gui.data, sim_name)
+    net_config = json.loads(configs)
+
+    # Check that connectivity includes gain values
+    assert "connectivity" in net_config
+    for conn in net_config["connectivity"]:
+        assert "nc_dict" in conn
+        assert "gain" in conn["nc_dict"]
+        # All gains should be non-negative
+        assert conn["nc_dict"]["gain"] >= 0
+        if (
+            (conn["src_type"] == "L2_basket")
+            and (conn["target_type"] == "L2_basket")
+            and (conn["receptor"] == "gabaa")
+        ):
+            assert conn["nc_dict"]["gain"] == 1.6
