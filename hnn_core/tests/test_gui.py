@@ -12,7 +12,7 @@ import traitlets
 import os
 
 from pathlib import Path
-from hnn_core import Dipole, Network
+from hnn_core import Dipole, Network, simulate_dipole
 from hnn_core.gui import HNNGUI
 from hnn_core.gui._viz_manager import (
     _idx2figname,
@@ -29,7 +29,10 @@ from hnn_core.gui.gui import (
 )
 from hnn_core.network import pick_connection, _compare_lists
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
-from hnn_core.hnn_io import dict_to_network, read_network_configuration
+from hnn_core.hnn_io import (
+    dict_to_network,
+    read_network_configuration,
+)
 from IPython.display import IFrame
 from ipywidgets import Tab, Text, link
 
@@ -1503,3 +1506,64 @@ def test_custom_gains_simulate_and_download(setup_gui):
             and (conn["receptor"] == "gabaa")
         ):
             assert conn["nc_dict"]["gain"] == 1.6
+
+
+def test_diff_gui_vs_api_networks_simulations():
+    """Test that synaptic gain changes are reproducible between the GUI and API."""
+    # Config
+    # --------------------------------
+    # Need a fully-detailed simulation to ensure spikes present (aka good data)
+    local_dt = 0.025
+    local_tstop = 40.0
+    global_custom_gain = 8.0
+    single_custom_gain = 2.0
+
+    # # AES: For some strange reason, the 3x3_drives network file does NOT produce
+    # # identical output, even when the synaptic gains are made identical. I think that's
+    # # a separate bug.
+    # net_file_path = Path(hnn_core_root / "tests" / "assets" / "jones2009_3x3_drives.json")
+    # Using the full GUI base file for now.
+    net_file_path = Path(hnn_core_root / "param" / "jones2009_base.json")
+
+    # Setup and run the GUI simulation
+    # --------------------------------
+    gui = HNNGUI(network_configuration=net_file_path)
+    gui.compose()
+
+    gui.widget_dt.value = local_dt
+    gui.widget_tstop.value = local_tstop
+
+    # Set some non-default gains
+    gui.global_gain_widgets["i_i"].value = global_custom_gain
+
+    # Also change a single gain, the first one: L2_B->L2_B, affected by i_i above.
+    # Yes this depends on the order of synapses in connectivity_widgets, but
+    # connectivity_widgets doesn't actually contain the text of which connection each
+    # widgets belongs to, so :shrug:
+    gui.connectivity_widgets[0][0].children[2].children[0].value = single_custom_gain
+
+    # Run a simulation to create a network with these gains
+    sim_name = "test_gains_gui"
+    gui.widget_simulation_name.value = sim_name
+    gui.run_button.click()
+    dpls_gui = gui.simulation_data[sim_name]["dpls"]
+
+    # Setup and run the API simulation
+    # --------------------------------
+    net_api = read_network_configuration(net_file_path)
+    net_api.set_global_synaptic_gains(i_i=8.0)
+    l2p_l2p_conn_idx = pick_connection(
+        net_api,
+        src_gids="L2_basket",
+        target_gids="L2_basket",
+    )
+    net_api.connectivity[l2p_l2p_conn_idx[0]]["nc_dict"]["gain"] = (
+        global_custom_gain * single_custom_gain
+    )
+
+    dpls_api = simulate_dipole(net_api, tstop=local_tstop, dt=local_dt, n_trials=1)
+
+    assert np.allclose(
+        dpls_gui[0].data["agg"],
+        dpls_api[0].data["agg"],
+    )
