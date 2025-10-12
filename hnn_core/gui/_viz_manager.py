@@ -143,6 +143,25 @@ data_templates = {
 
 
 def check_sim_plot_types(new_sim_name, plot_type_selection, target_selection, data):
+    """
+    Update the plot types available whenever a new simulation is selected.
+
+    Parameters
+    ----------
+    new_sim_name : str
+        The name of the simulation that has just been selected.
+    plot_type_selection : ipywidgets.Dropdown
+        The dropdown widget for selecting plot types. This function updates its '.options' attribute.
+    target_selection : ipywidgets.Dropdown
+        The dropdown widget for selecting target data. This function updates its '.options' and '.value' attribute.
+    data : dict
+        The data dictionary containing simulation information.
+
+    Notes
+    -----
+    if 'new_sim_name' corresponds to external data, plot types in '_ext_data_disabled_plot_types' will be disabled. The 'target_selection'
+    dropdown is updated to list all simulations except the current one (new_sim_name) and a "None" option.
+    """
     if not _is_simulation(data["simulations"][new_sim_name]):
         plot_type_selection.options = [
             pt for pt in _plot_types if pt not in _ext_data_disabled_plot_types
@@ -157,16 +176,59 @@ def check_sim_plot_types(new_sim_name, plot_type_selection, target_selection, da
 
 
 def _check_template_type_is_data_dependant(template_name):
+    """
+    Check if the template name corresponds to a data-dependent template.
+
+    Parameters
+    ----------
+    template_name : str
+        The name of the template to check.
+    
+    Returns
+    -------
+    bool
+        True if the template is data-dependent, False otherwise.
+
+    """
     sim_data_options = list(data_templates.keys())
     return template_name in sim_data_options
 
 
 def target_comparison_change(new_target_name, simulation_selection, data):
-    """Triggered when the target data is turned on or changed."""
+    """
+    Triggered when the target data is turned on or changed.
+    
+    Parameters
+    ----------
+    new_target_name : dict
+        Traitlets change dictionary containing the new value of the target data selection in the 'new' key.
+    simulation_selection : ipywidgets.Dropdown
+        Dropdown widget for simulation selection (unused here).
+    data : dict
+        Dictionary containing simulation data.   
+
+    Returns
+    -------
+    None
+    """
     pass
 
 
 def plot_type_coupled_change(new_plot_type, target_data_selection):
+    """
+    Enable or disable the target-data selection dropdown depending on plot type.
+
+    Parameters
+    ----------
+    new_plot_type : str
+        Name of the selected plot type.
+    target_data_selection : ipywidgets.Dropdown
+        Dropdown widget for selecting target data.
+
+    Notes
+    -----
+    If the new plot type is not "current dipole", the target data selection dropdown is disabled.
+    """
     if new_plot_type != "current dipole":
         target_data_selection.disabled = True
     else:
@@ -209,10 +271,35 @@ def unlink_relink(attribute):
 
 
 def _idx2figname(idx):
+    """
+    Convert a figure index to UI label.
+
+    Parameters
+    ----------
+    idx: int
+        The index of the figure.
+    Returns
+    ------
+    str
+        The UI label for the figure.
+    """
     return f"Figure {idx}"
 
 
 def _figname2idx(fname):
+    """
+    Convert a figure name to index.
+
+    Parameters
+    ----------
+    fname: str
+        The name of the figure.
+
+    Returns
+    -------
+    int
+        The index of the figure.
+    """
     return int(fname.split(" ")[-1])
 
 
@@ -461,6 +548,18 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
 
 
 def _static_rerender(widgets, fig, fig_idx):
+    """Re-render the static figure in the GUI.
+
+    Parameters
+    ----------
+    widgets : dict
+        A dictionary containing all the widget elements.
+    fig : matplotlib.figure.Figure
+        The figure to be re-rendered.
+    fig_idx : int
+        The index of the figure to be re-rendered.
+    """
+
     logger.debug("_static_re_render is called")
     figs_tabs = widgets["figs_tabs"]
     titles = figs_tabs.titles
@@ -472,12 +571,33 @@ def _static_rerender(widgets, fig, fig_idx):
 
 
 def _dynamic_rerender(fig):
+    """Re-render the dynamic figure in the GUI.
+    
+    Parameters
+    ----------
+    fig : matplotlib.figure.Figure
+        The figure to be re-rendered.
+
+    """
     fig.canvas.draw()
     fig.canvas.flush_events()
 
 
 def _avg_dipole_check(dpls):
-    """Check for averaged dipole, else average the trials"""
+    """Check for averaged dipole, else average the trials
+    
+    Parameters
+    ----------
+
+    dpls : list of Dipole
+        List of dipole objects to check for averaging.
+    
+    Returns
+    -------
+    dpl: Dipole or None
+        Returns the averaged dipole if available, otherwise returns None.
+    
+    """
     # Check if there is an averaged dipole already
     if not dpls:
         return None
@@ -519,7 +639,8 @@ def _plot_on_axes(
     Parameters
     ----------
     b : ipywidgets.Button
-    widgets_simulation : ipywidgets.Dropdown
+        The button that triggered this function.
+    simulations_widget : ipywidgets.Dropdown
         A dropdown widget that contains all the simulation names.
     widgets_plot_type : ipywidgets.Dropdown
         A dropdown widget that contains all the plot types.
@@ -544,7 +665,7 @@ def _plot_on_axes(
         A dict that contains all the widgets.
     data : dict
         A dict that contains all the simulation data. Can be accessed by names
-        specified in widgets_simulation and target_simulations weidgets.
+        specified in widgets_simulation and target_simulations widgets.
     fig_idx : int
         The index of the figure we want to plot on.
     fig : matplotlib.figure.Figure
@@ -662,6 +783,34 @@ def _clear_axis(
     existing_plots,
     add_plot_button,
 ):
+    """Clear the axis and reset the plot type.
+
+    This function clears the specified axis, resets the plot type, and updates the
+    relevant widgets and figures accordingly.
+
+    Parameters
+    ----------
+    b : ipywidgets.Button
+        The button that triggered this function.
+    widgets : dict
+        A dict that contains all the widgets.
+    data : dict
+        A dict that contains all the simulation data. Can be accessed by names specified 
+        in widgets_simulation and target_simulations widgets.
+    fig_idx : int
+        The index of the figure we want to clear.
+    fig : matplotlib.figure.Figure 
+        The figure we want to clear the axis from.
+    ax : matplotlib.axes._subplots.AxesSubplot
+        The axes we want to clear.
+    widgets_plot_type : ipywidgets.Dropdown
+        A dropdown widget that contains all the plot types.
+    existing_plots : ipywidgets.VBox
+        A VBox widget that contains all the existing plots.
+    add_plot_button : ipywidgets.Button
+        A button widget that allows adding new plots.            
+    """    
+    
     ax.clear()
 
     # Remove "plot_spikes_hist"'s inverted second axes object, if exists, and
@@ -688,6 +837,35 @@ def _clear_axis(
 
 
 def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
+    """
+    Creates a set of widgets for interacting with simulation data plots.
+
+    This function creates an interactive set of widgets that allow users to select
+    simulation data, plot types, target datasets (optionally), and adjust various parameters for visualizing the data.
+
+    This function also hooks up observers to the widgets to update the plot types and target data selections dynamically.
+
+    Parameters
+    ----------
+    widgets : dict
+        A dictionary containing all the widgets.
+    data : dict
+        A dictionary containing all the simulation data.
+    fig_default_params : dict
+        A dictionary containing the default parameters for the figure.
+    fig_idx : int
+        The index of the figure we want to control.
+    fig : matplotlib.figure.Figure
+        The figure we want to control.
+    ax : matplotlib.axes._subplots.AxesSubplot
+        The axes we want to control.
+
+    Returns
+    -------
+    vbox : ipywidgets.VBox
+        A VBox widget containing all the created widgets for controlling the plot.
+    """
+
     analysis_style = {"description_width": "200px"}
     layout = Layout(width="98%")
     simulation_names = tuple(data["simulations"].keys())
@@ -727,12 +905,12 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
         style=analysis_style,
     )
 
-    tagert_names = simulation_names[:-1]
+    target_names = simulation_names[:-1]
     if len(simulation_names) > 1:
-        tagert_names = simulation_names[1:]
+        target_names = simulation_names[1:]
 
     target_data_selection = Dropdown(
-        options=tagert_names + ("None",),
+        options=target_names + ("None",),
         value="None",
         description="Data to Compare:",
         disabled=False,
@@ -828,14 +1006,73 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
     clear_button = Button(description="Clear axis")
 
     def _on_sim_data_change(new_sim_name):
-        return check_sim_plot_types(
-            new_sim_name.new, plot_type_selection, target_data_selection, data
-        )
+        """
+        Callback function to handle changes in the simulation selection dropdown.
+        This function updates the plot types available based on the selected simulation
+        and also updates the target data selection dropdown.
+
+        Parameters
+        ----------
+        new_sim_name : dict
+            An traitlets change dictionary containing the new simulation name in the 'new' key.
+
+        Returns
+        -------
+        None
+            This function does not return a value. It triggers updating of the
+            plot type and target data selection options via the `check_sim_plot_types` function.
+
+        Notes
+        -------
+            The 'new' key from the change dictionary is explicitly passed to 'check_sim_plot_types' to update
+            available plot types.
+
+        """
 
     def _on_target_comparison_change(new_target_name):
+        """
+        Callback function to handle changes in the target data selection dropdown.
+        This function updates the plot types available based on the selected target data.
+
+        Parameters
+        ----------
+        new_target_name : dict
+            An traitlets change dictionary containing the new target data name in the 'new' key.
+
+        Returns
+        -------
+        None
+            This function does not return a value.
+        
+        Notes
+        -------
+        This function calls `target_comparison_change` to handle the change in target data selection, but since
+        'target_comparison_change' does not return anything, the 'new' key is not specified. 
+
+        """
         return target_comparison_change(new_target_name, simulation_selection, data)
 
     def _on_plot_type_change(new_plot_type):
+        """
+        Callback function to handle changes in the plot type selection dropdown.
+        This function updates the target data selection dropdown based on the selected plot type.
+
+        Parameters
+        ----------
+        new_plot_type : dict
+            An traitlets change dictionary containing the new plot type in the 'new' key.
+
+        Returns
+        -------
+        None
+            This function does not return a value. It triggers updating of the
+            plot type and target data selection options via the `plot_type_coupled_change` function.
+
+        Notes
+        -------
+            The 'new' key from the change dictionary is explicitly passed to 'plot_type_coupled_change' to enable
+            or disable the target data selection dropdown based on the selected plot type.
+        """
         return plot_type_coupled_change(new_plot_type.new, target_data_selection)
 
     simulation_selection.observe(_on_sim_data_change, "value")
@@ -907,6 +1144,21 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
 
 
 def _close_figure(b, widgets, data, fig_idx):
+    """
+    This function closes the figure and removes it from the tabs.
+
+    Parameters
+    ----------
+    b : ipywidgets.Button
+        The button that triggered this function.
+    widgets : dict
+        A dict that contains all the widgets.
+    data : dict
+        A dict that contains all the simulation data.
+    fig_idx : int
+        The index of the figure to be closed.
+    
+    """
     fig_related_widgets = [widgets["figs_tabs"], widgets["axes_config_tabs"]]
     for w_idx, tab in enumerate(fig_related_widgets):
         # Get tab object's list of children and their titles
@@ -945,6 +1197,23 @@ def _close_figure(b, widgets, data, fig_idx):
 
 
 def _add_axes_controls(widgets, data, fig_default_params, fig, axd):
+    """
+    Adds controls for each axis in the figure to the axes configuration tabs.
+
+    Parameters
+    ----------
+    widgets : dict
+        A dict that contains all the widgets.
+    data : dict
+        A dict that contains all the simulation data.
+    fig_default_params : dict
+        A dict that contains the default parameters for the figure.
+    fig : matplotlib.figure.Figure
+        The figure to which the axes belong.
+    axd : dict
+        A dict that maps axis keys to their corresponding axes.
+
+    """
     fig_idx = data["fig_idx"]["idx"]
 
     controls = Tab()
@@ -978,6 +1247,28 @@ def _add_axes_controls(widgets, data, fig_default_params, fig, axd):
 def _add_figure(
     b, widgets, data, fig_default_params, template_type, scale=0.95, dpi=96
 ):
+    """
+    Adds a new figure to the visualization tabs and initializes it with a template.
+
+    Parameters
+    ----------
+    b : ipywidgets.Button
+        The button that triggered this function.
+    widgets : dict
+        A dict that contains all the widgets.
+    data : dict
+        A dict that contains all the simulation data.
+    fig_default_params : dict
+        A dict that contains the default parameters for the figure.
+    template_type : dict
+        A dict that contains the template type and its parameters.
+    scale : float, default = 0.95
+        The scale factor for the figure size, by default 0.95.
+    dpi : int, default = 96
+        The dots per inch for the figure, by default 96.
+        
+    """
+
     fig_idx = data["fig_idx"]["idx"]
     viz_output_layout = data["visualization_output"]
     fig_outputs = Output()
@@ -1026,6 +1317,22 @@ def _postprocess_template(template_name, fig, idx, use_ipympl=True, widgets=None
     be made based on information other plots in the figure, it is adjusted with
     this function. For example, L2 and L5 dipole plots should have the same
     y-axis range.
+
+    Parameters
+    ----------
+
+    template_name : str
+        The name of the template to post-process.
+    fig : matplotlib.figure.Figure
+        The figure to post-process.
+    idx : int
+        The index of the figure to post-process.   
+    use_ipympl : bool, optional
+        Whether to use the ipympl backend for dynamic rendering, by default True.
+    widgets : dict, optional
+        A dict that contains all the widgets, by default None.
+
+
     """
     if template_name not in ["Dipole Layers (3x1)"]:
         return
@@ -1062,6 +1369,18 @@ class _VizManager:
     """
 
     def __init__(self, gui_data, viz_layout, fig_default_params):
+        """Initialize the visualization manager.
+
+        Parameters
+        ----------
+        gui_data : dict
+            A dict containing all simulation data
+        viz_layout : dict
+            A dict about visualization layout specs
+        fig_default_params : dict
+            A dict of default figure parameters
+
+        """
         plt.close("all")
         self.viz_layout = viz_layout
         self.fig_default_params = fig_default_params
@@ -1114,6 +1433,7 @@ class _VizManager:
 
     @property
     def widgets(self):
+        """Provides easy access to all the widgets."""
         return {
             "figs_output": self.figs_output,
             "axes_config_tabs": self.axes_config_tabs,
@@ -1134,7 +1454,14 @@ class _VizManager:
         }
 
     def reset_fig_config_tabs(self, template_name=None):
-        """Reset the figure config tabs with most recent simulation data."""
+        """Reset the figure config tabs with most recent simulation data.
+        
+        Parameters
+        ----------
+
+        template_name : str, optional
+            The name of the template to reset the figure config tabs to.
+        """
         simulation_names = tuple(self.data["simulations"].keys())
         for tab in self.axes_config_tabs.children:
             controls = tab.children[1]
@@ -1153,7 +1480,16 @@ class _VizManager:
         self._simulate_switch_fig_template(template_name)
 
     def compose(self):
-        """Compose widgets."""
+        """Compose widgets.
+        
+        Returns
+        -------
+
+        config_panel : ipywidgets.VBox
+            A VBox widget containing the configuration panel for the figures.
+        fig_output_container : ipywidgets.VBox
+            A VBox widget containing the output container for the figures.
+        """
         with self.axes_config_output:
             display(self.axes_config_tabs)
         with self.figs_output:
@@ -1184,6 +1520,18 @@ class _VizManager:
         return config_panel, fig_output_container
 
     def _layout_template_change(self, template_type):
+        """
+        Handle changes to the layout template. This function updates the dataset dropdown
+        options based on the selected template type.
+
+        Parameters
+        ----------
+
+        template_type : dict
+            A dict containing the new template type, which includes the 'new' key
+            with the name of the selected template.
+        
+        """
         # check if plot set type requires loaded sim-data
         if _check_template_type_is_data_dependant(template_type.new):
             # Add only simualated data
@@ -1206,7 +1554,14 @@ class _VizManager:
 
     @unlink_relink(attribute="figs_config_tab_link")
     def add_figure(self, b=None):
-        """Add a figure and corresponding config tabs to the dashboard."""
+        """Add a figure and corresponding config tabs to the dashboard.
+        Parameters
+        ----------
+
+        b : ipywidgets.Button, optional
+            The button that triggered this function.
+
+        """
         if len(self.data["simulations"]) == 0:
             logger.error("No data has been loaded")
             return
@@ -1262,15 +1617,44 @@ class _VizManager:
             )
 
     def _simulate_add_fig(self):
+        """Simulates a click on a button."""
         self.make_fig_button.click()
 
     def _simulate_switch_fig_template(self, template_name):
+        """Simulates a switch to a different figure template by updating the 'value' attribute
+        of the templates dropdown widget.
+
+        Parameters
+        ----------
+
+        template_name : str
+            The name of the template to switch to.
+        
+        Raises
+        ------
+        AssertionError
+            If the template name is not found in the available templates.
+        """
         assert template_name in fig_templates.keys() or data_templates.keys(), (
             "No such template"
         )
         self.templates_dropdown.value = template_name
 
     def _simulate_delete_figure(self, fig_name):
+        """Simulates the deletion of a figure by closing its tab and removing it from the data.
+        
+        Parameters
+        ----------
+
+        fig_name : str
+            The name of the figure to be deleted (e.g., 'Figure 1').
+
+        Raises
+        ------
+        AssertionError
+            If the figure name is not found in the tabs.
+
+        """
         tab = self.axes_config_tabs
         titles = tab.titles
         assert fig_name in titles
@@ -1312,6 +1696,12 @@ class _VizManager:
             operation : str
                 `"plot"` if you want to plot and `"clear"` if you want to
                 remove previously plotted visualizations.
+
+        Raises
+        ------
+        AssertionError
+            If the simulation name is not found in the data, if the plot type is not valid,
+            or if the operation is not one of the allowed values.
         """
         assert simulation_name in self.data["simulations"].keys()
         assert plot_type in _plot_types
