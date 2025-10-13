@@ -14,3 +14,12 @@ from .cells_default import pyramidal, basket
 from .parallel_backends import MPIBackend, JoblibBackend
 
 __version__ = "0.4.3dev2"
+
+def _maybe_check_first_run():
+    try:
+        from .first_run import check_first_run
+        check_first_run()
+    except ImportError as e:
+        print("Warning: could not run first-run check:", e)
+
+_maybe_check_first_run()
