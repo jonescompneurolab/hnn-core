@@ -1,11 +1,14 @@
 # Authors: George Dang <george_dang@brown.edu>
 #          Rajat Partani <rajatpartani@gmail.com>
 
+import json
+import os.path as op
 from pathlib import Path
 from time import sleep
-import pytest
+from urllib.request import urlretrieve
+
 import numpy as np
-import json
+import pytest
 
 from hnn_core import (
     simulate_dipole,
@@ -345,3 +348,48 @@ def test_read_incorrect_format(tmp_path):
 
     with pytest.raises(ValueError, match="The json should encode a Network object."):
         read_network_configuration(file_path)
+
+
+def test_network_serialization_metadata(jones_2009_network, tmp_path):
+    """Test saving and loading a network with the cell_metadata structure."""
+    net_original = jones_2009_network
+    net_original.add_evoked_drive(
+        "evd1",
+        mu=5,
+        sigma=1,
+        numspikes=1,
+        location="distal",
+        weights_ampa={"L2_pyramidal": 0.1},
+    )
+
+    json_path = tmp_path / "net_metadata.json"
+
+    net_original.write_configuration(json_path)
+
+    net_loaded = read_network_configuration(json_path)
+
+    assert net_loaded == net_original
+
+    # checking the nested structure in the loaded network
+    assert isinstance(net_loaded.cell_types["L2_pyramidal"], dict)
+    assert "cell_object" in net_loaded.cell_types["L2_pyramidal"]
+    assert "cell_metadata" in net_loaded.cell_types["L2_pyramidal"]
+    assert net_loaded.cell_types["L2_pyramidal"]["cell_metadata"]["layer"] == "2"
+
+
+def test_read_run_tutorial_json():
+    """Test that the first tutorial Network for ERP can be loaded and ran without error."""
+    net_url = (
+        "https://raw.githubusercontent.com/jonescompneurolab/"
+        "hnn-data/refs/heads/main/"
+        "network-configurations/ERPYes100Trials.json"
+    )
+    net_fname = op.join(hnn_core_root, "param", "ERPYes100Trials.json")
+    if not op.exists(net_fname):
+        urlretrieve(net_url, net_fname)
+
+    # Test that Network can be created without error.
+    net = read_network_configuration(net_fname)
+
+    # Test that Network can be simulated without error.
+    _ = simulate_dipole(net, tstop=2, n_trials=1, dt=0.5)

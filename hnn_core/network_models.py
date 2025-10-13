@@ -5,16 +5,21 @@
 import os.path as op
 import hnn_core
 from hnn_core import read_params
-from .network import Network
+from .network import Network, _create_cell_coords
 from .params import _short_name
-from .cells_default import pyramidal_ca
+from .cells_default import pyramidal_ca, pyramidal, basket
 from .externals.mne import _validate_type
+
+# ToDO -> direct _cell_L2Pyr calling
 
 
 def jones_2009_model(
-    params=None, add_drives_from_params=False, legacy_mode=False, mesh_shape=(10, 10)
+    params=None,
+    add_drives_from_params=False,
+    legacy_mode=False,
+    mesh_shape=(10, 10),
 ):
-    """Instantiate the network model described in Jones et al. 2009 [1]_
+    """Instantiate the network model described in Jones et al. 2009
 
     Parameters
     ----------
@@ -68,11 +73,76 @@ def jones_2009_model(
     if isinstance(params, str):
         params = read_params(params)
 
+    # Define cell types for Jones 2009 model
+    # data is here in metaData format
+    cell_types = {
+        "L2_basket": {
+            "cell_object": basket(cell_name="L2_basket"),
+            "cell_metadata": {
+                "morpho_type": "basket",
+                "electro_type": "inhibitory",
+                "layer": "2",
+                "measure_dipole": False,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+        "L2_pyramidal": {
+            "cell_object": pyramidal(cell_name="L2_pyramidal"),
+            "cell_metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "2",
+                "measure_dipole": True,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+        "L5_basket": {
+            "cell_object": basket(cell_name="L5_basket"),
+            "cell_metadata": {
+                "morpho_type": "basket",
+                "electro_type": "inhibitory",
+                "layer": "5",
+                "measure_dipole": False,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+        "L5_pyramidal": {
+            "cell_object": pyramidal(cell_name="L5_pyramidal"),
+            "cell_metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "5",
+                "measure_dipole": True,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+    }
+
+    # Create layer positions
+    layer_dict = _create_cell_coords(
+        n_pyr_x=mesh_shape[0],
+        n_pyr_y=mesh_shape[1],
+        z_coord=1307.4,  # Default layer separation
+        inplane_distance=1.0,  # Default in-plane distance
+    )
+
+    # Map cell types to layer positions
+    pos_dict = {
+        "L5_pyramidal": layer_dict["L5_bottom"],
+        "L2_pyramidal": layer_dict["L2_bottom"],
+        "L5_basket": layer_dict["L5_mid"],
+        "L2_basket": layer_dict["L2_mid"],
+        "origin": layer_dict["origin"],
+    }
+
+    # Create network with cell types and positions
     net = Network(
         params,
         add_drives_from_params=add_drives_from_params,
         legacy_mode=legacy_mode,
         mesh_shape=mesh_shape,
+        pos_dict=pos_dict,
+        cell_types=cell_types,
     )
 
     delay = net.delay
@@ -235,10 +305,10 @@ def law_2021_model(
     )
 
     # Update biophysics (increase gabab duration of inhibition)
-    net.cell_types["L2_pyramidal"].synapses["gabab"]["tau1"] = 45.0
-    net.cell_types["L2_pyramidal"].synapses["gabab"]["tau2"] = 200.0
-    net.cell_types["L5_pyramidal"].synapses["gabab"]["tau1"] = 45.0
-    net.cell_types["L5_pyramidal"].synapses["gabab"]["tau2"] = 200.0
+    net.cell_types["L2_pyramidal"]["cell_object"].synapses["gabab"]["tau1"] = 45.0
+    net.cell_types["L2_pyramidal"]["cell_object"].synapses["gabab"]["tau2"] = 200.0
+    net.cell_types["L5_pyramidal"]["cell_object"].synapses["gabab"]["tau1"] = 45.0
+    net.cell_types["L5_pyramidal"]["cell_object"].synapses["gabab"]["tau2"] = 200.0
 
     # Decrease L5_pyramidal -> L5_pyramidal nmda weight
     net.connectivity[2]["nc_dict"]["A_weight"] = 0.0004
@@ -249,7 +319,7 @@ def law_2021_model(
 
     # Remove L5 pyramidal somatic and basal dendrite calcium channels
     for sec in ["soma", "basal_1", "basal_2", "basal_3"]:
-        del net.cell_types["L5_pyramidal"].sections[sec].mechs["ca"]
+        del net.cell_types["L5_pyramidal"]["cell_object"].sections[sec].mechs["ca"]
 
     # Remove L2_basket -> L5_pyramidal gabaa connection
     del net.connectivity[10]  # Original paper simply sets gbar to 0.0
@@ -322,8 +392,10 @@ def calcium_model(
 
     # Replace L5 pyramidal cell template with updated calcium
     cell_name = "L5_pyramidal"
-    pos = net.cell_types[cell_name].pos
-    net.cell_types[cell_name] = pyramidal_ca(cell_name=_short_name(cell_name), pos=pos)
+    pos = net.cell_types[cell_name]["cell_object"].pos
+    net.cell_types[cell_name]["cell_object"] = pyramidal_ca(
+        cell_name=cell_name, pos=pos
+    )
 
     return net
 

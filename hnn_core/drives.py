@@ -13,7 +13,12 @@ from .params import (
 
 
 def _get_target_properties(
-    weights_ampa, weights_nmda, synaptic_delays, location, probability=1.0
+    weights_ampa,
+    weights_nmda,
+    synaptic_delays,
+    location,
+    cell_types,
+    probability=1.0,
 ):
     """Retrieve drive properties associated with each target cell type
 
@@ -43,16 +48,25 @@ def _get_target_properties(
         )
     # Distal drives should not target L5 basket cells according to the
     # canonical Jones model
-    if location == "distal" and "L5_basket" in target_populations:
-        raise ValueError(
-            "Due to physiological/anatomical constraints, "
-            "a distal drive cannot target L5_basket cell types. "
-            "L5_basket cell types must remain undefined by "
-            "the user in all synaptic weights dictionaries "
-            "for this drive. "
-            "Therefore, please remove the L5_basket entries "
-            "from the corresponding dictionaries."
-        )
+    # check using cell_metadata
+    if location == "distal":
+        for cell_name in target_populations:
+            # check if the cell exists in cell_metadata and matches criteria
+            if (
+                cell_name in cell_types
+                and cell_types[cell_name]["cell_metadata"].get("morpho_type")
+                == "basket"
+                and cell_types[cell_name]["cell_metadata"].get("layer") == "5"
+            ):
+                raise ValueError(
+                    "Due to physiological/anatomical constraints, "
+                    "a distal drive cannot target L5_basket cell types. "
+                    "L5_basket cell types must remain undefined by "
+                    "the user in all synaptic weights dictionaries "
+                    "for this drive. "
+                    "Therefore, please remove the L5_basket entries "
+                    "from the corresponding dictionaries."
+                )
 
     if isinstance(synaptic_delays, float):
         delays_by_type = {
@@ -298,7 +312,7 @@ def _drive_cell_event_times(
     )
 
     # check drive name validity, allowing substring matches
-    valid_drives = ["evoked", "poisson", "gaussian", "bursty"]
+    valid_drives = ["evoked", "poisson", "gaussian", "bursty", "spike_train"]
     # NB check if drive_type has a valid substring, not vice versa
     matches = [f for f in valid_drives if f in drive_type]
     if len(matches) == 0:
@@ -340,6 +354,24 @@ def _drive_cell_event_times(
             prng=prng,
             prng2=prng2,
         )
+    # Add this new case for spike_train drives
+    elif drive_type == "spike_train":
+        # For spike_train, the event times are explicitly provided in dynamics
+        if "times" not in dynamics or "gids" not in dynamics:
+            return []
+
+        # Get all spike times from the specified drive cell
+        times = dynamics["times"]
+        gids = dynamics["gids"]
+
+        # Extract only spikes from this drive cell GID
+        if times and gids:
+            mask = np.array(gids) == drive_cell_gid
+            cell_event_times = np.array(times)[mask].tolist()
+        else:
+            cell_event_times = []
+
+        return cell_event_times
 
     # brute force remove non-zero times. Might result in fewer vals
     # than desired

@@ -33,9 +33,9 @@ author = 'HNN Developers'
 # -- Version handling --------------------------------------------------------
 
 # The short X.Y version
-version = '0.4.3dev2'
+version = '0.4.4.dev0'
 # The full version, including alpha/beta/rc tags
-release = '0.4.3dev2'
+release = '0.4.4.dev0'
 
 ### HTML theme version control
 # If you are making a stable release, then you should add entries to the file
@@ -133,12 +133,20 @@ html_theme_options = {
             "name": "GitHub (Code)",
         },
         {
-            "url": "https://pypi.org/project/hnn-core/",
-            "name": "PyPI",
-        },
-        {
             "url": "https://hnn.brown.edu/",
             "name": "HNN Frontpage",
+        },
+        {
+            "url": "https://jonescompneurolab.github.io/textbook/content/preface.html",
+            "name": "HNN Textbook",
+        },
+        {
+            "url": "https://pypi.org/project/hnn-core/",
+            "name": "PyPI package",
+        },
+        {
+            "url": "https://anaconda.org/jonescompneurolab/repo",
+            "name": "Conda packages",
         },
     ],
     "header_links_before_dropdown": 7,
@@ -236,14 +244,17 @@ intersphinx_mapping = {
 }
 intersphinx_timeout = 5
 
+linkcheck_anchors = False
+
 linkcheck_ignore = [
-    'https://github.com/mne-tools/mne-python/blob/148de1661d5e43cc88d62e27731ce44e78892951/mne/utils/misc.py#',
     'https://neuron.yale.edu/neuron',
     'https://doi.org/10.1152/jn.00535.2009',
     'https://doi.org/10.1152/jn.00122.2010',
     'https://doi.org/10.1101/2021.04.16.440210',
+    'https://doi.org/10.7554/eLife.51214',
     'https://groups.google.com/g/hnnsolver',
-    'http://localhost:8866',
+    r'(http|https):\/\/localhost:\d+',
+    r'(http|https):\/\/github\.com\/jonescompneurolab\/hnn-core\/(issues|pull)\/\d+',
 ]
 
 sphinx_gallery_conf = {

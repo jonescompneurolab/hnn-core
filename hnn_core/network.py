@@ -15,11 +15,12 @@ from typing import Dict
 import numpy as np
 import warnings
 
+from .cell_response import read_spikes
 from .drives import _drive_cell_event_times
 from .drives import _get_target_properties, _add_drives_from_params
 from .drives import _check_drive_parameter_values, _check_poisson_rates
 from .cells_default import pyramidal, basket
-from .params import _long_name, _short_name
+from .params import _long_name
 from .viz import plot_cells
 from .externals.mne import _validate_type, _check_option
 from .extracellular import ExtracellularArray
@@ -29,7 +30,7 @@ from .externals.mne import copy_doc
 from .utils import _replace_dict_identifier
 
 
-def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
+def _create_cell_coords(n_pyr_x, n_pyr_y, z_coord, inplane_distance):
     """Creates coordinate grid and place cells in it.
 
     Parameters
@@ -38,7 +39,7 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
         The number of Pyramidal cells in x direction.
     n_pyr_y : int
         The number of Pyramidal cells in y direction.
-    zdiff : float
+    z_coord : float
         Expressed as a positive DEPTH of L2 relative to L5 pyramidal cell
         somas, where L5 is defined to lie at z==0. Interlaminar weight/delay
         calculations (lamtha) are not affected. The basket cells are
@@ -51,10 +52,11 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
 
     Returns
     -------
-    pos_dict : dict of list of tuple (x, y, z)
-        Dictionary containing coordinate positions.
-        Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
-        'common', or any of the elements of the list p_unique_keys
+    layer_dict : dict of list of tuple (x, y, z)
+        Dictionary containing coordinate positions of 'layers'. After calling
+        '_create_cell_coords', user can create their 'Network.pos_dict' by mapping
+        'origin' and their celltypes onto the different layers in 'layer_dict'. Keys are
+        'L2_bottom', 'L2_mid', 'L5_bottom', 'L5_mid', and 'origin'.
 
     Notes
     -----
@@ -62,16 +64,16 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
     Sort of a hack because of redundancy.
     """
 
-    def _calc_pyramidal_coord(xxrange, yyrange, zdiff):
-        list_coords = [pos for pos in it.product(xxrange, yyrange, [zdiff])]
+    def _calc_pyramidal_coord(xxrange, yyrange, z_coord):
+        list_coords = [pos for pos in it.product(xxrange, yyrange, [z_coord])]
         return list_coords
 
-    def _calc_basket_coord(n_pyr_x, n_pyr_y, zdiff, inplane_distance, weight):
-        xzero = np.arange(0, n_pyr_x, 3) * inplane_distance
-        xone = np.arange(1, n_pyr_x, 3) * inplane_distance
+    def _calc_basket_coord(n_x, n_y, z_coord, inplane_distance, weight):
+        xzero = np.arange(0, n_x, 3) * inplane_distance
+        xone = np.arange(1, n_x, 3) * inplane_distance
         # split even and odd y vals
-        yeven = np.arange(0, n_pyr_y, 2) * inplane_distance
-        yodd = np.arange(1, n_pyr_y, 2) * inplane_distance
+        yeven = np.arange(0, n_y, 2) * inplane_distance
+        yodd = np.arange(1, n_y, 2) * inplane_distance
         # create general list of x,y coords and sort it
         coords = [pos for pos in it.product(xzero, yeven)] + [
             pos for pos in it.product(xone, yodd)
@@ -80,17 +82,16 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
 
         # append the z value for position
         list_coords = [
-            (pos_xy[0], pos_xy[1], weight * zdiff) for pos_xy in coords_sorted
+            (pos_xy[0], pos_xy[1], weight * z_coord) for pos_xy in coords_sorted
         ]
-
         return list_coords
 
-    def _calc_origin(xxrange, yyrange, zdiff):
+    def _calc_origin(xxrange, yyrange, z_coord):
         # origin's z component isn't used in calculating distance functions.
         # will be used for adding external drives.
         origin_x = xxrange[int((len(xxrange) - 1) // 2)]
         origin_y = yyrange[int((len(yyrange) - 1) // 2)]
-        origin_z = np.floor(zdiff / 2)
+        origin_z = np.floor(z_coord / 2)
         origin = (origin_x, origin_y, origin_z)
         return origin
 
@@ -98,19 +99,28 @@ def _create_cell_coords(n_pyr_x, n_pyr_y, zdiff, inplane_distance):
     xxrange = np.arange(n_pyr_x) * inplane_distance
     yyrange = np.arange(n_pyr_y) * inplane_distance
 
-    pos_dict = {
-        "L5_pyramidal": _calc_pyramidal_coord(xxrange, yyrange, zdiff=0),
-        "L2_pyramidal": _calc_pyramidal_coord(xxrange, yyrange, zdiff=zdiff),
-        "L5_basket": _calc_basket_coord(
-            n_pyr_x, n_pyr_y, zdiff, inplane_distance, weight=0.2
+    # Create layer dictionary with anatomical layer positions
+    layer_dict = {
+        "L5_bottom": _calc_pyramidal_coord(xxrange, yyrange, z_coord=0),
+        "L2_bottom": _calc_pyramidal_coord(xxrange, yyrange, z_coord=z_coord),
+        "L5_mid": _calc_basket_coord(
+            n_pyr_x,
+            n_pyr_y,
+            z_coord=z_coord,
+            inplane_distance=inplane_distance,
+            weight=0.2,
         ),
-        "L2_basket": _calc_basket_coord(
-            n_pyr_x, n_pyr_y, zdiff, inplane_distance, weight=0.8
+        "L2_mid": _calc_basket_coord(
+            n_pyr_x,
+            n_pyr_y,
+            z_coord=z_coord,
+            inplane_distance=inplane_distance,
+            weight=0.8,
         ),
-        "origin": _calc_origin(xxrange, yyrange, zdiff),
+        "origin": _calc_origin(xxrange, yyrange, z_coord),
     }
 
-    return pos_dict
+    return layer_dict
 
 
 def _compare_lists(s, t):
@@ -310,20 +320,28 @@ class Network:
     ----------
     params : dict
         The parameters to use for constructing the network.
-    add_drives_from_params : bool
+    add_drives_from_params : bool, default=False
         If True, add drives as defined in the params-dict. NB this is mainly
         for backward-compatibility with HNN GUI, and will be deprecated in a
-        future release. Default: False
-    legacy_mode : bool
+        future release.
+    legacy_mode : bool, default=False
         Set to True by default to enable matching HNN GUI output when drives
         are added suitably. Will be deprecated in a future release.
     mesh_shape : tuple of int (default: (10, 10))
         Defines the (n_x, n_y) shape of the grid of pyramidal cells.
-
+    pos_dict : dict of list of tuple (x, y, z), optional
+        Dictionary containing the coordinate positions of all cells.
+        Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
+        or any external drive name.
+    cell_types : dict of Cell, optional
+        Dictionary containing names of real cell types in the network
+        (e.g. 'L2_basket') as keys and corresponding Cell instances as values.
+        The Cell instance associated with a given key is used as a template
+        for the other cells of its type in the population.
 
     Attributes
     ----------
-    cell_types : dict
+    cell_types : dict of Cell
         Dictionary containing names of real cell types in the network
         (e.g. 'L2_basket') as keys and corresponding Cell instances as values.
         The Cell instance associated with a given key is used as a template
@@ -334,10 +352,10 @@ class Network:
         cell_types, followed by keys read from external_drives. The value
         of each key is a range of ints, one for each cell in given category.
         Examples: 'L2_basket': range(0, 270), 'evdist1': range(272, 542), etc
-    pos_dict : dict
+    pos_dict : dict of list of tuple (x, y, z)
         Dictionary containing the coordinate positions of all cells.
         Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
-        or any external drive name
+        or any external drive name.
     cell_response : CellResponse
         An instance of the CellResponse object.
     external_drives : dict (keys: drive names) of dict (keys: parameters)
@@ -375,6 +393,8 @@ class Network:
         add_drives_from_params=False,
         legacy_mode=False,
         mesh_shape=(10, 10),
+        pos_dict=None,
+        cell_types=None,
     ):
         # Save the parameters used to create the Network
         _validate_type(params, dict, "params")
@@ -400,14 +420,6 @@ class Network:
                 DeprecationWarning,
                 stacklevel=1,
             )
-
-        # Source dict of names, first real ones only!
-        cell_types = {
-            "L2_basket": basket(cell_name=_short_name("L2_basket")),
-            "L2_pyramidal": pyramidal(cell_name=_short_name("L2_pyramidal")),
-            "L5_basket": basket(cell_name=_short_name("L5_basket")),
-            "L5_pyramidal": pyramidal(cell_name=_short_name("L5_pyramidal")),
-        }
 
         self.cell_response = None
         # external drives and biases
@@ -443,17 +455,78 @@ class Network:
 
         self._inplane_distance = 1.0  # XXX hard-coded default
         self._layer_separation = 1307.4  # XXX hard-coded default
-        self.set_cell_positions(
-            inplane_distance=self._inplane_distance,
-            layer_separation=self._layer_separation,
-        )
 
-        # populates self.gid_ranges for the 1st time: order matters for
-        # NetworkBuilder!
-        for cell_name in cell_types:
-            self._add_cell_type(
-                cell_name, self.pos_dict[cell_name], cell_template=cell_types[cell_name]
+        # Handle positions and cell types
+        if pos_dict is not None and cell_types is not None:
+            # Use provided positions and cell types
+            _validate_type(pos_dict, dict, "pos_dict")
+            _validate_type(cell_types, dict, "cell_types")
+            self.pos_dict = deepcopy(pos_dict)
+
+            # Add cell types from provided dictionary
+            for cell_name, cell_template in cell_types.items():
+                if cell_name in self.pos_dict:
+                    self._add_cell_type(
+                        cell_name, self.pos_dict[cell_name], cell_template=cell_template
+                    )
+        else:
+            # Default behavior - create standard network
+            cell_types_default = {
+                "L2_basket": {
+                    "cell_object": basket(cell_name="L2_basket"),
+                    "cell_metadata": {
+                        "morpho_type": "basket",
+                        "electro_type": "inhibitory",
+                        "layer": "2",
+                        "measure_dipole": False,
+                        "reference": "https://doi.org/10.7554/eLife.51214",
+                    },
+                },
+                "L2_pyramidal": {
+                    "cell_object": pyramidal(cell_name="L2_pyramidal"),
+                    "cell_metadata": {
+                        "morpho_type": "pyramidal",
+                        "electro_type": "excitatory",
+                        "layer": "2",
+                        "measure_dipole": True,
+                        "reference": "https://doi.org/10.7554/eLife.51214",
+                    },
+                },
+                "L5_basket": {
+                    "cell_object": basket(cell_name="L5_basket"),
+                    "cell_metadata": {
+                        "morpho_type": "basket",
+                        "electro_type": "inhibitory",
+                        "layer": "5",
+                        "measure_dipole": False,
+                        "reference": "https://doi.org/10.7554/eLife.51214",
+                    },
+                },
+                "L5_pyramidal": {
+                    "cell_object": pyramidal(cell_name="L5_pyramidal"),
+                    "cell_metadata": {
+                        "morpho_type": "pyramidal",
+                        "electro_type": "excitatory",
+                        "layer": "5",
+                        "measure_dipole": True,
+                        "reference": "https://doi.org/10.7554/eLife.51214",
+                    },
+                },
+            }
+
+            self.set_cell_positions(
+                inplane_distance=self._inplane_distance,
+                layer_separation=self._layer_separation,
             )
+
+            # populates self.gid_ranges for the 1st time: order matters for
+            # NetworkBuilder!
+            for cell_name, cell_template in cell_types_default.items():
+                self._add_cell_type(
+                    cell_name,
+                    self.pos_dict[cell_name],
+                    cell_template=cell_template,
+                )
 
         if add_drives_from_params:
             _add_drives_from_params(self)
@@ -464,13 +537,14 @@ class Network:
     def __repr__(self):
         class_name = self.__class__.__name__
         # Dynamically create the description based on the current cell types
-        descriptions = list()
+        descriptions = []
         for cell_name in self.cell_types:
-            count = len(self.pos_dict.get(cell_name, []))
-            descriptions.append(f"{count} {cell_name} cells")
+            cell_count = len(self.pos_dict.get(cell_name, []))
+            descriptions.append(f"{cell_count} {cell_name} cells")
 
         # Combine all descriptions into a single string
         description_str = "\n".join(descriptions)
+
         return f"<{class_name} | {description_str}>"
 
     def __eq__(self, other):
@@ -530,15 +604,22 @@ class Network:
                 f"Layer separation must be positive, got: {layer_separation}"
             )
 
-        pos = _create_cell_coords(
+        # Get layer positions using layer dict
+        layer_dict = _create_cell_coords(
             n_pyr_x=self._N_pyr_x,
             n_pyr_y=self._N_pyr_y,
-            zdiff=layer_separation,
+            z_coord=layer_separation,
             inplane_distance=inplane_distance,
         )
-        # update positions of the real cells
-        for key in pos.keys():
-            self.pos_dict[key] = pos[key]
+
+        # Map layers to cell types, for default mapping
+        self.pos_dict = {
+            "L5_pyramidal": layer_dict["L5_bottom"],
+            "L2_pyramidal": layer_dict["L2_bottom"],
+            "L5_basket": layer_dict["L5_mid"],
+            "L2_basket": layer_dict["L2_mid"],
+            "origin": layer_dict["origin"],
+        }
 
         # update drives to be positioned at network origin
         for drive_name, drive in self.external_drives.items():
@@ -787,9 +868,15 @@ class Network:
         """
 
         _check_drive_parameter_values("Poisson", tstart=tstart, tstop=tstop)
-        target_populations = _get_target_properties(
-            weights_ampa, weights_nmda, synaptic_delays, location
-        )[0]
+        target_populations, _, _, _ = _get_target_properties(
+            weights_ampa,
+            weights_nmda,
+            synaptic_delays,
+            location,
+            self.cell_types,
+            probability=probability,
+        )
+
         _check_poisson_rates(rate_constant, target_populations, self.cell_types.keys())
         if isinstance(rate_constant, dict):
             if not cell_specific:
@@ -984,6 +1071,130 @@ class Network:
             probability,
         )
 
+    def add_spike_train_drive(
+        self,
+        name,
+        *,
+        spike_data,
+        location,
+        weights_ampa=None,
+        weights_nmda=None,
+        synaptic_delays=0.1,
+        space_constant=3.0,
+        probability=1.0,
+        conn_seed=None,
+    ):
+        """Add an external drive from explicitly defined spike trains.
+
+        This method enables the target network to receive spike trains from a source
+        network (e.g., another HNN simulation) or external data, driving activity in the
+        target network's cells.
+
+        Parameters
+        ----------
+        name : str
+            Unique name for the drive (e.g., 'drive_from_NetA').
+        spike_data : dict or list of tuple
+            Spike train data from the **source network** (or external source) in one of
+            three formats:
+
+            - *Format 1 (dictionary)*: Keys are unique identifiers (str) for source
+            cells and values are lists of spike times in milliseconds. The keys
+            can be any string that helps identify the source.
+            Example:
+            ```
+            {"NetA_L2_pyramidal_GID0": [10.2, 25.3], "NetA_L5_pyramidal_GID1": [15.1, 30.4]}
+            ```
+
+            - *Format 2 (tuples)*: A list of (time, gid) tuples, where each tuple
+            contains a spike time (float, in ms) and a GID (int). The GIDs can be
+            any integers that uniquely identify different source cells.
+            Example:
+            ```
+            [(10.2, 0), (25.3, 1), (15.1, 0), (30.4, 1)]
+            ```
+
+            - *Format 3*: String path (or glob pattern) to spike files that can be loaded
+            with :func:`~hnn_core.read_spikes`. Example: "path/to/spk_*.txt"
+
+            Note: The GIDs in both formats refer to the source cells in the originating
+            network (or external data). These are arbitrary identifiers that will be
+            remapped internally to sequential drive cell IDs (0 to n-1) in the target
+            network. Different GIDs should be used for different source cells.
+        location : str
+            Target location of synapses in the target network. Must be 'proximal', 'distal', or
+            'soma', or a specific section name (when legacy_mode=False).
+        weights_ampa : dict or None
+            Synaptic weights (in uS) of AMPA receptors for each targeted cell type (dict keys).
+            Cell types omitted are set to zero.
+        weights_nmda : dict or None
+            Synaptic weights (in uS) of NMDA receptors for each targeted cell type (dict keys).
+            Cell types omitted are set to zero.
+        synaptic_delays : dict or float
+            Synaptic delay (in ms) at the column origin, dispersed laterally as
+            a function of the space_constant. If float, applies to all target
+            cell types. Use dict to create delay->cell mapping.
+        space_constant : float
+            Lateral dispersion constant (in units of inplane_distance) for synaptic weights and
+            delays within the target network. Default: 3.0
+        probability : float or dict
+            Connection probability between source and target cells. Default: 1.0 (all-to-all).
+        conn_seed : int
+            Optional seed for random number generator for connectivity (default: None).
+        cell_specific : bool
+            If True, enables cell-specific connectivity (e.g., for 1-to-1 mapping). Default: False.
+        n_drive_cells : str or int
+            Number of drive cells. Use 'n_cells' for 1-to-1 mapping with target cell types,
+            or an integer for a fixed number. Default: None (inferred from spike_data).
+        """
+        if not self._legacy_mode:
+            warnings.warn(
+                "Spike train drives can only target sections defined in "
+                "`Cell.sect_loc` when `legacy_mode=False`.",
+                UserWarning,
+            )
+
+        # Create the drive object
+        drive = _NetworkDrive()
+        drive["type"] = "spike_train"
+        drive["location"] = location
+        drive["events"] = list()  # Will be populated during instantiation
+
+        # Process spike_data into a standardized format
+        standardized_data, n_drive_cells, source_to_gid_map = (
+            self._standardize_spike_data(spike_data)
+        )
+
+        # Set drive properties
+        drive["dynamics"] = standardized_data
+        drive["n_drive_cells"] = n_drive_cells
+        if source_to_gid_map is not None:
+            drive["source_to_gid_map"] = source_to_gid_map
+        drive["conn_seed"] = conn_seed
+        drive["event_seed"] = (
+            0  # Not used for spike train, but included for consistency
+        )
+
+        # Save connection parameters
+        drive["weights_ampa"] = weights_ampa
+        drive["weights_nmda"] = weights_nmda
+        drive["synaptic_delays"] = synaptic_delays
+        drive["probability"] = probability
+
+        # Attach the drive to network cells
+        self._attach_drive(
+            name,
+            drive,
+            weights_ampa=weights_ampa,
+            weights_nmda=weights_nmda,
+            location=location,
+            space_constant=space_constant,
+            synaptic_delays=synaptic_delays,
+            n_drive_cells=drive["n_drive_cells"],
+            cell_specific=False,
+            probability=probability,
+        )
+
     def _attach_drive(
         self,
         name,
@@ -1060,7 +1271,12 @@ class Network:
         # allow passing weights as None, convert to dict here
         (target_populations, weights_by_type, delays_by_type, probability_by_type) = (
             _get_target_properties(
-                weights_ampa, weights_nmda, synaptic_delays, location, probability
+                weights_ampa,
+                weights_nmda,
+                synaptic_delays,
+                location,
+                self.cell_types,
+                probability=probability,
             )
         )
 
@@ -1080,11 +1296,11 @@ class Network:
 
         # Ensure location exists for all target cells
         cell_sections = [
-            set(self.cell_types[cell_type].sections.keys())
+            set(self.cell_types[cell_type]["cell_object"].sections.keys())
             for cell_type in target_populations
         ]
         sect_locs = [
-            set(self.cell_types[cell_type].sect_loc.keys())
+            set(self.cell_types[cell_type]["cell_object"].sect_loc.keys())
             for cell_type in target_populations
         ]
 
@@ -1391,6 +1607,18 @@ class Network:
             strings.
         """
         _validate_type(name_mapping, dict, "name_mapping")
+
+        # Store original cell object names to preserve them
+        original_cell_names = {}
+        for original_name in name_mapping.keys():
+            if (
+                isinstance(self.cell_types.get(original_name), dict)
+                and "cell_object" in self.cell_types[original_name]
+            ):
+                original_cell_names[original_name] = self.cell_types[original_name][
+                    "cell_object"
+                ].name
+
         for original_name, new_name in name_mapping.items():
             if original_name not in self.cell_types.keys():
                 raise ValueError(f"'{original_name}' is not in cell_types!")
@@ -1417,6 +1645,17 @@ class Network:
                         connection["src_type"] = new_name
                     if connection["target_type"] == original_name:
                         connection["target_type"] = new_name
+
+                # Restore original cell object name to preserve cell template identity
+                if (
+                    new_name in self.cell_types
+                    and isinstance(self.cell_types[new_name], dict)
+                    and "cell_object" in self.cell_types[new_name]
+                    and original_name in original_cell_names
+                ):
+                    self.cell_types[new_name]["cell_object"].name = original_cell_names[
+                        original_name
+                    ]
 
     def gid_to_type(self, gid):
         """Reverse lookup of gid to type."""
@@ -1483,7 +1722,6 @@ class Network:
         """
         conn = _Connectivity()
         threshold = self.threshold
-
         _validate_type(
             target_gids,
             (int, list, range, str),
@@ -1556,8 +1794,8 @@ class Network:
         _validate_type(loc, str, "loc")
         _validate_type(receptor, str, "receptor")
 
-        target_sect_loc = self.cell_types[target_type].sect_loc
-        target_sections = self.cell_types[target_type].sections
+        target_sect_loc = self.cell_types[target_type]["cell_object"].sect_loc
+        target_sections = self.cell_types[target_type]["cell_object"].sections
         valid_loc = list(target_sect_loc.keys()) + list(target_sections.keys())
 
         _check_option(
@@ -1690,6 +1928,7 @@ class Network:
         ----------
         e_e : float
             Synaptic gain of excitatory to excitatory connections
+
             (default None)
         e_i : float
             Synaptic gain of excitatory to inhibitory connections
@@ -1721,23 +1960,24 @@ class Network:
 
         net = self.copy() if copy else self
 
-        e_conns = pick_connection(self, receptor=["ampa", "nmda"])
-        e_cells = np.concatenate(
-            [list(net.connectivity[conn_idx]["src_gids"]) for conn_idx in e_conns]
-        ).tolist()
+        # Identify excitatory and inhibitory GIDs based on cell_metadata
+        e_gids = list()
+        i_gids = list()
+        for cell_type_name, cell_data in self.cell_types.items():
+            if cell_data["cell_metadata"].get("electro_type") == "excitatory":
+                e_gids.extend(self.gid_ranges[cell_type_name])
+            elif cell_data["cell_metadata"].get("electro_type") == "inhibitory":
+                i_gids.extend(self.gid_ranges[cell_type_name])
 
-        i_conns = pick_connection(self, receptor=["gabaa", "gabab"])
-        i_cells = np.concatenate(
-            [list(net.connectivity[conn_idx]["src_gids"]) for conn_idx in i_conns]
-        ).tolist()
+        # Define the connection types to modify
         conn_types = {
-            "e_e": (e_e, e_cells, e_cells),
-            "e_i": (e_i, e_cells, i_cells),
-            "i_e": (i_e, i_cells, e_cells),
-            "i_i": (i_i, i_cells, i_cells),
+            "e_e": (e_e, e_gids, e_gids),
+            "e_i": (e_i, e_gids, i_gids),
+            "i_e": (i_e, i_gids, e_gids),
+            "i_i": (i_i, i_gids, i_gids),
         }
 
-        for conn_type, (gain, e_vals, i_vals) in conn_types.items():
+        for conn_type, (gain, src_gids, target_gids) in conn_types.items():
             if gain is None:
                 continue
 
@@ -1747,7 +1987,9 @@ class Network:
                     f"Synaptic gains must be non-negative.Got {gain} for '{conn_type}'."
                 )
 
-            conn_indices = pick_connection(net, src_gids=e_vals, target_gids=i_vals)
+            conn_indices = pick_connection(
+                net, src_gids=src_gids, target_gids=target_gids
+            )
             for conn_idx in conn_indices:
                 net.connectivity[conn_idx]["nc_dict"]["gain"] = gain
 
@@ -1778,6 +2020,160 @@ class Network:
     @copy_doc(write_network_configuration)
     def write_configuration(self, fname, overwrite=True):
         write_network_configuration(self, fname, overwrite)
+
+    def filter_cell_types(self, **metadata_filters):
+        """
+        Filter cell types based on cell_metadata criteria
+        """
+        filtered_types = []
+        for cell_type_name, cell_type_data in self.cell_types.items():
+            cell_metadata = cell_type_data["cell_metadata"]
+            match = True
+            for key, value in metadata_filters.items():
+                if key not in cell_metadata or cell_metadata[key] != value:
+                    match = False
+                    break
+            if match:
+                filtered_types.append(cell_type_name)
+        return filtered_types
+
+    def _standardize_spike_data(self, spike_data):
+        """Standardize spike data to internal format with 'times' and 'gids' keys.
+
+        Parameters
+        ----------
+        spike_data : dict or list or str
+            Input spike data in one of three formats:
+            - Format 1: Dictionary where keys are source identifiers and values are
+              lists of spike times in ms.
+              Example: {"NetA_L2_pyramidal_GID0": [10.2, 25.3], ...}
+            - Format 2: List of (time, gid) tuples where time is the spike time in ms
+              and gid identifies the source cell.
+              Example: [(10.2, 0), (15.6, 1), (25.3, 0)]
+            - Format 3: String path (or glob pattern) to spike files that can be loaded
+              with hnn_core.read_spikes(), like "path/to/spk_*.txt"
+
+        Returns
+        -------
+        standardized_data : dict
+            Dictionary with 'times' and 'gids' keys containing spike information
+            in standardized internal format
+        n_drive_cells : int
+            Number of unique source cells detected
+        source_to_gid_map : dict or None
+            Mapping from source identifiers to sequential GIDs (for Format 1),
+            or None (for Format 2 or Format 3)
+        """
+        source_to_gid_map = None
+
+        if isinstance(spike_data, dict):
+            # Format 1: {source_id: [spike_times], ...}
+            source_ids = list(spike_data.keys())
+            n_drive_cells = len(source_ids)
+
+            # Transform to standardized format
+            all_times = []
+            all_gids = []
+
+            # Map source IDs to sequential gids
+            source_to_gid_map = {src_id: i for i, src_id in enumerate(source_ids)}
+
+            # Collect all spike times and corresponding gids
+            for src_id, times in spike_data.items():
+                gid = source_to_gid_map[src_id]
+                if isinstance(times, (list, np.ndarray)):
+                    all_times.extend(times)
+                    all_gids.extend([gid] * len(times))
+                else:
+                    raise ValueError(
+                        f"Spike times for source '{src_id}' must be a list or array. "
+                        f"Got {type(times)}."
+                    )
+
+            standardized_data = {
+                "times": all_times,
+                "gids": all_gids,
+            }
+
+        elif isinstance(spike_data, list) and all(
+            isinstance(x, tuple) and len(x) == 2 for x in spike_data
+        ):
+            # Format 2: List of (time, gid) tuples
+            times = [pair[0] for pair in spike_data]
+            gids = [pair[1] for pair in spike_data]
+
+            # Count unique drive cells
+            unique_gids = np.unique(gids)
+            n_drive_cells = len(unique_gids)
+
+            # Ensure gids are sequential from 0 to n-1
+            if len(unique_gids) > 0:
+                if (
+                    np.min(unique_gids) != 0
+                    or np.max(unique_gids) != len(unique_gids) - 1
+                ):
+                    # Reindex gids to be 0-based sequential integers
+                    gid_map = {
+                        old_gid: new_gid
+                        for new_gid, old_gid in enumerate(sorted(unique_gids))
+                    }
+                    new_gids = [gid_map[gid] for gid in gids]
+                    standardized_data = {
+                        "times": times,
+                        "gids": new_gids,
+                    }
+                else:
+                    standardized_data = {
+                        "times": times,
+                        "gids": gids,
+                    }
+            else:
+                standardized_data = {"times": [], "gids": []}
+
+        elif isinstance(spike_data, str):
+            # Format 3: Handle string input as file path
+            try:
+                # Read spike data from file
+                cell_response = read_spikes(spike_data)
+            except Exception as e:
+                raise ValueError(
+                    f"Error loading spike data from file '{spike_data}': {str(e)}"
+                )
+
+            # By default, use the first trial
+            trial_idx = 0
+            if trial_idx >= len(cell_response.spike_times):
+                raise ValueError(
+                    f"Trial index {trial_idx} exceeds available trials "
+                    f"({len(cell_response.spike_times)})"
+                )
+
+            # Extract spike data from specified trial
+            spike_times = cell_response.spike_times[trial_idx]
+            spike_gids = cell_response.spike_gids[trial_idx]
+            spike_types = cell_response.spike_types[trial_idx]
+
+            # Convert to dictionary format (Format 1)
+            spike_data_dict = {}
+            for t, g, cell_type in zip(spike_times, spike_gids, spike_types):
+                src_id = f"{cell_type}_GID{g}"
+                if src_id not in spike_data_dict:
+                    spike_data_dict[src_id] = []
+                spike_data_dict[src_id].append(t)
+
+            # Recursively call this function with the dictionary data
+            return self._standardize_spike_data(spike_data_dict)
+
+        else:
+            raise ValueError(
+                "spike_data must be either:\n"
+                "1. A dictionary {source_id: [spike_times], ...}\n"
+                "2. A list of (time, gid) tuples\n"
+                "3. A file path string loadable with read_spikes()\n"
+                f"Got {type(spike_data)}."
+            )
+
+        return standardized_data, n_drive_cells, source_to_gid_map
 
 
 class _Connectivity(dict):
@@ -1956,7 +2352,7 @@ def _add_cell_type_bias(
         "section": section,
     }
 
-    sections = list(network.cell_types[cell_type].sections.keys())
+    sections = list(network.cell_types[cell_type]["cell_object"].sections.keys())
 
     # error when section is defined that doesn't exist.
     if section not in sections:

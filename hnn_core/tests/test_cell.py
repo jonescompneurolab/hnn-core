@@ -94,7 +94,7 @@ def test_cell():
     assert cell.sections[sec_name].Ra == new_Ra
 
     # Testing update end pts using template cell
-    cell1 = pyramidal(cell_name="L5Pyr")
+    cell1 = pyramidal(cell_name="L5_pyramidal")
 
     # Test other not NotImplemented for Cell Class
     assert (cell1 == "cell") is False
@@ -135,7 +135,7 @@ def test_cell():
     # Checking equality till 5 decimal places
     np.testing.assert_almost_equal(end_pts_original, end_pts_new, 5)
 
-    # Testing distance function using template cell (L5pyr)
+    # Testing distance function using template cell (L5_pyramidal)
     sec_dist = dict()
     sec_dist["soma"] = 19.5
     sec_dist["apical_trunk"] = 90

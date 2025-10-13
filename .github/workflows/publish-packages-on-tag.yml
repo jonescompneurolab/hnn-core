@@ -95,6 +95,9 @@ jobs:
     environment:
       name: pypi
       url: https://pypi.org/p/hnn-core
+      # Note: This environment has been configured via Github > Settings > Environments
+      # to ONLY run off of the `master` branch. If you need to push a new PyPI build
+      # using a branch that is not `master`, you need to remove this protection.
 
     permissions:
       id-token: write  # IMPORTANT: mandatory for trusted publishing

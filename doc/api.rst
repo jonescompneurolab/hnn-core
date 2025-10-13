@@ -100,8 +100,20 @@ Parallel backends (:py:mod:`hnn_core.parallel_backends`):
    MPIBackend
    JoblibBackend
 
-Input and Output:
------------------
+Input and Output (hierarchical JSON) (:py:mod:`hnn_core.hnn_io`):
+-----------------------------------------------------------------
+.. currentmodule:: hnn_core.hnn_io
+
+.. autosummary::
+   :toctree: generated/
+
+   dict_to_network
+   network_to_dict
+   read_network_configuration
+   write_network_configuration
+
+Input and Output (non-hierarchical JSON):
+-----------------------------------------
 
 .. currentmodule:: hnn_core
 
