@@ -522,7 +522,7 @@ def get_L5PyrET_params():
         'L5Pyr_basal_gbar_NaTs2_t': 0.0102,
         'L5Pyr_basal_gbar_SKv3_1': 0.0001305,
         'L5Pyr_basal_gbar_Ih': 5.14e-5/4*2,
-        'L5Pyr_basal_g_pas': 1.75e-5/2*2,
+        'L5Pyr_basal_g_pas': 1.75e-5/2*3,
         'L5Pyr_basal_e_pas': -90,
 
         # Biophysics dends
@@ -539,7 +539,7 @@ def get_L5PyrET_params():
         'L5Pyr_dend_g_pas':  0.0000589/1.5,
         'L5Pyr_dend_e_pas': -85,
         'L5Pyr_dend_decay_CaDynamics_E2' : 122,
-        'L5Pyr_dend_gamma_CaDynamics_E2' : .0005096*1.1
+        'L5Pyr_dend_gamma_CaDynamics_E2' : .0005096*0.9
     }
 
 def get_Int_params():
