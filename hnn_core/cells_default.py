@@ -526,8 +526,8 @@ def pyramidal_l5ET(cell_name,pos, gid=None):
     p_all = get_L5PyrET_params()
 
     # override params according to function
-    gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=2.78e-5/2*1., gdend=2.78e-5/2*12.0, xkink=1500, hotzone=[1500, 1700], hotzone_factor=3.9)
-    gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=93.5e-6/2, gdend=93.5e-6/2*2.25, xkink=1500, hotzone=[1500, 1700], hotzone_factor=3.9)
+    gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=2.78e-5/2*1., gdend=2.78e-5/2*12.0, xkink=1500, hotzone=[1500, 1700], hotzone_factor=4.4)
+    gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=93.5e-6/2, gdend=93.5e-6/2*2.25, xkink=1500, hotzone=[1500, 1700], hotzone_factor=2.25)
     gbar_Ih = partial(_exp_g_at_dist, zero_val=p_all['L5Pyr_dend_gbar_Ih'],exp_term = 1./323, slope=2.087, offset=-.8696)
 
     # basal dendrites
@@ -578,15 +578,15 @@ def pyramidal_l5ET(cell_name,pos, gid=None):
     section_names = list(end_pts.keys())
 
     # initialize section voltage
-    v_init = {'soma': -70.62820902070445,
-            'basal_1': -70.68833400623593,
-            'basal_2': -70.77775514983897,
-            'basal_3': -70.77775514983897,
-            'apical_oblique': -70.59471467725159,
-            'apical_trunk': -70.5815879670308,
-            'apical_1': -69.62883464685193,
-            'apical_2': -65.7496819357426,
-            'apical_tuft': -61.28751781712565}
+    v_init = {'soma': -71.56521022702259,
+            'basal_1': -71.65128168943417,
+            'basal_2': -71.77924562640379,
+            'basal_3': -71.77924562640379,
+            'apical_oblique': -71.53636973768913,
+            'apical_trunk': -71.50652549683365,
+            'apical_1': -70.3781183764456,
+            'apical_2': -66.1535511211922,
+            'apical_tuft': -61.47225400606895}
 
     sections_apcl = _get_dends(p_all, 'L5Pyr', section_names=['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft'], v_init=v_init)
     sections_basal = _get_basal(p_all, 'L5Pyr', section_names=['basal_1', 'basal_2', 'basal_3', 'apical_oblique'], v_init=v_init)
