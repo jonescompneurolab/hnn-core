@@ -1498,7 +1498,6 @@ def test_custom_gains_simulate_and_download(setup_gui):
     net_config = json.loads(configs)
 
     # Check that connectivity includes gain values
-    assert "connectivity" in net_config
     for conn in net_config["connectivity"]:
         assert "nc_dict" in conn
         assert "gain" in conn["nc_dict"]
