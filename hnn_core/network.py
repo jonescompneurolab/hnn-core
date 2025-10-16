@@ -2482,7 +2482,7 @@ def _check_global_synaptic_gains_uniformity(net):
         "i_i": (i_gids, i_gids),
     }
 
-    output_indicator = False
+    output_indicator = True
     # Retrieve the gain value for each connection type
     for conn_type, (src_idxs, target_idxs) in conn_types.items():
         picks = pick_connection(net, src_gids=src_idxs, target_gids=target_idxs)
@@ -2495,7 +2495,7 @@ def _check_global_synaptic_gains_uniformity(net):
                     first_value,
                 )
             ):
-                output_indicator = True
+                output_indicator = False
                 print(
                     """
                     WARNING: Your imported Network uses custom synaptic gain values. Global synaptic gain values such as "Excitatory-to-Inhibitory" etc. will NOT be read or displayed properly. This is because Global synaptic gain values assume that initially, all gains are the same. If you continue to modify your Global synaptic gain values, double-check each connection's final synaptic gain value. To stop this warning, change your synaptic weights instead of your synaptic gains.

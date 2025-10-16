@@ -2050,9 +2050,9 @@ def test_check_global_synaptic_gains_uniformity():
     # Set some global gains
     net.set_global_synaptic_gains(e_e=0.5)
 
-    # With uniform gains (default), should return False (no warning)
+    # With uniform gains (default), should return True (no warning)
     result = _check_global_synaptic_gains_uniformity(net)
-    assert result is False
+    assert result is True
 
     # Make gains non-uniform by setting different gains for different connections
     # Get two e_e connections
@@ -2069,6 +2069,7 @@ def test_check_global_synaptic_gains_uniformity():
         result = _check_global_synaptic_gains_uniformity(net)
         stdout = buf.getvalue()
 
-    assert result is True
+    # With NON-uniform gains, check should return False
+    assert result is False
     assert "WARNING" in stdout
     assert "custom synaptic gain values" in stdout
