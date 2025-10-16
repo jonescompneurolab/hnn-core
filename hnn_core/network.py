@@ -1880,6 +1880,13 @@ class Network:
         nc_conn_items = [delay, weight, lamtha, threshold, gain]
         for key, arg_name, item in zip(nc_dict_keys, arg_names, nc_conn_items):
             _validate_type(item, (int, float), arg_name, "int or float")
+            if arg_name == "gain":
+                if item < 0.0:
+                    raise ValueError(
+                        f"Synaptic gains must be non-negative."
+                        f"Got {gain} for connection {conn['src_type']}->{conn['target_type']}."
+                    )
+
             conn["nc_dict"][key] = item
 
         # Probabilistically define connections
