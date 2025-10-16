@@ -2181,7 +2181,7 @@ def add_network_connectivity_tab(
             margin-bottom: 2px;
             text-align: center;
         ">
-        Global Synaptic Gain Multipliers
+        Global Synaptic Gain Modifiers
         </div>
         """
     )
