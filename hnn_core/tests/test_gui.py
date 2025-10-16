@@ -1389,8 +1389,8 @@ def test_adjust_synaptic_weights(setup_gui):
     # Change the synaptic weight widgets
     gui.global_gain_widgets["e_e"].value = 0.5
     gui.global_gain_widgets["e_i"].value = 0.5
-    gui.global_gain_widgets["i_i"].value = 1.1
     gui.global_gain_widgets["i_e"].value = 1.1
+    gui.global_gain_widgets["i_i"].value = 1.1
     _init_network_from_widgets(
         gui.params,
         gui.widget_dt,
@@ -1410,14 +1410,11 @@ def test_global_gain_widgets_initialization(setup_gui):
     """Test that global gain widgets are initialized properly."""
     gui = setup_gui
 
-    # Check that all four gain types are present
-    assert "e_e" in gui.global_gain_widgets
-    assert "e_i" in gui.global_gain_widgets
-    assert "i_e" in gui.global_gain_widgets
-    assert "i_i" in gui.global_gain_widgets
-
     # Check initial values are 1.0
     for gain_type in ["e_e", "e_i", "i_e", "i_i"]:
+        # Check that all four gain types are present
+        assert gain_type in gui.global_gain_widgets
+
         assert gui.global_gain_widgets[gain_type].value == 1.0
         assert gui.global_gain_widgets[gain_type].min == 0
         assert gui.global_gain_widgets[gain_type].max == 1e6
