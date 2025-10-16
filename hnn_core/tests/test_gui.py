@@ -1472,12 +1472,21 @@ def test_custom_gains_simulate_and_download(setup_gui):
     global_custom_gain = 0.8
     gui.global_gain_widgets["i_i"].value = global_custom_gain
 
-    # Also change a single gain, the first one: L2_B->L2_B, affected by i_i above.
-    # Yes this depends on the order of synapses in connectivity_widgets, but
-    # connectivity_widgets doesn't actually contain the text of which connection each
-    # widgets belongs to, so :shrug:
+    # Also change a single gain, the one for L5_B->L5_B, affected by i_i above.
+    src_type = "L5_basket"
+    target_type = "L5_basket"
     single_custom_gain = 2.0
-    gui.connectivity_widgets[0][0].children[2].children[0].value = single_custom_gain
+    conn_widget = None
+    for connectivity_field in gui.connectivity_widgets:
+        for widget in connectivity_field:
+            if (
+                (widget._belongsto["src_gids"] == src_type)
+                and (widget._belongsto["target_gids"] == target_type)
+            ):
+                widget.children[2].children[0].value = single_custom_gain
+                break
+        if conn_widget is not None:
+            break
 
     # Run a simulation to create a network with these gains
     sim_name = "test_gains"
@@ -1496,8 +1505,8 @@ def test_custom_gains_simulate_and_download(setup_gui):
         # All gains should be non-negative
         assert conn["nc_dict"]["gain"] >= 0
         if (
-            (conn["src_type"] == "L2_basket")
-            and (conn["target_type"] == "L2_basket")
+            (conn["src_type"] == src_type)
+            and (conn["target_type"] == target_type)
             and (conn["receptor"] == "gabaa")
         ):
             assert conn["nc_dict"]["gain"] == (
