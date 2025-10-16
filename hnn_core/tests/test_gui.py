@@ -1439,10 +1439,6 @@ def test_combined_gain_indicator_updates(setup_gui):
         if conn_widget is not None:
             break
 
-    assert conn_widget is not None, (
-        "Could not find L2_pyramidal->L2_pyramidal connection"
-    )
-
     # Extract single gain widget and combined gain indicator
     # Structure: children[2] is HBox containing [single_gain_input, combined_indicator]
     single_gain_widget = conn_widget.children[2].children[0]
