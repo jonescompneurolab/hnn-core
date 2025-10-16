@@ -581,7 +581,7 @@ class HNNGUI:
         self.connectivity_widgets = list()
 
         # Cell parameter dict
-        self.cell_pameters_widgets = dict()
+        self.cell_parameters_widgets = dict()
 
         # Synaptic Gains dict
         self.global_gain_widgets = dict()
@@ -769,7 +769,7 @@ class HNNGUI:
                 self.connectivity_widgets,
                 self.viz_manager,
                 self.simulation_list_widget,
-                self.cell_pameters_widgets,
+                self.cell_parameters_widgets,
                 self.global_gain_widgets,
             )
 
@@ -819,7 +819,7 @@ class HNNGUI:
         def _cell_type_radio_change(value):
             _update_cell_params_vbox(
                 self._cell_params_out,
-                self.cell_pameters_widgets,
+                self.cell_parameters_widgets,
                 value.new,
                 self.cell_layer_radio_buttons.value,
             )
@@ -827,7 +827,7 @@ class HNNGUI:
         def _cell_layer_radio_change(value):
             _update_cell_params_vbox(
                 self._cell_params_out,
-                self.cell_pameters_widgets,
+                self.cell_parameters_widgets,
                 self.cell_type_radio_buttons.value,
                 value.new,
             )
@@ -1183,7 +1183,7 @@ class HNNGUI:
                 self._connectivity_out,
                 self.connectivity_widgets,
                 self._cell_params_out,
-                self.cell_pameters_widgets,
+                self.cell_parameters_widgets,
                 self.cell_layer_radio_buttons,
                 self.cell_type_radio_buttons,
                 self._global_gain_out,
@@ -1339,7 +1339,7 @@ class HNNGUI:
                     self._connectivity_out,
                     self.connectivity_widgets,
                     self._cell_params_out,
-                    self.cell_pameters_widgets,
+                    self.cell_parameters_widgets,
                     self.cell_layer_radio_buttons,
                     self.cell_type_radio_buttons,
                     self._global_gain_out,
@@ -2106,7 +2106,7 @@ def add_connectivity_tab(
     connectivity_out,
     connectivity_textfields,
     cell_params_out,
-    cell_pameters_vboxes,
+    cell_parameters_vboxes,
     cell_layer_radio_button,
     cell_type_radio_button,
     global_gain_out,
@@ -2129,7 +2129,7 @@ def add_connectivity_tab(
     # build cell parameters tab
     add_cell_parameters_tab(
         cell_params_out,
-        cell_pameters_vboxes,
+        cell_parameters_vboxes,
         cell_layer_radio_button,
         cell_type_radio_button,
         layout,
@@ -2311,7 +2311,7 @@ def add_network_connectivity_tab(
 
 def add_cell_parameters_tab(
     cell_params_out,
-    cell_pameters_vboxes,
+    cell_parameters_vboxes,
     cell_layer_radio_button,
     cell_type_radio_button,
     layout,
@@ -2352,8 +2352,8 @@ def add_cell_parameters_tab(
                 )
                 text_field.layout.width = "350px"
                 layer_parameters.append(text_field)
-            cell_pameters_key = f"{cell_type[0]} Pyramidal_{layer}"
-            cell_pameters_vboxes[cell_pameters_key] = VBox(layer_parameters)
+            cell_parameters_key = f"{cell_type[0]} Pyramidal_{layer}"
+            cell_parameters_vboxes[cell_parameters_key] = VBox(layer_parameters)
             layer_parameters.clear()
 
     # clear existing connectivity
@@ -2362,7 +2362,7 @@ def add_cell_parameters_tab(
     # Add cell parameters
     _update_cell_params_vbox(
         cell_params_out,
-        cell_pameters_vboxes,
+        cell_parameters_vboxes,
         cell_type_radio_button.value,
         cell_layer_radio_button.value,
     )
@@ -2618,7 +2618,7 @@ def run_button_clicked(
     connectivity_textfields,
     viz_manager,
     simulations_list_widget,
-    cell_pameters_widgets,
+    cell_parameters_widgets,
     global_gain_textfields,
 ):
     """Run the simulation and plot outputs."""
@@ -2642,7 +2642,7 @@ def run_button_clicked(
             simulation_data[_sim_name],
             drive_widgets,
             connectivity_textfields,
-            cell_pameters_widgets,
+            cell_parameters_widgets,
             global_gain_textfields,
         )
 

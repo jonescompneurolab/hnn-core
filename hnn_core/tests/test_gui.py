@@ -124,7 +124,7 @@ def test_gui_compose():
     gui.compose()
     assert len(gui.connectivity_widgets) == 12
     assert len(gui.global_gain_widgets) == 4
-    assert len(gui.cell_pameters_widgets) == 6
+    assert len(gui.cell_parameters_widgets) == 6
     assert len(gui.drive_widgets) == 3
     plt.close("all")
 
@@ -333,7 +333,7 @@ def test_gui_change_connectivity():
                     _single_simulation,
                     gui.drive_widgets,
                     gui.connectivity_widgets,
-                    gui.cell_pameters_widgets,
+                    gui.cell_parameters_widgets,
                     gui.global_gain_widgets,
                     add_drive=False,
                 )
@@ -384,7 +384,7 @@ def test_gui_init_network(setup_gui):
         _single_simulation,
         gui.drive_widgets,
         gui.connectivity_widgets,
-        gui.cell_pameters_widgets,
+        gui.cell_parameters_widgets,
         gui.global_gain_widgets,
     )
     plt.close("all")
@@ -1031,7 +1031,7 @@ def test_gui_add_tonic_input():
         _single_simulation,
         gui.drive_widgets,
         gui.connectivity_widgets,
-        gui.cell_pameters_widgets,
+        gui.cell_parameters_widgets,
         gui.global_gain_widgets,
     )
 
@@ -1062,7 +1062,7 @@ def test_gui_cell_params_widgets(setup_gui):
     layers = gui.cell_layer_radio_buttons.options
     assert len(layers) == 3
 
-    keys = gui.cell_pameters_widgets.keys()
+    keys = gui.cell_parameters_widgets.keys()
     num_cell_params = 0
     for pyramid_cell_type in pyramid_cell_types:
         cell_type = pyramid_cell_type.split("_")[0]
@@ -1379,7 +1379,7 @@ def test_adjust_synaptic_weights(setup_gui):
         _single_simulation,
         gui.drive_widgets,
         gui.connectivity_widgets,
-        gui.cell_pameters_widgets,
+        gui.cell_parameters_widgets,
         gui.global_gain_widgets,
     )
 
@@ -1398,7 +1398,7 @@ def test_adjust_synaptic_weights(setup_gui):
         _single_simulation,
         gui.drive_widgets,
         gui.connectivity_widgets,
-        gui.cell_pameters_widgets,
+        gui.cell_parameters_widgets,
         gui.global_gain_widgets,
     )
 
