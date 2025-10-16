@@ -2490,10 +2490,11 @@ def _init_network_from_widgets(
                 # 2. Multiply global by single synapse gain to get total
                 single_simulation_data["net"].connectivity[conn_idx]["nc_dict"][
                     "gain"
-                ] = (1
-                     + (applied_global_gain_value - 1)
-                     + (vbox_key.children[2].children[0].value - 1)
-                     )
+                ] = (
+                    1
+                    + (applied_global_gain_value - 1)
+                    + (vbox_key.children[2].children[0].value - 1)
+                )
 
     # Update cell params
     update_functions = {
