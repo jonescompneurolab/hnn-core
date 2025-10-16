@@ -1456,19 +1456,19 @@ def test_combined_gain_indicator_updates(setup_gui):
     # Check initial combined gain indicator value includes both gains
     initial_single_gain = single_gain_widget.value
     initial_global_gain = 1.0  # default
-    expected_initial = initial_single_gain * initial_global_gain
-    assert f"{expected_initial:.4f}" in combined_indicator.value
+    expected_initial = 1 + (initial_single_gain - 1) + (initial_global_gain - 1)
+    assert f"{expected_initial:.2f}" in combined_indicator.value
 
     # Change global gain and check that combined indicator updates
     gui.global_gain_widgets["e_e"].value = 2.0
     new_global_gain = 2.0
-    expected_combined = initial_single_gain * new_global_gain
-    assert f"{expected_combined:.4f}" in combined_indicator.value
+    expected_combined = 1 + (initial_single_gain - 1) + (new_global_gain - 1)
+    assert f"{expected_combined:.2f}" in combined_indicator.value
 
     # Change single gain and check that combined indicator updates
     single_gain_widget.value = 0.5
-    expected_combined = 0.5 * new_global_gain
-    assert f"{expected_combined:.4f}" in combined_indicator.value
+    expected_combined = 1 + (single_gain_widget.value - 1) + (new_global_gain - 1)
+    assert f"{expected_combined:.2f}" in combined_indicator.value
 
 
 def test_custom_gains_simulate_and_download(setup_gui):
@@ -1476,13 +1476,15 @@ def test_custom_gains_simulate_and_download(setup_gui):
     gui = setup_gui
 
     # Set some non-default gains
-    gui.global_gain_widgets["i_i"].value = 0.8
+    global_custom_gain = 0.8
+    gui.global_gain_widgets["i_i"].value = global_custom_gain
 
     # Also change a single gain, the first one: L2_B->L2_B, affected by i_i above.
     # Yes this depends on the order of synapses in connectivity_widgets, but
     # connectivity_widgets doesn't actually contain the text of which connection each
     # widgets belongs to, so :shrug:
-    gui.connectivity_widgets[0][0].children[2].children[0].value = 2.0
+    single_custom_gain = 2.0
+    gui.connectivity_widgets[0][0].children[2].children[0].value = single_custom_gain
 
     # Run a simulation to create a network with these gains
     sim_name = "test_gains"
@@ -1505,7 +1507,9 @@ def test_custom_gains_simulate_and_download(setup_gui):
             and (conn["target_type"] == "L2_basket")
             and (conn["receptor"] == "gabaa")
         ):
-            assert conn["nc_dict"]["gain"] == 1.6
+            assert conn["nc_dict"]["gain"] == (
+                1 + (global_custom_gain - 1) + (single_custom_gain - 1)
+            )
 
 
 def test_diff_gui_vs_api_networks_simulations():
@@ -1558,7 +1562,7 @@ def test_diff_gui_vs_api_networks_simulations():
         target_gids="L2_basket",
     )
     net_api.connectivity[l2p_l2p_conn_idx[0]]["nc_dict"]["gain"] = (
-        global_custom_gain * single_custom_gain
+        1 + (global_custom_gain - 1) + (single_custom_gain - 1)
     )
 
     dpls_api = simulate_dipole(net_api, tstop=local_tstop, dt=local_dt, n_trials=1)
