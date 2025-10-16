@@ -1492,7 +1492,7 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
             continuous_update=False,
             min=0,
             max=1e6,
-            step=0.01,
+            step=0.1,
             description="Gain:",
             style=style,
         )
@@ -1501,8 +1501,9 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
             value=f"""
             <b>*Global={
                 (
-                    global_gain_textfields[global_gain_type].value
-                    * single_gain_text_input.value
+                    1
+                    + (global_gain_textfields[global_gain_type].value - 1)
+                    + (single_gain_text_input.value - 1)
                 ):.4f} Total</b>"""
         )
 
@@ -1512,7 +1513,9 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
                 gain_output.value = f"""
                 <b>*Global={
                     (
-                        global_gain_textfields[gain_type].value * gain_input.value
+                        1
+                        + (global_gain_textfields[gain_type].value - 1)
+                        + (gain_input.value - 1)
                     ):.4f} Total</b>"""
 
             return update_html
@@ -2487,7 +2490,10 @@ def _init_network_from_widgets(
                 # 2. Multiply global by single synapse gain to get total
                 single_simulation_data["net"].connectivity[conn_idx]["nc_dict"][
                     "gain"
-                ] = applied_global_gain_value * vbox_key.children[2].children[0].value
+                ] = (1
+                     + (applied_global_gain_value - 1)
+                     + (vbox_key.children[2].children[0].value - 1)
+                     )
 
     # Update cell params
     update_functions = {
