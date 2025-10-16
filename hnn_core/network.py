@@ -2451,7 +2451,7 @@ def _add_cell_type_bias(
 
 
 def _check_global_synaptic_gains_uniformity(net):
-    """Check whether gain values for uniform within their type of connection.
+    """Check whether gain values are uniform within their type of connection.
 
     This function identifies excitatory and inhibitory cells in the Network
     and retrieves the gain value for each type of synaptic connection:
