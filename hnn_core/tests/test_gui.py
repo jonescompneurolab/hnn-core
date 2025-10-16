@@ -1479,9 +1479,8 @@ def test_custom_gains_simulate_and_download(setup_gui):
     conn_widget = None
     for connectivity_field in gui.connectivity_widgets:
         for widget in connectivity_field:
-            if (
-                (widget._belongsto["src_gids"] == src_type)
-                and (widget._belongsto["target_gids"] == target_type)
+            if (widget._belongsto["src_gids"] == src_type) and (
+                widget._belongsto["target_gids"] == target_type
             ):
                 widget.children[2].children[0].value = single_custom_gain
                 break
