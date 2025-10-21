@@ -484,6 +484,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.objective_functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">_rmse_evoked</span><span class="p">,</span> <span class="n">_maximize_psd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..externals.mne</span><span class="w"> </span><span class="kn">import</span> <span class="n">_validate_type</span>
 
 
 <div class="viewcode-block" id="Optimizer">
@@ -495,6 +496,7 @@
         <span class="n">tstop</span><span class="p">,</span>
         <span class="n">constraints</span><span class="p">,</span>
         <span class="n">set_params</span><span class="p">,</span>
+        <span class="n">initial_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;bayesian&quot;</span><span class="p">,</span>
         <span class="n">obj_fun</span><span class="o">=</span><span class="s2">&quot;dipole_rmse&quot;</span><span class="p">,</span>
         <span class="n">max_iter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
@@ -516,6 +518,10 @@
 
 <span class="sd">            where ``net`` is a Network object and ``params`` is a dictionary</span>
 <span class="sd">            of the parameters that will be set inside the function.</span>
+<span class="sd">        initial_params : dict, optional</span>
+<span class="sd">            Initial parameters for the objective function. Keys are parameter</span>
+<span class="sd">            names, values are initial parameters. The default is None.</span>
+<span class="sd">            If None, the parameters will be set to the midpoints of parameter ranges.</span>
 <span class="sd">        solver : str</span>
 <span class="sd">            The optimizer, &#39;bayesian&#39; or &#39;cobyla&#39;.</span>
 <span class="sd">        obj_fun : str | func</span>
@@ -530,6 +536,8 @@
 <span class="sd">        ----------</span>
 <span class="sd">        constraints : dict</span>
 <span class="sd">            The user-defined constraints.</span>
+<span class="sd">        initial_params : dict</span>
+<span class="sd">            Initial parameters for the objective function.</span>
 <span class="sd">        max_iter : int</span>
 <span class="sd">            The max number of calls to the objective function.</span>
 <span class="sd">        solver : func</span>
@@ -579,6 +587,35 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span> <span class="o">=</span> <span class="n">obj_fun</span>  <span class="c1"># user-defined function</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Initial weights for the objective function</span>
+        <span class="k">if</span> <span class="n">initial_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Check if initial_params is not a dict</span>
+            <span class="n">_validate_type</span><span class="p">(</span><span class="n">initial_params</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+
+            <span class="c1"># Check if initial_params keys match constraints keys</span>
+            <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">initial_params</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;The keys of initial_params must match the keys of constraints.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Check if initial_params values contain only int or float</span>
+            <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">initial_params</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">_validate_type</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span>
+
+            <span class="c1"># Check if initial_params values are within constraints</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">initial_params</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="o">&lt;=</span> <span class="n">initial_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                    <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Initial parameter &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39; with value </span><span class="si">{</span><span class="n">initial_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">}</span><span class="s2"> is out of bounds </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
+                    <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initial_params</span> <span class="o">=</span> <span class="n">initial_params</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initial_params</span> <span class="o">=</span> <span class="n">_get_initial_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">tstop</span> <span class="o">=</span> <span class="n">tstop</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">net_</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">obj_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
@@ -604,17 +641,22 @@
 <span class="sd">        ----------</span>
 <span class="sd">        target : instance of Dipole (if obj_fun=&#39;dipole_rmse&#39;)</span>
 <span class="sd">            A dipole object with experimental data.</span>
+<span class="sd">        n_trials : int (if obj_fun=&#39;dipole_rmse&#39;)</span>
+<span class="sd">            Number of trials to simulate and average.</span>
 <span class="sd">        f_bands : list of tuples (if obj_fun=&#39;maximize_psd&#39;)</span>
 <span class="sd">            Lower and higher limit for each frequency band.</span>
-<span class="sd">        relative_bandpower : tuple (if obj_fun=&#39;maximize_psd&#39;)</span>
-<span class="sd">            Weight for each frequency band.</span>
+<span class="sd">        relative_bandpower : list of float | float (if obj_fun=&#39;maximize_psd&#39;)</span>
+<span class="sd">            Weight for each frequency band in f_bands. If a single float is provided,</span>
+<span class="sd">            the same weight is applied to all frequency bands.</span>
 <span class="sd">        scale_factor : float, optional</span>
 <span class="sd">            The dipole scale factor.</span>
 <span class="sd">        smooth_window_len : float, optional</span>
 <span class="sd">            The smooth window length.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;dipole_rmse&quot;</span> <span class="ow">and</span> <span class="s2">&quot;target&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;target must be specified&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;dipole_rmse&quot;</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="s2">&quot;target&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span> <span class="ow">or</span> <span class="s2">&quot;n_trials&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;target and n_trials must be specified&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span> <span class="ow">and</span> <span class="p">(</span>
             <span class="s2">&quot;f_bands&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span>
             <span class="ow">or</span> <span class="s2">&quot;relative_bandpower&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span>
@@ -622,15 +664,14 @@
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;f_bands and relative_bandpower must be specified&quot;</span><span class="p">)</span>
 
         <span class="n">constraints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_constraints</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
-        <span class="n">initial_params</span> <span class="o">=</span> <span class="n">_get_initial_params</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">constraints</span><span class="p">)</span>
 
         <span class="n">opt_params</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">net_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_opt</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_initial_net</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tstop</span><span class="p">,</span>
             <span class="n">constraints</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_params</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">initial_params</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun</span><span class="p">,</span>
-            <span class="n">initial_params</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">,</span>
             <span class="n">obj_fun_kwargs</span><span class="p">,</span>
         <span class="p">)</span>
@@ -677,8 +718,11 @@
         <span class="n">axis</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Objective value&quot;</span><span class="p">)</span>
         <span class="n">axis</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">axis</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
+        <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">axis</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span></div>
 </div>
 
 
@@ -776,8 +820,8 @@
     <span class="n">tstop</span><span class="p">,</span>
     <span class="n">constraints</span><span class="p">,</span>
     <span class="n">set_params</span><span class="p">,</span>
-    <span class="n">obj_fun</span><span class="p">,</span>
     <span class="n">initial_params</span><span class="p">,</span>
+    <span class="n">obj_fun</span><span class="p">,</span>
     <span class="n">max_iter</span><span class="p">,</span>
     <span class="n">obj_fun_kwargs</span><span class="p">,</span>
 <span class="p">):</span>
@@ -793,12 +837,15 @@
 <span class="sd">        Parameter constraints in solver-specific format.</span>
 <span class="sd">    set_params : func</span>
 <span class="sd">        User-defined function that sets parameters in network drives.</span>
-<span class="sd">    obj_fun : func</span>
-<span class="sd">        The objective function.</span>
 <span class="sd">    initial_params : dict</span>
 <span class="sd">        Keys are parameter names, values are initial parameters.</span>
+<span class="sd">    obj_fun : func</span>
+<span class="sd">        The objective function.</span>
 <span class="sd">    max_iter : int</span>
 <span class="sd">        Number of calls the optimizer makes.</span>
+<span class="sd">    obj_fun_kwargs : dict</span>
+<span class="sd">        Additional arguments along with their respective values to be passed</span>
+<span class="sd">        to the objective function.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -853,8 +900,8 @@
     <span class="n">tstop</span><span class="p">,</span>
     <span class="n">constraints</span><span class="p">,</span>
     <span class="n">set_params</span><span class="p">,</span>
-    <span class="n">obj_fun</span><span class="p">,</span>
     <span class="n">initial_params</span><span class="p">,</span>
+    <span class="n">obj_fun</span><span class="p">,</span>
     <span class="n">max_iter</span><span class="p">,</span>
     <span class="n">obj_fun_kwargs</span><span class="p">,</span>
 <span class="p">):</span>
@@ -870,12 +917,15 @@
 <span class="sd">        Parameter constraints in solver-specific format.</span>
 <span class="sd">    set_params : func</span>
 <span class="sd">        User-defined function that sets parameters in network drives.</span>
-<span class="sd">    obj_fun : func</span>
-<span class="sd">        The objective function.</span>
 <span class="sd">    initial_params : dict</span>
 <span class="sd">        Keys are parameter names, values are initial parameters.</span>
+<span class="sd">    obj_fun : func</span>
+<span class="sd">        The objective function.</span>
 <span class="sd">    max_iter : int</span>
 <span class="sd">        Number of calls the optimizer makes.</span>
+<span class="sd">    obj_fun_kwargs : dict</span>
+<span class="sd">        Additional arguments along with their respective values to be passed</span>
+<span class="sd">        to the objective function.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>

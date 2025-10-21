@@ -26,21 +26,23 @@ This example demonstrates how to optimize the power spectral density (PSD)
 of a current dipole signal with significant alpha and beta spectral
 components.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-15
+.. GENERATED FROM PYTHON SOURCE LINES 10-17
 
 .. code-block:: Python
 
 
     # Authors: Carolina Fernandez <cxf418@miami.edu>
 
+    from hnn_core.viz import plot_psd
+    from hnn_core.optimization import Optimizer
     import matplotlib.pyplot as plt
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 16-17
+.. GENERATED FROM PYTHON SOURCE LINES 18-19
 
 Let us import hnn_core
 
-.. GENERATED FROM PYTHON SOURCE LINES 17-23
+.. GENERATED FROM PYTHON SOURCE LINES 19-25
 
 .. code-block:: Python
 
@@ -51,16 +53,17 @@ Let us import hnn_core
     n_procs = 10
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-28
+.. GENERATED FROM PYTHON SOURCE LINES 26-30
 
 First, we define a function that will tell the optimization routine how to
 modify the network drive parameters. The function will take in the Network
 object with no attached drives, and a dictionary of the parameters we wish to
 optimize.
 
-.. GENERATED FROM PYTHON SOURCE LINES 28-63
+.. GENERATED FROM PYTHON SOURCE LINES 30-66
 
 .. code-block:: Python
+
 
 
     def set_params(net, params):
@@ -98,7 +101,7 @@ optimize.
                              synaptic_delays=syn_delays_d)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-72
+.. GENERATED FROM PYTHON SOURCE LINES 67-75
 
 Then, we define the constraints.
 
@@ -109,9 +112,10 @@ corresponding parameter.
 The following synaptic weight parameter ranges (units of micro-siemens)
 were chosen so as to keep the model in physiologically realistic regimes.
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-83
+.. GENERATED FROM PYTHON SOURCE LINES 75-87
 
 .. code-block:: Python
+
 
 
     constraints = dict()
@@ -125,15 +129,14 @@ were chosen so as to keep the model in physiologically realistic regimes.
                         'alpha_dist_burst_std': (10, 30)})
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-85
+.. GENERATED FROM PYTHON SOURCE LINES 88-89
 
 Now we define and fit the optimizer.
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-101
+.. GENERATED FROM PYTHON SOURCE LINES 89-104
 
 .. code-block:: Python
 
-    from hnn_core.optimization import Optimizer
 
     tstop = 300
     scale_factor = 3000
@@ -141,26 +144,25 @@ Now we define and fit the optimizer.
 
     net = jones_2009_model()
     optim = Optimizer(net, tstop=tstop, constraints=constraints,
-                      set_params=set_params, obj_fun='maximize_psd')
+                      set_params=set_params, obj_fun='maximize_psd', max_iter=50)
 
     # 8-15 Hz (alpha) and 15-30 Hz (beta) are the frequency bands whose
     # power we wish to maximize in a ratio of 1 to 2.
     with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
-        optim.fit(f_bands=[(9, 11), (19, 21)], relative_bandpower=(1, 2),
+        optim.fit(f_bands=[(9, 11), (19, 21)], relative_bandpower=[1, 2],
                   scale_factor=scale_factor, smooth_window_len=smooth_window_len)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-104
+.. GENERATED FROM PYTHON SOURCE LINES 105-107
 
 Finally, we can plot the optimized dipole, power spectral density (PSD), and
 convergence plot.
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-123
+.. GENERATED FROM PYTHON SOURCE LINES 107-126
 
 .. code-block:: Python
 
 
-    from hnn_core.viz import plot_psd
 
     with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
         opt_dpl = simulate_dipole(optim.net_, tstop=tstop, n_trials=1)[0]
@@ -177,7 +179,8 @@ convergence plot.
     plot_psd(opt_dpl, fmax=50, ax=axes[1], show=False)
 
     # convergence
-    fig1 = optim.plot_convergence()
+    optim.plot_convergence()
+    plt.show()
 
 
 .. _sphx_glr_download_auto_examples_howto_optimize_rhythmic.py:

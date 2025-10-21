@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**13:46.295** total execution time for 5 files **from auto_examples/workflows**:
+**07:18.736** total execution time for 5 files **from auto_examples/workflows**:
 
 .. container::
 
@@ -33,17 +33,17 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_beta.py` (``plot_simulate_beta.py``)
-     - 05:14.968
+     - 02:39.686
      - 0.0
    * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_gamma.py` (``plot_simulate_gamma.py``)
-     - 03:13.763
+     - 01:43.460
      - 0.0
    * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_alpha.py` (``plot_simulate_alpha.py``)
-     - 02:26.262
+     - 01:21.123
      - 0.0
    * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_evoked.py` (``plot_simulate_evoked.py``)
-     - 01:33.320
+     - 00:48.931
      - 0.0
    * - :ref:`sphx_glr_auto_examples_workflows_plot_simulate_somato.py` (``plot_simulate_somato.py``)
-     - 01:17.983
+     - 00:45.537
      - 0.0
