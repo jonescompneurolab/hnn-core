@@ -5,7 +5,7 @@ orphan: true
 (whats_new)=
 # What's new?
 
-<!-- Protip: the Github PRs webpage can NOT give you the true order of *when* PRs were
+<!-- Protip: the Github PRs webpage does NOT give you the true order of *when* PRs were
 merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 <!-- template below for new release notes: -->
@@ -22,45 +22,176 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 <!-- ### Public API Changes -->
 
-<!-- ### People who contributed to this release (in alphabetical order of family name): -->
+<!-- ### People who contributed to this release: -->
 
 <!-- ### Changelog -->
 
-## 0.4.4 In-progress Development Notes
+## 0.5.0 In-progress Development Notes
 
 ### New Features
 
-- Synaptic gains can now be set and retrieved for different "global" connection types (excitatory-to-excitatory, excitatory-to-inhibitory, inhibitory-to-excitatory, and inhibitory-to-inhibitory) using {meth}`~hnn_core.Network.set_global_synaptic_gains` and {meth}`~hnn_core.Network.get_global_synaptic_gains`. The GUI now includes widgets for modifying synaptic gains in the Connectivity interface, both on a "global" level and on an individual level. The multiplicative combination of global and individual gains is also always shown in the GUI. **Importantly**, all of the synaptic gain getters and setters across both the GUI and API do **not** change or reflect the gains of drives. They only change or reflect non-drive connections.
-
-<!-- ### Deprecations -->
-
-<!-- ### Upcoming Deprecations -->
+- You can now provide custom spike trains as inputs into your simulation; see the
+  description of {func}`~hnn_core.Network.add_spike_train_drive` below in the Public API
+  Changes section.
 
 ### Bug Fixes
 
-- Synaptic `gain` and `threshold` values are now loaded correctly when reading in a `Network` JSON file, instead of being overridden with default values,
-  by [George Dang][] and [Austin E. Soplata][] in {gh}`918`.
+- Synaptic `gain` and `threshold` values are now loaded correctly when reading in a
+  `Network` JSON file, instead of being overridden with default values, by [George
+  Dang][] and [Austin E. Soplata][] in {gh}`918`.
+
+### Deprecations
+
+- Similar to [NEURON][], we have dropped support for Python 3.8. We have also added support for Python 3.13.
 
 ### Public API Changes
 
-- `Network.update_weights` has been renamed to {meth}`~hnn_core.Network.set_global_synaptic_gains`.
-- {meth}`~hnn_core.Network.add_connection` now accepts optional `threshold` and `gain` arguments for setting connection-specific firing thresholds and synaptic gain values.
+- Synaptic gains can now be set and retrieved for different "global" connection types
+  (excitatory-to-excitatory, excitatory-to-inhibitory, inhibitory-to-excitatory, and
+  inhibitory-to-inhibitory) using {meth}`~hnn_core.Network.set_global_synaptic_gains`
+  (formerly called `Network.update_weights`) and
+  {meth}`~hnn_core.Network.get_global_synaptic_gains`. The GUI now includes widgets for
+  modifying synaptic gains in the Connectivity interface, both on a "global" level and
+  on an individual level. The additive combination of global and individual gains is
+  also always shown in the GUI. **Importantly**, all of the synaptic gain getters and
+  setters across both the GUI and API do **not** change or reflect the gains of
+  drives. They only change or reflect non-drive connections.
+
+- {meth}`~hnn_core.Network.add_connection` now accepts optional `threshold` and `gain`
+  arguments for setting connection-specific firing thresholds and synaptic gain values.
+
+- {class}`~hnn_core.optimization.Optimizer` now accepts user-defined initial weights in
+  the form of optional argument `initial_params` and allows the user to set the number
+  of trials by passing `n_trials` to {func}`~hnn_core.optimization.Optimizer.fit`,
+  by [Carolina Fernandez Pujol][] in {gh}`1057`.
+
+- The `cell_types` attribute and initializer argument of {class}`~hnn_core.Network` has
+  significantly changed. Previously, `Network.cell_types` was a dictionary where keys
+  were cell-type names and values were {class}`~hnn_core.Cell` instances of that
+  cell-type to be used as templates for building the Network. Now, the structure of
+  dictionary is different: `Network.cell_types` is a dictionary where keys are cell-type
+  names and values are child-dictionaries. The child-dictionaries of each cell-type have
+  the following keys: `cell_object` and `cell_metadata`. The value of
+  `Network.cell_types[<cell_type>]["cell_object"]` is the {class}`~hnn_core.Cell` instance
+  for that cell-type, similar to before. The value of
+  `Network.cell_types[<cell_type>]["cell_metadata"]` is a new dictionary containing
+  several key-values pairs that describe different aspects of the cell type, described
+  below:
+    - `morpho_type` : either `basket` or `pyramidal`
+    - `electro_type` : either `inhibitory` or `excitatory`
+    - `layer` : either `2` or `5`
+    - `measure_dipole` : either True or False
+    - `reference`: optional
+
+  You can find a working version of `Network.cell_types` for the default Jones 2009 model here as an example: <https://github.com/jonescompneurolab/hnn-core/blob/4659d0a2aff5f65c94794376abc669f6473fe808/hnn_core/network_models.py#L78> .
+  By [Chetan Kandpal][] in {gh}`1099`.
+
+- The newer Network object and file input/output module, {mod}`~hnn_core.hnn_io`, is now
+  published as part of the Public API. The recommended way to write a
+  {class}`~hnn_core.Network` object is
+  {func}`~hnn_core.hnn_io.write_network_configuration`, and the recommended way to read
+  the same is {func}`~hnn_core.hnn_io.read_network_configuration`.
+  By [Austin E. Soplata][] in {gh}`1108`.
+
+- {class}`~hnn_core.Network` now has support for calculating a "layer dictionary"
+  `layer_dict` attribute whose layers can be mapped as desired to an object's
+  `cell_types` attribute. This mapping can then be used to make a more flexible position
+  dictionary `pos_dict` attribute of the object. This also adds support for optional
+  `pos_dict` and `cell_types` arguments to the {class}`~hnn_core.Network`
+  constructor. This also begins the process of moving some model-specific celltype-usage
+  from `network.py` to `network_models.py`.
+  By [Chetan Kandpal][] in {gh}`1095`.
+
+- {class}`~hnn_core.Network` now has a new type of available "external drive", the
+  "spike train" drive, which you can add using
+  {func}`~hnn_core.Network.add_spike_train_drive`. This new drive can take in spike data
+  in various formats (see its docstring), including spikes generated by previous HNN
+  simulations, and then "replay" the spike trains as inputs into the current
+  simulation. This offers a large degree of control over both the data of the spike
+  trains and how you want to connect them to your simulation. There is a [new example
+  script
+  here](https://jonescompneurolab.github.io/hnn-core/dev/auto_examples/howto/plot_replaying_spike_data_as_input.html#sphx-glr-auto-examples-howto-plot-replaying-spike-data-as-input-py)
+  which illustrates its use.
+  By [Maira Usman][] in {gh}`1064`.
 
 ### People who contributed to this release:
 
 - [George Dang][]
+- [Dylan Daniels][]
+- [Katharina Duecker][]
+- [Chetan Kandpal][]
+- [Carolina Fernandez Pujol][]
 - [Austin E. Soplata][]
+- [Nick Tolley][]
+- [Maira Usman][]
 
 ### Changelog
 
-- Add methods {meth}`~hnn_core.Network.set_global_synaptic_gains` and {meth}`~hnn_core.Network.get_global_synaptic_gains` to modify and retrieve synaptic gains for different cell type connections in the network. Add GUI support for modifying synaptic gains with interactive widgets in the connectivity interface, for both individual connections and "global" connections (for example, "excitatory-to-excitatory"). Add `gain` and `threshold` parameters to {meth}`~hnn_core.Network.add_connection` to allow connection-specific control of synaptic gains and firing thresholds. There is also now a warning displayed when a user loads a `Network` JSON file that has inconsistent synaptic gains, since both {meth}`~hnn_core.Network.set_global_synaptic_gains` and {meth}`~hnn_core.Network.get_global_synaptic_gains` assume that gains are uniformly equal within each "global" connection type.
+- Add methods {meth}`~hnn_core.Network.set_global_synaptic_gains` and
+  {meth}`~hnn_core.Network.get_global_synaptic_gains` to modify and retrieve synaptic
+  gains for different cell type connections in the network. Add GUI support for
+  modifying synaptic gains with interactive widgets in the connectivity interface, for
+  both individual connections and "global" connections (for example,
+  "excitatory-to-excitatory"). Add `gain` and `threshold` parameters to
+  {meth}`~hnn_core.Network.add_connection` to allow connection-specific control of
+  synaptic gains and firing thresholds. There is also now a warning displayed when a
+  user loads a `Network` JSON file that has inconsistent synaptic gains, since both
+  {meth}`~hnn_core.Network.set_global_synaptic_gains` and
+  {meth}`~hnn_core.Network.get_global_synaptic_gains` assume that gains are uniformly
+  equal within each "global" connection type.
   By [George Dang][] and [Austin E. Soplata][] in {gh}`918`.
+
+- Enhance the optimization workflow for more reliable parameter fitting. This includes
+  adding support for user-defined initial weights. For optimal results, we now recommend
+  setting `initial_params` to hand-tuned values since they often provide a good starting
+  fit. The default objective function
+  ({func}`~hnn_core.optimization.objective_functions._rmse_evoked`) now averages results
+  over 3 dipoles rather than simulating a single dipole, with the option to control this
+  behavior by setting the `n_trials` parameter in
+  {func}`~hnn_core.optimization.Optimizer.fit`. To capture the model's average behavior,
+  it is recommended to set `n_trials` > 1, as using `n_trials=1` may identify parameters
+  that work well for one simulation run but perform poorly on average. The optimization
+  example (`examples/howto/optimize_evoked.py`) has also been enhanced with improved
+  markdown and updated contents to better illustrate best practices.
+  By [Carolina Fernandez Pujol][] in {gh}`1057`.
+
+- Tiny bugfix for the {gh}`1099` to enable backwards-compatibility,
+  by [Austin E. Soplata][] in {gh}`1119`.
+
+- Major upgrade to celltype metadata and `cell_types` in {class}`~hnn_core.Network`, see
+  the description above in Public API Changes for details,
+  By [Chetan Kandpal][] in {gh}`1099`.
+
+- Added {mod}`~hnn_core.hnn_io` to the Public API
+  by [Austin E. Soplata][] in {gh}`1108`.
+
+- Some time allowances for "MPI Timeout" errors were doubled. The infamous "MPI Timeout
+  Error" should occur less frequently now, though this is only a temporary, incomplete
+  solution to {gh}`774`.
+  By [Austin E. Soplata][] in {gh}`1102`.
+
+- Reduction of old "short name vs long name" usage (Chetan Chunk 1.5),
+  By [Chetan Kandpal][] in {gh}`1103`.
+
+- Add support for {class}`~hnn_core.Network` to calculate a more flexible "layer
+  dictionary" that can be used to construct your {class}`~hnn_core.Network`'s
+  `pos_dict`, and add its use in our existing `network_models.py`. This is the first in
+  a series of code changes meant to allow for more flexible cell types to be used.
+  By [Chetan Kandpal][] in {gh}`1095`.
+
+- Introduce new "spike_train" drive to {class}`~hnn_core.Network`
+  by [Maira Usman][] in {gh}`1064`.
+
+- Various development-process and documentation changes
+  by [Austin E. Soplata][] in {gh}`1081`, {gh}`1086`, {gh}`1090`, {gh}`1083`,
+  {gh}`1069`, {gh}`1107`, {gh}`1100`, {gh}`1114`, and {gh}`1126`.
+
+- Drop Python 3.8 support, add Python 3.13 support
+  by [Austin E. Soplata][] in {gh}`1070`.
 
 ## 0.4.3 Patch Notes
 
-Please note that not all updates since 0.4.2 are documented here, since this is an
-emergency patch release. All work done since 0.4.2 will be properly documented for the
-next version release which will come out within the next few weeks.
+This is an emergency patch release to fix a dependency issue.
 
 ### Bug Fixes
 
@@ -68,35 +199,11 @@ next version release which will come out within the next few weeks.
   versions). Going forward, the maximum NEURON version supported will be set explicitly
   in our install configuration, so that new, incompatible versions of NEURON are not
   used before testing.
-  by [Austin E. Soplata][] in {gh}`1152`.
+  by [Austin E. Soplata][] in {gh}`1153`.
 
-### Public API Changes
+### People who contributed to this release:
 
-- {class}`~hnn_core.Network` now accepts optional arguments for its position dictionary  attribute `pos_dict` and cell type dictionary attribute `cell_types`,
-  by [Chetan Kandpal][] in {gh}`1095`.
-
-- {class}`~hnn_core.optimization.Optimizer` now accepts user-defined initial weights in the form of optional argument `initial_params` and allows the user to set the number of trials by passing `n_trials` to {func}`~hnn_core.optimization.Optimizer.fit`,
-  by [Carolina Fernandez Pujol][] in {gh}`1057`.
-
-### People who contributed to this release (in alphabetical order of family name):
-
-- [Carolina Fernandez Pujol][]
-- [Chetan Kandpal][]
-
-### Changelog
-
-- Add support for {class}`~hnn_core.Network` to calculate a "layer dictionary"
-  `layer_dict` attribute whose layers can be mapped as desired to an object's
-  `cell_types` attribute. This mapping can then be used to make a more flexible position
-  dictionary `pos_dict` attribute of the object. This also adds support for optional
-  `pos_dict` and `cell_types` arguments to the {class}`~hnn_core.Network`
-  constructor. This also begins the process of moving some model-specific celltype-usage
-  from `network.py` to `network_models.py`. This is the first in a series of code
-  changes meant to allow for more flexible cell types to be used.
-  By [Chetan Kandpal][] in {gh}`1095`.
-
-- Enhance the optimization workflow for more reliable parameter fitting. This includes adding support for user-defined initial weights. For optimal results, we now recommend setting `initial_params` to hand-tuned values since they often provide a good starting fit. The default objective function ({func}`~hnn_core.optimization.objective_functions._rmse_evoked`) now averages results over 3 dipoles rather than simulating a single dipole, with the option to control this behavior by setting the `n_trials` parameter in {func}`~hnn_core.optimization.Optimizer.fit`. To capture the model's average behavior, it is recommended to set `n_trials` > 1, as using `n_trials=1` may identify parameters that work well for one simulation run but perform poorly on average. The optimization example (`examples/howto/optimize_evoked.py`) has also been enhanced with improved markdown and updated contents to better illustrate best practices.
- By [Carolina Fernandez Pujol][] in {gh}`1057`.
+- [Austin E. Soplata][]
 
 ## 0.4.2 Patch Notes
 
@@ -1130,3 +1237,4 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Mohamed W. ElSayed]: https://github.com/wagdy88
 [Maira Usman]: https://github.com/Myrausman
 [Chetan Kandpal]: https://github.com/Chetank99
+[NEURON]: https://nrn.readthedocs.io
