@@ -10,6 +10,8 @@ components.
 
 # Authors: Carolina Fernandez <cxf418@miami.edu>
 
+from hnn_core.viz import plot_psd
+from hnn_core.optimization import Optimizer
 import matplotlib.pyplot as plt
 
 ###############################################################################
@@ -25,6 +27,7 @@ n_procs = 10
 # modify the network drive parameters. The function will take in the Network
 # object with no attached drives, and a dictionary of the parameters we wish to
 # optimize.
+
 
 def set_params(net, params):
 
@@ -70,6 +73,7 @@ def set_params(net, params):
 # The following synaptic weight parameter ranges (units of micro-siemens)
 # were chosen so as to keep the model in physiologically realistic regimes.
 
+
 constraints = dict()
 constraints.update({'alpha_prox_weight': (4.4e-5, 6.4e-5),
                     'alpha_prox_tstart': (45, 55),
@@ -82,7 +86,6 @@ constraints.update({'alpha_prox_weight': (4.4e-5, 6.4e-5),
 
 ###############################################################################
 # Now we define and fit the optimizer.
-from hnn_core.optimization import Optimizer
 
 tstop = 300
 scale_factor = 3000
@@ -90,19 +93,18 @@ smooth_window_len = 20
 
 net = jones_2009_model()
 optim = Optimizer(net, tstop=tstop, constraints=constraints,
-                  set_params=set_params, obj_fun='maximize_psd')
+                  set_params=set_params, obj_fun='maximize_psd', max_iter=50)
 
 # 8-15 Hz (alpha) and 15-30 Hz (beta) are the frequency bands whose
 # power we wish to maximize in a ratio of 1 to 2.
 with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
-    optim.fit(f_bands=[(9, 11), (19, 21)], relative_bandpower=(1, 2),
+    optim.fit(f_bands=[(9, 11), (19, 21)], relative_bandpower=[1, 2],
               scale_factor=scale_factor, smooth_window_len=smooth_window_len)
 
 ###############################################################################
 # Finally, we can plot the optimized dipole, power spectral density (PSD), and
 # convergence plot.
 
-from hnn_core.viz import plot_psd
 
 with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
     opt_dpl = simulate_dipole(optim.net_, tstop=tstop, n_trials=1)[0]
@@ -119,4 +121,5 @@ axes[0].legend(['optimized'])
 plot_psd(opt_dpl, fmax=50, ax=axes[1], show=False)
 
 # convergence
-fig1 = optim.plot_convergence()
+optim.plot_convergence()
+plt.show()
