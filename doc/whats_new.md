@@ -83,8 +83,13 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
     - `measure_dipole` : either True or False
     - `reference`: optional
 
-  You can find a working version of `Network.cell_types` for the default Jones 2009 model here as an example: <https://github.com/jonescompneurolab/hnn-core/blob/4659d0a2aff5f65c94794376abc669f6473fe808/hnn_core/network_models.py#L78> .
-  By [Chetan Kandpal][] in {gh}`1099`.
+  You can find a working version of `Network.cell_types` for the default Jones 2009
+  model here as an example:
+  <https://github.com/jonescompneurolab/hnn-core/blob/4659d0a2aff5f65c94794376abc669f6473fe808/hnn_core/network_models.py#L78>
+  . The author for this was [Chetan Kandpal][] in {gh}`1099`. Others who helped with
+  design were [Dylan Daniels][], [Katharina Duecker][], [Austin E. Soplata][], and [Nick
+  Tolley][].
+
 
 - The newer Network object and file input/output module, {mod}`~hnn_core.hnn_io`, is now
   published as part of the Public API. The recommended way to write a
