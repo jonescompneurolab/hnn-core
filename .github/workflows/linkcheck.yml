@@ -2,11 +2,10 @@ name: Linkcheck
 
 on:
   push:
-# commenting out so it's executed now during debugging
-  #   branches:
-  #     - master
-  # schedule:
-  #   - cron: "0 0 1,15 * *"
+    branches:
+      - master
+  schedule:
+    - cron: "0 0 1,15 * *"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -32,7 +31,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install '.[docs, gui, parallel]'
-          pip install certifi
 
       - name: Linkcheck
         shell: bash -el {0}
