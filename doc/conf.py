@@ -33,9 +33,9 @@ author = 'HNN Developers'
 # -- Version handling --------------------------------------------------------
 
 # The short X.Y version
-version = '0.4.3dev2'
+version = '0.4.4.dev0'
 # The full version, including alpha/beta/rc tags
-release = '0.4.3dev2'
+release = '0.4.4.dev0'
 
 ### HTML theme version control
 # If you are making a stable release, then you should add entries to the file
@@ -133,12 +133,20 @@ html_theme_options = {
             "name": "GitHub (Code)",
         },
         {
-            "url": "https://pypi.org/project/hnn-core/",
-            "name": "PyPI",
-        },
-        {
             "url": "https://hnn.brown.edu/",
             "name": "HNN Frontpage",
+        },
+        {
+            "url": "https://jonescompneurolab.github.io/textbook/content/preface.html",
+            "name": "HNN Textbook",
+        },
+        {
+            "url": "https://pypi.org/project/hnn-core/",
+            "name": "PyPI package",
+        },
+        {
+            "url": "https://anaconda.org/jonescompneurolab/repo",
+            "name": "Conda packages",
         },
     ],
     "header_links_before_dropdown": 7,

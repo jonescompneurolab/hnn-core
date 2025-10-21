@@ -162,6 +162,8 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
 def _is_loaded_mechanisms():
     # copied from:
     # https://www.neuron.yale.edu/neuron/static/py_doc/modelspec/programmatic/mechtype.html
+    # For newer version of the same documentation, see
+    # https://nrn.readthedocs.io/en/8.2.7/hoc/modelspec/programmatic/mechtype.html
     mt = h.MechanismType(0)
     mname = h.ref("")
     mnames = list()
