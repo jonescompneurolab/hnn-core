@@ -2,10 +2,10 @@ name: Linkcheck
 
 on:
   push:
-    branches:
-      - master
-  schedule:
-    - cron: "0 0 1,15 * *"
+  #   branches:
+  #     - master
+  # schedule:
+  #   - cron: "0 0 1,15 * *"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
