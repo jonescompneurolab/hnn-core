@@ -248,6 +248,7 @@ linkcheck_anchors = False
 
 linkcheck_ignore = [
     'https://neuron.yale.edu/neuron',
+    'https://www.nsgportal.org',
     'https://doi.org/10.1152/jn.00535.2009',
     'https://doi.org/10.1152/jn.00122.2010',
     'https://doi.org/10.1101/2021.04.16.440210',
