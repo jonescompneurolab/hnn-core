@@ -1499,24 +1499,24 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
 
         combined_gain_indicator_output = HTML(
             value=f"""
-            <b>+Global={
+            <b>Total Computed Gain={
                 (
                     1
                     + (global_gain_textfields[global_gain_type].value - 1)
                     + (single_gain_text_input.value - 1)
-                ):.2f} Total</b>"""
+                ):.2f}</b>"""
         )
 
         # Create closure to capture current widget references
         def make_update_gain_indicator(gain_output, gain_input, gain_type):
             def update_gain_indicator(change):
                 gain_output.value = f"""
-                <b>+Global={
+                <b>Total Computed Gain={
                     (
                         1
                         + (global_gain_textfields[gain_type].value - 1)
                         + (gain_input.value - 1)
-                    ):.2f} Total</b>"""
+                    ):.2f}</b>"""
 
             return update_gain_indicator
 
