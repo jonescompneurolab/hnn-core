@@ -140,7 +140,7 @@ git add hnn_core/__init__.py doc/conf.py doc/whats_new.md doc/_static/versions.j
 4. On Github's website, make your PR.
 5. Wait for all CI to pass successfully on your PR.
 6. If you want to test automated package creation using TestPyPI (recommended), then you can do the following:
-    1. Change the versions of the code in your PR to a new development or "release-candidate" version such as `v0.4.4.rc0`. Make sure that this version does not already have a release present on TestPyPI by going here <https://test.pypi.org/project/hnn-core/#history>. It might! Also, it is important the version start with the letter `v`.
+    1. Change the versions of the code in your PR to a new development or "release-candidate (rc)" version such as `v0.4.4.rc0`. Make sure that this version does not already have a release present on TestPyPI by going here <https://test.pypi.org/project/hnn-core/#history>. It might! Also, it is important the version start with the letter `v`.
     2. Create a tag on the latest commit using the following command, where you substitute your own version: `git tag v0.4.4.rc0`.
     3. Make sure everything looks good, since the next step will create a release package, then try to push that release to TestPyPI (but not regular PyPI). This is important since published versions are immutable, as discussed above.
     4. Push your tag to `upstream` using the following command (again substituting your version) `git push upstream v0.4.4.rc0`.
@@ -170,28 +170,29 @@ cp -r ~/new-docs/* stable
 
 ## 6. Push a git tag to build the release
 
-1. Switch back to the `master` branch.
-2. Update your `master` branch such that it is in sync with `upstream`, and that its current commit is the "release commit" you previously merged through your PR.
-3. Create a tag for this release commit, where the tag is `v<new version>`, including the `v`. For example, if the new version that you just updated to is `0.4.4`, then you could do the following to create the tag locally:
+1. Note that the steps in this section will only be possible for a Maintainer with full Admin permissions for the Github repository of <https://github.com/jonescompneurolab/hnn-core>.
+2. Switch back to the `master` branch.
+3. Update your `master` branch such that it is in sync with `upstream`, and that its current commit is the "release commit" you previously merged through your PR.
+4. Create a tag for this release commit, where the tag is `v<new version>`, including the `v`. For example, if the new version that you just updated to is `0.4.4`, then you could do the following to create the tag locally:
 ```
 git tag v0.4.4
 ```
-4. *Important*: You must now go to the Github settings for the official HNN-Core repository here <https://github.com/jonescompneurolab/hnn-core/settings/> and make some changes, so that the package can be be built and deployed directly to PyPI.
+5. *Important*: You must now go to the Github settings for the official HNN-Core repository here <https://github.com/jonescompneurolab/hnn-core/settings/> and make some changes, so that the package can be be built and deployed directly to PyPI.
     1. Go to <https://github.com/jonescompneurolab/hnn-core/settings/>.
     2. Click on "Environments" on the left-hand side under the "Code and automation" section.
     3. Click on the `pypi` Environment (it should indicate it has "1 protection rule" nearby).
     4. Next to the "Deployment branches and tags" section, there is a dropdown that currently says "Protected branches only". **Change** the value of that dropdown to "No restriction".
     5. You can now proceed to push the tag (move on to the next step). (Note: I don't know why this step needs to be done, since in theory it's supposed to allow the build Action to proceed and deploy directly from `master` by itself, but it didn't the last time I tried. It may be an issue that the specific commit with the tag has to *first* pass ALL of its tests, and only THEN will deploy, as long as you are pushing the tag *after* the tests have all completed and passed. For now, this change appears to be necessary, but we want to keep the protection on normally in order to prevent a random tag on a PR from pushing a new, public stable version directly to PyPI. Also, testing/debugging these protection rules is a *pain* since we do NOT want to mess up official stable package builds going to PyPI...)
-5. Push the tag to `upstream`. Continuing the example from before, you could do this with:
+6. Push the tag to `upstream`. Continuing the example from before, you could do this with:
 ```
 git push upstream v0.4.4
 ```
-6. Congrats! Github will now automatically begin building the package directly from the commit using a "Publish (etc.)" workflow (you can watch it in our [Actions here](https://github.com/jonescompneurolab/hnn-core/actions)). Once Github has built the package file, it will automatically publish that package to both Pypi and TestPypi.
+7. Congrats! Github will now automatically begin building the package directly from the commit using a "Publish (etc.)" workflow (you can watch it in our [Actions here](https://github.com/jonescompneurolab/hnn-core/actions)). Once Github has built the package file, it will automatically publish that package to both Pypi and TestPypi.
     - The workflow code that Github uses to build and publish the packages is [located here](https://github.com/jonescompneurolab/hnn-core/blob/master/.github/workflows/publish-packages-on-tag.yml).
     - Note that if you ever change the filename of the workflow, you **must** go to TestPypi and Pypi and add a new "Publisher" to the `hnn-core` project. The new "Publisher" must use the new filename, in addition to other metadata. You can see the Pypi and TestPypi-specific [instructions here](https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/#configuring-trusted-publishing). Note that to add a new "Publisher" to the `hnn-core` project in the first place, you must have the necessary permissions. Ask Austin or Dylan if you need to upgrade your permissions.
     - Note that the publishing workflow uses the version exactly from `hnn_core/__init__.py`, NOT from the git tag itself. This is why it is important to double check that your tag numbers are consistent. It will not detect if there is a tag version mismatch.
-7. Assuming nothing went wrong with the Github Actions "Publish (etc.)" workflow, your new version should now be live on both [Pypi](https://pypi.org/project/hnn-core/#history) and [TestPypi](https://test.pypi.org/project/hnn-core/#history).
-8. *Important*: Make sure to go back to <https://github.com/jonescompneurolab/hnn-core/settings/> and reverse the Environment changes you made before. Specifically, again go to "Environments", click the `pypi` environment, and in the "Deployment branches and tags" section, click the dropdown which currently says "No restriction" and change it back to "Protected branches only".
+8. Assuming nothing went wrong with the Github Actions "Publish (etc.)" workflow, your new version should now be live on both [Pypi](https://pypi.org/project/hnn-core/#history) and [TestPypi](https://test.pypi.org/project/hnn-core/#history).
+9. *Important*: Make sure to go back to <https://github.com/jonescompneurolab/hnn-core/settings/> and reverse the Environment changes you made before. Specifically, again go to "Environments", click the `pypi` environment, and in the "Deployment branches and tags" section, click the dropdown which currently says "No restriction" and change it back to "Protected branches only".
 
 ## 7. Post-publishing tests
 
