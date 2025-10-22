@@ -1439,6 +1439,7 @@ class Network:
             arr._reset()
 
     def _instantiate_drives(self, tstop, n_trials=1, change_seed_per_drive=False):
+    def _instantiate_drives(self, tstop, n_trials=1, change_seed_per_drive=False):
         """Creates event time vectors for all drives across trials
 
         Parameters

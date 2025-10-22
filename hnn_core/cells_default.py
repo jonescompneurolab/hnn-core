@@ -13,6 +13,10 @@ from .params_default import (get_L2Pyr_params_default,
                              get_L2Pyr_params_new,
                              get_L5PyrET_params,
                              get_Int_params)
+                             get_L5Pyr_params_default,
+                             get_L2Pyr_params_new,
+                             get_L5PyrET_params,
+                             get_Int_params)
 # Units for e: mV
 # Units for gbar: S/cm^2 unless otherwise noted
 # units for taur: ms
