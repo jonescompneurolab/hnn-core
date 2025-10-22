@@ -177,11 +177,12 @@ def test_gui_upload_connectivity():
     assert len(gui.connectivity_widgets) == original_connectivity_count
 
     # check parameters with different files
+    # This is a synaptic weight
     assert gui.connectivity_widgets[0][0].children[1].value == 0.02
 
     # Set custom global gains
     gui.global_gain_widgets["e_e"].value = 1.5
-    gui.global_gain_widgets["e_i"].value = 0.8
+    gui.global_gain_widgets["e_i"].value = -0.8
     gui.global_gain_widgets["i_e"].value = 1.2
     gui.global_gain_widgets["i_i"].value = 0.9
 
@@ -189,8 +190,8 @@ def test_gui_upload_connectivity():
     # value should change when loading connectivity from file 2
     assert gui.connectivity_widgets[0][0].children[1].value == 0.01
     for gain_type in ["e_e", "e_i", "i_e", "i_i"]:
-        # The uploaded file should have default gains of 1.0
-        assert gui.global_gain_widgets[gain_type].value == 1.0
+        # The uploaded file should have reset the gain additions to 0
+        assert gui.global_gain_widgets[gain_type].value == 0.0
 
     # check that the gui param attribute was updated
     assert gui.params != default_params
@@ -1388,9 +1389,9 @@ def test_adjust_synaptic_weights(setup_gui):
 
     # Change the synaptic weight widgets
     gui.global_gain_widgets["e_e"].value = 0.5
-    gui.global_gain_widgets["e_i"].value = 0.5
-    gui.global_gain_widgets["i_e"].value = 1.1
-    gui.global_gain_widgets["i_i"].value = 1.1
+    gui.global_gain_widgets["e_i"].value = 0.6
+    gui.global_gain_widgets["i_e"].value = -0.4
+    gui.global_gain_widgets["i_i"].value = -0.3
     _init_network_from_widgets(
         gui.params,
         gui.widget_dt,
@@ -1403,7 +1404,12 @@ def test_adjust_synaptic_weights(setup_gui):
     )
 
     gains_altered = _single_simulation["net"].get_global_synaptic_gains()
-    assert gains_altered == {"e_e": 0.5, "e_i": 0.5, "i_e": 1.1, "i_i": 1.1}
+    assert gains_altered == {
+        "e_e": 1.0 + 0.5,
+        "e_i": 1.0 + 0.6,
+        "i_e": 1.0 + -0.4,
+        "i_i": 1.0 + -0.3,
+    }
 
 
 def test_global_gain_widgets_initialization(setup_gui):
@@ -1415,8 +1421,8 @@ def test_global_gain_widgets_initialization(setup_gui):
         # Check that all four gain types are present
         assert gain_type in gui.global_gain_widgets
 
-        assert gui.global_gain_widgets[gain_type].value == 1.0
-        assert gui.global_gain_widgets[gain_type].min == 0
+        assert gui.global_gain_widgets[gain_type].value == 0.0
+        assert gui.global_gain_widgets[gain_type].min == -1
         assert gui.global_gain_widgets[gain_type].max == 1e6
         assert gui.global_gain_widgets[gain_type].step == 0.1
 
@@ -1444,23 +1450,23 @@ def test_combined_gain_indicator_updates(setup_gui):
     single_gain_widget = conn_widget.children[2].children[0]
     combined_indicator = conn_widget.children[2].children[1]
     assert hasattr(single_gain_widget, "value")
-    assert single_gain_widget.value >= 0  # Non-negative gain
+    assert single_gain_widget.value >= -1  # Single gain must be >-1
 
     # Check initial combined gain indicator value includes both gains
     initial_single_gain = single_gain_widget.value
-    initial_global_gain = 1.0  # default
-    expected_initial = 1 + (initial_single_gain - 1) + (initial_global_gain - 1)
+    initial_global_gain = 0.0  # default
+    expected_initial = initial_single_gain + initial_global_gain
     assert f"{expected_initial:.2f}" in combined_indicator.value
 
     # Change global gain and check that combined indicator updates
     gui.global_gain_widgets["e_e"].value = 2.0
     new_global_gain = 2.0
-    expected_combined = 1 + (initial_single_gain - 1) + (new_global_gain - 1)
+    expected_combined = initial_single_gain + new_global_gain
     assert f"{expected_combined:.2f}" in combined_indicator.value
 
     # Change single gain and check that combined indicator updates
     single_gain_widget.value = 0.5
-    expected_combined = 1 + (single_gain_widget.value - 1) + (new_global_gain - 1)
+    expected_combined = single_gain_widget.value + new_global_gain
     assert f"{expected_combined:.2f}" in combined_indicator.value
 
 
@@ -1469,7 +1475,7 @@ def test_custom_gains_simulate_and_download(setup_gui):
     gui = setup_gui
 
     # Set some non-default gains
-    global_custom_gain = 0.8
+    global_custom_gain = -0.8
     gui.global_gain_widgets["i_i"].value = global_custom_gain
 
     # Also change a single gain, the one for L5_B->L5_B, affected by i_i above.
@@ -1508,11 +1514,11 @@ def test_custom_gains_simulate_and_download(setup_gui):
             and (conn["receptor"] == "gabaa")
         ):
             assert conn["nc_dict"]["gain"] == (
-                1 + (global_custom_gain - 1) + (single_custom_gain - 1)
+                1 + global_custom_gain + single_custom_gain
             )
 
 
-def test_diff_gui_vs_api_networks_simulations():
+def test_diff_gui_vs_api_gain_simulations():
     """Test that synaptic gain changes are reproducible between the GUI and API."""
     # Config
     # --------------------------------
@@ -1520,7 +1526,7 @@ def test_diff_gui_vs_api_networks_simulations():
     local_dt = 0.025
     local_tstop = 100.0
     global_custom_gain = 8.0
-    single_custom_gain = 2.0
+    single_custom_gain = -0.2
 
     # # AES: For some strange reason, the 3x3_drives network file does NOT produce
     # # identical output, even when the synaptic gains are made identical. I think that's
@@ -1555,14 +1561,18 @@ def test_diff_gui_vs_api_networks_simulations():
     # Setup and run the API simulation
     # --------------------------------
     net_api = read_network_configuration(net_file_path)
-    net_api.set_global_synaptic_gains(i_i=8.0)
+    # The GUI uses addition of multiple fields, but our set_ function sets the value
+    # directly, so "+1" must be explicitly added for equivalence to the GUI.
+    net_api.set_global_synaptic_gains(i_i=(1 + global_custom_gain))
     l2p_l2p_conn_idx = pick_connection(
         net_api,
         src_gids="L2_basket",
         target_gids="L2_basket",
     )
+    # Similar to above, the GUI algorithm uses addition and an implied +1, so we must
+    # manually add that here again to our API simulation:
     net_api.connectivity[l2p_l2p_conn_idx[0]]["nc_dict"]["gain"] = (
-        1 + (global_custom_gain - 1) + (single_custom_gain - 1)
+        global_custom_gain + (1 + single_custom_gain)
     )
 
     dpls_api = simulate_dipole(net_api, tstop=local_tstop, dt=local_dt, n_trials=1)

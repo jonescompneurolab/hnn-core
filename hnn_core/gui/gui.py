@@ -1487,36 +1487,33 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
         )
 
         single_gain_text_input = BoundedFloatText(
-            value=conn_data[receptor_name]["gain"],
+            value=(conn_data[receptor_name]["gain"] - 1),
             disabled=False,
             continuous_update=False,
-            min=0,
+            min=-1,
             max=1e6,
             step=0.1,
-            description="Gain:",
+            description="Gain Addition:",
             style=style,
         )
 
         combined_gain_indicator_output = HTML(
             value=f"""
-            <b>+Global={
+            <b>Total Added Gain={
                 (
-                    1
-                    + (global_gain_textfields[global_gain_type].value - 1)
-                    + (single_gain_text_input.value - 1)
-                ):.2f} Total</b>"""
+                    global_gain_textfields[global_gain_type].value
+                    + single_gain_text_input.value
+                ):.2f}</b>"""
         )
 
         # Create closure to capture current widget references
         def make_update_html(gain_output, gain_input, gain_type):
             def update_html(change):
                 gain_output.value = f"""
-                <b>+Global={
+                <b>Total Added Gain={
                     (
-                        1
-                        + (global_gain_textfields[gain_type].value - 1)
-                        + (gain_input.value - 1)
-                    ):.2f} Total</b>"""
+                        global_gain_textfields[gain_type].value + gain_input.value
+                    ):.2f}</b>"""
 
             return update_html
 
@@ -2159,9 +2156,9 @@ def add_network_connectivity_tab(
 
     for gain_type in gain_types:
         gain_widget = BoundedFloatText(
-            value=gain_values[gain_type],
+            value=(gain_values[gain_type] - 1),
             description=f"{global_gain_type_display_dict[gain_type]}",
-            min=0,
+            min=-1,
             max=1e6,
             step=0.1,
             disabled=False,
@@ -2181,7 +2178,7 @@ def add_network_connectivity_tab(
             margin-bottom: 2px;
             text-align: center;
         ">
-        Global Synaptic Gain Modifiers
+        Global Synaptic Gain Additions
         </div>
         """
     )
@@ -2487,13 +2484,14 @@ def _init_network_from_widgets(
                 ]
                 applied_global_gain_value = global_gain_values[global_gain_type]
 
-                # 2. Multiply global by single synapse gain to get total
+                # 2. Add the 1 plus (GUI global gain addition) plus (GUI single synapse
+                # gain addition) to get totals
                 single_simulation_data["net"].connectivity[conn_idx]["nc_dict"][
                     "gain"
                 ] = (
                     1
-                    + (applied_global_gain_value - 1)
-                    + (vbox_key.children[2].children[0].value - 1)
+                    + applied_global_gain_value
+                    + vbox_key.children[2].children[0].value
                 )
 
     # Update cell params
