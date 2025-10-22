@@ -127,6 +127,10 @@ plot_dipole(dpls, show=True)
 # Step 9: Combined Spike Raster
 # ------------------------------
 
+# This lets us see and confirm that the exact same input to each network produces the
+# exact same output for each network, even when the GIDs have been shifted for the
+# second network.
+
 def plot_combined_spike_raster(net_a, net_b, title="Combined Spike Raster"):
     """Aggregate spike rasters from both networks into a single figure."""
     spikes, gids, types = [], [], []
