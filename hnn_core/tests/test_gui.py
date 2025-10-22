@@ -178,7 +178,7 @@ def test_gui_upload_connectivity():
 
     # check parameters with different files
     # This is a synaptic weight
-    assert gui.connectivity_widgets[0][0].children[1].value == 0.02
+    assert gui.connectivity_widgets[0][0].children[1].children[0].value == 0.02
 
     # Set custom global gains
     gui.global_gain_widgets["e_e"].value = 1.5
@@ -188,7 +188,7 @@ def test_gui_upload_connectivity():
 
     gui._simulate_upload_connectivity(file2_path)
     # value should change when loading connectivity from file 2
-    assert gui.connectivity_widgets[0][0].children[1].value == 0.01
+    assert gui.connectivity_widgets[0][0].children[1].children[0].value == 0.01
     for gain_type in ["e_e", "e_i", "i_e", "i_i"]:
         # The uploaded file should have reset the gain additions to 0
         assert gui.global_gain_widgets[gain_type].value == 0.0
@@ -198,7 +198,7 @@ def test_gui_upload_connectivity():
 
     # Load drives and make sure connectivity does not change
     gui._simulate_upload_drives(file1_path)
-    assert gui.connectivity_widgets[0][0].children[1].value == 0.01
+    assert gui.connectivity_widgets[0][0].children[1].children[0].value == 0.01
 
     plt.close("all")
 
@@ -324,7 +324,7 @@ def test_gui_change_connectivity():
                 conn_idx = conn_indices[0]
 
                 # test if the slider and the input field are synchronous
-                vbox.children[1].value = w_val
+                vbox.children[1].children[0].value = w_val
 
                 # re initialize network
                 _init_network_from_widgets(

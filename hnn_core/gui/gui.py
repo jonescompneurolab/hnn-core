@@ -1507,21 +1507,69 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
         )
 
         # Create closure to capture current widget references
-        def make_update_html(gain_output, gain_input, gain_type):
-            def update_html(change):
+        def make_update_gain_indicator(gain_output, gain_input, gain_type):
+            def update_gain_indicator(change):
                 gain_output.value = f"""
                 <b>Total Added Gain={
                     (
                         global_gain_textfields[gain_type].value + gain_input.value
                     ):.2f}</b>"""
 
-            return update_html
+            return update_gain_indicator
 
-        update_fn = make_update_html(
+        # Connect the gain objects so they update each other
+        update_gain_indicator_fn = make_update_gain_indicator(
             combined_gain_indicator_output, single_gain_text_input, global_gain_type
         )
-        global_gain_textfields[global_gain_type].observe(update_fn, names="value")
-        single_gain_text_input.observe(update_fn, names="value")
+        global_gain_textfields[global_gain_type].observe(
+            update_gain_indicator_fn, names="value"
+        )
+        single_gain_text_input.observe(update_gain_indicator_fn, names="value")
+
+        # Now, create the similar final Weight text output
+        final_weight_indicator_output = HTML(
+            value=f"""
+            <b>Final Weight={
+                (
+                    weight_text_input.value
+                    * (
+                        1
+                        + global_gain_textfields[global_gain_type].value
+                        + single_gain_text_input.value
+                    )
+                ):.4f}</b>"""
+        )
+
+        # Create closure to capture current widget references
+        def make_update_weight_indicator(
+            weight_output, weight_input, gain_input, gain_type
+        ):
+            def update_weight_indicator(change):
+                weight_output.value = f"""
+                <b>Final Weight={
+                    (
+                        weight_input.value
+                        * (
+                            1
+                            + global_gain_textfields[gain_type].value
+                            + gain_input.value
+                        )
+                    ):.4f}</b>"""
+
+            return update_weight_indicator
+
+        # Connect the weight and gain objects so they update each other
+        update_weight_indicator_fn = make_update_weight_indicator(
+            final_weight_indicator_output,
+            weight_text_input,
+            single_gain_text_input,
+            global_gain_type,
+        )
+        global_gain_textfields[global_gain_type].observe(
+            update_weight_indicator_fn, names="value"
+        )
+        single_gain_text_input.observe(update_weight_indicator_fn, names="value")
+        weight_text_input.observe(update_weight_indicator_fn, names="value")
 
         display_name = conn_data[receptor_name]["receptor"].upper()
 
@@ -1541,7 +1589,12 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
                     value=f"""<p style='margin:5px;'><b>{html_tab}{html_tab}
             Receptor: {display_name}</b></p>"""
                 ),
-                weight_text_input,
+                HBox(
+                    [
+                        weight_text_input,
+                        final_weight_indicator_output,
+                    ]
+                ),
                 HBox(
                     [
                         single_gain_text_input,
@@ -2473,7 +2526,7 @@ def _init_network_from_widgets(
                 conn_idx = conn_indices[0]
                 single_simulation_data["net"].connectivity[conn_idx]["nc_dict"][
                     "A_weight"
-                ] = vbox_key.children[1].value
+                ] = vbox_key.children[1].children[0].value
 
                 # 1. identify which case of global_gain_textfield applies to this src/target
                 global_gain_type = global_gain_type_lookup_dict[
