@@ -587,19 +587,22 @@ instances of <a class="reference internal" href="hnn_core.extracellular.Extracel
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.filter_cell_types" title="hnn_core.Network.filter_cell_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_cell_types</span></code></a>(**metadata_filters)</p></td>
 <td><p>Filter cell types based on cell_metadata criteria</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.gid_to_type" title="hnn_core.Network.gid_to_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gid_to_type</span></code></a>(gid)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.get_global_synaptic_gains" title="hnn_core.Network.get_global_synaptic_gains"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_global_synaptic_gains</span></code></a>()</p></td>
+<td><p>Retrieve gain values for different celltype connections in the Network.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.gid_to_type" title="hnn_core.Network.gid_to_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gid_to_type</span></code></a>(gid)</p></td>
 <td><p>Reverse lookup of gid to type.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.plot_cells" title="hnn_core.Network.plot_cells"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cells</span></code></a>([ax, show])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.plot_cells" title="hnn_core.Network.plot_cells"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_cells</span></code></a>([ax, show])</p></td>
 <td><p>Plot the cells using Network.pos_dict.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.set_cell_positions" title="hnn_core.Network.set_cell_positions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_cell_positions</span></code></a>(*[, inplane_distance, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.set_cell_positions" title="hnn_core.Network.set_cell_positions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_cell_positions</span></code></a>(*[, inplane_distance, ...])</p></td>
 <td><p>Set relative positions of cells arranged in a square grid</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.update_weights" title="hnn_core.Network.update_weights"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_weights</span></code></a>([e_e, e_i, i_e, i_i, copy])</p></td>
-<td><p>Update synaptic weights of the network.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.set_global_synaptic_gains" title="hnn_core.Network.set_global_synaptic_gains"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_global_synaptic_gains</span></code></a>([e_e, e_i, i_e, ...])</p></td>
+<td><p>Change the synaptic gains of the celltypes in the Network.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Network.write_configuration" title="hnn_core.Network.write_configuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_configuration</span></code></a>(fname[, overwrite])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Network.write_configuration" title="hnn_core.Network.write_configuration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_configuration</span></code></a>(fname[, overwrite])</p></td>
 <td><p>Writes network configuration to a json file.</p></td>
 </tr>
 </tbody>
@@ -709,7 +712,7 @@ Used to randomly remove connections when probability &lt; 1.0.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.add_connection">
-<span class="sig-name descname"><span class="pre">add_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamtha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_autapses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_connection" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">add_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">src_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_gids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">receptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lamtha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_autapses</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conn_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.add_connection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.add_connection" title="Link to this definition">#</a></dt>
 <dd><p>Appends connections to connectivity list</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -740,12 +743,17 @@ to target specific sections.</p>
 </dd>
 <dt><strong>lamtha</strong><span class="classifier">float</span></dt><dd><p>Space constant.</p>
 </dd>
-<dt><strong>allow_autapses</strong><span class="classifier">bool</span></dt><dd><p>If True, allow connecting neuron to itself.</p>
+<dt><strong>threshold</strong><span class="classifier">float, default=None</span></dt><dd><p>Firing threshold of cells for connection. If None (the default), inherit the
+threshold from the Network object.</p>
 </dd>
-<dt><strong>probability</strong><span class="classifier">float</span></dt><dd><p>Probability of connection between any src-target pair.
+<dt><strong>gain</strong><span class="classifier">float, default=1.0</span></dt><dd><p>Multiplicative factor for synaptic weight.</p>
+</dd>
+<dt><strong>allow_autapses</strong><span class="classifier">bool, default=True</span></dt><dd><p>If True, allow connecting neuron to itself.</p>
+</dd>
+<dt><strong>probability</strong><span class="classifier">float, default=1.0</span></dt><dd><p>Probability of connection between any src-target pair.
 Defaults to 1.0 producing an all-to-all pattern.</p>
 </dd>
-<dt><strong>conn_seed</strong><span class="classifier">int</span></dt><dd><p>Optional initial seed for random number generator (default: None).
+<dt><strong>conn_seed</strong><span class="classifier">int, default=None</span></dt><dd><p>Optional initial seed for random number generator (default: None).
 Used to randomly remove connections when probability &lt; 1.0.</p>
 </dd>
 </dl>
@@ -1104,6 +1112,36 @@ the network, but cleared of existing data.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.Network.get_global_synaptic_gains">
+<span class="sig-name descname"><span class="pre">get_global_synaptic_gains</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.get_global_synaptic_gains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.get_global_synaptic_gains" title="Link to this definition">#</a></dt>
+<dd><p>Retrieve gain values for different celltype connections in the Network.</p>
+<p>This function identifies excitatory and inhibitory cells in the Network
+and retrieves the <em class="xref py py-obj">gain</em> value for each type of synaptic connection:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>excitatory to excitatory (e_e)</p></li>
+<li><p>excitatory to inhibitory (e_i)</p></li>
+<li><p>inhibitory to excitatory (i_e)</p></li>
+<li><p>inhibitory to inhibitory (i_i)</p></li>
+</ul>
+</div></blockquote>
+<p>The gain is assumed to be uniform across all instances of each connection type
+(for example, between AMPA and NMDA, and between <em class="xref py py-obj">L2_pyramidal-&gt;L2_pyramidal</em> and
+<em class="xref py py-obj">L2_pyramidal-&gt;L5_pyramidal</em>, etc.). Only the first connection’s gain value is
+used for each type.</p>
+<p>This does <strong>not</strong> return the synaptic gains of external drives.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>values</strong><span class="classifier">dict</span></dt><dd><p>A dictionary with the connection types (‘e_e’, ‘e_i’, ‘i_e’, ‘i_i’) as keys
+and their corresponding gain values.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Network.gid_to_type">
 <span class="sig-name descname"><span class="pre">gid_to_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.gid_to_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.gid_to_type" title="Link to this definition">#</a></dt>
 <dd><p>Reverse lookup of gid to type.</p>
@@ -1154,27 +1192,22 @@ this parameter does not affect the amplitude of the dipole moment.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="hnn_core.Network.update_weights">
-<span class="sig-name descname"><span class="pre">update_weights</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e_e</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_e</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.update_weights"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.update_weights" title="Link to this definition">#</a></dt>
-<dd><p>Update synaptic weights of the network.</p>
-<dl class="field-list">
+<dt class="sig sig-object py" id="hnn_core.Network.set_global_synaptic_gains">
+<span class="sig-name descname"><span class="pre">set_global_synaptic_gains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e_e</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">e_i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_e</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_i</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/network.html#Network.set_global_synaptic_gains"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Network.set_global_synaptic_gains" title="Link to this definition">#</a></dt>
+<dd><p>Change the synaptic gains of the celltypes in the Network.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>e_e</strong><span class="classifier">float</span></dt><dd><p>Synaptic gain of excitatory to excitatory connections</p>
-<p>(default None)</p>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>e_e</strong><span class="classifier">float, default=None</span></dt><dd><p>Synaptic gain of excitatory to excitatory connections</p>
 </dd>
-<dt><strong>e_i</strong><span class="classifier">float</span></dt><dd><p>Synaptic gain of excitatory to inhibitory connections
-(default None)</p>
+<dt><strong>e_i</strong><span class="classifier">float, default=None</span></dt><dd><p>Synaptic gain of excitatory to inhibitory connections</p>
 </dd>
-<dt><strong>i_e</strong><span class="classifier">float</span></dt><dd><p>Synaptic gain of inhibitory to excitatory connections
-(default None)</p>
+<dt><strong>i_e</strong><span class="classifier">float, default=None</span></dt><dd><p>Synaptic gain of inhibitory to excitatory connections</p>
 </dd>
-<dt><strong>i_i</strong><span class="classifier">float</span></dt><dd><p>Synaptic gain of inhibitory to inhibitory connections
-(default None)</p>
+<dt><strong>i_i</strong><span class="classifier">float, default=None</span></dt><dd><p>Synaptic gain of inhibitory to inhibitory connections</p>
 </dd>
-<dt><strong>copy</strong><span class="classifier">bool</span></dt><dd><p>If True, returns a copy of the network. If False,
-the network is updated in place with a return of None.
-(default False)</p>
+<dt><strong>copy</strong><span class="classifier">bool, default=False</span></dt><dd><p>If True, returns a copy of the network. If False,
+the network is updated in place with a return of None.</p>
 </dd>
 </dl>
 </dd>
@@ -1188,7 +1221,8 @@ the network is updated in place with a return of None.
 <p class="rubric">Notes</p>
 <p>Synaptic gains must be non-negative. The synaptic gains will only be
 updated if a float value is provided. If None is provided
-(the default), the synapticgain will remain unchanged.</p>
+(the default), the synaptic gain will remain unchanged.</p>
+<p>This does <strong>not</strong> change the synaptic gains of external drives.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1281,10 +1315,11 @@ voltages are not saved due to size.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.clear_drives"><code class="docutils literal notranslate"><span class="pre">Network.clear_drives()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.copy"><code class="docutils literal notranslate"><span class="pre">Network.copy()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.filter_cell_types"><code class="docutils literal notranslate"><span class="pre">Network.filter_cell_types()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.get_global_synaptic_gains"><code class="docutils literal notranslate"><span class="pre">Network.get_global_synaptic_gains()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.gid_to_type"><code class="docutils literal notranslate"><span class="pre">Network.gid_to_type()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.plot_cells"><code class="docutils literal notranslate"><span class="pre">Network.plot_cells()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.set_cell_positions"><code class="docutils literal notranslate"><span class="pre">Network.set_cell_positions()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.update_weights"><code class="docutils literal notranslate"><span class="pre">Network.update_weights()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.set_global_synaptic_gains"><code class="docutils literal notranslate"><span class="pre">Network.set_global_synaptic_gains()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.Network.write_configuration"><code class="docutils literal notranslate"><span class="pre">Network.write_configuration()</span></code></a></li>
 </ul>
 </li>

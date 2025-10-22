@@ -805,6 +805,16 @@
             <span class="n">weight</span><span class="o">=</span><span class="n">conn_data</span><span class="p">[</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span><span class="s2">&quot;A_weight&quot;</span><span class="p">],</span>
             <span class="n">delay</span><span class="o">=</span><span class="n">conn_data</span><span class="p">[</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span><span class="s2">&quot;A_delay&quot;</span><span class="p">],</span>
             <span class="n">lamtha</span><span class="o">=</span><span class="n">conn_data</span><span class="p">[</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span><span class="s2">&quot;lamtha&quot;</span><span class="p">],</span>
+            <span class="n">threshold</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">conn_data</span><span class="p">[</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span><span class="s2">&quot;threshold&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;threshold&quot;</span> <span class="ow">in</span> <span class="n">conn_data</span><span class="p">[</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">])</span>
+                <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">),</span>
+            <span class="n">gain</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">conn_data</span><span class="p">[</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span><span class="s2">&quot;gain&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;gain&quot;</span> <span class="ow">in</span> <span class="n">conn_data</span><span class="p">[</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">])</span>
+                <span class="k">else</span> <span class="mf">1.0</span>
+            <span class="p">),</span>
             <span class="n">allow_autapses</span><span class="o">=</span><span class="n">conn_data</span><span class="p">[</span><span class="s2">&quot;allow_autapses&quot;</span><span class="p">],</span>
             <span class="n">probability</span><span class="o">=</span><span class="n">conn_data</span><span class="p">[</span><span class="s2">&quot;probability&quot;</span><span class="p">],</span>
         <span class="p">)</span>
@@ -1061,6 +1071,9 @@
 <span class="sd">    -------</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Importing Network.</span>
+    <span class="c1"># Cannot do this globally due to circular import.</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.network</span><span class="w"> </span><span class="kn">import</span> <span class="n">_check_global_synaptic_gains_uniformity</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
         <span class="n">net_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
@@ -1073,6 +1086,7 @@
         <span class="p">)</span>
 
     <span class="n">net</span> <span class="o">=</span> <span class="n">dict_to_network</span><span class="p">(</span><span class="n">net_data</span><span class="p">,</span> <span class="n">read_drives</span><span class="p">,</span> <span class="n">read_external_biases</span><span class="p">)</span>
+    <span class="n">_check_global_synaptic_gains_uniformity</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">net</span></div>
 

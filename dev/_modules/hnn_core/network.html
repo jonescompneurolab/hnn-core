@@ -792,6 +792,37 @@
 
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_cell_index_by_synapse_type</span><span class="p">(</span><span class="n">net</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the indices of excitatory and inhibitory cells in the Network.</span>
+
+<span class="sd">    This function extracts the source GIDs (cell ID) of excitatory and inhibitory cells</span>
+<span class="sd">    based on their connection types. Excitatory and inhibitory cells are identified by</span>
+<span class="sd">    their electrophysiological metadata values. This does *not* return GIDs of external</span>
+<span class="sd">    drives.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    net : Instance of Network object</span>
+<span class="sd">        The Network object</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    e_cell_gids : list</span>
+<span class="sd">        The source GIDs of excitatory cells.</span>
+<span class="sd">    i_cell_gids : list</span>
+<span class="sd">        The source GIDs of inhibitory cells.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">e_cell_gids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">i_cell_gids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">cell_type_name</span><span class="p">,</span> <span class="n">cell_data</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;cell_metadata&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;electro_type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;excitatory&quot;</span><span class="p">:</span>
+            <span class="n">e_cell_gids</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">cell_type_name</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;cell_metadata&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;electro_type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;inhibitory&quot;</span><span class="p">:</span>
+            <span class="n">i_cell_gids</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">cell_type_name</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">e_cell_gids</span><span class="p">,</span> <span class="n">i_cell_gids</span>
+
+
 <div class="viewcode-block" id="Network">
 <a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Network</span><span class="p">:</span>
@@ -2180,6 +2211,8 @@
         <span class="n">weight</span><span class="p">,</span>
         <span class="n">delay</span><span class="p">,</span>
         <span class="n">lamtha</span><span class="p">,</span>
+        <span class="n">threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">gain</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
         <span class="n">allow_autapses</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">probability</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
         <span class="n">conn_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -2214,12 +2247,17 @@
 <span class="sd">            Synaptic delay in ms.</span>
 <span class="sd">        lamtha : float</span>
 <span class="sd">            Space constant.</span>
-<span class="sd">        allow_autapses : bool</span>
+<span class="sd">        threshold : float, default=None</span>
+<span class="sd">            Firing threshold of cells for connection. If None (the default), inherit the</span>
+<span class="sd">            threshold from the Network object.</span>
+<span class="sd">        gain : float, default=1.0</span>
+<span class="sd">            Multiplicative factor for synaptic weight.</span>
+<span class="sd">        allow_autapses : bool, default=True</span>
 <span class="sd">            If True, allow connecting neuron to itself.</span>
-<span class="sd">        probability : float</span>
+<span class="sd">        probability : float, default=1.0</span>
 <span class="sd">            Probability of connection between any src-target pair.</span>
 <span class="sd">            Defaults to 1.0 producing an all-to-all pattern.</span>
-<span class="sd">        conn_seed : int</span>
+<span class="sd">        conn_seed : int, default=None</span>
 <span class="sd">            Optional initial seed for random number generator (default: None).</span>
 <span class="sd">            Used to randomly remove connections when probability &lt; 1.0.</span>
 
@@ -2231,7 +2269,9 @@
 <span class="sd">        all its targets.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">conn</span> <span class="o">=</span> <span class="n">_Connectivity</span><span class="p">()</span>
-        <span class="n">threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span>
+        <span class="c1"># Threshold&#39;s value is validated later below with the rest of nc_dict</span>
+        <span class="k">if</span> <span class="n">threshold</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span>
         <span class="n">_validate_type</span><span class="p">(</span>
             <span class="n">target_gids</span><span class="p">,</span>
             <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">range</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span>
@@ -2345,14 +2385,19 @@
 
         <span class="c1"># Create and validate nc_dict</span>
         <span class="n">conn</span><span class="p">[</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="n">arg_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">,</span> <span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="s2">&quot;lamtha&quot;</span><span class="p">,</span> <span class="s2">&quot;threshold&quot;</span><span class="p">]</span>
-        <span class="n">nc_dict_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;A_delay&quot;</span><span class="p">,</span> <span class="s2">&quot;A_weight&quot;</span><span class="p">,</span> <span class="s2">&quot;lamtha&quot;</span><span class="p">,</span> <span class="s2">&quot;threshold&quot;</span><span class="p">]</span>
-        <span class="n">nc_conn_items</span> <span class="o">=</span> <span class="p">[</span><span class="n">delay</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">,</span> <span class="n">threshold</span><span class="p">]</span>
+        <span class="n">arg_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">,</span> <span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="s2">&quot;lamtha&quot;</span><span class="p">,</span> <span class="s2">&quot;threshold&quot;</span><span class="p">,</span> <span class="s2">&quot;gain&quot;</span><span class="p">]</span>
+        <span class="n">nc_dict_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;A_delay&quot;</span><span class="p">,</span> <span class="s2">&quot;A_weight&quot;</span><span class="p">,</span> <span class="s2">&quot;lamtha&quot;</span><span class="p">,</span> <span class="s2">&quot;threshold&quot;</span><span class="p">,</span> <span class="s2">&quot;gain&quot;</span><span class="p">]</span>
+        <span class="n">nc_conn_items</span> <span class="o">=</span> <span class="p">[</span><span class="n">delay</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">lamtha</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">gain</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">arg_name</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">nc_dict_keys</span><span class="p">,</span> <span class="n">arg_names</span><span class="p">,</span> <span class="n">nc_conn_items</span><span class="p">):</span>
             <span class="n">_validate_type</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="n">arg_name</span><span class="p">,</span> <span class="s2">&quot;int or float&quot;</span><span class="p">)</span>
-            <span class="n">conn</span><span class="p">[</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
+            <span class="k">if</span> <span class="n">arg_name</span> <span class="o">==</span> <span class="s2">&quot;gain&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">item</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Synaptic gains must be non-negative.&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;Got </span><span class="si">{</span><span class="n">gain</span><span class="si">}</span><span class="s2"> for connection </span><span class="si">{</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;src_type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">-&gt;</span><span class="si">{</span><span class="n">conn</span><span class="p">[</span><span class="s1">&#39;target_type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
+                    <span class="p">)</span>
 
-        <span class="n">conn</span><span class="p">[</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span><span class="s2">&quot;gain&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="n">conn</span><span class="p">[</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">item</span>
 
         <span class="c1"># Probabilistically define connections</span>
         <span class="k">if</span> <span class="n">probability</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
@@ -2441,30 +2486,26 @@
         <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Network.update_weights">
-<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.update_weights">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">update_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e_e</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">e_i</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">i_e</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">i_i</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update synaptic weights of the network.</span>
+<div class="viewcode-block" id="Network.set_global_synaptic_gains">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.set_global_synaptic_gains">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_global_synaptic_gains</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">e_e</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">e_i</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">i_e</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">i_i</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Change the synaptic gains of the celltypes in the Network.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        e_e : float</span>
+<span class="sd">        e_e : float, default=None</span>
 <span class="sd">            Synaptic gain of excitatory to excitatory connections</span>
-
-<span class="sd">            (default None)</span>
-<span class="sd">        e_i : float</span>
+<span class="sd">        e_i : float, default=None</span>
 <span class="sd">            Synaptic gain of excitatory to inhibitory connections</span>
-<span class="sd">            (default None)</span>
-<span class="sd">        i_e : float</span>
+<span class="sd">        i_e : float, default=None</span>
 <span class="sd">            Synaptic gain of inhibitory to excitatory connections</span>
-<span class="sd">            (default None)</span>
-<span class="sd">        i_i : float</span>
+<span class="sd">        i_i : float, default=None</span>
 <span class="sd">            Synaptic gain of inhibitory to inhibitory connections</span>
-<span class="sd">            (default None)</span>
-<span class="sd">        copy : bool</span>
+<span class="sd">        copy : bool, default=False</span>
 <span class="sd">            If True, returns a copy of the network. If False,</span>
 <span class="sd">            the network is updated in place with a return of None.</span>
-<span class="sd">            (default False)</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2475,21 +2516,15 @@
 <span class="sd">        -----</span>
 <span class="sd">        Synaptic gains must be non-negative. The synaptic gains will only be</span>
 <span class="sd">        updated if a float value is provided. If None is provided</span>
-<span class="sd">        (the default), the synapticgain will remain unchanged.</span>
+<span class="sd">        (the default), the synaptic gain will remain unchanged.</span>
 
+<span class="sd">        This does **not** change the synaptic gains of external drives.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_validate_type</span><span class="p">(</span><span class="n">copy</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="s2">&quot;copy&quot;</span><span class="p">)</span>
 
         <span class="n">net</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="n">copy</span> <span class="k">else</span> <span class="bp">self</span>
 
-        <span class="c1"># Identify excitatory and inhibitory GIDs based on cell_metadata</span>
-        <span class="n">e_gids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="n">i_gids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">cell_type_name</span><span class="p">,</span> <span class="n">cell_data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;cell_metadata&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;electro_type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;excitatory&quot;</span><span class="p">:</span>
-                <span class="n">e_gids</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">cell_type_name</span><span class="p">])</span>
-            <span class="k">elif</span> <span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;cell_metadata&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;electro_type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;inhibitory&quot;</span><span class="p">:</span>
-                <span class="n">i_gids</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gid_ranges</span><span class="p">[</span><span class="n">cell_type_name</span><span class="p">])</span>
+        <span class="n">e_gids</span><span class="p">,</span> <span class="n">i_gids</span> <span class="o">=</span> <span class="n">_get_cell_index_by_synapse_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="c1"># Define the connection types to modify</span>
         <span class="n">conn_types</span> <span class="o">=</span> <span class="p">{</span>
@@ -2506,7 +2541,7 @@
             <span class="n">_validate_type</span><span class="p">(</span><span class="n">gain</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="n">conn_type</span><span class="p">,</span> <span class="s2">&quot;int or float&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">gain</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Synaptic gains must be non-negative.Got </span><span class="si">{</span><span class="n">gain</span><span class="si">}</span><span class="s2"> for &#39;</span><span class="si">{</span><span class="n">conn_type</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Synaptic gains must be non-negative. Got </span><span class="si">{</span><span class="n">gain</span><span class="si">}</span><span class="s2"> for &#39;</span><span class="si">{</span><span class="n">conn_type</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
                 <span class="p">)</span>
 
             <span class="n">conn_indices</span> <span class="o">=</span> <span class="n">pick_connection</span><span class="p">(</span>
@@ -2517,6 +2552,57 @@
 
         <span class="k">if</span> <span class="n">copy</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">net</span></div>
+
+
+<div class="viewcode-block" id="Network.get_global_synaptic_gains">
+<a class="viewcode-back" href="../../generated/hnn_core.Network.html#hnn_core.Network.get_global_synaptic_gains">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_global_synaptic_gains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retrieve gain values for different celltype connections in the Network.</span>
+
+<span class="sd">        This function identifies excitatory and inhibitory cells in the Network</span>
+<span class="sd">        and retrieves the `gain` value for each type of synaptic connection:</span>
+
+<span class="sd">            - excitatory to excitatory (e_e)</span>
+<span class="sd">            - excitatory to inhibitory (e_i)</span>
+<span class="sd">            - inhibitory to excitatory (i_e)</span>
+<span class="sd">            - inhibitory to inhibitory (i_i)</span>
+
+<span class="sd">        The gain is assumed to be uniform across all instances of each connection type</span>
+<span class="sd">        (for example, between AMPA and NMDA, and between `L2_pyramidal-&gt;L2_pyramidal` and</span>
+<span class="sd">        `L2_pyramidal-&gt;L5_pyramidal`, etc.). Only the first connection&#39;s gain value is</span>
+<span class="sd">        used for each type.</span>
+
+<span class="sd">        This does **not** return the synaptic gains of external drives.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        values : dict</span>
+<span class="sd">            A dictionary with the connection types (&#39;e_e&#39;, &#39;e_i&#39;, &#39;i_e&#39;, &#39;i_i&#39;) as keys</span>
+<span class="sd">            and their corresponding gain values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">e_gids</span><span class="p">,</span> <span class="n">i_gids</span> <span class="o">=</span> <span class="n">_get_cell_index_by_synapse_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># Define the connection types and source/target cell indexes</span>
+        <span class="n">conn_types</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;e_e&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">e_gids</span><span class="p">,</span> <span class="n">e_gids</span><span class="p">),</span>
+            <span class="s2">&quot;e_i&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">e_gids</span><span class="p">,</span> <span class="n">i_gids</span><span class="p">),</span>
+            <span class="s2">&quot;i_e&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">i_gids</span><span class="p">,</span> <span class="n">e_gids</span><span class="p">),</span>
+            <span class="s2">&quot;i_i&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">i_gids</span><span class="p">,</span> <span class="n">i_gids</span><span class="p">),</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Retrieve the gain value for each connection type</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">conn_type</span><span class="p">,</span> <span class="p">(</span><span class="n">src_idxs</span><span class="p">,</span> <span class="n">target_idxs</span><span class="p">)</span> <span class="ow">in</span> <span class="n">conn_types</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">picks</span> <span class="o">=</span> <span class="n">pick_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">src_gids</span><span class="o">=</span><span class="n">src_idxs</span><span class="p">,</span> <span class="n">target_gids</span><span class="o">=</span><span class="n">target_idxs</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">picks</span><span class="p">:</span>
+                <span class="c1"># Extract the gain from the first connection</span>
+                <span class="n">values</span><span class="p">[</span><span class="n">conn_type</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">picks</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span><span class="s2">&quot;gain&quot;</span><span class="p">]</span>
+
+        <span class="c1"># This writes the warning to stdout</span>
+        <span class="n">_check_global_synaptic_gains_uniformity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">values</span></div>
 
 
 <div class="viewcode-block" id="Network.plot_cells">
@@ -2750,6 +2836,8 @@
 <span class="sd">            Synaptic delay in ms.</span>
 <span class="sd">        lamtha : float</span>
 <span class="sd">            Space constant.</span>
+<span class="sd">        threshold : float</span>
+<span class="sd">            Firing threshold of cells for connection.</span>
 <span class="sd">        gain : float</span>
 <span class="sd">            Multiplicative factor for synaptic weight.</span>
 <span class="sd">    probability : float</span>
@@ -2771,6 +2859,8 @@
         <span class="n">entr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">weight: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;nc_dict&#39;</span><span class="p">][</span><span class="s1">&#39;A_weight&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">; &quot;</span>
         <span class="n">entr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;delay: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;nc_dict&#39;</span><span class="p">][</span><span class="s1">&#39;A_delay&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">; &quot;</span>
         <span class="n">entr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;lamtha: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;nc_dict&#39;</span><span class="p">][</span><span class="s1">&#39;lamtha&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">entr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;threshold: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;nc_dict&#39;</span><span class="p">][</span><span class="s1">&#39;threshold&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">entr</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;gain: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="s1">&#39;nc_dict&#39;</span><span class="p">][</span><span class="s1">&#39;gain&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">entr</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> &quot;</span>
 
         <span class="k">return</span> <span class="n">entr</span>
@@ -2894,6 +2984,62 @@
         <span class="n">cell_type_bias</span><span class="p">[</span><span class="s2">&quot;section&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">section</span>
 
     <span class="n">network</span><span class="o">.</span><span class="n">external_biases</span><span class="p">[</span><span class="n">bias_name</span><span class="p">][</span><span class="n">cell_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell_type_bias</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_global_synaptic_gains_uniformity</span><span class="p">(</span><span class="n">net</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check whether gain values are uniform within their type of connection.</span>
+
+<span class="sd">    This function identifies excitatory and inhibitory cells in the Network</span>
+<span class="sd">    and retrieves the gain value for each type of synaptic connection:</span>
+
+<span class="sd">    - excitatory to excitatory (e_e)</span>
+<span class="sd">    - excitatory to inhibitory (e_i)</span>
+<span class="sd">    - inhibitory to excitatory (i_e)</span>
+<span class="sd">    - inhibitory to inhibitory (i_i)</span>
+
+<span class="sd">    The gain is then checked to see if it is uniform for all instances within each</span>
+<span class="sd">    connection type (for example, between AMPA and NMDA, and between different</span>
+<span class="sd">    connections like L2_pyramidal-&gt;L2_pyramidal and L2_pyramidal-&gt;L5_pyramidal). This</span>
+<span class="sd">    does **not** check the synaptic gains of external drives.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    output_indicator : bool</span>
+<span class="sd">        A truth value indicating whether the synaptic gains are uniform within their</span>
+<span class="sd">        connection type (True) or non-uniform (False).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">e_gids</span><span class="p">,</span> <span class="n">i_gids</span> <span class="o">=</span> <span class="n">_get_cell_index_by_synapse_type</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
+
+    <span class="c1"># Define the connection types and source/target cell indexes</span>
+    <span class="n">conn_types</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;e_e&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">e_gids</span><span class="p">,</span> <span class="n">e_gids</span><span class="p">),</span>
+        <span class="s2">&quot;e_i&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">e_gids</span><span class="p">,</span> <span class="n">i_gids</span><span class="p">),</span>
+        <span class="s2">&quot;i_e&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">i_gids</span><span class="p">,</span> <span class="n">e_gids</span><span class="p">),</span>
+        <span class="s2">&quot;i_i&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">i_gids</span><span class="p">,</span> <span class="n">i_gids</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="n">output_indicator</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1"># Retrieve the gain value for each connection type</span>
+    <span class="k">for</span> <span class="n">conn_type</span><span class="p">,</span> <span class="p">(</span><span class="n">src_idxs</span><span class="p">,</span> <span class="n">target_idxs</span><span class="p">)</span> <span class="ow">in</span> <span class="n">conn_types</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">picks</span> <span class="o">=</span> <span class="n">pick_connection</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">src_gids</span><span class="o">=</span><span class="n">src_idxs</span><span class="p">,</span> <span class="n">target_gids</span><span class="o">=</span><span class="n">target_idxs</span><span class="p">)</span>
+
+        <span class="n">first_value</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">picks</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span><span class="s2">&quot;gain&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">other_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">picks</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span>
+                    <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">picks</span><span class="p">[</span><span class="n">other_idx</span><span class="p">]][</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span><span class="s2">&quot;gain&quot;</span><span class="p">],</span>
+                    <span class="n">first_value</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">):</span>
+                <span class="n">output_indicator</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="nb">print</span><span class="p">(</span>
+<span class="w">                    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                    WARNING: Your imported Network uses custom synaptic gain values. Global synaptic gain values such as &quot;Excitatory-to-Inhibitory&quot; etc. will NOT be read or displayed properly. This is because Global synaptic gain values assume that initially, all gains are the same. If you continue to modify your Global synaptic gain values, double-check each connection&#39;s final synaptic gain value. To stop this warning, change your synaptic weights instead of your synaptic gains.</span>
+<span class="sd">                    &quot;&quot;&quot;</span>
+                <span class="p">)</span>
+                <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">output_indicator</span>
 </pre></div>
 
                 </article>

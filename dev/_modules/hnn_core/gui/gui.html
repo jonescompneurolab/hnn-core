@@ -632,6 +632,27 @@
     <span class="p">],</span>
 <span class="p">}</span>
 
+<span class="n">global_gain_type_display_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;e_e&quot;</span><span class="p">:</span> <span class="s2">&quot;Exc-to-Exc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;e_i&quot;</span><span class="p">:</span> <span class="s2">&quot;Exc-to-Inh&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;i_e&quot;</span><span class="p">:</span> <span class="s2">&quot;Inh-to-Exc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;i_i&quot;</span><span class="p">:</span> <span class="s2">&quot;Inh-to-Inh&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">global_gain_type_lookup_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">(</span><span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">,</span> <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">):</span> <span class="s2">&quot;e_e&quot;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">,</span> <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">):</span> <span class="s2">&quot;e_e&quot;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">,</span> <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">):</span> <span class="s2">&quot;e_e&quot;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">,</span> <span class="s2">&quot;L2_basket&quot;</span><span class="p">):</span> <span class="s2">&quot;e_i&quot;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">,</span> <span class="s2">&quot;L5_basket&quot;</span><span class="p">):</span> <span class="s2">&quot;e_i&quot;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">,</span> <span class="s2">&quot;L5_basket&quot;</span><span class="p">):</span> <span class="s2">&quot;e_i&quot;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s2">&quot;L2_basket&quot;</span><span class="p">,</span> <span class="s2">&quot;L2_pyramidal&quot;</span><span class="p">):</span> <span class="s2">&quot;i_e&quot;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s2">&quot;L2_basket&quot;</span><span class="p">,</span> <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">):</span> <span class="s2">&quot;i_e&quot;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s2">&quot;L5_basket&quot;</span><span class="p">,</span> <span class="s2">&quot;L5_pyramidal&quot;</span><span class="p">):</span> <span class="s2">&quot;i_e&quot;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s2">&quot;L2_basket&quot;</span><span class="p">,</span> <span class="s2">&quot;L2_basket&quot;</span><span class="p">):</span> <span class="s2">&quot;i_i&quot;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s2">&quot;L5_basket&quot;</span><span class="p">,</span> <span class="s2">&quot;L5_basket&quot;</span><span class="p">):</span> <span class="s2">&quot;i_i&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_OutputWidgetHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Handler</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_widget</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1037,8 +1058,11 @@
         <span class="c1"># Connectivity list</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
-        <span class="c1"># Cell parameter list</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="c1"># Cell parameter dict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cell_parameters_widgets</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="c1"># Synaptic Gains dict</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">global_gain_widgets</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_ui_components</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_logging_window_logger</span><span class="p">()</span>
@@ -1102,6 +1126,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_drives_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>  <span class="c1"># tab to add new drives</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>  <span class="c1"># tab to tune connectivity.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cell_params_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_global_gain_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_log_out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>
 
@@ -1228,7 +1253,8 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">viz_manager</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">simulation_list_widget</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cell_parameters_widgets</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">global_gain_widgets</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_simulation_list_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
@@ -1277,7 +1303,7 @@
         <span class="k">def</span><span class="w"> </span><span class="nf">_cell_type_radio_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="n">_update_cell_params_vbox</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_cell_params_out</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cell_parameters_widgets</span><span class="p">,</span>
                 <span class="n">value</span><span class="o">.</span><span class="n">new</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cell_layer_radio_buttons</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
             <span class="p">)</span>
@@ -1285,7 +1311,7 @@
         <span class="k">def</span><span class="w"> </span><span class="nf">_cell_layer_radio_change</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="n">_update_cell_params_vbox</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_cell_params_out</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cell_parameters_widgets</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cell_type_radio_buttons</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                 <span class="n">value</span><span class="o">.</span><span class="n">new</span><span class="p">,</span>
             <span class="p">)</span>
@@ -1388,6 +1414,11 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">load_connectivity_button</span><span class="p">,</span>
                     <span class="p">]</span>
                 <span class="p">),</span>
+                <span class="n">VBox</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_global_gain_out</span><span class="p">,</span>
+                    <span class="p">]</span>
+                <span class="p">),</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span><span class="p">,</span>
             <span class="p">]</span>
         <span class="p">)</span>
@@ -1399,8 +1430,14 @@
             <span class="p">]</span>
         <span class="p">)</span>
 
-        <span class="n">connectivity_configuration</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="n">connectivity_box</span><span class="p">,</span> <span class="n">cell_parameters</span><span class="p">]</span>
-        <span class="n">connectivity_configuration</span><span class="o">.</span><span class="n">titles</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Connectivity&quot;</span><span class="p">,</span> <span class="s2">&quot;Cell parameters&quot;</span><span class="p">]</span>
+        <span class="n">connectivity_configuration</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">connectivity_box</span><span class="p">,</span>
+            <span class="n">cell_parameters</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">connectivity_configuration</span><span class="o">.</span><span class="n">titles</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;Connectivity&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Cell parameters&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
 
         <span class="n">drive_selections</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span>
             <span class="p">[</span>
@@ -1641,9 +1678,11 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_cell_params_out</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cell_parameters_widgets</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cell_layer_radio_buttons</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cell_type_radio_buttons</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_global_gain_out</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">global_gain_widgets</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -1799,9 +1838,11 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">_connectivity_out</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">connectivity_widgets</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_cell_params_out</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">cell_pameters_widgets</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cell_parameters_widgets</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">cell_layer_radio_buttons</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">cell_type_radio_buttons</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_global_gain_out</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">global_gain_widgets</span><span class="p">,</span>
                     <span class="n">layout</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="n">load_type</span> <span class="o">==</span> <span class="s2">&quot;drives&quot;</span><span class="p">:</span>
@@ -1922,13 +1963,21 @@
     <span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_get_connectivity_widgets</span><span class="p">(</span><span class="n">conn_data</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create connectivity box widgets from specified weight and probability&quot;&quot;&quot;</span>
-
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_connectivity_widgets</span><span class="p">(</span><span class="n">conn_data</span><span class="p">,</span> <span class="n">global_gain_textfields</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create connectivity box widgets from specified weight and gains&quot;&quot;&quot;</span>
     <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;100px&quot;</span><span class="p">}</span>
+    <span class="n">html_tab</span> <span class="o">=</span> <span class="s2">&quot;&amp;emsp;&quot;</span>
+
     <span class="n">sliders</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">receptor_name</span> <span class="ow">in</span> <span class="n">conn_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-        <span class="n">w_text_input</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+    <span class="k">for</span> <span class="n">receptor_idx</span><span class="p">,</span> <span class="n">receptor_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">conn_data</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+        <span class="n">global_gain_type</span> <span class="o">=</span> <span class="n">global_gain_type_lookup_dict</span><span class="p">[</span>
+            <span class="p">(</span>
+                <span class="n">conn_data</span><span class="p">[</span><span class="n">receptor_name</span><span class="p">][</span><span class="s2">&quot;src_gids&quot;</span><span class="p">],</span>
+                <span class="n">conn_data</span><span class="p">[</span><span class="n">receptor_name</span><span class="p">][</span><span class="s2">&quot;target_gids&quot;</span><span class="p">],</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="n">weight_text_input</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
             <span class="n">value</span><span class="o">=</span><span class="n">conn_data</span><span class="p">[</span><span class="n">receptor_name</span><span class="p">][</span><span class="s2">&quot;weight&quot;</span><span class="p">],</span>
             <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">continuous_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -1938,6 +1987,96 @@
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Weight:&quot;</span><span class="p">,</span>
             <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
         <span class="p">)</span>
+
+        <span class="n">single_gain_text_input</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">conn_data</span><span class="p">[</span><span class="n">receptor_name</span><span class="p">][</span><span class="s2">&quot;gain&quot;</span><span class="p">],</span>
+            <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">continuous_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span>
+            <span class="n">step</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Gain:&quot;</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">combined_gain_indicator_output</span> <span class="o">=</span> <span class="n">HTML</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            &lt;p style=&#39;margin:0px;padding-left:115px;&#39;&gt;</span>
+<span class="s2">            &lt;b&gt;Total Computed Gain=</span><span class="si">{</span>
+<span class="w">                </span><span class="p">(</span>
+<span class="w">                    </span><span class="mi">1</span>
+<span class="w">                    </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">global_gain_textfields</span><span class="p">[</span><span class="n">global_gain_type</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">                    </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">single_gain_text_input</span><span class="o">.</span><span class="n">value</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">                </span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&lt;/b&gt;&lt;/p&gt;&quot;&quot;&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Create closure to capture current widget references</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">make_update_gain_indicator</span><span class="p">(</span><span class="n">gain_output</span><span class="p">,</span> <span class="n">gain_input</span><span class="p">,</span> <span class="n">gain_type</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">update_gain_indicator</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+                <span class="n">gain_output</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                &lt;p style=&#39;margin:0px;padding-left:115px;&#39;&gt;</span>
+<span class="s2">                &lt;b&gt;Total Computed Gain=</span><span class="si">{</span>
+<span class="w">                    </span><span class="p">(</span>
+<span class="w">                        </span><span class="mi">1</span>
+<span class="w">                        </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">global_gain_textfields</span><span class="p">[</span><span class="n">gain_type</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">                        </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">gain_input</span><span class="o">.</span><span class="n">value</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">                    </span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&lt;/b&gt;&lt;/p&gt;&quot;&quot;&quot;</span>
+
+            <span class="k">return</span> <span class="n">update_gain_indicator</span>
+
+        <span class="c1"># Connect the gain objects so they update each other</span>
+        <span class="n">update_gain_indicator_fn</span> <span class="o">=</span> <span class="n">make_update_gain_indicator</span><span class="p">(</span>
+            <span class="n">combined_gain_indicator_output</span><span class="p">,</span> <span class="n">single_gain_text_input</span><span class="p">,</span> <span class="n">global_gain_type</span>
+        <span class="p">)</span>
+        <span class="n">global_gain_textfields</span><span class="p">[</span><span class="n">global_gain_type</span><span class="p">]</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span>
+            <span class="n">update_gain_indicator_fn</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s2">&quot;value&quot;</span>
+        <span class="p">)</span>
+        <span class="n">single_gain_text_input</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">update_gain_indicator_fn</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Now, create the similar final Weight text output</span>
+        <span class="n">final_weight_indicator_output</span> <span class="o">=</span> <span class="n">HTML</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            &lt;b&gt;Final Weight=</span><span class="si">{</span>
+<span class="w">                </span><span class="p">(</span>
+<span class="w">                    </span><span class="n">weight_text_input</span><span class="o">.</span><span class="n">value</span>
+<span class="w">                    </span><span class="o">*</span><span class="w"> </span><span class="p">(</span>
+<span class="w">                        </span><span class="mi">1</span>
+<span class="w">                        </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">global_gain_textfields</span><span class="p">[</span><span class="n">global_gain_type</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">                        </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">single_gain_text_input</span><span class="o">.</span><span class="n">value</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">                    </span><span class="p">)</span>
+<span class="w">                </span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&lt;/b&gt;&quot;&quot;&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Create closure to capture current widget references</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">make_update_weight_indicator</span><span class="p">(</span>
+            <span class="n">weight_output</span><span class="p">,</span> <span class="n">weight_input</span><span class="p">,</span> <span class="n">gain_input</span><span class="p">,</span> <span class="n">gain_type</span>
+        <span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">update_weight_indicator</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+                <span class="n">weight_output</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                &lt;b&gt;Final Weight=</span><span class="si">{</span>
+<span class="w">                    </span><span class="p">(</span>
+<span class="w">                        </span><span class="n">weight_input</span><span class="o">.</span><span class="n">value</span>
+<span class="w">                        </span><span class="o">*</span><span class="w"> </span><span class="p">(</span>
+<span class="w">                            </span><span class="mi">1</span>
+<span class="w">                            </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">global_gain_textfields</span><span class="p">[</span><span class="n">gain_type</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">                            </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">gain_input</span><span class="o">.</span><span class="n">value</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">                        </span><span class="p">)</span>
+<span class="w">                    </span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&lt;/b&gt;&quot;&quot;&quot;</span>
+
+            <span class="k">return</span> <span class="n">update_weight_indicator</span>
+
+        <span class="c1"># Connect the weight and gain objects so they update each other</span>
+        <span class="n">update_weight_indicator_fn</span> <span class="o">=</span> <span class="n">make_update_weight_indicator</span><span class="p">(</span>
+            <span class="n">final_weight_indicator_output</span><span class="p">,</span>
+            <span class="n">weight_text_input</span><span class="p">,</span>
+            <span class="n">single_gain_text_input</span><span class="p">,</span>
+            <span class="n">global_gain_type</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">global_gain_textfields</span><span class="p">[</span><span class="n">global_gain_type</span><span class="p">]</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span>
+            <span class="n">update_weight_indicator_fn</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s2">&quot;value&quot;</span>
+        <span class="p">)</span>
+        <span class="n">single_gain_text_input</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">update_weight_indicator_fn</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+        <span class="n">weight_text_input</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">update_weight_indicator_fn</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
 
         <span class="n">display_name</span> <span class="o">=</span> <span class="n">conn_data</span><span class="p">[</span><span class="n">receptor_name</span><span class="p">][</span><span class="s2">&quot;receptor&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
 
@@ -1949,21 +2088,29 @@
         <span class="k">if</span> <span class="n">display_name</span> <span class="ow">in</span> <span class="n">map_display_names</span><span class="p">:</span>
             <span class="n">display_name</span> <span class="o">=</span> <span class="n">map_display_names</span><span class="p">[</span><span class="n">display_name</span><span class="p">]</span>
 
-        <span class="n">html_tab</span> <span class="o">=</span> <span class="s2">&quot;&amp;emsp;&quot;</span>
-
         <span class="n">conn_widget</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="n">HTML</span><span class="p">(</span>
                     <span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;p style=&#39;margin:5px;&#39;&gt;&lt;b&gt;</span><span class="si">{</span><span class="n">html_tab</span><span class="si">}{</span><span class="n">html_tab</span><span class="si">}</span>
 <span class="s2">            Receptor: </span><span class="si">{</span><span class="n">display_name</span><span class="si">}</span><span class="s2">&lt;/b&gt;&lt;/p&gt;&quot;&quot;&quot;</span>
                 <span class="p">),</span>
-                <span class="n">w_text_input</span><span class="p">,</span>
+                <span class="n">HBox</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">weight_text_input</span><span class="p">,</span>
+                        <span class="n">final_weight_indicator_output</span><span class="p">,</span>
+                    <span class="p">]</span>
+                <span class="p">),</span>
+                <span class="n">HBox</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">single_gain_text_input</span><span class="p">,</span>
+                    <span class="p">]</span>
+                <span class="p">),</span>
+                <span class="n">combined_gain_indicator_output</span><span class="p">,</span>
             <span class="p">]</span>
         <span class="p">)</span>
 
         <span class="c1">#  Add class to child Vboxes for targeted CSS</span>
         <span class="n">conn_widget</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;connectivity-subsection&quot;</span><span class="p">)</span>
-
         <span class="n">conn_widget</span><span class="o">.</span><span class="n">_belongsto</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;receptor&quot;</span><span class="p">:</span> <span class="n">conn_data</span><span class="p">[</span><span class="n">receptor_name</span><span class="p">][</span><span class="s2">&quot;receptor&quot;</span><span class="p">],</span>
             <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="n">conn_data</span><span class="p">[</span><span class="n">receptor_name</span><span class="p">][</span><span class="s2">&quot;location&quot;</span><span class="p">],</span>
@@ -2514,29 +2661,119 @@
     <span class="n">connectivity_out</span><span class="p">,</span>
     <span class="n">connectivity_textfields</span><span class="p">,</span>
     <span class="n">cell_params_out</span><span class="p">,</span>
-    <span class="n">cell_pameters_vboxes</span><span class="p">,</span>
+    <span class="n">cell_parameters_vboxes</span><span class="p">,</span>
     <span class="n">cell_layer_radio_button</span><span class="p">,</span>
     <span class="n">cell_type_radio_button</span><span class="p">,</span>
+    <span class="n">global_gain_out</span><span class="p">,</span>
+    <span class="n">global_gain_textfields</span><span class="p">,</span>
     <span class="n">layout</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add all possible connectivity boxes to connectivity tab.&quot;&quot;&quot;</span>
     <span class="n">net</span> <span class="o">=</span> <span class="n">dict_to_network</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
     <span class="c1"># build network connectivity tab</span>
-    <span class="n">add_network_connectivity_tab</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">)</span>
+    <span class="n">add_network_connectivity_tab</span><span class="p">(</span>
+        <span class="n">net</span><span class="p">,</span>
+        <span class="n">connectivity_out</span><span class="p">,</span>
+        <span class="n">connectivity_textfields</span><span class="p">,</span>
+        <span class="n">global_gain_out</span><span class="p">,</span>
+        <span class="n">global_gain_textfields</span><span class="p">,</span>
+        <span class="n">layout</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="c1"># build cell parameters tab</span>
     <span class="n">add_cell_parameters_tab</span><span class="p">(</span>
         <span class="n">cell_params_out</span><span class="p">,</span>
-        <span class="n">cell_pameters_vboxes</span><span class="p">,</span>
+        <span class="n">cell_parameters_vboxes</span><span class="p">,</span>
         <span class="n">cell_layer_radio_button</span><span class="p">,</span>
         <span class="n">cell_type_radio_button</span><span class="p">,</span>
         <span class="n">layout</span><span class="p">,</span>
     <span class="p">)</span>
+
     <span class="k">return</span> <span class="n">net</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">add_network_connectivity_tab</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">connectivity_out</span><span class="p">,</span> <span class="n">connectivity_textfields</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_network_connectivity_tab</span><span class="p">(</span>
+    <span class="n">net</span><span class="p">,</span>
+    <span class="n">connectivity_out</span><span class="p">,</span>
+    <span class="n">connectivity_textfields</span><span class="p">,</span>
+    <span class="n">global_gain_out</span><span class="p">,</span>
+    <span class="n">global_gain_textfields</span><span class="p">,</span>
+    <span class="n">layout</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates widgets for synaptic connectivity values and global synaptic gains&quot;&quot;&quot;</span>
+
+    <span class="c1">### Global synaptic gains</span>
+    <span class="c1"># ---------------------------------------------------------------</span>
+    <span class="n">global_gain_out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+    <span class="n">gain_values</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">get_global_synaptic_gains</span><span class="p">()</span>
+    <span class="n">gain_types</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;e_e&quot;</span><span class="p">,</span> <span class="s2">&quot;e_i&quot;</span><span class="p">,</span> <span class="s2">&quot;i_e&quot;</span><span class="p">,</span> <span class="s2">&quot;i_i&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Same as _get_connectivity_widgets</span>
+    <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;100px&quot;</span><span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">gain_type</span> <span class="ow">in</span> <span class="n">gain_types</span><span class="p">:</span>
+        <span class="n">gain_widget</span> <span class="o">=</span> <span class="n">BoundedFloatText</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">gain_values</span><span class="p">[</span><span class="n">gain_type</span><span class="p">],</span>
+            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">global_gain_type_display_dict</span><span class="p">[</span><span class="n">gain_type</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="nb">max</span><span class="o">=</span><span class="mf">1e6</span><span class="p">,</span>
+            <span class="n">step</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+            <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">gain_widget</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="s2">&quot;220px&quot;</span>
+        <span class="n">global_gain_textfields</span><span class="p">[</span><span class="n">gain_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">gain_widget</span>
+
+    <span class="n">title_box</span> <span class="o">=</span> <span class="n">HTML</span><span class="p">(</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &lt;div</span>
+<span class="sd">        style=&quot;</span>
+<span class="sd">            background: gray;</span>
+<span class="sd">            color: white;</span>
+<span class="sd">            width: 100%;</span>
+<span class="sd">            margin-bottom: 2px;</span>
+<span class="sd">            text-align: center;</span>
+<span class="sd">        &quot;&gt;</span>
+<span class="sd">        Global Synaptic Gain Modifiers</span>
+<span class="sd">        &lt;/div&gt;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">left_box</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">global_gain_textfields</span><span class="p">[</span><span class="s2">&quot;e_e&quot;</span><span class="p">],</span>
+            <span class="n">global_gain_textfields</span><span class="p">[</span><span class="s2">&quot;e_i&quot;</span><span class="p">],</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">right_box</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">global_gain_textfields</span><span class="p">[</span><span class="s2">&quot;i_e&quot;</span><span class="p">],</span>
+            <span class="n">global_gain_textfields</span><span class="p">[</span><span class="s2">&quot;i_i&quot;</span><span class="p">],</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">gain_vbox</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">title_box</span><span class="p">,</span>
+            <span class="n">HBox</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">left_box</span><span class="p">,</span>
+                    <span class="n">right_box</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="p">),</span>
+        <span class="p">],</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">Layout</span><span class="p">(</span>
+            <span class="n">border</span><span class="o">=</span><span class="s2">&quot;1px solid #bdbdbd&quot;</span><span class="p">,</span>  <span class="c1"># border width, style, and color</span>
+            <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;10px&quot;</span><span class="p">,</span>  <span class="c1"># optional: adds space inside the border</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">global_gain_out</span><span class="p">:</span>
+        <span class="n">display</span><span class="p">(</span><span class="n">gain_vbox</span><span class="p">)</span>
+
+    <span class="c1">### Connectivity accordion</span>
+    <span class="c1"># ---------------------------------------------------------------</span>
     <span class="n">cell_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">ct</span> <span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
     <span class="n">receptors</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;ampa&quot;</span><span class="p">,</span> <span class="s2">&quot;nmda&quot;</span><span class="p">,</span> <span class="s2">&quot;gabaa&quot;</span><span class="p">,</span> <span class="s2">&quot;gabab&quot;</span><span class="p">)</span>
     <span class="n">locations</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;proximal&quot;</span><span class="p">,</span> <span class="s2">&quot;distal&quot;</span><span class="p">,</span> <span class="s2">&quot;soma&quot;</span><span class="p">)</span>
@@ -2565,10 +2802,12 @@
                         <span class="n">conn_idx</span> <span class="o">=</span> <span class="n">conn_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                         <span class="n">current_w</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_idx</span><span class="p">][</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span><span class="s2">&quot;A_weight&quot;</span><span class="p">]</span>
                         <span class="n">current_p</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_idx</span><span class="p">][</span><span class="s2">&quot;probability&quot;</span><span class="p">]</span>
+                        <span class="n">current_g</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_idx</span><span class="p">][</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span><span class="s2">&quot;gain&quot;</span><span class="p">]</span>
                         <span class="c1"># valid connection</span>
                         <span class="n">receptor_related_conn</span><span class="p">[</span><span class="n">receptor</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
                             <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="n">current_w</span><span class="p">,</span>
                             <span class="s2">&quot;probability&quot;</span><span class="p">:</span> <span class="n">current_p</span><span class="p">,</span>
+                            <span class="s2">&quot;gain&quot;</span><span class="p">:</span> <span class="n">current_g</span><span class="p">,</span>
                             <span class="c1"># info used to identify connection</span>
                             <span class="s2">&quot;receptor&quot;</span><span class="p">:</span> <span class="n">receptor</span><span class="p">,</span>
                             <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="n">location</span><span class="p">,</span>
@@ -2578,7 +2817,9 @@
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">receptor_related_conn</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">connectivity_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">src_gids</span><span class="si">}</span><span class="s2">→</span><span class="si">{</span><span class="n">target_gids</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">location</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
                     <span class="n">connectivity_textfields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="n">_get_connectivity_widgets</span><span class="p">(</span><span class="n">receptor_related_conn</span><span class="p">)</span>
+                        <span class="n">_get_connectivity_widgets</span><span class="p">(</span>
+                            <span class="n">receptor_related_conn</span><span class="p">,</span> <span class="n">global_gain_textfields</span>
+                        <span class="p">)</span>
                     <span class="p">)</span>
 
     <span class="c1"># Style the contents of the Connectivity Tab</span>
@@ -2625,7 +2866,7 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">add_cell_parameters_tab</span><span class="p">(</span>
     <span class="n">cell_params_out</span><span class="p">,</span>
-    <span class="n">cell_pameters_vboxes</span><span class="p">,</span>
+    <span class="n">cell_parameters_vboxes</span><span class="p">,</span>
     <span class="n">cell_layer_radio_button</span><span class="p">,</span>
     <span class="n">cell_type_radio_button</span><span class="p">,</span>
     <span class="n">layout</span><span class="p">,</span>
@@ -2666,8 +2907,8 @@
                 <span class="p">)</span>
                 <span class="n">text_field</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="s2">&quot;350px&quot;</span>
                 <span class="n">layer_parameters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text_field</span><span class="p">)</span>
-            <span class="n">cell_pameters_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cell_type</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> Pyramidal_</span><span class="si">{</span><span class="n">layer</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="n">cell_pameters_vboxes</span><span class="p">[</span><span class="n">cell_pameters_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">layer_parameters</span><span class="p">)</span>
+            <span class="n">cell_parameters_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cell_type</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> Pyramidal_</span><span class="si">{</span><span class="n">layer</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">cell_parameters_vboxes</span><span class="p">[</span><span class="n">cell_parameters_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">VBox</span><span class="p">(</span><span class="n">layer_parameters</span><span class="p">)</span>
             <span class="n">layer_parameters</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
 
     <span class="c1"># clear existing connectivity</span>
@@ -2676,7 +2917,7 @@
     <span class="c1"># Add cell parameters</span>
     <span class="n">_update_cell_params_vbox</span><span class="p">(</span>
         <span class="n">cell_params_out</span><span class="p">,</span>
-        <span class="n">cell_pameters_vboxes</span><span class="p">,</span>
+        <span class="n">cell_parameters_vboxes</span><span class="p">,</span>
         <span class="n">cell_type_radio_button</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
         <span class="n">cell_layer_radio_button</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
     <span class="p">)</span>
@@ -2760,6 +3001,7 @@
     <span class="n">drive_widgets</span><span class="p">,</span>
     <span class="n">connectivity_textfields</span><span class="p">,</span>
     <span class="n">cell_params_vboxes</span><span class="p">,</span>
+    <span class="n">global_gain_textfields</span><span class="p">,</span>
     <span class="n">add_drive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct network and add drives.&quot;&quot;&quot;</span>
@@ -2767,6 +3009,12 @@
     <span class="n">single_simulation_data</span><span class="p">[</span><span class="s2">&quot;net&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dict_to_network</span><span class="p">(</span>
         <span class="n">params</span><span class="p">,</span> <span class="n">read_drives</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">read_external_biases</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">)</span>
+
+    <span class="c1"># Update with synaptic gains</span>
+    <span class="n">global_gain_values</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">key</span><span class="p">:</span> <span class="n">widget</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">widget</span> <span class="ow">in</span> <span class="n">global_gain_textfields</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
+
     <span class="c1"># adjust connectivity according to the connectivity_tab</span>
     <span class="k">for</span> <span class="n">connectivity_slider</span> <span class="ow">in</span> <span class="n">connectivity_textfields</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">vbox_key</span> <span class="ow">in</span> <span class="n">connectivity_slider</span><span class="p">:</span>
@@ -2783,10 +3031,27 @@
                 <span class="n">conn_idx</span> <span class="o">=</span> <span class="n">conn_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">single_simulation_data</span><span class="p">[</span><span class="s2">&quot;net&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_idx</span><span class="p">][</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span>
                     <span class="s2">&quot;A_weight&quot;</span>
-                <span class="p">]</span> <span class="o">=</span> <span class="n">vbox_key</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="p">]</span> <span class="o">=</span> <span class="n">vbox_key</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+                <span class="c1"># 1. identify which case of global_gain_textfield applies to this src/target</span>
+                <span class="n">global_gain_type</span> <span class="o">=</span> <span class="n">global_gain_type_lookup_dict</span><span class="p">[</span>
+                    <span class="p">(</span>
+                        <span class="n">vbox_key</span><span class="o">.</span><span class="n">_belongsto</span><span class="p">[</span><span class="s2">&quot;src_gids&quot;</span><span class="p">],</span>
+                        <span class="n">vbox_key</span><span class="o">.</span><span class="n">_belongsto</span><span class="p">[</span><span class="s2">&quot;target_gids&quot;</span><span class="p">],</span>
+                    <span class="p">)</span>
+                <span class="p">]</span>
+                <span class="n">applied_global_gain_value</span> <span class="o">=</span> <span class="n">global_gain_values</span><span class="p">[</span><span class="n">global_gain_type</span><span class="p">]</span>
+
+                <span class="c1"># 2. Multiply global by single synapse gain to get total</span>
+                <span class="n">single_simulation_data</span><span class="p">[</span><span class="s2">&quot;net&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">connectivity</span><span class="p">[</span><span class="n">conn_idx</span><span class="p">][</span><span class="s2">&quot;nc_dict&quot;</span><span class="p">][</span>
+                    <span class="s2">&quot;gain&quot;</span>
+                <span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="mi">1</span>
+                    <span class="o">+</span> <span class="p">(</span><span class="n">applied_global_gain_value</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="p">(</span><span class="n">vbox_key</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">value</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="p">)</span>
 
     <span class="c1"># Update cell params</span>
-
     <span class="n">update_functions</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;L2 Geometry&quot;</span><span class="p">:</span> <span class="n">_update_L2_geometry_cell_params</span><span class="p">,</span>
         <span class="s2">&quot;L5 Geometry&quot;</span><span class="p">:</span> <span class="n">_update_L5_geometry_cell_params</span><span class="p">,</span>
@@ -2908,7 +3173,8 @@
     <span class="n">connectivity_textfields</span><span class="p">,</span>
     <span class="n">viz_manager</span><span class="p">,</span>
     <span class="n">simulations_list_widget</span><span class="p">,</span>
-    <span class="n">cell_pameters_widgets</span><span class="p">,</span>
+    <span class="n">cell_parameters_widgets</span><span class="p">,</span>
+    <span class="n">global_gain_textfields</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Run the simulation and plot outputs.&quot;&quot;&quot;</span>
     <span class="n">simulation_data</span> <span class="o">=</span> <span class="n">all_data</span><span class="p">[</span><span class="s2">&quot;simulation_data&quot;</span><span class="p">]</span>
@@ -2931,7 +3197,8 @@
             <span class="n">simulation_data</span><span class="p">[</span><span class="n">_sim_name</span><span class="p">],</span>
             <span class="n">drive_widgets</span><span class="p">,</span>
             <span class="n">connectivity_textfields</span><span class="p">,</span>
-            <span class="n">cell_pameters_widgets</span><span class="p">,</span>
+            <span class="n">cell_parameters_widgets</span><span class="p">,</span>
+            <span class="n">global_gain_textfields</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;start simulation&quot;</span><span class="p">)</span>
