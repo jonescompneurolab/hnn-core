@@ -2264,7 +2264,7 @@ def add_network_connectivity_tab(
             ),
         ],
         layout=Layout(
-            border="1px solid gray",  # border width, style, and color
+            border="1px solid #bdbdbd",  # border width, style, and color
             padding="10px",  # optional: adds space inside the border
         ),
     )
