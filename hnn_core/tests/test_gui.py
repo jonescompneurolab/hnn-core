@@ -12,7 +12,7 @@ import traitlets
 import os
 
 from pathlib import Path
-from hnn_core import Dipole, Network
+from hnn_core import Dipole, Network, simulate_dipole
 from hnn_core.gui import HNNGUI
 from hnn_core.gui._viz_manager import (
     _idx2figname,
@@ -29,7 +29,10 @@ from hnn_core.gui.gui import (
 )
 from hnn_core.network import pick_connection, _compare_lists
 from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
-from hnn_core.hnn_io import dict_to_network, read_network_configuration
+from hnn_core.hnn_io import (
+    dict_to_network,
+    read_network_configuration,
+)
 from IPython.display import IFrame
 from ipywidgets import Tab, Text, link
 
@@ -120,6 +123,8 @@ def test_gui_compose():
     gui = HNNGUI()
     gui.compose()
     assert len(gui.connectivity_widgets) == 12
+    assert len(gui.global_gain_widgets) == 4
+    assert len(gui.cell_parameters_widgets) == 6
     assert len(gui.drive_widgets) == 3
     plt.close("all")
 
@@ -172,17 +177,28 @@ def test_gui_upload_connectivity():
     assert len(gui.connectivity_widgets) == original_connectivity_count
 
     # check parameters with different files
-    assert gui.connectivity_widgets[0][0].children[1].value == 0.02
-    # value should change when loading connectivity from file 2
+    # This is a synaptic weight
+    assert gui.connectivity_widgets[0][0].children[1].children[0].value == 0.02
+
+    # Set custom global gains
+    gui.global_gain_widgets["e_e"].value = 1.5
+    gui.global_gain_widgets["e_i"].value = 0.8
+    gui.global_gain_widgets["i_e"].value = 1.2
+    gui.global_gain_widgets["i_i"].value = 0.9
+
     gui._simulate_upload_connectivity(file2_path)
-    assert gui.connectivity_widgets[0][0].children[1].value == 0.01
+    # value should change when loading connectivity from file 2
+    assert gui.connectivity_widgets[0][0].children[1].children[0].value == 0.01
+    for gain_type in ["e_e", "e_i", "i_e", "i_i"]:
+        # The uploaded file should have default gains of 1.0
+        assert gui.global_gain_widgets[gain_type].value == 1.0
 
     # check that the gui param attribute was updated
     assert gui.params != default_params
 
     # Load drives and make sure connectivity does not change
     gui._simulate_upload_drives(file1_path)
-    assert gui.connectivity_widgets[0][0].children[1].value == 0.01
+    assert gui.connectivity_widgets[0][0].children[1].children[0].value == 0.01
 
     plt.close("all")
 
@@ -308,7 +324,7 @@ def test_gui_change_connectivity():
                 conn_idx = conn_indices[0]
 
                 # test if the slider and the input field are synchronous
-                vbox.children[1].value = w_val
+                vbox.children[1].children[0].value = w_val
 
                 # re initialize network
                 _init_network_from_widgets(
@@ -318,7 +334,8 @@ def test_gui_change_connectivity():
                     _single_simulation,
                     gui.drive_widgets,
                     gui.connectivity_widgets,
-                    gui.cell_pameters_widgets,
+                    gui.cell_parameters_widgets,
+                    gui.global_gain_widgets,
                     add_drive=False,
                 )
 
@@ -368,7 +385,8 @@ def test_gui_init_network(setup_gui):
         _single_simulation,
         gui.drive_widgets,
         gui.connectivity_widgets,
-        gui.cell_pameters_widgets,
+        gui.cell_parameters_widgets,
+        gui.global_gain_widgets,
     )
     plt.close("all")
 
@@ -1014,7 +1032,8 @@ def test_gui_add_tonic_input():
         _single_simulation,
         gui.drive_widgets,
         gui.connectivity_widgets,
-        gui.cell_pameters_widgets,
+        gui.cell_parameters_widgets,
+        gui.global_gain_widgets,
     )
 
     net = _single_simulation["net"]
@@ -1044,7 +1063,7 @@ def test_gui_cell_params_widgets(setup_gui):
     layers = gui.cell_layer_radio_buttons.options
     assert len(layers) == 3
 
-    keys = gui.cell_pameters_widgets.keys()
+    keys = gui.cell_parameters_widgets.keys()
     num_cell_params = 0
     for pyramid_cell_type in pyramid_cell_types:
         cell_type = pyramid_cell_type.split("_")[0]
@@ -1346,3 +1365,210 @@ def test_default_frequencies(setup_gui):
 
     assert gui_min == viz_min == new_min
     assert gui_max == viz_max == new_max
+
+
+def test_adjust_synaptic_weights(setup_gui):
+    """Test adjusting synaptic weight widgets."""
+
+    gui = setup_gui
+    _single_simulation = {}
+    _single_simulation["net"] = dict_to_network(gui.params)
+    _init_network_from_widgets(
+        gui.params,
+        gui.widget_dt,
+        gui.widget_tstop,
+        _single_simulation,
+        gui.drive_widgets,
+        gui.connectivity_widgets,
+        gui.cell_parameters_widgets,
+        gui.global_gain_widgets,
+    )
+
+    gains_default = _single_simulation["net"].get_global_synaptic_gains()
+    assert gains_default == {"e_e": 1.0, "e_i": 1.0, "i_e": 1.0, "i_i": 1.0}
+
+    # Change the synaptic weight widgets
+    gui.global_gain_widgets["e_e"].value = 0.5
+    gui.global_gain_widgets["e_i"].value = 0.5
+    gui.global_gain_widgets["i_e"].value = 1.1
+    gui.global_gain_widgets["i_i"].value = 1.1
+    _init_network_from_widgets(
+        gui.params,
+        gui.widget_dt,
+        gui.widget_tstop,
+        _single_simulation,
+        gui.drive_widgets,
+        gui.connectivity_widgets,
+        gui.cell_parameters_widgets,
+        gui.global_gain_widgets,
+    )
+
+    gains_altered = _single_simulation["net"].get_global_synaptic_gains()
+    assert gains_altered == {"e_e": 0.5, "e_i": 0.5, "i_e": 1.1, "i_i": 1.1}
+
+
+def test_global_gain_widgets_initialization(setup_gui):
+    """Test that global gain widgets are initialized properly."""
+    gui = setup_gui
+
+    # Check initial values are 1.0
+    for gain_type in ["e_e", "e_i", "i_e", "i_i"]:
+        # Check that all four gain types are present
+        assert gain_type in gui.global_gain_widgets
+
+        assert gui.global_gain_widgets[gain_type].value == 1.0
+        assert gui.global_gain_widgets[gain_type].min == 0
+        assert gui.global_gain_widgets[gain_type].max == 1e6
+        assert gui.global_gain_widgets[gain_type].step == 0.1
+
+
+def test_combined_gain_indicator_updates(setup_gui):
+    """Test that combined gain indicators update when global or single gains change."""
+    gui = setup_gui
+
+    # Get a connectivity widget that has gain indicators
+    # Find a L2_pyramidal->L2_pyramidal connection to test e_e type
+    conn_widget = None
+    for connectivity_field in gui.connectivity_widgets:
+        for widget in connectivity_field:
+            if (
+                widget._belongsto["src_gids"] == "L2_pyramidal"
+                and widget._belongsto["target_gids"] == "L2_pyramidal"
+            ):
+                conn_widget = widget
+                break
+        if conn_widget is not None:
+            break
+
+    # Extract single gain widget and combined gain indicator
+    # Structure: children[2] is HBox containing [single_gain_input, combined_indicator]
+    single_gain_widget = conn_widget.children[2].children[0]
+    combined_indicator = conn_widget.children[3]
+    assert hasattr(single_gain_widget, "value")
+    assert single_gain_widget.value >= 0  # Non-negative gain
+
+    # Check initial combined gain indicator value includes both gains
+    initial_single_gain = single_gain_widget.value
+    initial_global_gain = 1.0  # default
+    expected_initial = 1 + (initial_single_gain - 1) + (initial_global_gain - 1)
+    assert f"{expected_initial:.2f}" in combined_indicator.value
+
+    # Change global gain and check that combined indicator updates
+    gui.global_gain_widgets["e_e"].value = 2.0
+    new_global_gain = 2.0
+    expected_combined = 1 + (initial_single_gain - 1) + (new_global_gain - 1)
+    assert f"{expected_combined:.2f}" in combined_indicator.value
+
+    # Change single gain and check that combined indicator updates
+    single_gain_widget.value = 0.5
+    expected_combined = 1 + (single_gain_widget.value - 1) + (new_global_gain - 1)
+    assert f"{expected_combined:.2f}" in combined_indicator.value
+
+
+def test_custom_gains_simulate_and_download(setup_gui):
+    """Test that network configurations include gain values in serialization."""
+    gui = setup_gui
+
+    # Set some non-default gains
+    global_custom_gain = 0.8
+    gui.global_gain_widgets["i_i"].value = global_custom_gain
+
+    # Also change a single gain, the one for L5_B->L5_B, affected by i_i above.
+    src_type = "L5_basket"
+    target_type = "L5_basket"
+    single_custom_gain = 2.0
+    conn_widget = None
+    for connectivity_field in gui.connectivity_widgets:
+        for widget in connectivity_field:
+            if (widget._belongsto["src_gids"] == src_type) and (
+                widget._belongsto["target_gids"] == target_type
+            ):
+                widget.children[2].children[0].value = single_custom_gain
+                break
+        if conn_widget is not None:
+            break
+
+    # Run a simulation to create a network with these gains
+    sim_name = "test_gains"
+    gui.widget_simulation_name.value = sim_name
+    gui.run_button.click()
+
+    # Serialize the configuration
+    configs = serialize_config(gui.data, sim_name)
+    net_config = json.loads(configs)
+
+    # Check that connectivity includes gain values
+    for conn in net_config["connectivity"]:
+        assert "nc_dict" in conn
+        assert "gain" in conn["nc_dict"]
+        # All gains should be non-negative
+        assert conn["nc_dict"]["gain"] >= 0
+        if (
+            (conn["src_type"] == src_type)
+            and (conn["target_type"] == target_type)
+            and (conn["receptor"] == "gabaa")
+        ):
+            assert conn["nc_dict"]["gain"] == (
+                1 + (global_custom_gain - 1) + (single_custom_gain - 1)
+            )
+
+
+def test_diff_gui_vs_api_networks_simulations():
+    """Test that synaptic gain changes are reproducible between the GUI and API."""
+    # Config
+    # --------------------------------
+    # Need a fully-detailed simulation to ensure spikes present (aka good data)
+    local_dt = 0.025
+    local_tstop = 100.0
+    global_custom_gain = 8.0
+    single_custom_gain = 2.0
+
+    # # AES: For some strange reason, the 3x3_drives network file does NOT produce
+    # # identical output, even when the synaptic gains are made identical. I think that's
+    # # a separate bug.
+    # net_file_path = Path(hnn_core_root / "tests" / "assets" / "jones2009_3x3_drives.json")
+    # Using the full GUI base file for now.
+    net_file_path = Path(hnn_core_root / "param" / "jones2009_base.json")
+
+    # Setup and run the GUI simulation
+    # --------------------------------
+    gui = HNNGUI(network_configuration=net_file_path)
+    gui.compose()
+
+    gui.widget_dt.value = local_dt
+    gui.widget_tstop.value = local_tstop
+
+    # Set some non-default gains
+    gui.global_gain_widgets["i_i"].value = global_custom_gain
+
+    # Also change a single gain, the first one: L2_B->L2_B, affected by i_i above.
+    # Yes this depends on the order of synapses in connectivity_widgets, but
+    # connectivity_widgets doesn't actually contain the text of which connection each
+    # widgets belongs to, so :shrug:
+    gui.connectivity_widgets[0][0].children[2].children[0].value = single_custom_gain
+
+    # Run a simulation to create a network with these gains
+    sim_name = "test_gains_gui"
+    gui.widget_simulation_name.value = sim_name
+    gui.run_button.click()
+    dpls_gui = gui.simulation_data[sim_name]["dpls"]
+
+    # Setup and run the API simulation
+    # --------------------------------
+    net_api = read_network_configuration(net_file_path)
+    net_api.set_global_synaptic_gains(i_i=8.0)
+    l2p_l2p_conn_idx = pick_connection(
+        net_api,
+        src_gids="L2_basket",
+        target_gids="L2_basket",
+    )
+    net_api.connectivity[l2p_l2p_conn_idx[0]]["nc_dict"]["gain"] = (
+        1 + (global_custom_gain - 1) + (single_custom_gain - 1)
+    )
+
+    dpls_api = simulate_dipole(net_api, tstop=local_tstop, dt=local_dt, n_trials=1)
+
+    assert np.allclose(
+        dpls_gui[0].data["agg"],
+        dpls_api[0].data["agg"],
+    )

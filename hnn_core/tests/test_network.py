@@ -1,5 +1,7 @@
 # Authors: Mainak Jas <mainakjas@gmail.com>
 
+from contextlib import redirect_stdout
+import io
 import os.path as op
 import tempfile
 
@@ -19,7 +21,12 @@ from hnn_core import (
     simulate_dipole,
 )
 from hnn_core.cells_default import pyramidal
-from hnn_core.network import _create_cell_coords, pick_connection
+from hnn_core.network import (
+    _check_global_synaptic_gains_uniformity,
+    _create_cell_coords,
+    _get_cell_index_by_synapse_type,
+    pick_connection,
+)
 from hnn_core.network_builder import NetworkBuilder
 from hnn_core.network_models import add_erp_drives_to_jones_model
 from hnn_core.viz import plot_dipole
@@ -1273,8 +1280,8 @@ def test_network_models_mesh(network_model):
     del net, dp
 
 
-def test_synaptic_gains():
-    """Test synaptic gains update"""
+def test_set_global_synaptic_gains():
+    """Test synaptic gains setter"""
     net = jones_2009_model()
     nb_base = NetworkBuilder(net)
     e_cell_names = ["L2_pyramidal", "L5_pyramidal"]
@@ -1284,16 +1291,16 @@ def test_synaptic_gains():
     arg_names = ["e_e", "e_i", "i_e", "i_i"]
     for arg in arg_names:
         with pytest.raises(TypeError, match="must be an instance of int or"):
-            net.update_weights(**{arg: "abc"})
+            net.set_global_synaptic_gains(**{arg: "abc"})
 
         with pytest.raises(ValueError, match="must be non-negative"):
-            net.update_weights(**{arg: -1})
+            net.set_global_synaptic_gains(**{arg: -1})
 
     with pytest.raises(TypeError, match="must be an instance of bool"):
-        net.update_weights(copy="True")
+        net.set_global_synaptic_gains(copy="True")
 
     # Single argument check with copy
-    net_updated = net.update_weights(e_e=2.0, copy=True)
+    net_updated = net.set_global_synaptic_gains(e_e=2.0, copy=True)
     for conn in net_updated.connectivity:
         if conn["src_type"] in e_cell_names and conn["target_type"] in e_cell_names:
             assert conn["nc_dict"]["gain"] == 2.0
@@ -1304,7 +1311,7 @@ def test_synaptic_gains():
         assert conn["nc_dict"]["gain"] == 1.0
 
     # Single argument with inplace change
-    net.update_weights(i_e=0.5, copy=False)
+    net.set_global_synaptic_gains(i_e=0.5, copy=False)
     for conn in net.connectivity:
         if conn["src_type"] in i_cell_names and conn["target_type"] in e_cell_names:
             assert conn["nc_dict"]["gain"] == 0.5
@@ -1312,7 +1319,7 @@ def test_synaptic_gains():
             assert conn["nc_dict"]["gain"] == 1.0
 
     # Two argument check
-    net.update_weights(i_e=0.5, i_i=0.25, copy=False)
+    net.set_global_synaptic_gains(i_e=0.5, i_i=0.25, copy=False)
     for conn in net.connectivity:
         if conn["src_type"] in i_cell_names and conn["target_type"] in e_cell_names:
             assert conn["nc_dict"]["gain"] == 0.5
@@ -1341,6 +1348,11 @@ def test_synaptic_gains():
         _get_weight(nb_updated, "L2Pyr_L5Basket_ampa")
         / _get_weight(nb_base, "L2Pyr_L5Basket_ampa")
     ) == 1
+
+    # Verify network can be simulated with very heterogeneous gains
+    net.connectivity[1]["nc_dict"]["gain"] = 0.37
+    dpls = simulate_dipole(net, tstop=10.0, n_trials=1)
+    assert len(dpls[0].times) > 0
 
 
 class TestPickConnection:
@@ -1899,7 +1911,7 @@ def test_update_weights_metadata():
     i_cell_names = net.filter_cell_types(electro_type="inhibitory")
 
     # Test updating excitatory to inhibitory connections
-    net.update_weights(e_i=2.0)
+    net.set_global_synaptic_gains(e_i=2.0)
 
     for conn in net.connectivity:
         is_e_to_i = (
@@ -1911,3 +1923,153 @@ def test_update_weights_metadata():
         else:
             # Assert that all other gains remain unchanged
             assert conn["nc_dict"]["gain"] == 1.0
+
+
+def test_get_global_synaptic_gains():
+    """Test synaptic gains getter."""
+    net = jones_2009_model()
+    assert net.get_global_synaptic_gains() == {
+        "e_e": 1.0,
+        "e_i": 1.0,
+        "i_e": 1.0,
+        "i_i": 1.0,
+    }
+    new_gains = {"e_e": 0.5, "e_i": 1.5, "i_e": 0.75, "i_i": 1.0}
+    net.set_global_synaptic_gains(**new_gains)
+    assert net.get_global_synaptic_gains() == new_gains
+
+
+def test_add_connection_threshold_and_gain():
+    """Test adding connections with custom threshold and gain parameters."""
+    net = jones_2009_model()
+
+    # Add connection with custom threshold
+    custom_threshold = 15.0
+    net.add_connection(
+        src_gids="L2_pyramidal",
+        target_gids="L2_basket",
+        loc="soma",
+        receptor="ampa",
+        weight=1e-3,
+        delay=1.0,
+        lamtha=3.0,
+        threshold=custom_threshold,
+    )
+
+    # Check that the threshold was set correctly
+    conn_idx = pick_connection(
+        net, src_gids="L2_pyramidal", target_gids="L2_basket", receptor="ampa"
+    )[-1]
+    assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == custom_threshold
+
+    # Add connection with custom gain
+    custom_gain = 2.5
+    net.add_connection(
+        src_gids="L5_pyramidal",
+        target_gids="L5_basket",
+        loc="soma",
+        receptor="ampa",
+        weight=1e-3,
+        delay=1.0,
+        lamtha=3.0,
+        gain=custom_gain,
+    )
+
+    # Check that the gain was set correctly
+    conn_idx = pick_connection(
+        net, src_gids="L5_pyramidal", target_gids="L5_basket", receptor="ampa"
+    )[-1]
+    assert net.connectivity[conn_idx]["nc_dict"]["gain"] == custom_gain
+
+    # Add connection with both custom threshold and gain
+    net.add_connection(
+        src_gids="L2_basket",
+        target_gids="L2_pyramidal",
+        loc="soma",
+        receptor="gabaa",
+        weight=1e-3,
+        delay=1.0,
+        lamtha=3.0,
+        threshold=custom_threshold,
+        gain=custom_gain,
+    )
+
+    # Check that both were set correctly
+    conn_idx = pick_connection(
+        net, src_gids="L2_basket", target_gids="L2_pyramidal", receptor="gabaa"
+    )[-1]
+    assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == custom_threshold
+    assert net.connectivity[conn_idx]["nc_dict"]["gain"] == custom_gain
+
+    # Test that default threshold is inherited from network when threshold=None
+    net.add_connection(
+        src_gids="L5_basket",
+        target_gids="L5_pyramidal",
+        loc="soma",
+        receptor="gabaa",
+        weight=1e-3,
+        delay=1.0,
+        lamtha=3.0,
+        threshold=None,  # Should use net.threshold
+        gain=1.5,
+    )
+
+    conn_idx = pick_connection(
+        net, src_gids="L5_basket", target_gids="L5_pyramidal", receptor="gabaa"
+    )[-1]
+    assert net.connectivity[conn_idx]["nc_dict"]["threshold"] == net.threshold
+    assert net.connectivity[conn_idx]["nc_dict"]["gain"] == 1.5
+
+
+def test_get_cell_index_by_synapse_type():
+    """Test _get_cell_index_by_synapse_type helper function."""
+    net = jones_2009_model()
+
+    e_gids, i_gids = _get_cell_index_by_synapse_type(net)
+
+    # Check that excitatory cells are correctly identified
+    expected_e_gids = list(net.gid_ranges["L2_pyramidal"]) + list(
+        net.gid_ranges["L5_pyramidal"]
+    )
+    assert sorted(e_gids) == sorted(expected_e_gids)
+
+    # Check that inhibitory cells are correctly identified
+    expected_i_gids = list(net.gid_ranges["L2_basket"]) + list(
+        net.gid_ranges["L5_basket"]
+    )
+    assert sorted(i_gids) == sorted(expected_i_gids)
+
+    # Ensure no overlap between excitatory and inhibitory
+    assert len(set(e_gids).intersection(set(i_gids))) == 0
+
+
+def test_check_global_synaptic_gains_uniformity():
+    """Test _check_global_synaptic_gains_uniformity function."""
+    net = jones_2009_model()
+
+    # Set some global gains
+    net.set_global_synaptic_gains(e_e=0.5)
+
+    # With uniform gains (default), should return True (no warning)
+    result = _check_global_synaptic_gains_uniformity(net)
+    assert result is True
+
+    # Make gains non-uniform by setting different gains for different connections
+    # Get two e_e connections
+    l2p_l2p_conns = pick_connection(
+        net, src_gids="L2_pyramidal", target_gids="L2_pyramidal"
+    )
+
+    # Set different gains for these connections
+    net.connectivity[l2p_l2p_conns[0]]["nc_dict"]["gain"] = 1.0
+    net.connectivity[l2p_l2p_conns[1]]["nc_dict"]["gain"] = 2.0
+
+    # Capture stdout to check for warning message
+    with io.StringIO() as buf, redirect_stdout(buf):
+        result = _check_global_synaptic_gains_uniformity(net)
+        stdout = buf.getvalue()
+
+    # With NON-uniform gains, check should return False
+    assert result is False
+    assert "WARNING" in stdout
+    assert "custom synaptic gain values" in stdout

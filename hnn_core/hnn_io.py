@@ -329,6 +329,16 @@ def _read_connectivity(net, conns_data):
             weight=conn_data["nc_dict"]["A_weight"],
             delay=conn_data["nc_dict"]["A_delay"],
             lamtha=conn_data["nc_dict"]["lamtha"],
+            threshold=(
+                conn_data["nc_dict"]["threshold"]
+                if ("threshold" in conn_data["nc_dict"])
+                else None
+            ),
+            gain=(
+                conn_data["nc_dict"]["gain"]
+                if ("gain" in conn_data["nc_dict"])
+                else 1.0
+            ),
             allow_autapses=conn_data["allow_autapses"],
             probability=conn_data["probability"],
         )
@@ -574,6 +584,9 @@ def read_network_configuration(fname, read_drives=True, read_external_biases=Tru
     -------
 
     """
+    # Importing Network.
+    # Cannot do this globally due to circular import.
+    from .network import _check_global_synaptic_gains_uniformity
 
     with open(fname, "r") as file:
         net_data = json.load(file)
@@ -586,5 +599,6 @@ def read_network_configuration(fname, read_drives=True, read_external_biases=Tru
         )
 
     net = dict_to_network(net_data, read_drives, read_external_biases)
+    _check_global_synaptic_gains_uniformity(net)
 
     return net

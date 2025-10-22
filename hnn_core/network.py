@@ -313,6 +313,37 @@ def pick_connection(net, src_gids=None, target_gids=None, loc=None, receptor=Non
     return sorted(conn_set)
 
 
+def _get_cell_index_by_synapse_type(net):
+    """Returns the indices of excitatory and inhibitory cells in the Network.
+
+    This function extracts the source GIDs (cell ID) of excitatory and inhibitory cells
+    based on their connection types. Excitatory and inhibitory cells are identified by
+    their electrophysiological metadata values. This does *not* return GIDs of external
+    drives.
+
+    Parameters
+    ----------
+    net : Instance of Network object
+        The Network object
+
+    Returns
+    -------
+    e_cell_gids : list
+        The source GIDs of excitatory cells.
+    i_cell_gids : list
+        The source GIDs of inhibitory cells.
+    """
+    e_cell_gids = list()
+    i_cell_gids = list()
+    for cell_type_name, cell_data in net.cell_types.items():
+        if cell_data["cell_metadata"].get("electro_type") == "excitatory":
+            e_cell_gids.extend(net.gid_ranges[cell_type_name])
+        elif cell_data["cell_metadata"].get("electro_type") == "inhibitory":
+            i_cell_gids.extend(net.gid_ranges[cell_type_name])
+
+    return e_cell_gids, i_cell_gids
+
+
 class Network:
     """The Network class.
 
@@ -1670,6 +1701,8 @@ class Network:
         weight,
         delay,
         lamtha,
+        threshold=None,
+        gain=1.0,
         allow_autapses=True,
         probability=1.0,
         conn_seed=None,
@@ -1704,12 +1737,17 @@ class Network:
             Synaptic delay in ms.
         lamtha : float
             Space constant.
-        allow_autapses : bool
+        threshold : float, default=None
+            Firing threshold of cells for connection. If None (the default), inherit the
+            threshold from the Network object.
+        gain : float, default=1.0
+            Multiplicative factor for synaptic weight.
+        allow_autapses : bool, default=True
             If True, allow connecting neuron to itself.
-        probability : float
+        probability : float, default=1.0
             Probability of connection between any src-target pair.
             Defaults to 1.0 producing an all-to-all pattern.
-        conn_seed : int
+        conn_seed : int, default=None
             Optional initial seed for random number generator (default: None).
             Used to randomly remove connections when probability < 1.0.
 
@@ -1721,7 +1759,9 @@ class Network:
         all its targets.
         """
         conn = _Connectivity()
-        threshold = self.threshold
+        # Threshold's value is validated later below with the rest of nc_dict
+        if threshold is None:
+            threshold = self.threshold
         _validate_type(
             target_gids,
             (int, list, range, str),
@@ -1835,14 +1875,19 @@ class Network:
 
         # Create and validate nc_dict
         conn["nc_dict"] = dict()
-        arg_names = ["delay", "weight", "lamtha", "threshold"]
-        nc_dict_keys = ["A_delay", "A_weight", "lamtha", "threshold"]
-        nc_conn_items = [delay, weight, lamtha, threshold]
+        arg_names = ["delay", "weight", "lamtha", "threshold", "gain"]
+        nc_dict_keys = ["A_delay", "A_weight", "lamtha", "threshold", "gain"]
+        nc_conn_items = [delay, weight, lamtha, threshold, gain]
         for key, arg_name, item in zip(nc_dict_keys, arg_names, nc_conn_items):
             _validate_type(item, (int, float), arg_name, "int or float")
-            conn["nc_dict"][key] = item
+            if arg_name == "gain":
+                if item < 0.0:
+                    raise ValueError(
+                        f"Synaptic gains must be non-negative."
+                        f"Got {gain} for connection {conn['src_type']}->{conn['target_type']}."
+                    )
 
-        conn["nc_dict"]["gain"] = 1.0
+            conn["nc_dict"][key] = item
 
         # Probabilistically define connections
         if probability != 1.0:
@@ -1921,28 +1966,24 @@ class Network:
             }
         )
 
-    def update_weights(self, e_e=None, e_i=None, i_e=None, i_i=None, copy=False):
-        """Update synaptic weights of the network.
+    def set_global_synaptic_gains(
+        self, e_e=None, e_i=None, i_e=None, i_i=None, copy=False
+    ):
+        """Change the synaptic gains of the celltypes in the Network.
 
         Parameters
         ----------
-        e_e : float
+        e_e : float, default=None
             Synaptic gain of excitatory to excitatory connections
-
-            (default None)
-        e_i : float
+        e_i : float, default=None
             Synaptic gain of excitatory to inhibitory connections
-            (default None)
-        i_e : float
+        i_e : float, default=None
             Synaptic gain of inhibitory to excitatory connections
-            (default None)
-        i_i : float
+        i_i : float, default=None
             Synaptic gain of inhibitory to inhibitory connections
-            (default None)
-        copy : bool
+        copy : bool, default=False
             If True, returns a copy of the network. If False,
             the network is updated in place with a return of None.
-            (default False)
 
         Returns
         -------
@@ -1953,21 +1994,15 @@ class Network:
         -----
         Synaptic gains must be non-negative. The synaptic gains will only be
         updated if a float value is provided. If None is provided
-        (the default), the synapticgain will remain unchanged.
+        (the default), the synaptic gain will remain unchanged.
 
+        This does **not** change the synaptic gains of external drives.
         """
         _validate_type(copy, bool, "copy")
 
         net = self.copy() if copy else self
 
-        # Identify excitatory and inhibitory GIDs based on cell_metadata
-        e_gids = list()
-        i_gids = list()
-        for cell_type_name, cell_data in self.cell_types.items():
-            if cell_data["cell_metadata"].get("electro_type") == "excitatory":
-                e_gids.extend(self.gid_ranges[cell_type_name])
-            elif cell_data["cell_metadata"].get("electro_type") == "inhibitory":
-                i_gids.extend(self.gid_ranges[cell_type_name])
+        e_gids, i_gids = _get_cell_index_by_synapse_type(self)
 
         # Define the connection types to modify
         conn_types = {
@@ -1984,7 +2019,7 @@ class Network:
             _validate_type(gain, (int, float), conn_type, "int or float")
             if gain < 0.0:
                 raise ValueError(
-                    f"Synaptic gains must be non-negative.Got {gain} for '{conn_type}'."
+                    f"Synaptic gains must be non-negative. Got {gain} for '{conn_type}'."
                 )
 
             conn_indices = pick_connection(
@@ -1995,6 +2030,54 @@ class Network:
 
         if copy:
             return net
+
+    def get_global_synaptic_gains(self):
+        """Retrieve gain values for different celltype connections in the Network.
+
+        This function identifies excitatory and inhibitory cells in the Network
+        and retrieves the `gain` value for each type of synaptic connection:
+
+            - excitatory to excitatory (e_e)
+            - excitatory to inhibitory (e_i)
+            - inhibitory to excitatory (i_e)
+            - inhibitory to inhibitory (i_i)
+
+        The gain is assumed to be uniform across all instances of each connection type
+        (for example, between AMPA and NMDA, and between `L2_pyramidal->L2_pyramidal` and
+        `L2_pyramidal->L5_pyramidal`, etc.). Only the first connection's gain value is
+        used for each type.
+
+        This does **not** return the synaptic gains of external drives.
+
+        Returns
+        -------
+        values : dict
+            A dictionary with the connection types ('e_e', 'e_i', 'i_e', 'i_i') as keys
+            and their corresponding gain values.
+        """
+        e_gids, i_gids = _get_cell_index_by_synapse_type(self)
+
+        # Define the connection types and source/target cell indexes
+        conn_types = {
+            "e_e": (e_gids, e_gids),
+            "e_i": (e_gids, i_gids),
+            "i_e": (i_gids, e_gids),
+            "i_i": (i_gids, i_gids),
+        }
+
+        # Retrieve the gain value for each connection type
+        values = {}
+        for conn_type, (src_idxs, target_idxs) in conn_types.items():
+            picks = pick_connection(self, src_gids=src_idxs, target_gids=target_idxs)
+
+            if picks:
+                # Extract the gain from the first connection
+                values[conn_type] = self.connectivity[picks[0]]["nc_dict"]["gain"]
+
+        # This writes the warning to stdout
+        _check_global_synaptic_gains_uniformity(self)
+
+        return values
 
     def plot_cells(self, ax=None, show=True):
         """Plot the cells using Network.pos_dict.
@@ -2217,6 +2300,8 @@ class _Connectivity(dict):
             Synaptic delay in ms.
         lamtha : float
             Space constant.
+        threshold : float
+            Firing threshold of cells for connection.
         gain : float
             Multiplicative factor for synaptic weight.
     probability : float
@@ -2238,6 +2323,8 @@ class _Connectivity(dict):
         entr += f"\nweight: {self['nc_dict']['A_weight']}; "
         entr += f"delay: {self['nc_dict']['A_delay']}; "
         entr += f"lamtha: {self['nc_dict']['lamtha']}"
+        entr += f"threshold: {self['nc_dict']['threshold']}"
+        entr += f"gain: {self['nc_dict']['gain']}"
         entr += "\n "
 
         return entr
@@ -2361,3 +2448,59 @@ def _add_cell_type_bias(
         cell_type_bias["section"] = section
 
     network.external_biases[bias_name][cell_type] = cell_type_bias
+
+
+def _check_global_synaptic_gains_uniformity(net):
+    """Check whether gain values are uniform within their type of connection.
+
+    This function identifies excitatory and inhibitory cells in the Network
+    and retrieves the gain value for each type of synaptic connection:
+
+    - excitatory to excitatory (e_e)
+    - excitatory to inhibitory (e_i)
+    - inhibitory to excitatory (i_e)
+    - inhibitory to inhibitory (i_i)
+
+    The gain is then checked to see if it is uniform for all instances within each
+    connection type (for example, between AMPA and NMDA, and between different
+    connections like L2_pyramidal->L2_pyramidal and L2_pyramidal->L5_pyramidal). This
+    does **not** check the synaptic gains of external drives.
+
+    Returns
+    -------
+    output_indicator : bool
+        A truth value indicating whether the synaptic gains are uniform within their
+        connection type (True) or non-uniform (False).
+    """
+    e_gids, i_gids = _get_cell_index_by_synapse_type(net)
+
+    # Define the connection types and source/target cell indexes
+    conn_types = {
+        "e_e": (e_gids, e_gids),
+        "e_i": (e_gids, i_gids),
+        "i_e": (i_gids, e_gids),
+        "i_i": (i_gids, i_gids),
+    }
+
+    output_indicator = True
+    # Retrieve the gain value for each connection type
+    for conn_type, (src_idxs, target_idxs) in conn_types.items():
+        picks = pick_connection(net, src_gids=src_idxs, target_gids=target_idxs)
+
+        first_value = net.connectivity[picks[0]]["nc_dict"]["gain"]
+        for other_idx in range(1, len(picks)):
+            if not bool(
+                np.isclose(
+                    net.connectivity[picks[other_idx]]["nc_dict"]["gain"],
+                    first_value,
+                )
+            ):
+                output_indicator = False
+                print(
+                    """
+                    WARNING: Your imported Network uses custom synaptic gain values. Global synaptic gain values such as "Excitatory-to-Inhibitory" etc. will NOT be read or displayed properly. This is because Global synaptic gain values assume that initially, all gains are the same. If you continue to modify your Global synaptic gain values, double-check each connection's final synaptic gain value. To stop this warning, change your synaptic weights instead of your synaptic gains.
+                    """
+                )
+                break
+
+    return output_indicator
