@@ -124,7 +124,7 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
             "smoothing and scaling explicitly using Dipole methods.",
             DeprecationWarning,
         )
-    dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc)
+    dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc, bsl_cor)
 
     return dpls
 
@@ -677,6 +677,32 @@ class Dipole(object):
             colorbar_inside=colorbar_inside,
             show=show,
         )
+
+    def _baseline_renormalize_ca(self):
+        """Baseline correction based on calcium model without drives"""
+
+        hnn_core_root = op.dirname(hnn_core.__file__)
+
+        # load the baseline dipole
+        with open(op.join(hnn_core_root, 'param', 'bsl_dipole_ca.json'), 'r') as f:
+            bsl_dpl = json.load(f)
+
+        A_L2 = bsl_dpl['L2'][-1]
+        A_L5 = bsl_dpl['L5'][-1]
+
+        C_L2 = bsl_dpl['L2'][1]
+        C_L5 = bsl_dpl['L5'][1]
+
+        popt_l2 = np.array(bsl_dpl['popt_l2'])
+        popt_l5 = np.array(bsl_dpl['popt_l5'])
+
+        exp_fit_l2 = exp_decay(np.array(self.times[1:]), A_L2, C_L2, *popt_l2)
+        exp_fit_l5 = exp_decay(np.array(self.times[1:]), A_L5, C_L5, *popt_l5)
+
+        self.data['L2'][1:] -= exp_fit_l2
+        self.data['L5'][1:] -= exp_fit_l5
+        
+        self.data['agg'] = self.data['L2'] + self.data['L5']
 
     def _baseline_renormalize(self, N_pyr_x, N_pyr_y):
         """Only baseline renormalize if the units are fAm.

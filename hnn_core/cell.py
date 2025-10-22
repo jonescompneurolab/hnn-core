@@ -208,7 +208,6 @@ class Section:
     """
     def __init__(self, L, diam, Ra, cm, v=-65, end_pts=None):
 
-    def __init__(self, L, diam, Ra, cm, end_pts=None):
         self._L = L
         self._diam = diam
         self._Ra = Ra

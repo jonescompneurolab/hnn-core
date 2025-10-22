@@ -7,7 +7,7 @@ import hnn_core
 from hnn_core import read_params
 from .network import Network, _create_cell_coords
 from .params import _short_name
-from .cells_default import pyramidal_ca, pyramidal_l5ET, pyramidal_l23, interneuron
+from .cells_default import basket, pyramidal, pyramidal_ca, pyramidal_l5ET, pyramidal_l23, interneuron
 from .externals.mne import _validate_type
 
 import random
@@ -409,8 +409,75 @@ def duecker_2025_ET_model(params=None, add_drives_from_params=False,
     if params is None:
         params = read_params(params_fname)
 
-    net = Network(params, add_drives_from_params=add_drives_from_params,
-                  legacy_mode=legacy_mode, mesh_shape=mesh_shape)
+    cell_types = {
+        "L2_basket": {
+            "cell_object": interneuron(cell_name=_short_name("L2_basket"), layer=2),
+            "cell_metadata": {
+                "morpho_type": "interneuron",
+                "electro_type": "inhibitory",
+                "layer": "2",
+                "measure_dipole": False,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+        "L2_pyramidal": {
+            "cell_object": pyramidal_l23(cell_name=_short_name("L2_pyramidal")),
+            "cell_metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "2",
+                "measure_dipole": True,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+        "L5_basket": {
+            "cell_object": interneuron(cell_name=_short_name("L5_basket"), layer=5),
+            "cell_metadata": {
+                "morpho_type": "interneuron",
+                "electro_type": "inhibitory",
+                "layer": "5",
+                "measure_dipole": False,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+        "L5_pyramidal": {
+            "cell_object": pyramidal_l5ET(cell_name=_short_name("L5_pyramidal")),
+            "cell_metadata": {
+                "morpho_type": "pyramidal",
+                "electro_type": "excitatory",
+                "layer": "5",
+                "measure_dipole": True,
+                "reference": "https://doi.org/10.7554/eLife.51214",
+            },
+        },
+    }
+
+    # Create layer positions
+    layer_dict = _create_cell_coords(
+        n_pyr_x=mesh_shape[0],
+        n_pyr_y=mesh_shape[1],
+        z_coord=1307.4,  # Default layer separation
+        inplane_distance=1.0,  # Default in-plane distance
+    )
+
+    # Map cell types to layer positions
+    pos_dict = {
+        "L5_pyramidal": layer_dict["L5_bottom"],
+        "L2_pyramidal": layer_dict["L2_bottom"],
+        "L5_basket": layer_dict["L5_mid"],
+        "L2_basket": layer_dict["L2_mid"],
+        "origin": layer_dict["origin"],
+    }
+
+    # Create network with cell types and positions
+    net = Network(
+        params,
+        add_drives_from_params=add_drives_from_params,
+        legacy_mode=legacy_mode,
+        mesh_shape=mesh_shape,
+        pos_dict=pos_dict,
+        cell_types=cell_types,
+    )
     
 
     delay = net.delay
@@ -547,27 +614,7 @@ def duecker_2025_ET_model(params=None, add_drives_from_params=False,
     
     # Replace cells
 
-    # L5
-    cell_name = 'L5_pyramidal'
-    pos = net.cell_types[cell_name].pos
-    net.cell_types[cell_name] = pyramidal_l5ET(
-        cell_name=_short_name(cell_name), pos=pos)
-
-    cell_name = 'L5_basket'
-    pos = net.cell_types[cell_name].pos
-    net.cell_types[cell_name] = interneuron(
-        cell_name=_short_name(cell_name), pos=pos)
     
-    # L2/3
-    cell_name = 'L2_pyramidal'
-    pos = net.cell_types[cell_name].pos
-    net.cell_types[cell_name] = pyramidal_l23(
-        cell_name=_short_name(cell_name), pos=pos)
-    
-    cell_name = 'L2_basket'
-    pos = net.cell_types[cell_name].pos
-    net.cell_types[cell_name] = interneuron(
-        cell_name=_short_name(cell_name), pos=pos)
     
     return net
 

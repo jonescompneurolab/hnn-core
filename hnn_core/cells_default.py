@@ -521,7 +521,7 @@ def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
 
     return cell
 
-def pyramidal_l5ET(cell_name,pos, gid=None):
+def pyramidal_l5ET(cell_name,pos=(0,0,0), gid=None):
         
     p_all = get_L5PyrET_params()
 
@@ -678,7 +678,7 @@ def pyramidal_l5ET(cell_name,pos, gid=None):
 
 
 
-def pyramidal_l23(cell_name,pos, gid=None):
+def pyramidal_l23(cell_name,pos=(0,0,0), gid=None):
 
     p_all = get_L2Pyr_params_new()
 
@@ -810,7 +810,7 @@ def pyramidal_l23(cell_name,pos, gid=None):
 
     return cell
 
-def interneuron(cell_name, pos, gid=None):
+def interneuron(cell_name,pos=(0,0,0), layer=2, gid=None):
 
     p_all = get_Int_params()
     sections = dict()
@@ -818,9 +818,9 @@ def interneuron(cell_name, pos, gid=None):
     synapses = _get_basket_syn_props()
     sections['soma'].syns = list(synapses.keys())
 
-    if cell_name == 'L2Basket':
+    if layer == 2:
         sect_loc = dict(proximal=['soma'], distal=['soma'])
-    elif cell_name == 'L5Basket':
+    elif layer == 5:
         sect_loc = dict(proximal=['soma'], distal=[])
 
     cell_tree = None
