@@ -1,6 +1,6 @@
 """
 ==============================================
-10. Simulating Two Minimal Independent Networks
+10. Simulating Two Minimal Independent Networks (beta feature)
 ==============================================
 
 This how-to demonstrates constructing and running two *independent* minimal
@@ -71,7 +71,7 @@ net1 = create_minimal_network(gid_start=0)
 
 drive_gid_1 = net1._get_next_available_gid()
 net1.add_evoked_drive(
-    'evdist1', mu=5.0, sigma=1.0, numspikes=1, location='distal',
+    'evdist1_net1', mu=5.0, sigma=1.0, numspikes=1, location='distal',
     weights_ampa={'L2_pyramidal': 0.1, 'L5_pyramidal': 0.1},
     gid_start=drive_gid_1
 )
@@ -87,7 +87,7 @@ net2 = create_minimal_network(gid_start=next_gid)
 # -----------------------------------
 drive_gid_2 = net2._get_next_available_gid()
 net2.add_evoked_drive(
-    'evdist2', mu=5.0, sigma=1.0, numspikes=1, location='distal',
+    'evdist1_net2', mu=5.0, sigma=1.0, numspikes=1, location='distal',
     weights_ampa={'L2_pyramidal': 0.1, 'L5_pyramidal': 0.1},
     gid_start=drive_gid_2
 )
@@ -167,5 +167,4 @@ def plot_combined_spike_raster(net_a, net_b, title="Combined Spike Raster"):
 
 
 plot_combined_spike_raster(net1, net2, title="Net1 + Net2 Spikes")
-
 
