@@ -156,19 +156,11 @@
     
     "N_pyr_x": 10,
     "N_pyr_y": 10,
-<<<<<<< HEAD
     "gbar_L2Pyr_L2Pyr_ampa": 0.0004,
     "gbar_L2Pyr_L2Pyr_nmda": 0.000025,
     "gbar_L2Basket_L2Pyr_gabaa": 0.05,
     "gbar_L2Basket_L2Pyr_gabab": 0.0125,
     "gbar_L2Pyr_L5Pyr": 0.004,
-=======
-    "gbar_L2Pyr_L2Pyr_ampa": 0.0005,
-    "gbar_L2Pyr_L2Pyr_nmda": 0.00005,
-    "gbar_L2Basket_L2Pyr_gabaa": 0.05,
-    "gbar_L2Basket_L2Pyr_gabab": 0.0075,
-    "gbar_L2Pyr_L5Pyr": 0.002,
->>>>>>> 60141f54478d23ae3c9bcf75b63020d1288e025b
     "gbar_L2Basket_L5Pyr": 0.002,
     "gbar_L5Pyr_L5Pyr_ampa": 0.0005,
     "gbar_L5Pyr_L5Pyr_nmda": 0.00025,
