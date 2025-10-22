@@ -1466,6 +1466,8 @@ def create_expanded_button(
 def _get_connectivity_widgets(conn_data, global_gain_textfields):
     """Create connectivity box widgets from specified weight and gains"""
     style = {"description_width": "100px"}
+    html_tab = "&emsp;"
+
     sliders = list()
     for receptor_idx, receptor_name in enumerate(conn_data.keys()):
         global_gain_type = global_gain_type_lookup_dict[
@@ -1499,24 +1501,26 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
 
         combined_gain_indicator_output = HTML(
             value=f"""
+            <p style='margin:0px;padding-left:115px;'>
             <b>Total Computed Gain={
                 (
                     1
                     + (global_gain_textfields[global_gain_type].value - 1)
                     + (single_gain_text_input.value - 1)
-                ):.2f}</b>"""
+                ):.2f}</b></p>"""
         )
 
         # Create closure to capture current widget references
         def make_update_gain_indicator(gain_output, gain_input, gain_type):
             def update_gain_indicator(change):
                 gain_output.value = f"""
+                <p style='margin:0px;padding-left:115px;'>
                 <b>Total Computed Gain={
                     (
                         1
                         + (global_gain_textfields[gain_type].value - 1)
                         + (gain_input.value - 1)
-                    ):.2f}</b>"""
+                    ):.2f}</b></p>"""
 
             return update_gain_indicator
 
@@ -1584,8 +1588,6 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
         if display_name in map_display_names:
             display_name = map_display_names[display_name]
 
-        html_tab = "&emsp;"
-
         conn_widget = VBox(
             [
                 HTML(
@@ -1601,9 +1603,9 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
                 HBox(
                     [
                         single_gain_text_input,
-                        combined_gain_indicator_output,
                     ]
                 ),
+                combined_gain_indicator_output,
             ]
         )
 

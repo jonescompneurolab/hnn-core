@@ -1443,7 +1443,7 @@ def test_combined_gain_indicator_updates(setup_gui):
     # Extract single gain widget and combined gain indicator
     # Structure: children[2] is HBox containing [single_gain_input, combined_indicator]
     single_gain_widget = conn_widget.children[2].children[0]
-    combined_indicator = conn_widget.children[2].children[1]
+    combined_indicator = conn_widget.children[3]
     assert hasattr(single_gain_widget, "value")
     assert single_gain_widget.value >= 0  # Non-negative gain
 
