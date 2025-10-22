@@ -668,6 +668,7 @@ class Network:
         probability=1.0,
         event_seed=2,
         conn_seed=3,
+        gid_start=None,
     ):
         """Add an 'evoked' external drive to the network
 
@@ -710,11 +711,7 @@ class Network:
         weights_nmda : dict or None
             Synaptic weights (in uS) of NMDA receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
-        synaptic_delays : dict or float
-            Synaptic delay (in ms) at the column origin, dispersed laterally as
-            a function of the space_constant. If float, applies to all target
-            cell types. Use dict to create delay->cell mapping.
-        space_constant : float
+        space_constant : float, default: 3.0
             Describes lateral dispersion (from the column origin) of synaptic
             weights and delays within the simulated column. The constant is
             measured in the units of ``inplane_distance`` of
@@ -723,7 +720,11 @@ class Network:
             ``exp(-(x / (3 * inplane_distance)) ** 2)``, where x is the
             physical distance (in um) between the connected cells in the xy
             plane (delays are modulated by the inverse of this factor).
-        probability : dict or float (default: 1.0)
+        synaptic_delays : dict or float, default: 0.1
+            Synaptic delay (in ms) at the column origin, dispersed laterally as
+            a function of the space_constant. If float, applies to all target
+            cell types. Use dict to create delay->cell mapping.
+        probability : dict or float, default: 1.0
             Probability of connection between any src-target pair.
             Use dict to create probability->cell mapping. If float, applies to
             all target cell types
@@ -735,6 +736,10 @@ class Network:
             Optional initial seed for random number generator (default: 3).
             Used to randomly remove connections when probability < 1.0.
             Fixed across trials (see Notes)
+        gid_start : int, default: None
+            Optional number to use as the starting index for the drive's GID range,
+            instead of the default. Default case (None) builds the GID range of the
+            drive starting from the Network's max GID + 1.
 
         Notes
         -----
@@ -777,6 +782,7 @@ class Network:
             n_drive_cells,
             cell_specific,
             probability,
+            gid_start=gid_start,
         )
 
     def add_poisson_drive(
@@ -796,6 +802,7 @@ class Network:
         probability=1.0,
         event_seed=2,
         conn_seed=3,
+        gid_start=None,
     ):
         """Add a Poisson-distributed external drive to the network
 
@@ -842,11 +849,7 @@ class Network:
         weights_nmda : dict or None
             Synaptic weights (in uS) of NMDA receptors on each targeted cell
             type (dict keys). Cell types omitted from the dict are set to zero.
-        synaptic_delays : dict or float
-            Synaptic delay (in ms) at the column origin, dispersed laterally as
-            a function of the space_constant. If float, applies to all target
-            cell types. Use dict to create delay->cell mapping.
-        space_constant : float
+        space_constant : float, default: 100.0
             Describes lateral dispersion (from the column origin) of synaptic
             weights and delays within the simulated column. The constant is
             measured in the units of ``inplane_distance`` of
@@ -855,7 +858,11 @@ class Network:
             ``exp(-(x / (3 * inplane_distance)) ** 2)``, where ``x`` is the
             physical distance (in um) between the connected cells in the xy
             plane.
-        probability : dict or float (default: 1.0)
+        synaptic_delays : dict or float, default: 0.1
+            Synaptic delay (in ms) at the column origin, dispersed laterally as
+            a function of the space_constant. If float, applies to all target
+            cell types. Use dict to create delay->cell mapping.
+        probability : dict or float, default: 1.0
             Probability of connection between any src-target pair.
             Use dict to create probability->cell mapping. If float, applies to
             all target cell types.
@@ -865,6 +872,10 @@ class Network:
         conn_seed : int
             Optional initial seed for random number generator (default: 3).
             Used to randomly remove connections when probability < 1.0.
+        gid_start : int, default: None
+            Optional number to use as the starting index for the drive's GID range,
+            instead of the default. Default case (None) builds the GID range of the
+            drive starting from the Network's max GID + 1.
         """
 
         _check_drive_parameter_values("Poisson", tstart=tstart, tstop=tstop)
@@ -920,6 +931,7 @@ class Network:
             n_drive_cells,
             cell_specific,
             probability,
+            gid_start=gid_start,
         )
 
     def add_bursty_drive(
@@ -943,6 +955,7 @@ class Network:
         probability=1.0,
         event_seed=2,
         conn_seed=3,
+        gid_start=None,
     ):
         """Add a bursty (rhythmic) external drive to all cells of the network
 
@@ -1019,6 +1032,10 @@ class Network:
         conn_seed : int
             Optional initial seed for random number generator (default: 3).
             Used to randomly remove connections when probability < 1.0.
+        gid_start : int, default: None
+            Optional number to use as the starting index for the drive's GID range,
+            instead of the default. Default case (None) builds the GID range of the
+            drive starting from the Network's max GID + 1.
         """
         if not self._legacy_mode:
             _check_drive_parameter_values(
@@ -1069,6 +1086,7 @@ class Network:
             n_drive_cells,
             cell_specific,
             probability,
+            gid_start=gid_start,
         )
 
     def add_spike_train_drive(
@@ -1083,6 +1101,7 @@ class Network:
         space_constant=3.0,
         probability=1.0,
         conn_seed=None,
+        gid_start=None,
     ):
         """Add an external drive from explicitly defined spike trains.
 
@@ -1103,7 +1122,10 @@ class Network:
             can be any string that helps identify the source.
             Example:
             ```
-            {"NetA_L2_pyramidal_GID0": [10.2, 25.3], "NetA_L5_pyramidal_GID1": [15.1, 30.4]}
+            {
+                "NetA_L2_pyramidal_GID0": [10.2, 25.3],
+                "NetA_L5_pyramidal_GID1": [15.1, 30.4],
+            }
             ```
 
             - *Format 2 (tuples)*: A list of (time, gid) tuples, where each tuple
@@ -1122,30 +1144,32 @@ class Network:
             remapped internally to sequential drive cell IDs (0 to n-1) in the target
             network. Different GIDs should be used for different source cells.
         location : str
-            Target location of synapses in the target network. Must be 'proximal', 'distal', or
-            'soma', or a specific section name (when legacy_mode=False).
-        weights_ampa : dict or None
-            Synaptic weights (in uS) of AMPA receptors for each targeted cell type (dict keys).
+            Target location of synapses in the target network. Must be 'proximal',
+            'distal', or 'soma', or a specific section name (when legacy_mode=False).
+        weights_ampa : dict or None, default: None
+            Synaptic weights (in uS) of AMPA receptors for each targeted cell type (dict
+            keys).
             Cell types omitted are set to zero.
-        weights_nmda : dict or None
-            Synaptic weights (in uS) of NMDA receptors for each targeted cell type (dict keys).
+        weights_nmda : dict or None, default: None
+            Synaptic weights (in uS) of NMDA receptors for each targeted cell type (dict
+            keys).
             Cell types omitted are set to zero.
-        synaptic_delays : dict or float
+        synaptic_delays : dict or float, default: 0.1
             Synaptic delay (in ms) at the column origin, dispersed laterally as
             a function of the space_constant. If float, applies to all target
             cell types. Use dict to create delay->cell mapping.
-        space_constant : float
-            Lateral dispersion constant (in units of inplane_distance) for synaptic weights and
-            delays within the target network. Default: 3.0
-        probability : float or dict
-            Connection probability between source and target cells. Default: 1.0 (all-to-all).
-        conn_seed : int
+        space_constant : float, default: 3.0
+            Lateral dispersion constant (in units of inplane_distance) for synaptic
+            weights and delays within the target network. Default: 3.0
+        probability : float or dict, default: 1.0
+            Connection probability between source and target cells. Default: 1.0
+            (all-to-all).
+        conn_seed : int, default: None
             Optional seed for random number generator for connectivity (default: None).
-        cell_specific : bool
-            If True, enables cell-specific connectivity (e.g., for 1-to-1 mapping). Default: False.
-        n_drive_cells : str or int
-            Number of drive cells. Use 'n_cells' for 1-to-1 mapping with target cell types,
-            or an integer for a fixed number. Default: None (inferred from spike_data).
+        gid_start : int, default: None
+            Optional number to use as the starting index for the drive's GID range,
+            instead of the default. Default case (None) builds the GID range of the
+            drive starting from the Network's max GID + 1.
         """
         if not self._legacy_mode:
             warnings.warn(
@@ -1193,6 +1217,7 @@ class Network:
             n_drive_cells=drive["n_drive_cells"],
             cell_specific=False,
             probability=probability,
+            gid_start=gid_start,
         )
 
     def _attach_drive(
@@ -1207,6 +1232,7 @@ class Network:
         n_drive_cells,
         cell_specific,
         probability,
+        gid_start=None,
     ):
         """Attach a drive to network based on connectivity information
 
@@ -1256,11 +1282,17 @@ class Network:
             connectivity requires that n_drive_cells='n_cells', where 'n_cells'
             denotes the number of all available cells that this drive can
             target in the network.
-        probability : dict or float (default: 1.0)
+        probability : dict or float
             Probability of connection between any src-target pair.
             Use dict to create probability->cell mapping. If float, applies to
             all target cell types
+        gid_start : int, default: None
+            Optional number to use as the starting index for the drive's GID range,
+            instead of the default. Default case (None) builds the GID range of the
+            drive starting from the Network's max GID + 1.
 
+        Notes
+        -----
         Attached drive is stored in self.external_drives[name]
         self.pos_dict is updated, and self._update_gid_ranges() called
         """
@@ -1365,7 +1397,7 @@ class Network:
         self.external_drives[name] = drive
 
         pos = [self.pos_dict["origin"]] * n_drive_cells
-        self._add_cell_type(name, pos)
+        self._add_cell_type(name, pos, gid_start=gid_start)
 
         # Set the starting index for cell-specific source gids
         # This will be updated depending on the number of target cells
@@ -1583,10 +1615,25 @@ class Network:
                     t_stop=tstop,
                 )
 
-    def _add_cell_type(self, cell_name, pos, cell_template=None):
-        """Add cell type by updating pos_dict and gid_ranges."""
-        ll = self._n_gids
-        self._n_gids += len(pos)
+    def _add_cell_type(self, cell_name, pos, cell_template=None, gid_start=None):
+        """Add cell type by updating pos_dict and gid_ranges.
+
+        Parameters
+        ----------
+        cell_name : str
+            The name of the cell type to add.
+        pos : tuple
+            Coordinates of cell soma in xyz-space.
+        cell_template : Instance of Cell object, default: None
+            Previously-instantiated `Cell` object to add for corresponding `cell_name`.
+        gid_start : int, default: None
+            Optional number to use as the starting index for the drive's GID range,
+            instead of the default. Default case (None) builds the GID range of the
+            drive starting from the Network's max GID + 1.
+
+        """
+        ll = self._n_gids if (gid_start is None) else gid_start
+        self._n_gids = ll + len(pos)
         self.gid_ranges[cell_name] = range(ll, self._n_gids)
         self.pos_dict[cell_name] = pos
         if cell_template is not None:
@@ -2174,6 +2221,80 @@ class Network:
             )
 
         return standardized_data, n_drive_cells, source_to_gid_map
+
+    def _get_next_available_gid(self):
+        """Return the next unused GID number, equal to current max GID + 1."""
+        max_gid = -1
+        for rng in self.gid_ranges.values():
+            if len(rng) > 0:
+                max_gid = max(max_gid, max(rng))
+        return max_gid + 1
+
+    def _shift_gid_ranges(self, gid_start):
+        """Reset cell and non-drive GIDs to begin at a different number.
+
+        Parameters
+        ----------
+        gid_start : int
+            Number to begin the Network's non-drive GIDs at, instead of the default
+            value of 0. This number will be used to reconstruct both
+            `Network.gid_ranges` and some entries in `Network.connectivity`.
+
+        Notes
+        -----
+        - This function is intended for future work in simulating multiple `Network`
+          objects within the same simulation. Specifically, this is intended for usage
+          with the "second" or any additional `Network` objects, such that the first
+          `Network` and additional `Networks` use a disjoint set of GIDs.
+        - This successfully shifts GIDs for individual cells and for non-drive synapses,
+          but currently does NOT shift GIDs for external drives. You should shift your
+          Network's GIDs only BEFORE adding drives to the Network.
+        """
+        # Shift GID ranges to start at gid_start and avoid overlap
+        current_gid = gid_start
+
+        original_gid_ranges = deepcopy(self.gid_ranges)
+        self.gid_ranges = OrderedDict()
+
+        # Shift individual cell GIDs to match new gid_ranges
+        for ct in self.cell_types.keys():
+            n_cells = len(self.pos_dict[ct])
+            self.gid_ranges[ct] = range(current_gid, current_gid + n_cells)
+            current_gid += n_cells
+
+        # Shift connectivity GIDs to match new gid_ranges
+        for conn in self.connectivity:
+            # Shift target_gids if target_type is in mapping
+            if "target_type" in conn and conn["target_type"] in self.cell_types.keys():
+                ct = conn["target_type"]
+                gid_range = list(self.gid_ranges[ct])
+                n_targets = len(conn["target_gids"])
+                # Replace with correct GIDs from gid_ranges
+                conn["target_gids"] = gid_range[:n_targets]
+            # Shift src_gids if src_type is in mapping
+            if "src_type" in conn and conn["src_type"] in self.cell_types.keys():
+                ct = conn["src_type"]
+                gid_range = list(self.gid_ranges[ct])
+                n_srcs = len(conn["src_gids"])
+                conn["src_gids"] = gid_range[:n_srcs]
+
+            if "gid_pairs" in conn and conn["gid_pairs"]:
+                src_type = conn["src_type"]
+                tgt_type = conn["target_type"]
+
+                # Calculate offsets using original and new GID ranges
+                src_offset = (
+                    self.gid_ranges[src_type][0] - original_gid_ranges[src_type][0]
+                )
+                tgt_offset = (
+                    self.gid_ranges[tgt_type][0] - original_gid_ranges[tgt_type][0]
+                )
+                new_gid_pairs = {}
+                for src_gid, tgt_gids in conn["gid_pairs"].items():
+                    new_src_gid = int(src_gid) + src_offset
+                    new_tgt_gids = [int(tg) + tgt_offset for tg in tgt_gids]
+                    new_gid_pairs[new_src_gid] = new_tgt_gids
+                conn["gid_pairs"] = new_gid_pairs
 
 
 class _Connectivity(dict):
