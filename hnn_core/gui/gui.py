@@ -1537,8 +1537,8 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
                     weight_text_input.value
                     * (
                         1
-                        + global_gain_textfields[global_gain_type].value
-                        + single_gain_text_input.value
+                        + (global_gain_textfields[global_gain_type].value - 1)
+                        + (single_gain_text_input.value - 1)
                     )
                 ):.4f}</b>"""
         )
@@ -1554,8 +1554,8 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
                         weight_input.value
                         * (
                             1
-                            + global_gain_textfields[gain_type].value
-                            + gain_input.value
+                            + (global_gain_textfields[gain_type].value - 1)
+                            + (gain_input.value - 1)
                         )
                     ):.4f}</b>"""
 
