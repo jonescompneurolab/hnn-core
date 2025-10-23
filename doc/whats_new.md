@@ -34,15 +34,15 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   description of {func}`~hnn_core.Network.add_spike_train_drive` below in the Public API
   Changes section.
 
-### Bug Fixes
-
-- Synaptic `gain` and `threshold` values are now loaded correctly when reading in a
-  `Network` JSON file, instead of being overridden with default values, by [George
-  Dang][] and [Austin E. Soplata][] in {gh}`918`.
-
 ### Deprecations
 
 - Similar to [NEURON][], we have dropped support for Python 3.8. We have also added support for Python 3.13.
+
+### Bug Fixes
+
+- Synaptic `gain` and `threshold` values are now loaded correctly when reading in a
+  `Network` JSON file, instead of being overridden with default values,
+  by [George Dang][] and [Austin E. Soplata][] in {gh}`918`.
 
 ### Public API Changes
 
