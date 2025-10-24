@@ -4,27 +4,22 @@
 #          Sam Neymotin <samnemo@gmail.com>
 
 import os
+import os.path as op
 import warnings
 from io import StringIO
+import json
 
 import numpy as np
 from copy import deepcopy
 from h5io import write_hdf5, read_hdf5
 from .externals.mne import _check_option
 
+import hnn_core
 from .viz import plot_dipole, plot_psd, plot_tfr_morlet
 
 
-def simulate_dipole(
-    net,
-    tstop,
-    dt=0.025,
-    n_trials=None,
-    record_vsec=False,
-    record_isec=False,
-    record_ca=False,
-    postproc=False,
-):
+def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
+                    record_isec=False, record_ca=False, postproc=False, bsl_cor='jones', change_seed_per_drive=False):
     """Simulate a dipole given the experiment parameters.
 
     Parameters
@@ -56,6 +51,10 @@ def simulate_dipole(
         extracellular recordings etc. The preferred way is to use the
         :meth:`~hnn_core.dipole.Dipole.smooth` and
         :meth:`~hnn_core.dipole.Dipole.scale` methods instead. Default: False.
+    bsl_cor : str
+        Baseline correction method. Default: 'jones'
+        For jones_2009_model and law_2021_model, use method 'jones' (manual correction).
+        For new_calcium_model, use method 'calcium'.
 
     Returns
     -------
@@ -67,7 +66,7 @@ def simulate_dipole(
 
     if _BACKEND is None:
         _BACKEND = JoblibBackend(n_jobs=1)
-
+        
     if n_trials is None:
         n_trials = net._params["N_trials"]
     if n_trials < 1:
@@ -99,7 +98,7 @@ def simulate_dipole(
             if duration < 0.0:
                 raise ValueError("Duration of tonic input cannot be negative")
 
-    net._instantiate_drives(n_trials=n_trials, tstop=tstop)
+    net._instantiate_drives(n_trials=n_trials, tstop=tstop, change_seed_per_drive=change_seed_per_drive)
     net._reset_rec_arrays()
 
     _check_option("record_vsec", record_vsec, ["all", "soma", False])
@@ -125,7 +124,7 @@ def simulate_dipole(
             "smoothing and scaling explicitly using Dipole methods.",
             DeprecationWarning,
         )
-    dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc)
+    dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc, bsl_cor)
 
     return dpls
 
@@ -331,6 +330,8 @@ def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
 
     return np.sqrt((weights * ((dpl1 - dpl2) ** 2)).sum() / weights.sum())
 
+def exp_decay(t, A, C, b):
+    return ((C-A) * np.exp(-b*(t))) + A
 
 class Dipole(object):
     """Dipole class.
@@ -676,6 +677,32 @@ class Dipole(object):
             colorbar_inside=colorbar_inside,
             show=show,
         )
+
+    def _baseline_renormalize_ca(self):
+        """Baseline correction based on calcium model without drives"""
+
+        hnn_core_root = op.dirname(hnn_core.__file__)
+
+        # load the baseline dipole
+        with open(op.join(hnn_core_root, 'param', 'bsl_dipole_ca.json'), 'r') as f:
+            bsl_dpl = json.load(f)
+
+        A_L2 = bsl_dpl['L2'][-1]
+        A_L5 = bsl_dpl['L5'][-1]
+
+        C_L2 = bsl_dpl['L2'][1]
+        C_L5 = bsl_dpl['L5'][1]
+
+        popt_l2 = np.array(bsl_dpl['popt_l2'])
+        popt_l5 = np.array(bsl_dpl['popt_l5'])
+
+        exp_fit_l2 = exp_decay(np.array(self.times[1:]), A_L2, C_L2, *popt_l2)
+        exp_fit_l5 = exp_decay(np.array(self.times[1:]), A_L5, C_L5, *popt_l5)
+
+        self.data['L2'][1:] -= exp_fit_l2
+        self.data['L5'][1:] -= exp_fit_l5
+        
+        self.data['agg'] = self.data['L2'] + self.data['L5']
 
     def _baseline_renormalize(self, N_pyr_x, N_pyr_y):
         """Only baseline renormalize if the units are fAm.
