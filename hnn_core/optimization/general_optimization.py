@@ -156,13 +156,13 @@ class Optimizer:
 
         Parameters
         ----------
-        target : instance of Dipole (if obj_fun='dipole_rmse')
+        target : instance of Dipole (Required if obj_fun='dipole_rmse')
             A dipole object with experimental data.
-        n_trials : int (if obj_fun='dipole_rmse')
+        n_trials : int (Optional if obj_fun='dipole_rmse')
             Number of trials to simulate and average.
-        f_bands : list of tuples (if obj_fun='maximize_psd')
+        f_bands : list of tuples (Required if obj_fun='maximize_psd')
             Lower and higher limit for each frequency band.
-        relative_bandpower : list of float | float (if obj_fun='maximize_psd')
+        relative_bandpower : list of float | float (Required if obj_fun='maximize_psd')
             Weight for each frequency band in f_bands. If a single float is provided,
             the same weight is applied to all frequency bands.
         scale_factor : float, optional
@@ -170,10 +170,12 @@ class Optimizer:
         smooth_window_len : float, optional
             The smooth window length.
         """
-        if self.obj_fun_name == "dipole_rmse" and (
-            "target" not in obj_fun_kwargs or "n_trials" not in obj_fun_kwargs
-        ):
-            raise Exception("target and n_trials must be specified")
+        if self.obj_fun_name == "dipole_rmse":
+            if "target" not in obj_fun_kwargs:
+                raise Exception("target must be specified")
+            elif "n_trials" not in obj_fun_kwargs:
+                obj_fun_kwargs["n_trials"] = 1
+
         elif self.obj_fun_name == "maximize_psd" and (
             "f_bands" not in obj_fun_kwargs
             or "relative_bandpower" not in obj_fun_kwargs
