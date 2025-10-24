@@ -33,7 +33,7 @@ author = 'HNN Developers'
 # -- Version handling --------------------------------------------------------
 
 # The short X.Y version
-version = '0.5.0'
+version = '0.5.1.dev0'
 release = version
 
 ### HTML theme version control
