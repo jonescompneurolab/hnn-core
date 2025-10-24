@@ -5,14 +5,19 @@
         "url": "https://jonescompneurolab.github.io/hnn-core/dev/index.html"
     },
     {
-        "name": "Stable (v0.4.3)",
+        "name": "Stable (v0.5.0)",
         "version": "stable",
         "url": "https://jonescompneurolab.github.io/hnn-core/stable/index.html"
     },
     {
+        "name": "v0.5.0",
+        "version": "0.5.0",
+        "url": "https://jonescompneurolab.github.io/hnn-core/v0.5.0/index.html"
+    },
+    {
         "name": "v0.4.3",
         "version": "0.4.3",
-        "url": "https://jonescompneurolab.github.io/hnn-core/v0.4.2/index.html"
+        "url": "https://jonescompneurolab.github.io/hnn-core/v0.4.3/index.html"
     },
     {
         "name": "v0.4.2",
