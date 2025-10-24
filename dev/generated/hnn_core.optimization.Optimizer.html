@@ -508,13 +508,13 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>target</strong><span class="classifier">instance of Dipole (if obj_fun=’dipole_rmse’)</span></dt><dd><p>A dipole object with experimental data.</p>
+<dt><strong>target</strong><span class="classifier">instance of Dipole (Required if obj_fun=’dipole_rmse’)</span></dt><dd><p>A dipole object with experimental data.</p>
 </dd>
-<dt><strong>n_trials</strong><span class="classifier">int (if obj_fun=’dipole_rmse’)</span></dt><dd><p>Number of trials to simulate and average.</p>
+<dt><strong>n_trials</strong><span class="classifier">int (Optional if obj_fun=’dipole_rmse’)</span></dt><dd><p>Number of trials to simulate and average.</p>
 </dd>
-<dt><strong>f_bands</strong><span class="classifier">list of tuples (if obj_fun=’maximize_psd’)</span></dt><dd><p>Lower and higher limit for each frequency band.</p>
+<dt><strong>f_bands</strong><span class="classifier">list of tuples (Required if obj_fun=’maximize_psd’)</span></dt><dd><p>Lower and higher limit for each frequency band.</p>
 </dd>
-<dt><strong>relative_bandpower</strong><span class="classifier">list of float | float (if obj_fun=’maximize_psd’)</span></dt><dd><p>Weight for each frequency band in f_bands. If a single float is provided,
+<dt><strong>relative_bandpower</strong><span class="classifier">list of float | float (Required if obj_fun=’maximize_psd’)</span></dt><dd><p>Weight for each frequency band in f_bands. If a single float is provided,
 the same weight is applied to all frequency bands.</p>
 </dd>
 <dt><strong>scale_factor</strong><span class="classifier">float, optional</span></dt><dd><p>The dipole scale factor.</p>

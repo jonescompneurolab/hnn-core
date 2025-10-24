@@ -639,13 +639,13 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        target : instance of Dipole (if obj_fun=&#39;dipole_rmse&#39;)</span>
+<span class="sd">        target : instance of Dipole (Required if obj_fun=&#39;dipole_rmse&#39;)</span>
 <span class="sd">            A dipole object with experimental data.</span>
-<span class="sd">        n_trials : int (if obj_fun=&#39;dipole_rmse&#39;)</span>
+<span class="sd">        n_trials : int (Optional if obj_fun=&#39;dipole_rmse&#39;)</span>
 <span class="sd">            Number of trials to simulate and average.</span>
-<span class="sd">        f_bands : list of tuples (if obj_fun=&#39;maximize_psd&#39;)</span>
+<span class="sd">        f_bands : list of tuples (Required if obj_fun=&#39;maximize_psd&#39;)</span>
 <span class="sd">            Lower and higher limit for each frequency band.</span>
-<span class="sd">        relative_bandpower : list of float | float (if obj_fun=&#39;maximize_psd&#39;)</span>
+<span class="sd">        relative_bandpower : list of float | float (Required if obj_fun=&#39;maximize_psd&#39;)</span>
 <span class="sd">            Weight for each frequency band in f_bands. If a single float is provided,</span>
 <span class="sd">            the same weight is applied to all frequency bands.</span>
 <span class="sd">        scale_factor : float, optional</span>
@@ -653,10 +653,12 @@
 <span class="sd">        smooth_window_len : float, optional</span>
 <span class="sd">            The smooth window length.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;dipole_rmse&quot;</span> <span class="ow">and</span> <span class="p">(</span>
-            <span class="s2">&quot;target&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span> <span class="ow">or</span> <span class="s2">&quot;n_trials&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span>
-        <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;target and n_trials must be specified&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;dipole_rmse&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;target&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;target must be specified&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="s2">&quot;n_trials&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span><span class="p">:</span>
+                <span class="n">obj_fun_kwargs</span><span class="p">[</span><span class="s2">&quot;n_trials&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj_fun_name</span> <span class="o">==</span> <span class="s2">&quot;maximize_psd&quot;</span> <span class="ow">and</span> <span class="p">(</span>
             <span class="s2">&quot;f_bands&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span>
             <span class="ow">or</span> <span class="s2">&quot;relative_bandpower&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj_fun_kwargs</span>
