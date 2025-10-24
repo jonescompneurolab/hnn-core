@@ -5,7 +5,7 @@ orphan: true
 (how_to_create_releases)=
 # How to create releases
 
-Last updated: 2025-06-26
+Last updated: 2025-10-24
 
 ## 0. Notes before starting
 
@@ -73,7 +73,7 @@ pip install -e "."
 
 4. Test that it can successfully run a simulation using the following:
 ```
-python -c "from hnn_core import jones_2009_model, simulate_dipole ; simulate_dipole(jones_2009_model(), tstop=20)"
+python -c "from hnn_core import jones_2009_model, simulate_dipole ; simulate_dipole(jones_2009_model(), tstop=20) ; print('--> SUCCESS: The test worked!')"
 ```
 Simply testing the import with `python -c "import hnn_core"` is NOT enough! You must test an actual simulation run. If you encounter issues with your compiled MOD files, then run `make clean` to delete the existing ones, then try running a simulation again. If you continue to have issues, then halt the release and investigate!
 
@@ -82,13 +82,23 @@ Simply testing the import with `python -c "import hnn_core"` is NOT enough! You 
 pip install -e ".[dev]"
 ```
 
-6. Run all tests by using:
+6. Test that MPI simulations work as well, using the following command:
+```
+python -c "
+from hnn_core import jones_2009_model, MPIBackend, simulate_dipole
+with MPIBackend():
+    simulate_dipole(jones_2009_model(), tstop=20)
+print('--> SUCCESS: The test worked!')
+"
+```
+
+7. Run all tests by using:
 ```
 make test
 ```
 Note that this will download and create some new files into the current directory. These new files should NOT be included in any future commits, especially those for a release. Obviously, if you run into errors, then halt the release and investigate.
 
-7. Go into your `doc` directory, clean your local copy of the docs, then run a full build of the documentation. You can use the following to do this:
+8. Go into your `doc` directory, clean your local copy of the docs, then run a full build of the documentation. You can use the following to do this:
 ```
 cd doc
 make clean
@@ -96,28 +106,28 @@ make html
 ```
 This can take a while depending on your computer speed. The build process should produce warnings but no errors. If it reports errors, investigate them.
 
-8. Manually inspect the newly-built documentation pages to make sure there are no issues. You can do this by opening the file located at `doc/_build/html/index.html` in your web browser, and then navigating from there.
+9. Manually inspect the newly-built documentation pages to make sure there are no issues. You can do this by opening the file located at `doc/_build/html/index.html` in your web browser, and then navigating from there.
 
-9. Make a copy of the newly built documentation; we will be using it later. Assuming you are still in the `doc` directory, you can do this easily using:
+10. Make a copy of the newly built documentation; we will be using it later. Assuming you are still in the `doc` directory, you can do this easily using:
 ```
 mkdir -p ~/new-docs
 cp -r _build/html/* ~/new-docs
 ```
 
-10. Change directory back up to the "root" directory of your repository.
+11. Change directory back up to the "root" directory of your repository.
 
-11. Next, install the dependencies we need for building a local version of our package using:
+12. Next, install the dependencies we need for building a local version of our package using:
 ```
 pip install -U setuptools twine
 ```
 
-12. Build our package locally using the following:
+13. Build our package locally using the following:
 ```
 python setup.py sdist
 ```
 This will create a "source tarball" package file of the new version in a new directory at `dist/hnn_core-<version>.tar.gz`. Note that we *do not build wheels*, we only build source tarballs.
 
-13. Check some metadata of our package, using:
+14. Check some metadata of our package, using:
 ```
 twine check dist/*
 ```
@@ -140,9 +150,9 @@ git add hnn_core/__init__.py doc/conf.py doc/whats_new.md doc/_static/versions.j
 4. On Github's website, make your PR.
 5. Wait for all CI to pass successfully on your PR.
 6. If you want to test automated package creation using TestPyPI (recommended), then you can do the following:
-    1. Change the versions of the code in your PR to a new development or "release-candidate (rc)" version such as `v0.4.4.rc0`. Make sure that this version does not already have a release present on TestPyPI by going here <https://test.pypi.org/project/hnn-core/#history>. It might! Also, it is important the version start with the letter `v`.
+    1. Change the versions of the **code** in your PR to a new development or "release-candidate (rc)" version such as `v0.4.4.rc0`. Make sure that this version does not already have a release present on TestPyPI by going here <https://test.pypi.org/project/hnn-core/#history>. It might! Also, it is important the version start with the letter `v`.
     2. Create a tag on the latest commit using the following command, where you substitute your own version: `git tag v0.4.4.rc0`.
-    3. Make sure everything looks good, since the next step will create a release package, then try to push that release to TestPyPI (but not regular PyPI). This is important since published versions are immutable, as discussed above.
+    3. Make sure everything looks good, since the next step will create a release package, then try to push that release to TestPyPI (but not regular PyPI). This is important since published versions are immutable, as discussed above. Note that TestPyPI does *not* care about the version in the `git` tag, but instead *only* cares about the version in `hnn_core/__init__.py`. If the version you use in that file and in `git` differ, then only the file's version matters, and is *permanent* (unlike the `git` tag).
     4. Push your tag to `upstream` using the following command (again substituting your version) `git push upstream v0.4.4.rc0`.
     5. If it builds and deploys correctly, you should now be able to find your new version available on TestPyPI. Note that the command provided on the TestPyPI webpage will NOT install the new package correctly! Instead, you must slightly change the command to be like the following: `pip install --extra-index-url https://test.pypi.org/simple/ "hnn-core"`.
     6. Make sure to test that it installs and runs correctly!
@@ -177,22 +187,23 @@ cp -r ~/new-docs/* stable
 ```
 git tag v0.4.4
 ```
-5. *Important*: You must now go to the Github settings for the official HNN-Core repository here <https://github.com/jonescompneurolab/hnn-core/settings/> and make some changes, so that the package can be be built and deployed directly to PyPI.
+5. As a warning, TestPyPI and PyPI ONLY care about the version in the actual code (i.e. in `hnn_core/__init__.py`), not the version you're using in the `git` tag. Double-check that they're both what you want!
+6. *Important*: You must now go to the Github settings for the official HNN-Core repository here <https://github.com/jonescompneurolab/hnn-core/settings/> and make some changes, so that the package can be be built and deployed directly to PyPI.
     1. Go to <https://github.com/jonescompneurolab/hnn-core/settings/>.
     2. Click on "Environments" on the left-hand side under the "Code and automation" section.
     3. Click on the `pypi` Environment (it should indicate it has "1 protection rule" nearby).
     4. Next to the "Deployment branches and tags" section, there is a dropdown that currently says "Protected branches only". **Change** the value of that dropdown to "No restriction".
-    5. You can now proceed to push the tag (move on to the next step). (Note: I don't know why this step needs to be done, since in theory it's supposed to allow the build Action to proceed and deploy directly from `master` by itself, but it didn't the last time I tried. It may be an issue that the specific commit with the tag has to *first* pass ALL of its tests, and only THEN will deploy, as long as you are pushing the tag *after* the tests have all completed and passed. For now, this change appears to be necessary, but we want to keep the protection on normally in order to prevent a random tag on a PR from pushing a new, public stable version directly to PyPI. Also, testing/debugging these protection rules is a *pain* since we do NOT want to mess up official stable package builds going to PyPI...)
-6. Push the tag to `upstream`. Continuing the example from before, you could do this with:
+    5. You can now proceed to push the tag (move on to the next step). (Note: In theory, this is supposed to allow the build Action to proceed and deploy directly from `master` by itself. However, I can't figure out an unknown issues that prevents deployment; it may be the fact that the branch has permission, but the "tag" does not. However, if you change the settings to allow for branch `master` and tag `v*`, Github treats that as an OR rather than an AND, so *any* tag on each branch (or PR!) can push a new version to our public PyPI, which is a security risk. Testing/debugging these protection rules is a *pain* since we do NOT want to mess up official stable package builds going to PyPI...)
+7. Push the tag to `upstream`. Continuing the example from before, you could do this with:
 ```
 git push upstream v0.4.4
 ```
-7. Congrats! Github will now automatically begin building the package directly from the commit using a "Publish (etc.)" workflow (you can watch it in our [Actions here](https://github.com/jonescompneurolab/hnn-core/actions)). Once Github has built the package file, it will automatically publish that package to both Pypi and TestPypi.
+8. Congrats! Github will now automatically begin building the package directly from the commit using a "Publish (etc.)" workflow (you can watch it in our [Actions here](https://github.com/jonescompneurolab/hnn-core/actions)). Once Github has built the package file, it will automatically publish that package to both Pypi and TestPypi.
     - The workflow code that Github uses to build and publish the packages is [located here](https://github.com/jonescompneurolab/hnn-core/blob/master/.github/workflows/publish-packages-on-tag.yml).
     - Note that if you ever change the filename of the workflow, you **must** go to TestPypi and Pypi and add a new "Publisher" to the `hnn-core` project. The new "Publisher" must use the new filename, in addition to other metadata. You can see the Pypi and TestPypi-specific [instructions here](https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/#configuring-trusted-publishing). Note that to add a new "Publisher" to the `hnn-core` project in the first place, you must have the necessary permissions. Ask Austin or Dylan if you need to upgrade your permissions.
     - Note that the publishing workflow uses the version exactly from `hnn_core/__init__.py`, NOT from the git tag itself. This is why it is important to double check that your tag numbers are consistent. It will not detect if there is a tag version mismatch.
-8. Assuming nothing went wrong with the Github Actions "Publish (etc.)" workflow, your new version should now be live on both [Pypi](https://pypi.org/project/hnn-core/#history) and [TestPypi](https://test.pypi.org/project/hnn-core/#history).
-9. *Important*: Make sure to go back to <https://github.com/jonescompneurolab/hnn-core/settings/> and reverse the Environment changes you made before. Specifically, again go to "Environments", click the `pypi` environment, and in the "Deployment branches and tags" section, click the dropdown which currently says "No restriction" and change it back to "Protected branches only".
+9. Assuming nothing went wrong with the Github Actions "Publish (etc.)" workflow, your new version should now be live on both [Pypi](https://pypi.org/project/hnn-core/#history) and [TestPypi](https://test.pypi.org/project/hnn-core/#history).
+10. *Important*: Make sure to go back to <https://github.com/jonescompneurolab/hnn-core/settings/> and reverse the Environment changes you made before. Specifically, again go to "Environments", click the `pypi` environment, and in the "Deployment branches and tags" section, click the dropdown which currently says "No restriction" and change it back to "Protected branches only".
 
 ## 7. Post-publishing tests
 
@@ -244,30 +255,24 @@ git add hnn_core/__init__.py doc/conf.py doc/whats_new.md
 ```
 8. Make a commit, then push. You can push this to `upstream/master` directly. It is *not* recommended that you push a version tag for this commit, *unless* you need this development version to be available from `pip`. (If you for some reason need to be publishing a development version as a package available from pip, then you may be better off having that user install `hnn-core` from source instead).
 
-## 10. Build and distribute Conda packages utilizing the new version
+## 10. Build and distribute Conda package utilizing the new version
 
-1. We're done....with Github and Pypi that is! Oh, you thought that was all? Nope. Now that our new version has been released on Pypi, we need to **use the new Pypi package to rebuild new Conda packages for the new version too**. Do not fret however! This part may seem intimidating, but you don't need to do that many steps.
+1. We're done....with Github and Pypi that is! Oh, you thought that was all? Nope. Now that our new version has been released on Pypi, we need to **use the new Pypi package to rebuild a new Conda package for the new version too**. Do not fret however! This part may seem intimidating, but you don't need to do that many steps.
+    - Originally, we released two Conda packages: `hnn-core-all` (all dependencies, including MPI) and `hnn-core` (only the API). However, in the interest of not confusing users, we dropped the `hnn-core` Conda package, so now there is only a single one you need to build: `hnn-core-all`.
 2. Elsewhere on your hard drive, clone our repo here <https://github.com/jonescompneurolab/hnn-core-conda-packaging>. We will NOT be using your local copy of `hnn-core`'s source code for this, but instead be using the Pypi package directly.
 3. Read through the that repo's ["How to use this repo to build and upload the packages" section](https://github.com/jonescompneurolab/hnn-core-conda-packaging?tab=readme-ov-file#how-to-use-this-repo-to-build-and-upload-the-packages). You do *not* need to read the entire README.
 4. Follow the instructions until you are told to run `00-install-build-deps.sh` to install the conda building dependencies. Execute that script.
-5. Let's start with the more complex conda package. `cd` into `hnn-core-all/recipe`.
+5. `cd` into `hnn-core-all/recipe`.
 6. Open the file `meta.yaml` (aka `hnn-core-all/recipe/meta.yaml`). You need to do the following:
      1. Increment the `version` variable at the top to the latest version on Pypi.
      2. Go to <https://pypi.org/project/hnn-core/#files>, and click on `view details`.
      3. Copy the SHA256 Hash digest.
      4. Paste it into the value for `sha256` inside `meta.yaml`.
-7. If NEURON has released a new stable version (currently, newer than 8.2.7), then you also need to edit `hnn-core-all/recipe/build.sh`. Open that file.
+7. If NEURON has released a new stable version that we support (currently, newer than 8.2.7), then you also need to edit `hnn-core-all/recipe/build.sh`. Open that file.
      1. Inside that file, identify the places where `NRN_WHL_URL` values are set to URLs that provide the NEURON wheel files.
      2. Go to <https://pypi.org/project/NEURON/#files>.
-     3. For the version of Python we support in our conda packages (currently 3.12 only), you must copy the *full URL link* of the relevant NEURON wheel file, and then replace its existing value in `build.sh`. The easiest way to do this is right-click on the relevant `.whl` file link and click `Copy Link`. You will know you're on the right track when the URL is long and includes a complete hash of the file, for example like: <https://files.pythonhosted.org/packages/3e/69/5a8d498fd3096726768ab875b0e9a633cfdb68f976a6d520b6158b07ed7c/neuron-8.2.7-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl>.
+     3. For the version of Python we support in our conda package (currently 3.12 only), you must copy the *full URL link* of the relevant NEURON wheel file, and then replace its existing value in `build.sh`. The easiest way to do this is right-click on the relevant `.whl` file link and click `Copy Link`. You will know you're on the right track when the URL is long and includes a complete hash of the file, for example like: <https://files.pythonhosted.org/packages/3e/69/5a8d498fd3096726768ab875b0e9a633cfdb68f976a6d520b6158b07ed7c/neuron-8.2.7-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl>.
      4. Yes this is super annoying, but it is required for reasons described in our Conda package building repo's README.
-8. Once you have updated `hnn-core-all/recipe/meta.yaml` and `hnn-core-all/recipe/build.sh`, do the same for the other conda package, `hnn-core`. You should be able to make the exact same changes in the same places to `hnn-core/recipe/meta.yaml` and `hnn-core/recipe/build.sh`.
-9. Before trying to build the packages, save your work, and make a commit on your own branch of the repo or something.
-10. From here, you can continue where you left off from ["How to use this repo to build and upload the packages" section](https://github.com/jonescompneurolab/hnn-core-conda-packaging?tab=readme-ov-file#how-to-use-this-repo-to-build-and-upload-the-packages), which should be around step 5. Details are in that repo.
-11. To summarize the rest of the instructions from that repo, assuming you have no problems, the rest of the workflow will look like this:
-      1. You `cd` into each Conda package's directory.
-      2. Execute `01-build-pkg.sh`, which takes a few minutes to build the package.
-      3. Assuming that succeeded, you test that you can install and run the package. As always, make sure you do this from somewhere that is NOT inside your main `hnn-core` code repository, otherwise Python will sometimes use your local code instead of the package you have installed in your environment.
-      4. Satisfied, you upload the package.
-      5. Repeat for the other package.
-12. Do something to celebrate, you're done!
+8. Before trying to build the package, save your work to <https://github.com/jonescompneurolab/hnn-core-conda-packaging>.
+9. From here, you can continue where you left off from ["How to use this repo to build and upload the packages" section](https://github.com/jonescompneurolab/hnn-core-conda-packaging?tab=readme-ov-file#how-to-use-this-repo-to-build-and-upload-the-packages), which should be around step 5. Details are in that repo.
+10. Do something to celebrate, you're done!
