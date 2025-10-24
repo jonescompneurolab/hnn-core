@@ -364,19 +364,37 @@ class Network:
         Dictionary containing the coordinate positions of all cells.
         Keys are 'L2_pyramidal', 'L5_pyramidal', 'L2_basket', 'L5_basket',
         or any external drive name.
-    cell_types : dict of Cell, optional
-        Dictionary containing names of real cell types in the network
-        (e.g. 'L2_basket') as keys and corresponding Cell instances as values.
-        The Cell instance associated with a given key is used as a template
-        for the other cells of its type in the population.
+    cell_types : dict of dict of (Cell | dict), optional
+        Dictionary containing names of real cell types in the network (e.g. 'L2_basket')
+        as keys and child-dictionaries describing the cell type. The child-dictionary
+        contains two keys: "cell_object" and "cell_metadata". The value of "cell_object"
+        is the corresponding Cell instance of the cell type being described, and this
+        instance is used as a template for the other cells of its type in the
+        population. The value of "cell_metadata" is a dictionary containing several
+        key-values pairs that describe different aspects of the cell type, described
+        below:
+            - "morpho_type" : either "basket" or "pyramidal"
+            - "electro_type" : either "inhibitory" or "excitatory"
+            - "layer" : either "2" or "5"
+            - "measure_dipole" : either True or False
+            - "reference": optional
 
     Attributes
     ----------
-    cell_types : dict of Cell
-        Dictionary containing names of real cell types in the network
-        (e.g. 'L2_basket') as keys and corresponding Cell instances as values.
-        The Cell instance associated with a given key is used as a template
-        for the other cells of its type in the population.
+    cell_types : dict of dict of (Cell | dict)
+        Dictionary containing names of real cell types in the network (e.g. 'L2_basket')
+        as keys and child-dictionaries describing the cell type. The child-dictionary
+        contains two keys: "cell_object" and "cell_metadata". The value of "cell_object"
+        is the corresponding Cell instance of the cell type being described, and this
+        instance is used as a template for the other cells of its type in the
+        population. The value of "cell_metadata" is a dictionary containing several
+        key-values pairs that describe different aspects of the cell type, described
+        below:
+            - "morpho_type" : either "basket" or "pyramidal"
+            - "electro_type" : either "inhibitory" or "excitatory"
+            - "layer" : either "2" or "5"
+            - "measure_dipole" : either True or False
+            - "reference": optional
     gid_ranges : dict
         A dictionary of unique identifiers of each real and artificial cell
         in the network. Every cell type is represented by a key read from
