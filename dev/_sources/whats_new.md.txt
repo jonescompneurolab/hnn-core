@@ -26,7 +26,7 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 <!-- ### Changelog -->
 
-## 0.5.0 In-progress Development Notes
+## 0.5.0 Release Notes
 
 ### New Features
 
