@@ -57,13 +57,12 @@ jobs:
         run: |
           python -m ruff check hnn_core
 
-      # - name: Test non-MPI, embarrassingly parallel tests with pytest
-      #   shell: cmd
-      #   run: |
-      #     python -m pytest ./hnn_core/tests/ -m "not uses_mpi" -n auto
+      - name: Test non-MPI, embarrassingly parallel tests with pytest
+        shell: cmd
+        run: |
+          python -m pytest ./hnn_core/tests/ -m "not uses_mpi" -n auto
 
-      # - name: Test MPI-using parallel tests with pytest
-      #   shell: cmd
-      #   run: |
-      #     python -m pytest ./hnn_core/tests/ -m "uses_mpi"
-
+      - name: Test MPI-using parallel tests with pytest
+        shell: cmd
+        run: |
+          python -m pytest ./hnn_core/tests/ -m "uses_mpi"
