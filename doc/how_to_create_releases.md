@@ -73,7 +73,7 @@ pip install -e "."
 
 4. Test that it can successfully run a simulation using the following:
 ```
-python -c "from hnn_core import jones_2009_model, simulate_dipole ; simulate_dipole(jones_2009_model(), tstop=20) ; print('--> SUCCESS: The test worked!')"
+python -c "from hnn_core import jones_2009_model, simulate_dipole ; simulate_dipole(jones_2009_model(), tstop=20) ; print('--> SUCCESS: The test worked')"
 ```
 Simply testing the import with `python -c "import hnn_core"` is NOT enough! You must test an actual simulation run. If you encounter issues with your compiled MOD files, then run `make clean` to delete the existing ones, then try running a simulation again. If you continue to have issues, then halt the release and investigate!
 
@@ -88,7 +88,7 @@ python -c "
 from hnn_core import jones_2009_model, MPIBackend, simulate_dipole
 with MPIBackend():
     simulate_dipole(jones_2009_model(), tstop=20)
-print('--> SUCCESS: The test worked!')
+print('--> SUCCESS: The test worked')
 "
 ```
 
