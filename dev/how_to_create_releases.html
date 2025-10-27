@@ -477,14 +477,14 @@
                   
   <section id="how-to-create-releases">
 <span id="id1"></span><h1>How to create releases<a class="headerlink" href="#how-to-create-releases" title="Link to this heading">#</a></h1>
-<p>Last updated: 2025-06-26</p>
+<p>Last updated: 2025-10-24</p>
 <section id="notes-before-starting">
 <h2>0. Notes before starting<a class="headerlink" href="#notes-before-starting" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p>We use at least 2 types of releases:</p>
 <ol class="arabic simple">
 <li><p>“stable” releases (aka “full” version releases), which are updates to the <em>default</em> version that is publicly distributed. I.e. these are what users will install if they run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">hnn-core</span></code>, etc.</p></li>
-<li><p>“dev” releases, or development releases. These can be incremented as desired, but are mainly used to distinguish new work that is merged after the latest stable release. After any stable release, there should immediately be a follow-up PR (or commit) that begins creation of the next dev release. Dev releases <em>can</em> be pushed to Pypi as long as they are indicated as development versions. However, we typically only need to do all of the steps on this page for a stable release, not every dev release.</p></li>
+<li><p>“dev” releases, or development releases. These can be incremented as desired, but are mainly used to distinguish new work that is merged after the latest stable release. After any stable release, there should immediately be a follow-up PR (or commit) that begins creation of the next dev release. Dev releases <em>can</em> be pushed to PyPI as long as they are indicated as development versions. However, we typically only need to do all of the steps on this page for a stable release, not every dev release.</p></li>
 <li><p>(optional) “rc” releases, or “release candidates”. If desired, a dev version can be changed to an rc version if we want to distribute specific rc versions for “beta-testing” for an soon and upcoming stable release.</p></li>
 </ol>
 </li>
@@ -507,8 +507,8 @@
 <li><p>However, in accordance with <a class="reference external" href="https://semver.org/#semantic-versioning-specification-semver">semantic versioning</a>, since HNN-Core has not yet reached 1.0, our <code class="docutils literal notranslate"><span class="pre">patch</span></code> and <code class="docutils literal notranslate"><span class="pre">minor</span></code> releases do NOT need to be backwards-compatible yet.</p></li>
 <li><p><em>Pay careful attention</em> to the use of <code class="docutils literal notranslate"><span class="pre">v</span></code> in front of the version identifier. Some commands and config values need e.g. <code class="docutils literal notranslate"><span class="pre">v0.4</span></code>, while others should <em>not</em> include the <code class="docutils literal notranslate"><span class="pre">v</span></code>, as in <code class="docutils literal notranslate"><span class="pre">0.4</span></code>.</p></li>
 <li><p>Unless said otherwise, these instructions assume you are in the “root” (aka top-level) directory of the <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> code repository.</p></li>
-<li><p>Once you push a new version to TestPypi or Pypi, we CANNOT re-upload a different package to that same version. That version will always, <em>permanently</em>, be attached to that specific package file. This is a security limitation of Pypi and cannot be bypassed. If you make a mistake and upload a broken package however, there is still a solution: uploading a newer version with a higher version number. You can always increment the <code class="docutils literal notranslate"><span class="pre">patch</span></code> part of the version, then follow the process again to have a new, fixed version pushed to both TestPypi and Pypi.</p></li>
-<li><p>Due to the rule we use to detect when to auto-publish packages (<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/blob/843ed4aaed5a09d46c49ce34b5b620ec112d4e5a/.github/workflows/publish-packages-on-tag.yml#L10">see here</a>) <em>any</em> tag pushed to <code class="docutils literal notranslate"><span class="pre">upstream</span></code> that begins with <code class="docutils literal notranslate"><span class="pre">v</span></code> will cause the workflow to run. This means that any new version tag pushed to upstream will cause a package to be built, and the version of the code inside that commit (in <code class="docutils literal notranslate"><span class="pre">hnn_core/__init__.py</span></code>, NOT the tag itself!) will be used when uploading the package to Pypi. If that is a valid version that has not been used before, Pypi will accept and publish that package according to the version in question. Because versions are immutable on Pypi, this means that that version will NOT be available again! So, double- and triple-check before you push a tag!</p></li>
+<li><p>Once you push a new version to TestPyPI or PyPI, we CANNOT re-upload a different package to that same version. That version will always, <em>permanently</em>, be attached to that specific package file. This is a security limitation of PyPI and cannot be bypassed. If you make a mistake and upload a broken package however, there is still a solution: uploading a newer version with a higher version number. You can always increment the <code class="docutils literal notranslate"><span class="pre">patch</span></code> part of the version, then follow the process again to have a new, fixed version pushed to both TestPyPI and PyPI.</p></li>
+<li><p>Due to the rule we use to detect when to auto-publish packages (<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/blob/843ed4aaed5a09d46c49ce34b5b620ec112d4e5a/.github/workflows/publish-packages-on-tag.yml#L10">see here</a>) <em>any</em> tag pushed to <code class="docutils literal notranslate"><span class="pre">upstream</span></code> that begins with <code class="docutils literal notranslate"><span class="pre">v</span></code> will cause the workflow to run. This means that any new version tag pushed to upstream will cause a package to be built, and the version of the code inside that commit (in <code class="docutils literal notranslate"><span class="pre">hnn_core/__init__.py</span></code>, NOT the tag itself!) will be used when uploading the package to PyPI. If that is a valid version that has not been used before, PyPI will accept and publish that package according to the version in question. Because versions are immutable on PyPI, this means that that version will NOT be available again! So, double- and triple-check before you push a tag!</p></li>
 <li><p>The original “How to make a release” is <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/wiki/How-to-make-a-release">available here</a>, however it should be considered deprecated. It leaves out a few important steps (or suggests doing them out-of-order), and does not account for our new automatic Github-tag publishing workflow.</p></li>
 </ul>
 </section>
@@ -517,7 +517,7 @@
 <ul class="simple">
 <li><p>Make sure all milestones are achieved or migrated to the next version.</p></li>
 <li><p>Make sure the CI passes on master.</p></li>
-<li><p>Make sure that for both TestPypi and Pypi, there are NOT already existing releases for the new version that you want to push. You can view <a class="reference external" href="https://test.pypi.org/project/hnn-core/#history">TestPypi releases here</a> and <a class="reference external" href="https://pypi.org/project/hnn-core/#history">Pypi releases here</a>.</p></li>
+<li><p>Make sure that for both TestPyPI and PyPI, there are NOT already existing releases for the new version that you want to push. You can view <a class="reference external" href="https://test.pypi.org/project/hnn-core/#history">TestPyPI releases here</a> and <a class="reference external" href="https://pypi.org/project/hnn-core/#history">PyPI releases here</a>.</p></li>
 </ul>
 </section>
 <section id="prepare-your-local-version-of-the-release">
@@ -556,7 +556,7 @@
 <ol class="arabic simple" start="4">
 <li><p>Test that it can successfully run a simulation using the following:</p></li>
 </ol>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;from hnn_core import jones_2009_model, simulate_dipole ; simulate_dipole(jones_2009_model(), tstop=20)&quot;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;from hnn_core import jones_2009_model, simulate_dipole ; simulate_dipole(jones_2009_model(), tstop=20) ; print(&#39;--&gt; SUCCESS: The test worked&#39;)&quot;</span>
 </pre></div>
 </div>
 <p>Simply testing the import with <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-c</span> <span class="pre">&quot;import</span> <span class="pre">hnn_core&quot;</span></code> is NOT enough! You must test an actual simulation run. If you encounter issues with your compiled MOD files, then run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">clean</span></code> to delete the existing ones, then try running a simulation again. If you continue to have issues, then halt the release and investigate!</p>
@@ -567,13 +567,24 @@
 </pre></div>
 </div>
 <ol class="arabic simple" start="6">
+<li><p>Test that MPI simulations work as well, using the following command:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">hnn_core</span><span class="w"> </span><span class="kn">import</span> <span class="n">jones_2009_model</span><span class="p">,</span> <span class="n">MPIBackend</span><span class="p">,</span> <span class="n">simulate_dipole</span>
+<span class="k">with</span> <span class="n">MPIBackend</span><span class="p">():</span>
+    <span class="n">simulate_dipole</span><span class="p">(</span><span class="n">jones_2009_model</span><span class="p">(),</span> <span class="n">tstop</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;--&gt; SUCCESS: The test worked&#39;</span><span class="p">)</span>
+<span class="s2">&quot;</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="7">
 <li><p>Run all tests by using:</p></li>
 </ol>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">test</span>
 </pre></div>
 </div>
 <p>Note that this will download and create some new files into the current directory. These new files should NOT be included in any future commits, especially those for a release. Obviously, if you run into errors, then halt the release and investigate.</p>
-<ol class="arabic simple" start="7">
+<ol class="arabic simple" start="8">
 <li><p>Go into your <code class="docutils literal notranslate"><span class="pre">doc</span></code> directory, clean your local copy of the docs, then run a full build of the documentation. You can use the following to do this:</p></li>
 </ol>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">doc</span>
@@ -582,7 +593,7 @@
 </pre></div>
 </div>
 <p>This can take a while depending on your computer speed. The build process should produce warnings but no errors. If it reports errors, investigate them.</p>
-<ol class="arabic simple" start="8">
+<ol class="arabic simple" start="9">
 <li><p>Manually inspect the newly-built documentation pages to make sure there are no issues. You can do this by opening the file located at <code class="docutils literal notranslate"><span class="pre">doc/_build/html/index.html</span></code> in your web browser, and then navigating from there.</p></li>
 <li><p>Make a copy of the newly built documentation; we will be using it later. Assuming you are still in the <code class="docutils literal notranslate"><span class="pre">doc</span></code> directory, you can do this easily using:</p></li>
 </ol>
@@ -590,21 +601,21 @@
 <span class="n">cp</span> <span class="o">-</span><span class="n">r</span> <span class="n">_build</span><span class="o">/</span><span class="n">html</span><span class="o">/*</span> <span class="o">~/</span><span class="n">new</span><span class="o">-</span><span class="n">docs</span>
 </pre></div>
 </div>
-<ol class="arabic simple" start="10">
+<ol class="arabic simple" start="11">
 <li><p>Change directory back up to the “root” directory of your repository.</p></li>
 <li><p>Next, install the dependencies we need for building a local version of our package using:</p></li>
 </ol>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">U</span> <span class="n">setuptools</span> <span class="n">twine</span>
 </pre></div>
 </div>
-<ol class="arabic simple" start="12">
+<ol class="arabic simple" start="13">
 <li><p>Build our package locally using the following:</p></li>
 </ol>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">sdist</span>
 </pre></div>
 </div>
 <p>This will create a “source tarball” package file of the new version in a new directory at <code class="docutils literal notranslate"><span class="pre">dist/hnn_core-&lt;version&gt;.tar.gz</span></code>. Note that we <em>do not build wheels</em>, we only build source tarballs.</p>
-<ol class="arabic simple" start="13">
+<ol class="arabic simple" start="14">
 <li><p>Check some metadata of our package, using:</p></li>
 </ol>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">twine</span> <span class="n">check</span> <span class="n">dist</span><span class="o">/*</span>
@@ -629,11 +640,25 @@
 </pre></div>
 </div>
 <ol class="arabic simple" start="2">
-<li><p>Make your commit, but do NOT tag it yet.</p></li>
+<li><p>Make your commit.</p></li>
 <li><p>Push your commit to your branch.</p></li>
 <li><p>On Github’s website, make your PR.</p></li>
 <li><p>Wait for all CI to pass successfully on your PR.</p></li>
-<li><p>Finally, when ready to merge to <code class="docutils literal notranslate"><span class="pre">master</span></code>, use “SQUASH and merge” to merge the PR as a single commit. We will refer to the commit you just pushed to <code class="docutils literal notranslate"><span class="pre">master</span></code> as the “release commit”.</p></li>
+<li><p>If you want to test automated package creation using TestPyPI (recommended), then you can do the following:</p>
+<ol class="arabic simple">
+<li><p>Change the versions of the <strong>code</strong> in your PR to a new development or “release-candidate (rc)” version such as <code class="docutils literal notranslate"><span class="pre">v0.4.4.rc0</span></code>. Make sure that this version does not already have a release present on TestPyPI by going here <a class="reference external" href="https://test.pypi.org/project/hnn-core/#history">https://test.pypi.org/project/hnn-core/#history</a>. It might! Also, it is important the version start with the letter <code class="docutils literal notranslate"><span class="pre">v</span></code>.</p></li>
+<li><p>Create a tag on the latest commit using the following command, where you substitute your own version: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">tag</span> <span class="pre">v0.4.4.rc0</span></code>.</p></li>
+<li><p>Make sure everything looks good, since the next step will create a release package, then try to push that release to TestPyPI (but not regular PyPI). This is important since published versions are immutable, as discussed above. Note that TestPyPI does <em>not</em> care about the version in the <code class="docutils literal notranslate"><span class="pre">git</span></code> tag, but instead <em>only</em> cares about the version in <code class="docutils literal notranslate"><span class="pre">hnn_core/__init__.py</span></code>. If the version you use in that file and in <code class="docutils literal notranslate"><span class="pre">git</span></code> differ, then only the file’s version matters, and is <em>permanent</em> (unlike the <code class="docutils literal notranslate"><span class="pre">git</span></code> tag).</p></li>
+<li><p>Push your tag to <code class="docutils literal notranslate"><span class="pre">upstream</span></code> using the following command (again substituting your version) <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">upstream</span> <span class="pre">v0.4.4.rc0</span></code>.</p></li>
+<li><p>If it builds and deploys correctly, you should now be able to find your new version available on TestPyPI. Note that the command provided on the TestPyPI webpage will NOT install the new package correctly! Instead, you must slightly change the command to be like the following: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--extra-index-url</span> <span class="pre">https://test.pypi.org/simple/</span> <span class="pre">&quot;hnn-core&quot;</span></code>.</p></li>
+<li><p>Make sure to test that it installs and runs correctly!</p></li>
+</ol>
+</li>
+<li><p>Finally, when ready to merge to <code class="docutils literal notranslate"><span class="pre">master</span></code>, use “SQUASH and merge” to merge the PR as a single commit. We will refer to the commit you just pushed to <code class="docutils literal notranslate"><span class="pre">master</span></code> as the “release commit”.</p>
+<ul class="simple">
+<li><p>If you created a version on the PR for TestPyPI usage, it may not be included in the final version of the PR that is created on the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch. This would make your example <code class="docutils literal notranslate"><span class="pre">v0.4.4.rc0</span></code> release an “orphaned” release that is not on the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch. This is totally okay, since that version was for testing the release.</p></li>
+</ul>
+</li>
 <li><p>Note: If you have “cyclical documentation dependencies”, such as if you reference a new web-page on the <code class="docutils literal notranslate"><span class="pre">stable</span></code> version of the docs, but that page doesn’t exist yet in the <code class="docutils literal notranslate"><span class="pre">stable</span></code> doc version, then that is fine. You can do the following:</p>
 <ol class="arabic simple">
 <li><p>create this PR but don’t merge it yet,</p></li>
@@ -665,6 +690,7 @@
 <section id="push-a-git-tag-to-build-the-release">
 <h2>6. Push a git tag to build the release<a class="headerlink" href="#push-a-git-tag-to-build-the-release" title="Link to this heading">#</a></h2>
 <ol class="arabic simple">
+<li><p>Note that the steps in this section will only be possible for a Maintainer with full Admin permissions for the Github repository of <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core">jonescompneurolab/hnn-core</a>.</p></li>
 <li><p>Switch back to the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch.</p></li>
 <li><p>Update your <code class="docutils literal notranslate"><span class="pre">master</span></code> branch such that it is in sync with <code class="docutils literal notranslate"><span class="pre">upstream</span></code>, and that its current commit is the “release commit” you previously merged through your PR.</p></li>
 <li><p>Create a tag for this release commit, where the tag is <code class="docutils literal notranslate"><span class="pre">v&lt;new</span> <span class="pre">version&gt;</span></code>, including the <code class="docutils literal notranslate"><span class="pre">v</span></code>. For example, if the new version that you just updated to is <code class="docutils literal notranslate"><span class="pre">0.4.4</span></code>, then you could do the following to create the tag locally:</p></li>
@@ -672,21 +698,32 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">tag</span> <span class="n">v0</span><span class="mf">.4.4</span>
 </pre></div>
 </div>
-<ol class="arabic simple" start="4">
+<ol class="arabic simple" start="5">
+<li><p>As a warning, TestPyPI and PyPI ONLY care about the version in the actual code (i.e. in <code class="docutils literal notranslate"><span class="pre">hnn_core/__init__.py</span></code>), not the version you’re using in the <code class="docutils literal notranslate"><span class="pre">git</span></code> tag. Double-check that they’re both what you want!</p></li>
+<li><p><em>Important</em>: You must now go to the Github settings for the official HNN-Core repository here <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core/settings/">jonescompneurolab/hnn-core</a> and make some changes, so that the package can be be built and deployed directly to PyPI.</p>
+<ol class="arabic simple">
+<li><p>Go to <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core/settings/">jonescompneurolab/hnn-core</a>.</p></li>
+<li><p>Click on “Environments” on the left-hand side under the “Code and automation” section.</p></li>
+<li><p>Click on the <code class="docutils literal notranslate"><span class="pre">pypi</span></code> Environment (it should indicate it has “1 protection rule” nearby).</p></li>
+<li><p>Next to the “Deployment branches and tags” section, there is a dropdown that currently says “Protected branches only”. <strong>Change</strong> the value of that dropdown to “No restriction”.</p></li>
+<li><p>You can now proceed to push the tag (move on to the next step). (Note: In theory, this is supposed to allow the build Action to proceed and deploy directly from <code class="docutils literal notranslate"><span class="pre">master</span></code> by itself. However, I can’t figure out an unknown issue that prevents deployment; it may be the fact that the branch has permission, but the “tag” does not. However, if you change the settings to allow for branch <code class="docutils literal notranslate"><span class="pre">master</span></code> and tag <code class="docutils literal notranslate"><span class="pre">v*</span></code>, Github treats that as an OR rather than an AND, so <em>any</em> tag on each branch (or PR!) can push a new version to our public PyPI, which is a security risk. Testing/debugging these protection rules is a <em>pain</em> since we do NOT want to mess up official stable package builds going to PyPI…)</p></li>
+</ol>
+</li>
 <li><p>Push the tag to <code class="docutils literal notranslate"><span class="pre">upstream</span></code>. Continuing the example from before, you could do this with:</p></li>
 </ol>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">push</span> <span class="n">upstream</span> <span class="n">v0</span><span class="mf">.4.4</span>
 </pre></div>
 </div>
-<ol class="arabic simple" start="5">
-<li><p>Congrats! Github will now automatically begin building the package directly from the commit using a “Publish (etc.)” workflow (you can watch it in our <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/actions">Actions here</a>). Once Github has built the package file, it will automatically publish that package to both Pypi and TestPypi.</p>
+<ol class="arabic simple" start="8">
+<li><p>Congrats! Github will now automatically begin building the package directly from the commit using a “Publish (etc.)” workflow (you can watch it in our <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/actions">Actions here</a>). Once Github has built the package file, it will automatically publish that package to both PyPI and TestPyPI.</p>
 <ul class="simple">
 <li><p>The workflow code that Github uses to build and publish the packages is <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/blob/master/.github/workflows/publish-packages-on-tag.yml">located here</a>.</p></li>
-<li><p>Note that if you ever change the filename of the workflow, you <strong>must</strong> go to TestPypi and Pypi and add a new “Publisher” to the <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> project. The new “Publisher” must use the new filename, in addition to other metadata. You can see the Pypi and TestPypi-specific <a class="reference external" href="https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/#configuring-trusted-publishing">instructions here</a>. Note that to add a new “Publisher” to the <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> project in the first place, you must have the necessary permissions. Ask Austin or Dylan if you need to upgrade your permissions.</p></li>
+<li><p>Note that if you ever change the filename of the workflow, you <strong>must</strong> go to TestPyPI and PyPI and add a new “Publisher” to the <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> project. The new “Publisher” must use the new filename, in addition to other metadata. You can see the PyPI and TestPyPI-specific <a class="reference external" href="https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/#configuring-trusted-publishing">instructions here</a>. Note that to add a new “Publisher” to the <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> project in the first place, you must have the necessary permissions. Ask Austin or Dylan if you need to upgrade your permissions.</p></li>
 <li><p>Note that the publishing workflow uses the version exactly from <code class="docutils literal notranslate"><span class="pre">hnn_core/__init__.py</span></code>, NOT from the git tag itself. This is why it is important to double check that your tag numbers are consistent. It will not detect if there is a tag version mismatch.</p></li>
 </ul>
 </li>
-<li><p>Assuming nothing went wrong with the Github Actions “Publish (etc.)” workflow, your new version should now be live on both <a class="reference external" href="https://pypi.org/project/hnn-core/#history">Pypi</a> and <a class="reference external" href="https://test.pypi.org/project/hnn-core/#history">TestPypi</a>.</p></li>
+<li><p>Assuming nothing went wrong with the Github Actions “Publish (etc.)” workflow, your new version should now be live on both <a class="reference external" href="https://pypi.org/project/hnn-core/#history">PyPI</a> and <a class="reference external" href="https://test.pypi.org/project/hnn-core/#history">TestPyPI</a>.</p></li>
+<li><p><em>Important</em>: Make sure to go back to <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core/settings/">jonescompneurolab/hnn-core</a> and reverse the Environment changes you made before. Specifically, again go to “Environments”, click the <code class="docutils literal notranslate"><span class="pre">pypi</span></code> environment, and in the “Deployment branches and tags” section, click the dropdown which currently says “No restriction” and change it back to “Protected branches only”.</p></li>
 </ol>
 </section>
 <section id="post-publishing-tests">
@@ -694,8 +731,8 @@
 <ol class="arabic simple">
 <li><p>Create yet another fresh Python environment.</p></li>
 <li><p>Move somewhere outside of your <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> code repository, such as to your <code class="docutils literal notranslate"><span class="pre">~/Desktop</span></code>. We want to test that our new package installs and works correctly without relying on any code on your hard drive.</p></li>
-<li><p>Wait 10 minutes for Pypi’s stores to start distributing your new release (go grab a coffee). It may be ready instantly, or not. Maybe ponder how you can improve this package release process…</p></li>
-<li><p>Install the basic version of <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> from Pypi with:</p></li>
+<li><p>Wait 10 minutes for PyPI’s stores to start distributing your new release (go grab a coffee). It may be ready instantly, or not. Maybe ponder how you can improve this package release process…</p></li>
+<li><p>Install the basic version of <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> from PyPI with:</p></li>
 </ol>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">hnn</span><span class="o">-</span><span class="n">core</span>
 </pre></div>
@@ -708,7 +745,7 @@
 </pre></div>
 </div>
 <ol class="arabic simple" start="6">
-<li><p>You can also test the TestPypi version in yet another environment if you want, but you should note that the command shown at the top of the <a class="reference external" href="https://test.pypi.org/project/hnn-core/#history">TestPypi page</a> will NOT work, due to the <code class="docutils literal notranslate"><span class="pre">-i</span></code> argument. (The reason for this is that TestPypi does not actually provide the <code class="docutils literal notranslate"><span class="pre">setuptools</span></code> package that we need, <a class="reference external" href="https://stackoverflow.com/a/77948986">see here</a>). If you want to install the TestPypi version in a way that actually works, you should do the following:</p></li>
+<li><p>You can also test the TestPyPI version in yet another environment if you want, but you should note that the command shown at the top of the <a class="reference external" href="https://test.pypi.org/project/hnn-core/#history">TestPyPI page</a> will NOT work, due to the <code class="docutils literal notranslate"><span class="pre">-i</span></code> argument. (The reason for this is that TestPyPI does not actually provide the <code class="docutils literal notranslate"><span class="pre">setuptools</span></code> package that we need, <a class="reference external" href="https://stackoverflow.com/a/77948986">see here</a>). If you want to install the TestPyPI version in a way that actually works, you should do the following:</p></li>
 </ol>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">extra</span><span class="o">-</span><span class="n">index</span><span class="o">-</span><span class="n">url</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">test</span><span class="o">.</span><span class="n">pypi</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">simple</span><span class="o">/</span> <span class="s2">&quot;hnn-core&quot;</span>
 </pre></div>
@@ -745,7 +782,7 @@
 <li><p>Return to your <code class="docutils literal notranslate"><span class="pre">hnn-code</span></code> repository on the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch in your terminal.</p></li>
 <li><p>Start to realize that this is a lot of steps. Maybe too many.</p></li>
 <li><p>Begin incrementing the version <em>again</em> to the <em>next development version</em>. You can do this via a personal branch then PR, or just do it as a single commit that you will later push to <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code>.</p></li>
-<li><p>View the <a class="reference external" href="https://test.pypi.org/project/hnn-core/#history">TestPypi page here</a> and <a class="reference external" href="https://pypi.org/project/hnn-core/#history">Pypi here</a>, and check to make sure that the next development version you want to use has not already been taken by an existing package. It is possible for this to happen, due to the necessity to debug our package building pipeline, etc. Increment your next development version so it’s higher. For example, if you just released version <code class="docutils literal notranslate"><span class="pre">0.4.4</span></code> but there is a pre-existing package for version <code class="docutils literal notranslate"><span class="pre">0.4.5dev1</span></code>, then you should prepare to increment the next development version to <code class="docutils literal notranslate"><span class="pre">0.4.5dev2</span></code>.</p></li>
+<li><p>View the <a class="reference external" href="https://test.pypi.org/project/hnn-core/#history">TestPyPI page here</a> and <a class="reference external" href="https://pypi.org/project/hnn-core/#history">PyPI here</a>, and check to make sure that the next development version you want to use has not already been taken by an existing package. It is possible for this to happen, due to the necessity to debug our package building pipeline, etc. Increment your next development version so it’s higher. For example, if you just released version <code class="docutils literal notranslate"><span class="pre">0.4.4</span></code> but there is a pre-existing package for version <code class="docutils literal notranslate"><span class="pre">0.4.5dev1</span></code>, then you should prepare to increment the next development version to <code class="docutils literal notranslate"><span class="pre">0.4.5dev2</span></code>.</p></li>
 <li><p>Update <code class="docutils literal notranslate"><span class="pre">hnn_core/__init__.py</span></code> and <code class="docutils literal notranslate"><span class="pre">doc/conf.py</span></code> to use the next development version. You do NOT need to make any changes to <code class="docutils literal notranslate"><span class="pre">doc/_static/versions.json</span></code>.</p></li>
 <li><p>Add a new section to the top of <code class="docutils literal notranslate"><span class="pre">doc/whats_new.md</span></code> that says “Current”, pushing the most recent version release notes downwards.</p></li>
 <li><p>Git add these three files, such as using:</p></li>
@@ -757,42 +794,36 @@
 <li><p>Make a commit, then push. You can push this to <code class="docutils literal notranslate"><span class="pre">upstream/master</span></code> directly. It is <em>not</em> recommended that you push a version tag for this commit, <em>unless</em> you need this development version to be available from <code class="docutils literal notranslate"><span class="pre">pip</span></code>. (If you for some reason need to be publishing a development version as a package available from pip, then you may be better off having that user install <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> from source instead).</p></li>
 </ol>
 </section>
-<section id="build-and-distribute-conda-packages-utilizing-the-new-version">
-<h2>10. Build and distribute Conda packages utilizing the new version<a class="headerlink" href="#build-and-distribute-conda-packages-utilizing-the-new-version" title="Link to this heading">#</a></h2>
+<section id="build-and-distribute-conda-package-utilizing-the-new-version">
+<h2>10. Build and distribute Conda package utilizing the new version<a class="headerlink" href="#build-and-distribute-conda-package-utilizing-the-new-version" title="Link to this heading">#</a></h2>
 <ol class="arabic simple">
-<li><p>We’re done….with Github and Pypi that is! Oh, you thought that was all? Nope. Now that our new version has been released on Pypi, we need to <strong>use the new Pypi package to rebuild new Conda packages for the new version too</strong>. Do not fret however! This part may seem intimidating, but you don’t need to do that many steps.</p></li>
-<li><p>Elsewhere on your hard drive, clone our repo here <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core-conda-packaging">jonescompneurolab/hnn-core-conda-packaging</a>. We will NOT be using your local copy of <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>’s source code for this, but instead be using the Pypi package directly.</p></li>
+<li><p>We’re done….with Github and PyPI that is! Oh, you thought that was all? Nope. Now that our new version has been released on PyPI, we need to <strong>use the new PyPI package to rebuild a new Conda package for the new version too</strong>. Do not fret however! This part may seem intimidating, but you don’t need to do that many steps.</p>
+<ul class="simple">
+<li><p>Originally, we released two Conda packages: <code class="docutils literal notranslate"><span class="pre">hnn-core-all</span></code> (all dependencies, including MPI) and <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> (only the API). However, in the interest of not confusing users, we dropped the <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> Conda package, so now there is only a single one you need to build: <code class="docutils literal notranslate"><span class="pre">hnn-core-all</span></code>.</p></li>
+</ul>
+</li>
+<li><p>Elsewhere on your hard drive, clone our repo here <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core-conda-packaging">jonescompneurolab/hnn-core-conda-packaging</a>. We will NOT be using your local copy of <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>’s source code for this, but instead be using the PyPI package directly.</p></li>
 <li><p>Read through the that repo’s <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core-conda-packaging?tab=readme-ov-file#how-to-use-this-repo-to-build-and-upload-the-packages">“How to use this repo to build and upload the packages” section</a>. You do <em>not</em> need to read the entire README.</p></li>
 <li><p>Follow the instructions until you are told to run <code class="docutils literal notranslate"><span class="pre">00-install-build-deps.sh</span></code> to install the conda building dependencies. Execute that script.</p></li>
-<li><p>Let’s start with the more complex conda package. <code class="docutils literal notranslate"><span class="pre">cd</span></code> into <code class="docutils literal notranslate"><span class="pre">hnn-core-all/recipe</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cd</span></code> into <code class="docutils literal notranslate"><span class="pre">hnn-core-all/recipe</span></code>.</p></li>
 <li><p>Open the file <code class="docutils literal notranslate"><span class="pre">meta.yaml</span></code> (aka <code class="docutils literal notranslate"><span class="pre">hnn-core-all/recipe/meta.yaml</span></code>). You need to do the following:</p>
 <ol class="arabic simple">
-<li><p>Increment the <code class="docutils literal notranslate"><span class="pre">version</span></code> variable at the top to the latest version on Pypi.</p></li>
+<li><p>Increment the <code class="docutils literal notranslate"><span class="pre">version</span></code> variable at the top to the latest version on PyPI.</p></li>
 <li><p>Go to <a class="reference external" href="https://pypi.org/project/hnn-core/#files">https://pypi.org/project/hnn-core/#files</a>, and click on <code class="docutils literal notranslate"><span class="pre">view</span> <span class="pre">details</span></code>.</p></li>
 <li><p>Copy the SHA256 Hash digest.</p></li>
 <li><p>Paste it into the value for <code class="docutils literal notranslate"><span class="pre">sha256</span></code> inside <code class="docutils literal notranslate"><span class="pre">meta.yaml</span></code>.</p></li>
 </ol>
 </li>
-<li><p>If NEURON has released a new stable version (currently, newer than 8.2.7), then you also need to edit <code class="docutils literal notranslate"><span class="pre">hnn-core-all/recipe/build.sh</span></code>. Open that file.</p>
+<li><p>If NEURON has released a new stable version that we support (currently, newer than 8.2.7), then you also need to edit <code class="docutils literal notranslate"><span class="pre">hnn-core-all/recipe/build.sh</span></code>. Open that file.</p>
 <ol class="arabic simple">
 <li><p>Inside that file, identify the places where <code class="docutils literal notranslate"><span class="pre">NRN_WHL_URL</span></code> values are set to URLs that provide the NEURON wheel files.</p></li>
 <li><p>Go to <a class="reference external" href="https://pypi.org/project/NEURON/#files">https://pypi.org/project/NEURON/#files</a>.</p></li>
-<li><p>For the version of Python we support in our conda packages (currently 3.12 only), you must copy the <em>full URL link</em> of the relevant NEURON wheel file, and then replace its existing value in <code class="docutils literal notranslate"><span class="pre">build.sh</span></code>. The easiest way to do this is right-click on the relevant <code class="docutils literal notranslate"><span class="pre">.whl</span></code> file link and click <code class="docutils literal notranslate"><span class="pre">Copy</span> <span class="pre">Link</span></code>. You will know you’re on the right track when the URL is long and includes a complete hash of the file, for example like: <a class="reference external" href="https://files.pythonhosted.org/packages/3e/69/5a8d498fd3096726768ab875b0e9a633cfdb68f976a6d520b6158b07ed7c/neuron-8.2.7-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl">https://files.pythonhosted.org/packages/3e/69/5a8d498fd3096726768ab875b0e9a633cfdb68f976a6d520b6158b07ed7c/neuron-8.2.7-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl</a>.</p></li>
+<li><p>For the version of Python we support in our conda package (currently 3.12 only), you must copy the <em>full URL link</em> of the relevant NEURON wheel file, and then replace its existing value in <code class="docutils literal notranslate"><span class="pre">build.sh</span></code>. The easiest way to do this is right-click on the relevant <code class="docutils literal notranslate"><span class="pre">.whl</span></code> file link and click <code class="docutils literal notranslate"><span class="pre">Copy</span> <span class="pre">Link</span></code>. You will know you’re on the right track when the URL is long and includes a complete hash of the file, for example like: <a class="reference external" href="https://files.pythonhosted.org/packages/3e/69/5a8d498fd3096726768ab875b0e9a633cfdb68f976a6d520b6158b07ed7c/neuron-8.2.7-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl">https://files.pythonhosted.org/packages/3e/69/5a8d498fd3096726768ab875b0e9a633cfdb68f976a6d520b6158b07ed7c/neuron-8.2.7-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl</a>.</p></li>
 <li><p>Yes this is super annoying, but it is required for reasons described in our Conda package building repo’s README.</p></li>
 </ol>
 </li>
-<li><p>Once you have updated <code class="docutils literal notranslate"><span class="pre">hnn-core-all/recipe/meta.yaml</span></code> and <code class="docutils literal notranslate"><span class="pre">hnn-core-all/recipe/build.sh</span></code>, do the same for the other conda package, <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>. You should be able to make the exact same changes in the same places to <code class="docutils literal notranslate"><span class="pre">hnn-core/recipe/meta.yaml</span></code> and <code class="docutils literal notranslate"><span class="pre">hnn-core/recipe/build.sh</span></code>.</p></li>
-<li><p>Before trying to build the packages, save your work, and make a commit on your own branch of the repo or something.</p></li>
+<li><p>Before trying to build the package, save your work to <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core-conda-packaging">jonescompneurolab/hnn-core-conda-packaging</a>.</p></li>
 <li><p>From here, you can continue where you left off from <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core-conda-packaging?tab=readme-ov-file#how-to-use-this-repo-to-build-and-upload-the-packages">“How to use this repo to build and upload the packages” section</a>, which should be around step 5. Details are in that repo.</p></li>
-<li><p>To summarize the rest of the instructions from that repo, assuming you have no problems, the rest of the workflow will look like this:</p>
-<ol class="arabic simple">
-<li><p>You <code class="docutils literal notranslate"><span class="pre">cd</span></code> into each Conda package’s directory.</p></li>
-<li><p>Execute <code class="docutils literal notranslate"><span class="pre">01-build-pkg.sh</span></code>, which takes a few minutes to build the package.</p></li>
-<li><p>Assuming that succeeded, you test that you can install and run the package. As always, make sure you do this from somewhere that is NOT inside your main <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> code repository, otherwise Python will sometimes use your local code instead of the package you have installed in your environment.</p></li>
-<li><p>Satisfied, you upload the package.</p></li>
-<li><p>Repeat for the other package.</p></li>
-</ol>
-</li>
 <li><p>Do something to celebrate, you’re done!</p></li>
 </ol>
 </section>
@@ -837,7 +868,7 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#post-publishing-tests">7. Post-publishing tests</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#more-github-release-steps">8. More Github release steps</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#increment-version-again-to-a-development-version">9. Increment version again, to a development version</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build-and-distribute-conda-packages-utilizing-the-new-version">10. Build and distribute Conda packages utilizing the new version</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build-and-distribute-conda-package-utilizing-the-new-version">10. Build and distribute Conda package utilizing the new version</a></li>
 </ul>
   </nav></div>
 
