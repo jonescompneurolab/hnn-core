@@ -11,7 +11,7 @@ Last updated: 2025-10-24
 
 - We use at least 2 types of releases:
     1. "stable" releases (aka "full" version releases), which are updates to the *default* version that is publicly distributed. I.e. these are what users will install if they run `pip install hnn-core`, etc.
-    2. "dev" releases, or development releases. These can be incremented as desired, but are mainly used to distinguish new work that is merged after the latest stable release. After any stable release, there should immediately be a follow-up PR (or commit) that begins creation of the next dev release. Dev releases *can* be pushed to Pypi as long as they are indicated as development versions. However, we typically only need to do all of the steps on this page for a stable release, not every dev release.
+    2. "dev" releases, or development releases. These can be incremented as desired, but are mainly used to distinguish new work that is merged after the latest stable release. After any stable release, there should immediately be a follow-up PR (or commit) that begins creation of the next dev release. Dev releases *can* be pushed to PyPI as long as they are indicated as development versions. However, we typically only need to do all of the steps on this page for a stable release, not every dev release.
     3. (optional) "rc" releases, or "release candidates". If desired, a dev version can be changed to an rc version if we want to distribute specific rc versions for "beta-testing" for an soon and upcoming stable release.
 
 - Version identifiers:
@@ -33,9 +33,9 @@ Last updated: 2025-10-24
 
 - Unless said otherwise, these instructions assume you are in the "root" (aka top-level) directory of the `hnn-core` code repository.
 
-- Once you push a new version to TestPypi or Pypi, we CANNOT re-upload a different package to that same version. That version will always, *permanently*, be attached to that specific package file. This is a security limitation of Pypi and cannot be bypassed. If you make a mistake and upload a broken package however, there is still a solution: uploading a newer version with a higher version number. You can always increment the `patch` part of the version, then follow the process again to have a new, fixed version pushed to both TestPypi and Pypi.
+- Once you push a new version to TestPyPI or PyPI, we CANNOT re-upload a different package to that same version. That version will always, *permanently*, be attached to that specific package file. This is a security limitation of PyPI and cannot be bypassed. If you make a mistake and upload a broken package however, there is still a solution: uploading a newer version with a higher version number. You can always increment the `patch` part of the version, then follow the process again to have a new, fixed version pushed to both TestPyPI and PyPI.
 
-- Due to the rule we use to detect when to auto-publish packages ([see here](https://github.com/jonescompneurolab/hnn-core/blob/843ed4aaed5a09d46c49ce34b5b620ec112d4e5a/.github/workflows/publish-packages-on-tag.yml#L10)) *any* tag pushed to `upstream` that begins with `v` will cause the workflow to run. This means that any new version tag pushed to upstream will cause a package to be built, and the version of the code inside that commit (in `hnn_core/__init__.py`, NOT the tag itself!) will be used when uploading the package to Pypi. If that is a valid version that has not been used before, Pypi will accept and publish that package according to the version in question. Because versions are immutable on Pypi, this means that that version will NOT be available again! So, double- and triple-check before you push a tag!
+- Due to the rule we use to detect when to auto-publish packages ([see here](https://github.com/jonescompneurolab/hnn-core/blob/843ed4aaed5a09d46c49ce34b5b620ec112d4e5a/.github/workflows/publish-packages-on-tag.yml#L10)) *any* tag pushed to `upstream` that begins with `v` will cause the workflow to run. This means that any new version tag pushed to upstream will cause a package to be built, and the version of the code inside that commit (in `hnn_core/__init__.py`, NOT the tag itself!) will be used when uploading the package to PyPI. If that is a valid version that has not been used before, PyPI will accept and publish that package according to the version in question. Because versions are immutable on PyPI, this means that that version will NOT be available again! So, double- and triple-check before you push a tag!
 
 - The original "How to make a release" is [available here](https://github.com/jonescompneurolab/hnn-core/wiki/How-to-make-a-release), however it should be considered deprecated. It leaves out a few important steps (or suggests doing them out-of-order), and does not account for our new automatic Github-tag publishing workflow.
 
@@ -43,7 +43,7 @@ Last updated: 2025-10-24
 
 - Make sure all milestones are achieved or migrated to the next version.
 - Make sure the CI passes on master.
-- Make sure that for both TestPypi and Pypi, there are NOT already existing releases for the new version that you want to push. You can view [TestPypi releases here](https://test.pypi.org/project/hnn-core/#history) and [Pypi releases here](https://pypi.org/project/hnn-core/#history).
+- Make sure that for both TestPyPI and PyPI, there are NOT already existing releases for the new version that you want to push. You can view [TestPyPI releases here](https://test.pypi.org/project/hnn-core/#history) and [PyPI releases here](https://pypi.org/project/hnn-core/#history).
 
 ## 2. Prepare your local version of the release
 
@@ -198,19 +198,19 @@ git tag v0.4.4
 ```
 git push upstream v0.4.4
 ```
-8. Congrats! Github will now automatically begin building the package directly from the commit using a "Publish (etc.)" workflow (you can watch it in our [Actions here](https://github.com/jonescompneurolab/hnn-core/actions)). Once Github has built the package file, it will automatically publish that package to both Pypi and TestPypi.
+8. Congrats! Github will now automatically begin building the package directly from the commit using a "Publish (etc.)" workflow (you can watch it in our [Actions here](https://github.com/jonescompneurolab/hnn-core/actions)). Once Github has built the package file, it will automatically publish that package to both PyPI and TestPyPI.
     - The workflow code that Github uses to build and publish the packages is [located here](https://github.com/jonescompneurolab/hnn-core/blob/master/.github/workflows/publish-packages-on-tag.yml).
-    - Note that if you ever change the filename of the workflow, you **must** go to TestPypi and Pypi and add a new "Publisher" to the `hnn-core` project. The new "Publisher" must use the new filename, in addition to other metadata. You can see the Pypi and TestPypi-specific [instructions here](https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/#configuring-trusted-publishing). Note that to add a new "Publisher" to the `hnn-core` project in the first place, you must have the necessary permissions. Ask Austin or Dylan if you need to upgrade your permissions.
+    - Note that if you ever change the filename of the workflow, you **must** go to TestPyPI and PyPI and add a new "Publisher" to the `hnn-core` project. The new "Publisher" must use the new filename, in addition to other metadata. You can see the PyPI and TestPyPI-specific [instructions here](https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/#configuring-trusted-publishing). Note that to add a new "Publisher" to the `hnn-core` project in the first place, you must have the necessary permissions. Ask Austin or Dylan if you need to upgrade your permissions.
     - Note that the publishing workflow uses the version exactly from `hnn_core/__init__.py`, NOT from the git tag itself. This is why it is important to double check that your tag numbers are consistent. It will not detect if there is a tag version mismatch.
-9. Assuming nothing went wrong with the Github Actions "Publish (etc.)" workflow, your new version should now be live on both [Pypi](https://pypi.org/project/hnn-core/#history) and [TestPypi](https://test.pypi.org/project/hnn-core/#history).
+9. Assuming nothing went wrong with the Github Actions "Publish (etc.)" workflow, your new version should now be live on both [PyPI](https://pypi.org/project/hnn-core/#history) and [TestPyPI](https://test.pypi.org/project/hnn-core/#history).
 10. *Important*: Make sure to go back to <https://github.com/jonescompneurolab/hnn-core/settings/> and reverse the Environment changes you made before. Specifically, again go to "Environments", click the `pypi` environment, and in the "Deployment branches and tags" section, click the dropdown which currently says "No restriction" and change it back to "Protected branches only".
 
 ## 7. Post-publishing tests
 
 1. Create yet another fresh Python environment.
 2. Move somewhere outside of your `hnn-core` code repository, such as to your `~/Desktop`. We want to test that our new package installs and works correctly without relying on any code on your hard drive.
-3. Wait 10 minutes for Pypi's stores to start distributing your new release (go grab a coffee). It may be ready instantly, or not. Maybe ponder how you can improve this package release process...
-4. Install the basic version of `hnn-core` from Pypi with:
+3. Wait 10 minutes for PyPI's stores to start distributing your new release (go grab a coffee). It may be ready instantly, or not. Maybe ponder how you can improve this package release process...
+4. Install the basic version of `hnn-core` from PyPI with:
 ```
 pip install hnn-core
 ```
@@ -220,7 +220,7 @@ Make sure that you check that it's the latest version that you just uploaded. If
 ```
 python -c "from hnn_core import jones_2009_model, simulate_dipole ; simulate_dipole(jones_2009_model(), tstop=20)"
 ```
-6. You can also test the TestPypi version in yet another environment if you want, but you should note that the command shown at the top of the [TestPypi page](https://test.pypi.org/project/hnn-core/#history) will NOT work, due to the `-i` argument. (The reason for this is that TestPypi does not actually provide the `setuptools` package that we need, [see here](https://stackoverflow.com/a/77948986)). If you want to install the TestPypi version in a way that actually works, you should do the following:
+6. You can also test the TestPyPI version in yet another environment if you want, but you should note that the command shown at the top of the [TestPyPI page](https://test.pypi.org/project/hnn-core/#history) will NOT work, due to the `-i` argument. (The reason for this is that TestPyPI does not actually provide the `setuptools` package that we need, [see here](https://stackoverflow.com/a/77948986)). If you want to install the TestPyPI version in a way that actually works, you should do the following:
 ```
 pip install --extra-index-url https://test.pypi.org/simple/ "hnn-core"
 ```
@@ -246,7 +246,7 @@ Only do these steps if you have made a stable release.
 1. Return to your `hnn-code` repository on the `master` branch in your terminal.
 2. Start to realize that this is a lot of steps. Maybe too many.
 3. Begin incrementing the version *again* to the *next development version*. You can do this via a personal branch then PR, or just do it as a single commit that you will later push to `upstream/master`.
-4. View the [TestPypi page here](https://test.pypi.org/project/hnn-core/#history) and [Pypi here](https://pypi.org/project/hnn-core/#history), and check to make sure that the next development version you want to use has not already been taken by an existing package. It is possible for this to happen, due to the necessity to debug our package building pipeline, etc. Increment your next development version so it's higher. For example, if you just released version `0.4.4` but there is a pre-existing package for version `0.4.5dev1`, then you should prepare to increment the next development version to `0.4.5dev2`.
+4. View the [TestPyPI page here](https://test.pypi.org/project/hnn-core/#history) and [PyPI here](https://pypi.org/project/hnn-core/#history), and check to make sure that the next development version you want to use has not already been taken by an existing package. It is possible for this to happen, due to the necessity to debug our package building pipeline, etc. Increment your next development version so it's higher. For example, if you just released version `0.4.4` but there is a pre-existing package for version `0.4.5dev1`, then you should prepare to increment the next development version to `0.4.5dev2`.
 5. Update `hnn_core/__init__.py` and `doc/conf.py` to use the next development version. You do NOT need to make any changes to `doc/_static/versions.json`.
 6. Add a new section to the top of `doc/whats_new.md` that says "Current", pushing the most recent version release notes downwards.
 7. Git add these three files, such as using:
@@ -257,14 +257,14 @@ git add hnn_core/__init__.py doc/conf.py doc/whats_new.md
 
 ## 10. Build and distribute Conda package utilizing the new version
 
-1. We're done....with Github and Pypi that is! Oh, you thought that was all? Nope. Now that our new version has been released on Pypi, we need to **use the new Pypi package to rebuild a new Conda package for the new version too**. Do not fret however! This part may seem intimidating, but you don't need to do that many steps.
+1. We're done....with Github and PyPI that is! Oh, you thought that was all? Nope. Now that our new version has been released on PyPI, we need to **use the new PyPI package to rebuild a new Conda package for the new version too**. Do not fret however! This part may seem intimidating, but you don't need to do that many steps.
     - Originally, we released two Conda packages: `hnn-core-all` (all dependencies, including MPI) and `hnn-core` (only the API). However, in the interest of not confusing users, we dropped the `hnn-core` Conda package, so now there is only a single one you need to build: `hnn-core-all`.
-2. Elsewhere on your hard drive, clone our repo here <https://github.com/jonescompneurolab/hnn-core-conda-packaging>. We will NOT be using your local copy of `hnn-core`'s source code for this, but instead be using the Pypi package directly.
+2. Elsewhere on your hard drive, clone our repo here <https://github.com/jonescompneurolab/hnn-core-conda-packaging>. We will NOT be using your local copy of `hnn-core`'s source code for this, but instead be using the PyPI package directly.
 3. Read through the that repo's ["How to use this repo to build and upload the packages" section](https://github.com/jonescompneurolab/hnn-core-conda-packaging?tab=readme-ov-file#how-to-use-this-repo-to-build-and-upload-the-packages). You do *not* need to read the entire README.
 4. Follow the instructions until you are told to run `00-install-build-deps.sh` to install the conda building dependencies. Execute that script.
 5. `cd` into `hnn-core-all/recipe`.
 6. Open the file `meta.yaml` (aka `hnn-core-all/recipe/meta.yaml`). You need to do the following:
-     1. Increment the `version` variable at the top to the latest version on Pypi.
+     1. Increment the `version` variable at the top to the latest version on PyPI.
      2. Go to <https://pypi.org/project/hnn-core/#files>, and click on `view details`.
      3. Copy the SHA256 Hash digest.
      4. Paste it into the value for `sha256` inside `meta.yaml`.
