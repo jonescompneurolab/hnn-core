@@ -13,6 +13,7 @@ from h5io import write_hdf5, read_hdf5
 from .externals.mne import _check_option
 
 from .viz import plot_dipole, plot_psd, plot_tfr_morlet
+from .dipole_contributions import plot_dipole_contributions, analyze_dipole_contributions
 
 
 def simulate_dipole(
@@ -676,6 +677,73 @@ class Dipole(object):
             colorbar_inside=colorbar_inside,
             show=show,
         )
+
+    def plot_contributions(
+        self,
+        net,
+        tmin=None,
+        tmax=None,
+        ax=None,
+        show_components=True,
+        show_total=True,
+        show=True,
+    ):
+        """Plot dipole contributions showing UP vs DOWN components.
+
+        This visualization shows how different network components (drives, layers,
+        biases) contribute to the overall dipole signal, with components that
+        typically cause UP (positive) deflections shown above zero and components
+        that cause DOWN (negative) deflections shown below zero.
+
+        Parameters
+        ----------
+        net : Network
+            The network object containing drive and connectivity information.
+        tmin : float | None
+            Start time for plotting (ms). If None, use full simulation.
+        tmax : float | None
+            End time for plotting (ms). If None, use full simulation.
+        ax : matplotlib.axes.Axes | None
+            Axes to plot into. If None, creates new figure.
+        show_components : bool
+            Whether to show individual component contributions.
+        show_total : bool
+            Whether to show the total dipole signal.
+        show : bool
+            Whether to display the figure.
+
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+            The figure object.
+        """
+        return plot_dipole_contributions(
+            net=net,
+            dpls=self,
+            tmin=tmin,
+            tmax=tmax,
+            ax=ax,
+            show_components=show_components,
+            show_total=show_total,
+            show=show,
+        )
+
+    def analyze_contributions(self, net, verbose=True):
+        """Analyze and summarize dipole contributions.
+
+        Parameters
+        ----------
+        net : Network
+            The network object.
+        verbose : bool
+            Whether to print analysis summary.
+
+        Returns
+        -------
+        analysis : dict
+            Dictionary containing analysis results.
+        """
+        return analyze_dipole_contributions(net=net, dpls=self, verbose=verbose)
 
     def _baseline_renormalize(self, N_pyr_x, N_pyr_y):
         """Only baseline renormalize if the units are fAm.
