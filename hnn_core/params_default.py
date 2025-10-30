@@ -539,7 +539,7 @@ def get_L5PyrET_params():
         'L5Pyr_dend_g_pas':  0.0000589/1.5,
         'L5Pyr_dend_e_pas': -85,
         'L5Pyr_dend_decay_CaDynamics_E2' : 122,
-        'L5Pyr_dend_gamma_CaDynamics_E2' : .0005096*1
+        'L5Pyr_dend_gamma_CaDynamics_E2' : .0005096*0.9
     }
 
 def get_Int_params():
