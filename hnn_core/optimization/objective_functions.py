@@ -54,7 +54,6 @@ def _rmse_evoked(
 
     if 'bsl_cor' in obj_fun_kwargs:
         dpls = simulate_dipole(new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"], bsl_cor=obj_fun_kwargs['bsl_cor'])
-    
     else:
         dpls = simulate_dipole(new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"])
 
