@@ -531,6 +531,7 @@ class Network:
         if add_drives_from_params:
             _add_drives_from_params(self)
 
+
         self._tstop = None
         self._dt = None
 
@@ -1438,7 +1439,7 @@ class Network:
         for arr in self.rec_arrays.values():
             arr._reset()
 
-    def _instantiate_drives(self, tstop, n_trials=1, change_seed_per_drive=False):
+    def _instantiate_drives(self, tstop, n_trials=1):
         """Creates event time vectors for all drives across trials
 
         Parameters
@@ -1454,24 +1455,11 @@ class Network:
         need to be recalculated, all the GIDs etc remain the same.
         """
         self._reset_drives()
-        rnd_seed = int(np.random.uniform(100, 1000))
         # each trial needs unique event time vectors
         for trial_idx in range(n_trials):
             for d, drive in enumerate(self.external_drives.values()):
                 event_times = list()  # new list for each trial and drive
-
-                if change_seed_per_drive:
-                    
-                    warnings.warn('change_seed_per_drive set to True. '
-                                  'Starting seed will be changed from '
-                                    f'{drive["event_seed"]} to '
-                                    f'{rnd_seed} to ensure different '
-                                    'drives across gids.')
-
-                    event_seed = (rnd_seed*d)
-                else:
-                    event_seed = drive['event_seed']
-                    
+                
                 for drive_cell_gid in self.gid_ranges[drive['name']]:
                     drive_cell_gid_offset = (drive_cell_gid -
                                              self.gid_ranges[drive['name']][0])
@@ -1486,6 +1474,7 @@ class Network:
                                 for conn_idx in conn_idxs
                             ]
                         )
+                        
                         for target_type in target_types:
                             event_times.append(
                                 _drive_cell_event_times(
@@ -1500,6 +1489,7 @@ class Network:
                                 )
                             )
                     else:
+                        
                         src_event_times = _drive_cell_event_times(
                             drive["type"],
                             drive["dynamics"],
