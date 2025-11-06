@@ -15,7 +15,9 @@ from .params_default import get_L2Pyr_params_default, get_L5Pyr_params_default
 # units for taur: ms
 
 
-def _get_dends(params, cell_type, section_names):
+# KD: comment: initialize membrane potential here as it's not overridden by
+# h.finitialize unless called as h.finitialize(-65)
+def _get_dends(params, cell_type, section_names, v_init={"all": -65}):
     """Convert a flat dictionary to a nested dictionary.
 
     Returns
@@ -34,22 +36,64 @@ def _get_dends(params, cell_type, section_names):
                 # map apicaltrunk -> apical_trunk etc.
                 middle = section_name.replace("_", "")
             dend_prop[key] = params[f"{cell_type}_{middle}_{key}"]
+            if len(v_init) == 1:
+                v = v_init["all"]
+            else:
+                v = v_init[section_name]
+
         sections[section_name] = Section(
             L=dend_prop["L"],
             diam=dend_prop["diam"],
             Ra=dend_prop["Ra"],
             cm=dend_prop["cm"],
+            v=v,
         )
     return sections
 
 
-def _get_pyr_soma(p_all, cell_type):
+# KD: In the new model, the basal dendrites are differently tuned from the apical
+# dendrites.
+def _get_basal(params, cell_type, section_names, v_init={"all": -65}):
+    """Convert a flat dictionary to a nested dictionary.
+
+    Returns
+    -------
+    sections : dict
+        Dictionary of sections. Keys are section names
+    """
+    prop_names = ["L", "diam", "Ra", "cm"]
+    sections = dict()
+    for section_name in section_names:
+        dend_prop = dict()
+        middle = section_name.replace("_", "")
+        for key in prop_names:
+            if key in ["Ra", "cm"]:
+                middle = "basal"
+            else:
+                # map apicaltrunk -> apical_trunk etc.
+                middle = section_name.replace("_", "")
+            dend_prop[key] = params[f"{cell_type}_{middle}_{key}"]
+            if len(v_init) == 1:
+                v = v_init["all"]
+            else:
+                v = v_init[section_name]
+        sections[section_name] = Section(
+            L=dend_prop["L"],
+            diam=dend_prop["diam"],
+            Ra=dend_prop["Ra"],
+            cm=dend_prop["cm"],
+            v=v,
+        )
+
+
+def _get_pyr_soma(p_all, cell_type, v_init=-65):
     """Get somatic properties."""
     return Section(
         L=p_all[f"{cell_type}_soma_L"],
         diam=p_all[f"{cell_type}_soma_diam"],
         cm=p_all[f"{cell_type}_soma_cm"],
         Ra=p_all[f"{cell_type}_soma_Ra"],
+        v=v_init,
     )
 
 
@@ -70,7 +114,12 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
         "basal_3",
     ]
 
-    sections = _get_dends(p_all, cell_type="L2Pyr", section_names=section_names)
+    sections = _get_dends(
+        p_all,
+        cell_type="L2Pyr",
+        section_names=section_names,
+        v_init={"all": -71.46},
+    )
     sections["soma"] = _get_pyr_soma(p_all, "L2Pyr")
 
     end_pts = {
@@ -153,8 +202,29 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
         "basal_3",
     ]
 
-    sections = _get_dends(p_all, cell_type="L5Pyr", section_names=section_names)
-    sections["soma"] = _get_pyr_soma(p_all, "L5Pyr")
+    v_init = {
+        "apical_1": -71.32,
+        "apical_2": -69.08,
+        "apical_tuft": -67.30,
+        "apical_trunk": -72,
+        "soma": -72.0,
+        "basal_1": -72,
+        "basal_2": -72,
+        "basal_3": -72,
+        "apical_oblique": -72,
+    }
+
+    sections = _get_dends(
+        p_all,
+        cell_type="L5Pyr",
+        section_names=section_names,
+        v_init=v_init,
+    )
+    sections["soma"] = _get_pyr_soma(
+        p_all,
+        "L5Pyr",
+        v_init=-72,
+    )
 
     end_pts = {
         "soma": [[0, 0, 0], [0, 0, 23]],
@@ -230,9 +300,15 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
     )
 
 
-def _get_basket_soma(cell_name):
+def _get_basket_soma(cell_name, v_init=-64.9737):
     end_pts = [[0, 0, 0], [0, 0, 39.0]]
     return Section(L=39.0, diam=20.0, cm=0.85, Ra=200.0, end_pts=end_pts)
+
+
+# values from Chamberland et al 2023
+def _get_interneuron_soma(cell_name, v_init=-75):
+    end_pts = [[0, 0, 0], [0, 0, 20.0]]
+    return Section(L=20.0, diam=20.0, cm=1, Ra=200.0, end_pts=end_pts)
 
 
 def _get_pyr_syn_props(p_all, cell_type):
