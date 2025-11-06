@@ -104,6 +104,8 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
         assert isinstance(override_params, dict)
         p_all = compare_dictionaries(p_all, override_params)
 
+    all_v_init = -71.46
+
     section_names = [
         "apical_trunk",
         "apical_1",
@@ -118,9 +120,15 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
         p_all,
         cell_type="L2Pyr",
         section_names=section_names,
-        v_init={"all": -71.46},
+        v_init={
+            "all": all_v_init,
+        },
     )
-    sections["soma"] = _get_pyr_soma(p_all, "L2Pyr")
+    sections["soma"] = _get_pyr_soma(
+        p_all,
+        "L2Pyr",
+        v_init=all_v_init,
+    )
 
     end_pts = {
         "soma": [[-50, 0, 765], [-50, 0, 778]],
@@ -302,13 +310,14 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
 
 def _get_basket_soma(cell_name, v_init=-64.9737):
     end_pts = [[0, 0, 0], [0, 0, 39.0]]
-    return Section(L=39.0, diam=20.0, cm=0.85, Ra=200.0, end_pts=end_pts)
-
-
-# values from Chamberland et al 2023
-def _get_interneuron_soma(cell_name, v_init=-75):
-    end_pts = [[0, 0, 0], [0, 0, 20.0]]
-    return Section(L=20.0, diam=20.0, cm=1, Ra=200.0, end_pts=end_pts)
+    return Section(
+        L=39.0,
+        diam=20.0,
+        cm=0.85,
+        Ra=200.0,
+        v=v_init,
+        end_pts=end_pts,
+    )
 
 
 def _get_pyr_syn_props(p_all, cell_type):
