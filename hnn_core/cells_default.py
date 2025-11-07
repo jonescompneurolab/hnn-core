@@ -303,7 +303,7 @@ def _get_mechanisms(p_all, cell_type, section_names, mechanisms):
     return mech_props
 
 
-def _exp_g_at_dist(x, zero_val, exp_term, offset):
+def _exp_g_at_dist(x, zero_val, exp_term, offset, slope=1):
     """Compute exponential distance-dependent ionic conductance.
 
     Parameters
@@ -314,12 +314,16 @@ def _exp_g_at_dist(x, zero_val, exp_term, offset):
         Value of function when x = 0
     exp_term : float | int
         Multiplier of x in the exponent
-    offset: float |int
+    offset : float | int
         Offset value added to output
-
+    slope : int | float, default=1
+        Slope of the exponential component
     """
-
-    return zero_val * np.exp(exp_term * x) + offset
+    # AES: TODO Should the offset be multiplied by zero_val? This was also changed in
+    # #1168, but seems suspicious to me... It currently passes tests, BUT it appears
+    # that offset is always 0 in every use case used so far, so if this introduces a
+    # bug, it will not be detected...
+    return zero_val * (slope * np.exp(exp_term * x) + offset)
 
 
 def basket(cell_name, pos=(0, 0, 0), gid=None):
@@ -390,7 +394,7 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
         raise ValueError(f"Unknown pyramidal cell type: {cell_name}")
 
 
-def _linear_g_at_dist(x, gsoma, gdend, xkink):
+def _linear_g_at_dist(x, gsoma, gdend, xkink, hotzone_factor=1, hotzone=[0, 0]):
     """Compute linear distance-dependent ionic conductance.
 
     Parameters
@@ -403,13 +407,23 @@ def _linear_g_at_dist(x, gsoma, gdend, xkink):
         Dendritic conductance
     xkink : float | int
         Plateau value where conductance is fixed at gdend.
+    hotzone_factor: int | float, default=1
+        Increase in conducivity that creates a hotzone.
+    hotzone : [float, float]
+        TODO: AES: Seems to be the start and end distance of the hotzone. Should prob be
+        renamed to `hotzone_boundaries` or something like that.  Start and end of
+        hotzone if hotzone_factor > 1. Units are the same as that of `x`.
 
     Notes
     -----
     Linearly scales conductance along dendrite.
     Returns gdend when x > xkink.
     """
-    return gsoma + np.min([xkink, x]) * (gdend - gsoma) / xkink
+    gbar = gsoma + np.min([xkink, x]) * (gdend - gsoma) / xkink
+    if hotzone[0] < x < hotzone[1]:
+        gbar *= hotzone_factor
+
+    return gbar
 
 
 def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
