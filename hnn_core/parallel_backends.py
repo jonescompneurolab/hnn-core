@@ -32,11 +32,26 @@ def _thread_handler(event, out, queue):
         queue.put(line)
 
 
-def _gather_trial_data(sim_data, net, n_trials, postproc):
+def _gather_trial_data(sim_data, net, n_trials, postproc, bsl_cor="jones"):
     """Arrange data by trial
 
     To be called after simulate(). Returns list of Dipoles, one for each trial,
     and saves spiking info in net (instance of Network).
+
+    Parameters
+    ----------
+    sim_data : ???
+        AES: Apparently this has never been documented before?
+    net : Network object
+        The Network object specifying how cells are connected.
+    n_trials : int
+        Number of trials to simulate.
+    postproc : bool
+        If False, no postprocessing applied to the dipole
+    bsl_cor : str, {'jones', 'calcium'}
+        Baseline correction method. Defaults to 'jones'. For jones_2009_model and
+        law_2021_model, use 'jones' (manual correction). For the new calcium model, use
+        'calcium'.
     """
     dpls = list()
 
@@ -67,7 +82,13 @@ def _gather_trial_data(sim_data, net, n_trials, postproc):
 
         N_pyr_x = net._N_pyr_x
         N_pyr_y = net._N_pyr_y
-        dpl._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
+        if bsl_cor == "jones":
+            print("Applying Jones baseline correction", flush=True)
+            dpl._baseline_renormalize(N_pyr_x, N_pyr_y)  # XXX cf. #270
+        elif bsl_cor == "calcium":
+            print("Applying calcium model baseline correction", flush=True)
+            dpl._baseline_renormalize_ca()  # cf. #1168
+
         dpl._convert_fAm_to_nAm()  # always applied, cf. #264
         if postproc:
             window_len = net._params["dipole_smooth_win"]  # specified in ms
@@ -537,7 +558,7 @@ class JoblibBackend(object):
 
         _BACKEND = self._old_backend
 
-    def simulate(self, net, tstop, dt, n_trials, postproc=False):
+    def simulate(self, net, tstop, dt, n_trials, postproc=False, bsl_cor="jones"):
         """Simulate the HNN model
 
         Parameters
@@ -545,14 +566,18 @@ class JoblibBackend(object):
         net : Network object
             The Network object specifying how cells are
             connected.
-        n_trials : int
-            Number of trials to simulate.
         tstop : float
             The simulation stop time (ms).
         dt : float
             The integration time step of h.CVode (ms)
+        n_trials : int
+            Number of trials to simulate.
         postproc : bool
             If False, no postprocessing applied to the dipole
+        bsl_cor : str, {'jones', 'calcium'}
+            Baseline correction method. Defaults to 'jones'. For jones_2009_model and
+            law_2021_model, use 'jones' (manual correction). For the new calcium model,
+            use 'calcium'.
 
         Returns
         -------
@@ -570,7 +595,7 @@ class JoblibBackend(object):
         )
 
         dpls = _gather_trial_data(
-            sim_data, net=net, n_trials=n_trials, postproc=postproc
+            sim_data, net=net, n_trials=n_trials, postproc=postproc, bsl_cor=bsl_cor
         )
 
         return dpls
@@ -944,7 +969,7 @@ class MPIBackend(object):
         if self.n_procs > 1:
             kill_proc_name("nrniv")
 
-    def simulate(self, net, tstop, dt, n_trials, postproc=False):
+    def simulate(self, net, tstop, dt, n_trials, postproc=False, bsl_cor="jones"):
         """Simulate the HNN model in parallel on all cores
 
         Parameters
@@ -960,6 +985,10 @@ class MPIBackend(object):
             Number of trials to simulate.
         postproc : bool
             If False, no postprocessing applied to the dipole
+        bsl_cor : str, {'jones', 'calcium'}
+            Baseline correction method. Defaults to 'jones'. For jones_2009_model and
+            law_2021_model, use 'jones' (manual correction). For the new calcium model,
+            use 'calcium'.
 
         Returns
         -------
@@ -1003,7 +1032,7 @@ class MPIBackend(object):
             universal_newlines=True,
         )
 
-        dpls = _gather_trial_data(sim_data, net, n_trials, postproc)
+        dpls = _gather_trial_data(sim_data, net, n_trials, postproc, bsl_cor)
         return dpls
 
     def terminate(self):
