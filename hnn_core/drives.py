@@ -162,6 +162,7 @@ def _add_drives_from_params(net):
     )
 
     for drive_name in sorted(drive_specs.keys()):  # order matters
+        # Note: In "legacy_mode", the seeds used here will be overwritten later.
         specs = drive_specs[drive_name]
         if specs["type"] == "evoked":
             net.add_evoked_drive(
@@ -236,12 +237,30 @@ def _add_drives_from_params(net):
         _tstop = bias_specs["tonic"][cellname]["tstop"]
         net.add_tonic_bias(amplitude=_cell_types_amplitudes, t0=_t0, tstop=_tstop)
 
-    # KD 11/03: this is a problem for reproducibility in HNN core, as this is only done when loading params from .json files,
-    # so the seeds between the original simulation and loaded simulation will differ. Do we need this?
-    # # in HNN-GUI, seed is determined by "absolute GID" instead of the
-    # # gid offset with respect to the first cell of a population.
-    # for drive_name, drive in net.external_drives.items():
-    #     drive["event_seed"] += net.gid_ranges[drive_name][0]
+
+    if net._legacy_mode:
+        # In the Original HNN's GUI, seed was determined by "absolute GID" instead of the
+        # gid offset with respect to the first cell of a population. Also, in
+        # "legacy_mode", HNN-Core uses information from "default.json", custom offsets
+        # for certain drives, and the aforementioned GIDs to determine the final seed of
+        # each drive.
+        #
+        # To understand how `legacy_mode` sets drive seeds in detail, please see
+        # TODO
+        for drive_name, drive in net.external_drives.items():
+            # First, we need to reset the initial state of the event_seed for these
+            # particular drives to what they have traditionally been:
+            if drive_name in ("evdist1", "evprox1", "evprox2"):
+                # 2 - 18 = -16
+                # 2 is from the original event_seed from
+                #   https://github.com/jonescompneurolab/hnn-core/blob/90f4d636b13647869f11825daf40eb985b6965cb/hnn_core/param/default.json#L18-L20
+                # -18 is from the legacy_mode offset from
+                #    `params.py::_extract_drive_specs_from_hnn_params`
+                # = -16
+                drive["event_seed"] = -16
+            # Then, we overwrite every drive's seed by adding its initial gid_range,
+            # determined at runtime:
+            drive["event_seed"] += net.gid_ranges[drive_name][0]
 
 
 def _get_prng(seed, gid):
