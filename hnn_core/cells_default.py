@@ -290,14 +290,15 @@ def _get_basket_soma(cell_name, v_init=-64.9737):
 
 
 # values from Chamberland et al 2023
-def _get_interneuron_soma(cell_name, v_init=-75):
+def _get_interneuron_soma(cell_name, v_init=-69):
     end_pts = [[0, 0, 0], [0, 0, 20.]]
     return Section(
         L=20.,
         diam=20.,
         cm=1,
         Ra=200.,
-        end_pts=end_pts
+        end_pts=end_pts,
+        v=v_init
     )
 
 
