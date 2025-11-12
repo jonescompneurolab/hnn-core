@@ -237,7 +237,6 @@ def _add_drives_from_params(net):
         _tstop = bias_specs["tonic"][cellname]["tstop"]
         net.add_tonic_bias(amplitude=_cell_types_amplitudes, t0=_t0, tstop=_tstop)
 
-
     if net._legacy_mode:
         # In the Original HNN's GUI, seed was determined by "absolute GID" instead of the
         # gid offset with respect to the first cell of a population. Also, in
