@@ -245,7 +245,7 @@ def _add_drives_from_params(net):
         # each drive.
         #
         # To understand how `legacy_mode` sets drive seeds in detail, please see
-        # TODO
+        # https://github.com/jonescompneurolab/hnn-core/pull/1180#issuecomment-3524054931
         for drive_name, drive in net.external_drives.items():
             # First, we need to reset the initial state of the event_seed for these
             # particular drives to what they have traditionally been:
