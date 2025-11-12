@@ -396,7 +396,7 @@ def calcium_model(
 
     return net
 
-def duecker_2025_ET_model(params=None, add_drives_from_params=False,
+def duecker_ET_model(params=None, add_drives_from_params=False,
                   legacy_mode=False, mesh_shape=(10, 10)):
 
 
