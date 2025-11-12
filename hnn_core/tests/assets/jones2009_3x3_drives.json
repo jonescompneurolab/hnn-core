@@ -1978,7 +1978,7 @@
             "synaptic_delays": {
                 "L2_basket": 0.1,
                 "L2_pyramidal": 0.1,
-                "L5_pyramidal": 0.1
+                "L5_pyramidal": 1.0
             },
             "probability": 1.0,
             "name": "evdist1",
@@ -2459,7 +2459,7 @@
             "loc": "distal",
             "receptor": "ampa",
             "nc_dict": {
-                "A_delay": 0.1,
+                "A_delay": 1.0,
                 "A_weight": 0.1423,
                 "lamtha": 3.0,
                 "threshold": 0.0,
@@ -2527,7 +2527,7 @@
             "loc": "distal",
             "receptor": "nmda",
             "nc_dict": {
-                "A_delay": 0.1,
+                "A_delay": 1.0,
                 "A_weight": 0.080074,
                 "lamtha": 3.0,
                 "threshold": 0.0,

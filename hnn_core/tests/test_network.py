@@ -846,7 +846,7 @@ def test_network_drives_legacy():
 
     # check select synaptic delays
     target_delays = {
-        "evdist1": {"L2_basket": 0.1, "L5_pyramidal": 0.1},
+        "evdist1": {"L2_basket": 0.1, "L5_pyramidal": 1.0},
         "evprox1": {"L2_basket": 0.1, "L5_pyramidal": 1.0},
         "evprox2": {"L2_basket": 0.1, "L5_pyramidal": 1.0},
     }
