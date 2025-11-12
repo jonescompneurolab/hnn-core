@@ -54,7 +54,7 @@ def simulate_dipole(net, tstop, dt=0.025, n_trials=None, record_vsec=False,
     bsl_cor : str
         Baseline correction method. Default: 'jones'
         For jones_2009_model and law_2021_model, use method 'jones' (manual correction).
-        For new_calcium_model, use method 'calcium'.
+        For duecker_ET_model, use method 'duecker'.
 
     Returns
     -------
@@ -678,13 +678,13 @@ class Dipole(object):
             show=show,
         )
 
-    def _baseline_renormalize_ca(self):
+    def _baseline_renormalize_dueckerET(self):
         """Baseline correction based on calcium model without drives"""
 
         hnn_core_root = op.dirname(hnn_core.__file__)
 
         # load the baseline dipole
-        with open(op.join(hnn_core_root, 'param', 'bsl_dipole_ca.json'), 'r') as f:
+        with open(op.join(hnn_core_root, 'param', 'bsl_dipole_dueckerET.json'), 'r') as f:
             bsl_dpl = json.load(f)
 
         A_L2 = bsl_dpl['L2'][-1]

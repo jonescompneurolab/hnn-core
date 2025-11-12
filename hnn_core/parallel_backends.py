@@ -74,9 +74,9 @@ def _gather_trial_data(sim_data, net, n_trials, postproc, bsl_cor='jones'):
 
         dpl._convert_fAm_to_nAm()  # always applied, cf. #264
 
-        if bsl_cor == 'calcium':
+        if bsl_cor == 'duecker':
             print('Applying calcium model baseline correction', flush=True)
-            dpl._baseline_renormalize_ca()
+            dpl._baseline_renormalize_dueckerET()
 
         if postproc:
             window_len = net._params["dipole_smooth_win"]  # specified in ms
