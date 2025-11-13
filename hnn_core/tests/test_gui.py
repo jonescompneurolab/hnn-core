@@ -303,6 +303,7 @@ def test_gui_upload_data():
     file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt"  # noqa
     file2_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt"  # noqa
     gui._simulate_upload_data(file1_url)
+
     assert len(gui.data["simulation_data"]) == 1
     assert "S1_SupraT" in gui.data["simulation_data"].keys()
     assert gui.data["simulation_data"]["S1_SupraT"]["net"] is None
@@ -1601,3 +1602,58 @@ def test_diff_gui_vs_api_networks_simulations():
         dpls_gui[0].data["agg"],
         dpls_api[0].data["agg"],
     )
+
+
+@requires_mpi4py
+@requires_psutil
+@pytest.mark.uses_mpi
+def test_gui_run_optimization():
+    """TODO"""
+    gui = HNNGUI()
+    _ = gui.compose()
+
+    gui.widget_tstop.value = 170
+    gui.widget_dt.value = 0.025
+    gui.widget_backend_selection.value = "MPI"
+
+    gui.widget_ntrials.value = 2
+    gui.widget_opt_max_iter.value = 3
+    gui.widget_n_jobs.value = 3
+
+    # file2_path = Path(hnn_core_root.parents[0], "default_all.json")
+    # gui._simulate_upload_drives(file2_path)
+
+    # doesn't work for real files???
+    # file1_path = hnn_core_root / "dpl2.txt"
+    file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt"  # noqa
+    gui._simulate_upload_data(file1_url)
+
+    # data_url = ('https://raw.githubusercontent.com/jonescompneurolab/hnn/master/'
+    #             'data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt')
+    # urlretrieve(data_url, 'yes_trial_S1_ERP_all_avg.txt')
+    # from hnn_core import read_dipole
+    # target_dipole = read_dipole('yes_trial_S1_ERP_all_avg.txt')
+
+    # AES not sure that this is all that is required to actually update this widget...
+    gui.opt_target_widgets["rmse_target_data"].value = "S1_SupraT"
+    # gui.widget_opt_obj_fun.value = "maximize_psd"
+
+    # Enable some values that we want to constrain for the optimization
+    gui.opt_drive_widgets[0]["mu_opt_checkbox"].value = True
+    # gui.opt_drive_widgets[0]["weights_ampa"]["L2_pyramidal_opt_checkbox"].value = True
+    # gui.opt_drive_widgets[-1]["amplitude"]["L2_pyramidal_opt_checkbox"].value = True
+    # gui.opt_drive_widgets[0]["weights_ampa"]["L2_pyramidal_opt_checkbox"].value = True
+    # gui.opt_drive_widgets[3]["tstop_opt_checkbox"].value = True
+
+    gui.run_opt_button.click()
+
+    gui.opt_target_widgets["rmse_target_data"].value = "S1_SupraT"
+    gui.opt_drive_widgets[0]["mu_opt_checkbox"].value = True
+
+    default_name = gui.widget_simulation_name.value
+    dpls = gui.simulation_data[default_name + "_optimized"]["dpls"]
+    assert isinstance(gui.simulation_data[default_name + "_optimized"]["net"], Network)
+    assert isinstance(dpls, list)
+    assert len(dpls) > 0
+    assert all([isinstance(dpl, Dipole) for dpl in dpls])
+    plt.close("all")
