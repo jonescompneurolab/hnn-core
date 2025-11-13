@@ -43,6 +43,7 @@ from ipywidgets import (
 from ipywidgets.embed import embed_minimal_html
 import hnn_core
 from hnn_core import JoblibBackend, MPIBackend, simulate_dipole
+from hnn_core.optimization import Optimizer
 from hnn_core.gui._logging import logger
 from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
@@ -365,6 +366,8 @@ class HNNGUI:
             ),
             "drive_widget": Layout(width="auto"),
             "drive_textbox": Layout(width="270px", height="auto"),
+            # optimization related
+            "opt_textbox": Layout(width="250px"),
             # simulation status related
             "simulation_status_height": f"{status_height}px",
             "simulation_status_common": "background:gray;padding-left:10px",
@@ -500,14 +503,17 @@ class HNNGUI:
         self.simulation_list_widget = Dropdown(
             options=[], value=None, description="", layout={"width": "15%"}
         )
+
         # Drive selection
+        drive_dropdown_style = {"description_width": "100px"}
+
         self.widget_drive_type_selection = Dropdown(
             options=["Evoked", "Poisson", "Rhythmic", "Tonic"],
             value="Evoked",
             description="Drive type:",
             disabled=False,
             layout=self.layout["drive_widget"],
-            style={"description_width": "100px"},
+            style=drive_dropdown_style,
         )
         self.widget_location_selection = Dropdown(
             options=["Proximal", "Distal"],
@@ -515,12 +521,68 @@ class HNNGUI:
             description="Drive location:",
             disabled=False,
             layout=self.layout["drive_widget"],
-            style={"description_width": "100px"},
+            style=drive_dropdown_style,
         )
         self.add_drive_button = create_expanded_button(
             "Add drive",
             "primary",
             layout=self.layout["btn"],
+            button_color=self.layout["theme_color"],
+        )
+
+        # Optimizer widgets
+        # Just use same styling as top-level drive widgets (not accordion)
+        opt_dropdown_style = {"description_width": "120px"}
+
+        self.widget_opt_solver = Dropdown(
+            options=["bayesian", "cobyla"],
+            value="bayesian",
+            description="Solver:",
+            disabled=False,
+            layout=self.layout["opt_textbox"],
+            style=opt_dropdown_style,
+        )
+        self.widget_opt_obj_fun = Dropdown(
+            options=["dipole_rmse", "maximize_psd"],
+            value="dipole_rmse",
+            description="Objective Function:",
+            disabled=False,
+            layout=self.layout["opt_textbox"],
+            style=opt_dropdown_style,
+        )
+        self.widget_opt_max_iter = BoundedIntText(
+            value=200,
+            min=1,
+            max=10000,
+            description="Max Iterations:",
+            disabled=False,
+            layout=self.layout["opt_textbox"],
+            style=opt_dropdown_style,
+        )
+        self.widget_opt_tstop = BoundedFloatText(
+            value=170.0,
+            min=0.1,
+            max=1000.0,
+            description="tstop (ms):",
+            disabled=False,
+            layout=self.layout["opt_textbox"],
+            style=opt_dropdown_style,
+        )
+        # DATA to optimize towards aka target data
+        self.widget_opt_target_data = Dropdown(
+            options=self.simulation_data,
+            value=None,
+            description="Target Data:",
+            disabled=False,
+            layout=Layout(width="98%"),
+        )
+
+        self.opt_status_out = Output()
+
+        self.run_opt_button = create_expanded_button(
+            "Run Optimization",
+            "primary",
+            layout=self.layout["btn_full_w"],
             button_color=self.layout["theme_color"],
         )
 
@@ -646,6 +708,7 @@ class HNNGUI:
         self._connectivity_out = Output()  # tab to tune connectivity.
         self._cell_params_out = Output()
         self._global_gain_out = Output()
+        self._opt_out = Output()  # tab for optimization
 
         self._log_out = Output()
 
@@ -838,6 +901,12 @@ class HNNGUI:
         self.load_connectivity_button.observe(_on_upload_connectivity, names="value")
         self.load_drives_button.observe(_on_upload_drives, names="value")
         self.run_button.on_click(_run_button_clicked)
+
+        # optimization button
+        def _run_opt_button_clicked(b):
+            return self._run_optimization()
+
+        self.run_opt_button.on_click(_run_opt_button_clicked)
         self.load_data_button.observe(_on_upload_data, names="value")
         self.simulation_list_widget.observe(_simulation_list_change, "value")
         self.widget_drive_type_selection.observe(_driver_type_change, "value")
@@ -979,15 +1048,48 @@ class HNNGUI:
 
         config_panel, figs_output = self.viz_manager.compose()
 
+        # Create optimizer tab
+        opt_box = VBox(
+            [
+                HBox(
+                    [
+                        VBox(
+                            [
+                                self.widget_opt_solver,
+                                self.widget_opt_obj_fun,
+                            ]
+                        ),
+                        VBox(
+                            [
+                                self.widget_opt_max_iter,
+                                self.widget_opt_tstop,
+                            ]
+                        )
+                    ]
+                ),
+                self.widget_opt_target_data,
+                self.run_opt_button,
+                self.opt_status_out,
+                self._opt_out,
+            ]
+        )
+
         # Tabs for left pane
         left_tab = Tab()
         left_tab.children = [
             simulation_box,
             connectivity_configuration,
             drives_options,
+            opt_box,
             config_panel,
         ]
-        titles = ("Simulation", "Network", "External drives", "Visualization")
+        titles = (
+            "Simulation",
+            "Network",
+            "External drives",
+            "Optimization",
+            "Visualization",
+        )
         for idx, title in enumerate(titles):
             left_tab.set_title(idx, title)
 
@@ -1355,6 +1457,71 @@ class HNNGUI:
         # Resets file counter to 0
         change["owner"].set_trait("value", ([]))
         return params
+
+    def _run_optimization(self):
+        """Run parameter optimization using the current network and settings."""
+
+        # AES TODO
+        # 1. Existing Opt tab needs to be updated with drives-accordion, including when
+        # drives are manipulated, added, or removed
+        # 2. Once opt tab is full, THEN we worry about executing
+        # 3. need initial data loaded
+
+        with self.opt_status_out:
+            self.opt_status_out.clear_output(wait=True)
+            print("Starting optimization...")
+
+            try:
+                # Get current network from parameters
+                net = dict_to_network(self.params)
+
+                # Get optimization parameters from widgets
+                solver = self.widget_opt_solver.value
+                obj_fun = self.widget_opt_obj_fun.value
+                max_iter = self.widget_opt_max_iter.value
+                tstop = self.widget_opt_tstop.value
+
+                print(f"Solver: {solver}")
+                print(f"Objective function: {obj_fun}")
+                print(f"Max iterations: {max_iter}")
+                print(f"Simulation duration: {tstop} ms")
+
+                # Simple constraints example - this would need to be configured by user
+                constraints = {
+                    "evoked_param": [1.0, 50.0]  # example constraint
+                }
+
+                def set_params_func(network, params):
+                    """Example parameter setter - would need user customization"""
+                    # This is a placeholder - real implementation would need
+                    # user-defined parameter mapping
+                    pass
+
+                # Create optimizer
+                optimizer = Optimizer(
+                    initial_net=net,
+                    tstop=tstop,
+                    constraints=constraints,
+                    set_params=set_params_func,
+                    solver=solver,
+                    obj_fun=obj_fun,
+                    max_iter=max_iter,
+                )
+
+                print("Optimizer created successfully!")
+                print(f"Optimizer configuration: {optimizer}")
+                print("Note: This is a basic implementation.")
+                print("For full functionality, you would need to:")
+                print("1. Define proper parameter constraints")
+                print("2. Implement the set_params function")
+                print("3. Provide target data for dipole_rmse objective")
+                print("4. Configure frequency bands for maximize_psd objective")
+
+            except Exception as e:
+                print(f"Error during optimization setup: {str(e)}")
+                import traceback
+
+                traceback.print_exc()
 
 
 def _prepare_upload_file_from_local(path):
