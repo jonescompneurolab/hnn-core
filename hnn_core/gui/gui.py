@@ -551,7 +551,8 @@ class HNNGUI:
             style=opt_dropdown_style,
         )
         self.widget_opt_max_iter = BoundedIntText(
-            value=200,
+            # value=200,  # AES debug
+            value=3,
             min=1,
             max=10000,
             description="Max Iterations:",
@@ -568,21 +569,10 @@ class HNNGUI:
             layout=self.layout["opt_textbox"],
             style=opt_dropdown_style,
         )
-        # DATA to optimize towards aka target data
-        self.widget_opt_target_data = Dropdown(
-            options=self.simulation_data,
-            value=None,
-            description="Target Data:",
-            disabled=False,
-            layout=Layout(width="98%"),
-        )
-
-        self.opt_status_out = Output()
-
         self.run_opt_button = create_expanded_button(
             "Run Optimization",
-            "primary",
-            layout=self.layout["btn_full_w"],
+            "success",
+            layout=Layout(width="auto"),
             button_color=self.layout["theme_color"],
         )
 
@@ -648,7 +638,33 @@ class HNNGUI:
         # Synaptic Gains dict
         self.global_gain_widgets = dict()
 
+        # Add optimzation section
+        self.opt_drive_widgets = list()
+        self.opt_drive_widget_constraints = list()
+        self.opt_drive_boxes = list()
+        self.opt_accordion = Accordion()
+
         self._init_ui_components()
+
+
+        # DATA to optimize towards aka target data
+        # Note: all data, included loaded/experimental data, seems to be governed under
+        # "self.simulation_data".
+        #
+        # AES UGH need to dive in and debug with pytest to figure out HOW DO I ACCESS LOADED DATA
+        self.widget_opt_target_data = Dropdown(
+            # options=self.simulation_data,
+            # options=self.data,  # this at least prints "simulation_data"
+            # options=self.data["simulation_data"],  # nope
+            options=self.data["simulation_data"],  # nope
+            # options=self.data["simulation_data"].keys(),  # nope
+            value=None,
+            description="Target Data:",
+            disabled=False,
+            layout=Layout(width="98%"),
+        )
+
+
         self.add_logging_window_logger()
 
     @staticmethod
@@ -708,7 +724,7 @@ class HNNGUI:
         self._connectivity_out = Output()  # tab to tune connectivity.
         self._cell_params_out = Output()
         self._global_gain_out = Output()
-        self._opt_out = Output()  # tab for optimization
+        self._opt_out = Output()  # dynamic part of optimization tab
 
         self._log_out = Output()
 
@@ -836,6 +852,39 @@ class HNNGUI:
                 self.global_gain_widgets,
             )
 
+        def _run_opt_button_clicked(b):
+            return run_opt_button_clicked(
+                self.widget_simulation_name,
+                self._log_out,
+                self.opt_drive_widgets,
+                self.data,
+                self.widget_dt,
+                self.widget_tstop,
+                self.fig_default_params,
+                self.widget_default_smoothing,
+                self.widget_default_scaling,
+                self.widget_min_frequency,
+                self.widget_max_frequency,
+                self.widget_ntrials,
+                self.widget_backend_selection,
+                self.widget_mpi_cmd,
+                self.widget_n_jobs,
+                self.params,
+                self._simulation_status_bar,
+                self._simulation_status_contents,
+                self.connectivity_widgets,
+                self.viz_manager,
+                self.simulation_list_widget,
+                self.cell_parameters_widgets,
+                self.global_gain_widgets,
+                self.opt_drive_widget_constraints,
+                self.widget_opt_solver.value,
+                self.widget_opt_obj_fun.value,
+                self.widget_opt_max_iter.value,
+                self.widget_opt_tstop,
+                self.widget_opt_target_data,
+            )
+
         def _simulation_list_change(value):
             # Simulation Data
             _simulation_data, file_extension = _serialize_simulation(
@@ -901,12 +950,8 @@ class HNNGUI:
         self.load_connectivity_button.observe(_on_upload_connectivity, names="value")
         self.load_drives_button.observe(_on_upload_drives, names="value")
         self.run_button.on_click(_run_button_clicked)
-
-        # optimization button
-        def _run_opt_button_clicked(b):
-            return self._run_optimization()
-
         self.run_opt_button.on_click(_run_opt_button_clicked)
+
         self.load_data_button.observe(_on_upload_data, names="value")
         self.simulation_list_widget.observe(_simulation_list_change, "value")
         self.widget_drive_type_selection.observe(_driver_type_change, "value")
@@ -1064,12 +1109,11 @@ class HNNGUI:
                                 self.widget_opt_max_iter,
                                 self.widget_opt_tstop,
                             ]
-                        )
+                        ),
                     ]
                 ),
                 self.widget_opt_target_data,
                 self.run_opt_button,
-                self.opt_status_out,
                 self._opt_out,
             ]
         )
@@ -1119,8 +1163,8 @@ class HNNGUI:
 
         self._link_callbacks()
 
-        # initialize drive and connectivity ipywidgets
-        self.load_drive_and_connectivity()
+        # initialize connectivity, drives, and optimization ipywidgets
+        self.load_conn_drives_opt()
 
         if not return_layout:
             return
@@ -1276,8 +1320,8 @@ class HNNGUI:
         self.drive_accordion.selected_index = idx
         self.drive_boxes[idx].children[-1].click()
 
-    def load_drive_and_connectivity(self):
-        """Add drive and connectivity ipywidgets from params."""
+    def load_conn_drives_opt(self):
+        """Add connectivity, drives, and optimization ipywidgets from params."""
         with self._log_out:
             # Add connectivity
             add_connectivity_tab(
@@ -1295,6 +1339,9 @@ class HNNGUI:
 
             # Add drives
             self.add_drive_tab(self.params)
+
+            # Add optimization
+            self.add_opt_tab(self.params)
 
     def add_drive_widget(
         self,
@@ -1458,70 +1505,138 @@ class HNNGUI:
         change["owner"].set_trait("value", ([]))
         return params
 
-    def _run_optimization(self):
-        """Run parameter optimization using the current network and settings."""
+    def add_opt_tab(self, params):
+        """Create/update the dynamic output of the optimization tab"""
+        net = dict_to_network(params)
+        drive_specs = net.external_drives
+        tonic_specs = net.external_biases
 
-        # AES TODO
-        # 1. Existing Opt tab needs to be updated with drives-accordion, including when
-        # drives are manipulated, added, or removed
-        # 2. Once opt tab is full, THEN we worry about executing
-        # 3. need initial data loaded
+        # clear before adding drives
+        self._opt_out.clear_output()
+        while len(self.opt_drive_widgets) > 0:
+            self.opt_drive_widgets.pop()
+            self.opt_drive_boxes.pop()
 
-        with self.opt_status_out:
-            self.opt_status_out.clear_output(wait=True)
-            print("Starting optimization...")
+        drive_names = list(drive_specs.keys())
+        # Add tonic biases
+        if tonic_specs:
+            drive_names.extend(list(tonic_specs.keys()))
 
-            try:
-                # Get current network from parameters
-                net = dict_to_network(self.params)
-
-                # Get optimization parameters from widgets
-                solver = self.widget_opt_solver.value
-                obj_fun = self.widget_opt_obj_fun.value
-                max_iter = self.widget_opt_max_iter.value
-                tstop = self.widget_opt_tstop.value
-
-                print(f"Solver: {solver}")
-                print(f"Objective function: {obj_fun}")
-                print(f"Max iterations: {max_iter}")
-                print(f"Simulation duration: {tstop} ms")
-
-                # Simple constraints example - this would need to be configured by user
-                constraints = {
-                    "evoked_param": [1.0, 50.0]  # example constraint
-                }
-
-                def set_params_func(network, params):
-                    """Example parameter setter - would need user customization"""
-                    # This is a placeholder - real implementation would need
-                    # user-defined parameter mapping
-                    pass
-
-                # Create optimizer
-                optimizer = Optimizer(
-                    initial_net=net,
-                    tstop=tstop,
-                    constraints=constraints,
-                    set_params=set_params_func,
-                    solver=solver,
-                    obj_fun=obj_fun,
-                    max_iter=max_iter,
+        for idx, drive_name in enumerate(drive_names):  # order matters
+            if "tonic" in drive_name:
+                specs = dict(type="tonic", location=None)
+                kwargs = dict(prespecified_drive_data=tonic_specs[drive_name])
+            else:
+                specs = drive_specs[drive_name]
+                kwargs = dict(
+                    prespecified_drive_data=specs["dynamics"],
+                    prespecified_weights_ampa=specs["weights_ampa"],
+                    prespecified_weights_nmda=specs["weights_nmda"],
+                    prespecified_delays=specs["synaptic_delays"],
+                    prespecified_n_drive_cells=specs["n_drive_cells"],
+                    prespecified_cell_specific=specs["cell_specific"],
+                    event_seed=specs["event_seed"],
                 )
 
-                print("Optimizer created successfully!")
-                print(f"Optimizer configuration: {optimizer}")
-                print("Note: This is a basic implementation.")
-                print("For full functionality, you would need to:")
-                print("1. Define proper parameter constraints")
-                print("2. Implement the set_params function")
-                print("3. Provide target data for dipole_rmse objective")
-                print("4. Configure frequency bands for maximize_psd objective")
+            should_render = idx == (len(drive_names) - 1)
+            self.add_opt_widget(
+                drive_type=specs["type"].capitalize(),
+                location=specs["location"],
+                prespecified_drive_name=drive_name,
+                render=should_render,
+                expand_last_drive=False,
+                **kwargs,
+            )
 
-            except Exception as e:
-                print(f"Error during optimization setup: {str(e)}")
-                import traceback
+    def add_opt_widget(
+        self,
+        drive_type,
+        location,
+        prespecified_drive_name=None,
+        prespecified_drive_data=None,
+        prespecified_weights_ampa=None,
+        prespecified_weights_nmda=None,
+        prespecified_delays=None,
+        prespecified_n_drive_cells=None,
+        prespecified_cell_specific=None,
+        render=True,
+        expand_last_drive=True,
+        event_seed=14,
+    ):
+        """Add a optimization widget for a new drive, including to the accordion."""
 
-                traceback.print_exc()
+        # Check only adds 1 tonic input widget
+        if drive_type == "Tonic" and not _is_valid_add_tonic_input(self.drive_widgets):
+            return
+
+        # Build drive widget objects
+        name = (
+            drive_type + str(len(self.drive_boxes))
+            if not prespecified_drive_name
+            else prespecified_drive_name
+        )
+        style = {"description_width": "125px"}
+        prespecified_drive_data = (
+            {} if not prespecified_drive_data else prespecified_drive_data
+        )
+        prespecified_drive_data.update({"seedcore": max(event_seed, 2)})
+
+        # AES: TODO
+        # 1. first make new evoked only accordion entry with checkboxes/constraints
+        # 2. then build rest of execution pipeline with said constraints
+        # 3. then realize my design was broken and have to start over again
+
+        # AES TODO widget sizes UGH
+        opt_drive_box, opt_drive_widget, opt_drive_widget_constraints = (
+            _build_opt_objects(
+                drive_type,
+                name,
+                self.widget_tstop,
+                Layout(width="270px", height="auto"),  #  self.layout["drive_widget"],
+                {"description_width": "125px"},  # style,
+                location,
+                prespecified_drive_data,
+                prespecified_weights_ampa,
+                prespecified_weights_nmda,
+                prespecified_delays,
+                prespecified_n_drive_cells,
+                prespecified_cell_specific,
+            )
+        )
+
+        # # Add delete button and assign its call-back function
+        # delete_button = Button(
+        #     description="Delete",
+        #     button_style="danger",
+        #     icon="close",
+        #     layout=self.layout["del_fig_btn"],
+        # )
+        # delete_button.on_click(self._delete_single_drive)
+        # opt_drive_box.children += (
+        #     HTML(value="<p> </p>"),  # Adds blank space
+        #     delete_button,
+        # )
+
+        self.opt_drive_boxes.append(opt_drive_box)
+        self.opt_drive_widgets.append(opt_drive_widget)
+        self.opt_drive_widget_constraints.append(opt_drive_widget_constraints)
+
+        if render:
+            # Construct accordion object
+            self.opt_accordion.children = self.opt_drive_boxes
+            self.opt_accordion.selected_index = (
+                len(self.opt_drive_boxes) - 1 if expand_last_drive else None
+            )
+            # Update accordion title with location
+            for idx, opt_drive_widget in enumerate(self.opt_drive_widgets):
+                tab_name = opt_drive_widget["name"]
+                if opt_drive_widget["type"] != "Tonic":
+                    tab_name += f" ({opt_drive_widget['location']})"
+                self.opt_accordion.set_title(idx, tab_name)
+
+            self._opt_out.clear_output()
+            with self._opt_out:
+                display(self.opt_accordion)
 
 
 def _prepare_upload_file_from_local(path):
@@ -1868,7 +1983,7 @@ def _cell_spec_change(change, widget):
         widget.disabled = False
 
 
-def _get_rhythmic_widget(
+def _get_rhythmic_widget_for_drives(
     name,
     tstop_widget,
     layout,
@@ -1997,7 +2112,7 @@ def _get_rhythmic_widget(
     return drive, drive_box
 
 
-def _get_poisson_widget(
+def _get_poisson_widget_for_drives(
     name,
     tstop_widget,
     layout,
@@ -2110,7 +2225,7 @@ def _get_poisson_widget(
     return drive, drive_box
 
 
-def _get_evoked_widget(
+def _get_evoked_widget_for_drives(
     name,
     layout,
     style,
@@ -2207,7 +2322,7 @@ def _get_evoked_widget(
     return drive, drive_box
 
 
-def _get_tonic_widget(name, tstop_widget, layout, style, data=None):
+def _get_tonic_widget_for_drives(name, tstop_widget, layout, style, data=None):
     cell_types = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
     default_values = {"amplitude": 0, "t0": 0, "tstop": tstop_widget.value}
     t0 = default_values["t0"]
@@ -2273,7 +2388,7 @@ def _build_drive_objects(
     cell_specific,
 ):
     if drive_type in ("Rhythmic", "Bursty"):
-        drive, drive_box = _get_rhythmic_widget(
+        drive, drive_box = _get_rhythmic_widget_for_drives(
             name,
             tstop_widget,
             layout,
@@ -2287,7 +2402,7 @@ def _build_drive_objects(
             cell_specific=cell_specific,
         )
     elif drive_type == "Poisson":
-        drive, drive_box = _get_poisson_widget(
+        drive, drive_box = _get_poisson_widget_for_drives(
             name,
             tstop_widget,
             layout,
@@ -2301,7 +2416,7 @@ def _build_drive_objects(
             cell_specific=cell_specific,
         )
     elif drive_type in ("Evoked", "Gaussian"):
-        drive, drive_box = _get_evoked_widget(
+        drive, drive_box = _get_evoked_widget_for_drives(
             name,
             layout,
             style,
@@ -2314,7 +2429,7 @@ def _build_drive_objects(
             cell_specific=cell_specific,
         )
     elif drive_type == "Tonic":
-        drive, drive_box = _get_tonic_widget(
+        drive, drive_box = _get_tonic_widget_for_drives(
             name, tstop_widget, layout, style, data=drive_data
         )
     else:
@@ -2660,6 +2775,7 @@ def _drive_widget_to_dict(drive, name):
     return {k: v.value for k, v in drive[name].items()}
 
 
+# AES tstop appears to be unused
 def _init_network_from_widgets(
     params,
     dt,
@@ -3185,6 +3301,900 @@ def _is_valid_add_tonic_input(drive_widgets):
         if drive["type"] == "Tonic":
             return False
     return True
+
+
+def _get_rhythmic_widget_for_opt(
+    name,
+    tstop_widget,
+    layout,
+    style,
+    location,
+    data={},
+    weights_ampa=None,
+    weights_nmda=None,
+    delays=None,
+    n_drive_cells=None,
+    cell_specific=None,
+):
+    default_data = {
+        "tstart": 0.0,
+        "tstart_std": 0.0,
+        "tstop": tstop_widget.value,
+        "burst_rate": 7.5,
+        "burst_std": 0,
+        "numspikes": 1,
+        "n_drive_cells": 1,
+        "cell_specific": False,
+        "seedcore": 14,
+    }
+    data.update({"n_drive_cells": n_drive_cells, "cell_specific": cell_specific})
+    default_data = _update_nested_dict(default_data, data)
+
+    kwargs = dict(layout=layout, style=style)
+    tstart = BoundedFloatText(
+        value=default_data["tstart"],
+        description="Start time (ms)",
+        min=0,
+        max=1e6,
+        **kwargs,
+    )
+    tstart_std = BoundedFloatText(
+        value=default_data["tstart_std"],
+        description="Start time dev (ms)",
+        min=0,
+        max=1e6,
+        **kwargs,
+    )
+    tstop = BoundedFloatText(
+        value=default_data["tstop"],
+        description="Stop time (ms)",
+        max=tstop_widget.value,
+        **kwargs,
+    )
+    burst_rate = BoundedFloatText(
+        value=default_data["burst_rate"],
+        description="Burst rate (Hz)",
+        min=0,
+        max=1e6,
+        **kwargs,
+    )
+    burst_std = BoundedFloatText(
+        value=default_data["burst_std"],
+        description="Burst std dev (Hz)",
+        min=0,
+        max=1e6,
+        **kwargs,
+    )
+    numspikes = BoundedIntText(
+        value=default_data["numspikes"],
+        description="No. Spikes:",
+        min=0,
+        max=int(1e6),
+        **kwargs,
+    )
+    n_drive_cells = IntText(
+        value=default_data["n_drive_cells"],
+        description="No. Drive Cells:",
+        disabled=default_data["cell_specific"],
+        **kwargs,
+    )
+    cell_specific = Checkbox(
+        value=default_data["cell_specific"], description="Cell-Specific", **kwargs
+    )
+    seedcore = IntText(value=default_data["seedcore"], description="Seed", **kwargs)
+
+    widgets_list, widgets_dict = _get_drive_weight_widgets(
+        layout,
+        style,
+        location,
+        data={
+            "weights_ampa": weights_ampa,
+            "weights_nmda": weights_nmda,
+            "delays": delays,
+        },
+    )
+
+    # Disable n_drive_cells widget based on cell_specific checkbox
+    cell_specific.observe(
+        partial(_cell_spec_change, widget=n_drive_cells), names="value"
+    )
+
+    opt_drive_box = VBox(
+        [
+            tstart,
+            tstart_std,
+            tstop,
+            burst_rate,
+            burst_std,
+            numspikes,
+            n_drive_cells,
+            cell_specific,
+            seedcore,
+        ]
+        + widgets_list
+    )
+
+    opt_drive_widget = dict(
+        type="Rhythmic",
+        name=name,
+        tstart=tstart,
+        tstart_std=tstart_std,
+        burst_rate=burst_rate,
+        burst_std=burst_std,
+        numspikes=numspikes,
+        seedcore=seedcore,
+        location=location,
+        tstop=tstop,
+        n_drive_cells=n_drive_cells,
+        is_cell_specific=cell_specific,
+    )
+    opt_drive_widget.update(widgets_dict)
+
+    opt_drive_widget_constraints = dict()
+    return opt_drive_box, opt_drive_widget, opt_drive_widget_constraints
+
+
+def _get_poisson_widget_for_opt(
+    name,
+    tstop_widget,
+    layout,
+    style,
+    location,
+    data={},
+    weights_ampa=None,
+    weights_nmda=None,
+    delays=None,
+    n_drive_cells=None,
+    cell_specific=None,
+):
+    default_data = {
+        "tstart": 0.0,
+        "tstop": tstop_widget.value,
+        "n_drive_cells": 1,
+        "cell_specific": True,
+        "seedcore": 14,
+        "rate_constant": {
+            "L2_pyramidal": 40.0,
+            "L5_pyramidal": 40.0,
+            "L2_basket": 40.0,
+            "L5_basket": 40.0,
+        },
+    }
+    data.update({"n_drive_cells": n_drive_cells, "cell_specific": cell_specific})
+    default_data = _update_nested_dict(default_data, data)
+
+    tstart = BoundedFloatText(
+        value=default_data["tstart"],
+        description="Start time (ms)",
+        min=0,
+        max=1e6,
+        layout=layout,
+        style=style,
+    )
+    tstop = BoundedFloatText(
+        value=default_data["tstop"],
+        max=tstop_widget.value,
+        description="Stop time (ms)",
+        layout=layout,
+        style=style,
+    )
+    n_drive_cells = IntText(
+        value=default_data["n_drive_cells"],
+        description="No. Drive Cells:",
+        disabled=default_data["cell_specific"],
+        layout=layout,
+        style=style,
+    )
+    cell_specific = Checkbox(
+        value=default_data["cell_specific"],
+        description="Cell-Specific",
+        layout=layout,
+        style=style,
+    )
+    seedcore = IntText(
+        value=default_data["seedcore"], description="Seed", layout=layout, style=style
+    )
+
+    cell_types = ["L5_pyramidal", "L2_pyramidal", "L5_basket", "L2_basket"]
+    rate_constant = dict()
+    for cell_type in cell_types:
+        rate_constant[f"{cell_type}"] = BoundedFloatText(
+            value=default_data["rate_constant"][cell_type],
+            description=f"{cell_type}:",
+            min=0,
+            max=1e6,
+            step=0.01,
+            layout=layout,
+            style=style,
+        )
+
+    widgets_list, widgets_dict = _get_drive_weight_widgets(
+        layout,
+        style,
+        location,
+        data={
+            "weights_ampa": weights_ampa,
+            "weights_nmda": weights_nmda,
+            "delays": delays,
+        },
+    )
+    widgets_dict.update({"rate_constant": rate_constant})
+    widgets_list.extend(
+        [HTML(value="<b>Rate constants</b>")]
+        + list(widgets_dict["rate_constant"].values())
+    )
+
+    # Disable n_drive_cells widget based on cell_specific checkbox
+    cell_specific.observe(
+        partial(_cell_spec_change, widget=n_drive_cells), names="value"
+    )
+
+    opt_drive_box = VBox(
+        [tstart, tstop, n_drive_cells, cell_specific, seedcore] + widgets_list
+    )
+    opt_drive_widget = dict(
+        type="Poisson",
+        name=name,
+        tstart=tstart,
+        tstop=tstop,
+        rate_constant=rate_constant,
+        seedcore=seedcore,
+        location=location,  # notice this is a widget but a str!
+        n_drive_cells=n_drive_cells,
+        is_cell_specific=cell_specific,
+    )
+    opt_drive_widget.update(widgets_dict)
+
+    opt_drive_widget_constraints = dict()
+    return opt_drive_box, opt_drive_widget, opt_drive_widget_constraints
+
+
+def _get_evoked_widget_for_opt(
+    name,
+    layout,
+    style,
+    location,
+    data={},
+    weights_ampa=None,
+    weights_nmda=None,
+    delays=None,
+    n_drive_cells=None,
+    cell_specific=None,
+):
+    initial_contraint_range_proportion = 0.2
+    default_data = {
+        "mu": 0,
+        "sigma": 1,
+        "numspikes": 1,
+        "n_drive_cells": 1,
+        "cell_specific": True,
+        "seedcore": 14,
+    }
+    data.update({"n_drive_cells": n_drive_cells, "cell_specific": cell_specific})
+    default_data = _update_nested_dict(default_data, data)
+    kwargs = dict(layout=layout, style=style)
+
+    # AES TODO write lambda/whatever to multiply and format output of min/max
+
+    column_titles = HTML(
+        value="""<div style=text-align:center;'>
+        <b>Optimize against?</b>     Constraints:
+        </div>""",
+    )
+
+    mu = BoundedFloatText(
+        value=default_data["mu"],
+        description="Mean time:",
+        min=0,
+        max=1e6,
+        step=0.01,
+        disabled=True,  # ghosted!
+        **kwargs,
+    )
+    mu_opt_checkbox = Checkbox(value=True, **kwargs)
+    mu_opt_min = BoundedFloatText(
+        value=(default_data["mu"] * (1 - initial_contraint_range_proportion)),
+        description="Min:",
+        min=0,
+        max=1e6,
+        step=0.01,
+        **kwargs,
+    )
+    mu_opt_max = BoundedFloatText(
+        value=(default_data["mu"] * (1 + initial_contraint_range_proportion)),
+        description="Max:",
+        min=0,
+        max=1e6,
+        step=0.01,
+        **kwargs,
+    )
+
+    sigma = BoundedFloatText(
+        value=default_data["sigma"],
+        description="Std dev time:",
+        min=0,
+        max=1e6,
+        step=0.01,
+        **kwargs,
+    )
+    numspikes = IntText(
+        value=default_data["numspikes"], description="No. Spikes:", **kwargs
+    )
+    n_drive_cells = IntText(
+        value=default_data["n_drive_cells"],
+        description="No. Drive Cells:",
+        disabled=default_data["cell_specific"],
+        **kwargs,
+    )
+    cell_specific = Checkbox(
+        value=default_data["cell_specific"], description="Cell-Specific", **kwargs
+    )
+    seedcore = IntText(value=default_data["seedcore"], description="Seed: ", **kwargs)
+
+    widgets_list, widgets_dict = _get_drive_weight_widgets(
+        layout,
+        style,
+        location,
+        data={
+            "weights_ampa": weights_ampa,
+            "weights_nmda": weights_nmda,
+            "delays": delays,
+        },
+    )
+
+    # Disable n_drive_cells widget based on cell_specific checkbox
+    cell_specific.observe(
+        partial(_cell_spec_change, widget=n_drive_cells), names="value"
+    )
+
+    opt_drive_box = VBox(
+        [
+            column_titles,
+            HBox(
+                [
+                    mu,
+                    mu_opt_checkbox,
+                    mu_opt_min,
+                    mu_opt_max,
+                ]
+            ),
+            sigma,
+            numspikes,
+            n_drive_cells,
+            cell_specific,
+            seedcore,
+        ]
+        + widgets_list
+    )
+    opt_drive_widget = dict(
+        type="Evoked",
+        name=name,
+        mu=mu,
+        sigma=sigma,
+        numspikes=numspikes,
+        seedcore=seedcore,
+        location=location,
+        sync_within_trial=False,
+        n_drive_cells=n_drive_cells,
+        is_cell_specific=cell_specific,
+    )
+    opt_drive_widget.update(widgets_dict)
+
+    opt_drive_widget_constraints = dict(
+        type="Evoked",
+        name=name,
+        mu_opt_min=mu_opt_min,
+        mu_opt_max=mu_opt_max,
+        mu_opt_checkbox=mu_opt_checkbox,
+    )
+    return opt_drive_box, opt_drive_widget, opt_drive_widget_constraints
+
+
+def _get_tonic_widget_for_opt(name, tstop_widget, layout, style, data=None):
+    cell_types = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
+    default_values = {"amplitude": 0, "t0": 0, "tstop": tstop_widget.value}
+    t0 = default_values["t0"]
+    tstop = default_values["tstop"]
+    default_data = {cell_type: default_values for cell_type in cell_types}
+
+    kwargs = dict(layout=layout, style=style)
+    if isinstance(data, dict):
+        default_data = _update_nested_dict(default_data, data)
+
+    amplitudes = dict()
+    for cell_type in cell_types:
+        amplitude = default_data[cell_type]["amplitude"]
+        amplitudes[cell_type] = BoundedFloatText(
+            value=amplitude, description=cell_type, min=0, max=1e6, step=0.01, **kwargs
+        )
+        # Reset the global t0 and stop with values from the 'data' keyword.
+        # It should be same across all the cell-types.
+        if amplitude > 0:
+            t0 = default_data[cell_type]["t0"]
+            tstop = default_data[cell_type]["tstop"]
+
+    start_times = BoundedFloatText(
+        value=t0, description="Start time", min=0, max=1e6, step=1.0, **kwargs
+    )
+    stop_times = BoundedFloatText(
+        value=tstop, description="Stop time", min=-1, max=1e6, step=1.0, **kwargs
+    )
+
+    widgets_dict = {"amplitude": amplitudes, "t0": start_times, "tstop": stop_times}
+    widgets_list = (
+        [HTML(value="<b>Times (ms):</b>")]
+        + [start_times, stop_times]
+        + [HTML(value="<b>Amplitude (nA):</b>")]
+        + list(amplitudes.values())
+    )
+
+    opt_drive_box = VBox(widgets_list)
+    opt_drive_widget = dict(
+        type="Tonic",
+        name=name,
+        amplitude=amplitudes,
+        t0=start_times,
+        tstop=stop_times,
+    )
+
+    opt_drive_widget.update(widgets_dict)
+
+    opt_drive_widget_constraints = dict()
+    return opt_drive_box, opt_drive_widget, opt_drive_widget_constraints
+
+
+def _build_opt_objects(
+    drive_type,
+    name,
+    tstop_widget,
+    layout,
+    style,
+    location,
+    drive_data,
+    weights_ampa,
+    weights_nmda,
+    delays,
+    n_drive_cells,
+    cell_specific,
+):
+    if drive_type in ("Rhythmic", "Bursty"):
+        # AES TODO maybe add drive_type into opt_drive_widget_constraints to keep track?
+        opt_drive_box, opt_drive_widget, opt_drive_widget_constraints = (
+            _get_rhythmic_widget_for_opt(
+                name,
+                tstop_widget,
+                layout,
+                style,
+                location,
+                data=drive_data,
+                weights_ampa=weights_ampa,
+                weights_nmda=weights_nmda,
+                delays=delays,
+                n_drive_cells=n_drive_cells,
+                cell_specific=cell_specific,
+            )
+        )
+    elif drive_type == "Poisson":
+        opt_drive_box, opt_drive_widget, opt_drive_widget_constraints = (
+            _get_poisson_widget_for_opt(
+                name,
+                tstop_widget,
+                layout,
+                style,
+                location,
+                data=drive_data,
+                weights_ampa=weights_ampa,
+                weights_nmda=weights_nmda,
+                delays=delays,
+                n_drive_cells=n_drive_cells,
+                cell_specific=cell_specific,
+            )
+        )
+    elif drive_type in ("Evoked", "Gaussian"):
+        opt_drive_box, opt_drive_widget, opt_drive_widget_constraints = (
+            _get_evoked_widget_for_opt(
+                name,
+                layout,
+                style,
+                location,
+                data=drive_data,
+                weights_ampa=weights_ampa,
+                weights_nmda=weights_nmda,
+                delays=delays,
+                n_drive_cells=n_drive_cells,
+                cell_specific=cell_specific,
+            )
+        )
+    elif drive_type == "Tonic":
+        opt_drive_box, opt_drive_widget, opt_drive_widget_constraints = (
+            _get_tonic_widget_for_opt(
+                name, tstop_widget, layout, style, data=drive_data
+            )
+        )
+    else:
+        raise ValueError(f"Unknown drive type {drive_type}")
+
+    return opt_drive_box, opt_drive_widget, opt_drive_widget_constraints
+
+
+def run_opt_button_clicked(
+    widget_simulation_name,
+    log_out,
+    opt_drive_widgets,
+    all_data,
+    dt,
+    tstop,
+    fig_default_params,
+    widget_default_smoothing,
+    widget_default_scaling,
+    widget_min_frequency,
+    widget_max_frequency,
+    ntrials,
+    backend_selection,
+    mpi_cmd,
+    n_jobs,
+    params,
+    simulation_status_bar,
+    simulation_status_contents,
+    connectivity_textfields,
+    viz_manager,
+    simulations_list_widget,
+    cell_parameters_widgets,
+    global_gain_textfields,
+    opt_drive_widget_constraints,
+    opt_solver,
+    opt_obj_fun,
+    opt_max_iter,
+    opt_tstop,
+    opt_target_data,
+):
+    """Run the simulation and plot outputs."""
+    simulation_data = all_data["simulation_data"]
+    # AES annoyingly, with logout seems to prevent PDB usage inside pytest
+    # AES TODO debug: removing logout for now so I can inspect
+    # with log_out:
+
+    # clear empty trash simulations
+    for _name in tuple(simulation_data.keys()):
+        if len(simulation_data[_name]["dpls"]) == 0:
+            del simulation_data[_name]
+
+    _sim_name = widget_simulation_name.value
+    if simulation_data[_sim_name]["net"] is not None:
+        print("Simulation with the same name exists!")
+        simulation_status_bar.value = simulation_status_contents["failed"]
+        return
+
+    # AES net is initialised at simulation_data[_sim_name]['net'], weird
+    _init_network_from_widgets(
+        params,
+        dt,
+        tstop,
+        simulation_data[_sim_name],
+        opt_drive_widgets,
+        connectivity_textfields,
+        cell_parameters_widgets,
+        global_gain_textfields,
+        add_drive=False,  # AES bc opt needs to add drives itself
+    )
+
+    # AES debug
+    # Set the middle drive's checkbox off, just to keep things interesting
+    opt_drive_widget_constraints[1]["mu_opt_checkbox"].value = False
+
+    def generate_constraints_and_func(
+        net, opt_drive_widgets, opt_drive_widget_constraints
+    ):
+        # AES TODO params needs to be created dynamically based on which parameters
+        # are checked
+        # TODO this also means we have to dynamically create the variable names
+        #
+        # Maybe first iterate through constraints, assemble param var names, and grab constraint values for those whose checkbox is true
+        # then later, use string matching to re-find them
+
+        constraints = {}
+        for drive_idx, drive_constraints in enumerate(opt_drive_widget_constraints):
+            if drive_constraints["type"] in ("Tonic"):
+                # weights_amplitudes = _drive_widget_to_dict(drive_constraints, "amplitude")
+                # net.add_tonic_bias(
+                #     amplitude=weights_amplitudes,
+                #     t0=drive_constraints["t0"].value,
+                #     tstop=drive_constraints["tstop"].value,
+                # )
+                pass
+            else:
+                # sync_inputs_kwargs = dict(
+                #     n_drive_cells=(
+                #         "n_cells"
+                #         if drive_constraints["is_cell_specific"].value
+                #         else drive_constraints["n_drive_cells"].value
+                #     ),
+                #     cell_specific=drive_constraints["is_cell_specific"].value,
+                # )
+
+                # weights_ampa = _drive_widget_to_dict(drive_constraints, "weights_ampa")
+                # weights_nmda = _drive_widget_to_dict(drive_constraints, "weights_nmda")
+                # synaptic_delays = _drive_widget_to_dict(drive_constraints, "delays")
+                # print(f"drive_constraints type is {drive_constraints['type']}, location={drive_constraints['location']}")
+
+                if drive_constraints["type"] == "Poisson":
+                    rate_constant = _drive_widget_to_dict(
+                        drive_constraints, "rate_constant"
+                    )
+
+                elif drive_constraints["type"] in ("Evoked", "Gaussian"):
+                    # AES for keys??? oh yeah
+                    for kk in drive_constraints.keys():
+                        # For every variable with a checkbox, but only if the checkbox
+                        # is true/checked
+                        if ("_opt_checkbox" in kk) and (drive_constraints[kk]):
+                            # Extract the var name
+                            var_name = kk.split("_opt_checkbox")[0]
+                            # Create a new, unique var name for this drive's instance of
+                            # that variable, which will become our key in our
+                            # `constraints` dict
+                            unique_param_name = str(
+                                drive_constraints["type"]
+                                + "_"
+                                + drive_constraints["name"]
+                                + "_"
+                                + var_name
+                            )
+                            # Use the unique name as the key, and add the bounds
+                            # bpoint works here
+                            # breakpoint()  # AES debug
+                            constraints.update(
+                                {
+                                    unique_param_name: tuple([
+                                        drive_constraints[var_name + "_opt_min"].value,
+                                        drive_constraints[var_name + "_opt_max"].value,
+                                    ])
+                                }
+                            )
+                            # AES debug note: if there's a bug, then strangely, the
+                            # breakpoint is skipped sometimes...
+                elif drive_constraints["type"] in ("Rhythmic", "Bursty"):
+                    pass
+
+        # bpoint works here
+        # breakpoint()  # AES debug
+        def set_params(net, params, set_params_kwargs):
+            for drive_idx, drive in enumerate(opt_drive_widgets):
+                # We know that every drive_widget is going to have a corresponding
+                # constraints dictionary, and their indices will match
+
+                def namegen(var):
+                    unique_param_name = str(
+                         drive["type"]
+                         + "_"
+                         + drive["name"]
+                         + "_"
+                         + var
+                    )
+                    if unique_param_name in params.keys():
+                        return unique_param_name
+                    else:
+                        return None
+
+                if drive["type"] in ("Tonic"):
+                    weights_amplitudes = _drive_widget_to_dict(drive, "amplitude")
+                    net.add_tonic_bias(
+                        amplitude=weights_amplitudes,
+                        t0=drive["t0"].value,
+                        tstop=drive["tstop"].value,
+                    )
+                else:
+                    sync_inputs_kwargs = dict(
+                        n_drive_cells=(
+                            "n_cells"
+                            if drive["is_cell_specific"].value
+                            else drive["n_drive_cells"].value
+                        ),
+                        cell_specific=drive["is_cell_specific"].value,
+                    )
+
+                    weights_ampa = _drive_widget_to_dict(drive, "weights_ampa")
+                    weights_nmda = _drive_widget_to_dict(drive, "weights_nmda")
+                    synaptic_delays = _drive_widget_to_dict(drive, "delays")
+                    print(
+                        f"drive type is {drive['type']}, location={drive['location']}"
+                    )
+                    if drive["type"] == "Poisson":
+                        rate_constant = _drive_widget_to_dict(drive, "rate_constant")
+
+                        # AES have all of these try to first use the param var if exists, then fallback to the drive?
+                        net.add_poisson_drive(
+                            name=drive["name"],
+                            tstart=drive["tstart"].value,
+                            tstop=drive["tstop"].value,
+                            rate_constant=rate_constant,
+                            location=drive["location"],
+                            weights_ampa=weights_ampa,
+                            weights_nmda=weights_nmda,
+                            synaptic_delays=synaptic_delays,
+                            space_constant=100.0,
+                            event_seed=drive["seedcore"].value,
+                            **sync_inputs_kwargs,
+                        )
+                    elif drive["type"] in ("Evoked", "Gaussian"):
+                        net.add_evoked_drive(
+                            name=drive["name"],
+                            mu=(namegen("mu") if namegen("mu") else drive["mu"].value),
+                            sigma=drive["sigma"].value,
+                            numspikes=drive["numspikes"].value,
+                            location=drive["location"],
+                            weights_ampa=weights_ampa,
+                            weights_nmda=weights_nmda,
+                            synaptic_delays=synaptic_delays,
+                            space_constant=3.0,
+                            event_seed=drive["seedcore"].value,
+                            **sync_inputs_kwargs,
+                        )
+
+                    elif drive["type"] in ("Rhythmic", "Bursty"):
+                        net.add_bursty_drive(
+                            name=drive["name"],
+                            tstart=drive["tstart"].value,
+                            tstart_std=drive["tstart_std"].value,
+                            tstop=drive["tstop"].value,
+                            location=drive["location"],
+                            burst_rate=drive["burst_rate"].value,
+                            burst_std=drive["burst_std"].value,
+                            numspikes=drive["numspikes"].value,
+                            weights_ampa=weights_ampa,
+                            weights_nmda=weights_nmda,
+                            synaptic_delays=synaptic_delays,
+                            event_seed=drive["seedcore"].value,
+                            **sync_inputs_kwargs,
+                        )
+
+            # # ---------------
+            # # from Carolina's examples:
+            # # Proximal (alpha)
+            # weights_ampa_p = {
+            #     "L2_pyramidal": params["alpha_prox_weight"],
+            #     "L5_pyramidal": 4.4e-5,
+            # }
+            # syn_delays_p = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
+
+            # net.add_bursty_drive(
+            #     "alpha_prox",
+            #     tstart=params["alpha_prox_tstart"],
+            #     burst_rate=params["alpha_prox_burst_rate"],
+            #     burst_std=params["alpha_prox_burst_std"],
+            #     numspikes=2,
+            #     spike_isi=10,
+            #     n_drive_cells=10,
+            #     location="proximal",
+            #     weights_ampa=weights_ampa_p,
+            #     synaptic_delays=syn_delays_p,
+            # )
+
+            # # Distal (beta)
+            # weights_ampa_d = {
+            #     "L2_pyramidal": params["alpha_dist_weight"],
+            #     "L5_pyramidal": 4.4e-5,
+            # }
+            # syn_delays_d = {"L2_pyramidal": 5.0, "L5_pyramidal": 5.0}
+
+            # net.add_bursty_drive(
+            #     "alpha_dist",
+            #     tstart=params["alpha_dist_tstart"],
+            #     burst_rate=params["alpha_dist_burst_rate"],
+            #     burst_std=params["alpha_dist_burst_std"],
+            #     numspikes=2,
+            #     spike_isi=10,
+            #     n_drive_cells=10,
+            #     location="distal",
+            #     weights_ampa=weights_ampa_d,
+            #     synaptic_delays=syn_delays_d,
+            # )
+
+        return set_params, constraints
+
+    set_params_func, constraints = generate_constraints_and_func(
+        simulation_data[_sim_name]["net"],
+        opt_drive_widgets,
+        opt_drive_widget_constraints,
+    )
+
+    # Create optimizer
+    optim = Optimizer(
+        initial_net=simulation_data[_sim_name]["net"],
+        tstop=opt_tstop,
+        constraints=constraints,
+        set_params=set_params_func,
+        solver=opt_solver,
+        obj_fun=opt_obj_fun,
+        max_iter=opt_max_iter,
+    )
+    # breakpoint()  # AES debug
+
+
+    print("start simulation")
+    if backend_selection.value == "MPI":
+        # 'use_hwthreading_if_found' and 'sensible_default_cores' have
+        # already been set elsewhere, and do not need to be re-set here.
+        # Hardware-threading and oversubscription will always be disabled
+        # to prevent edge cases in the GUI.
+        backend = MPIBackend(
+            # n_procs=n_jobs.value,
+            n_procs=11,  # AES debug
+            mpi_cmd=mpi_cmd.value,
+            override_hwthreading_option=False,
+            override_oversubscribe_option=False,
+        )
+    else:
+        backend = JoblibBackend(n_jobs=n_jobs.value)
+        print(f"Using Joblib with {n_jobs.value} core(s).")
+    with backend:
+        simulation_status_bar.value = simulation_status_contents[
+            "Running Optimization, please wait..."
+        ]
+        optim.fit(
+            target=opt_target_data,
+            n_trials=1,
+        )
+        # breakpoint()  # AES debug
+
+        # # AES original actual run
+        # simulation_data[_sim_name]["dpls"] = simulate_dipole(
+        #     simulation_data[_sim_name]["net"],
+        #     tstop=tstop.value,
+        #     dt=dt.value,
+        #     n_trials=ntrials.value,
+        # )
+
+        # AES TODO
+        # 1. DONE Existing Opt tab needs to be updated with drives-accordion, including when
+        # drives are manipulated, added, or removed
+        # 2. Once opt tab is full, THEN we worry about executing
+        # 3. need initial data loaded
+        # ???
+        # X. take final output params, and load them BACK in the GUI
+        # X. Maybe force a save of the final network params too automatically?
+
+        # TODO put this in log
+        # with self._log_out:
+        # print("Starting optimization...")
+
+        print(f"Solver: {opt_solver}")
+        print(f"Objective function: {opt_obj_fun}")
+        print(f"Max iterations: {opt_max_iter}")
+        print(f"Simulation duration: {opt_tstop} ms")
+
+
+        simulation_status_bar.value = simulation_status_contents["finished"]
+
+        sim_names = [
+            sim_name
+            for sim_name in simulation_data
+            if simulation_data[sim_name]["net"] is not None
+        ]
+
+        simulations_list_widget.options = sim_names
+        simulations_list_widget.value = sim_names[0]
+
+    viz_manager.reset_fig_config_tabs()
+
+    # update default visualization params in gui based on widget
+    fig_default_params["default_smoothing"] = widget_default_smoothing.value
+    fig_default_params["default_scaling"] = widget_default_scaling.value
+    fig_default_params["default_min_frequency"] = widget_min_frequency.value
+    fig_default_params["default_max_frequency"] = widget_max_frequency.value
+
+    # change default visualization params in viz_manager to mirror gui
+    for widget, value in fig_default_params.items():
+        viz_manager.fig_default_params[widget] = value
+
+    # AES TODO
+    # viz_manager.add_figure()
+    # fig_name = _idx2figname(viz_manager.data["fig_idx"]["idx"] - 1)
+    # ax_plots = [("ax0", "input histogram"), ("ax1", "current dipole")]
+    # for ax_name, plot_type in ax_plots:
+    #     viz_manager._simulate_edit_figure(
+    #         fig_name, ax_name, _sim_name, plot_type, {}, "plot"
+    #     )
 
 
 def launch():
