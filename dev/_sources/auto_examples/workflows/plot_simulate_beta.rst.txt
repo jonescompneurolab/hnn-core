@@ -141,7 +141,7 @@ the distal dendrites of L5 pyramidal cells.
     cell counts: 35 srcs, 100 targets
     connection probability: 1.0 
     loc: 'distal'; receptor: 'gabaa'
-    weight: 0.025; delay: 1.0; lamtha: 70.0
+    weight: 0.025; delay: 1.0; lamtha: 70.0threshold: 0.0gain: 1.0
  
 
 
@@ -176,7 +176,7 @@ L2_basket -> L5_pyramidal GABAa connection, and replacing it with GABAb.
     cell counts: 35 srcs, 100 targets
     connection probability: 1.0 
     loc: 'distal'; receptor: 'gabab'
-    weight: 0.0002; delay: 1.0; lamtha: 50.0
+    weight: 0.0002; delay: 1.0; lamtha: 50.0threshold: 0.0gain: 1.0
  
 
     Connection Removed from Law Model
@@ -184,7 +184,7 @@ L2_basket -> L5_pyramidal GABAa connection, and replacing it with GABAb.
     cell counts: 35 srcs, 100 targets
     connection probability: 1.0 
     loc: 'distal'; receptor: 'gabaa'
-    weight: 0.001; delay: 1.0; lamtha: 50.0
+    weight: 0.001; delay: 1.0; lamtha: 50.0threshold: 0.0gain: 1.0
  
 
 
@@ -623,7 +623,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (2 minutes 39.686 seconds)
+   **Total running time of the script:** (2 minutes 35.390 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_beta.py:
