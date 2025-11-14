@@ -674,7 +674,6 @@ class HNNGUI:
 
         # Add optimzation section
         self.opt_drive_widgets = list()
-        self.opt_drive_widget_constraints = list()
         self.opt_drive_boxes = list()
         self.opt_accordion = Accordion()
 
@@ -894,7 +893,6 @@ class HNNGUI:
                 self.simulation_list_widget,
                 self.cell_parameters_widgets,
                 self.global_gain_widgets,
-                self.opt_drive_widget_constraints,
                 self.widget_opt_solver.value,
                 self.widget_opt_obj_fun.value,
                 self.widget_opt_max_iter.value,
@@ -1608,7 +1606,7 @@ class HNNGUI:
         # 3. then realize my design was broken and have to start over again
 
         # AES TODO widget sizes UGH
-        opt_drive_box, opt_drive_widget, opt_drive_widget_constraints = (
+        opt_drive_box, opt_drive_widget = (
             _build_opt_objects(
                 drive_type,
                 name,
@@ -1644,7 +1642,6 @@ class HNNGUI:
 
         self.opt_drive_boxes.append(opt_drive_box)
         self.opt_drive_widgets.append(opt_drive_widget)
-        self.opt_drive_widget_constraints.append(opt_drive_widget_constraints)
 
         if render:
             # Construct accordion object
@@ -3455,8 +3452,7 @@ def _get_rhythmic_widget_for_opt(
     )
     opt_drive_widget.update(widgets_dict)
 
-    opt_drive_widget_constraints = dict()
-    return opt_drive_box, opt_drive_widget, opt_drive_widget_constraints
+    return opt_drive_box, opt_drive_widget
 
 
 def _get_poisson_widget_for_opt(
@@ -3570,8 +3566,7 @@ def _get_poisson_widget_for_opt(
     )
     opt_drive_widget.update(widgets_dict)
 
-    opt_drive_widget_constraints = dict()
-    return opt_drive_box, opt_drive_widget, opt_drive_widget_constraints
+    return opt_drive_box, opt_drive_widget
 
 
 def _get_evoked_widget_for_opt(
@@ -3735,10 +3730,14 @@ def _get_evoked_widget_for_opt(
         ]
         + widgets_list
     )
+    # AES maybe make dictionary, THEN make opt_drive_box so as to not use var names?
     opt_drive_widget = dict(
         type="Evoked",
         name=name,
         mu=mu,
+        mu_opt_min=mu_opt_min,
+        mu_opt_max=mu_opt_max,
+        mu_opt_checkbox=mu_opt_checkbox,
         sigma=sigma,
         numspikes=numspikes,
         seedcore=seedcore,
@@ -3748,16 +3747,7 @@ def _get_evoked_widget_for_opt(
         is_cell_specific=cell_specific,
     )
     opt_drive_widget.update(widgets_dict)
-
-    # AES maybe make constraints dictionary, THEN make opt_drive_box so as to not use var names?
-    opt_drive_widget_constraints = dict(
-        type="Evoked",
-        name=name,
-        mu_opt_min=mu_opt_min,
-        mu_opt_max=mu_opt_max,
-        mu_opt_checkbox=mu_opt_checkbox,
-    )
-    return opt_drive_box, opt_drive_widget, opt_drive_widget_constraints
+    return opt_drive_box, opt_drive_widget
 
 
 def _get_tonic_widget_for_opt(name, tstop_widget, layout, style, data=None):
@@ -3809,8 +3799,7 @@ def _get_tonic_widget_for_opt(name, tstop_widget, layout, style, data=None):
 
     opt_drive_widget.update(widgets_dict)
 
-    opt_drive_widget_constraints = dict()
-    return opt_drive_box, opt_drive_widget, opt_drive_widget_constraints
+    return opt_drive_box, opt_drive_widget
 
 
 def _build_opt_objects(
@@ -3828,8 +3817,7 @@ def _build_opt_objects(
     cell_specific,
 ):
     if drive_type in ("Rhythmic", "Bursty"):
-        # AES TODO maybe add drive_type into opt_drive_widget_constraints to keep track?
-        opt_drive_box, opt_drive_widget, opt_drive_widget_constraints = (
+        opt_drive_box, opt_drive_widget = (
             _get_rhythmic_widget_for_opt(
                 name,
                 tstop_widget,
@@ -3845,7 +3833,7 @@ def _build_opt_objects(
             )
         )
     elif drive_type == "Poisson":
-        opt_drive_box, opt_drive_widget, opt_drive_widget_constraints = (
+        opt_drive_box, opt_drive_widget = (
             _get_poisson_widget_for_opt(
                 name,
                 tstop_widget,
@@ -3861,7 +3849,7 @@ def _build_opt_objects(
             )
         )
     elif drive_type in ("Evoked", "Gaussian"):
-        opt_drive_box, opt_drive_widget, opt_drive_widget_constraints = (
+        opt_drive_box, opt_drive_widget = (
             _get_evoked_widget_for_opt(
                 name,
                 layout,
@@ -3876,7 +3864,7 @@ def _build_opt_objects(
             )
         )
     elif drive_type == "Tonic":
-        opt_drive_box, opt_drive_widget, opt_drive_widget_constraints = (
+        opt_drive_box, opt_drive_widget = (
             _get_tonic_widget_for_opt(
                 name, tstop_widget, layout, style, data=drive_data
             )
@@ -3884,7 +3872,7 @@ def _build_opt_objects(
     else:
         raise ValueError(f"Unknown drive type {drive_type}")
 
-    return opt_drive_box, opt_drive_widget, opt_drive_widget_constraints
+    return opt_drive_box, opt_drive_widget
 
 
 def run_opt_button_clicked(
@@ -3911,7 +3899,6 @@ def run_opt_button_clicked(
     simulations_list_widget,
     cell_parameters_widgets,
     global_gain_textfields,
-    opt_drive_widget_constraints,
     opt_solver,
     opt_obj_fun,
     opt_max_iter,
@@ -3953,11 +3940,9 @@ def run_opt_button_clicked(
     # AES debug
     # AES TODO not working for some reason, investigate
     # Set the middle drive's checkbox off, just to keep things interesting
-    opt_drive_widget_constraints[1]["mu_opt_checkbox"].value = False
+    opt_drive_widgets[1]["mu_opt_checkbox"].value = False
 
-    def generate_constraints_and_func(
-        net, opt_drive_widgets, opt_drive_widget_constraints
-    ):
+    def generate_constraints_and_func(net, opt_drive_widgets):
         # AES TODO params needs to be created dynamically based on which parameters
         # are checked
         # TODO this also means we have to dynamically create the variable names
@@ -3966,50 +3951,49 @@ def run_opt_button_clicked(
         # then later, use string matching to re-find them
 
         constraints = {}
-        for drive_idx, drive_constraints in enumerate(opt_drive_widget_constraints):
-            if drive_constraints["type"] in ("Tonic"):
-                # weights_amplitudes = _drive_widget_to_dict(drive_constraints, "amplitude")
+        for drive_idx, drive in enumerate(opt_drive_widgets):
+            if drive["type"] in ("Tonic"):
+                # weights_amplitudes = _drive_widget_to_dict(drive, "amplitude")
                 # net.add_tonic_bias(
                 #     amplitude=weights_amplitudes,
-                #     t0=drive_constraints["t0"].value,
-                #     tstop=drive_constraints["tstop"].value,
+                #     t0=drive["t0"].value,
+                #     tstop=drive["tstop"].value,
                 # )
                 pass
             else:
                 # sync_inputs_kwargs = dict(
                 #     n_drive_cells=(
                 #         "n_cells"
-                #         if drive_constraints["is_cell_specific"].value
-                #         else drive_constraints["n_drive_cells"].value
+                #         if drive["is_cell_specific"].value
+                #         else drive["n_drive_cells"].value
                 #     ),
-                #     cell_specific=drive_constraints["is_cell_specific"].value,
+                #     cell_specific=drive["is_cell_specific"].value,
                 # )
 
-                # weights_ampa = _drive_widget_to_dict(drive_constraints, "weights_ampa")
-                # weights_nmda = _drive_widget_to_dict(drive_constraints, "weights_nmda")
-                # synaptic_delays = _drive_widget_to_dict(drive_constraints, "delays")
-                # print(f"drive_constraints type is {drive_constraints['type']}, location={drive_constraints['location']}")
+                # weights_ampa = _drive_widget_to_dict(drive, "weights_ampa")
+                # weights_nmda = _drive_widget_to_dict(drive, "weights_nmda")
+                # synaptic_delays = _drive_widget_to_dict(drive, "delays")
+                # print(f"drive type is {drive['type']}, location={drive['location']}")
 
-                if drive_constraints["type"] == "Poisson":
+                if drive["type"] == "Poisson":
                     rate_constant = _drive_widget_to_dict(
-                        drive_constraints, "rate_constant"
+                        drive, "rate_constant"
                     )
 
-                elif drive_constraints["type"] in ("Evoked", "Gaussian"):
-                    # AES for keys??? oh yeah
-                    for kk in drive_constraints.keys():
+                elif drive["type"] in ("Evoked", "Gaussian"):
+                    for kk in drive.keys():
                         # For every variable with a checkbox, but only if the checkbox
                         # is true/checked
-                        if ("_opt_checkbox" in kk) and (drive_constraints[kk]):
+                        if ("_opt_checkbox" in kk) and (drive[kk]):
                             # Extract the var name
                             var_name = kk.split("_opt_checkbox")[0]
                             # Create a new, unique var name for this drive's instance of
                             # that variable, which will become our key in our
                             # `constraints` dict
                             unique_param_name = str(
-                                drive_constraints["type"]
+                                drive["type"]
                                 + "_"
-                                + drive_constraints["name"]
+                                + drive["name"]
                                 + "_"
                                 + var_name
                             )
@@ -4019,14 +4003,14 @@ def run_opt_button_clicked(
                             constraints.update(
                                 {
                                     unique_param_name: tuple([
-                                        drive_constraints[var_name + "_opt_min"].value,
-                                        drive_constraints[var_name + "_opt_max"].value,
+                                        drive[var_name + "_opt_min"].value,
+                                        drive[var_name + "_opt_max"].value,
                                     ])
                                 }
                             )
                             # AES debug note: if there's a bug, then strangely, the
                             # breakpoint is skipped sometimes...
-                elif drive_constraints["type"] in ("Rhythmic", "Bursty"):
+                elif drive["type"] in ("Rhythmic", "Bursty"):
                     pass
 
         # bpoint works here
@@ -4168,7 +4152,6 @@ def run_opt_button_clicked(
     set_params_func, constraints = generate_constraints_and_func(
         simulation_data[_sim_name]["net"],
         opt_drive_widgets,
-        opt_drive_widget_constraints,
     )
 
     # Create optimizer
