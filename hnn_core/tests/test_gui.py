@@ -1584,7 +1584,13 @@ def test_gui_run_optimization():
     gui.widget_dt.value = 0.025
     gui.widget_backend_selection.value = "MPI"
     # gui.widget_ntrials.value = 2
-    breakpoint()  # AES debug
+
+    # doesn't work for real files???
+    # file1_path = hnn_core_root / "dpl2.txt"
+    file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt"  # noqa
+    gui._simulate_upload_data(file1_url)
+    # breakpoint()  # AES debug
+
     gui.run_opt_button.click()
 
     default_name = gui.widget_simulation_name.value

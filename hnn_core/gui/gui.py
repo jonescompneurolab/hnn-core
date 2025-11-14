@@ -381,6 +381,8 @@ class HNNGUI:
             color:white;'>Not running</div>""",
             "running": f"""<div style='{self.layout["simulation_status_running"]};
             color:white;'>Running...</div>""",
+            "opt_running": f"""<div style='{self.layout["simulation_status_running"]};
+            color:white;'>Optimization Running, please be patient...</div>""",
             "finished": f"""<div style='{self.layout["simulation_status_finished"]};
             color:white;'>Simulation finished</div>""",
             "failed": f"""<div style='{self.layout["simulation_status_failed"]};
@@ -552,8 +554,8 @@ class HNNGUI:
         )
         self.widget_opt_max_iter = BoundedIntText(
             # value=200,  # AES debug
-            # value=3,
-            value=15,
+            value=3,
+            # value=15,
             min=1,
             max=10000,
             description="Max Iterations:",
@@ -569,6 +571,36 @@ class HNNGUI:
             disabled=False,
             layout=self.layout["opt_textbox"],
             style=opt_dropdown_style,
+        )
+
+
+        # # DATA to optimize towards aka target data
+        # # Note: all data, included loaded/experimental data, seems to be governed under
+        # # "self.simulation_data".
+        # #
+        # # AES UGH need to dive in and debug with pytest to figure out HOW DO I ACCESS LOADED DATA
+        # sim_names = [
+        #     simulations
+        #     for simulations, sim_name in self.data["simulation_data"].items()
+        #     if sim_name["net"] is not None
+        # ]
+        # if len(sim_names) == 0:
+        #     sim_names = [" "]
+
+        self.widget_opt_target_data = Dropdown(
+            # options=self.simulation_data,
+            # options=self.data,  # this at least prints "simulation_data"
+            # options=self.data["simulation_data"],  # nope
+            # options=self.data["simulation_data"],  # nope
+            options=self.data["simulation_data"].keys(),  # nope
+            # options=self.viz_manager.datasets_dropdown.options,  # nope
+            # options=sim_names,
+            # options=None,
+            # value=sim_names[0],
+            value=None,
+            description="Target Data:",
+            disabled=False,
+            layout=Layout(width="98%"),
         )
 
         self.run_opt_button = create_expanded_button(
@@ -647,37 +679,6 @@ class HNNGUI:
         self.opt_accordion = Accordion()
 
         self._init_ui_components()
-
-
-        # DATA to optimize towards aka target data
-        # Note: all data, included loaded/experimental data, seems to be governed under
-        # "self.simulation_data".
-        #
-        # AES UGH need to dive in and debug with pytest to figure out HOW DO I ACCESS LOADED DATA
-        sim_names = [
-            simulations
-            for simulations, sim_name in self.data["simulation_data"].items()
-            if sim_name["net"] is not None
-        ]
-        if len(sim_names) == 0:
-            sim_names = [" "]
-
-        self.widget_opt_target_data = Dropdown(
-            # options=self.simulation_data,
-            # options=self.data,  # this at least prints "simulation_data"
-            # options=self.data["simulation_data"],  # nope
-            # options=self.data["simulation_data"],  # nope
-            # options=self.data["simulation_data"].keys(),  # nope
-            # options=self.viz_manager.datasets_dropdown.options,  # nope
-            options=sim_names,
-            value=sim_names[0],
-            # value=None,
-            description="Target Data:",
-            disabled=False,
-            layout=Layout(width="98%"),
-        )
-
-
         self.add_logging_window_logger()
 
     @staticmethod
@@ -742,6 +743,9 @@ class HNNGUI:
         self._log_out = Output()
 
         self.viz_manager = _VizManager(self.data, self.layout, self.fig_default_params)
+
+        # Register widget_opt_target_data to be updated when simulation data changes
+        self.viz_manager._external_data_widget = self.widget_opt_target_data
 
         # detailed configuration of backends
         self._backend_config_out = Output()
@@ -974,7 +978,7 @@ class HNNGUI:
 
         # AES why isn't this working
         # self.widget_opt_target_data.observe(_on_upload_data, names="value")
-        self.widget_opt_target_data.observe(self.viz_manager._layout_template_change, names="value")
+        # self.widget_opt_target_data.observe(self.viz_manager._layout_template_change, names="value")
 
     def _delete_single_drive(self, b):
         index = self.drive_accordion.selected_index
@@ -1609,8 +1613,12 @@ class HNNGUI:
                 drive_type,
                 name,
                 self.widget_tstop,
-                Layout(width="270px", height="auto"),  #  self.layout["drive_widget"],
-                {"description_width": "125px"},  # style,
+                # Layout(width="270px", height="auto"),  #  self.layout["drive_widget"],
+                # Layout(width="170px", height="auto"),  #  self.layout["drive_widget"],
+                # Layout(width="140px", height="auto"),  #  self.layout["drive_widget"],
+                # {"description_width": "125px"},  # style,
+                self.layout["drive_textbox"],
+                style,
                 location,
                 prespecified_drive_data,
                 prespecified_weights_ampa,
@@ -3578,6 +3586,7 @@ def _get_evoked_widget_for_opt(
     n_drive_cells=None,
     cell_specific=None,
 ):
+    # AES TODO: remove top-padding inside, since it's awkward space between drive name and first HTML element
     initial_contraint_range_proportion = 0.2
     default_data = {
         "mu": 0,
@@ -3589,16 +3598,29 @@ def _get_evoked_widget_for_opt(
     }
     data.update({"n_drive_cells": n_drive_cells, "cell_specific": cell_specific})
     default_data = _update_nested_dict(default_data, data)
-    kwargs = dict(layout=layout, style=style)
 
+    # Visual config for "main variable" widgets
+    var_layout=Layout(width="225px")
+    var_style={"description_width": "100px"}
+    # Visual config for checkbox widgets
+    checkbox_layout=Layout(width="30px")
+    checkbox_style={"description_width": "0px"}
+    # Visual config for min and max constraint widgets
+    minmax_layout=Layout(width="100px")
+    minmax_style={"description_width": "30px"}
+
+    # kwargs = dict(layout=layout, style=style)
     # AES TODO write lambda/whatever to multiply and format output of min/max
+    html_tab = "&emsp;"
 
     column_titles = HTML(
-        value="""<div style=text-align:center;'>
-        <b>Optimize against?</b>     Constraints:
-        </div>""",
+        value=f"""
+        <div style='margin:0px 0px 0px 190px;'><b>Optimize against?</b>
+        {html_tab}{html_tab}{html_tab}Constraints:</div>
+        """,
     )
 
+    # AES TODO observe on these
     mu = BoundedFloatText(
         value=default_data["mu"],
         description="Mean time:",
@@ -3606,16 +3628,22 @@ def _get_evoked_widget_for_opt(
         max=1e6,
         step=0.01,
         disabled=True,  # ghosted!
-        **kwargs,
+        layout=var_layout,
+        style=var_style,
     )
-    mu_opt_checkbox = Checkbox(value=True, **kwargs)
+    mu_opt_checkbox = Checkbox(
+        value=True,
+        layout=checkbox_layout,
+        style=checkbox_style,
+        )
     mu_opt_min = BoundedFloatText(
         value=(default_data["mu"] * (1 - initial_contraint_range_proportion)),
         description="Min:",
         min=0,
         max=1e6,
         step=0.01,
-        **kwargs,
+        layout=minmax_layout,
+        style=minmax_style,
     )
     mu_opt_max = BoundedFloatText(
         value=(default_data["mu"] * (1 + initial_contraint_range_proportion)),
@@ -3623,7 +3651,8 @@ def _get_evoked_widget_for_opt(
         min=0,
         max=1e6,
         step=0.01,
-        **kwargs,
+        layout=minmax_layout,
+        style=minmax_style,
     )
 
     sigma = BoundedFloatText(
@@ -3632,25 +3661,38 @@ def _get_evoked_widget_for_opt(
         min=0,
         max=1e6,
         step=0.01,
-        **kwargs,
+        layout=var_layout,
+        style=var_style,
     )
     numspikes = IntText(
-        value=default_data["numspikes"], description="No. Spikes:", **kwargs
+        value=default_data["numspikes"],
+        description="No. Spikes:",
+        layout=var_layout,
+        style=var_style,
     )
     n_drive_cells = IntText(
         value=default_data["n_drive_cells"],
         description="No. Drive Cells:",
         disabled=default_data["cell_specific"],
-        **kwargs,
+        layout=var_layout,
+        style=var_style,
     )
     cell_specific = Checkbox(
-        value=default_data["cell_specific"], description="Cell-Specific", **kwargs
+        value=default_data["cell_specific"],
+        description="Cell-Specific",
+        layout=var_layout,
+        style=var_style,
     )
-    seedcore = IntText(value=default_data["seedcore"], description="Seed: ", **kwargs)
+    seedcore = IntText(
+        value=default_data["seedcore"],
+        description="Seed: ",
+        layout=var_layout,
+        style=var_style,
+    )
 
     widgets_list, widgets_dict = _get_drive_weight_widgets(
-        layout,
-        style,
+        var_layout,
+        var_style,
         location,
         data={
             "weights_ampa": weights_ampa,
@@ -3664,6 +3706,15 @@ def _get_evoked_widget_for_opt(
         partial(_cell_spec_change, widget=n_drive_cells), names="value"
     )
 
+    quadruple_entry_hbox = Layout(
+        display='flex',
+        flex_flow='row',
+        # align_items='stretch',
+        align_items='flex-start',
+        # width='90%',
+        width='480px',  # AES NO TOUCHING!
+        # width='200px',
+        )
     opt_drive_box = VBox(
         [
             column_titles,
@@ -3673,7 +3724,8 @@ def _get_evoked_widget_for_opt(
                     mu_opt_checkbox,
                     mu_opt_min,
                     mu_opt_max,
-                ]
+                ],
+                layout=quadruple_entry_hbox,
             ),
             sigma,
             numspikes,
@@ -3697,6 +3749,7 @@ def _get_evoked_widget_for_opt(
     )
     opt_drive_widget.update(widgets_dict)
 
+    # AES maybe make constraints dictionary, THEN make opt_drive_box so as to not use var names?
     opt_drive_widget_constraints = dict(
         type="Evoked",
         name=name,
@@ -3863,7 +3916,7 @@ def run_opt_button_clicked(
     opt_obj_fun,
     opt_max_iter,
     opt_tstop,
-    opt_target_data,
+    opt_target_data_name,
 ):
     """Run the simulation and plot outputs."""
     simulation_data = all_data["simulation_data"]
@@ -3882,6 +3935,8 @@ def run_opt_button_clicked(
         simulation_status_bar.value = simulation_status_contents["failed"]
         return
 
+
+    # breakpoint()  # AES debug
     # AES net is initialised at simulation_data[_sim_name]['net'], weird
     _init_network_from_widgets(
         params,
@@ -3896,6 +3951,7 @@ def run_opt_button_clicked(
     )
 
     # AES debug
+    # AES TODO not working for some reason, investigate
     # Set the middle drive's checkbox off, just to keep things interesting
     opt_drive_widget_constraints[1]["mu_opt_checkbox"].value = False
 
@@ -4127,6 +4183,11 @@ def run_opt_button_clicked(
     )
     # breakpoint()  # AES debug
 
+
+    # Extract the actual target data
+    # Like everywhere else in the GUI, we only support usage of single-trial dipole data
+    target_dipole = simulation_data[opt_target_data_name]["dpls"][0]
+
     # AES debug
     # backend_selection = "MPI"
 
@@ -4147,27 +4208,44 @@ def run_opt_button_clicked(
         backend = JoblibBackend(n_jobs=n_jobs.value)
         print(f"Using Joblib with {n_jobs.value} core(s).")
     with backend:
-        # simulation_status_bar.value = simulation_status_contents[
-        #     "Running Optimization, please wait..."
-        # ]
+        simulation_status_bar.value = simulation_status_contents["opt_running"]
 
-
-
-        from urllib.request import urlretrieve
-        from hnn_core import read_dipole
-        # data_url = ('https://raw.githubusercontent.com/jonescompneurolab/hnn/master/'
-        #             'data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt')
-        # urlretrieve(data_url, 'yes_trial_S1_ERP_all_avg.txt')
-        # dipole_experimental = read_dipole('yes_trial_S1_ERP_all_avg.txt')
-        dipole_experimental = read_dipole('dpl2.txt')
+        # # AES for debugging readin
+        # from urllib.request import urlretrieve
+        # from hnn_core import read_dipole
+        # # data_url = ('https://raw.githubusercontent.com/jonescompneurolab/hnn/master/'
+        # #             'data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt')
+        # # urlretrieve(data_url, 'yes_trial_S1_ERP_all_avg.txt')
+        # # dipole_experimental = read_dipole('yes_trial_S1_ERP_all_avg.txt')
+        # dipole_experimental = read_dipole('dpl2.txt')
 
         # breakpoint()  # AES debug
+        print(f"Solver: {opt_solver}")
+        print(f"Objective function: {opt_obj_fun}")
+        print(f"Max iterations: {opt_max_iter}")
+        print(f"Simulation duration: {opt_tstop} ms")
+
+
         optim.fit(
-            # target=opt_target_data,
-            target=dipole_experimental,
+            target=target_dipole,
             n_trials=1,
         )
-        breakpoint()  # AES debug
+
+
+        print(f"Optimization finished!")
+
+        # breakpoint()  # AES debug
+
+        # AES Now, let's resimulate (if necessary) the final version of the optimized network for usage and display in the GU
+
+        simulation_data[_sim_name + "_optimized"]["net"] = optim.net_
+
+        simulation_data[_sim_name + "_optimized"]["dpls"] = simulate_dipole(
+            simulation_data[_sim_name + "_optimized"]["net"],
+            tstop=tstop.value,
+            dt=dt.value,
+            n_trials=ntrials.value,
+        )
 
         # # AES original actual run
         # simulation_data[_sim_name]["dpls"] = simulate_dipole(
@@ -4190,11 +4268,6 @@ def run_opt_button_clicked(
         # with self._log_out:
         # print("Starting optimization...")
 
-        print(f"Solver: {opt_solver}")
-        print(f"Objective function: {opt_obj_fun}")
-        print(f"Max iterations: {opt_max_iter}")
-        print(f"Simulation duration: {opt_tstop} ms")
-
 
         simulation_status_bar.value = simulation_status_contents["finished"]
 
@@ -4203,7 +4276,6 @@ def run_opt_button_clicked(
             for sim_name in simulation_data
             if simulation_data[sim_name]["net"] is not None
         ]
-
         simulations_list_widget.options = sim_names
         simulations_list_widget.value = sim_names[0]
 
@@ -4219,14 +4291,14 @@ def run_opt_button_clicked(
     for widget, value in fig_default_params.items():
         viz_manager.fig_default_params[widget] = value
 
-    # AES TODO
-    # viz_manager.add_figure()
-    # fig_name = _idx2figname(viz_manager.data["fig_idx"]["idx"] - 1)
-    # ax_plots = [("ax0", "input histogram"), ("ax1", "current dipole")]
-    # for ax_name, plot_type in ax_plots:
-    #     viz_manager._simulate_edit_figure(
-    #         fig_name, ax_name, _sim_name, plot_type, {}, "plot"
-    #     )
+
+    viz_manager.add_figure()
+    fig_name = _idx2figname(viz_manager.data["fig_idx"]["idx"] - 1)
+    ax_plots = [("ax0", "input histogram"), ("ax1", "current dipole")]
+    for ax_name, plot_type in ax_plots:
+        viz_manager._simulate_edit_figure(
+            fig_name, ax_name, (_sim_name + "_optimized"), plot_type, {}, "plot"
+        )
 
 
 def launch():

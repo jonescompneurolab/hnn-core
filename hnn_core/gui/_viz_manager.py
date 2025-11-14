@@ -1153,6 +1153,9 @@ class _VizManager:
             template_name = list(fig_templates.keys())[0]
         self._simulate_switch_fig_template(template_name)
 
+        # Update the external data widget (widget_opt_target_data)
+        self.update_external_data_widget()
+
     def compose(self):
         """Compose widgets."""
         with self.axes_config_output:
@@ -1183,6 +1186,22 @@ class _VizManager:
             ]
         )
         return config_panel, fig_output_container
+
+    def update_external_data_widget(self):
+        """Update external data widget with all available simulation data.
+
+        This updates any registered external widgets (like widget_opt_target_data)
+        with all available simulation data, not filtered by template type.
+        """
+        if hasattr(self, '_external_data_widget') and self._external_data_widget is not None:
+            all_sim_names = list(self.data["simulations"].keys())
+            if len(all_sim_names) == 0:
+                all_sim_names = [" "]
+
+            self._external_data_widget.options = all_sim_names
+            # Update value if current value is not in new options
+            if self._external_data_widget.value not in all_sim_names:
+                self._external_data_widget.value = all_sim_names[0]
 
     def _layout_template_change(self, template_type):
         # check if plot set type requires loaded sim-data
