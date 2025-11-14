@@ -552,7 +552,8 @@ class HNNGUI:
         )
         self.widget_opt_max_iter = BoundedIntText(
             # value=200,  # AES debug
-            value=3,
+            # value=3,
+            value=15,
             min=1,
             max=10000,
             description="Max Iterations:",
@@ -561,7 +562,7 @@ class HNNGUI:
             style=opt_dropdown_style,
         )
         self.widget_opt_tstop = BoundedFloatText(
-            value=170.0,
+            value=170,
             min=0.1,
             max=1000.0,
             description="tstop (ms):",
@@ -569,6 +570,7 @@ class HNNGUI:
             layout=self.layout["opt_textbox"],
             style=opt_dropdown_style,
         )
+
         self.run_opt_button = create_expanded_button(
             "Run Optimization",
             "success",
@@ -652,13 +654,24 @@ class HNNGUI:
         # "self.simulation_data".
         #
         # AES UGH need to dive in and debug with pytest to figure out HOW DO I ACCESS LOADED DATA
+        sim_names = [
+            simulations
+            for simulations, sim_name in self.data["simulation_data"].items()
+            if sim_name["net"] is not None
+        ]
+        if len(sim_names) == 0:
+            sim_names = [" "]
+
         self.widget_opt_target_data = Dropdown(
             # options=self.simulation_data,
             # options=self.data,  # this at least prints "simulation_data"
             # options=self.data["simulation_data"],  # nope
-            options=self.data["simulation_data"],  # nope
+            # options=self.data["simulation_data"],  # nope
             # options=self.data["simulation_data"].keys(),  # nope
-            value=None,
+            # options=self.viz_manager.datasets_dropdown.options,  # nope
+            options=sim_names,
+            value=sim_names[0],
+            # value=None,
             description="Target Data:",
             disabled=False,
             layout=Layout(width="98%"),
@@ -881,8 +894,8 @@ class HNNGUI:
                 self.widget_opt_solver.value,
                 self.widget_opt_obj_fun.value,
                 self.widget_opt_max_iter.value,
-                self.widget_opt_tstop,
-                self.widget_opt_target_data,
+                self.widget_opt_tstop.value,
+                self.widget_opt_target_data.value,
             )
 
         def _simulation_list_change(value):
@@ -958,6 +971,10 @@ class HNNGUI:
 
         self.cell_type_radio_buttons.observe(_cell_type_radio_change, "value")
         self.cell_layer_radio_buttons.observe(_cell_layer_radio_change, "value")
+
+        # AES why isn't this working
+        # self.widget_opt_target_data.observe(_on_upload_data, names="value")
+        self.widget_opt_target_data.observe(self.viz_manager._layout_template_change, names="value")
 
     def _delete_single_drive(self, b):
         index = self.drive_accordion.selected_index
@@ -3958,7 +3975,7 @@ def run_opt_button_clicked(
 
         # bpoint works here
         # breakpoint()  # AES debug
-        def set_params(net, params, set_params_kwargs):
+        def set_params(net, params):
             for drive_idx, drive in enumerate(opt_drive_widgets):
                 # We know that every drive_widget is going to have a corresponding
                 # constraints dictionary, and their indices will match
@@ -4019,7 +4036,7 @@ def run_opt_button_clicked(
                     elif drive["type"] in ("Evoked", "Gaussian"):
                         net.add_evoked_drive(
                             name=drive["name"],
-                            mu=(namegen("mu") if namegen("mu") else drive["mu"].value),
+                            mu=(params[namegen("mu")] if namegen("mu") else drive["mu"].value),
                             sigma=drive["sigma"].value,
                             numspikes=drive["numspikes"].value,
                             location=drive["location"],
@@ -4110,6 +4127,8 @@ def run_opt_button_clicked(
     )
     # breakpoint()  # AES debug
 
+    # AES debug
+    # backend_selection = "MPI"
 
     print("start simulation")
     if backend_selection.value == "MPI":
@@ -4128,14 +4147,27 @@ def run_opt_button_clicked(
         backend = JoblibBackend(n_jobs=n_jobs.value)
         print(f"Using Joblib with {n_jobs.value} core(s).")
     with backend:
-        simulation_status_bar.value = simulation_status_contents[
-            "Running Optimization, please wait..."
-        ]
+        # simulation_status_bar.value = simulation_status_contents[
+        #     "Running Optimization, please wait..."
+        # ]
+
+
+
+        from urllib.request import urlretrieve
+        from hnn_core import read_dipole
+        # data_url = ('https://raw.githubusercontent.com/jonescompneurolab/hnn/master/'
+        #             'data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt')
+        # urlretrieve(data_url, 'yes_trial_S1_ERP_all_avg.txt')
+        # dipole_experimental = read_dipole('yes_trial_S1_ERP_all_avg.txt')
+        dipole_experimental = read_dipole('dpl2.txt')
+
+        # breakpoint()  # AES debug
         optim.fit(
-            target=opt_target_data,
+            # target=opt_target_data,
+            target=dipole_experimental,
             n_trials=1,
         )
-        # breakpoint()  # AES debug
+        breakpoint()  # AES debug
 
         # # AES original actual run
         # simulation_data[_sim_name]["dpls"] = simulate_dipole(

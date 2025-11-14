@@ -274,6 +274,7 @@ def test_gui_upload_data():
     file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt"  # noqa
     file2_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt"  # noqa
     gui._simulate_upload_data(file1_url)
+    breakpoint()  # AES debug
     assert len(gui.data["simulation_data"]) == 1
     assert "S1_SupraT" in gui.data["simulation_data"].keys()
     assert gui.data["simulation_data"]["S1_SupraT"]["net"] is None
@@ -1580,12 +1581,12 @@ def test_gui_run_optimization():
     _ = gui.compose()
 
     gui.widget_tstop.value = 170
-    gui.widget_dt.value = 0.5
-    # gui.widget_backend_selection.value = "MPI"
+    gui.widget_dt.value = 0.025
+    gui.widget_backend_selection.value = "MPI"
     # gui.widget_ntrials.value = 2
+    breakpoint()  # AES debug
     gui.run_opt_button.click()
 
-    breakpoint()  # AES debug
     default_name = gui.widget_simulation_name.value
     dpls = gui.simulation_data[default_name]["dpls"]
     assert isinstance(gui.simulation_data[default_name]["net"], Network)
