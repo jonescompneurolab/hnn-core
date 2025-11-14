@@ -1362,6 +1362,8 @@ class HNNGUI:
             # Add optimization
             self.add_opt_tab(self.params)
 
+            # AES where to do opt observe of drive values?
+
     def add_drive_widget(
         self,
         drive_type,
@@ -1516,6 +1518,7 @@ class HNNGUI:
                 )
             elif load_type == "drives":
                 self.add_drive_tab(params)
+                # AES TODO add self.add_opt_tab here too
             else:
                 raise ValueError
 
@@ -1626,6 +1629,8 @@ class HNNGUI:
                 prespecified_cell_specific,
             )
         )
+
+        # AES TODO after these are created, add observers
 
         # # Add delete button and assign its call-back function
         # delete_button = Button(
@@ -3569,6 +3574,222 @@ def _get_poisson_widget_for_opt(
     return opt_drive_box, opt_drive_widget
 
 
+def _create_opt_widgets_for_var(
+    var_name,
+    initial_value,
+    var_description,
+    initial_constraint_range_proportion=None,
+    var_layout=None,
+    var_style=None,
+    checkbox_layout=None,
+    checkbox_style=None,
+    minmax_layout=None,
+    minmax_style=None,
+    var_type=float(),
+    init_bool=False,
+):
+    opt_checkbox_widget = Checkbox(
+        value=init_bool,
+        layout=checkbox_layout,
+        style=checkbox_style,
+    )
+    if isinstance(var_type, float):
+        var_widget = BoundedFloatText(
+            value=initial_value,
+            description=var_description,
+            min=0,
+            max=1e6,
+            step=0.01,
+            disabled=True,  # ghosted!
+            layout=var_layout,
+            style=var_style,
+        )
+        opt_min_widget = BoundedFloatText(
+            value=(initial_value * (1 - initial_constraint_range_proportion)),
+            description="Min:",
+            min=0,
+            max=1e6,
+            step=0.01,
+            layout=minmax_layout,
+            style=minmax_style,
+        )
+        opt_max_widget = BoundedFloatText(
+            value=(initial_value * (1 + initial_constraint_range_proportion)),
+            description="Max:",
+            min=0,
+            max=1e6,
+            step=0.01,
+            layout=minmax_layout,
+            style=minmax_style,
+        )
+    elif isinstance(var_type, int):
+        var_widget = IntText(
+            value=initial_value,
+            description=var_description,
+            layout=var_layout,
+            style=var_style,
+        )
+        opt_min_widget = IntText(
+            value=round(initial_value * (1 - initial_constraint_range_proportion)),
+            description="Min:",
+            layout=minmax_layout,
+            style=minmax_style,
+        )
+        opt_max_widget = IntText(
+            value=round(initial_value * (1 + initial_constraint_range_proportion)),
+            description="Max:",
+            layout=minmax_layout,
+            style=minmax_style,
+        )
+    return {
+        f"{var_name}" : var_widget,
+        f"{var_name}_opt_checkbox" : opt_checkbox_widget,
+        f"{var_name}_opt_min" : opt_min_widget,
+        f"{var_name}_opt_max" : opt_max_widget,
+        }
+
+
+def _create_hbox_for_opt_var(var_name, widget_dict, layout):
+    """Home Box Office widget."""
+    return HBox(
+        [
+            widget_dict[f"{var_name}"],
+            widget_dict[f"{var_name}_opt_checkbox"],
+            widget_dict[f"{var_name}_opt_min"],
+            widget_dict[f"{var_name}_opt_max"],
+        ],
+        layout=layout,
+    )
+
+# AES todo change name
+def _get_drive_weight_widgets_for_opt(
+        layout, style, location, data=None, quadruple_entry_hbox=None, **_autogen_opt_widget_kwargs
+):
+    default_data = {
+        "weights_ampa": {
+            "L5_pyramidal": 0.0,
+            "L2_pyramidal": 0.0,
+            "L5_basket": 0.0,
+            "L2_basket": 0.0,
+        },
+        "weights_nmda": {
+            "L5_pyramidal": 0.0,
+            "L2_pyramidal": 0.0,
+            "L5_basket": 0.0,
+            "L2_basket": 0.0,
+        },
+        "delays": {
+            "L5_pyramidal": 0.1,
+            "L2_pyramidal": 0.1,
+            "L5_basket": 0.1,
+            "L2_basket": 0.1,
+        },
+    }
+    if isinstance(data, dict):
+        default_data = _update_nested_dict(default_data, data)
+
+    cell_types = ["L5_pyramidal", "L2_pyramidal", "L5_basket", "L2_basket"]
+    if location == "distal":
+        cell_types.remove("L5_basket")
+
+    # weights_ampa, weights_nmda, delays = dict(), dict(), dict()
+
+    # AES TODO oof, next todo is working out weights. Instead of
+    # changing structure of "weights_ampa" dict, probably need to simply
+    # create other dicts that have the same per-celltype structure...
+
+    syn_widgets_dict = {}
+    ampa_weights_list, nmda_weights_list, delays_list = [], [], []
+    for cell_type in cell_types:
+        # weights_ampa.update(
+        syn_widgets_dict.update(
+            _create_opt_widgets_for_var(
+                f"{cell_type}_weights_ampa",
+                default_data["weights_ampa"][cell_type],
+                f"{cell_type}:",
+                **_autogen_opt_widget_kwargs,
+            )
+        )
+        ampa_weights_list.append(
+            _create_hbox_for_opt_var(
+                f"{cell_type}_weights_ampa",
+                syn_widgets_dict,
+                quadruple_entry_hbox,
+            ))
+        # weights_nmda.update(
+        syn_widgets_dict.update(
+            _create_opt_widgets_for_var(
+                f"{cell_type}_weights_nmda",
+                default_data["weights_nmda"][cell_type],
+                f"{cell_type}:",
+                **_autogen_opt_widget_kwargs,
+            )
+        )
+        nmda_weights_list.append(
+            _create_hbox_for_opt_var(
+                f"{cell_type}_weights_nmda",
+                syn_widgets_dict,
+                quadruple_entry_hbox,
+            ))
+
+        # delays.update(
+        syn_widgets_dict.update(
+            _create_opt_widgets_for_var(
+                f"{cell_type}_delays",
+                default_data["delays"][cell_type],
+                f"{cell_type}:",
+                **_autogen_opt_widget_kwargs,
+            )
+        )
+        delays_list.append(
+            _create_hbox_for_opt_var(
+                f"{cell_type}_delays",
+                syn_widgets_dict,
+                quadruple_entry_hbox,
+            ))
+
+        # weights_ampa[f"{cell_type}"] = BoundedFloatText(
+        #     value=default_data["weights_ampa"][cell_type],
+        #     description=f"{cell_type}:",
+        #     min=0,
+        #     max=1e6,
+        #     step=0.01,
+        #     **kwargs,
+        # )
+        # weights_nmda[f"{cell_type}"] = BoundedFloatText(
+        #     value=default_data["weights_nmda"][cell_type],
+        #     description=f"{cell_type}:",
+        #     min=0,
+        #     max=1e6,
+        #     step=0.01,
+        #     **kwargs,
+        # )
+        # delays[f"{cell_type}"] = BoundedFloatText(
+        #     value=default_data["delays"][cell_type],
+        #     description=f"{cell_type}:",
+        #     min=0,
+        #     max=1e6,
+        #     step=0.1,
+        #     **kwargs,
+        # )
+
+    # widgets_dict = {
+    #     "weights_ampa": weights_ampa,
+    #     "weights_nmda": weights_nmda,
+    #     "delays": delays,
+    # }
+    syn_widgets_list = (
+        [HTML(value="<b>AMPA weights</b>")]
+        + ampa_weights_list
+        + [HTML(value="<b>NMDA weights</b>")]
+        + nmda_weights_list
+        + [HTML(value="<b>Synaptic delays</b>")]
+        + delays_list
+    )
+    return syn_widgets_list, syn_widgets_dict
+    # return widgets_dict_out
+
+
 def _get_evoked_widget_for_opt(
     name,
     layout,
@@ -3582,7 +3803,7 @@ def _get_evoked_widget_for_opt(
     cell_specific=None,
 ):
     # AES TODO: remove top-padding inside, since it's awkward space between drive name and first HTML element
-    initial_contraint_range_proportion = 0.2
+    initial_constraint_range_proportion = 0.2
     default_data = {
         "mu": 0,
         "sigma": 1,
@@ -3604,6 +3825,17 @@ def _get_evoked_widget_for_opt(
     minmax_layout=Layout(width="100px")
     minmax_style={"description_width": "30px"}
 
+    quadruple_entry_hbox = Layout(
+        display='flex',
+        flex_flow='row',
+        # align_items='stretch',
+        align_items='flex-start',
+        # width='90%',
+        width='480px',  # AES NO TOUCHING!
+        # width='200px',
+        )
+
+
     # kwargs = dict(layout=layout, style=style)
     # AES TODO write lambda/whatever to multiply and format output of min/max
     html_tab = "&emsp;"
@@ -3615,56 +3847,83 @@ def _get_evoked_widget_for_opt(
         """,
     )
 
-    # AES TODO observe on these
-    mu = BoundedFloatText(
-        value=default_data["mu"],
-        description="Mean time:",
-        min=0,
-        max=1e6,
-        step=0.01,
-        disabled=True,  # ghosted!
-        layout=var_layout,
-        style=var_style,
-    )
-    mu_opt_checkbox = Checkbox(
-        value=True,
-        layout=checkbox_layout,
-        style=checkbox_style,
-        )
-    mu_opt_min = BoundedFloatText(
-        value=(default_data["mu"] * (1 - initial_contraint_range_proportion)),
-        description="Min:",
-        min=0,
-        max=1e6,
-        step=0.01,
-        layout=minmax_layout,
-        style=minmax_style,
-    )
-    mu_opt_max = BoundedFloatText(
-        value=(default_data["mu"] * (1 + initial_contraint_range_proportion)),
-        description="Max:",
-        min=0,
-        max=1e6,
-        step=0.01,
-        layout=minmax_layout,
-        style=minmax_style,
+    _autogen_opt_widget_kwargs = dict(
+        initial_constraint_range_proportion=initial_constraint_range_proportion,
+        var_layout=var_layout,
+        var_style=var_style,
+        checkbox_layout=checkbox_layout,
+        checkbox_style=checkbox_style,
+        minmax_layout=minmax_layout,
+        minmax_style=minmax_style,
     )
 
-    sigma = BoundedFloatText(
-        value=default_data["sigma"],
-        description="Std dev time:",
-        min=0,
-        max=1e6,
-        step=0.01,
-        layout=var_layout,
-        style=var_style,
+    # AES maybe make dictionary, THEN make opt_drive_box so as to not use var names?
+    # opt_drive_widget = dict(
+    #     type="Evoked",
+    #     name=name,
+    #     mu=mu,
+    #     mu_opt_min=mu_opt_min,
+    #     mu_opt_max=mu_opt_max,
+    #     mu_opt_checkbox=mu_opt_checkbox,
+    #     sigma=sigma,
+    #     numspikes=numspikes,
+    #     seedcore=seedcore,
+    #     location=location,
+    #     sync_within_trial=False,
+    #     n_drive_cells=n_drive_cells,
+    #     is_cell_specific=cell_specific,
+    # )
+
+    # AES TODO observe on these
+    opt_drive_widget = dict(
+        type="Evoked",
+        name=name,
     )
-    numspikes = IntText(
-        value=default_data["numspikes"],
-        description="No. Spikes:",
-        layout=var_layout,
-        style=var_style,
+    # mu = BoundedFloatText(
+    #     value=default_data["mu"],
+    #     description="Mean time:",
+    #     min=0,
+    #     max=1e6,
+    #     step=0.01,
+    #     disabled=True,  # ghosted!
+    #     layout=var_layout,
+    #     style=var_style,
+    # )
+    opt_drive_widget.update(
+        _create_opt_widgets_for_var(
+            "mu", default_data["mu"], "Mean time:", **_autogen_opt_widget_kwargs
+        )
+        | _create_opt_widgets_for_var(
+            "sigma",
+            default_data["sigma"],
+            "Std dev time:",
+            **_autogen_opt_widget_kwargs,
+        )
+        | _create_opt_widgets_for_var(
+            "numspikes",
+            default_data["numspikes"],
+            "No. Spikes:",
+            **_autogen_opt_widget_kwargs,
+            var_type=int(),
+        )
     )
+
+    # sigma = BoundedFloatText(
+    #     value=default_data["sigma"],
+    #     description="Std dev time:",
+    #     min=0,
+    #     max=1e6,
+    #     step=0.01,
+    #     layout=var_layout,
+    #     style=var_style,
+    # )
+
+    # numspikes = IntText(
+    #     value=default_data["numspikes"],
+    #     description="No. Spikes:",
+    #     layout=var_layout,
+    #     style=var_style,
+    # )
     n_drive_cells = IntText(
         value=default_data["n_drive_cells"],
         description="No. Drive Cells:",
@@ -3684,8 +3943,14 @@ def _get_evoked_widget_for_opt(
         layout=var_layout,
         style=var_style,
     )
+    opt_drive_widget.update(dict(
+        location=location,
+        sync_within_trial=False,
+        n_drive_cells=n_drive_cells,
+        is_cell_specific=cell_specific,
+    ))
 
-    widgets_list, widgets_dict = _get_drive_weight_widgets(
+    syn_widgets_list, syn_widgets_dict = _get_drive_weight_widgets_for_opt(
         var_layout,
         var_style,
         location,
@@ -3694,6 +3959,8 @@ def _get_evoked_widget_for_opt(
             "weights_nmda": weights_nmda,
             "delays": delays,
         },
+        quadruple_entry_hbox=quadruple_entry_hbox,
+        **_autogen_opt_widget_kwargs,
     )
 
     # Disable n_drive_cells widget based on cell_specific checkbox
@@ -3701,52 +3968,23 @@ def _get_evoked_widget_for_opt(
         partial(_cell_spec_change, widget=n_drive_cells), names="value"
     )
 
-    quadruple_entry_hbox = Layout(
-        display='flex',
-        flex_flow='row',
-        # align_items='stretch',
-        align_items='flex-start',
-        # width='90%',
-        width='480px',  # AES NO TOUCHING!
-        # width='200px',
-        )
+    #AEs just insert from the existing dict, duh
     opt_drive_box = VBox(
         [
             column_titles,
-            HBox(
-                [
-                    mu,
-                    mu_opt_checkbox,
-                    mu_opt_min,
-                    mu_opt_max,
-                ],
-                layout=quadruple_entry_hbox,
-            ),
-            sigma,
-            numspikes,
+            _create_hbox_for_opt_var("mu", opt_drive_widget, quadruple_entry_hbox),
+            _create_hbox_for_opt_var("sigma", opt_drive_widget, quadruple_entry_hbox),
+            _create_hbox_for_opt_var("numspikes", opt_drive_widget, quadruple_entry_hbox),
             n_drive_cells,
             cell_specific,
             seedcore,
         ]
-        + widgets_list
+        + syn_widgets_list
     )
-    # AES maybe make dictionary, THEN make opt_drive_box so as to not use var names?
-    opt_drive_widget = dict(
-        type="Evoked",
-        name=name,
-        mu=mu,
-        mu_opt_min=mu_opt_min,
-        mu_opt_max=mu_opt_max,
-        mu_opt_checkbox=mu_opt_checkbox,
-        sigma=sigma,
-        numspikes=numspikes,
-        seedcore=seedcore,
-        location=location,
-        sync_within_trial=False,
-        n_drive_cells=n_drive_cells,
-        is_cell_specific=cell_specific,
-    )
-    opt_drive_widget.update(widgets_dict)
+
+
+    # AES what to do about this
+    opt_drive_widget.update(syn_widgets_dict)
     return opt_drive_box, opt_drive_widget
 
 
@@ -4050,6 +4288,9 @@ def run_opt_button_clicked(
                         cell_specific=drive["is_cell_specific"].value,
                     )
 
+                    # AES TODO oof, next todo is working out weights. Instead of
+                    # changing structure of "weights_ampa" dict, probably need to simply
+                    # create other dicts that have the same per-celltype structure...
                     weights_ampa = _drive_widget_to_dict(drive, "weights_ampa")
                     weights_nmda = _drive_widget_to_dict(drive, "weights_nmda")
                     synaptic_delays = _drive_widget_to_dict(drive, "delays")

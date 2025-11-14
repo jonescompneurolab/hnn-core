@@ -1193,7 +1193,10 @@ class _VizManager:
         This updates any registered external widgets (like widget_opt_target_data)
         with all available simulation data, not filtered by template type.
         """
-        if hasattr(self, '_external_data_widget') and self._external_data_widget is not None:
+        if (
+            hasattr(self, "_external_data_widget")
+            and self._external_data_widget is not None
+        ):
             all_sim_names = list(self.data["simulations"].keys())
             if len(all_sim_names) == 0:
                 all_sim_names = [" "]
