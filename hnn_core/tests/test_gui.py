@@ -1594,8 +1594,8 @@ def test_gui_run_optimization():
     gui.run_opt_button.click()
 
     default_name = gui.widget_simulation_name.value
-    dpls = gui.simulation_data[default_name]["dpls"]
-    assert isinstance(gui.simulation_data[default_name]["net"], Network)
+    dpls = gui.simulation_data[default_name + "_optimized"]["dpls"]
+    assert isinstance(gui.simulation_data[default_name + "_optimized"]["net"], Network)
     assert isinstance(dpls, list)
     assert len(dpls) > 0
     assert all([isinstance(dpl, Dipole) for dpl in dpls])

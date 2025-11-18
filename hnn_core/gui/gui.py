@@ -573,7 +573,6 @@ class HNNGUI:
             style=opt_dropdown_style,
         )
 
-
         # # DATA to optimize towards aka target data
         # # Note: all data, included loaded/experimental data, seems to be governed under
         # # "self.simulation_data".
@@ -1609,25 +1608,23 @@ class HNNGUI:
         # 3. then realize my design was broken and have to start over again
 
         # AES TODO widget sizes UGH
-        opt_drive_box, opt_drive_widget = (
-            _build_opt_objects(
-                drive_type,
-                name,
-                self.widget_tstop,
-                # Layout(width="270px", height="auto"),  #  self.layout["drive_widget"],
-                # Layout(width="170px", height="auto"),  #  self.layout["drive_widget"],
-                # Layout(width="140px", height="auto"),  #  self.layout["drive_widget"],
-                # {"description_width": "125px"},  # style,
-                self.layout["drive_textbox"],
-                style,
-                location,
-                prespecified_drive_data,
-                prespecified_weights_ampa,
-                prespecified_weights_nmda,
-                prespecified_delays,
-                prespecified_n_drive_cells,
-                prespecified_cell_specific,
-            )
+        opt_drive_box, opt_drive_widget = _build_opt_objects(
+            drive_type,
+            name,
+            self.widget_tstop,
+            # Layout(width="270px", height="auto"),  #  self.layout["drive_widget"],
+            # Layout(width="170px", height="auto"),  #  self.layout["drive_widget"],
+            # Layout(width="140px", height="auto"),  #  self.layout["drive_widget"],
+            # {"description_width": "125px"},  # style,
+            self.layout["drive_textbox"],
+            style,
+            location,
+            prespecified_drive_data,
+            prespecified_weights_ampa,
+            prespecified_weights_nmda,
+            prespecified_delays,
+            prespecified_n_drive_cells,
+            prespecified_cell_specific,
         )
 
         # AES TODO after these are created, add observers
@@ -3642,11 +3639,11 @@ def _create_opt_widgets_for_var(
             style=minmax_style,
         )
     return {
-        f"{var_name}" : var_widget,
-        f"{var_name}_opt_checkbox" : opt_checkbox_widget,
-        f"{var_name}_opt_min" : opt_min_widget,
-        f"{var_name}_opt_max" : opt_max_widget,
-        }
+        f"{var_name}": var_widget,
+        f"{var_name}_opt_checkbox": opt_checkbox_widget,
+        f"{var_name}_opt_min": opt_min_widget,
+        f"{var_name}_opt_max": opt_max_widget,
+    }
 
 
 def _create_hbox_for_opt_var(var_name, widget_dict, layout):
@@ -3661,9 +3658,15 @@ def _create_hbox_for_opt_var(var_name, widget_dict, layout):
         layout=layout,
     )
 
+
 # AES todo change name
 def _get_drive_weight_widgets_for_opt(
-        layout, style, location, data=None, quadruple_entry_hbox=None, **_autogen_opt_widget_kwargs
+    layout,
+    style,
+    location,
+    data=None,
+    quadruple_entry_hbox=None,
+    **_autogen_opt_widget_kwargs,
 ):
     default_data = {
         "weights_ampa": {
@@ -3698,13 +3701,53 @@ def _get_drive_weight_widgets_for_opt(
     # changing structure of "weights_ampa" dict, probably need to simply
     # create other dicts that have the same per-celltype structure...
 
-    syn_widgets_dict = {}
+    syn_widgets_dict = {
+        "weights_ampa": {},
+        "weights_nmda": {},
+        "delays": {},
+    }
     ampa_weights_list, nmda_weights_list, delays_list = [], [], []
+
+    kwargs = dict(layout=layout, style=style)
+    weights_ampa, weights_nmda, delays = dict(), dict(), dict()
+
     for cell_type in cell_types:
-        # weights_ampa.update(
-        syn_widgets_dict.update(
+        # # AES original method
+        # weights_ampa[f"{cell_type}"] = BoundedFloatText(
+        #     value=default_data["weights_ampa"][cell_type],
+        #     description=f"{cell_type}:",
+        #     min=0,
+        #     max=1e6,
+        #     step=0.01,
+        #     **kwargs,
+        # )
+        # weights_nmda[f"{cell_type}"] = BoundedFloatText(
+        #     value=default_data["weights_nmda"][cell_type],
+        #     description=f"{cell_type}:",
+        #     min=0,
+        #     max=1e6,
+        #     step=0.01,
+        #     **kwargs,
+        # )
+        # delays[f"{cell_type}"] = BoundedFloatText(
+        #     value=default_data["delays"][cell_type],
+        #     description=f"{cell_type}:",
+        #     min=0,
+        #     max=1e6,
+        #     step=0.1,
+        #     **kwargs,
+        # )
+
+        # widgets_dict = {
+        #     "weights_ampa": weights_ampa,
+        #     "weights_nmda": weights_nmda,
+        #     "delays": delays,
+        # }
+
+        # AES second attempt
+        syn_widgets_dict["weights_ampa"].update(
             _create_opt_widgets_for_var(
-                f"{cell_type}_weights_ampa",
+                cell_type,
                 default_data["weights_ampa"][cell_type],
                 f"{cell_type}:",
                 **_autogen_opt_widget_kwargs,
@@ -3712,14 +3755,15 @@ def _get_drive_weight_widgets_for_opt(
         )
         ampa_weights_list.append(
             _create_hbox_for_opt_var(
-                f"{cell_type}_weights_ampa",
-                syn_widgets_dict,
+                cell_type,
+                syn_widgets_dict["weights_ampa"],
                 quadruple_entry_hbox,
-            ))
+            )
+        )
         # weights_nmda.update(
-        syn_widgets_dict.update(
+        syn_widgets_dict["weights_nmda"].update(
             _create_opt_widgets_for_var(
-                f"{cell_type}_weights_nmda",
+                cell_type,
                 default_data["weights_nmda"][cell_type],
                 f"{cell_type}:",
                 **_autogen_opt_widget_kwargs,
@@ -3727,15 +3771,16 @@ def _get_drive_weight_widgets_for_opt(
         )
         nmda_weights_list.append(
             _create_hbox_for_opt_var(
-                f"{cell_type}_weights_nmda",
-                syn_widgets_dict,
+                cell_type,
+                syn_widgets_dict["weights_nmda"],
                 quadruple_entry_hbox,
-            ))
+            )
+        )
 
         # delays.update(
-        syn_widgets_dict.update(
+        syn_widgets_dict["delays"].update(
             _create_opt_widgets_for_var(
-                f"{cell_type}_delays",
+                cell_type,
                 default_data["delays"][cell_type],
                 f"{cell_type}:",
                 **_autogen_opt_widget_kwargs,
@@ -3743,11 +3788,60 @@ def _get_drive_weight_widgets_for_opt(
         )
         delays_list.append(
             _create_hbox_for_opt_var(
-                f"{cell_type}_delays",
-                syn_widgets_dict,
+                cell_type,
+                syn_widgets_dict["delays"],
                 quadruple_entry_hbox,
-            ))
+            )
+        )
 
+        # # AES: first attempt at rewriting dicts
+        # syn_widgets_dict.update(
+        #     _create_opt_widgets_for_var(
+        #         f"{cell_type}_weights_ampa",
+        #         default_data["weights_ampa"][cell_type],
+        #         f"{cell_type}:",
+        #         **_autogen_opt_widget_kwargs,
+        #     )
+        # )
+        # ampa_weights_list.append(
+        #     _create_hbox_for_opt_var(
+        #         f"{cell_type}_weights_ampa",
+        #         syn_widgets_dict,
+        #         quadruple_entry_hbox,
+        #     ))
+        # # weights_nmda.update(
+        # syn_widgets_dict.update(
+        #     _create_opt_widgets_for_var(
+        #         f"{cell_type}_weights_nmda",
+        #         default_data["weights_nmda"][cell_type],
+        #         f"{cell_type}:",
+        #         **_autogen_opt_widget_kwargs,
+        #     )
+        # )
+        # nmda_weights_list.append(
+        #     _create_hbox_for_opt_var(
+        #         f"{cell_type}_weights_nmda",
+        #         syn_widgets_dict,
+        #         quadruple_entry_hbox,
+        #     ))
+
+        # # delays.update(
+        # syn_widgets_dict.update(
+        #     _create_opt_widgets_for_var(
+        #         f"{cell_type}_delays",
+        #         default_data["delays"][cell_type],
+        #         f"{cell_type}:",
+        #         **_autogen_opt_widget_kwargs,
+        #     )
+        # )
+        # delays_list.append(
+        #     _create_hbox_for_opt_var(
+        #         f"{cell_type}_delays",
+        #         syn_widgets_dict,
+        #         quadruple_entry_hbox,
+        #     ))
+
+        # # AES don't remember what this is from
         # weights_ampa[f"{cell_type}"] = BoundedFloatText(
         #     value=default_data["weights_ampa"][cell_type],
         #     description=f"{cell_type}:",
@@ -3816,25 +3910,24 @@ def _get_evoked_widget_for_opt(
     default_data = _update_nested_dict(default_data, data)
 
     # Visual config for "main variable" widgets
-    var_layout=Layout(width="225px")
-    var_style={"description_width": "100px"}
+    var_layout = Layout(width="225px")
+    var_style = {"description_width": "100px"}
     # Visual config for checkbox widgets
-    checkbox_layout=Layout(width="30px")
-    checkbox_style={"description_width": "0px"}
+    checkbox_layout = Layout(width="30px")
+    checkbox_style = {"description_width": "0px"}
     # Visual config for min and max constraint widgets
-    minmax_layout=Layout(width="100px")
-    minmax_style={"description_width": "30px"}
+    minmax_layout = Layout(width="100px")
+    minmax_style = {"description_width": "30px"}
 
     quadruple_entry_hbox = Layout(
-        display='flex',
-        flex_flow='row',
+        display="flex",
+        flex_flow="row",
         # align_items='stretch',
-        align_items='flex-start',
+        align_items="flex-start",
         # width='90%',
-        width='480px',  # AES NO TOUCHING!
+        width="480px",  # AES NO TOUCHING!
         # width='200px',
-        )
-
+    )
 
     # kwargs = dict(layout=layout, style=style)
     # AES TODO write lambda/whatever to multiply and format output of min/max
@@ -3943,12 +4036,15 @@ def _get_evoked_widget_for_opt(
         layout=var_layout,
         style=var_style,
     )
-    opt_drive_widget.update(dict(
-        location=location,
-        sync_within_trial=False,
-        n_drive_cells=n_drive_cells,
-        is_cell_specific=cell_specific,
-    ))
+    opt_drive_widget.update(
+        dict(
+            seedcore=seedcore,
+            location=location,
+            sync_within_trial=False,
+            n_drive_cells=n_drive_cells,
+            is_cell_specific=cell_specific,
+        )
+    )
 
     syn_widgets_list, syn_widgets_dict = _get_drive_weight_widgets_for_opt(
         var_layout,
@@ -3968,20 +4064,21 @@ def _get_evoked_widget_for_opt(
         partial(_cell_spec_change, widget=n_drive_cells), names="value"
     )
 
-    #AEs just insert from the existing dict, duh
+    # AEs just insert from the existing dict, duh
     opt_drive_box = VBox(
         [
             column_titles,
             _create_hbox_for_opt_var("mu", opt_drive_widget, quadruple_entry_hbox),
             _create_hbox_for_opt_var("sigma", opt_drive_widget, quadruple_entry_hbox),
-            _create_hbox_for_opt_var("numspikes", opt_drive_widget, quadruple_entry_hbox),
+            _create_hbox_for_opt_var(
+                "numspikes", opt_drive_widget, quadruple_entry_hbox
+            ),
             n_drive_cells,
             cell_specific,
             seedcore,
         ]
         + syn_widgets_list
     )
-
 
     # AES what to do about this
     opt_drive_widget.update(syn_widgets_dict)
@@ -4055,57 +4152,49 @@ def _build_opt_objects(
     cell_specific,
 ):
     if drive_type in ("Rhythmic", "Bursty"):
-        opt_drive_box, opt_drive_widget = (
-            _get_rhythmic_widget_for_opt(
-                name,
-                tstop_widget,
-                layout,
-                style,
-                location,
-                data=drive_data,
-                weights_ampa=weights_ampa,
-                weights_nmda=weights_nmda,
-                delays=delays,
-                n_drive_cells=n_drive_cells,
-                cell_specific=cell_specific,
-            )
+        opt_drive_box, opt_drive_widget = _get_rhythmic_widget_for_opt(
+            name,
+            tstop_widget,
+            layout,
+            style,
+            location,
+            data=drive_data,
+            weights_ampa=weights_ampa,
+            weights_nmda=weights_nmda,
+            delays=delays,
+            n_drive_cells=n_drive_cells,
+            cell_specific=cell_specific,
         )
     elif drive_type == "Poisson":
-        opt_drive_box, opt_drive_widget = (
-            _get_poisson_widget_for_opt(
-                name,
-                tstop_widget,
-                layout,
-                style,
-                location,
-                data=drive_data,
-                weights_ampa=weights_ampa,
-                weights_nmda=weights_nmda,
-                delays=delays,
-                n_drive_cells=n_drive_cells,
-                cell_specific=cell_specific,
-            )
+        opt_drive_box, opt_drive_widget = _get_poisson_widget_for_opt(
+            name,
+            tstop_widget,
+            layout,
+            style,
+            location,
+            data=drive_data,
+            weights_ampa=weights_ampa,
+            weights_nmda=weights_nmda,
+            delays=delays,
+            n_drive_cells=n_drive_cells,
+            cell_specific=cell_specific,
         )
     elif drive_type in ("Evoked", "Gaussian"):
-        opt_drive_box, opt_drive_widget = (
-            _get_evoked_widget_for_opt(
-                name,
-                layout,
-                style,
-                location,
-                data=drive_data,
-                weights_ampa=weights_ampa,
-                weights_nmda=weights_nmda,
-                delays=delays,
-                n_drive_cells=n_drive_cells,
-                cell_specific=cell_specific,
-            )
+        opt_drive_box, opt_drive_widget = _get_evoked_widget_for_opt(
+            name,
+            layout,
+            style,
+            location,
+            data=drive_data,
+            weights_ampa=weights_ampa,
+            weights_nmda=weights_nmda,
+            delays=delays,
+            n_drive_cells=n_drive_cells,
+            cell_specific=cell_specific,
         )
     elif drive_type == "Tonic":
-        opt_drive_box, opt_drive_widget = (
-            _get_tonic_widget_for_opt(
-                name, tstop_widget, layout, style, data=drive_data
-            )
+        opt_drive_box, opt_drive_widget = _get_tonic_widget_for_opt(
+            name, tstop_widget, layout, style, data=drive_data
         )
     else:
         raise ValueError(f"Unknown drive type {drive_type}")
@@ -4149,17 +4238,17 @@ def run_opt_button_clicked(
     # AES TODO debug: removing logout for now so I can inspect
     # with log_out:
 
+    # AES TODO UGH need to handle existing sim
     # clear empty trash simulations
     for _name in tuple(simulation_data.keys()):
         if len(simulation_data[_name]["dpls"]) == 0:
             del simulation_data[_name]
 
     _sim_name = widget_simulation_name.value
-    if simulation_data[_sim_name]["net"] is not None:
-        print("Simulation with the same name exists!")
-        simulation_status_bar.value = simulation_status_contents["failed"]
-        return
-
+    # if (simulation_data[_sim_name]["net"] + "_optimized") is not None:
+    #     print("Simulation with the same name exists!")
+    #     simulation_status_bar.value = simulation_status_contents["failed"]
+    #     return
 
     # breakpoint()  # AES debug
     # AES net is initialised at simulation_data[_sim_name]['net'], weird
@@ -4175,20 +4264,46 @@ def run_opt_button_clicked(
         add_drive=False,  # AES bc opt needs to add drives itself
     )
 
+
+    # ----------------------------------------------------------------------------------
+    # DEBUGGING ZONE
     # AES debug
     # AES TODO not working for some reason, investigate
     # Set the middle drive's checkbox off, just to keep things interesting
-    opt_drive_widgets[1]["mu_opt_checkbox"].value = False
+    # opt_drive_widgets[0]["mu_opt_checkbox"].value = False
+    # opt_drive_widgets[0]["weights_ampa"]["L2_pyramidal_opt_checkbox"].value = True
+    # opt_max_iter = 15
+
+    # AES for debugging readin
+    # from urllib.request import urlretrieve
+    # data_url = ('https://raw.githubusercontent.com/jonescompneurolab/hnn/master/'
+    #             'data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt')
+    # urlretrieve(data_url, 'yes_trial_S1_ERP_all_avg.txt')
+    from hnn_core import read_dipole
+    target_dipole = read_dipole('yes_trial_S1_ERP_all_avg.txt')
+    # target_dipole = read_dipole('S1_SupraT.txt')
+    # # UGHHHHH. Apparently some of our own dipole outputs can't be used?
+    # target_dipole = read_dipole('dpl2.txt')
+    # ------------------------------------------------------------------------------
+
+
+    # ----------------------------------------------------------------------------------
+    # # Extract the actual target data
+    # # Like everywhere else in the GUI, we only support usage of single-trial dipole data
+    # target_dipole = simulation_data[opt_target_data_name]["dpls"][0]
 
     def generate_constraints_and_func(net, opt_drive_widgets):
         # AES TODO params needs to be created dynamically based on which parameters
         # are checked
         # TODO this also means we have to dynamically create the variable names
         #
-        # Maybe first iterate through constraints, assemble param var names, and grab constraint values for those whose checkbox is true
-        # then later, use string matching to re-find them
-
         constraints = {}
+        # First, iterate through constraints, assemble param var names, and grab
+        # constraint values for those whose checkbox is true. This builds a
+        # `constraints` dictionary that is FLAT, where the keys are long variable names
+        # (with their context) for which the user has checked the checkbox, and their
+        # values are a tuple with their min and max constraints.
+        # ------------------------------------------------------------------------------
         for drive_idx, drive in enumerate(opt_drive_widgets):
             if drive["type"] in ("Tonic"):
                 # weights_amplitudes = _drive_widget_to_dict(drive, "amplitude")
@@ -4213,25 +4328,26 @@ def run_opt_button_clicked(
                 # synaptic_delays = _drive_widget_to_dict(drive, "delays")
                 # print(f"drive type is {drive['type']}, location={drive['location']}")
 
-                if drive["type"] == "Poisson":
-                    rate_constant = _drive_widget_to_dict(
-                        drive, "rate_constant"
-                    )
-
-                elif drive["type"] in ("Evoked", "Gaussian"):
-                    for kk in drive.keys():
+                # Synaptic variables are a special case, since they are dicts instead of
+                # single values
+                for syn_type in ("weights_ampa", "weights_nmda", "delays"):
+                    for key in drive[syn_type].keys():
                         # For every variable with a checkbox, but only if the checkbox
                         # is true/checked
-                        if ("_opt_checkbox" in kk) and (drive[kk]):
-                            # Extract the var name
-                            var_name = kk.split("_opt_checkbox")[0]
+                        if ("_opt_checkbox" in key) and (drive[syn_type][key].value):
+                            # Extract the var name, which in the complicated synaptic
+                            # case is ONLY the celltype
+                            var_name = key.split("_opt_checkbox")[0]
                             # Create a new, unique var name for this drive's instance of
                             # that variable, which will become our key in our
-                            # `constraints` dict
+                            # `constraints` dict. Since we are dealing with synaptic
+                            # variables, we ALSO need to add the type of weight/delay:
                             unique_param_name = str(
                                 drive["type"]
                                 + "_"
                                 + drive["name"]
+                                + "_"
+                                + syn_type
                                 + "_"
                                 + var_name
                             )
@@ -4240,10 +4356,46 @@ def run_opt_button_clicked(
                             # breakpoint()  # AES debug
                             constraints.update(
                                 {
-                                    unique_param_name: tuple([
-                                        drive[var_name + "_opt_min"].value,
-                                        drive[var_name + "_opt_max"].value,
-                                    ])
+                                    unique_param_name: tuple(
+                                        [
+                                            drive[syn_type][
+                                                var_name + "_opt_min"
+                                            ].value,
+                                            drive[syn_type][
+                                                var_name + "_opt_max"
+                                            ].value,
+                                        ]
+                                    )
+                                }
+                            )
+
+                if drive["type"] == "Poisson":
+                    rate_constant = _drive_widget_to_dict(drive, "rate_constant")
+
+                elif drive["type"] in ("Evoked", "Gaussian"):
+                    for key in drive.keys():
+                        # For every variable with a checkbox, but only if the checkbox
+                        # is true/checked
+                        if ("_opt_checkbox" in key) and (drive[key].value):
+                            # Extract the var name
+                            var_name = key.split("_opt_checkbox")[0]
+                            # Create a new, unique var name for this drive's instance of
+                            # that variable, which will become our key in our
+                            # `constraints` dict
+                            unique_param_name = str(
+                                drive["type"] + "_" + drive["name"] + "_" + var_name
+                            )
+                            # Use the unique name as the key, and add the bounds
+                            # bpoint works here
+                            # breakpoint()  # AES debug
+                            constraints.update(
+                                {
+                                    unique_param_name: tuple(
+                                        [
+                                            drive[var_name + "_opt_min"].value,
+                                            drive[var_name + "_opt_max"].value,
+                                        ]
+                                    )
                                 }
                             )
                             # AES debug note: if there's a bug, then strangely, the
@@ -4253,31 +4405,46 @@ def run_opt_button_clicked(
 
         # bpoint works here
         # breakpoint()  # AES debug
+
+        # Second, create a new `set_params` function that iterates through the drive
+        # widgets AGAIN, but which deploys our newly-created `constraints` dict:
+        # ------------------------------------------------------------------------------
         def set_params(net, params):
             for drive_idx, drive in enumerate(opt_drive_widgets):
                 # We know that every drive_widget is going to have a corresponding
                 # constraints dictionary, and their indices will match
 
-                def namegen(var):
+                def namegen(var, syn_type=None):
                     unique_param_name = str(
-                         drive["type"]
-                         + "_"
-                         + drive["name"]
-                         + "_"
-                         + var
+                        drive["type"]
+                        + "_"
+                        + drive["name"]
+                        + "_"
+                        + (syn_type + "_" if syn_type else "")
+                        + var
                     )
                     if unique_param_name in params.keys():
                         return unique_param_name
                     else:
                         return None
 
+                # def namegen_syn(syn_type, var):
+                #     unique_param_name = str(
+                #         drive["type"] + "_" + drive["name"] + "_" + syn_type + "_" + var
+                #     )
+                #     if unique_param_name in params.keys():
+                #         return unique_param_name
+                #     else:
+                #         return None
+
                 if drive["type"] in ("Tonic"):
-                    weights_amplitudes = _drive_widget_to_dict(drive, "amplitude")
-                    net.add_tonic_bias(
-                        amplitude=weights_amplitudes,
-                        t0=drive["t0"].value,
-                        tstop=drive["tstop"].value,
-                    )
+                    # weights_amplitudes = _drive_widget_to_dict(drive, "amplitude")
+                    # net.add_tonic_bias(
+                    #     amplitude=weights_amplitudes,
+                    #     t0=drive["t0"].value,
+                    #     tstop=drive["tstop"].value,
+                    # )
+                    pass
                 else:
                     sync_inputs_kwargs = dict(
                         n_drive_cells=(
@@ -4291,39 +4458,72 @@ def run_opt_button_clicked(
                     # AES TODO oof, next todo is working out weights. Instead of
                     # changing structure of "weights_ampa" dict, probably need to simply
                     # create other dicts that have the same per-celltype structure...
-                    weights_ampa = _drive_widget_to_dict(drive, "weights_ampa")
-                    weights_nmda = _drive_widget_to_dict(drive, "weights_nmda")
-                    synaptic_delays = _drive_widget_to_dict(drive, "delays")
+
+                    deployed_syn_dicts = {
+                        "weights_ampa" : {},
+                        "weights_nmda" : {},
+                        "delays" : {},
+                        }
+                    cell_types = [
+                        "L5_pyramidal",
+                        "L2_pyramidal",
+                        "L5_basket",
+                        "L2_basket",
+                    ]
+                    if drive["location"] == "distal":
+                        cell_types.remove("L5_basket")
+
+                    for syn_type in deployed_syn_dicts:
+                        for ct in cell_types:
+                            deployed_syn_dicts[syn_type].update(
+                                {
+                                    ct :
+                                    (
+                                        params[namegen(ct, syn_type)]
+                                        if namegen(ct, syn_type)
+                                        else drive[syn_type][ct].value
+                                    )
+                                }
+                            )
+
+                    # breakpoint()  # AES debug
+                    # weights_ampa = _drive_widget_to_dict(drive, "weights_ampa")
+                    # weights_nmda = _drive_widget_to_dict(drive, "weights_nmda")
+                    # synaptic_delays = _drive_widget_to_dict(drive, "delays")
                     print(
                         f"drive type is {drive['type']}, location={drive['location']}"
                     )
                     if drive["type"] == "Poisson":
+                        # AES is this a dictionary? huh?
                         rate_constant = _drive_widget_to_dict(drive, "rate_constant")
-
-                        # AES have all of these try to first use the param var if exists, then fallback to the drive?
                         net.add_poisson_drive(
                             name=drive["name"],
                             tstart=drive["tstart"].value,
                             tstop=drive["tstop"].value,
                             rate_constant=rate_constant,
                             location=drive["location"],
-                            weights_ampa=weights_ampa,
-                            weights_nmda=weights_nmda,
-                            synaptic_delays=synaptic_delays,
+                            weights_ampa=deployed_syn_dicts["weights_ampa"],
+                            weights_nmda=deployed_syn_dicts["weights_nmda"],
+                            synaptic_delays=deployed_syn_dicts["delays"],
                             space_constant=100.0,
                             event_seed=drive["seedcore"].value,
                             **sync_inputs_kwargs,
                         )
                     elif drive["type"] in ("Evoked", "Gaussian"):
+ # AES okay how to handle the weights/delays. Maybe use dict compre?
                         net.add_evoked_drive(
                             name=drive["name"],
-                            mu=(params[namegen("mu")] if namegen("mu") else drive["mu"].value),
+                            mu=(
+                                params[namegen("mu")]
+                                if namegen("mu")
+                                else drive["mu"].value
+                            ),
                             sigma=drive["sigma"].value,
                             numspikes=drive["numspikes"].value,
                             location=drive["location"],
-                            weights_ampa=weights_ampa,
-                            weights_nmda=weights_nmda,
-                            synaptic_delays=synaptic_delays,
+                            weights_ampa=deployed_syn_dicts["weights_ampa"],
+                            weights_nmda=deployed_syn_dicts["weights_nmda"],
+                            synaptic_delays=deployed_syn_dicts["delays"],
                             space_constant=3.0,
                             event_seed=drive["seedcore"].value,
                             **sync_inputs_kwargs,
@@ -4339,9 +4539,9 @@ def run_opt_button_clicked(
                             burst_rate=drive["burst_rate"].value,
                             burst_std=drive["burst_std"].value,
                             numspikes=drive["numspikes"].value,
-                            weights_ampa=weights_ampa,
-                            weights_nmda=weights_nmda,
-                            synaptic_delays=synaptic_delays,
+                            weights_ampa=deployed_syn_dicts["weights_ampa"],
+                            weights_nmda=deployed_syn_dicts["weights_nmda"],
+                            synaptic_delays=deployed_syn_dicts["delays"],
                             event_seed=drive["seedcore"].value,
                             **sync_inputs_kwargs,
                         )
@@ -4408,10 +4608,6 @@ def run_opt_button_clicked(
     # breakpoint()  # AES debug
 
 
-    # Extract the actual target data
-    # Like everywhere else in the GUI, we only support usage of single-trial dipole data
-    target_dipole = simulation_data[opt_target_data_name]["dpls"][0]
-
     # AES debug
     # backend_selection = "MPI"
 
@@ -4434,29 +4630,17 @@ def run_opt_button_clicked(
     with backend:
         simulation_status_bar.value = simulation_status_contents["opt_running"]
 
-        # # AES for debugging readin
-        # from urllib.request import urlretrieve
-        # from hnn_core import read_dipole
-        # # data_url = ('https://raw.githubusercontent.com/jonescompneurolab/hnn/master/'
-        # #             'data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt')
-        # # urlretrieve(data_url, 'yes_trial_S1_ERP_all_avg.txt')
-        # # dipole_experimental = read_dipole('yes_trial_S1_ERP_all_avg.txt')
-        # dipole_experimental = read_dipole('dpl2.txt')
-
         # breakpoint()  # AES debug
         print(f"Solver: {opt_solver}")
         print(f"Objective function: {opt_obj_fun}")
         print(f"Max iterations: {opt_max_iter}")
         print(f"Simulation duration: {opt_tstop} ms")
 
+        breakpoint()  # AES debug
+        # AES TODO trials
+        optim.fit(target=target_dipole, n_trials=1)
 
-        optim.fit(
-            target=target_dipole,
-            n_trials=1,
-        )
-
-
-        print(f"Optimization finished!")
+        print("Optimization finished!")
 
         # breakpoint()  # AES debug
 
@@ -4492,7 +4676,6 @@ def run_opt_button_clicked(
         # with self._log_out:
         # print("Starting optimization...")
 
-
         simulation_status_bar.value = simulation_status_contents["finished"]
 
         sim_names = [
@@ -4514,7 +4697,6 @@ def run_opt_button_clicked(
     # change default visualization params in viz_manager to mirror gui
     for widget, value in fig_default_params.items():
         viz_manager.fig_default_params[widget] = value
-
 
     viz_manager.add_figure()
     fig_name = _idx2figname(viz_manager.data["fig_idx"]["idx"] - 1)
