@@ -10,6 +10,8 @@ import mimetypes
 import numpy as np
 import sys
 import json
+import re
+import textwrap
 import urllib.parse
 import urllib.request
 import zipfile
@@ -4202,6 +4204,230 @@ def _build_opt_objects(
     return opt_drive_box, opt_drive_widget
 
 
+def generate_constraints_and_func(net, opt_drive_widgets):
+    # AES TODO params needs to be created dynamically based on which parameters
+    # are checked
+    # TODO this also means we have to dynamically create the variable names
+    #
+    constraints = {}
+    # First, iterate through set of variable-specific widgets for each drive, assemble
+    # param var names, and grab constraint values for those whose checkbox is true. This
+    # builds a `constraints` dictionary that is FLAT, where the keys are long variable
+    # names (with their context) for which the user has checked the checkbox, and their
+    # values are a tuple with their min and max constraints.
+    # ------------------------------------------------------------------------------
+    for drive_idx, drive in enumerate(opt_drive_widgets):
+        if drive["type"] in ("Tonic"):
+            # weights_amplitudes = _drive_widget_to_dict(drive, "amplitude")
+            # net.add_tonic_bias(
+            #     amplitude=weights_amplitudes,
+            #     t0=drive["t0"].value,
+            #     tstop=drive["tstop"].value,
+            # )
+            pass
+        else:
+            # sync_inputs_kwargs = dict(
+            #     n_drive_cells=(
+            #         "n_cells"
+            #         if drive["is_cell_specific"].value
+            #         else drive["n_drive_cells"].value
+            #     ),
+            #     cell_specific=drive["is_cell_specific"].value,
+            # )
+
+            # weights_ampa = _drive_widget_to_dict(drive, "weights_ampa")
+            # weights_nmda = _drive_widget_to_dict(drive, "weights_nmda")
+            # synaptic_delays = _drive_widget_to_dict(drive, "delays")
+            # print(f"drive type is {drive['type']}, location={drive['location']}")
+
+            # Synaptic variables are a special case, since they are dicts instead of
+            # single values
+            for syn_type in ("weights_ampa", "weights_nmda", "delays"):
+                for key in drive[syn_type].keys():
+                    # For every variable with a checkbox, but only if the checkbox
+                    # is true/checked
+                    if ("_opt_checkbox" in key) and (drive[syn_type][key].value):
+                        # Extract the var name, which in the complicated synaptic
+                        # case is ONLY the celltype
+                        var_name = key.split("_opt_checkbox")[0]
+                        # Create a new, unique var name for this drive's instance of
+                        # that variable, which will become our key in our
+                        # `constraints` dict. Since we are dealing with synaptic
+                        # variables, we ALSO need to add the type of weight/delay:
+                        unique_param_name = str(
+                            drive["type"]
+                            + "_"
+                            + drive["name"]
+                            + "_"
+                            + syn_type
+                            + "_"
+                            + var_name
+                        )
+                        # Use the unique name as the key, and add the bounds
+                        constraints.update(
+                            {
+                                unique_param_name: tuple(
+                                    [
+                                        drive[syn_type][var_name + "_opt_min"].value,
+                                        drive[syn_type][var_name + "_opt_max"].value,
+                                    ]
+                                )
+                            }
+                        )
+
+            if drive["type"] == "Poisson":
+                rate_constant = _drive_widget_to_dict(drive, "rate_constant")
+
+            elif drive["type"] in ("Evoked", "Gaussian"):
+                for key in drive.keys():
+                    # For every variable with a checkbox, but only if the checkbox
+                    # is true/checked
+                    if ("_opt_checkbox" in key) and (drive[key].value):
+                        # Extract the var name
+                        var_name = key.split("_opt_checkbox")[0]
+                        # Create a new, unique var name for this drive's instance of
+                        # that variable, which will become our key in our
+                        # `constraints` dict
+                        unique_param_name = str(
+                            drive["type"] + "_" + drive["name"] + "_" + var_name
+                        )
+                        # Use the unique name as the key, and add the bounds
+                        constraints.update(
+                            {
+                                unique_param_name: tuple(
+                                    [
+                                        drive[var_name + "_opt_min"].value,
+                                        drive[var_name + "_opt_max"].value,
+                                    ]
+                                )
+                            }
+                        )
+            elif drive["type"] in ("Rhythmic", "Bursty"):
+                pass
+
+    # Second, create a new `set_params` function that iterates through the drive
+    # widgets AGAIN, but which deploys our newly-created `constraints` dict:
+    # ------------------------------------------------------------------------------
+    def set_params(net, params):
+        for drive_idx, drive in enumerate(opt_drive_widgets):
+
+            def name_check(var, syn_type=None):
+                unique_param_name = str(
+                    drive["type"]
+                    + "_"
+                    + drive["name"]
+                    + "_"
+                    + (syn_type + "_" if syn_type else "")
+                    + var
+                )
+                if unique_param_name in params.keys():
+                    return unique_param_name
+                else:
+                    return None
+
+            def use_params_if_exists(var_name):
+                return (
+                    params[name_check(var_name)]
+                    if name_check(var_name)
+                    else drive[var_name].value
+                )
+
+            if drive["type"] in ("Tonic"):
+                # weights_amplitudes = _drive_widget_to_dict(drive, "amplitude")
+                # net.add_tonic_bias(
+                #     amplitude=weights_amplitudes,
+                #     t0=drive["t0"].value,
+                #     tstop=drive["tstop"].value,
+                # )
+                pass
+            else:
+                sync_inputs_kwargs = dict(
+                    n_drive_cells=(
+                        "n_cells"
+                        if drive["is_cell_specific"].value
+                        else drive["n_drive_cells"].value
+                    ),
+                    cell_specific=drive["is_cell_specific"].value,
+                )
+
+                deployed_syn_dicts = {
+                    "weights_ampa": {},
+                    "weights_nmda": {},
+                    "delays": {},
+                }
+                cell_types = [
+                    "L5_pyramidal",
+                    "L2_pyramidal",
+                    "L5_basket",
+                    "L2_basket",
+                ]
+                if drive["location"] == "distal":
+                    cell_types.remove("L5_basket")
+
+                for syn_type in deployed_syn_dicts:
+                    for ct in cell_types:
+                        deployed_syn_dicts[syn_type].update(
+                            {
+                                ct: (
+                                    params[name_check(ct, syn_type)]
+                                    if name_check(ct, syn_type)
+                                    else drive[syn_type][ct].value
+                                )
+                            }
+                        )
+
+                print(f"drive type is {drive['type']}, location={drive['location']}")
+                if drive["type"] == "Poisson":
+                    # AES TODO rate constants need to be treated like other per-celltype synaptic thingies
+                    rate_constant = _drive_widget_to_dict(drive, "rate_constant")
+                    net.add_poisson_drive(
+                        name=drive["name"],
+                        tstart=drive["tstart"].value,
+                        tstop=drive["tstop"].value,
+                        rate_constant=rate_constant,
+                        location=drive["location"],
+                        weights_ampa=deployed_syn_dicts["weights_ampa"],
+                        weights_nmda=deployed_syn_dicts["weights_nmda"],
+                        synaptic_delays=deployed_syn_dicts["delays"],
+                        space_constant=100.0,
+                        event_seed=drive["seedcore"].value,
+                        **sync_inputs_kwargs,
+                    )
+                elif drive["type"] in ("Evoked", "Gaussian"):
+                    net.add_evoked_drive(
+                        name=drive["name"],
+                        mu=use_params_if_exists("mu"),
+                        sigma=drive["sigma"].value,
+                        numspikes=drive["numspikes"].value,
+                        location=drive["location"],
+                        weights_ampa=deployed_syn_dicts["weights_ampa"],
+                        weights_nmda=deployed_syn_dicts["weights_nmda"],
+                        synaptic_delays=deployed_syn_dicts["delays"],
+                        space_constant=3.0,
+                        event_seed=drive["seedcore"].value,
+                        **sync_inputs_kwargs,
+                    )
+
+                elif drive["type"] in ("Rhythmic", "Bursty"):
+                    net.add_bursty_drive(
+                        name=drive["name"],
+                        tstart=drive["tstart"].value,
+                        tstart_std=drive["tstart_std"].value,
+                        tstop=drive["tstop"].value,
+                        location=drive["location"],
+                        burst_rate=drive["burst_rate"].value,
+                        burst_std=drive["burst_std"].value,
+                        numspikes=drive["numspikes"].value,
+                        weights_ampa=deployed_syn_dicts["weights_ampa"],
+                        weights_nmda=deployed_syn_dicts["weights_nmda"],
+                        synaptic_delays=deployed_syn_dicts["delays"],
+                        event_seed=drive["seedcore"].value,
+                        **sync_inputs_kwargs,
+                    )
+
+    return set_params, constraints
+
+
 def run_opt_button_clicked(
     widget_simulation_name,
     log_out,
@@ -4232,479 +4458,270 @@ def run_opt_button_clicked(
     opt_tstop,
     opt_target_data_name,
 ):
-    """Run the simulation and plot outputs."""
-    simulation_data = all_data["simulation_data"]
-    # AES annoyingly, with logout seems to prevent PDB usage inside pytest
-    # AES TODO debug: removing logout for now so I can inspect
-    # with log_out:
+    """Run the simulation and plot outputs.
 
-    # AES TODO UGH need to handle existing sim
-    # clear empty trash simulations
-    for _name in tuple(simulation_data.keys()):
-        if len(simulation_data[_name]["dpls"]) == 0:
-            del simulation_data[_name]
+    This was initially built from copying `run_button_clicked`.
+    """
+    with log_out:
+        # Sim data setup (and related input validation)
+        # ------------------------------------------------------------------------------
+        simulation_data = all_data["simulation_data"]
 
-    _sim_name = widget_simulation_name.value
-    # if (simulation_data[_sim_name]["net"] + "_optimized") is not None:
-    #     print("Simulation with the same name exists!")
-    #     simulation_status_bar.value = simulation_status_contents["failed"]
-    #     return
+        # clear empty trash simulations
+        # AES: a "trash" simulation appears to be created (named "default") even if all
+        # a user does is load an external dipole data file. However, I do not fully
+        # understand how VizManager et al. manages the simulation data (I find it very
+        # confusing) so I am NOT touching it.
+        for _name in tuple(simulation_data.keys()):
+            if len(simulation_data[_name]["dpls"]) == 0:
+                del simulation_data[_name]
 
-    # breakpoint()  # AES debug
-    # AES net is initialised at simulation_data[_sim_name]['net'], weird
-    _init_network_from_widgets(
-        params,
-        dt,
-        tstop,
-        simulation_data[_sim_name],
-        opt_drive_widgets,
-        connectivity_textfields,
-        cell_parameters_widgets,
-        global_gain_textfields,
-        add_drive=False,  # AES bc opt needs to add drives itself
-    )
+        # AES TODO UGH need to handle existing sim
+        _sim_name = widget_simulation_name.value
 
+        # Target data extraction (and related input validation)
+        # ------------------------------------------------------------------------------
+        if not opt_target_data_name:
+            # In this case, they probably have not run any simulations or loaded any data.
+            logger.error(
+                textwrap.dedent("""
+                You have not selected a dataset to use as the target of
+                optimization. Please load and select a dataset of dipole data to
+                optimize towards.
+                """).replace("\n", " ")
+            )
+            simulation_status_bar.value = simulation_status_contents["failed"]
+            return
+        elif (opt_target_data_name == "default") and (
+            not simulation_data["default"]["dpls"]
+        ):
+            # In this case, they have selected "default", which is the default name of
+            # the first simulation, BUT they have not actually run any simulations
+            # yet. They likely either want to compare against a simulation result, or
+            # (more likely) forgot to load their experimental target data first.
+            #
+            # ATTN: How we want to handle this, and what we want to communicate, needs
+            # some discussion and thinking.
+            logger.error(
+                textwrap.dedent("""
+                You have selected the 'default' dataset to use as the target of
+                optimization, but there is no dipole data associated with that dataset.
+                Please either load and select a dataset of dipole data to optimize
+                towards, or run a simulation first if you want to optimize against that
+                simulation.
+                """).replace("\n", " ")
+            )
+            simulation_status_bar.value = simulation_status_contents["failed"]
+            return
+        else:
+            # Extract the actual target data
+            # Like everywhere else in the GUI, we only support usage of single-trial
+            # dipole data.
+            target_dipole = simulation_data[opt_target_data_name]["dpls"][0]
 
-    # ----------------------------------------------------------------------------------
-    # DEBUGGING ZONE
-    # AES debug
-    # AES TODO not working for some reason, investigate
-    # Set the middle drive's checkbox off, just to keep things interesting
-    # opt_drive_widgets[0]["mu_opt_checkbox"].value = False
-    # opt_drive_widgets[0]["weights_ampa"]["L2_pyramidal_opt_checkbox"].value = True
-    # opt_max_iter = 15
+        # Input validation
+        # ------------------------------------------------------------------------------
+        # Note that this function initializes our `Network` object at
+        # `simulation_data[_sim_name]['net']`, which we will use later. If a user has
+        # previously run a simulation for this `_sim_name`, then this will *overwrite*
+        # the `Network` object at that location. The only difference, however, is that
+        # drives will not be added at this step, due to `add_drive=False`. We need this
+        # because Optimization needs to have complete control over how drives are added,
+        # since the drives need to be added in the Optimizer's `set_params` function.
+        _init_network_from_widgets(
+            params,
+            dt,
+            tstop,
+            simulation_data[_sim_name],
+            opt_drive_widgets,
+            connectivity_textfields,
+            cell_parameters_widgets,
+            global_gain_textfields,
+            add_drive=False,
+        )
 
-    # AES for debugging readin
-    # from urllib.request import urlretrieve
-    # data_url = ('https://raw.githubusercontent.com/jonescompneurolab/hnn/master/'
-    #             'data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt')
-    # urlretrieve(data_url, 'yes_trial_S1_ERP_all_avg.txt')
-    from hnn_core import read_dipole
-    target_dipole = read_dipole('yes_trial_S1_ERP_all_avg.txt')
-    # target_dipole = read_dipole('S1_SupraT.txt')
-    # # UGHHHHH. Apparently some of our own dipole outputs can't be used?
-    # target_dipole = read_dipole('dpl2.txt')
-    # ------------------------------------------------------------------------------
-
-
-    # ----------------------------------------------------------------------------------
-    # # Extract the actual target data
-    # # Like everywhere else in the GUI, we only support usage of single-trial dipole data
-    # target_dipole = simulation_data[opt_target_data_name]["dpls"][0]
-
-    def generate_constraints_and_func(net, opt_drive_widgets):
-        # AES TODO params needs to be created dynamically based on which parameters
-        # are checked
-        # TODO this also means we have to dynamically create the variable names
+        # Dynamically create both the constraints and the param-applying-function
+        # ------------------------------------------------------------------------------
         #
-        constraints = {}
-        # First, iterate through constraints, assemble param var names, and grab
-        # constraint values for those whose checkbox is true. This builds a
-        # `constraints` dictionary that is FLAT, where the keys are long variable names
-        # (with their context) for which the user has checked the checkbox, and their
-        # values are a tuple with their min and max constraints.
         # ------------------------------------------------------------------------------
-        for drive_idx, drive in enumerate(opt_drive_widgets):
-            if drive["type"] in ("Tonic"):
-                # weights_amplitudes = _drive_widget_to_dict(drive, "amplitude")
-                # net.add_tonic_bias(
-                #     amplitude=weights_amplitudes,
-                #     t0=drive["t0"].value,
-                #     tstop=drive["tstop"].value,
-                # )
-                pass
-            else:
-                # sync_inputs_kwargs = dict(
-                #     n_drive_cells=(
-                #         "n_cells"
-                #         if drive["is_cell_specific"].value
-                #         else drive["n_drive_cells"].value
-                #     ),
-                #     cell_specific=drive["is_cell_specific"].value,
-                # )
+        # THE AES DEBUGGGGG ZONE
+        # AES TODO not working for some reason, investigate
+        # Set the middle drive's checkbox off, just to keep things interesting
+        # opt_drive_widgets[0]["mu_opt_checkbox"].value = False
+        opt_drive_widgets[0]["weights_ampa"]["L2_pyramidal_opt_checkbox"].value = True
+        # opt_max_iter = 15
+        opt_max_iter = 3
+        n_jobs.value = 11
 
-                # weights_ampa = _drive_widget_to_dict(drive, "weights_ampa")
-                # weights_nmda = _drive_widget_to_dict(drive, "weights_nmda")
-                # synaptic_delays = _drive_widget_to_dict(drive, "delays")
-                # print(f"drive type is {drive['type']}, location={drive['location']}")
+        # # AES for debugging readin
+        # # from urllib.request import urlretrieve
+        # # data_url = ('https://raw.githubusercontent.com/jonescompneurolab/hnn/master/'
+        # #             'data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt')
+        # # urlretrieve(data_url, 'yes_trial_S1_ERP_all_avg.txt')
+        # from hnn_core import read_dipole
+        # target_dipole = read_dipole('yes_trial_S1_ERP_all_avg.txt')
+        # # target_dipole = read_dipole('S1_SupraT.txt')
+        # # # UGHHHHH. Apparently some of our own dipole outputs can't be used?
+        # # target_dipole = read_dipole('dpl2.txt')
 
-                # Synaptic variables are a special case, since they are dicts instead of
-                # single values
-                for syn_type in ("weights_ampa", "weights_nmda", "delays"):
-                    for key in drive[syn_type].keys():
-                        # For every variable with a checkbox, but only if the checkbox
-                        # is true/checked
-                        if ("_opt_checkbox" in key) and (drive[syn_type][key].value):
-                            # Extract the var name, which in the complicated synaptic
-                            # case is ONLY the celltype
-                            var_name = key.split("_opt_checkbox")[0]
-                            # Create a new, unique var name for this drive's instance of
-                            # that variable, which will become our key in our
-                            # `constraints` dict. Since we are dealing with synaptic
-                            # variables, we ALSO need to add the type of weight/delay:
-                            unique_param_name = str(
-                                drive["type"]
-                                + "_"
-                                + drive["name"]
-                                + "_"
-                                + syn_type
-                                + "_"
-                                + var_name
-                            )
-                            # Use the unique name as the key, and add the bounds
-                            # bpoint works here
-                            # breakpoint()  # AES debug
-                            constraints.update(
-                                {
-                                    unique_param_name: tuple(
-                                        [
-                                            drive[syn_type][
-                                                var_name + "_opt_min"
-                                            ].value,
-                                            drive[syn_type][
-                                                var_name + "_opt_max"
-                                            ].value,
-                                        ]
-                                    )
-                                }
-                            )
+        set_params_func, constraints = generate_constraints_and_func(
+            simulation_data[_sim_name]["net"],
+            opt_drive_widgets,
+        )
+        if not constraints:
+            logger.error(
+                textwrap.dedent("""
+                You have not selected any parameters to constrain in the optimization.
+                Please select some parameters using the checkboxes, and try again.
+                """).replace("\n", " ")
+            )
+            simulation_status_bar.value = simulation_status_contents["failed"]
+            return
 
-                if drive["type"] == "Poisson":
-                    rate_constant = _drive_widget_to_dict(drive, "rate_constant")
-
-                elif drive["type"] in ("Evoked", "Gaussian"):
-                    for key in drive.keys():
-                        # For every variable with a checkbox, but only if the checkbox
-                        # is true/checked
-                        if ("_opt_checkbox" in key) and (drive[key].value):
-                            # Extract the var name
-                            var_name = key.split("_opt_checkbox")[0]
-                            # Create a new, unique var name for this drive's instance of
-                            # that variable, which will become our key in our
-                            # `constraints` dict
-                            unique_param_name = str(
-                                drive["type"] + "_" + drive["name"] + "_" + var_name
-                            )
-                            # Use the unique name as the key, and add the bounds
-                            # bpoint works here
-                            # breakpoint()  # AES debug
-                            constraints.update(
-                                {
-                                    unique_param_name: tuple(
-                                        [
-                                            drive[var_name + "_opt_min"].value,
-                                            drive[var_name + "_opt_max"].value,
-                                        ]
-                                    )
-                                }
-                            )
-                            # AES debug note: if there's a bug, then strangely, the
-                            # breakpoint is skipped sometimes...
-                elif drive["type"] in ("Rhythmic", "Bursty"):
-                    pass
-
-        # bpoint works here
-        # breakpoint()  # AES debug
-
-        # Second, create a new `set_params` function that iterates through the drive
-        # widgets AGAIN, but which deploys our newly-created `constraints` dict:
+        # Instantiate our Optimizer object
         # ------------------------------------------------------------------------------
-        def set_params(net, params):
-            for drive_idx, drive in enumerate(opt_drive_widgets):
-                # We know that every drive_widget is going to have a corresponding
-                # constraints dictionary, and their indices will match
+        # This uses our recreated `Network` object (which has NO current drives), our
+        # new dynamically-created constraints, and our similarly-created params function
+        # to build our Optimizer. All other arguments are simply pulled from their GUI
+        # values directly.
+        optim = Optimizer(
+            initial_net=simulation_data[_sim_name]["net"],
+            tstop=opt_tstop,
+            constraints=constraints,
+            set_params=set_params_func,
+            solver=opt_solver,
+            obj_fun=opt_obj_fun,
+            max_iter=opt_max_iter,
+        )
 
-                def namegen(var, syn_type=None):
-                    unique_param_name = str(
-                        drive["type"]
-                        + "_"
-                        + drive["name"]
-                        + "_"
-                        + (syn_type + "_" if syn_type else "")
-                        + var
+        # Setup simulation backends
+        # ------------------------------------------------------------------------------
+        if backend_selection.value == "MPI":
+            # 'use_hwthreading_if_found' and 'sensible_default_cores' have
+            # already been set elsewhere, and do not need to be re-set here.
+            # Hardware-threading and oversubscription will always be disabled
+            # to prevent edge cases in the GUI.
+            backend = MPIBackend(
+                n_procs=n_jobs.value,
+                mpi_cmd=mpi_cmd.value,
+                override_hwthreading_option=False,
+                override_oversubscribe_option=False,
+            )
+        else:
+            backend = JoblibBackend(n_jobs=n_jobs.value)
+            print(f"Using Joblib with {n_jobs.value} core(s).")
+
+        with backend:
+            simulation_status_bar.value = simulation_status_contents["opt_running"]
+            logger.info("Optimization started.")
+            logger.info(f"Solver: {opt_solver}")
+            logger.info(f"Objective function: {opt_obj_fun}")
+            logger.info(f"Max iterations: {opt_max_iter}")
+            logger.info(f"Simulation duration: {opt_tstop} ms")
+
+            # Execute optimization
+            # --------------------------------------------------------------------------
+            # AES TODO maximize PSD, which requires even more parameters, yay
+            try:
+                if opt_obj_fun == "dipole_rmse":
+                    optim.fit(target=target_dipole, n_trials=ntrials.value)
+            except Exception as e:
+                logger.error(
+                    f"Optimization fitting failed due to exception: '{e}'",
+                    exc_info=True,
+                )
+                simulation_status_bar.value = simulation_status_contents["failed"]
+                raise
+
+            logger.info("Optimization finished!")
+
+            # AES DEBUG mode
+            # # Check if optimization showed ANY difference in the objective function. If
+            # # it did not, then we made no progress, and there's no point in
+            # # re-simulating or displaying the output.
+            # if np.all(optim.obj_ == optim.obj_[0]):
+            #     logger.error(
+            #         textwrap.dedent("""
+            #         The objective function did not change over the course of the
+            #         optimization. You probably need to increase the number of max
+            #         iterations in order to start converging.
+            #         """).replace("\n", " ")
+            #     )
+            #     simulation_status_bar.value = simulation_status_contents["failed"]
+            #     return
+
+            # --------------------------------------------------------------------------
+            # Now, let's resimulate the final version of the optimized network for usage
+            # and display it in the GUI
+            #
+            # First, let's make our new simulation name.
+            if (_sim_name + "_optimized") in simulation_data.keys():
+                # Let's handle our output simulation name in the case that there are
+                # pre-existing datasets with the names we want to use, such as if they
+                # are executing a second round of Optimization, or their simulation name
+                # just happens to end in "_optimized" by coincidence:
+                if (_sim_name + "_optimized" + "_1") in simulation_data.keys():
+                    predecessor_sim_suffix_number = []
+                    for key in simulation_data.keys():
+                        match = re.search(r"_(\d+)$", key)
+                        if match:
+                            predecessor_sim_suffix_number.append(int(match.group(1)))
+                    new_name = (
+                        _sim_name
+                        + "_optimized"
+                        + f"_{max(predecessor_sim_suffix_number) + 1}"
                     )
-                    if unique_param_name in params.keys():
-                        return unique_param_name
-                    else:
-                        return None
-
-                # def namegen_syn(syn_type, var):
-                #     unique_param_name = str(
-                #         drive["type"] + "_" + drive["name"] + "_" + syn_type + "_" + var
-                #     )
-                #     if unique_param_name in params.keys():
-                #         return unique_param_name
-                #     else:
-                #         return None
-
-                if drive["type"] in ("Tonic"):
-                    # weights_amplitudes = _drive_widget_to_dict(drive, "amplitude")
-                    # net.add_tonic_bias(
-                    #     amplitude=weights_amplitudes,
-                    #     t0=drive["t0"].value,
-                    #     tstop=drive["tstop"].value,
-                    # )
-                    pass
                 else:
-                    sync_inputs_kwargs = dict(
-                        n_drive_cells=(
-                            "n_cells"
-                            if drive["is_cell_specific"].value
-                            else drive["n_drive_cells"].value
-                        ),
-                        cell_specific=drive["is_cell_specific"].value,
-                    )
+                    new_name = _sim_name + "_optimized" + "_1"
+            else:
+                new_name = _sim_name + "_optimized"
 
-                    # AES TODO oof, next todo is working out weights. Instead of
-                    # changing structure of "weights_ampa" dict, probably need to simply
-                    # create other dicts that have the same per-celltype structure...
+            # Now let's use the final version of the optimized Network, and use it to
+            # simulate
+            simulation_data[new_name]["net"] = optim.net_
+            simulation_data[new_name]["dpls"] = simulate_dipole(
+                simulation_data[new_name]["net"],
+                tstop=tstop.value,
+                dt=dt.value,
+                n_trials=ntrials.value,
+            )
+            simulation_status_bar.value = simulation_status_contents["finished"]
 
-                    deployed_syn_dicts = {
-                        "weights_ampa" : {},
-                        "weights_nmda" : {},
-                        "delays" : {},
-                        }
-                    cell_types = [
-                        "L5_pyramidal",
-                        "L2_pyramidal",
-                        "L5_basket",
-                        "L2_basket",
-                    ]
-                    if drive["location"] == "distal":
-                        cell_types.remove("L5_basket")
+            # AES TODO Maybe force a file-save of the final network params too
+            # automatically? This is a good spot to do it
 
-                    for syn_type in deployed_syn_dicts:
-                        for ct in cell_types:
-                            deployed_syn_dicts[syn_type].update(
-                                {
-                                    ct :
-                                    (
-                                        params[namegen(ct, syn_type)]
-                                        if namegen(ct, syn_type)
-                                        else drive[syn_type][ct].value
-                                    )
-                                }
-                            )
+            # Finally, update the list of simulations to include our new one:
+            sim_names = [
+                sim_name
+                for sim_name in simulation_data
+                if simulation_data[sim_name]["net"] is not None
+            ]
+            simulations_list_widget.options = sim_names
+            simulations_list_widget.value = sim_names[0]
 
-                    # breakpoint()  # AES debug
-                    # weights_ampa = _drive_widget_to_dict(drive, "weights_ampa")
-                    # weights_nmda = _drive_widget_to_dict(drive, "weights_nmda")
-                    # synaptic_delays = _drive_widget_to_dict(drive, "delays")
-                    print(
-                        f"drive type is {drive['type']}, location={drive['location']}"
-                    )
-                    if drive["type"] == "Poisson":
-                        # AES is this a dictionary? huh?
-                        rate_constant = _drive_widget_to_dict(drive, "rate_constant")
-                        net.add_poisson_drive(
-                            name=drive["name"],
-                            tstart=drive["tstart"].value,
-                            tstop=drive["tstop"].value,
-                            rate_constant=rate_constant,
-                            location=drive["location"],
-                            weights_ampa=deployed_syn_dicts["weights_ampa"],
-                            weights_nmda=deployed_syn_dicts["weights_nmda"],
-                            synaptic_delays=deployed_syn_dicts["delays"],
-                            space_constant=100.0,
-                            event_seed=drive["seedcore"].value,
-                            **sync_inputs_kwargs,
-                        )
-                    elif drive["type"] in ("Evoked", "Gaussian"):
- # AES okay how to handle the weights/delays. Maybe use dict compre?
-                        net.add_evoked_drive(
-                            name=drive["name"],
-                            mu=(
-                                params[namegen("mu")]
-                                if namegen("mu")
-                                else drive["mu"].value
-                            ),
-                            sigma=drive["sigma"].value,
-                            numspikes=drive["numspikes"].value,
-                            location=drive["location"],
-                            weights_ampa=deployed_syn_dicts["weights_ampa"],
-                            weights_nmda=deployed_syn_dicts["weights_nmda"],
-                            synaptic_delays=deployed_syn_dicts["delays"],
-                            space_constant=3.0,
-                            event_seed=drive["seedcore"].value,
-                            **sync_inputs_kwargs,
-                        )
+        # ------------------------------------------------------------------------------
+        # The remainder of this function is just repeating some post-run visualization
+        # steps, which are identical to those in `run_button_clicked`
+        viz_manager.reset_fig_config_tabs()
 
-                    elif drive["type"] in ("Rhythmic", "Bursty"):
-                        net.add_bursty_drive(
-                            name=drive["name"],
-                            tstart=drive["tstart"].value,
-                            tstart_std=drive["tstart_std"].value,
-                            tstop=drive["tstop"].value,
-                            location=drive["location"],
-                            burst_rate=drive["burst_rate"].value,
-                            burst_std=drive["burst_std"].value,
-                            numspikes=drive["numspikes"].value,
-                            weights_ampa=deployed_syn_dicts["weights_ampa"],
-                            weights_nmda=deployed_syn_dicts["weights_nmda"],
-                            synaptic_delays=deployed_syn_dicts["delays"],
-                            event_seed=drive["seedcore"].value,
-                            **sync_inputs_kwargs,
-                        )
+        # update default visualization params in gui based on widget
+        fig_default_params["default_smoothing"] = widget_default_smoothing.value
+        fig_default_params["default_scaling"] = widget_default_scaling.value
+        fig_default_params["default_min_frequency"] = widget_min_frequency.value
+        fig_default_params["default_max_frequency"] = widget_max_frequency.value
 
-            # # ---------------
-            # # from Carolina's examples:
-            # # Proximal (alpha)
-            # weights_ampa_p = {
-            #     "L2_pyramidal": params["alpha_prox_weight"],
-            #     "L5_pyramidal": 4.4e-5,
-            # }
-            # syn_delays_p = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
+        # change default visualization params in viz_manager to mirror gui
+        for widget, value in fig_default_params.items():
+            viz_manager.fig_default_params[widget] = value
 
-            # net.add_bursty_drive(
-            #     "alpha_prox",
-            #     tstart=params["alpha_prox_tstart"],
-            #     burst_rate=params["alpha_prox_burst_rate"],
-            #     burst_std=params["alpha_prox_burst_std"],
-            #     numspikes=2,
-            #     spike_isi=10,
-            #     n_drive_cells=10,
-            #     location="proximal",
-            #     weights_ampa=weights_ampa_p,
-            #     synaptic_delays=syn_delays_p,
-            # )
-
-            # # Distal (beta)
-            # weights_ampa_d = {
-            #     "L2_pyramidal": params["alpha_dist_weight"],
-            #     "L5_pyramidal": 4.4e-5,
-            # }
-            # syn_delays_d = {"L2_pyramidal": 5.0, "L5_pyramidal": 5.0}
-
-            # net.add_bursty_drive(
-            #     "alpha_dist",
-            #     tstart=params["alpha_dist_tstart"],
-            #     burst_rate=params["alpha_dist_burst_rate"],
-            #     burst_std=params["alpha_dist_burst_std"],
-            #     numspikes=2,
-            #     spike_isi=10,
-            #     n_drive_cells=10,
-            #     location="distal",
-            #     weights_ampa=weights_ampa_d,
-            #     synaptic_delays=syn_delays_d,
-            # )
-
-        return set_params, constraints
-
-    set_params_func, constraints = generate_constraints_and_func(
-        simulation_data[_sim_name]["net"],
-        opt_drive_widgets,
-    )
-
-    # Create optimizer
-    optim = Optimizer(
-        initial_net=simulation_data[_sim_name]["net"],
-        tstop=opt_tstop,
-        constraints=constraints,
-        set_params=set_params_func,
-        solver=opt_solver,
-        obj_fun=opt_obj_fun,
-        max_iter=opt_max_iter,
-    )
-    # breakpoint()  # AES debug
-
-
-    # AES debug
-    # backend_selection = "MPI"
-
-    print("start simulation")
-    if backend_selection.value == "MPI":
-        # 'use_hwthreading_if_found' and 'sensible_default_cores' have
-        # already been set elsewhere, and do not need to be re-set here.
-        # Hardware-threading and oversubscription will always be disabled
-        # to prevent edge cases in the GUI.
-        backend = MPIBackend(
-            # n_procs=n_jobs.value,
-            n_procs=11,  # AES debug
-            mpi_cmd=mpi_cmd.value,
-            override_hwthreading_option=False,
-            override_oversubscribe_option=False,
-        )
-    else:
-        backend = JoblibBackend(n_jobs=n_jobs.value)
-        print(f"Using Joblib with {n_jobs.value} core(s).")
-    with backend:
-        simulation_status_bar.value = simulation_status_contents["opt_running"]
-
-        # breakpoint()  # AES debug
-        print(f"Solver: {opt_solver}")
-        print(f"Objective function: {opt_obj_fun}")
-        print(f"Max iterations: {opt_max_iter}")
-        print(f"Simulation duration: {opt_tstop} ms")
-
-        breakpoint()  # AES debug
-        # AES TODO trials
-        optim.fit(target=target_dipole, n_trials=1)
-
-        print("Optimization finished!")
-
-        # breakpoint()  # AES debug
-
-        # AES Now, let's resimulate (if necessary) the final version of the optimized network for usage and display in the GU
-
-        simulation_data[_sim_name + "_optimized"]["net"] = optim.net_
-
-        simulation_data[_sim_name + "_optimized"]["dpls"] = simulate_dipole(
-            simulation_data[_sim_name + "_optimized"]["net"],
-            tstop=tstop.value,
-            dt=dt.value,
-            n_trials=ntrials.value,
-        )
-
-        # # AES original actual run
-        # simulation_data[_sim_name]["dpls"] = simulate_dipole(
-        #     simulation_data[_sim_name]["net"],
-        #     tstop=tstop.value,
-        #     dt=dt.value,
-        #     n_trials=ntrials.value,
-        # )
-
-        # AES TODO
-        # 1. DONE Existing Opt tab needs to be updated with drives-accordion, including when
-        # drives are manipulated, added, or removed
-        # 2. Once opt tab is full, THEN we worry about executing
-        # 3. need initial data loaded
-        # ???
-        # X. take final output params, and load them BACK in the GUI
-        # X. Maybe force a save of the final network params too automatically?
-
-        # TODO put this in log
-        # with self._log_out:
-        # print("Starting optimization...")
-
-        simulation_status_bar.value = simulation_status_contents["finished"]
-
-        sim_names = [
-            sim_name
-            for sim_name in simulation_data
-            if simulation_data[sim_name]["net"] is not None
-        ]
-        simulations_list_widget.options = sim_names
-        simulations_list_widget.value = sim_names[0]
-
-    viz_manager.reset_fig_config_tabs()
-
-    # update default visualization params in gui based on widget
-    fig_default_params["default_smoothing"] = widget_default_smoothing.value
-    fig_default_params["default_scaling"] = widget_default_scaling.value
-    fig_default_params["default_min_frequency"] = widget_min_frequency.value
-    fig_default_params["default_max_frequency"] = widget_max_frequency.value
-
-    # change default visualization params in viz_manager to mirror gui
-    for widget, value in fig_default_params.items():
-        viz_manager.fig_default_params[widget] = value
-
-    viz_manager.add_figure()
-    fig_name = _idx2figname(viz_manager.data["fig_idx"]["idx"] - 1)
-    ax_plots = [("ax0", "input histogram"), ("ax1", "current dipole")]
-    for ax_name, plot_type in ax_plots:
-        viz_manager._simulate_edit_figure(
-            fig_name, ax_name, (_sim_name + "_optimized"), plot_type, {}, "plot"
-        )
+        viz_manager.add_figure()
+        fig_name = _idx2figname(viz_manager.data["fig_idx"]["idx"] - 1)
+        ax_plots = [("ax0", "input histogram"), ("ax1", "current dipole")]
+        for ax_name, plot_type in ax_plots:
+            # AES TODO: for dipole_rmse, auto-plot the target data too
+            viz_manager._simulate_edit_figure(
+                fig_name, ax_name, (_sim_name + "_optimized"), plot_type, {}, "plot"
+            )
 
 
 def launch():

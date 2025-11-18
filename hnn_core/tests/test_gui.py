@@ -1583,13 +1583,21 @@ def test_gui_run_optimization():
     gui.widget_tstop.value = 170
     gui.widget_dt.value = 0.025
     gui.widget_backend_selection.value = "MPI"
+
     # gui.widget_ntrials.value = 2
+    # gui.opt_max_iter = 3
+
+    gui.run_button.click()
 
     # doesn't work for real files???
     # file1_path = hnn_core_root / "dpl2.txt"
     file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt"  # noqa
     gui._simulate_upload_data(file1_url)
     # breakpoint()  # AES debug
+
+    # Enable some values that we want to constrain for the optimization
+    gui.opt_drive_widgets[0]["mu_opt_checkbox"].value = True
+    gui.opt_drive_widgets[0]["weights_ampa"]["L2_pyramidal_opt_checkbox"].value = True
 
     gui.run_opt_button.click()
 
