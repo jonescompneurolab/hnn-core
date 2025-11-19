@@ -4352,13 +4352,55 @@ def _build_opt_objects(
 
 
 def generate_constraints_and_func(net, opt_drive_widgets):
+    """TODO
+
+    This was originally adapted from a combination of the code in
+    _init_network_from_widgets and ???
+    """
     constraints = {}
+
     # First, iterate through set of variable-specific widgets for each drive, assemble
     # param var names, and grab constraint values for those whose checkbox is true. This
     # builds a `constraints` dictionary that is FLAT, where the keys are long variable
     # names (with their context) for which the user has checked the checkbox, and their
     # values are a tuple with their min and max constraints.
     # ------------------------------------------------------------------------------
+    def _build_constraints(drive, syn_type=None):
+        output_constraints = {}
+        if syn_type:
+            input_dict = drive[syn_type]
+        else:
+            input_dict = drive
+        for key in input_dict.keys():
+            # For every variable with a checkbox, but only if the checkbox
+            # is true/checked
+            if ("_opt_checkbox" in key) and (input_dict[key].value):
+                # Extract the var name
+                var_name = key.split("_opt_checkbox")[0]
+                # Create a new, unique var name for this drive's instance of
+                # that variable, which will become our key in our
+                # `input_constraints` dict
+                unique_param_name = str(
+                    drive["type"]
+                    + "_"
+                    + drive["name"]
+                    + "_"
+                    + (syn_type + "_" if syn_type else "")
+                    + var_name
+                )
+                # Use the unique name as the key, and add the bounds
+                output_constraints.update(
+                    {
+                        unique_param_name: tuple(
+                            [
+                                input_dict[var_name + "_opt_min"].value,
+                                input_dict[var_name + "_opt_max"].value,
+                            ]
+                        )
+                    }
+                )
+        return output_constraints
+
     for drive_idx, drive in enumerate(opt_drive_widgets):
         if drive["type"] in ("Tonic"):
             # weights_amplitudes = _drive_widget_to_dict(drive, "amplitude")
@@ -4369,83 +4411,17 @@ def generate_constraints_and_func(net, opt_drive_widgets):
             # )
             pass
         else:
-            # sync_inputs_kwargs = dict(
-            #     n_drive_cells=(
-            #         "n_cells"
-            #         if drive["is_cell_specific"].value
-            #         else drive["n_drive_cells"].value
-            #     ),
-            #     cell_specific=drive["is_cell_specific"].value,
-            # )
-
-            # weights_ampa = _drive_widget_to_dict(drive, "weights_ampa")
-            # weights_nmda = _drive_widget_to_dict(drive, "weights_nmda")
-            # synaptic_delays = _drive_widget_to_dict(drive, "delays")
-            # print(f"drive type is {drive['type']}, location={drive['location']}")
-
             # Synaptic variables are a special case, since they are dicts instead of
             # single values
             for syn_type in ("weights_ampa", "weights_nmda", "delays"):
-                for key in drive[syn_type].keys():
-                    # For every variable with a checkbox, but only if the checkbox
-                    # is true/checked
-                    if ("_opt_checkbox" in key) and (drive[syn_type][key].value):
-                        # Extract the var name, which in the complicated synaptic
-                        # case is ONLY the celltype
-                        var_name = key.split("_opt_checkbox")[0]
-                        # Create a new, unique var name for this drive's instance of
-                        # that variable, which will become our key in our
-                        # `constraints` dict. Since we are dealing with synaptic
-                        # variables, we ALSO need to add the type of weight/delay:
-                        unique_param_name = str(
-                            drive["type"]
-                            + "_"
-                            + drive["name"]
-                            + "_"
-                            + syn_type
-                            + "_"
-                            + var_name
-                        )
-                        # Use the unique name as the key, and add the bounds
-                        constraints.update(
-                            {
-                                unique_param_name: tuple(
-                                    [
-                                        drive[syn_type][var_name + "_opt_min"].value,
-                                        drive[syn_type][var_name + "_opt_max"].value,
-                                    ]
-                                )
-                            }
-                        )
+                constraints.update(_build_constraints(drive, syn_type))
 
             if drive["type"] == "Poisson":
-                # rate_constant = _drive_widget_to_dict(drive, "rate_constant")
-                pass
+                constraints.update(_build_constraints(drive, "rate_constant"))
 
             elif drive["type"] in ("Evoked", "Gaussian"):
-                for key in drive.keys():
-                    # For every variable with a checkbox, but only if the checkbox
-                    # is true/checked
-                    if ("_opt_checkbox" in key) and (drive[key].value):
-                        # Extract the var name
-                        var_name = key.split("_opt_checkbox")[0]
-                        # Create a new, unique var name for this drive's instance of
-                        # that variable, which will become our key in our
-                        # `constraints` dict
-                        unique_param_name = str(
-                            drive["type"] + "_" + drive["name"] + "_" + var_name
-                        )
-                        # Use the unique name as the key, and add the bounds
-                        constraints.update(
-                            {
-                                unique_param_name: tuple(
-                                    [
-                                        drive[var_name + "_opt_min"].value,
-                                        drive[var_name + "_opt_max"].value,
-                                    ]
-                                )
-                            }
-                        )
+                constraints.update(_build_constraints(drive))
+
             elif drive["type"] in ("Rhythmic", "Bursty"):
                 pass
 
@@ -4522,13 +4498,23 @@ def generate_constraints_and_func(net, opt_drive_widgets):
 
                 print(f"drive type is {drive['type']}, location={drive['location']}")
                 if drive["type"] == "Poisson":
-                    # AES TODO rate constants need to be treated like other per-celltype synaptic thingies
-                    rate_constant = _drive_widget_to_dict(drive, "rate_constant")
+                    deployed_syn_dicts["rate_constant"] = {}
+                    for ct in cell_types:
+                        deployed_syn_dicts["rate_constant"].update(
+                            {
+                                ct: (
+                                    params[name_check(ct, "rate_constant")]
+                                    if name_check(ct, "rate_constant")
+                                    else drive["rate_constant"][ct].value
+                                )
+                            }
+                        )
+
                     net.add_poisson_drive(
                         name=drive["name"],
                         tstart=drive["tstart"].value,
                         tstop=drive["tstop"].value,
-                        rate_constant=rate_constant,
+                        rate_constant=deployed_syn_dicts["rate_constant"],
                         location=drive["location"],
                         weights_ampa=deployed_syn_dicts["weights_ampa"],
                         weights_nmda=deployed_syn_dicts["weights_nmda"],
