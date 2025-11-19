@@ -1506,7 +1506,7 @@ class HNNGUI:
                 )
             elif load_type == "drives":
                 self.add_drive_tab(params)
-                # AES TODO add self.add_opt_tab here too
+                self.add_opt_tab(params)
             else:
                 raise ValueError
 
@@ -1570,13 +1570,15 @@ class HNNGUI:
         # Visual config for checkbox widgets
         checkbox_layout = Layout(width="30px")
         checkbox_style = {"description_width": "0px"}
-        # Visual config for min and max constraint widgets
+        # Visual config for min and max frequency band widgets
         minmax_layout = Layout(width="90px")
         minmax_style = {"description_width": "30px"}
+        # Visual config for frequency band proportion widgets
         proportion_layout = Layout(width="140px")
         proportion_style = {"description_width": "80px"}
 
         # Parameters for obj_fun="maximize_psd" Frequency Band 1
+        # ------------------------------------------------------------------------------
         self.opt_target_widgets["psd_target_band1_min"] = BoundedFloatText(
             value=15,
             description="Min:",
@@ -1601,11 +1603,13 @@ class HNNGUI:
             min=0,
             max=1,
             step=0.1,
+            disabled=True,
             layout=proportion_layout,
             style=proportion_style,
         )
 
         # Parameters for obj_fun="maximize_psd" Frequency Band 2
+        # ------------------------------------------------------------------------------
         self.opt_target_widgets["psd_target_band2_checkbox"] = Checkbox(
             value=False,
             layout=checkbox_layout,
@@ -1632,7 +1636,7 @@ class HNNGUI:
             style=minmax_style,
         )
         self.opt_target_widgets["psd_target_band2_proportion"] = BoundedFloatText(
-            value=0.5,
+            value=0,
             description="Proportion:",
             min=0,
             max=1,
@@ -1642,12 +1646,62 @@ class HNNGUI:
             style=proportion_style,
         )
 
-        # AES TODO if the checkbox is checked, then have the two proportions balance
-        # AES TODO have the band2 stuff ghosted unless checkbox
+        # Let's have the PSD band2 checkbox control the ghosting/disabling of its other
+        # band2 widgets, AND the band1 proportion widget
+        # ------------------------------------------------------------------------------
+        def _handle_band2_ghosting(change):
+            if self.opt_target_widgets["psd_target_band2_min"].disabled:
+                self.opt_target_widgets["psd_target_band1_proportion"].disabled = False
+                self.opt_target_widgets["psd_target_band2_min"].disabled = False
+                self.opt_target_widgets["psd_target_band2_max"].disabled = False
+                self.opt_target_widgets["psd_target_band2_proportion"].disabled = False
+            else:
+                self.opt_target_widgets["psd_target_band1_proportion"].disabled = True
+                self.opt_target_widgets["psd_target_band2_min"].disabled = True
+                self.opt_target_widgets["psd_target_band2_max"].disabled = True
+                self.opt_target_widgets["psd_target_band2_proportion"].disabled = True
 
+        self.opt_target_widgets["psd_target_band2_checkbox"].observe(
+            _handle_band2_ghosting,
+            names="value",
+        )
+
+        # Next, let's make the two Proportion widgets inter-dependent and add to 1
+        # ------------------------------------------------------------------------------
+        # Flag to prevent infinite recursion
+        _updating = {"flag": False}
+
+        def update_widget1(change):
+            if _updating["flag"]:
+                return
+            _updating["flag"] = True
+            self.opt_target_widgets["psd_target_band1_proportion"].value = (
+                1.0 - change["new"]
+            )
+            _updating["flag"] = False
+
+        def update_widget2(change):
+            if _updating["flag"]:
+                return
+            _updating["flag"] = True
+            self.opt_target_widgets["psd_target_band2_proportion"].value = (
+                1.0 - change["new"]
+            )
+            _updating["flag"] = False
+
+        self.opt_target_widgets["psd_target_band1_proportion"].observe(
+            update_widget2, names="value"
+        )
+        self.opt_target_widgets["psd_target_band2_proportion"].observe(
+            update_widget1, names="value"
+        )
+
+        # FINALLY, actually display all this stuff
+        # ------------------------------------------------------------------------------
         self._update_opt_target_hbox(
             self.widget_opt_obj_fun.value,
         )
+
 
     def add_opt_drive_accordion(self, params):
         """Create/update the drives output of the optimization tab"""
@@ -1726,11 +1780,6 @@ class HNNGUI:
             {} if not prespecified_drive_data else prespecified_drive_data
         )
         prespecified_drive_data.update({"seedcore": max(event_seed, 2)})
-
-        # AES: TODO
-        # 1. first make new evoked only accordion entry with checkboxes/constraints
-        # 2. then build rest of execution pipeline with said constraints
-        # 3. then realize my design was broken and have to start over again
 
         opt_drive_box, opt_drive_widget = _build_opt_objects(
             drive_type,
@@ -4531,7 +4580,7 @@ def run_opt_button_clicked(
         # AES TODO not working for some reason, investigate
         # Set the middle drive's checkbox off, just to keep things interesting
         # opt_drive_widgets[0]["mu_opt_checkbox"].value = False
-        opt_drive_widgets[0]["weights_ampa"]["L2_pyramidal_opt_checkbox"].value = True
+        # opt_drive_widgets[0]["weights_ampa"]["L2_pyramidal_opt_checkbox"].value = True
         # opt_max_iter = 15
         opt_max_iter = 3
         n_jobs.value = 11
@@ -4741,6 +4790,7 @@ def run_opt_button_clicked(
             )
 
         # AES TODO updated the currently selected sim for download at the bottom
+
 
 def launch():
     """Launch voila with hnn_widget.ipynb.
