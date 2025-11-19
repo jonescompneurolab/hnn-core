@@ -3534,12 +3534,23 @@ def _get_rhythmic_widget_for_opt(
     layout,
     style,
     location,
+    var_layout,
+    var_style,
+    checkbox_layout,
+    checkbox_style,
+    minmax_layout,
+    minmax_style,
+    quadruple_entry_hbox_layout,
+    column_titles,
+    initial_constraint_range_proportion,
     data={},
     weights_ampa=None,
     weights_nmda=None,
     delays=None,
     n_drive_cells=None,
     cell_specific=None,
+    drive_idx=None,
+    drive_widgets=None,
 ):
     default_data = {
         "tstart": 0.0,
@@ -3555,6 +3566,51 @@ def _get_rhythmic_widget_for_opt(
     data.update({"n_drive_cells": n_drive_cells, "cell_specific": cell_specific})
     default_data = _update_nested_dict(default_data, data)
 
+    _autogen_opt_widget_kwargs = dict(
+        initial_constraint_range_proportion=initial_constraint_range_proportion,
+        var_layout=var_layout,
+        var_style=var_style,
+        checkbox_layout=checkbox_layout,
+        checkbox_style=checkbox_style,
+        minmax_layout=minmax_layout,
+        minmax_style=minmax_style,
+        drive_idx=drive_idx,
+        drive_widgets=drive_widgets,
+    )
+
+    # Let's "initialize" the dictionary that will hold our widgets:
+    opt_drive_widget = dict(
+        type="Rhythmic",
+        name=name,
+        location=location,
+    )
+
+    # Add the non-synaptic widgets that we are interested in constraining/optimizing
+    # against, along with new widgets to control their constraints:
+    opt_drive_widget.update(
+        _create_opt_widgets_for_var(
+            "burst_rate",
+            default_data["burst_rate"],
+            "Burst rate (Hz):",
+            **_autogen_opt_widget_kwargs,
+        )
+        | _create_opt_widgets_for_var(
+            "burst_std",
+            default_data["burst_std"],
+            "Burst std dev (Hz):",
+            **_autogen_opt_widget_kwargs,
+        )
+        | _create_opt_widgets_for_var(
+            "numspikes",
+            default_data["numspikes"],
+            "No. Spikes:",
+            **_autogen_opt_widget_kwargs,
+            var_type=int(),
+        )
+    )
+
+    # Add the non-synaptic widgets that we are NOT interested in constraining/optimizing
+    # against
     kwargs = dict(layout=layout, style=style)
     tstart = BoundedFloatText(
         value=default_data["tstart"],
@@ -3576,27 +3632,6 @@ def _get_rhythmic_widget_for_opt(
         max=tstop_widget.value,
         **kwargs,
     )
-    burst_rate = BoundedFloatText(
-        value=default_data["burst_rate"],
-        description="Burst rate (Hz)",
-        min=0,
-        max=1e6,
-        **kwargs,
-    )
-    burst_std = BoundedFloatText(
-        value=default_data["burst_std"],
-        description="Burst std dev (Hz)",
-        min=0,
-        max=1e6,
-        **kwargs,
-    )
-    numspikes = BoundedIntText(
-        value=default_data["numspikes"],
-        description="No. Spikes:",
-        min=0,
-        max=int(1e6),
-        **kwargs,
-    )
     n_drive_cells = IntText(
         value=default_data["n_drive_cells"],
         description="No. Drive Cells:",
@@ -3607,53 +3642,63 @@ def _get_rhythmic_widget_for_opt(
         value=default_data["cell_specific"], description="Cell-Specific", **kwargs
     )
     seedcore = IntText(value=default_data["seedcore"], description="Seed", **kwargs)
+    opt_drive_widget.update(
+        dict(
+            tstart=tstart,
+            tstart_std=tstart_std,
+            tstop=tstop,
+            n_drive_cells=n_drive_cells,
+            is_cell_specific=cell_specific,
+            seedcore=seedcore,
+        )
+    )
 
-    widgets_list, widgets_dict = _get_drive_weight_widgets(
-        layout,
-        style,
+    # Add the synaptic widgets, all of which we are interested in
+    # constraining/optimizing against, along with new widgets to control their
+    # constraints:
+    syn_widgets_list, syn_widgets_dict = _get_drive_weight_widgets_for_opt(
+        var_layout,
+        var_style,
         location,
         data={
             "weights_ampa": weights_ampa,
             "weights_nmda": weights_nmda,
             "delays": delays,
         },
+        quadruple_entry_hbox_layout=quadruple_entry_hbox_layout,
+        **_autogen_opt_widget_kwargs,
     )
+    opt_drive_widget.update(syn_widgets_dict)
 
-    # Disable n_drive_cells widget based on cell_specific checkbox
+    # Disable n_drive_cells widget based on cell_specific checkbox (Note that this
+    # concerns the "Optimization" version of this widget, NOT the Drive one. We want
+    # them to be independent.)
     cell_specific.observe(
         partial(_cell_spec_change, widget=n_drive_cells), names="value"
     )
 
+    # Finally, decide the positioning and layout of all of the above widgets
     opt_drive_box = VBox(
         [
+            column_titles,
             tstart,
             tstart_std,
             tstop,
-            burst_rate,
-            burst_std,
-            numspikes,
+            _create_hbox_for_opt_var(
+                "burst_rate", opt_drive_widget, quadruple_entry_hbox_layout
+            ),
+            _create_hbox_for_opt_var(
+                "burst_std", opt_drive_widget, quadruple_entry_hbox_layout
+            ),
+            _create_hbox_for_opt_var(
+                "numspikes", opt_drive_widget, quadruple_entry_hbox_layout
+            ),
             n_drive_cells,
             cell_specific,
             seedcore,
         ]
-        + widgets_list
+        + syn_widgets_list
     )
-
-    opt_drive_widget = dict(
-        type="Rhythmic",
-        name=name,
-        tstart=tstart,
-        tstart_std=tstart_std,
-        burst_rate=burst_rate,
-        burst_std=burst_std,
-        numspikes=numspikes,
-        seedcore=seedcore,
-        location=location,
-        tstop=tstop,
-        n_drive_cells=n_drive_cells,
-        is_cell_specific=cell_specific,
-    )
-    opt_drive_widget.update(widgets_dict)
 
     return opt_drive_box, opt_drive_widget
 
@@ -3773,11 +3818,14 @@ def _get_poisson_widget_for_opt(
     )
     opt_drive_widget.update(syn_widgets_dict)
 
-    # Disable n_drive_cells widget based on cell_specific checkbox
+    # Disable n_drive_cells widget based on cell_specific checkbox (Note that this
+    # concerns the "Optimization" version of this widget, NOT the Drive one. We want
+    # them to be independent.)
     cell_specific.observe(
         partial(_cell_spec_change, widget=n_drive_cells), names="value"
     )
 
+    # Finally, decide the positioning and layout of all of the above widgets
     opt_drive_box = VBox(
         [column_titles, tstart, tstop, n_drive_cells, cell_specific, seedcore]
         + syn_widgets_list
@@ -4287,12 +4335,23 @@ def _build_opt_objects(
             layout,
             style,
             location,
+            var_layout,
+            var_style,
+            checkbox_layout,
+            checkbox_style,
+            minmax_layout,
+            minmax_style,
+            quadruple_entry_hbox_layout,
+            column_titles,
+            initial_constraint_range_proportion,
             data=drive_data,
             weights_ampa=weights_ampa,
             weights_nmda=weights_nmda,
             delays=delays,
             n_drive_cells=n_drive_cells,
             cell_specific=cell_specific,
+            drive_idx=drive_idx,
+            drive_widgets=drive_widgets,
         )
     elif drive_type == "Poisson":
         opt_drive_box, opt_drive_widget = _get_poisson_widget_for_opt(
@@ -4423,7 +4482,7 @@ def generate_constraints_and_func(net, opt_drive_widgets):
                 constraints.update(_build_constraints(drive))
 
             elif drive["type"] in ("Rhythmic", "Bursty"):
-                pass
+                constraints.update(_build_constraints(drive))
 
     # Second, create a new `set_params` function that iterates through the drive
     # widgets AGAIN, but which deploys our newly-created `constraints` dict:
@@ -4519,7 +4578,7 @@ def generate_constraints_and_func(net, opt_drive_widgets):
                         weights_ampa=deployed_syn_dicts["weights_ampa"],
                         weights_nmda=deployed_syn_dicts["weights_nmda"],
                         synaptic_delays=deployed_syn_dicts["delays"],
-                        space_constant=100.0,
+                        space_constant=100.0,  # AES TODO what is this?
                         event_seed=drive["seedcore"].value,
                         **sync_inputs_kwargs,
                     )
@@ -4527,13 +4586,13 @@ def generate_constraints_and_func(net, opt_drive_widgets):
                     net.add_evoked_drive(
                         name=drive["name"],
                         mu=use_params_if_exists("mu"),
-                        sigma=drive["sigma"].value,
-                        numspikes=drive["numspikes"].value,
+                        sigma=use_params_if_exists("sigma"),
+                        numspikes=use_params_if_exists("numspikes"),
                         location=drive["location"],
                         weights_ampa=deployed_syn_dicts["weights_ampa"],
                         weights_nmda=deployed_syn_dicts["weights_nmda"],
                         synaptic_delays=deployed_syn_dicts["delays"],
-                        space_constant=3.0,
+                        space_constant=3.0,  # AES TODO what is this?
                         event_seed=drive["seedcore"].value,
                         **sync_inputs_kwargs,
                     )
@@ -4545,9 +4604,9 @@ def generate_constraints_and_func(net, opt_drive_widgets):
                         tstart_std=drive["tstart_std"].value,
                         tstop=drive["tstop"].value,
                         location=drive["location"],
-                        burst_rate=drive["burst_rate"].value,
-                        burst_std=drive["burst_std"].value,
-                        numspikes=drive["numspikes"].value,
+                        burst_rate=use_params_if_exists("burst_rate"),
+                        burst_std=use_params_if_exists("burst_std"),
+                        numspikes=use_params_if_exists("numspikes"),
                         weights_ampa=deployed_syn_dicts["weights_ampa"],
                         weights_nmda=deployed_syn_dicts["weights_nmda"],
                         synaptic_delays=deployed_syn_dicts["delays"],
@@ -4890,6 +4949,10 @@ def run_opt_button_clicked(
             )
 
         # AES TODO updated the currently selected sim for download at the bottom
+
+        # AES TODO just adding a new drive directly via the GUI doesn't populate the opt tab? but loadin ga file with that drive does
+        # AES todo apply layout styles
+        # AES todo stress test
 
 
 def launch():
