@@ -588,7 +588,6 @@ class HNNGUI:
         # if len(sim_names) == 0:
         #     sim_names = [" "]
 
-
         self.run_opt_button = create_expanded_button(
             "Run Optimization",
             "success",
@@ -660,7 +659,7 @@ class HNNGUI:
         # Add optimzation section
         self.opt_drive_widgets = list()
         self.opt_drive_boxes = list()
-        self.opt_target_parameters_widgets = list()
+        self.opt_target_widgets = {}
         self.opt_accordion = Accordion()
 
         self._init_ui_components()
@@ -881,7 +880,7 @@ class HNNGUI:
                 self.widget_opt_obj_fun.value,
                 self.widget_opt_max_iter.value,
                 self.widget_opt_tstop.value,
-                self.widget_opt_rmse_target_data.value,
+                self.opt_target_widgets,
             )
 
         def _simulation_list_change(value):
@@ -1516,12 +1515,6 @@ class HNNGUI:
         change["owner"].set_trait("value", ([]))
         return params
 
-
-    def add_opt_tab(self, params):
-
-        self.add_opt_target_parameters_widgets()
-        self.add_opt_drive_accordion(params)
-
     def _update_opt_target_hbox(self, opt_obj_fun):
         # cell_type_out, cell_parameters_list, cell_type, cell_layer
         # AES TODO
@@ -1529,24 +1522,32 @@ class HNNGUI:
 
         if opt_obj_fun == "dipole_rmse":
             # DEBUG
-            output_widgets = self.widget_opt_rmse_target_data
+            output_widgets = self.opt_target_widgets["rmse_target_data"]
         elif opt_obj_fun == "maximize_psd":
-            output_widgets = VBox([
-                HBox([
-                    HTML("Frequency Band 1"),
-                    HTML("<span style='display: inline-block; width: 32px;'></span>"),
-                    self.widget_opt_psd_target_band1_min,
-                    self.widget_opt_psd_target_band1_max,
-                    self.widget_opt_psd_target_band1_proportion,
-                    ]),
-                HBox([
-                    HTML("Frequency Band 2"),
-                    self.widget_opt_psd_target_band2_checkbox,
-                    self.widget_opt_psd_target_band2_min,
-                    self.widget_opt_psd_target_band2_max,
-                    self.widget_opt_psd_target_band2_proportion,
-                    ])
-                ])
+            output_widgets = VBox(
+                [
+                    HBox(
+                        [
+                            HTML("Frequency Band 1"),
+                            HTML(
+                                "<span style='display:inline-block;width: 32px;'></span>"
+                            ),
+                            self.opt_target_widgets["psd_target_band1_min"],
+                            self.opt_target_widgets["psd_target_band1_max"],
+                            self.opt_target_widgets["psd_target_band1_proportion"],
+                        ]
+                    ),
+                    HBox(
+                        [
+                            HTML("Frequency Band 2"),
+                            self.opt_target_widgets["psd_target_band2_checkbox"],
+                            self.opt_target_widgets["psd_target_band2_min"],
+                            self.opt_target_widgets["psd_target_band2_max"],
+                            self.opt_target_widgets["psd_target_band2_proportion"],
+                        ]
+                    ),
+                ]
+            )
 
         # cell_parameters_key = f"{cell_type}_{cell_layer}"
         # if cell_layer in ["Biophysics", "Geometry"]:
@@ -1562,29 +1563,21 @@ class HNNGUI:
         with self._opt_target_out:
             display(output_widgets)
 
-
-
-    def add_opt_target_parameters_widgets(self):
-
+    def add_opt_target_widgets(self):
         # The obj_fun="dipole_rmse" case is very simple
         # ------------------------------------------------------------------------------
-        self.widget_opt_rmse_target_data = Dropdown(
-            # options=self.simulation_data,
-            # options=self.data,  # this at least prints "simulation_data"
-            # options=self.data["simulation_data"],  # nope
-            # options=self.data["simulation_data"],  # nope
+        # self.widget_opt_rmse_target_data = Dropdown(
+        self.opt_target_widgets["rmse_target_data"] = Dropdown(
             options=self.data["simulation_data"].keys(),  # nope
-            # options=self.viz_manager.datasets_dropdown.options,  # nope
-            # options=sim_names,
-            # options=None,
-            # value=sim_names[0],
             value=None,
             description="Target Data:",
             disabled=False,
             layout=Layout(width="98%"),
         )
-        # Register widget_opt_rmse_target_data to be updated when simulation data changes
-        self.viz_manager._external_data_widget = self.widget_opt_rmse_target_data
+        # Register opt_target_widgets["rmse_target_data"] to be updated when simulation data changes
+        self.viz_manager._external_data_widget = self.opt_target_widgets[
+            "rmse_target_data"
+        ]
 
         # The obj_fun="maximize_psd" case is much more complex
         # ------------------------------------------------------------------------------
@@ -1598,7 +1591,7 @@ class HNNGUI:
         proportion_style = {"description_width": "80px"}
 
         # Parameters for obj_fun="maximize_psd" Frequency Band 1
-        self.widget_opt_psd_target_band1_min = BoundedFloatText(
+        self.opt_target_widgets["psd_target_band1_min"] = BoundedFloatText(
             value=15,
             description="Min:",
             min=0,
@@ -1607,7 +1600,7 @@ class HNNGUI:
             layout=minmax_layout,
             style=minmax_style,
         )
-        self.widget_opt_psd_target_band1_max = BoundedFloatText(
+        self.opt_target_widgets["psd_target_band1_max"] = BoundedFloatText(
             value=25,
             description="Max:",
             min=0,
@@ -1616,7 +1609,7 @@ class HNNGUI:
             layout=minmax_layout,
             style=minmax_style,
         )
-        self.widget_opt_psd_target_band1_proportion = BoundedFloatText(
+        self.opt_target_widgets["psd_target_band1_proportion"] = BoundedFloatText(
             value=1,
             description="Proportion:",
             min=0,
@@ -1627,12 +1620,12 @@ class HNNGUI:
         )
 
         # Parameters for obj_fun="maximize_psd" Frequency Band 2
-        self.widget_opt_psd_target_band2_checkbox = Checkbox(
-             value=False,
-             layout=checkbox_layout,
-             style=checkbox_style,
-         )
-        self.widget_opt_psd_target_band2_min = BoundedFloatText(
+        self.opt_target_widgets["psd_target_band2_checkbox"] = Checkbox(
+            value=False,
+            layout=checkbox_layout,
+            style=checkbox_style,
+        )
+        self.opt_target_widgets["psd_target_band2_min"] = BoundedFloatText(
             value=9,
             description="Min:",
             min=0,
@@ -1642,7 +1635,7 @@ class HNNGUI:
             layout=minmax_layout,
             style=minmax_style,
         )
-        self.widget_opt_psd_target_band2_max = BoundedFloatText(
+        self.opt_target_widgets["psd_target_band2_max"] = BoundedFloatText(
             value=14,
             description="Max:",
             min=0,
@@ -1652,7 +1645,7 @@ class HNNGUI:
             layout=minmax_layout,
             style=minmax_style,
         )
-        self.widget_opt_psd_target_band2_proportion = BoundedFloatText(
+        self.opt_target_widgets["psd_target_band2_proportion"] = BoundedFloatText(
             value=0.5,
             description="Proportion:",
             min=0,
@@ -1669,8 +1662,6 @@ class HNNGUI:
         self._update_opt_target_hbox(
             self.widget_opt_obj_fun.value,
         )
-
-
 
     def add_opt_drive_accordion(self, params):
         """Create/update the drives output of the optimization tab"""
@@ -1714,6 +1705,10 @@ class HNNGUI:
                 expand_last_drive=False,
                 **kwargs,
             )
+
+    def add_opt_tab(self, params):
+        self.add_opt_target_widgets()
+        self.add_opt_drive_accordion(params)
 
     def add_opt_drive_widget(
         self,
@@ -4600,7 +4595,7 @@ def run_opt_button_clicked(
     opt_obj_fun,
     opt_max_iter,
     opt_tstop,
-    opt_rmse_target_data_name,
+    opt_target_widgets,
 ):
     """Run the simulation and plot outputs.
 
@@ -4623,45 +4618,49 @@ def run_opt_button_clicked(
         # AES TODO UGH need to handle existing sim
         _sim_name = widget_simulation_name.value
 
-        # Target data extraction (and related input validation)
+        # RMSE Target data extraction (and related input validation)
         # ------------------------------------------------------------------------------
-        if not opt_rmse_target_data_name:
-            # In this case, they probably have not run any simulations or loaded any data.
-            logger.error(
-                textwrap.dedent("""
-                You have not selected a dataset to use as the target of
-                optimization. Please load and select a dataset of dipole data to
-                optimize towards.
-                """).replace("\n", " ")
-            )
-            simulation_status_bar.value = simulation_status_contents["failed"]
-            return
-        elif (opt_rmse_target_data_name == "default") and (
-            not simulation_data["default"]["dpls"]
-        ):
-            # In this case, they have selected "default", which is the default name of
-            # the first simulation, BUT they have not actually run any simulations
-            # yet. They likely either want to compare against a simulation result, or
-            # (more likely) forgot to load their experimental target data first.
-            #
-            # ATTN: How we want to handle this, and what we want to communicate, needs
-            # some discussion and thinking.
-            logger.error(
-                textwrap.dedent("""
-                You have selected the 'default' dataset to use as the target of
-                optimization, but there is no dipole data associated with that dataset.
-                Please either load and select a dataset of dipole data to optimize
-                towards, or run a simulation first if you want to optimize against that
-                simulation.
-                """).replace("\n", " ")
-            )
-            simulation_status_bar.value = simulation_status_contents["failed"]
-            return
-        else:
-            # Extract the actual target data
-            # Like everywhere else in the GUI, we only support usage of single-trial
-            # dipole data.
-            target_dipole = simulation_data[opt_rmse_target_data_name]["dpls"][0]
+        if opt_obj_fun == "dipole_rmse":
+            opt_rmse_target_data_name = opt_target_widgets["rmse_target_data"].value
+            if not opt_rmse_target_data_name:
+                # In this case, they probably have not run any simulations or loaded any
+                # data.
+                logger.error(
+                    textwrap.dedent("""
+                    You have not selected a dataset to use as the target of
+                    optimization. Please load and select a dataset of dipole data to
+                    optimize towards.
+                    """).replace("\n", " ")
+                )
+                simulation_status_bar.value = simulation_status_contents["failed"]
+                return
+            elif (opt_rmse_target_data_name == "default") and (
+                not simulation_data["default"]["dpls"]
+            ):
+                # In this case, they have selected "default", which is the default name
+                # of the first simulation, BUT they have not actually run any
+                # simulations yet. They likely either want to compare against a
+                # simulation result, or (more likely) forgot to load their experimental
+                # target data first.
+                #
+                # ATTN: How we want to handle this, and what we want to communicate,
+                # needs some discussion and thinking.
+                logger.error(
+                    textwrap.dedent("""
+                    You have selected the 'default' dataset to use as the target of
+                    optimization, but there is no dipole data associated with that
+                    dataset.  Please either load and select a dataset of dipole data to
+                    optimize towards, or run a simulation first if you want to optimize
+                    against that simulation.
+                    """).replace("\n", " ")
+                )
+                simulation_status_bar.value = simulation_status_contents["failed"]
+                return
+            else:
+                # Extract the actual target data
+                # Like everywhere else in the GUI, we only support usage of single-trial
+                # dipole data.
+                target_dipole = simulation_data[opt_rmse_target_data_name]["dpls"][0]
 
         # Input validation
         # ------------------------------------------------------------------------------
@@ -4766,9 +4765,43 @@ def run_opt_button_clicked(
             # Execute optimization
             # --------------------------------------------------------------------------
             # AES TODO maximize PSD, which requires even more parameters, yay
+            # AES TODO scale and smooth factors
             try:
                 if opt_obj_fun == "dipole_rmse":
                     optim.fit(target=target_dipole, n_trials=ntrials.value)
+                elif opt_obj_fun == "maximize_psd":
+                    if opt_target_widgets["psd_target_band2_checkbox"].value:
+                        f_bands = [
+                            (
+                                opt_target_widgets["psd_target_band1_min"].value,
+                                opt_target_widgets["psd_target_band1_max"].value,
+                            ),
+                            (
+                                opt_target_widgets["psd_target_band2_min"].value,
+                                opt_target_widgets["psd_target_band2_max"].value,
+                            ),
+                        ]
+                        relative_bandpower = [
+                            opt_target_widgets["psd_target_band1_proportion"].value,
+                            opt_target_widgets["psd_target_band2_proportion"].value,
+                        ]
+                        optim.fit(
+                            f_bands=f_bands, relative_bandpower=relative_bandpower
+                        )
+                    else:
+                        f_bands = [
+                            (
+                                opt_target_widgets["psd_target_band1_min"].value,
+                                opt_target_widgets["psd_target_band1_max"].value,
+                            )
+                        ]
+                        relative_bandpower = [
+                            opt_target_widgets["psd_target_band1_proportion"].value,
+                        ]
+                        optim.fit(
+                            f_bands=f_bands, relative_bandpower=relative_bandpower
+                        )
+
             except Exception as e:
                 logger.error(
                     f"Optimization fitting failed due to exception: '{e}'",
