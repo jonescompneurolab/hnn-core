@@ -216,7 +216,7 @@ def plot_laminar_lfp(
             ax.set_xlim(left=times[0], right=times[-1])
     if voltage_offset is not None:
         ax.set_ylim(-voltage_offset, n_offsets * voltage_offset)
-        ylabel = "Individual contact traces"
+        ylabel = "Individual contact traces\nat depth [µm]"
         if len(contact_labels) != n_offsets:
             raise ValueError(
                 f"contact_labels is length {len(contact_labels)},"
@@ -227,7 +227,16 @@ def plot_laminar_lfp(
                 0, len(contact_labels) * voltage_offset, voltage_offset
             )
             ax.set_yticks(trace_ticks)
-            ax.set_yticklabels(contact_labels)
+
+            # Show every 3rd label to avoid clutter
+            reduced_labels = []
+            for i, lab in enumerate(contact_labels):
+                if i % 3 == 0:
+                    reduced_labels.append(lab)
+                else:
+                    reduced_labels.append("")  # empty label
+
+            ax.set_yticklabels(reduced_labels)
 
         if voltage_scalebar is None:
             voltage_scalebar = voltage_offset
@@ -1857,7 +1866,7 @@ def plot_laminar_csd(
         times, new_depths, data, cmap=cmap, shading="auto", vmin=vmin, vmax=vmax
     )
     ax.set_xlabel("time (s)")
-    ax.set_ylabel("electrode depth")
+    ax.set_ylabel("electrode depth [µm]")
     if colorbar:
         color_axis = ax.inset_axes([1.05, 0, 0.02, 1], transform=ax.transAxes)
         plt.colorbar(im, ax=ax, cax=color_axis).set_label(r"$CSD (uV/um^{2})$")
