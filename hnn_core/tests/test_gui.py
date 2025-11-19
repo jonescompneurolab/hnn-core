@@ -274,7 +274,7 @@ def test_gui_upload_data():
     file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt"  # noqa
     file2_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt"  # noqa
     gui._simulate_upload_data(file1_url)
-    breakpoint()  # AES debug
+
     assert len(gui.data["simulation_data"]) == 1
     assert "S1_SupraT" in gui.data["simulation_data"].keys()
     assert gui.data["simulation_data"]["S1_SupraT"]["net"] is None

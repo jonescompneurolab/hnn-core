@@ -656,7 +656,7 @@ class HNNGUI:
         # Synaptic Gains dict
         self.global_gain_widgets = dict()
 
-        # Add optimzation section
+        # Add optimization section
         self.opt_drive_widgets = list()
         self.opt_drive_boxes = list()
         self.opt_target_widgets = {}
@@ -1702,7 +1702,6 @@ class HNNGUI:
             self.widget_opt_obj_fun.value,
         )
 
-
     def add_opt_drive_accordion(self, params):
         """Create/update the drives output of the optimization tab"""
         net = dict_to_network(params)
@@ -1726,6 +1725,9 @@ class HNNGUI:
                 kwargs = dict(prespecified_drive_data=tonic_specs[drive_name])
             else:
                 specs = drive_specs[drive_name]
+                # AES: there appears to be no "prespecified" version of the Poisson
+                # drive's rate_constants, but maybe it doesn't matter? TODO what are
+                # these even for?
                 kwargs = dict(
                     prespecified_drive_data=specs["dynamics"],
                     prespecified_weights_ampa=specs["weights_ampa"],
@@ -1769,18 +1771,48 @@ class HNNGUI:
         if drive_type == "Tonic" and not _is_valid_add_tonic_input(self.drive_widgets):
             return
 
-        # Build drive widget objects
         name = (
             drive_type + str(len(self.drive_boxes))
             if not prespecified_drive_name
             else prespecified_drive_name
         )
-        style = {"description_width": "125px"}
         prespecified_drive_data = (
             {} if not prespecified_drive_data else prespecified_drive_data
         )
         prespecified_drive_data.update({"seedcore": max(event_seed, 2)})
 
+        # Set the proportion of the initial min/max constraint values
+        initial_constraint_range_proportion = 0.2
+
+        # Stylin'
+        # ------------------------------------------------------------------------------
+        # AES TODO deprecate when can
+        style = {"description_width": "125px"}
+
+        # Visual config for "main variable" widgets
+        var_layout = Layout(width="225px")
+        var_style = {"description_width": "100px"}
+        # Visual config for checkbox widgets
+        checkbox_layout = Layout(width="30px")
+        checkbox_style = {"description_width": "0px"}
+        # Visual config for min and max constraint widgets
+        minmax_layout = Layout(width="100px")
+        minmax_style = {"description_width": "30px"}
+        quadruple_entry_hbox_layout = Layout(
+            display="flex",
+            flex_flow="row",
+            align_items="flex-start",
+            width="480px",  # carefully curated...
+        )
+        html_tab = "&emsp;"
+        column_titles = HTML(
+            value=f"""
+            <div style='margin:0px 0px 0px 190px;'><b>Optimize against?</b>
+            {html_tab}{html_tab}{html_tab}Constraints:</div>
+            """,
+        )
+
+        # Build drive widget objects
         opt_drive_box, opt_drive_widget = _build_opt_objects(
             drive_type,
             name,
@@ -1796,6 +1828,15 @@ class HNNGUI:
             prespecified_cell_specific,
             drive_idx,
             self.drive_widgets,
+            var_layout,
+            var_style,
+            checkbox_layout,
+            checkbox_style,
+            minmax_layout,
+            minmax_style,
+            quadruple_entry_hbox_layout,
+            column_titles,
+            initial_constraint_range_proportion,
         )
 
         self.opt_drive_boxes.append(opt_drive_box)
@@ -3623,12 +3664,23 @@ def _get_poisson_widget_for_opt(
     layout,
     style,
     location,
+    var_layout,
+    var_style,
+    checkbox_layout,
+    checkbox_style,
+    minmax_layout,
+    minmax_style,
+    quadruple_entry_hbox_layout,
+    column_titles,
+    initial_constraint_range_proportion,
     data={},
     weights_ampa=None,
     weights_nmda=None,
     delays=None,
     n_drive_cells=None,
     cell_specific=None,
+    drive_idx=None,
+    drive_widgets=None,
 ):
     default_data = {
         "tstart": 0.0,
@@ -3636,16 +3688,31 @@ def _get_poisson_widget_for_opt(
         "n_drive_cells": 1,
         "cell_specific": True,
         "seedcore": 14,
-        "rate_constant": {
-            "L2_pyramidal": 40.0,
-            "L5_pyramidal": 40.0,
-            "L2_basket": 40.0,
-            "L5_basket": 40.0,
-        },
     }
     data.update({"n_drive_cells": n_drive_cells, "cell_specific": cell_specific})
     default_data = _update_nested_dict(default_data, data)
 
+    _autogen_opt_widget_kwargs = dict(
+        initial_constraint_range_proportion=initial_constraint_range_proportion,
+        var_layout=var_layout,
+        var_style=var_style,
+        checkbox_layout=checkbox_layout,
+        checkbox_style=checkbox_style,
+        minmax_layout=minmax_layout,
+        minmax_style=minmax_style,
+        drive_idx=drive_idx,
+        drive_widgets=drive_widgets,
+    )
+
+    # Let's "initialize" the dictionary that will hold our widgets:
+    opt_drive_widget = dict(
+        type="Poisson",
+        name=name,
+        location=location,  # notice this is a widget but a str!
+    )
+
+    # Add the non-synaptic widgets that we are NOT interested in constraining/optimizing
+    # against
     tstart = BoundedFloatText(
         value=default_data["tstart"],
         description="Start time (ms)",
@@ -3677,35 +3744,34 @@ def _get_poisson_widget_for_opt(
     seedcore = IntText(
         value=default_data["seedcore"], description="Seed", layout=layout, style=style
     )
-
-    cell_types = ["L5_pyramidal", "L2_pyramidal", "L5_basket", "L2_basket"]
-    rate_constant = dict()
-    for cell_type in cell_types:
-        rate_constant[f"{cell_type}"] = BoundedFloatText(
-            value=default_data["rate_constant"][cell_type],
-            description=f"{cell_type}:",
-            min=0,
-            max=1e6,
-            step=0.01,
-            layout=layout,
-            style=style,
+    opt_drive_widget.update(
+        dict(
+            tstart=tstart,
+            tstop=tstop,
+            n_drive_cells=n_drive_cells,
+            is_cell_specific=cell_specific,
+            seedcore=seedcore,
         )
+    )
 
-    widgets_list, widgets_dict = _get_drive_weight_widgets(
-        layout,
-        style,
+    # Add the synaptic widgets, all of which we are interested in
+    # constraining/optimizing against, along with new widgets to control their
+    # constraints:
+    syn_widgets_list, syn_widgets_dict = _get_drive_weight_widgets_for_opt(
+        var_layout,
+        var_style,
         location,
         data={
             "weights_ampa": weights_ampa,
             "weights_nmda": weights_nmda,
             "delays": delays,
+            # Ignoring passing rate_constant, since no prespecified data
         },
+        quadruple_entry_hbox_layout=quadruple_entry_hbox_layout,
+        if_poisson=True,
+        **_autogen_opt_widget_kwargs,
     )
-    widgets_dict.update({"rate_constant": rate_constant})
-    widgets_list.extend(
-        [HTML(value="<b>Rate constants</b>")]
-        + list(widgets_dict["rate_constant"].values())
-    )
+    opt_drive_widget.update(syn_widgets_dict)
 
     # Disable n_drive_cells widget based on cell_specific checkbox
     cell_specific.observe(
@@ -3713,20 +3779,9 @@ def _get_poisson_widget_for_opt(
     )
 
     opt_drive_box = VBox(
-        [tstart, tstop, n_drive_cells, cell_specific, seedcore] + widgets_list
+        [column_titles, tstart, tstop, n_drive_cells, cell_specific, seedcore]
+        + syn_widgets_list
     )
-    opt_drive_widget = dict(
-        type="Poisson",
-        name=name,
-        tstart=tstart,
-        tstop=tstop,
-        rate_constant=rate_constant,
-        seedcore=seedcore,
-        location=location,  # notice this is a widget but a str!
-        n_drive_cells=n_drive_cells,
-        is_cell_specific=cell_specific,
-    )
-    opt_drive_widget.update(widgets_dict)
 
     return opt_drive_box, opt_drive_widget
 
@@ -3846,13 +3901,13 @@ def _create_hbox_for_opt_var(var_name, widget_dict, layout):
     )
 
 
-# AES todo change name
 def _get_drive_weight_widgets_for_opt(
     layout,
     style,
     location,
     data=None,
-    quadruple_entry_hbox=None,
+    quadruple_entry_hbox_layout=None,
+    if_poisson=False,
     **_autogen_opt_widget_kwargs,
 ):
     default_data = {
@@ -3875,6 +3930,18 @@ def _get_drive_weight_widgets_for_opt(
             "L2_basket": 0.1,
         },
     }
+    if if_poisson:
+        default_data.update(
+            {
+                "rate_constant": {
+                    "L2_pyramidal": 40.0,
+                    "L5_pyramidal": 40.0,
+                    "L2_basket": 40.0,
+                    "L5_basket": 40.0,
+                },
+            }
+        )
+
     if isinstance(data, dict):
         default_data = _update_nested_dict(default_data, data)
 
@@ -3887,7 +3954,16 @@ def _get_drive_weight_widgets_for_opt(
         "weights_nmda": {},
         "delays": {},
     }
+    if if_poisson:
+        syn_widgets_dict.update(
+            {
+                "rate_constant": {},
+            }
+        )
+
     ampa_weights_list, nmda_weights_list, delays_list = [], [], []
+    if if_poisson:
+        rate_constant_list = []
     for cell_type in cell_types:
         # Create the widgets and their placement, for AMPA weights
         syn_widgets_dict["weights_ampa"].update(
@@ -3903,7 +3979,7 @@ def _get_drive_weight_widgets_for_opt(
             _create_hbox_for_opt_var(
                 cell_type,
                 syn_widgets_dict["weights_ampa"],
-                quadruple_entry_hbox,
+                quadruple_entry_hbox_layout,
             )
         )
         # Create the widgets and their placement, for NMDA weights
@@ -3920,7 +3996,7 @@ def _get_drive_weight_widgets_for_opt(
             _create_hbox_for_opt_var(
                 cell_type,
                 syn_widgets_dict["weights_nmda"],
-                quadruple_entry_hbox,
+                quadruple_entry_hbox_layout,
             )
         )
         # Create the widgets and their placement, for synaptic delays
@@ -3937,9 +4013,27 @@ def _get_drive_weight_widgets_for_opt(
             _create_hbox_for_opt_var(
                 cell_type,
                 syn_widgets_dict["delays"],
-                quadruple_entry_hbox,
+                quadruple_entry_hbox_layout,
             )
         )
+        if if_poisson:
+            # Create the widgets and their placement, for Poisson rate constants
+            syn_widgets_dict["rate_constant"].update(
+                _create_opt_widgets_for_var(
+                    cell_type,
+                    default_data["rate_constant"][cell_type],
+                    f"{cell_type}:",
+                    syn_type="rate_constant",
+                    **_autogen_opt_widget_kwargs,
+                )
+            )
+            rate_constant_list.append(
+                _create_hbox_for_opt_var(
+                    cell_type,
+                    syn_widgets_dict["rate_constant"],
+                    quadruple_entry_hbox_layout,
+                )
+            )
 
     syn_widgets_list = (
         [HTML(value="<b>AMPA weights</b>")]
@@ -3948,15 +4042,27 @@ def _get_drive_weight_widgets_for_opt(
         + nmda_weights_list
         + [HTML(value="<b>Synaptic delays</b>")]
         + delays_list
+        + (
+            [HTML(value="<b>Rate constants</b>")] + rate_constant_list
+            if if_poisson
+            else []
+        )
     )
     return syn_widgets_list, syn_widgets_dict
 
 
 def _get_evoked_widget_for_opt(
     name,
-    layout,
-    style,
     location,
+    var_layout,
+    var_style,
+    checkbox_layout,
+    checkbox_style,
+    minmax_layout,
+    minmax_style,
+    quadruple_entry_hbox_layout,
+    column_titles,
+    initial_constraint_range_proportion,
     data={},
     weights_ampa=None,
     weights_nmda=None,
@@ -3966,7 +4072,6 @@ def _get_evoked_widget_for_opt(
     drive_idx=None,
     drive_widgets=None,
 ):
-    initial_constraint_range_proportion = 0.2
     default_data = {
         "mu": 0,
         "sigma": 1,
@@ -3977,32 +4082,6 @@ def _get_evoked_widget_for_opt(
     }
     data.update({"n_drive_cells": n_drive_cells, "cell_specific": cell_specific})
     default_data = _update_nested_dict(default_data, data)
-
-    # Visual config for "main variable" widgets
-    var_layout = Layout(width="225px")
-    var_style = {"description_width": "100px"}
-    # Visual config for checkbox widgets
-    checkbox_layout = Layout(width="30px")
-    checkbox_style = {"description_width": "0px"}
-    # Visual config for min and max constraint widgets
-    minmax_layout = Layout(width="100px")
-    minmax_style = {"description_width": "30px"}
-
-    quadruple_entry_hbox = Layout(
-        display="flex",
-        flex_flow="row",
-        align_items="flex-start",
-        width="480px",  # carefully curated...
-    )
-
-    html_tab = "&emsp;"
-
-    column_titles = HTML(
-        value=f"""
-        <div style='margin:0px 0px 0px 190px;'><b>Optimize against?</b>
-        {html_tab}{html_tab}{html_tab}Constraints:</div>
-        """,
-    )
 
     _autogen_opt_widget_kwargs = dict(
         initial_constraint_range_proportion=initial_constraint_range_proportion,
@@ -4016,11 +4095,16 @@ def _get_evoked_widget_for_opt(
         drive_widgets=drive_widgets,
     )
 
+    # Let's "initialize" the dictionary that will hold our widgets:
     opt_drive_widget = dict(
         type="Evoked",
         name=name,
+        location=location,
+        sync_within_trial=False,
     )
 
+    # Add the non-synaptic widgets that we are interested in constraining/optimizing
+    # against, along with new widgets to control their constraints:
     opt_drive_widget.update(
         _create_opt_widgets_for_var(
             "mu",
@@ -4043,6 +4127,8 @@ def _get_evoked_widget_for_opt(
         )
     )
 
+    # Add the non-synaptic widgets that we are NOT interested in constraining/optimizing
+    # against
     n_drive_cells = IntText(
         value=default_data["n_drive_cells"],
         description="No. Drive Cells:",
@@ -4064,14 +4150,15 @@ def _get_evoked_widget_for_opt(
     )
     opt_drive_widget.update(
         dict(
-            seedcore=seedcore,
-            location=location,
-            sync_within_trial=False,
             n_drive_cells=n_drive_cells,
             is_cell_specific=cell_specific,
+            seedcore=seedcore,
         )
     )
 
+    # Add the synaptic widgets, all of which we are interested in
+    # constraining/optimizing against, along with new widgets to control their
+    # constraints:
     syn_widgets_list, syn_widgets_dict = _get_drive_weight_widgets_for_opt(
         var_layout,
         var_style,
@@ -4081,9 +4168,10 @@ def _get_evoked_widget_for_opt(
             "weights_nmda": weights_nmda,
             "delays": delays,
         },
-        quadruple_entry_hbox=quadruple_entry_hbox,
+        quadruple_entry_hbox_layout=quadruple_entry_hbox_layout,
         **_autogen_opt_widget_kwargs,
     )
+    opt_drive_widget.update(syn_widgets_dict)
 
     # Disable n_drive_cells widget based on cell_specific checkbox (Note that this
     # concerns the "Optimization" version of this widget, NOT the Drive one. We want
@@ -4092,13 +4180,18 @@ def _get_evoked_widget_for_opt(
         partial(_cell_spec_change, widget=n_drive_cells), names="value"
     )
 
+    # Finally, decide the positioning and layout of all of the above widgets
     opt_drive_box = VBox(
         [
             column_titles,
-            _create_hbox_for_opt_var("mu", opt_drive_widget, quadruple_entry_hbox),
-            _create_hbox_for_opt_var("sigma", opt_drive_widget, quadruple_entry_hbox),
             _create_hbox_for_opt_var(
-                "numspikes", opt_drive_widget, quadruple_entry_hbox
+                "mu", opt_drive_widget, quadruple_entry_hbox_layout
+            ),
+            _create_hbox_for_opt_var(
+                "sigma", opt_drive_widget, quadruple_entry_hbox_layout
+            ),
+            _create_hbox_for_opt_var(
+                "numspikes", opt_drive_widget, quadruple_entry_hbox_layout
             ),
             n_drive_cells,
             cell_specific,
@@ -4107,7 +4200,6 @@ def _get_evoked_widget_for_opt(
         + syn_widgets_list
     )
 
-    opt_drive_widget.update(syn_widgets_dict)
     return opt_drive_box, opt_drive_widget
 
 
@@ -4178,6 +4270,15 @@ def _build_opt_objects(
     cell_specific,
     drive_idx,
     drive_widgets,
+    var_layout,
+    var_style,
+    checkbox_layout,
+    checkbox_style,
+    minmax_layout,
+    minmax_style,
+    quadruple_entry_hbox_layout,
+    column_titles,
+    initial_constraint_range_proportion,
 ):
     if drive_type in ("Rhythmic", "Bursty"):
         opt_drive_box, opt_drive_widget = _get_rhythmic_widget_for_opt(
@@ -4200,19 +4301,37 @@ def _build_opt_objects(
             layout,
             style,
             location,
+            var_layout,
+            var_style,
+            checkbox_layout,
+            checkbox_style,
+            minmax_layout,
+            minmax_style,
+            quadruple_entry_hbox_layout,
+            column_titles,
+            initial_constraint_range_proportion,
             data=drive_data,
             weights_ampa=weights_ampa,
             weights_nmda=weights_nmda,
             delays=delays,
             n_drive_cells=n_drive_cells,
             cell_specific=cell_specific,
+            drive_idx=drive_idx,
+            drive_widgets=drive_widgets,
         )
     elif drive_type in ("Evoked", "Gaussian"):
         opt_drive_box, opt_drive_widget = _get_evoked_widget_for_opt(
             name,
-            layout,
-            style,
             location,
+            var_layout,
+            var_style,
+            checkbox_layout,
+            checkbox_style,
+            minmax_layout,
+            minmax_style,
+            quadruple_entry_hbox_layout,
+            column_titles,
+            initial_constraint_range_proportion,
             data=drive_data,
             weights_ampa=weights_ampa,
             weights_nmda=weights_nmda,
@@ -4233,10 +4352,6 @@ def _build_opt_objects(
 
 
 def generate_constraints_and_func(net, opt_drive_widgets):
-    # AES TODO params needs to be created dynamically based on which parameters
-    # are checked
-    # TODO this also means we have to dynamically create the variable names
-    #
     constraints = {}
     # First, iterate through set of variable-specific widgets for each drive, assemble
     # param var names, and grab constraint values for those whose checkbox is true. This
@@ -4304,7 +4419,8 @@ def generate_constraints_and_func(net, opt_drive_widgets):
                         )
 
             if drive["type"] == "Poisson":
-                rate_constant = _drive_widget_to_dict(drive, "rate_constant")
+                # rate_constant = _drive_widget_to_dict(drive, "rate_constant")
+                pass
 
             elif drive["type"] in ("Evoked", "Gaussian"):
                 for key in drive.keys():
@@ -4504,7 +4620,6 @@ def run_opt_button_clicked(
             if len(simulation_data[_name]["dpls"]) == 0:
                 del simulation_data[_name]
 
-        # AES TODO UGH need to handle existing sim
         _sim_name = widget_simulation_name.value
 
         # RMSE Target data extraction (and related input validation)
@@ -4585,7 +4700,7 @@ def run_opt_button_clicked(
         opt_max_iter = 3
         n_jobs.value = 11
 
-        # # AES for debugging readin
+        # # AES for debugging read in
         # # from urllib.request import urlretrieve
         # # data_url = ('https://raw.githubusercontent.com/jonescompneurolab/hnn/master/'
         # #             'data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt')
@@ -4653,7 +4768,6 @@ def run_opt_button_clicked(
 
             # Execute optimization
             # --------------------------------------------------------------------------
-            # AES TODO maximize PSD, which requires even more parameters, yay
             # AES TODO scale and smooth factors
             try:
                 if opt_obj_fun == "dipole_rmse":
