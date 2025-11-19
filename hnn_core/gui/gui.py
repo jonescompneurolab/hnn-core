@@ -2548,6 +2548,10 @@ def _get_evoked_widget_for_drives(
 
 
 def _get_tonic_widget_for_drives(name, tstop_widget, layout, style, data=None):
+    # AES: This initial default value is malformed. The data is created as if each
+    # celltype has their own `t0` and `tstop` values, but as shown on the GUI, those
+    # parameters are singletons and do not differ across celltypes.
+    # AES TODO: is this a bug? What if not all celltypes' tonics are having their t0 updated?
     cell_types = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
     default_values = {"amplitude": 0, "t0": 0, "tstop": tstop_widget.value}
     t0 = default_values["t0"]
@@ -3982,10 +3986,10 @@ def _get_drive_weight_widgets_for_opt(
         default_data.update(
             {
                 "rate_constant": {
-                    "L2_pyramidal": 40.0,
                     "L5_pyramidal": 40.0,
-                    "L2_basket": 40.0,
+                    "L2_pyramidal": 40.0,
                     "L5_basket": 40.0,
+                    "L2_basket": 40.0,
                 },
             }
         )
@@ -4251,56 +4255,168 @@ def _get_evoked_widget_for_opt(
     return opt_drive_box, opt_drive_widget
 
 
-def _get_tonic_widget_for_opt(name, tstop_widget, layout, style, data=None):
-    cell_types = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
-    default_values = {"amplitude": 0, "t0": 0, "tstop": tstop_widget.value}
-    t0 = default_values["t0"]
-    tstop = default_values["tstop"]
-    default_data = {cell_type: default_values for cell_type in cell_types}
+def _get_tonic_widget_for_opt(
+    name,
+    tstop_widget,
+    layout,
+    style,
+    var_layout,
+    var_style,
+    checkbox_layout,
+    checkbox_style,
+    minmax_layout,
+    minmax_style,
+    quadruple_entry_hbox_layout,
+    column_titles,
+    initial_constraint_range_proportion,
+    data=None,
+    drive_idx=None,
+    drive_widgets=None,
+):
+    # # cell_types = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
+    # cell_types = ["L5_pyramidal", "L2_pyramidal", "L5_basket", "L2_basket"]
+    # default_values = {"amplitude": 0, "t0": 0, "tstop": tstop_widget.value}
+    # t0 = default_values["t0"]
+    # tstop = default_values["tstop"]
+    # default_data = {cell_type: default_values for cell_type in cell_types}
+    default_data = {
+        "t0": 0,
+        "tstop": tstop_widget.value,
+        "amplitudes": {
+            "L5_pyramidal": 0.0,
+            "L2_pyramidal": 0.0,
+            "L5_basket": 0.0,
+            "L2_basket": 0.0,
+        },
+    }
 
     kwargs = dict(layout=layout, style=style)
     if isinstance(data, dict):
         default_data = _update_nested_dict(default_data, data)
 
-    amplitudes = dict()
-    for cell_type in cell_types:
-        amplitude = default_data[cell_type]["amplitude"]
-        amplitudes[cell_type] = BoundedFloatText(
-            value=amplitude, description=cell_type, min=0, max=1e6, step=0.01, **kwargs
-        )
-        # Reset the global t0 and stop with values from the 'data' keyword.
-        # It should be same across all the cell-types.
-        if amplitude > 0:
-            t0 = default_data[cell_type]["t0"]
-            tstop = default_data[cell_type]["tstop"]
-
-    start_times = BoundedFloatText(
-        value=t0, description="Start time", min=0, max=1e6, step=1.0, **kwargs
-    )
-    stop_times = BoundedFloatText(
-        value=tstop, description="Stop time", min=-1, max=1e6, step=1.0, **kwargs
+    _autogen_opt_widget_kwargs = dict(
+        initial_constraint_range_proportion=initial_constraint_range_proportion,
+        var_layout=var_layout,
+        var_style=var_style,
+        checkbox_layout=checkbox_layout,
+        checkbox_style=checkbox_style,
+        minmax_layout=minmax_layout,
+        minmax_style=minmax_style,
+        drive_idx=drive_idx,
+        drive_widgets=drive_widgets,
     )
 
-    widgets_dict = {"amplitude": amplitudes, "t0": start_times, "tstop": stop_times}
-    widgets_list = (
-        [HTML(value="<b>Times (ms):</b>")]
-        + [start_times, stop_times]
-        + [HTML(value="<b>Amplitude (nA):</b>")]
-        + list(amplitudes.values())
-    )
-
-    opt_drive_box = VBox(widgets_list)
+    # Let's "initialize" the dictionary that will hold our widgets:
     opt_drive_widget = dict(
         type="Tonic",
         name=name,
-        amplitude=amplitudes,
-        t0=start_times,
-        tstop=stop_times,
     )
 
-    opt_drive_widget.update(widgets_dict)
+    # Add the non-synaptic widgets that we are NOT interested in constraining/optimizing
+    # against
+    start_times = BoundedFloatText(
+        value=default_data["t0"],
+        description="Start time",
+        min=0,
+        max=1e6,
+        step=1.0,
+        **kwargs,
+    )
+    stop_times = BoundedFloatText(
+        value=default_data["tstop"],
+        description="Stop time",
+        min=-1,
+        max=1e6,
+        step=1.0,
+        **kwargs,
+    )
+    opt_drive_widget.update(
+        dict(
+            t0=start_times,
+            tstop=stop_times,
+        )
+    )
+
+    syn_widgets_dict = {
+        "amplitudes" : {},
+    }
+    amplitudes_list = []
+    # Add the synaptic widgets, all of which we are interested in
+    # constraining/optimizing against, along with new widgets to control their
+    # constraints:
+    for cell_type in ["L5_pyramidal", "L2_pyramidal", "L5_basket", "L2_basket"]:
+        syn_widgets_dict["amplitudes"].update(
+            _create_opt_widgets_for_var(
+                cell_type,
+                default_data["amplitudes"][cell_type],
+                f"{cell_type}:",
+                syn_type="amplitudes",
+                **_autogen_opt_widget_kwargs,
+            )
+        )
+        amplitudes_list.append(
+            _create_hbox_for_opt_var(
+                cell_type,
+                syn_widgets_dict["amplitudes"],
+                quadruple_entry_hbox_layout,
+            )
+        )
+    opt_drive_widget.update(syn_widgets_dict)
+
+    syn_widgets_list = (
+        [HTML(value="<b>Amplitude (nA)</b>")]
+        + amplitudes_list
+    )
+    opt_drive_box = VBox(
+        [
+            column_titles,
+            start_times,
+            stop_times,
+        ]
+        + syn_widgets_list
+    )
 
     return opt_drive_box, opt_drive_widget
+
+    # amplitudes = dict()
+    # for cell_type in cell_types:
+    #     amplitude = default_data[cell_type]["amplitude"]
+    #     amplitudes[cell_type] = BoundedFloatText(
+    #         value=amplitude, description=cell_type, min=0, max=1e6, step=0.01, **kwargs
+    #     )
+    #     # Reset the global t0 and stop with values from the 'data' keyword.
+    #     # It should be same across all the cell-types.
+    #     if amplitude > 0:
+    #         t0 = default_data[cell_type]["t0"]
+    #         tstop = default_data[cell_type]["tstop"]
+
+    # start_times = BoundedFloatText(
+    #     value=t0, description="Start time", min=0, max=1e6, step=1.0, **kwargs
+    # )
+    # stop_times = BoundedFloatText(
+    #     value=tstop, description="Stop time", min=-1, max=1e6, step=1.0, **kwargs
+    # )
+
+    # widgets_dict = {"amplitude": amplitudes, "t0": start_times, "tstop": stop_times}
+    # widgets_list = (
+    #     [HTML(value="<b>Times (ms):</b>")]
+    #     + [start_times, stop_times]
+    #     + [HTML(value="<b>Amplitude (nA):</b>")]
+    #     + list(amplitudes.values())
+    # )
+
+    # opt_drive_box = VBox(widgets_list)
+    # opt_drive_widget = dict(
+    #     type="Tonic",
+    #     name=name,
+    #     amplitude=amplitudes,
+    #     t0=start_times,
+    #     tstop=stop_times,
+    # )
+
+    # opt_drive_widget.update(widgets_dict)
+
+    # return opt_drive_box, opt_drive_widget
 
 
 def _build_opt_objects(
@@ -4402,7 +4518,22 @@ def _build_opt_objects(
         )
     elif drive_type == "Tonic":
         opt_drive_box, opt_drive_widget = _get_tonic_widget_for_opt(
-            name, tstop_widget, layout, style, data=drive_data
+            name,
+            tstop_widget,
+            layout,
+            style,
+            var_layout,
+            var_style,
+            checkbox_layout,
+            checkbox_style,
+            minmax_layout,
+            minmax_style,
+            quadruple_entry_hbox_layout,
+            column_titles,
+            initial_constraint_range_proportion,
+            data=drive_data,
+            drive_idx=drive_idx,
+            drive_widgets=drive_widgets,
         )
     else:
         raise ValueError(f"Unknown drive type {drive_type}")
@@ -4953,6 +5084,7 @@ def run_opt_button_clicked(
         # AES TODO just adding a new drive directly via the GUI doesn't populate the opt tab? but loadin ga file with that drive does
         # AES todo apply layout styles
         # AES todo stress test
+        # AES todo remove unnecessary vars like location where applicable
 
 
 def launch():
