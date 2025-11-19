@@ -588,21 +588,6 @@ class HNNGUI:
         # if len(sim_names) == 0:
         #     sim_names = [" "]
 
-        self.widget_opt_target_data = Dropdown(
-            # options=self.simulation_data,
-            # options=self.data,  # this at least prints "simulation_data"
-            # options=self.data["simulation_data"],  # nope
-            # options=self.data["simulation_data"],  # nope
-            options=self.data["simulation_data"].keys(),  # nope
-            # options=self.viz_manager.datasets_dropdown.options,  # nope
-            # options=sim_names,
-            # options=None,
-            # value=sim_names[0],
-            value=None,
-            description="Target Data:",
-            disabled=False,
-            layout=Layout(width="98%"),
-        )
 
         self.run_opt_button = create_expanded_button(
             "Run Optimization",
@@ -653,7 +638,6 @@ class HNNGUI:
         )
 
         # Plotting window
-
         # Visualization figure related dicts
         self.plot_outputs_dict = dict()
         self.plot_dropdown_types_dict = dict()
@@ -676,6 +660,7 @@ class HNNGUI:
         # Add optimzation section
         self.opt_drive_widgets = list()
         self.opt_drive_boxes = list()
+        self.opt_target_parameters_widgets = list()
         self.opt_accordion = Accordion()
 
         self._init_ui_components()
@@ -738,14 +723,12 @@ class HNNGUI:
         self._connectivity_out = Output()  # tab to tune connectivity.
         self._cell_params_out = Output()
         self._global_gain_out = Output()
-        self._opt_out = Output()  # dynamic part of optimization tab
+        self._opt_target_out = Output()  # dynamic target params widgets of opt tab
+        self._opt_drives_out = Output()  # drive accordion of optimization tab
 
         self._log_out = Output()
 
         self.viz_manager = _VizManager(self.data, self.layout, self.fig_default_params)
-
-        # Register widget_opt_target_data to be updated when simulation data changes
-        self.viz_manager._external_data_widget = self.widget_opt_target_data
 
         # detailed configuration of backends
         self._backend_config_out = Output()
@@ -898,7 +881,7 @@ class HNNGUI:
                 self.widget_opt_obj_fun.value,
                 self.widget_opt_max_iter.value,
                 self.widget_opt_tstop.value,
-                self.widget_opt_target_data.value,
+                self.widget_opt_rmse_target_data.value,
             )
 
         def _simulation_list_change(value):
@@ -960,6 +943,9 @@ class HNNGUI:
                 value.new,
             )
 
+        def _opt_obj_fun_change(value):
+            self._update_opt_target_hbox(value.new)
+
         self.widget_backend_selection.observe(_handle_backend_change, "value")
         self.add_drive_button.on_click(_add_drive_button_clicked)
         self.delete_drive_button.on_click(_delete_drives_clicked)
@@ -975,9 +961,11 @@ class HNNGUI:
         self.cell_type_radio_buttons.observe(_cell_type_radio_change, "value")
         self.cell_layer_radio_buttons.observe(_cell_layer_radio_change, "value")
 
+        self.widget_opt_obj_fun.observe(_opt_obj_fun_change, "value")
+
         # AES why isn't this working
-        # self.widget_opt_target_data.observe(_on_upload_data, names="value")
-        # self.widget_opt_target_data.observe(self.viz_manager._layout_template_change, names="value")
+        # self.widget_opt_rmse_target_data.observe(_on_upload_data, names="value")
+        # self.widget_opt_rmse_target_data.observe(self.viz_manager._layout_template_change, names="value")
 
     def _delete_single_drive(self, b):
         index = self.drive_accordion.selected_index
@@ -1132,9 +1120,9 @@ class HNNGUI:
                         ),
                     ]
                 ),
-                self.widget_opt_target_data,
+                self._opt_target_out,
                 self.run_opt_button,
-                self._opt_out,
+                self._opt_drives_out,
             ]
         )
 
@@ -1528,14 +1516,170 @@ class HNNGUI:
         change["owner"].set_trait("value", ([]))
         return params
 
+
     def add_opt_tab(self, params):
-        """Create/update the dynamic output of the optimization tab"""
+
+        self.add_opt_target_parameters_widgets()
+        self.add_opt_drive_accordion(params)
+
+    def _update_opt_target_hbox(self, opt_obj_fun):
+        # cell_type_out, cell_parameters_list, cell_type, cell_layer
+        # AES TODO
+        self._opt_target_out.clear_output()
+
+        if opt_obj_fun == "dipole_rmse":
+            # DEBUG
+            output_widgets = self.widget_opt_rmse_target_data
+        elif opt_obj_fun == "maximize_psd":
+            output_widgets = VBox([
+                HBox([
+                    HTML("Frequency Band 1"),
+                    HTML("<span style='display: inline-block; width: 32px;'></span>"),
+                    self.widget_opt_psd_target_band1_min,
+                    self.widget_opt_psd_target_band1_max,
+                    self.widget_opt_psd_target_band1_proportion,
+                    ]),
+                HBox([
+                    HTML("Frequency Band 2"),
+                    self.widget_opt_psd_target_band2_checkbox,
+                    self.widget_opt_psd_target_band2_min,
+                    self.widget_opt_psd_target_band2_max,
+                    self.widget_opt_psd_target_band2_proportion,
+                    ])
+                ])
+
+        # cell_parameters_key = f"{cell_type}_{cell_layer}"
+        # if cell_layer in ["Biophysics", "Geometry"]:
+        #     cell_parameters_key += f" {cell_type.split(' ')[0]}"
+
+        # # Needed for the button to display L2/3, but the underlying data to use L2
+        # cell_parameters_key = cell_parameters_key.replace("L2/3", "L2")
+
+        # if cell_parameters_key in cell_parameters_list:
+        #     cell_type_out.clear_output()
+        #     with cell_type_out:
+        #         display(cell_parameters_list[cell_parameters_key])
+        with self._opt_target_out:
+            display(output_widgets)
+
+
+
+    def add_opt_target_parameters_widgets(self):
+
+        # The obj_fun="dipole_rmse" case is very simple
+        # ------------------------------------------------------------------------------
+        self.widget_opt_rmse_target_data = Dropdown(
+            # options=self.simulation_data,
+            # options=self.data,  # this at least prints "simulation_data"
+            # options=self.data["simulation_data"],  # nope
+            # options=self.data["simulation_data"],  # nope
+            options=self.data["simulation_data"].keys(),  # nope
+            # options=self.viz_manager.datasets_dropdown.options,  # nope
+            # options=sim_names,
+            # options=None,
+            # value=sim_names[0],
+            value=None,
+            description="Target Data:",
+            disabled=False,
+            layout=Layout(width="98%"),
+        )
+        # Register widget_opt_rmse_target_data to be updated when simulation data changes
+        self.viz_manager._external_data_widget = self.widget_opt_rmse_target_data
+
+        # The obj_fun="maximize_psd" case is much more complex
+        # ------------------------------------------------------------------------------
+        # Visual config for checkbox widgets
+        checkbox_layout = Layout(width="30px")
+        checkbox_style = {"description_width": "0px"}
+        # Visual config for min and max constraint widgets
+        minmax_layout = Layout(width="90px")
+        minmax_style = {"description_width": "30px"}
+        proportion_layout = Layout(width="140px")
+        proportion_style = {"description_width": "80px"}
+
+        # Parameters for obj_fun="maximize_psd" Frequency Band 1
+        self.widget_opt_psd_target_band1_min = BoundedFloatText(
+            value=15,
+            description="Min:",
+            min=0,
+            max=1e6,
+            step=0.1,
+            layout=minmax_layout,
+            style=minmax_style,
+        )
+        self.widget_opt_psd_target_band1_max = BoundedFloatText(
+            value=25,
+            description="Max:",
+            min=0,
+            max=1e6,
+            step=0.1,
+            layout=minmax_layout,
+            style=minmax_style,
+        )
+        self.widget_opt_psd_target_band1_proportion = BoundedFloatText(
+            value=1,
+            description="Proportion:",
+            min=0,
+            max=1,
+            step=0.1,
+            layout=proportion_layout,
+            style=proportion_style,
+        )
+
+        # Parameters for obj_fun="maximize_psd" Frequency Band 2
+        self.widget_opt_psd_target_band2_checkbox = Checkbox(
+             value=False,
+             layout=checkbox_layout,
+             style=checkbox_style,
+         )
+        self.widget_opt_psd_target_band2_min = BoundedFloatText(
+            value=9,
+            description="Min:",
+            min=0,
+            max=1e6,
+            step=0.1,
+            disabled=True,
+            layout=minmax_layout,
+            style=minmax_style,
+        )
+        self.widget_opt_psd_target_band2_max = BoundedFloatText(
+            value=14,
+            description="Max:",
+            min=0,
+            max=1e6,
+            step=0.1,
+            disabled=True,
+            layout=minmax_layout,
+            style=minmax_style,
+        )
+        self.widget_opt_psd_target_band2_proportion = BoundedFloatText(
+            value=0.5,
+            description="Proportion:",
+            min=0,
+            max=1,
+            step=0.1,
+            disabled=True,
+            layout=proportion_layout,
+            style=proportion_style,
+        )
+
+        # AES TODO if the checkbox is checked, then have the two proportions balance
+        # AES TODO have the band2 stuff ghosted unless checkbox
+
+        self._update_opt_target_hbox(
+            self.widget_opt_obj_fun.value,
+        )
+
+
+
+    def add_opt_drive_accordion(self, params):
+        """Create/update the drives output of the optimization tab"""
         net = dict_to_network(params)
         drive_specs = net.external_drives
         tonic_specs = net.external_biases
 
         # clear before adding drives
-        self._opt_out.clear_output()
+        self._opt_drives_out.clear_output()
         while len(self.opt_drive_widgets) > 0:
             self.opt_drive_widgets.pop()
             self.opt_drive_boxes.pop()
@@ -1562,7 +1706,7 @@ class HNNGUI:
                 )
 
             should_render = idx == (len(drive_names) - 1)
-            self.add_opt_widget(
+            self.add_opt_drive_widget(
                 drive_type=specs["type"].capitalize(),
                 location=specs["location"],
                 prespecified_drive_name=drive_name,
@@ -1571,7 +1715,7 @@ class HNNGUI:
                 **kwargs,
             )
 
-    def add_opt_widget(
+    def add_opt_drive_widget(
         self,
         drive_type,
         location,
@@ -1660,8 +1804,8 @@ class HNNGUI:
                     tab_name += f" ({opt_drive_widget['location']})"
                 self.opt_accordion.set_title(idx, tab_name)
 
-            self._opt_out.clear_output()
-            with self._opt_out:
+            self._opt_drives_out.clear_output()
+            with self._opt_drives_out:
                 display(self.opt_accordion)
 
 
@@ -4456,7 +4600,7 @@ def run_opt_button_clicked(
     opt_obj_fun,
     opt_max_iter,
     opt_tstop,
-    opt_target_data_name,
+    opt_rmse_target_data_name,
 ):
     """Run the simulation and plot outputs.
 
@@ -4481,7 +4625,7 @@ def run_opt_button_clicked(
 
         # Target data extraction (and related input validation)
         # ------------------------------------------------------------------------------
-        if not opt_target_data_name:
+        if not opt_rmse_target_data_name:
             # In this case, they probably have not run any simulations or loaded any data.
             logger.error(
                 textwrap.dedent("""
@@ -4492,7 +4636,7 @@ def run_opt_button_clicked(
             )
             simulation_status_bar.value = simulation_status_contents["failed"]
             return
-        elif (opt_target_data_name == "default") and (
+        elif (opt_rmse_target_data_name == "default") and (
             not simulation_data["default"]["dpls"]
         ):
             # In this case, they have selected "default", which is the default name of
@@ -4517,7 +4661,7 @@ def run_opt_button_clicked(
             # Extract the actual target data
             # Like everywhere else in the GUI, we only support usage of single-trial
             # dipole data.
-            target_dipole = simulation_data[opt_target_data_name]["dpls"][0]
+            target_dipole = simulation_data[opt_rmse_target_data_name]["dpls"][0]
 
         # Input validation
         # ------------------------------------------------------------------------------
