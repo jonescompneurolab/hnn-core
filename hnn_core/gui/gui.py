@@ -538,18 +538,18 @@ class HNNGUI:
         # Just use same styling as top-level drive widgets (not accordion)
         opt_dropdown_style = {"description_width": "120px"}
 
-        self.widget_opt_solver = Dropdown(
-            options=["bayesian", "cobyla"],
-            value="bayesian",
-            description="Solver:",
-            disabled=False,
-            layout=self.layout["opt_textbox"],
-            style=opt_dropdown_style,
-        )
         self.widget_opt_obj_fun = Dropdown(
             options=["dipole_rmse", "maximize_psd"],
             value="dipole_rmse",
             description="Objective Function:",
+            disabled=False,
+            layout=self.layout["opt_textbox"],
+            style=opt_dropdown_style,
+        )
+        self.widget_opt_solver = Dropdown(
+            options=["bayesian", "cobyla"],
+            value="bayesian",
+            description="Solver:",
             disabled=False,
             layout=self.layout["opt_textbox"],
             style=opt_dropdown_style,
@@ -863,7 +863,7 @@ class HNNGUI:
             )
 
         def _run_opt_button_clicked(b):
-            return run_opt_button_clicked(
+            output_config = run_opt_button_clicked(
                 self.widget_simulation_name,
                 self._log_out,
                 self.opt_drive_widgets,
@@ -893,6 +893,12 @@ class HNNGUI:
                 self.widget_opt_tstop.value,
                 self.opt_target_widgets,
             )
+            # AES "Hack" to re-load our NEW, optimized drive parameters...
+            # ...is it a hack if it works well? ;)
+            if output_config:
+                self.params = json.loads(output_config)
+                self.load_conn_drives_opt()
+            return
 
         def _simulation_list_change(value):
             # Simulation Data
@@ -1126,8 +1132,8 @@ class HNNGUI:
                     [
                         VBox(
                             [
-                                self.widget_opt_solver,
                                 self.widget_opt_obj_fun,
+                                self.widget_opt_solver,
                             ]
                         ),
                         VBox(
@@ -1368,8 +1374,6 @@ class HNNGUI:
 
             # Add optimization
             self.add_opt_tab(self.params)
-
-            # AES where to do opt observe of drive values?
 
     def add_drive_widget(
         self,
@@ -4991,7 +4995,7 @@ def run_opt_button_clicked(
                     """).replace("\n", " ")
                 )
                 simulation_status_bar.value = simulation_status_contents["failed"]
-                return
+                return None
             elif (opt_rmse_target_data_name == "default") and (
                 not simulation_data["default"]["dpls"]
             ):
@@ -5013,7 +5017,7 @@ def run_opt_button_clicked(
                     """).replace("\n", " ")
                 )
                 simulation_status_bar.value = simulation_status_contents["failed"]
-                return
+                return None
             else:
                 # Extract the actual target data
                 # Like everywhere else in the GUI, we only support usage of single-trial
@@ -5077,7 +5081,7 @@ def run_opt_button_clicked(
                 """).replace("\n", " ")
             )
             simulation_status_bar.value = simulation_status_contents["failed"]
-            return
+            return None
 
         # Instantiate our Optimizer object
         # ------------------------------------------------------------------------------
@@ -5181,7 +5185,7 @@ def run_opt_button_clicked(
                     """).replace("\n", " ")
                 )
                 simulation_status_bar.value = simulation_status_contents["failed"]
-                return
+                return None
 
             # --------------------------------------------------------------------------
             # Now, let's resimulate the final version of the optimized network for usage
@@ -5230,7 +5234,7 @@ def run_opt_button_clicked(
                 if simulation_data[sim_name]["net"] is not None
             ]
             simulations_list_widget.options = sim_names
-            simulations_list_widget.value = sim_names[0]
+            simulations_list_widget.value = sim_names[-1]
 
         # ------------------------------------------------------------------------------
         # The remainder of this function is just repeating some post-run visualization
@@ -5256,11 +5260,12 @@ def run_opt_button_clicked(
                 fig_name, ax_name, (_sim_name + "_optimized"), plot_type, {}, "plot"
             )
 
-        # AES TODO updated the currently selected sim for download at the bottom
 
-        # AES todo stress test
+        optimized_config = serialize_config(all_data, (_sim_name + "_optimized"))
+        return optimized_config
+
+        # AES TODO stress test
         # AES TODO scale and smooth factors
-        # AES todo oh geez how to update the Drive widget values FROM our final opt net? one hack: serialize and upload it?
 
 
 def launch():
