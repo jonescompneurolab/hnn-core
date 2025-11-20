@@ -229,14 +229,13 @@ def plot_laminar_lfp(
             ax.set_yticks(trace_ticks)
 
             # Show every 3rd label to avoid clutter
-            reduced_labels = []
-            for i, lab in enumerate(contact_labels):
-                if i % 3 == 0:
-                    reduced_labels.append(lab)
-                else:
-                    reduced_labels.append("")  # empty label
-
+            ylabel_skip = 3
+            reduced_labels = [
+                label if i % ylabel_skip == 0 else ""
+                for i, label in enumerate(contact_labels)
+            ]
             ax.set_yticklabels(reduced_labels)
+
 
         if voltage_scalebar is None:
             voltage_scalebar = voltage_offset
