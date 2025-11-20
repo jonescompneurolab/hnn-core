@@ -1821,31 +1821,28 @@ class HNNGUI:
             """,
         )
 
-        # Build drive widget objects
-        opt_drive_box, opt_drive_widget = _build_opt_objects(
+        opt_drive_box, opt_drive_widget = _build_opt_drive_widget(
             drive_type,
             name,
-            self.widget_tstop,
-            self.layout["drive_textbox"],
-            style,
-            location,
-            prespecified_drive_data,
-            prespecified_weights_ampa,
-            prespecified_weights_nmda,
-            prespecified_delays,
-            prespecified_n_drive_cells,
-            prespecified_cell_specific,
-            drive_idx,
-            self.drive_widgets,
-            var_layout,
-            var_style,
             checkbox_layout,
             checkbox_style,
             minmax_layout,
             minmax_style,
             quadruple_entry_hbox_layout,
+            var_layout,
+            var_style,
             column_titles,
             initial_constraint_range_proportion,
+            prespecified_drive_data,
+            drive_idx,
+            self.drive_widgets,
+            location,
+            prespecified_weights_ampa,
+            prespecified_weights_nmda,
+            prespecified_delays,
+            prespecified_n_drive_cells,
+            prespecified_cell_specific,
+            self.widget_tstop,
         )
 
         self.opt_drive_boxes.append(opt_drive_box)
@@ -3542,14 +3539,17 @@ def _is_valid_add_tonic_input(drive_widgets):
 
 
 def _make_observer(var_widget, var_key, drive_widgets, drive_idx, syn_type=None):
-    """Cyclomatic complexity = TO THE MOON"""
+    """Create & set an 'observe' handler for an Optimization widget to a Drive widget.
 
+    Cyclomatic complexity = To infinity, and beyond!
+    """
     # Once again, let's use closures to make new observer handlers for every variable,
     # so that the Optimization tab copy of each variable will be auto-updated when the
     # variable is changed in the Drives tab.
     def _make_update_var_func(var_widget, source_widget):
         def _update_var_func(change):
             var_widget.value = source_widget.value
+
         return _update_var_func
 
     if syn_type:
@@ -3583,7 +3583,31 @@ def _create_opt_widgets_for_var(
     drive_idx=None,
     drive_widgets=None,
 ):
-    """This creates the opt var's main widget, related widgets, and observation linkage"""
+    """For a drive variable, create its multiple Optimization widgets and observers.
+
+    For each drive's variable that we want to allow Optimization for, we need to create
+    4 widgets:
+
+        1. The widget showing that variable inside the drive's accordion entry. This
+        widget is disabled/ghosted by default, since contains the same information as
+        the variable's value in the equivalent widget in the Drives tab. Towards the end
+        of this function, we create an observation such that the Optimization version of
+        the widget updates its value based on changes in the Drive version of the
+        widget.
+
+        2. A checkbox widget for whether this variable should have its value and
+        constraints used during the Optimization. This checkbox is False by default, and
+        is used later in `_generate_constraints_and_func` to build the "parameters
+        update function" (`set_params`) that is needed by the Optimization process.
+
+        3. A widget for the minimum value of the constraint range that should be used
+        for this drive variable. This will only be actually used if the checkbox is
+        checked.
+
+        4. A widget for the maximum value of the constraint range that should be used
+        for this drive variable. This will only be actually used if the checkbox is
+        checked.
+    """
     opt_checkbox_widget = Checkbox(
         value=init_bool,
         layout=checkbox_layout,
@@ -3651,7 +3675,8 @@ def _create_opt_widgets_for_var(
 
 
 def _create_hbox_for_opt_var(var_name, widget_dict, layout):
-    """Home Box Office widget."""
+    """Helper function for placement & layout of a single drive variable's Opt widgets.
+    """
     return HBox(
         [
             widget_dict[f"{var_name}"],
@@ -3663,7 +3688,7 @@ def _create_hbox_for_opt_var(var_name, widget_dict, layout):
     )
 
 
-def _get_drive_weight_widgets_for_opt(
+def _create_synaptic_widgets_for_opt(
     layout,
     style,
     location,
@@ -3672,6 +3697,41 @@ def _get_drive_weight_widgets_for_opt(
     if_poisson=False,
     **_autogen_opt_widget_kwargs,
 ):
+    """Orchestration function for a drive's synaptic Optimization widgets.
+
+    Similarly to `_create_opt_widgets_for_var`, this creates 4 Optimization widgets for
+    each synaptic variable of a valid drive. Additionally, this also arranges the
+    placement/layout of these widgets for use later. Since each target celltype is its
+    own variable, this produces many widgets and places them in a visually hierarchical
+    structure analogous to the synaptic variable's widgets in the Drive tab. The four
+    widgets are:
+
+        1. The widget showing that variable inside the drive's accordion entry. This
+        widget is disabled/ghosted by default, since contains the same information as
+        the variable's value in the equivalent widget in the Drives tab. An observation
+        is created such that the Optimization version of the widget updates its value
+        based on changes in the Drive version of the widget.
+
+        2. A checkbox widget for whether this variable should have its value and
+        constraints used during the Optimization. This checkbox is False by default, and
+        is used later in `_generate_constraints_and_func` to build the "parameters
+        update function" (`set_params`) that is needed by the Optimization process.
+
+        3. A widget for the minimum value of the constraint range that should be used
+        for this drive variable. This will only be actually used if the checkbox is
+        checked.
+
+        4. A widget for the maximum value of the constraint range that should be used
+        for this drive variable. This will only be actually used if the checkbox is
+        checked.
+
+    This handles the cases for Evoked, Poisson, and Rhythmic drives, but not Tonic
+    biases. Tonic biases require slightly different handling, and do the same essential
+    code inside their own `_create...` function.
+
+    This is analogous to, and was built from, the Drives-tab equivalent
+    `_get_drive_weight_widgets`.
+    """
     default_data = {
         "weights_ampa": {
             "L5_pyramidal": 0.0,
@@ -3813,7 +3873,7 @@ def _get_drive_weight_widgets_for_opt(
     return syn_widgets_list, syn_widgets_dict
 
 
-def _get_evoked_widget_for_opt(
+def _create_evoked_widget_for_opt(
     name,
     checkbox_layout,
     checkbox_style,
@@ -3834,6 +3894,11 @@ def _get_evoked_widget_for_opt(
     n_drive_cells,
     cell_specific,
 ):
+    """Create all widgets (& observers) for an Evoked drive in the Optimization tab.
+
+    This is analogous to, and was built from, the Drives-tab equivalent
+    `_get_evoked_widget_for_drives`.
+    """
     # Initial setup
     # ----------------------------------------------------------------------------------
     default_data = {
@@ -3936,7 +4001,7 @@ def _get_evoked_widget_for_opt(
     # Add the synaptic widgets, all of which we are interested in
     # constraining/optimizing against, along with new widgets to control their
     # constraints:
-    syn_widgets_list, syn_widgets_dict = _get_drive_weight_widgets_for_opt(
+    syn_widgets_list, syn_widgets_dict = _create_synaptic_widgets_for_opt(
         var_layout,
         var_style,
         location,
@@ -3973,7 +4038,7 @@ def _get_evoked_widget_for_opt(
     return opt_drive_box, opt_drive_widget
 
 
-def _get_poisson_widget_for_opt(
+def _create_poisson_widget_for_opt(
     name,
     checkbox_layout,
     checkbox_style,
@@ -3995,6 +4060,11 @@ def _get_poisson_widget_for_opt(
     cell_specific,
     tstop_widget,
 ):
+    """Create all widgets (& observers) for a Poisson drive in the Optimization tab.
+
+    This is analogous to, and was built from, the Drives-tab equivalent
+    `_get_poisson_widget_for_drives`.
+    """
     # Initial setup
     # ----------------------------------------------------------------------------------
     default_data = {
@@ -4093,7 +4163,7 @@ def _get_poisson_widget_for_opt(
     # Add the synaptic widgets, all of which we are interested in
     # constraining/optimizing against, along with new widgets to control their
     # constraints:
-    syn_widgets_list, syn_widgets_dict = _get_drive_weight_widgets_for_opt(
+    syn_widgets_list, syn_widgets_dict = _create_synaptic_widgets_for_opt(
         var_layout,
         var_style,
         location,
@@ -4125,7 +4195,7 @@ def _get_poisson_widget_for_opt(
     return opt_drive_box, opt_drive_widget
 
 
-def _get_rhythmic_widget_for_opt(
+def _create_rhythmic_widget_for_opt(
     name,
     checkbox_layout,
     checkbox_style,
@@ -4147,6 +4217,11 @@ def _get_rhythmic_widget_for_opt(
     cell_specific,
     tstop_widget,
 ):
+    """Create all widgets (& observers) for a Rhythmic drive in the Optimization tab.
+
+    This is analogous to, and was built from, the Drives-tab equivalent
+    `_get_rhythmic_widget_for_drives`.
+    """
     # Initial setup
     # ----------------------------------------------------------------------------------
     default_data = {
@@ -4285,7 +4360,7 @@ def _get_rhythmic_widget_for_opt(
     # Add the synaptic widgets, all of which we are interested in
     # constraining/optimizing against, along with new widgets to control their
     # constraints:
-    syn_widgets_list, syn_widgets_dict = _get_drive_weight_widgets_for_opt(
+    syn_widgets_list, syn_widgets_dict = _create_synaptic_widgets_for_opt(
         var_layout,
         var_style,
         location,
@@ -4332,7 +4407,7 @@ def _get_rhythmic_widget_for_opt(
     return opt_drive_box, opt_drive_widget
 
 
-def _get_tonic_widget_for_opt(
+def _create_tonic_widget_for_opt(
     name,
     checkbox_layout,
     checkbox_style,
@@ -4348,6 +4423,11 @@ def _get_tonic_widget_for_opt(
     drive_widgets,
     tstop_widget,
 ):
+    """Create all widgets (& observers) for a Tonic drive (bias) in the Optimization tab.
+
+    This is analogous to, and was built from, the Drives-tab equivalent
+    `_get_tonic_widget_for_drives`.
+    """
     # Initial setup
     # ----------------------------------------------------------------------------------
     # Note that unlike the similar "weights_ampa" etc., the drive_widgets use
@@ -4458,33 +4538,45 @@ def _get_tonic_widget_for_opt(
     return opt_drive_box, opt_drive_widget
 
 
-def _build_opt_objects(
+def _build_opt_drive_widget(
     drive_type,
     name,
-    tstop_widget,
-    layout,
-    style,
-    location,
-    drive_data,
-    weights_ampa,
-    weights_nmda,
-    delays,
-    n_drive_cells,
-    cell_specific,
-    drive_idx,
-    drive_widgets,
-    var_layout,
-    var_style,
     checkbox_layout,
     checkbox_style,
     minmax_layout,
     minmax_style,
     quadruple_entry_hbox_layout,
+    var_layout,
+    var_style,
     column_titles,
     initial_constraint_range_proportion,
+    drive_data,
+    drive_idx,
+    drive_widgets,
+    location,
+    weights_ampa,
+    weights_nmda,
+    delays,
+    n_drive_cells,
+    cell_specific,
+    tstop_widget,
 ):
+    """Build & arrange the Optimization widgets for a single Drive's widgets-set.
+
+    Note that this returned widget contains MANY smaller widgets inside. The arrangement
+    of these smaller widgets is returned in the "box".
+
+    Also note that the "Drive" itself (as opposed to its widgets) does not necessarily
+    exist at this point in time, just like it's possible that no Network objects
+    exists. This does create the Drives themselves; it only creates Optimization widgets
+    that are based on, and observing of, existing Drive widgets. The Drives themselves
+    are only created *later* during one of the `run_..._clicked` actions.
+
+    This is analogous to, and was built from, the Drives-tab equivalent
+    `_build_drive_objects`.
+    """
     if drive_type in ("Evoked", "Gaussian"):
-        opt_drive_box, opt_drive_widget = _get_evoked_widget_for_opt(
+        opt_drive_box, opt_drive_widget = _create_evoked_widget_for_opt(
             name,
             checkbox_layout,
             checkbox_style,
@@ -4506,7 +4598,7 @@ def _build_opt_objects(
             cell_specific,
         )
     elif drive_type == "Poisson":
-        opt_drive_box, opt_drive_widget = _get_poisson_widget_for_opt(
+        opt_drive_box, opt_drive_widget = _create_poisson_widget_for_opt(
             name,
             checkbox_layout,
             checkbox_style,
@@ -4529,7 +4621,7 @@ def _build_opt_objects(
             tstop_widget,
         )
     elif drive_type in ("Rhythmic", "Bursty"):
-        opt_drive_box, opt_drive_widget = _get_rhythmic_widget_for_opt(
+        opt_drive_box, opt_drive_widget = _create_rhythmic_widget_for_opt(
             name,
             checkbox_layout,
             checkbox_style,
@@ -4552,7 +4644,7 @@ def _build_opt_objects(
             tstop_widget,
         )
     elif drive_type == "Tonic":
-        opt_drive_box, opt_drive_widget = _get_tonic_widget_for_opt(
+        opt_drive_box, opt_drive_widget = _create_tonic_widget_for_opt(
             name,
             checkbox_layout,
             checkbox_style,
@@ -4575,13 +4667,31 @@ def _build_opt_objects(
 
 
 def _generate_constraints_and_func(net, opt_drive_widgets):
-    """TODO
+    """Dynamically create a constraints dict and usage/update function from Opt widgets.
 
-    This was originally adapted from a combination of the code in
-    _init_network_from_widgets and ???
+    Using the widgets of both the Drive and Optimization tabs, this does two things:
+
+        1. Creates a "constraints" dictionary where, for any drive's variable in the
+        Optimization tab, if that variable's "opt_checkbox" widget is checked, a
+        key-value pair is created. The key is a unique name for that variable that
+        includes the drive type, drive name, synaptic variable type if present, and
+        variable name. The value is a tuple of the minimum and maximum constraint values
+        from the appropriate Optimization widgets for that variable.
+
+        2. Creates a "set_params" function consumes the "constraints" dictionary. This
+        function creates ALL drives for the assumed-drive-less Network object. For the
+        variables of each drive, if there is a name-matching entry in the "constraints"
+        dictionary, then that value is used (enabling the Optimizer to control and
+        vary/"optimize" that variable). If there is no name-matching entry in the
+        constraints dictionary, then the value of the Drive widget for that variable is
+        used.
+
+    Note that THIS is where the Drives are actually added to the Network object during
+    Optimization.
+
+    This was originally created from the code in `_init_network_from_widgets`, but it
+    has no proper equivalent for the Drives. This one took some brainpower to make.
     """
-    constraints = {}
-
     # First, iterate through set of variable-specific widgets for each drive, assemble
     # param var names, and grab constraint values for those whose checkbox is true. This
     # builds a `constraints` dictionary that is FLAT, where the keys are long variable
@@ -4624,6 +4734,7 @@ def _generate_constraints_and_func(net, opt_drive_widgets):
                 )
         return output_constraints
 
+    constraints = {}
     for drive_idx, drive in enumerate(opt_drive_widgets):
         if drive["type"] in ("Tonic"):
             constraints.update(_build_constraints(drive, "amplitude"))
@@ -4802,9 +4913,35 @@ def run_opt_button_clicked(
     opt_tstop,
     opt_target_widgets,
 ):
-    """Run the simulation and plot outputs.
+    """Run an Optimization, then re-run its final simulation and plot its outputs.
 
-    This was initially built from copying `run_button_clicked`.
+    This does the following steps:
+
+    1. Some setup based on the existing simulation data and names.
+    2. Perform some input validation based on the type of optimization selected
+        (i.e. checks for valid data if the objective function is `dipole_rmse`).
+    3. Instantiate the Network object, but NOT including any drives. This creates the
+        Network object at `simulation_data[_sim_name]["net"]` specifically.
+    4. Dynamically build the `constraints` dict and the function (`set_params_func`)
+        used to deploy user-provided constraints, update parameters during each
+        optimization iteration, and create the drives anew every time (since we are
+        optimizing for drive parameters).
+    5. Check that at least some constraints have been indicated by the user.
+    6. Create the Optimizer object using our Network, `constraints`, `set_params_func`,
+        and other top-level Optimization widget values.
+    7. Select and setup our simulation backend.
+    8. The big one: execute the actual Optimizer fitting, including checking and
+        applying "target" widgets options.
+    9. Afterwards, create a new `simulation_data` name (depending on existing names) and
+        re-execute the final version of optimized Network. (We have to do this since the
+        Optimizer object does not (I think?) give us the final simulation output
+        data). The optimized simulation data gets saved to `<current GUI Simulation Name
+        widget value>_optimized` or something similar.
+    10. Save the re-executed final optimized Network and simulation data into
+        `simulation_data`, so that it can be used and explored in the GUI.
+    11. Plot the resulting optimized dipole.
+
+    This was built based off of `run_button_clicked`.
     """
     with log_out:
         # Sim data setup (and related input validation)
@@ -5101,9 +5238,7 @@ def run_opt_button_clicked(
         # AES TODO updated the currently selected sim for download at the bottom
 
         # AES TODO just adding a new drive directly via the GUI doesn't populate the opt tab? but loading a file with that drive does
-        # AES todo apply layout styles
         # AES todo stress test
-        # AES todo remove unnecessary vars like location where applicable
         # AES TODO scale and smooth factors
 
 
