@@ -3541,6 +3541,31 @@ def _is_valid_add_tonic_input(drive_widgets):
     return True
 
 
+def _make_observer(var_widget, var_key, drive_widgets, drive_idx, syn_type=None):
+    """Cyclomatic complexity = TO THE MOON"""
+
+    # Once again, let's use closures to make new observer handlers for every variable,
+    # so that the Optimization tab copy of each variable will be auto-updated when the
+    # variable is changed in the Drives tab.
+    def _make_update_var_func(var_widget, source_widget):
+        def _update_var_func(change):
+            var_widget.value = source_widget.value
+        return _update_var_func
+
+    if syn_type:
+        _fn = _make_update_var_func(
+            var_widget,
+            drive_widgets[drive_idx][syn_type][var_key],
+        )
+        drive_widgets[drive_idx][syn_type][var_key].observe(_fn, names="value")
+    else:
+        _fn = _make_update_var_func(
+            var_widget,
+            drive_widgets[drive_idx][var_key],
+        )
+        drive_widgets[drive_idx][var_key].observe(_fn, names="value")
+
+
 def _create_opt_widgets_for_var(
     var_name,
     initial_value,
@@ -3597,6 +3622,7 @@ def _create_opt_widgets_for_var(
         var_widget = IntText(
             value=initial_value,
             description=var_description,
+            disabled=True,  # ghosted!
             layout=var_layout,
             style=var_style,
         )
@@ -3613,27 +3639,8 @@ def _create_opt_widgets_for_var(
             style=minmax_style,
         )
 
-    # Once again, let's use closures to make new observer handlers for every variable,
-    # so that the Optimization tab copy of each variable will be auto-updated when the
-    # variable is changed in the Drives tab.
-    def _make_update_var_func(var_widget, source_widget):
-        def _update_var_func(change):
-            var_widget.value = source_widget.value
-
-        return _update_var_func
-
-    if syn_type:
-        fn = _make_update_var_func(
-            var_widget,
-            drive_widgets[drive_idx][syn_type][var_name],
-        )
-        drive_widgets[drive_idx][syn_type][var_name].observe(fn, names="value")
-    else:
-        fn = _make_update_var_func(
-            var_widget,
-            drive_widgets[drive_idx][var_name],
-        )
-        drive_widgets[drive_idx][var_name].observe(fn, names="value")
+    # Connect the main var_widget to its observed Drives tab equivalent
+    _make_observer(var_widget, var_name, drive_widgets, drive_idx, syn_type)
 
     return {
         f"{var_name}": var_widget,
@@ -3827,6 +3834,8 @@ def _get_evoked_widget_for_opt(
     n_drive_cells,
     cell_specific,
 ):
+    # Initial setup
+    # ----------------------------------------------------------------------------------
     default_data = {
         "mu": 0,
         "sigma": 1,
@@ -3850,6 +3859,8 @@ def _get_evoked_widget_for_opt(
         drive_widgets=drive_widgets,
     )
 
+    # Begin making the widgets
+    # ----------------------------------------------------------------------------------
     # Let's "initialize" the dictionary that will hold our widgets:
     opt_drive_widget = dict(
         type="Evoked",
@@ -3883,26 +3894,37 @@ def _get_evoked_widget_for_opt(
     )
 
     # Add the non-synaptic widgets that we are NOT interested in constraining/optimizing
-    # against
+    # against:
+    #
+    # Our `n_drive_cells` optimization widget will observe the drive tab's
+    # `n_drive_cells` value, NOT our local `cell_specific` widget's value
     n_drive_cells = IntText(
         value=default_data["n_drive_cells"],
         description="No. Drive Cells:",
-        disabled=default_data["cell_specific"],
+        disabled=True,
         layout=var_layout,
         style=var_style,
     )
+    _make_observer(n_drive_cells, "n_drive_cells", drive_widgets, drive_idx)
+
     cell_specific = Checkbox(
         value=default_data["cell_specific"],
         description="Cell-Specific",
+        disabled=True,
         layout=var_layout,
         style=var_style,
     )
+    _make_observer(cell_specific, "is_cell_specific", drive_widgets, drive_idx)
+
     seedcore = IntText(
         value=default_data["seedcore"],
         description="Seed:",
+        disabled=True,
         layout=var_layout,
         style=var_style,
     )
+    _make_observer(seedcore, "seedcore", drive_widgets, drive_idx)
+
     opt_drive_widget.update(
         dict(
             n_drive_cells=n_drive_cells,
@@ -3927,13 +3949,6 @@ def _get_evoked_widget_for_opt(
         **_autogen_opt_widget_kwargs,
     )
     opt_drive_widget.update(syn_widgets_dict)
-
-    # Disable n_drive_cells widget based on cell_specific checkbox (Note that this
-    # concerns the "Optimization" version of this widget, NOT the Drive one. We want
-    # them to be independent.)
-    cell_specific.observe(
-        partial(_cell_spec_change, widget=n_drive_cells), names="value"
-    )
 
     # Finally, decide the positioning and layout of all of the above widgets
     opt_drive_box = VBox(
@@ -3980,6 +3995,8 @@ def _get_poisson_widget_for_opt(
     cell_specific,
     tstop_widget,
 ):
+    # Initial setup
+    # ----------------------------------------------------------------------------------
     default_data = {
         "tstart": 0.0,
         "tstop": tstop_widget.value,
@@ -4002,6 +4019,8 @@ def _get_poisson_widget_for_opt(
         drive_widgets=drive_widgets,
     )
 
+    # Begin making the widgets
+    # ----------------------------------------------------------------------------------
     # Let's "initialize" the dictionary that will hold our widgets:
     opt_drive_widget = dict(
         type="Poisson",
@@ -4016,35 +4035,51 @@ def _get_poisson_widget_for_opt(
         description="Start time (ms):",
         min=0,
         max=1e6,
+        disabled=True,
         layout=var_layout,
         style=var_style,
     )
+    _make_observer(tstart, "tstart", drive_widgets, drive_idx)
+
     tstop = BoundedFloatText(
         value=default_data["tstop"],
         max=tstop_widget.value,
         description="Stop time (ms):",
+        disabled=True,
         layout=var_layout,
         style=var_style,
     )
+    _make_observer(tstop, "tstop", drive_widgets, drive_idx)
+
+    # Our `n_drive_cells` optimization widget will observe the drive tab's
+    # `n_drive_cells` value, NOT our local `cell_specific` widget's value
     n_drive_cells = IntText(
         value=default_data["n_drive_cells"],
         description="No. Drive Cells:",
-        disabled=default_data["cell_specific"],
+        disabled=True,
         layout=var_layout,
         style=var_style,
     )
+    _make_observer(n_drive_cells, "n_drive_cells", drive_widgets, drive_idx)
+
     cell_specific = Checkbox(
         value=default_data["cell_specific"],
         description="Cell-Specific",
+        disabled=True,
         layout=var_layout,
         style=var_style,
     )
+    _make_observer(cell_specific, "is_cell_specific", drive_widgets, drive_idx)
+
     seedcore = IntText(
         value=default_data["seedcore"],
         description="Seed:",
+        disabled=True,
         layout=var_layout,
         style=var_style,
     )
+    _make_observer(seedcore, "seedcore", drive_widgets, drive_idx)
+
     opt_drive_widget.update(
         dict(
             tstart=tstart,
@@ -4112,6 +4147,8 @@ def _get_rhythmic_widget_for_opt(
     cell_specific,
     tstop_widget,
 ):
+    # Initial setup
+    # ----------------------------------------------------------------------------------
     default_data = {
         "tstart": 0.0,
         "tstart_std": 0.0,
@@ -4138,6 +4175,8 @@ def _get_rhythmic_widget_for_opt(
         drive_widgets=drive_widgets,
     )
 
+    # Begin making the widgets
+    # ----------------------------------------------------------------------------------
     # Let's "initialize" the dictionary that will hold our widgets:
     opt_drive_widget = dict(
         type="Rhythmic",
@@ -4176,43 +4215,62 @@ def _get_rhythmic_widget_for_opt(
         description="Start time (ms):",
         min=0,
         max=1e6,
+        disabled=True,
         layout=var_layout,
         style=var_style,
     )
+    _make_observer(tstart, "tstart", drive_widgets, drive_idx)
+
     tstart_std = BoundedFloatText(
         value=default_data["tstart_std"],
         description="Start std dev (ms):",
         min=0,
         max=1e6,
+        disabled=True,
         layout=var_layout,
         style=var_style,
     )
+    _make_observer(tstart_std, "tstart_std", drive_widgets, drive_idx)
+
     tstop = BoundedFloatText(
         value=default_data["tstop"],
         description="Stop time (ms):",
         max=tstop_widget.value,
+        disabled=True,
         layout=var_layout,
         style=var_style,
     )
+    _make_observer(tstop, "tstop", drive_widgets, drive_idx)
+
+    # Our `n_drive_cells` optimization widget will observe the drive tab's
+    # `n_drive_cells` value, NOT our local `cell_specific` widget's value
     n_drive_cells = IntText(
         value=default_data["n_drive_cells"],
         description="No. Drive Cells:",
-        disabled=default_data["cell_specific"],
+        disabled=True,
         layout=var_layout,
         style=var_style,
     )
+    _make_observer(n_drive_cells, "n_drive_cells", drive_widgets, drive_idx)
+
     cell_specific = Checkbox(
         value=default_data["cell_specific"],
         description="Cell-Specific",
+        disabled=True,
         layout=var_layout,
         style=var_style,
     )
+    _make_observer(cell_specific, "is_cell_specific", drive_widgets, drive_idx)
+
     seedcore = IntText(
         value=default_data["seedcore"],
         description="Seed:",
+        disabled=True,
         layout=var_layout,
         style=var_style,
     )
+    _make_observer(seedcore, "seedcore", drive_widgets, drive_idx)
+
     opt_drive_widget.update(
         dict(
             tstart=tstart,
@@ -4290,6 +4348,8 @@ def _get_tonic_widget_for_opt(
     drive_widgets,
     tstop_widget,
 ):
+    # Initial setup
+    # ----------------------------------------------------------------------------------
     # Note that unlike the similar "weights_ampa" etc., the drive_widgets use
     # "amplitude" in the singular, not plural "amplitudes".
     default_data = {
@@ -4318,6 +4378,8 @@ def _get_tonic_widget_for_opt(
         drive_widgets=drive_widgets,
     )
 
+    # Begin making the widgets
+    # ----------------------------------------------------------------------------------
     # Let's "initialize" the dictionary that will hold our widgets:
     opt_drive_widget = dict(
         type="Tonic",
@@ -4332,18 +4394,24 @@ def _get_tonic_widget_for_opt(
         min=0,
         max=1e6,
         step=1.0,
+        disabled=True,
         layout=var_layout,
         style=var_style,
     )
+    _make_observer(start_times, "t0", drive_widgets, drive_idx)
+
     stop_times = BoundedFloatText(
         value=default_data["tstop"],
         description="Stop time (ms):",
         min=-1,
         max=1e6,
         step=1.0,
+        disabled=True,
         layout=var_layout,
         style=var_style,
     )
+    _make_observer(stop_times, "tstop", drive_widgets, drive_idx)
+
     opt_drive_widget.update(
         dict(
             t0=start_times,
