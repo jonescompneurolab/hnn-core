@@ -1598,7 +1598,7 @@ def test_gui_run_optimization():
     # gui.opt_target_widgets["rmse_target_data"].value = "S1_SupraT"
     gui.widget_opt_obj_fun.value = "maximize_psd"
 
-    file2_path = Path(hnn_core_root.parents[0], "default_to.json")
+    file2_path = Path(hnn_core_root.parents[0], "default_all.json")
     gui._simulate_upload_drives(file2_path)
 
     # Enable some values that we want to constrain for the optimization
