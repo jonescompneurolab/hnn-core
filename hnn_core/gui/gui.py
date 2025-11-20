@@ -660,7 +660,7 @@ class HNNGUI:
         self.opt_drive_widgets = list()
         self.opt_drive_boxes = list()
         self.opt_target_widgets = {}
-        self.opt_accordion = Accordion()
+        self.opt_drive_accordion = Accordion()
 
         self._init_ui_components()
         self.add_logging_window_logger()
@@ -795,18 +795,29 @@ class HNNGUI:
 
         def _add_drive_button_clicked(b):
             location = self.widget_location_selection.value.lower()
-            return self.add_drive_widget(
+            output = self.add_drive_widget(
                 self.widget_drive_type_selection.value,
                 location,
             )
+            self.add_opt_drive_widget(
+                drive_type=self.widget_drive_type_selection.value,
+                location=location,
+                prespecified_drive_name=self.drive_widgets[-1]["name"],
+                drive_idx=-1,
+            )
+            return output
 
         def _delete_drives_clicked(b):
             self._drives_out.clear_output()
+            self._opt_drives_out.clear_output()
             # black magic: the following does not work
             # global drive_widgets; drive_widgets = list()
             while len(self.drive_widgets) > 0:
                 self.drive_widgets.pop()
                 self.drive_boxes.pop()
+            while len(self.opt_drive_widgets) > 0:
+                self.opt_drive_widgets.pop()
+                self.opt_drive_boxes.pop()
 
         def _on_upload_connectivity(change):
             new_params = self.on_upload_params_change(
@@ -962,28 +973,36 @@ class HNNGUI:
 
         self.widget_opt_obj_fun.observe(_opt_obj_fun_change, "value")
 
-        # AES why isn't this working
-        # self.widget_opt_rmse_target_data.observe(_on_upload_data, names="value")
-        # self.widget_opt_rmse_target_data.observe(self.viz_manager._layout_template_change, names="value")
-
     def _delete_single_drive(self, b):
         index = self.drive_accordion.selected_index
 
         # Remove selected drive from drive lists
         self.drive_boxes.pop(index)
         self.drive_widgets.pop(index)
+        # Do the same for the Optimization tab's representation of that drive
+        self.opt_drive_boxes.pop(index)
+        self.opt_drive_widgets.pop(index)
 
-        # Rebuild the accordion collection
+        # Rebuild the accordion collections
         self.drive_accordion.titles = tuple(
             t for i, t in enumerate(self.drive_accordion.titles) if i != index
         )
         self.drive_accordion.selected_index = None
         self.drive_accordion.children = self.drive_boxes
 
+        self.opt_drive_accordion.titles = tuple(
+            t for i, t in enumerate(self.opt_drive_accordion.titles) if i != index
+        )
+        self.opt_drive_accordion.selected_index = None
+        self.opt_drive_accordion.children = self.opt_drive_boxes
+
         # Render
         self._drives_out.clear_output()
         with self._drives_out:
             display(self.drive_accordion)
+        self._opt_drives_out.clear_output()
+        with self._opt_drives_out:
+            display(self.opt_drive_accordion)
 
     def compose(self, return_layout=True):
         """Compose widgets.
@@ -1793,9 +1812,6 @@ class HNNGUI:
 
         # Stylin'
         # ------------------------------------------------------------------------------
-        # AES TODO deprecate when can
-        style = {"description_width": "125px"}
-
         # Visual config for "main variable" widgets
         # var_layout = Layout(width="225px")
         var_layout = Layout(width="230px")
@@ -1850,8 +1866,8 @@ class HNNGUI:
 
         if render:
             # Construct accordion object
-            self.opt_accordion.children = self.opt_drive_boxes
-            self.opt_accordion.selected_index = (
+            self.opt_drive_accordion.children = self.opt_drive_boxes
+            self.opt_drive_accordion.selected_index = (
                 len(self.opt_drive_boxes) - 1 if expand_last_drive else None
             )
             # Update accordion title with location
@@ -1859,11 +1875,11 @@ class HNNGUI:
                 tab_name = opt_drive_widget["name"]
                 if opt_drive_widget["type"] != "Tonic":
                     tab_name += f" ({opt_drive_widget['location']})"
-                self.opt_accordion.set_title(idx, tab_name)
+                self.opt_drive_accordion.set_title(idx, tab_name)
 
             self._opt_drives_out.clear_output()
             with self._opt_drives_out:
-                display(self.opt_accordion)
+                display(self.opt_drive_accordion)
 
     def add_opt_tab(self, params):
         self.add_opt_target_widgets()
@@ -3543,6 +3559,7 @@ def _make_observer(var_widget, var_key, drive_widgets, drive_idx, syn_type=None)
 
     Cyclomatic complexity = To infinity, and beyond!
     """
+
     # Once again, let's use closures to make new observer handlers for every variable,
     # so that the Optimization tab copy of each variable will be auto-updated when the
     # variable is changed in the Drives tab.
@@ -3675,8 +3692,7 @@ def _create_opt_widgets_for_var(
 
 
 def _create_hbox_for_opt_var(var_name, widget_dict, layout):
-    """Helper function for placement & layout of a single drive variable's Opt widgets.
-    """
+    """Helper function for placement & layout of a single drive variable's Opt widgets."""
     return HBox(
         [
             widget_dict[f"{var_name}"],
@@ -4692,6 +4708,7 @@ def _generate_constraints_and_func(net, opt_drive_widgets):
     This was originally created from the code in `_init_network_from_widgets`, but it
     has no proper equivalent for the Drives. This one took some brainpower to make.
     """
+
     # First, iterate through set of variable-specific widgets for each drive, assemble
     # param var names, and grab constraint values for those whose checkbox is true. This
     # builds a `constraints` dictionary that is FLAT, where the keys are long variable
@@ -5147,20 +5164,24 @@ def run_opt_button_clicked(
 
             logger.info("Optimization finished!")
 
-            # AES DEBUG mode
-            # # Check if optimization showed ANY difference in the objective function. If
-            # # it did not, then we made no progress, and there's no point in
-            # # re-simulating or displaying the output.
-            # if np.all(optim.obj_ == optim.obj_[0]):
-            #     logger.error(
-            #         textwrap.dedent("""
-            #         The objective function did not change over the course of the
-            #         optimization. You probably need to increase the number of max
-            #         iterations in order to start converging.
-            #         """).replace("\n", " ")
-            #     )
-            #     simulation_status_bar.value = simulation_status_contents["failed"]
-            #     return
+            # Check if optimization showed ANY difference in the objective function. If
+            # it did not, then we made no progress, and there's no point in
+            # re-simulating or displaying the output.
+            #
+            # ATTN: If we want to include something like the following in our automated
+            # testing, then we need to be sure (or at least very confident) that the
+            # same inputs will produce the same outputs (i.e. that our optimization is
+            # deterministic). Is it?
+            if np.all(optim.obj_ == optim.obj_[0]):
+                logger.error(
+                    textwrap.dedent("""
+                    The objective function did not change over the course of the
+                    optimization. You probably need to increase the number of max
+                    iterations in order to start converging.
+                    """).replace("\n", " ")
+                )
+                simulation_status_bar.value = simulation_status_contents["failed"]
+                return
 
             # --------------------------------------------------------------------------
             # Now, let's resimulate the final version of the optimized network for usage
@@ -5237,9 +5258,9 @@ def run_opt_button_clicked(
 
         # AES TODO updated the currently selected sim for download at the bottom
 
-        # AES TODO just adding a new drive directly via the GUI doesn't populate the opt tab? but loading a file with that drive does
         # AES todo stress test
         # AES TODO scale and smooth factors
+        # AES todo oh geez how to update the Drive widget values FROM our final opt net? one hack: serialize and upload it?
 
 
 def launch():
