@@ -39,3 +39,10 @@ cover
 __pycache__
 
 *.log
+
+
+hnn_core/mod/*.c
+hnn_core/mod/*.o
+hnn_core/mod/*.dll
+hnn_core/mod/x86_64/
+hnn_core/mod/*_mod.*
