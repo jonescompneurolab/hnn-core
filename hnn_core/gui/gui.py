@@ -1739,6 +1739,7 @@ class HNNGUI:
                 )
 
             should_render = drive_idx == (len(drive_names) - 1)
+
             self.add_opt_drive_widget(
                 drive_type=specs["type"].capitalize(),
                 location=specs["location"],
@@ -1767,8 +1768,13 @@ class HNNGUI:
     ):
         """Add a optimization widget for a new drive, including to the accordion."""
 
-        # Check only adds 1 tonic input widget
-        if drive_type == "Tonic" and not _is_valid_add_tonic_input(self.drive_widgets):
+        # Check only adds 1 tonic input widget to the OPT per-drive widgets (the
+        # self.drive_widgets, on the other hand, have already been built by this point,
+        # and if there is a tonic drive, it will be present in self.drive_widgets but
+        # not in self.opt_drive_widgets):
+        if drive_type == "Tonic" and not _is_valid_add_tonic_input(
+            self.opt_drive_widgets
+        ):
             return
 
         name = (
@@ -4273,16 +4279,12 @@ def _get_tonic_widget_for_opt(
     drive_idx=None,
     drive_widgets=None,
 ):
-    # # cell_types = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
-    # cell_types = ["L5_pyramidal", "L2_pyramidal", "L5_basket", "L2_basket"]
-    # default_values = {"amplitude": 0, "t0": 0, "tstop": tstop_widget.value}
-    # t0 = default_values["t0"]
-    # tstop = default_values["tstop"]
-    # default_data = {cell_type: default_values for cell_type in cell_types}
+    # Note that unlike the similar "weights_ampa" etc., the drive_widgets use
+    # "amplitude" in the singular, not plural "amplitudes".
     default_data = {
         "t0": 0,
         "tstop": tstop_widget.value,
-        "amplitudes": {
+        "amplitude": {
             "L5_pyramidal": 0.0,
             "L2_pyramidal": 0.0,
             "L5_basket": 0.0,
@@ -4338,35 +4340,32 @@ def _get_tonic_widget_for_opt(
     )
 
     syn_widgets_dict = {
-        "amplitudes" : {},
+        "amplitude": {},
     }
     amplitudes_list = []
     # Add the synaptic widgets, all of which we are interested in
     # constraining/optimizing against, along with new widgets to control their
     # constraints:
     for cell_type in ["L5_pyramidal", "L2_pyramidal", "L5_basket", "L2_basket"]:
-        syn_widgets_dict["amplitudes"].update(
+        syn_widgets_dict["amplitude"].update(
             _create_opt_widgets_for_var(
                 cell_type,
-                default_data["amplitudes"][cell_type],
+                default_data["amplitude"][cell_type],
                 f"{cell_type}:",
-                syn_type="amplitudes",
+                syn_type="amplitude",  # Note that the drive_widgets use singular 'amplitude'
                 **_autogen_opt_widget_kwargs,
             )
         )
         amplitudes_list.append(
             _create_hbox_for_opt_var(
                 cell_type,
-                syn_widgets_dict["amplitudes"],
+                syn_widgets_dict["amplitude"],
                 quadruple_entry_hbox_layout,
             )
         )
     opt_drive_widget.update(syn_widgets_dict)
 
-    syn_widgets_list = (
-        [HTML(value="<b>Amplitude (nA)</b>")]
-        + amplitudes_list
-    )
+    syn_widgets_list = [HTML(value="<b>Amplitude (nA)</b>")] + amplitudes_list
     opt_drive_box = VBox(
         [
             column_titles,
@@ -4377,46 +4376,6 @@ def _get_tonic_widget_for_opt(
     )
 
     return opt_drive_box, opt_drive_widget
-
-    # amplitudes = dict()
-    # for cell_type in cell_types:
-    #     amplitude = default_data[cell_type]["amplitude"]
-    #     amplitudes[cell_type] = BoundedFloatText(
-    #         value=amplitude, description=cell_type, min=0, max=1e6, step=0.01, **kwargs
-    #     )
-    #     # Reset the global t0 and stop with values from the 'data' keyword.
-    #     # It should be same across all the cell-types.
-    #     if amplitude > 0:
-    #         t0 = default_data[cell_type]["t0"]
-    #         tstop = default_data[cell_type]["tstop"]
-
-    # start_times = BoundedFloatText(
-    #     value=t0, description="Start time", min=0, max=1e6, step=1.0, **kwargs
-    # )
-    # stop_times = BoundedFloatText(
-    #     value=tstop, description="Stop time", min=-1, max=1e6, step=1.0, **kwargs
-    # )
-
-    # widgets_dict = {"amplitude": amplitudes, "t0": start_times, "tstop": stop_times}
-    # widgets_list = (
-    #     [HTML(value="<b>Times (ms):</b>")]
-    #     + [start_times, stop_times]
-    #     + [HTML(value="<b>Amplitude (nA):</b>")]
-    #     + list(amplitudes.values())
-    # )
-
-    # opt_drive_box = VBox(widgets_list)
-    # opt_drive_widget = dict(
-    #     type="Tonic",
-    #     name=name,
-    #     amplitude=amplitudes,
-    #     t0=start_times,
-    #     tstop=stop_times,
-    # )
-
-    # opt_drive_widget.update(widgets_dict)
-
-    # return opt_drive_box, opt_drive_widget
 
 
 def _build_opt_objects(
@@ -4593,13 +4552,7 @@ def generate_constraints_and_func(net, opt_drive_widgets):
 
     for drive_idx, drive in enumerate(opt_drive_widgets):
         if drive["type"] in ("Tonic"):
-            # weights_amplitudes = _drive_widget_to_dict(drive, "amplitude")
-            # net.add_tonic_bias(
-            #     amplitude=weights_amplitudes,
-            #     t0=drive["t0"].value,
-            #     tstop=drive["tstop"].value,
-            # )
-            pass
+            constraints.update(_build_constraints(drive, "amplitude"))
         else:
             # Synaptic variables are a special case, since they are dicts instead of
             # single values
@@ -4635,21 +4588,46 @@ def generate_constraints_and_func(net, opt_drive_widgets):
                 else:
                     return None
 
-            def use_params_if_exists(var_name):
+            def use_nonsyn_params_if_exists(var_name):
                 return (
                     params[name_check(var_name)]
                     if name_check(var_name)
                     else drive[var_name].value
                 )
 
+            def create_parametrized_syn_dicts_if_exist(syn_type):
+                cell_types = [
+                    "L5_pyramidal",
+                    "L2_pyramidal",
+                    "L5_basket",
+                    "L2_basket",
+                ]
+                if syn_type != "amplitude":
+                    if drive["location"] == "distal":
+                        cell_types.remove("L5_basket")
+                output_dict = {syn_type: {}}
+                for ct in cell_types:
+                    output_dict[syn_type].update(
+                        {
+                            ct: (
+                                params[name_check(ct, syn_type)]
+                                if name_check(ct, syn_type)
+                                else drive[syn_type][ct].value
+                            )
+                        }
+                    )
+                return output_dict
+
             if drive["type"] in ("Tonic"):
-                # weights_amplitudes = _drive_widget_to_dict(drive, "amplitude")
-                # net.add_tonic_bias(
-                #     amplitude=weights_amplitudes,
-                #     t0=drive["t0"].value,
-                #     tstop=drive["tstop"].value,
-                # )
-                pass
+                deployed_syn_dicts = {}
+                deployed_syn_dicts.update(
+                    create_parametrized_syn_dicts_if_exist("amplitude")
+                )
+                net.add_tonic_bias(
+                    amplitude=deployed_syn_dicts["amplitude"],
+                    t0=drive["t0"].value,
+                    tstop=drive["tstop"].value,
+                )
             else:
                 sync_inputs_kwargs = dict(
                     n_drive_cells=(
@@ -4660,45 +4638,17 @@ def generate_constraints_and_func(net, opt_drive_widgets):
                     cell_specific=drive["is_cell_specific"].value,
                 )
 
-                deployed_syn_dicts = {
-                    "weights_ampa": {},
-                    "weights_nmda": {},
-                    "delays": {},
-                }
-                cell_types = [
-                    "L5_pyramidal",
-                    "L2_pyramidal",
-                    "L5_basket",
-                    "L2_basket",
-                ]
-                if drive["location"] == "distal":
-                    cell_types.remove("L5_basket")
-
-                for syn_type in deployed_syn_dicts:
-                    for ct in cell_types:
-                        deployed_syn_dicts[syn_type].update(
-                            {
-                                ct: (
-                                    params[name_check(ct, syn_type)]
-                                    if name_check(ct, syn_type)
-                                    else drive[syn_type][ct].value
-                                )
-                            }
-                        )
+                deployed_syn_dicts = {}
+                for syn_type in ("weights_ampa", "weights_nmda", "delays"):
+                    deployed_syn_dicts.update(
+                        create_parametrized_syn_dicts_if_exist(syn_type)
+                    )
 
                 print(f"drive type is {drive['type']}, location={drive['location']}")
                 if drive["type"] == "Poisson":
-                    deployed_syn_dicts["rate_constant"] = {}
-                    for ct in cell_types:
-                        deployed_syn_dicts["rate_constant"].update(
-                            {
-                                ct: (
-                                    params[name_check(ct, "rate_constant")]
-                                    if name_check(ct, "rate_constant")
-                                    else drive["rate_constant"][ct].value
-                                )
-                            }
-                        )
+                    deployed_syn_dicts.update(
+                        create_parametrized_syn_dicts_if_exist("rate_constant")
+                    )
 
                     net.add_poisson_drive(
                         name=drive["name"],
@@ -4716,9 +4666,9 @@ def generate_constraints_and_func(net, opt_drive_widgets):
                 elif drive["type"] in ("Evoked", "Gaussian"):
                     net.add_evoked_drive(
                         name=drive["name"],
-                        mu=use_params_if_exists("mu"),
-                        sigma=use_params_if_exists("sigma"),
-                        numspikes=use_params_if_exists("numspikes"),
+                        mu=use_nonsyn_params_if_exists("mu"),
+                        sigma=use_nonsyn_params_if_exists("sigma"),
+                        numspikes=use_nonsyn_params_if_exists("numspikes"),
                         location=drive["location"],
                         weights_ampa=deployed_syn_dicts["weights_ampa"],
                         weights_nmda=deployed_syn_dicts["weights_nmda"],
@@ -4735,9 +4685,9 @@ def generate_constraints_and_func(net, opt_drive_widgets):
                         tstart_std=drive["tstart_std"].value,
                         tstop=drive["tstop"].value,
                         location=drive["location"],
-                        burst_rate=use_params_if_exists("burst_rate"),
-                        burst_std=use_params_if_exists("burst_std"),
-                        numspikes=use_params_if_exists("numspikes"),
+                        burst_rate=use_nonsyn_params_if_exists("burst_rate"),
+                        burst_std=use_nonsyn_params_if_exists("burst_std"),
+                        numspikes=use_nonsyn_params_if_exists("numspikes"),
                         weights_ampa=deployed_syn_dicts["weights_ampa"],
                         weights_nmda=deployed_syn_dicts["weights_nmda"],
                         synaptic_delays=deployed_syn_dicts["delays"],
@@ -4944,7 +4894,6 @@ def run_opt_button_clicked(
 
             # Execute optimization
             # --------------------------------------------------------------------------
-            # AES TODO scale and smooth factors
             try:
                 if opt_obj_fun == "dipole_rmse":
                     optim.fit(target=target_dipole, n_trials=ntrials.value)
@@ -4964,9 +4913,6 @@ def run_opt_button_clicked(
                             opt_target_widgets["psd_target_band1_proportion"].value,
                             opt_target_widgets["psd_target_band2_proportion"].value,
                         ]
-                        optim.fit(
-                            f_bands=f_bands, relative_bandpower=relative_bandpower
-                        )
                     else:
                         f_bands = [
                             (
@@ -4977,9 +4923,8 @@ def run_opt_button_clicked(
                         relative_bandpower = [
                             opt_target_widgets["psd_target_band1_proportion"].value,
                         ]
-                        optim.fit(
-                            f_bands=f_bands, relative_bandpower=relative_bandpower
-                        )
+
+                    optim.fit(f_bands=f_bands, relative_bandpower=relative_bandpower)
 
             except Exception as e:
                 logger.error(
@@ -5081,10 +5026,11 @@ def run_opt_button_clicked(
 
         # AES TODO updated the currently selected sim for download at the bottom
 
-        # AES TODO just adding a new drive directly via the GUI doesn't populate the opt tab? but loadin ga file with that drive does
+        # AES TODO just adding a new drive directly via the GUI doesn't populate the opt tab? but loading a file with that drive does
         # AES todo apply layout styles
         # AES todo stress test
         # AES todo remove unnecessary vars like location where applicable
+        # AES TODO scale and smooth factors
 
 
 def launch():
