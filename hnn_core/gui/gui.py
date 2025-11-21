@@ -560,7 +560,7 @@ class HNNGUI:
             style=opt_dropdown_style,
         )
         self.widget_opt_max_iter = BoundedIntText(
-            value=15,
+            value=5,
             min=1,
             max=10000,
             description="Max Iterations:",
