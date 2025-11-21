@@ -486,7 +486,11 @@ class HNNGUI:
             disabled=False,
         )
         self.widget_n_jobs = BoundedIntText(
-            value=1, min=1, max=self.n_cores, description="Cores:", disabled=False
+            value=self.n_cores,
+            min=1,
+            max=self.n_cores,
+            description="Cores:",
+            disabled=False,
         )
         self.load_data_button = FileUpload(
             accept=".txt,.csv",
@@ -556,8 +560,7 @@ class HNNGUI:
             style=opt_dropdown_style,
         )
         self.widget_opt_max_iter = BoundedIntText(
-            value=3,
-            # value=15,  # AES TODO
+            value=15,
             min=1,
             max=10000,
             description="Max Iterations:",
@@ -592,19 +595,6 @@ class HNNGUI:
             layout=self.layout["opt_textbox"],
             style=opt_dropdown_style,
         )
-
-        # # DATA to optimize towards aka target data
-        # # Note: all data, included loaded/experimental data, seems to be governed under
-        # # "self.simulation_data".
-        # #
-        # # AES UGH need to dive in and debug with pytest to figure out HOW DO I ACCESS LOADED DATA
-        # sim_names = [
-        #     simulations
-        #     for simulations, sim_name in self.data["simulation_data"].items()
-        #     if sim_name["net"] is not None
-        # ]
-        # if len(sim_names) == 0:
-        #     sim_names = [" "]
 
         self.run_opt_button = create_expanded_button(
             "Run Optimization",
@@ -3118,7 +3108,6 @@ def _drive_widget_to_dict(drive, name):
     return {k: v.value for k, v in drive[name].items()}
 
 
-# AES tstop appears to be unused
 def _init_network_from_widgets(
     params,
     dt,
@@ -3729,8 +3718,6 @@ def _create_opt_widgets_for_var(
     """
 
     prior_checkbox, prior_min, prior_max = None, None, None
-    # if drive_idx==3:
-    #     breakpoint()  # AES debug
     if prior_opt_widget_values:
         unique_param_name = str(
             drive_widgets[drive_idx]["type"]
@@ -4434,7 +4421,7 @@ def _create_rhythmic_widget_for_opt(
     )
 
     # Add the non-synaptic widgets that we are NOT interested in constraining/optimizing
-    # against
+    # against:
     # ----------------------------------------------------------------------------------
     # AES: numspikes is a special case, since it MUST be an integer, but our
     # Optimization's constraints-updaing functions currently assume all constraints are
@@ -5077,6 +5064,7 @@ def run_opt_button_clicked(
         simulation_data = all_data["simulation_data"]
 
         # clear empty trash simulations
+        #
         # AES: a "trash" simulation appears to be created (named "default") even if all
         # a user does is load an external dipole data file. However, I do not fully
         # understand how VizManager et al. manages the simulation data (I find it very
@@ -5154,28 +5142,6 @@ def run_opt_button_clicked(
 
         # Dynamically create both the constraints and the param-applying-function
         # ------------------------------------------------------------------------------
-        #
-        # ------------------------------------------------------------------------------
-        # THE AES DEBUGGGGG ZONE
-        # AES TODO not working for some reason, investigate
-        # Set the middle drive's checkbox off, just to keep things interesting
-        # opt_drive_widgets[0]["mu_opt_checkbox"].value = False
-        # opt_drive_widgets[0]["weights_ampa"]["L2_pyramidal_opt_checkbox"].value = True
-        # opt_max_iter = 15
-        opt_max_iter = 3
-        n_jobs.value = 11
-
-        # # AES for debugging read in
-        # # from urllib.request import urlretrieve
-        # # data_url = ('https://raw.githubusercontent.com/jonescompneurolab/hnn/master/'
-        # #             'data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt')
-        # # urlretrieve(data_url, 'yes_trial_S1_ERP_all_avg.txt')
-        # from hnn_core import read_dipole
-        # target_dipole = read_dipole('yes_trial_S1_ERP_all_avg.txt')
-        # # target_dipole = read_dipole('S1_SupraT.txt')
-        # # # UGHHHHH. Apparently some of our own dipole outputs can't be used?
-        # # target_dipole = read_dipole('dpl2.txt')
-
         set_params_func, constraints = _generate_constraints_and_func(
             simulation_data[_sim_name]["net"],
             opt_drive_widgets,
@@ -5394,24 +5360,13 @@ def run_opt_button_clicked(
             "plot",
         )
 
-        # ATTN Maybe force a file-save of the final network params automatically at the
+        # ATTN: Maybe force a file-save of the final network params automatically at the
         # end? Since the `HNNGUI.save_config_button` is just a huge HTML element itself,
         # I can't get it to artificially ".click()" to actually initiate a download. Is
         # there even a way to do this?
 
         optimized_config = serialize_config(all_data, new_name)
         return optimized_config
-
-        # AES TODO stress test
-
-        # AES TODO MEGA todo idea: generate code that reproduces the current GUI
-        # simulation run environment (with only the single selected simulation
-        # data). Then do the same thing for the Optimization, aka generate a script
-        # where someone can take where they are in the GUI and continue in the API. For
-        # the Opt, it *may* be enough to extract the drive widget values, without having
-        # to serialize the drive widgets themselves. Out of scope for this issue, but
-        # still a powerful idea.
-
 
 def launch():
     """Launch voila with hnn_widget.ipynb.

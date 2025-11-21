@@ -1585,21 +1585,29 @@ def test_gui_run_optimization():
     gui.widget_backend_selection.value = "MPI"
 
     gui.widget_ntrials.value = 2
-    # gui.opt_max_iter = 3
+    gui.opt_max_iter.value = 3
+    gui.widget_n_jobs.value = 11
 
     # gui.run_button.click()
 
-    # # doesn't work for real files???
-    # # file1_path = hnn_core_root / "dpl2.txt"
-    # file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt"  # noqa
-    # gui._simulate_upload_data(file1_url)
-    # breakpoint()  # AES debug
-    # # AES TODO apparently need to do something else to set the target data? UGHHHHH
-    # gui.opt_target_widgets["rmse_target_data"].value = "S1_SupraT"
-    gui.widget_opt_obj_fun.value = "maximize_psd"
-
     file2_path = Path(hnn_core_root.parents[0], "default_all.json")
     gui._simulate_upload_drives(file2_path)
+
+    # doesn't work for real files???
+    # file1_path = hnn_core_root / "dpl2.txt"
+    file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt"  # noqa
+    gui._simulate_upload_data(file1_url)
+
+
+    # data_url = ('https://raw.githubusercontent.com/jonescompneurolab/hnn/master/'
+    #             'data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt')
+    # urlretrieve(data_url, 'yes_trial_S1_ERP_all_avg.txt')
+    # from hnn_core import read_dipole
+    # target_dipole = read_dipole('yes_trial_S1_ERP_all_avg.txt')
+
+    # AES TODO apparently need to do something else to set the target data? UGHHHHH
+    gui.opt_target_widgets["rmse_target_data"].value = "S1_SupraT"
+    # gui.widget_opt_obj_fun.value = "maximize_psd"
 
     # Enable some values that we want to constrain for the optimization
     gui.opt_drive_widgets[0]["mu_opt_checkbox"].value = True
@@ -1610,6 +1618,7 @@ def test_gui_run_optimization():
 
     gui.run_opt_button.click()
 
+    gui.opt_target_widgets["rmse_target_data"].value = "S1_SupraT"
     gui.run_opt_button.click()
 
     default_name = gui.widget_simulation_name.value
