@@ -1589,7 +1589,7 @@ class HNNGUI:
                 [
                     HBox(
                         [
-                            HTML("Frequency Band 1"),
+                            HTML("Frequency Band 1 (Hz)"),
                             HTML(
                                 "<span style='display:inline-block;width: 32px;'></span>"
                             ),
@@ -1600,7 +1600,7 @@ class HNNGUI:
                     ),
                     HBox(
                         [
-                            HTML("Frequency Band 2"),
+                            HTML("Frequency Band 2 (Hz)"),
                             self.opt_target_widgets["psd_target_band2_checkbox"],
                             self.opt_target_widgets["psd_target_band2_min"],
                             self.opt_target_widgets["psd_target_band2_max"],
