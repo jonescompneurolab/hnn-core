@@ -1584,7 +1584,7 @@ def test_gui_run_optimization():
     gui.widget_dt.value = 0.025
     gui.widget_backend_selection.value = "MPI"
 
-    # gui.widget_ntrials.value = 2
+    gui.widget_ntrials.value = 2
     # gui.opt_max_iter = 3
 
     # gui.run_button.click()
@@ -1603,8 +1603,10 @@ def test_gui_run_optimization():
 
     # Enable some values that we want to constrain for the optimization
     gui.opt_drive_widgets[0]["mu_opt_checkbox"].value = True
-    gui.opt_drive_widgets[0]["weights_ampa"]["L2_pyramidal_opt_checkbox"].value = True
-    gui.opt_drive_widgets[-1]["amplitude"]["L2_pyramidal_opt_checkbox"].value = True
+    # gui.opt_drive_widgets[0]["weights_ampa"]["L2_pyramidal_opt_checkbox"].value = True
+    # gui.opt_drive_widgets[-1]["amplitude"]["L2_pyramidal_opt_checkbox"].value = True
+    # gui.opt_drive_widgets[0]["weights_ampa"]["L2_pyramidal_opt_checkbox"].value = True
+    gui.opt_drive_widgets[3]["tstop_opt_checkbox"].value = True
 
     gui.run_opt_button.click()
 
