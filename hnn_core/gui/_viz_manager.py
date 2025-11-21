@@ -1127,7 +1127,6 @@ class _VizManager:
         """Provides easy access to visualization-related data."""
         return {
             "use_ipympl": self.use_ipympl,
-            # AES WHAT????
             "simulations": self.gui_data["simulation_data"],
             "fig_idx": self.fig_idx,
             "visualization_output": self.viz_layout["visualization_output"],
