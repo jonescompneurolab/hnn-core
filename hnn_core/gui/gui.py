@@ -486,7 +486,7 @@ class HNNGUI:
             disabled=False,
         )
         self.widget_n_jobs = BoundedIntText(
-            value=self.n_cores,
+            value=1,
             min=1,
             max=self.n_cores,
             description="Cores:",
@@ -4313,7 +4313,7 @@ def _create_poisson_widget_for_opt(
             n_drive_cells,
             cell_specific,
             seedcore,
-         ]
+        ]
         + syn_widgets_list
     )
 
@@ -5367,6 +5367,7 @@ def run_opt_button_clicked(
 
         optimized_config = serialize_config(all_data, new_name)
         return optimized_config
+
 
 def launch():
     """Launch voila with hnn_widget.ipynb.
