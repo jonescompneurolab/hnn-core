@@ -41,6 +41,7 @@ from ipywidgets import (
     Text,
     Checkbox,
     Box,
+    dlink,
 )
 from ipywidgets.embed import embed_minimal_html
 import hnn_core
@@ -555,9 +556,8 @@ class HNNGUI:
             style=opt_dropdown_style,
         )
         self.widget_opt_max_iter = BoundedIntText(
-            # value=200,  # AES debug
             value=3,
-            # value=15,
+            # value=15,  # AES TODO
             min=1,
             max=10000,
             description="Max Iterations:",
@@ -570,6 +570,24 @@ class HNNGUI:
             min=0.1,
             max=1000.0,
             description="tstop (ms):",
+            disabled=False,
+            layout=self.layout["opt_textbox"],
+            style=opt_dropdown_style,
+        )
+        self.widget_opt_smoothing = BoundedFloatText(
+            value=30.0,
+            description="Dipole Smoothing:",
+            min=0.0,
+            max=100.0,
+            step=1.0,
+            disabled=False,
+            layout=self.layout["opt_textbox"],
+            style=opt_dropdown_style,
+        )
+        self.widget_opt_scaling = FloatText(
+            value=3000.0,
+            description="Dipole Scaling:",
+            step=100.0,
             disabled=False,
             layout=self.layout["opt_textbox"],
             style=opt_dropdown_style,
@@ -891,6 +909,8 @@ class HNNGUI:
                 self.widget_opt_obj_fun.value,
                 self.widget_opt_max_iter.value,
                 self.widget_opt_tstop.value,
+                self.widget_opt_smoothing.value,
+                self.widget_opt_scaling.value,
                 self.opt_target_widgets,
             )
             # AES "Hack" to re-load our NEW, optimized drive parameters...
@@ -978,6 +998,22 @@ class HNNGUI:
         self.cell_layer_radio_buttons.observe(_cell_layer_radio_change, "value")
 
         self.widget_opt_obj_fun.observe(_opt_obj_fun_change, "value")
+        dlink(
+            (self.widget_default_smoothing, "value"),
+            (self.widget_opt_smoothing, "value"),
+        )
+        dlink(
+            (self.widget_opt_smoothing, "value"),
+            (self.widget_default_smoothing, "value"),
+        )
+        dlink(
+            (self.widget_default_scaling, "value"),
+            (self.widget_opt_scaling, "value"),
+        )
+        dlink(
+            (self.widget_opt_scaling, "value"),
+            (self.widget_default_scaling, "value"),
+        )
 
     def _delete_single_drive(self, b):
         index = self.drive_accordion.selected_index
@@ -1134,12 +1170,14 @@ class HNNGUI:
                             [
                                 self.widget_opt_obj_fun,
                                 self.widget_opt_solver,
+                                self.widget_opt_smoothing,
                             ]
                         ),
                         VBox(
                             [
                                 self.widget_opt_max_iter,
                                 self.widget_opt_tstop,
+                                self.widget_opt_scaling,
                             ]
                         ),
                     ]
@@ -1731,6 +1769,40 @@ class HNNGUI:
         drive_specs = net.external_drives
         tonic_specs = net.external_biases
 
+        # AES TODO want to retain state of checkboxes...interesting...
+
+        if self.opt_drive_widgets:
+            # This means there's existing state, such as if we're doing a second round
+            # of optimization. In this case, we want to retain the "state" of our
+            # optimization widgets:
+            prior_opt_widget_values = [{}] * len(self.opt_drive_widgets)
+            for drive_idx, drive in enumerate(self.opt_drive_widgets):
+                for key in drive.keys():
+                    if "_opt_checkbox" in key:
+                        if drive[key].value:
+                            opt_checkbox_key = key
+                            opt_checkbox_value = True
+                            opt_min_key = key.split("_opt_checkbox")[0] + "_opt_min"
+                            opt_min_value = self.opt_drive_widgets[drive_idx][
+                                key.split("_opt_checkbox")[0] + "_opt_min"
+                            ].value
+                            opt_max_key = key.split("_opt_checkbox")[0] + "_opt_max"
+                            opt_max_value = self.opt_drive_widgets[drive_idx][
+                                key.split("_opt_checkbox")[0] + "_opt_max"
+                            ].value
+                            prior_opt_widget_values[drive_idx].update(
+                                {
+                                    opt_checkbox_key: opt_checkbox_value,
+                                    opt_min_key: opt_min_value,
+                                    opt_max_key: opt_max_value,
+                                }
+                            )
+
+                    # AES TODO need to add synapses next
+                    # AES TODO it's copying the positive checkbox across all drives of that type
+        else:
+            prior_opt_widget_values = None
+
         # clear before adding drives
         self._opt_drives_out.clear_output()
         while len(self.opt_drive_widgets) > 0:
@@ -1748,10 +1820,6 @@ class HNNGUI:
                 kwargs = dict(prespecified_drive_data=tonic_specs[drive_name])
             else:
                 specs = drive_specs[drive_name]
-                # AES: there appears to be no "prespecified" version of the Poisson
-                # drive's rate_constants, but maybe it doesn't matter? TODO what are
-                # these even for, if there are already default values inside the
-                # functions?
                 kwargs = dict(
                     prespecified_drive_data=specs["dynamics"],
                     prespecified_weights_ampa=specs["weights_ampa"],
@@ -1771,6 +1839,7 @@ class HNNGUI:
                 render=should_render,
                 expand_last_drive=False,
                 drive_idx=drive_idx,
+                prior_opt_widget_values=prior_opt_widget_values,
                 **kwargs,
             )
 
@@ -1789,6 +1858,7 @@ class HNNGUI:
         expand_last_drive=True,
         drive_idx=None,
         event_seed=14,
+        prior_opt_widget_values=None,
     ):
         """Add a optimization widget for a new drive, including to the accordion."""
 
@@ -1863,6 +1933,7 @@ class HNNGUI:
             prespecified_n_drive_cells,
             prespecified_cell_specific,
             self.widget_tstop,
+            prior_opt_widget_values,
         )
 
         self.opt_drive_boxes.append(opt_drive_box)
@@ -2574,10 +2645,6 @@ def _get_evoked_widget_for_drives(
 
 
 def _get_tonic_widget_for_drives(name, tstop_widget, layout, style, data=None):
-    # AES: This initial default value is malformed. The data is created as if each
-    # celltype has their own `t0` and `tstop` values, but as shown on the GUI, those
-    # parameters are singletons and do not differ across celltypes.
-    # AES TODO: is this a bug? What if not all celltypes' tonics are having their t0 updated?
     cell_types = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
     default_values = {"amplitude": 0, "t0": 0, "tstop": tstop_widget.value}
     t0 = default_values["t0"]
@@ -3603,6 +3670,7 @@ def _create_opt_widgets_for_var(
     minmax_style=None,
     drive_idx=None,
     drive_widgets=None,
+    prior_opt_widget_values=None,
 ):
     """For a drive variable, create its multiple Optimization widgets and observers.
 
@@ -3629,11 +3697,31 @@ def _create_opt_widgets_for_var(
         for this drive variable. This will only be actually used if the checkbox is
         checked.
     """
+
+    if prior_opt_widget_values:
+        if prior_opt_widget_values[drive_idx]:
+            if (var_name + "_opt_checkbox") in prior_opt_widget_values[drive_idx]:
+                prior_checkbox = True
+                prior_min = prior_opt_widget_values[drive_idx][var_name + "_opt_min"]
+                prior_max = prior_opt_widget_values[drive_idx][var_name + "_opt_max"]
+            else:
+                prior_checkbox, prior_min, prior_max = None, None, None
+        else:
+            prior_checkbox, prior_min, prior_max = None, None, None
+    else:
+        prior_checkbox, prior_min, prior_max = None, None, None
+
+
     opt_checkbox_widget = Checkbox(
-        value=init_bool,
+        value=(prior_checkbox if prior_checkbox else init_bool),
         layout=checkbox_layout,
         style=checkbox_style,
     )
+    # opt_checkbox_widget = Checkbox(
+    #     value= init_bool,
+    #     layout=checkbox_layout,
+    #     style=checkbox_style,
+    # )
     if isinstance(var_type, float):
         var_widget = BoundedFloatText(
             value=initial_value,
@@ -3646,7 +3734,7 @@ def _create_opt_widgets_for_var(
             style=var_style,
         )
         opt_min_widget = BoundedFloatText(
-            value=(initial_value * (1 - initial_constraint_range_proportion)),
+            value=(prior_min if prior_min else (initial_value * (1 - initial_constraint_range_proportion))),
             description="Min:",
             min=0,
             max=1e6,
@@ -3655,7 +3743,7 @@ def _create_opt_widgets_for_var(
             style=minmax_style,
         )
         opt_max_widget = BoundedFloatText(
-            value=(initial_value * (1 + initial_constraint_range_proportion)),
+            value=(prior_max if prior_max else (initial_value * (1 + initial_constraint_range_proportion))),
             description="Max:",
             min=0,
             max=1e6,
@@ -3672,13 +3760,13 @@ def _create_opt_widgets_for_var(
             style=var_style,
         )
         opt_min_widget = IntText(
-            value=round(initial_value * (1 - initial_constraint_range_proportion)),
+            value=(prior_min if prior_min else round(initial_value * (1 - initial_constraint_range_proportion))),
             description="Min:",
             layout=minmax_layout,
             style=minmax_style,
         )
         opt_max_widget = IntText(
-            value=round(initial_value * (1 + initial_constraint_range_proportion)),
+            value=(prior_max if prior_max else round(initial_value * (1 + initial_constraint_range_proportion))),
             description="Max:",
             layout=minmax_layout,
             style=minmax_style,
@@ -3907,6 +3995,7 @@ def _create_evoked_widget_for_opt(
     drive_data,
     drive_idx,
     drive_widgets,
+    prior_opt_widget_values,
     location,
     weights_ampa,
     weights_nmda,
@@ -3942,6 +4031,7 @@ def _create_evoked_widget_for_opt(
         minmax_style=minmax_style,
         drive_idx=drive_idx,
         drive_widgets=drive_widgets,
+        prior_opt_widget_values=prior_opt_widget_values,
     )
 
     # Begin making the widgets
@@ -4580,6 +4670,7 @@ def _build_opt_drive_widget(
     n_drive_cells,
     cell_specific,
     tstop_widget,
+    prior_opt_widget_values,
 ):
     """Build & arrange the Optimization widgets for a single Drive's widgets-set.
 
@@ -4610,6 +4701,7 @@ def _build_opt_drive_widget(
             drive_data,
             drive_idx,
             drive_widgets,
+            prior_opt_widget_values,
             location,
             weights_ampa,
             weights_nmda,
@@ -4865,7 +4957,7 @@ def _generate_constraints_and_func(net, opt_drive_widgets):
                         weights_ampa=deployed_syn_dicts["weights_ampa"],
                         weights_nmda=deployed_syn_dicts["weights_nmda"],
                         synaptic_delays=deployed_syn_dicts["delays"],
-                        space_constant=100.0,  # AES TODO what is this?
+                        space_constant=100.0,
                         event_seed=drive["seedcore"].value,
                         **sync_inputs_kwargs,
                     )
@@ -4879,7 +4971,7 @@ def _generate_constraints_and_func(net, opt_drive_widgets):
                         weights_ampa=deployed_syn_dicts["weights_ampa"],
                         weights_nmda=deployed_syn_dicts["weights_nmda"],
                         synaptic_delays=deployed_syn_dicts["delays"],
-                        space_constant=3.0,  # AES TODO what is this?
+                        space_constant=3.0,
                         event_seed=drive["seedcore"].value,
                         **sync_inputs_kwargs,
                     )
@@ -4932,6 +5024,8 @@ def run_opt_button_clicked(
     opt_obj_fun,
     opt_max_iter,
     opt_tstop,
+    opt_smoothing,
+    opt_scaling,
     opt_target_widgets,
 ):
     """Run an Optimization, then re-run its final simulation and plot its outputs.
@@ -4961,6 +5055,10 @@ def run_opt_button_clicked(
     10. Save the re-executed final optimized Network and simulation data into
         `simulation_data`, so that it can be used and explored in the GUI.
     11. Plot the resulting optimized dipole.
+    12. Return the "JSON config" string of our optimized Network, which the GUI will use
+        (in `HNNGUI._run_opt_button_clicked`) to RE-load all parameters of all drives.
+        This way, after a successful optimization, the GUI's Drives' parameters will
+        reflect their newly optimized values.
 
     This was built based off of `run_button_clicked`.
     """
@@ -5128,7 +5226,12 @@ def run_opt_button_clicked(
             # --------------------------------------------------------------------------
             try:
                 if opt_obj_fun == "dipole_rmse":
-                    optim.fit(target=target_dipole, n_trials=ntrials.value)
+                    optim.fit(
+                        target=target_dipole,
+                        n_trials=ntrials.value,
+                        smooth_window_len=opt_smoothing,
+                        scale_factor=opt_scaling,
+                    )
                 elif opt_obj_fun == "maximize_psd":
                     if opt_target_widgets["psd_target_band2_checkbox"].value:
                         f_bands = [
@@ -5156,7 +5259,12 @@ def run_opt_button_clicked(
                             opt_target_widgets["psd_target_band1_proportion"].value,
                         ]
 
-                    optim.fit(f_bands=f_bands, relative_bandpower=relative_bandpower)
+                    optim.fit(
+                        f_bands=f_bands,
+                        relative_bandpower=relative_bandpower,
+                        smooth_window_len=opt_smoothing,
+                        scale_factor=opt_scaling,
+                    )
 
             except Exception as e:
                 logger.error(
@@ -5165,27 +5273,6 @@ def run_opt_button_clicked(
                 )
                 simulation_status_bar.value = simulation_status_contents["failed"]
                 raise
-
-            logger.info("Optimization finished!")
-
-            # Check if optimization showed ANY difference in the objective function. If
-            # it did not, then we made no progress, and there's no point in
-            # re-simulating or displaying the output.
-            #
-            # ATTN: If we want to include something like the following in our automated
-            # testing, then we need to be sure (or at least very confident) that the
-            # same inputs will produce the same outputs (i.e. that our optimization is
-            # deterministic). Is it?
-            if np.all(optim.obj_ == optim.obj_[0]):
-                logger.error(
-                    textwrap.dedent("""
-                    The objective function did not change over the course of the
-                    optimization. You probably need to increase the number of max
-                    iterations in order to start converging.
-                    """).replace("\n", " ")
-                )
-                simulation_status_bar.value = simulation_status_contents["failed"]
-                return None
 
             # --------------------------------------------------------------------------
             # Now, let's resimulate the final version of the optimized network for usage
@@ -5222,11 +5309,6 @@ def run_opt_button_clicked(
                 dt=dt.value,
                 n_trials=ntrials.value,
             )
-            simulation_status_bar.value = simulation_status_contents["finished"]
-
-            # AES TODO Maybe force a file-save of the final network params too
-            # automatically? This is a good spot to do it
-
             # Finally, update the list of simulations to include our new one:
             sim_names = [
                 sim_name
@@ -5236,14 +5318,43 @@ def run_opt_button_clicked(
             simulations_list_widget.options = sim_names
             simulations_list_widget.value = sim_names[-1]
 
+            # Report back to the user, now that all simulations/output are completed:
+            logger.info(
+                textwrap.dedent(f"""
+                Optimization finished!
+                Don't forget to "Save Network"!
+                First objective function result: {optim.obj_[0]}
+                Last objective function result: {optim.obj_[-1]}
+                Diff: {abs(optim.obj_[-1] - optim.obj_[0])}
+                """)
+            )
+            # Check if optimization showed ANY difference in the objective function. If
+            # it did not, then we made no progress.
+            #
+            # ATTN: If we want to include something like the following in our automated
+            # testing, then we need to be sure (or at least very confident) that the
+            # same inputs will produce the same outputs (i.e. that our optimization is
+            # deterministic). Is it?
+            if np.all(optim.obj_ == optim.obj_[0]):
+                logger.warning(
+                    textwrap.dedent("""
+                    The objective function did not change over the course of the
+                    optimization. You probably need to increase the number of max
+                    iterations in order to start converging.
+                    """).replace("\n", " ")
+                )
+                simulation_status_bar.value = simulation_status_contents["failed"]
+            else:
+                simulation_status_bar.value = simulation_status_contents["finished"]
+
         # ------------------------------------------------------------------------------
         # The remainder of this function is just repeating some post-run visualization
         # steps, which are identical to those in `run_button_clicked`
         viz_manager.reset_fig_config_tabs()
 
         # update default visualization params in gui based on widget
-        fig_default_params["default_smoothing"] = widget_default_smoothing.value
-        fig_default_params["default_scaling"] = widget_default_scaling.value
+        fig_default_params["default_smoothing"] = opt_smoothing
+        fig_default_params["default_scaling"] = opt_scaling
         fig_default_params["default_min_frequency"] = widget_min_frequency.value
         fig_default_params["default_max_frequency"] = widget_max_frequency.value
 
@@ -5253,19 +5364,47 @@ def run_opt_button_clicked(
 
         viz_manager.add_figure()
         fig_name = _idx2figname(viz_manager.data["fig_idx"]["idx"] - 1)
-        ax_plots = [("ax0", "input histogram"), ("ax1", "current dipole")]
-        for ax_name, plot_type in ax_plots:
-            # AES TODO: for dipole_rmse, auto-plot the target data too
-            viz_manager._simulate_edit_figure(
-                fig_name, ax_name, (_sim_name + "_optimized"), plot_type, {}, "plot"
-            )
+        viz_manager._simulate_edit_figure(
+            fig_name,
+            "ax0",
+            (_sim_name + "_optimized"),
+            "input histogram",
+            {},
+            "plot",
+        )
+        viz_manager._simulate_edit_figure(
+            fig_name,
+            "ax1",
+            (_sim_name + "_optimized"),
+            "current dipole",
+            {
+                "data_to_compare": opt_target_widgets["rmse_target_data"].value
+                if opt_obj_fun == "dipole_rmse"
+                else None
+            },
+            "plot",
+        )
 
+        # ATTN Maybe force a file-save of the final network params automatically at the
+        # end? Since the `HNNGUI.save_config_button` is just a huge HTML element itself,
+        # I can't get it to artificially ".click()" to actually initiate a download. Is
+        # there even a way to do this?
 
-        optimized_config = serialize_config(all_data, (_sim_name + "_optimized"))
+        optimized_config = serialize_config(all_data, new_name)
         return optimized_config
 
         # AES TODO stress test
-        # AES TODO scale and smooth factors
+        # AES TODO test trials
+        # AES TODO stop un-checking of opt Checkboxes after a simulation
+        # AES todo number spikes not working?
+
+        # AES TODO MEGA todo idea: generate code that reproduces the current GUI
+        # simulation run environment (with only the single selected simulation
+        # data). Then do the same thing for the Optimization, aka generate a script
+        # where someone can take where they are in the GUI and continue in the API. For
+        # the Opt, it *may* be enough to extract the drive widget values, without having
+        # to serialize the drive widgets themselves. Out of scope for this issue, but
+        # still a powerful idea.
 
 
 def launch():

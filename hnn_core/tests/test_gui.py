@@ -1608,6 +1608,8 @@ def test_gui_run_optimization():
 
     gui.run_opt_button.click()
 
+    gui.run_opt_button.click()
+
     default_name = gui.widget_simulation_name.value
     dpls = gui.simulation_data[default_name + "_optimized"]["dpls"]
     assert isinstance(gui.simulation_data[default_name + "_optimized"]["net"], Network)
