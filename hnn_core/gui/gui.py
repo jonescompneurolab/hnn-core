@@ -570,7 +570,7 @@ class HNNGUI:
         )
         self.widget_opt_tstop = BoundedFloatText(
             value=170,
-            min=0.1,
+            min=1,
             max=1000.0,
             description="tstop (ms):",
             disabled=False,
@@ -987,6 +987,15 @@ class HNNGUI:
         self.cell_layer_radio_buttons.observe(_cell_layer_radio_change, "value")
 
         self.widget_opt_obj_fun.observe(_opt_obj_fun_change, "value")
+        dlink(
+            (self.widget_opt_tstop, "value"),
+            (self.widget_tstop, "value"),
+        )
+        dlink(
+            (self.widget_tstop, "value"),
+            (self.widget_opt_tstop, "value"),
+        )
+
         dlink(
             (self.widget_default_smoothing, "value"),
             (self.widget_opt_smoothing, "value"),
