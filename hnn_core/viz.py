@@ -283,6 +283,7 @@ def plot_layer_comparison(
     plt_show(show)
     return fig
 
+
 def _lighten_color(color, amount=0.5):
     import matplotlib.colors as mc
 
