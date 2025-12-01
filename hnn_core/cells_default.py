@@ -53,8 +53,8 @@ def _get_dends(params, cell_type, section_names, v_init={"all": -65}):
     return sections
 
 
-# KD: In the new model, the basal dendrites are differently tuned from the apical
-# dendrites.
+# KD: In the new `duecker_ET_model` model, tuning of the basal dendrites is different
+# from the tuning of the apical dendrites.
 def _get_basal(params, cell_type, section_names, v_init={"all": -65}):
     """Convert a flat dictionary to a nested dictionary.
 
