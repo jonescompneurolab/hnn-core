@@ -36,17 +36,19 @@ def _get_dends(params, cell_type, section_names, v_init={"all": -65}):
                 # map apicaltrunk -> apical_trunk etc.
                 middle = section_name.replace("_", "")
             dend_prop[key] = params[f"{cell_type}_{middle}_{key}"]
-            if len(v_init) == 1:
-                v0 = v_init["all"]
-            else:
-                v0 = v_init[section_name]
+        # v0 is handled separately since it is "newer", and will never be found in the
+        # `params` input.
+        if len(v_init) == 1:
+            dend_prop["v0"] = v_init["all"]
+        else:
+            dend_prop["v0"] = v_init[section_name]
 
         sections[section_name] = Section(
             L=dend_prop["L"],
             diam=dend_prop["diam"],
             Ra=dend_prop["Ra"],
             cm=dend_prop["cm"],
-            v0=v0,
+            v0=dend_prop["v0"],
         )
     return sections
 
@@ -73,16 +75,18 @@ def _get_basal(params, cell_type, section_names, v_init={"all": -65}):
                 # map apicaltrunk -> apical_trunk etc.
                 middle = section_name.replace("_", "")
             dend_prop[key] = params[f"{cell_type}_{middle}_{key}"]
-            if len(v_init) == 1:
-                v0 = v_init["all"]
-            else:
-                v0 = v_init[section_name]
+        # v0 is handled separately since it is "newer", and will never be found in the
+        # `params` input.
+        if len(v_init) == 1:
+            dend_prop["v0"] = v_init["all"]
+        else:
+            dend_prop["v0"] = v_init[section_name]
         sections[section_name] = Section(
             L=dend_prop["L"],
             diam=dend_prop["diam"],
             Ra=dend_prop["Ra"],
             cm=dend_prop["cm"],
-            v0=v0,
+            v0=dend_prop["v0"],
         )
 
 
