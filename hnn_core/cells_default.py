@@ -37,16 +37,16 @@ def _get_dends(params, cell_type, section_names, v_init={"all": -65}):
                 middle = section_name.replace("_", "")
             dend_prop[key] = params[f"{cell_type}_{middle}_{key}"]
             if len(v_init) == 1:
-                v = v_init["all"]
+                v0 = v_init["all"]
             else:
-                v = v_init[section_name]
+                v0 = v_init[section_name]
 
         sections[section_name] = Section(
             L=dend_prop["L"],
             diam=dend_prop["diam"],
             Ra=dend_prop["Ra"],
             cm=dend_prop["cm"],
-            v=v,
+            v0=v0,
         )
     return sections
 
@@ -74,15 +74,15 @@ def _get_basal(params, cell_type, section_names, v_init={"all": -65}):
                 middle = section_name.replace("_", "")
             dend_prop[key] = params[f"{cell_type}_{middle}_{key}"]
             if len(v_init) == 1:
-                v = v_init["all"]
+                v0 = v_init["all"]
             else:
-                v = v_init[section_name]
+                v0 = v_init[section_name]
         sections[section_name] = Section(
             L=dend_prop["L"],
             diam=dend_prop["diam"],
             Ra=dend_prop["Ra"],
             cm=dend_prop["cm"],
-            v=v,
+            v0=v0,
         )
 
 
@@ -93,7 +93,7 @@ def _get_pyr_soma(p_all, cell_type, v_init=-65):
         diam=p_all[f"{cell_type}_soma_diam"],
         cm=p_all[f"{cell_type}_soma_cm"],
         Ra=p_all[f"{cell_type}_soma_Ra"],
-        v=v_init,
+        v0=v_init,
     )
 
 
@@ -315,7 +315,7 @@ def _get_basket_soma(cell_name, v_init=-64.9737):
         diam=20.0,
         cm=0.85,
         Ra=200.0,
-        v=v_init,
+        v0=v_init,
         end_pts=end_pts,
     )
 

@@ -166,13 +166,13 @@ def _read_cell_types(cell_types_data):
         sections_data = cell_data["sections"]
         for section_name in sections_data:
             section_data = sections_data[section_name]
-            if "v" in section_data.keys():
+            if "v0" in section_data.keys():
                 sections[section_name] = Section(
                     L=section_data["L"],
                     diam=section_data["diam"],
                     cm=section_data["cm"],
                     Ra=section_data["Ra"],
-                    v=section_data["v"],
+                    v0=section_data["v0"],
                     end_pts=section_data["end_pts"],
                 )
             else:
