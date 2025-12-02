@@ -1650,6 +1650,9 @@ class HNNGUI:
 
         # The obj_fun="maximize_psd" case is much more complex
         # ------------------------------------------------------------------------------
+        # Note: these are ONLY for the Optimization "target" widgets, NOT the
+        # Optimization drive widgets!
+        #
         # Visual config for checkbox widgets
         checkbox_layout = Layout(width="30px")
         checkbox_style = {"description_width": "0px"}
@@ -1799,29 +1802,37 @@ class HNNGUI:
             # as by checking its checkbox). In this case, we want to re-load the prior
             # "state" of our optimization widgets:
             #
-            # This code is basically copied from `_generate_constraints_and_func`
+            # This code is basically copied from `_generate_constraints_and_func`, but
+            # using `_extract_prior_constraints` instead of `_build_constraints` due to
+            # the use of min/max percentages.
             for drive in self.opt_drive_widgets:
                 if drive["type"] in ("Tonic"):
-                    prior_opt_widget_values.update(_build_constraints(drive))
+                    prior_opt_widget_values.update(_extract_prior_constraints(drive))
                     prior_opt_widget_values.update(
-                        _build_constraints(drive, "amplitude")
+                        _extract_prior_constraints(drive, "amplitude")
                     )
                 else:
                     # Synaptic variables are a special case, since they are dicts instead of
                     # single values
                     for syn_type in ("weights_ampa", "weights_nmda", "delays"):
                         prior_opt_widget_values.update(
-                            _build_constraints(drive, syn_type)
+                            _extract_prior_constraints(drive, syn_type)
                         )
                     if drive["type"] == "Poisson":
-                        prior_opt_widget_values.update(_build_constraints(drive))
                         prior_opt_widget_values.update(
-                            _build_constraints(drive, "rate_constant")
+                            _extract_prior_constraints(drive)
+                        )
+                        prior_opt_widget_values.update(
+                            _extract_prior_constraints(drive, "rate_constant")
                         )
                     elif drive["type"] in ("Evoked", "Gaussian"):
-                        prior_opt_widget_values.update(_build_constraints(drive))
+                        prior_opt_widget_values.update(
+                            _extract_prior_constraints(drive)
+                        )
                     elif drive["type"] in ("Rhythmic", "Bursty"):
-                        prior_opt_widget_values.update(_build_constraints(drive))
+                        prior_opt_widget_values.update(
+                            _extract_prior_constraints(drive)
+                        )
 
         # clear before adding drives
         self._opt_drives_out.clear_output()
@@ -1901,8 +1912,9 @@ class HNNGUI:
         )
         prespecified_drive_data.update({"seedcore": max(event_seed, 2)})
 
-        # Set the proportion of the initial min/max constraint values
-        initial_constraint_range_proportion = 0.2
+        # Set the lower (negative) and upper (positive) bounds of the initial min/max
+        # constraint values
+        initial_constraint_range_percentage = 20
 
         # Stylin'
         # ------------------------------------------------------------------------------
@@ -1927,7 +1939,7 @@ class HNNGUI:
         column_titles = HTML(
             value=f"""
             <div style='margin:0px 0px 0px 190px;'><b>Optimize against?</b>
-            {html_tab}{html_tab}{html_tab}Constraints:</div>
+            {html_tab}{html_tab}{html_tab}Constraints (in %):</div>
             """,
         )
 
@@ -1942,7 +1954,7 @@ class HNNGUI:
             var_layout,
             var_style,
             column_titles,
-            initial_constraint_range_proportion,
+            initial_constraint_range_percentage,
             prespecified_drive_data,
             drive_idx,
             self.drive_widgets,
@@ -3689,7 +3701,7 @@ def _create_opt_widgets_for_var(
     var_description,
     syn_type=None,
     init_bool=False,
-    initial_constraint_range_proportion=None,
+    initial_constraint_range_percentage=None,
     var_layout=None,
     var_style=None,
     checkbox_layout=None,
@@ -3717,16 +3729,16 @@ def _create_opt_widgets_for_var(
         is used later in `_generate_constraints_and_func` to build the "parameters
         update function" (`set_params`) that is needed by the Optimization process.
 
-        3. A widget for the minimum value of the constraint range that should be used
-        for this drive variable. This will only be actually used if the checkbox is
-        checked.
+        3. A widget for the "minimum" percentage of the current value of the drive
+        variable, to be used as the minimum of the constraint range. This will only be
+        actually used if the checkbox is checked.
 
-        4. A widget for the maximum value of the constraint range that should be used
-        for this drive variable. This will only be actually used if the checkbox is
-        checked.
+        4. A widget for the "maximum" percentage of the current value of the drive
+        variable, to be used as the maximum of the constraint range. This will only be
+        actually used if the checkbox is checked.
     """
 
-    prior_checkbox, prior_min, prior_max = None, None, None
+    prior_checkbox, prior_min_pct, prior_max_pct = None, None, None
     if prior_opt_widget_values:
         unique_param_name = str(
             drive_widgets[drive_idx]["type"]
@@ -3739,8 +3751,8 @@ def _create_opt_widgets_for_var(
         for prior_constraint_key in prior_opt_widget_values.keys():
             if unique_param_name in prior_constraint_key:
                 prior_checkbox = True
-                prior_min = prior_opt_widget_values[unique_param_name][0]
-                prior_max = prior_opt_widget_values[unique_param_name][1]
+                prior_min_pct = prior_opt_widget_values[unique_param_name][0]
+                prior_max_pct = prior_opt_widget_values[unique_param_name][1]
                 break
 
     var_widget = BoundedFloatText(
@@ -3757,30 +3769,29 @@ def _create_opt_widgets_for_var(
         layout=checkbox_layout,
         style=checkbox_style,
     )
-
     opt_min_widget = BoundedFloatText(
         value=(
-            prior_min
-            if prior_min
-            else (initial_value * (1 - initial_constraint_range_proportion))
+            prior_min_pct
+            if prior_min_pct is not None
+            else -initial_constraint_range_percentage
         ),
         description="Min:",
-        min=0,
-        max=1e6,
-        step=0.1,
+        min=-100,
+        max=1000,
+        step=1,
         layout=minmax_layout,
         style=minmax_style,
     )
     opt_max_widget = BoundedFloatText(
         value=(
-            prior_max
-            if prior_max
-            else (initial_value * (1 + initial_constraint_range_proportion))
+            prior_max_pct
+            if prior_max_pct is not None
+            else initial_constraint_range_percentage
         ),
         description="Max:",
-        min=0,
-        max=1e6,
-        step=0.1,
+        min=-100,
+        max=1000,
+        step=1,
         layout=minmax_layout,
         style=minmax_style,
     )
@@ -3838,13 +3849,13 @@ def _create_synaptic_widgets_for_opt(
         is used later in `_generate_constraints_and_func` to build the "parameters
         update function" (`set_params`) that is needed by the Optimization process.
 
-        3. A widget for the minimum value of the constraint range that should be used
-        for this drive variable. This will only be actually used if the checkbox is
-        checked.
+        3. A widget for the "minimum" percentage of the current value of the drive
+        variable, to be used as the minimum of the constraint range. This will only be
+        actually used if the checkbox is checked.
 
-        4. A widget for the maximum value of the constraint range that should be used
-        for this drive variable. This will only be actually used if the checkbox is
-        checked.
+        4. A widget for the "maximum" percentage of the current value of the drive
+        variable, to be used as the maximum of the constraint range. This will only be
+        actually used if the checkbox is checked.
 
     This handles the cases for Evoked, Poisson, and Rhythmic drives, but not Tonic
     biases. Tonic biases require slightly different handling, and do the same essential
@@ -4004,7 +4015,7 @@ def _create_evoked_widget_for_opt(
     var_layout,
     var_style,
     column_titles,
-    initial_constraint_range_proportion,
+    initial_constraint_range_percentage,
     drive_data,
     drive_idx,
     drive_widgets,
@@ -4035,7 +4046,7 @@ def _create_evoked_widget_for_opt(
     default_data = _update_nested_dict(default_data, drive_data)
 
     _autogen_opt_widget_kwargs = dict(
-        initial_constraint_range_proportion=initial_constraint_range_proportion,
+        initial_constraint_range_percentage=initial_constraint_range_percentage,
         var_layout=var_layout,
         var_style=var_style,
         checkbox_layout=checkbox_layout,
@@ -4179,7 +4190,7 @@ def _create_poisson_widget_for_opt(
     var_layout,
     var_style,
     column_titles,
-    initial_constraint_range_proportion,
+    initial_constraint_range_percentage,
     drive_data,
     drive_idx,
     drive_widgets,
@@ -4210,7 +4221,7 @@ def _create_poisson_widget_for_opt(
     default_data = _update_nested_dict(default_data, drive_data)
 
     _autogen_opt_widget_kwargs = dict(
-        initial_constraint_range_proportion=initial_constraint_range_proportion,
+        initial_constraint_range_percentage=initial_constraint_range_percentage,
         var_layout=var_layout,
         var_style=var_style,
         checkbox_layout=checkbox_layout,
@@ -4339,7 +4350,7 @@ def _create_rhythmic_widget_for_opt(
     var_layout,
     var_style,
     column_titles,
-    initial_constraint_range_proportion,
+    initial_constraint_range_percentage,
     drive_data,
     drive_idx,
     drive_widgets,
@@ -4374,7 +4385,7 @@ def _create_rhythmic_widget_for_opt(
     default_data = _update_nested_dict(default_data, drive_data)
 
     _autogen_opt_widget_kwargs = dict(
-        initial_constraint_range_proportion=initial_constraint_range_proportion,
+        initial_constraint_range_percentage=initial_constraint_range_percentage,
         var_layout=var_layout,
         var_style=var_style,
         checkbox_layout=checkbox_layout,
@@ -4544,7 +4555,7 @@ def _create_tonic_widget_for_opt(
     var_layout,
     var_style,
     column_titles,
-    initial_constraint_range_proportion,
+    initial_constraint_range_percentage,
     drive_data,
     drive_idx,
     drive_widgets,
@@ -4575,7 +4586,7 @@ def _create_tonic_widget_for_opt(
         default_data = _update_nested_dict(default_data, drive_data)
 
     _autogen_opt_widget_kwargs = dict(
-        initial_constraint_range_proportion=initial_constraint_range_proportion,
+        initial_constraint_range_percentage=initial_constraint_range_percentage,
         var_layout=var_layout,
         var_style=var_style,
         checkbox_layout=checkbox_layout,
@@ -4663,7 +4674,7 @@ def _build_opt_drive_widget(
     var_layout,
     var_style,
     column_titles,
-    initial_constraint_range_proportion,
+    initial_constraint_range_percentage,
     drive_data,
     drive_idx,
     drive_widgets,
@@ -4701,7 +4712,7 @@ def _build_opt_drive_widget(
             var_layout,
             var_style,
             column_titles,
-            initial_constraint_range_proportion,
+            initial_constraint_range_percentage,
             drive_data,
             drive_idx,
             drive_widgets,
@@ -4724,7 +4735,7 @@ def _build_opt_drive_widget(
             var_layout,
             var_style,
             column_titles,
-            initial_constraint_range_proportion,
+            initial_constraint_range_percentage,
             drive_data,
             drive_idx,
             drive_widgets,
@@ -4748,7 +4759,7 @@ def _build_opt_drive_widget(
             var_layout,
             var_style,
             column_titles,
-            initial_constraint_range_proportion,
+            initial_constraint_range_percentage,
             drive_data,
             drive_idx,
             drive_widgets,
@@ -4772,7 +4783,7 @@ def _build_opt_drive_widget(
             var_layout,
             var_style,
             column_titles,
-            initial_constraint_range_proportion,
+            initial_constraint_range_percentage,
             drive_data,
             drive_idx,
             drive_widgets,
@@ -4785,7 +4796,12 @@ def _build_opt_drive_widget(
     return opt_drive_box, opt_drive_widget
 
 
-def _build_constraints(drive, syn_type=None):
+def _extract_prior_constraints(drive, syn_type=None):
+    """Extract percentage values from optimization widgets for prior state preservation.
+
+    This function extracts the raw percentage values from the min/max widgets,
+    which are used to preserve the optimization widget state when rebuilding the UI.
+    """
     output_constraints = {}
     if syn_type:
         input_dict = drive[syn_type]
@@ -4808,16 +4824,54 @@ def _build_constraints(drive, syn_type=None):
                 + (syn_type + "_" if syn_type else "")
                 + var_name
             )
-            # Use the unique name as the key, and add the bounds
+            # Get the percentage values from the min/max widgets (raw percentages)
+            min_pct = input_dict[var_name + "_opt_min"].value
+            max_pct = input_dict[var_name + "_opt_max"].value
+            # Store the raw percentage values for prior state restoration
+            output_constraints.update({unique_param_name: tuple([min_pct, max_pct])})
+    return output_constraints
+
+
+def _build_constraints(drive, syn_type=None):
+    """Build constraints dictionary with actual values converted from percentages.
+
+    This function converts the percentage values from the min/max widgets into
+    actual constraint values based on the current parameter value.
+    """
+    output_constraints = {}
+    if syn_type:
+        input_dict = drive[syn_type]
+    else:
+        input_dict = drive
+    for key in input_dict.keys():
+        # For every variable with a checkbox, but only if the checkbox
+        # is true/checked
+        if ("_opt_checkbox" in key) and (input_dict[key].value):
+            # Extract the var name
+            var_name = key.split("_opt_checkbox")[0]
+            # Create a new, unique var name for this drive's instance of
+            # that variable, which will become our key in our
+            # `input_constraints` dict
+            unique_param_name = str(
+                drive["type"]
+                + "_"
+                + drive["name"]
+                + "_"
+                + (syn_type + "_" if syn_type else "")
+                + var_name
+            )
+            # Get the current value of the parameter
+            current_value = input_dict[var_name].value
+            # Get the percentage values from the min/max widgets
+            min_pct = input_dict[var_name + "_opt_min"].value
+            max_pct = input_dict[var_name + "_opt_max"].value
+            # Convert percentages to actual values
+            # e.g., if current_value=10 and min_pct=-50, then min_value=10*(1-0.5)=5
+            min_value = current_value * (1 + min_pct / 100)
+            max_value = current_value * (1 + max_pct / 100)
+            # Use the unique name as the key, and add the bounds as actual values
             output_constraints.update(
-                {
-                    unique_param_name: tuple(
-                        [
-                            input_dict[var_name + "_opt_min"].value,
-                            input_dict[var_name + "_opt_max"].value,
-                        ]
-                    )
-                }
+                {unique_param_name: tuple([min_value, max_value])}
             )
     return output_constraints
 
