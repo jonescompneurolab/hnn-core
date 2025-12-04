@@ -508,6 +508,10 @@ class HNNGUI:
         self.save_config_button = self._init_html_download_button(
             title="Save Network", mimetype="application/json"
         )
+        self.save_opt_history_button = self._init_html_download_button(
+            title="Save Optimization History",
+            mimetype="text/plain",
+        )
 
         self.simulation_list_widget = Dropdown(
             options=[], value=None, description="", layout={"width": "15%"}
@@ -599,7 +603,10 @@ class HNNGUI:
         self.run_opt_button = create_expanded_button(
             "Run Optimization",
             "success",
-            layout=Layout(width="auto"),
+            layout=Layout(
+                height=self.layout["run_btn"].height,
+                width="74%",
+            ),
             button_color=self.layout["theme_color"],
         )
 
@@ -669,6 +676,7 @@ class HNNGUI:
         self.opt_drive_boxes = list()
         self.opt_target_widgets = {}
         self.opt_drive_accordion = Accordion()
+        self.opt_results = list()
 
         self._init_ui_components()
         self.add_logging_window_logger()
@@ -871,7 +879,7 @@ class HNNGUI:
             )
 
         def _run_opt_button_clicked(b):
-            output_config = run_opt_button_clicked(
+            result = run_opt_button_clicked(
                 self.widget_simulation_name,
                 self._log_out,
                 self.opt_drive_widgets,
@@ -904,9 +912,16 @@ class HNNGUI:
             )
             # AES "Hack" to re-load our NEW, optimized drive parameters...
             # ...is it a hack if it works well? ;)
-            if output_config:
+            if result:
+                output_config, opt_result = result
+                # Rebuild the drives' widgets in the Drives and Optimization tabs from
+                # the returned parameters after optimization:
                 self.params = json.loads(output_config)
                 self.load_conn_drives_opt()
+
+                # Add and use the output of the latest optimization run to the history:
+                self.opt_results.append(opt_result)
+                self._update_opt_history_button()
             return
 
         def _simulation_list_change(value):
@@ -1181,7 +1196,13 @@ class HNNGUI:
                     ]
                 ),
                 self._opt_target_out,
-                self.run_opt_button,
+                HBox(
+                    [
+                        self.run_opt_button,
+                        self.save_opt_history_button,
+                    ],
+                    layout=Layout(width="100%"),
+                ),
                 self._opt_drives_out,
             ]
         )
@@ -1675,7 +1696,9 @@ class HNNGUI:
         # Parameters for obj_fun="maximize_psd" Frequency Band 1
         # ------------------------------------------------------------------------------
         # Determine disabled states based on prior checkbox value (if it exists)
-        band2_checkbox_value = prior_target_state.get("psd_target_band2_checkbox", False)
+        band2_checkbox_value = prior_target_state.get(
+            "psd_target_band2_checkbox", False
+        )
         band1_proportion_disabled = not band2_checkbox_value
         band2_widgets_disabled = not band2_checkbox_value
 
@@ -1805,6 +1828,135 @@ class HNNGUI:
         # ------------------------------------------------------------------------------
         self._update_opt_target_hbox(
             self.widget_opt_obj_fun.value,
+        )
+
+    def _generate_opt_history_table(self, report_timestamp):
+        """Generate a human-readable text table of optimization history.
+
+        Parameters
+        ----------
+        report_timestamp : str
+            A timestamp, formatted however you choose, which will be used to indicate
+            the time when the report was generated. This will represent the same time as
+            the time used to generate the filename for the report.
+
+        Returns
+        -------
+        str
+            A formatted text table documenting the initial and final values
+            of optimized parameters and the first/final objective function values
+            for each full optimization run.
+        """
+        if not self.opt_results:
+            return "No optimization runs have been completed yet."
+
+        lines = []
+        lines.append("=" * 100)
+        lines.append("OPTIMIZATION HISTORY")
+        lines.append(f"Generated: {report_timestamp}")
+        lines.append("=" * 100)
+        lines.append("")
+
+        for run_idx, opt_result in enumerate(self.opt_results, start=1):
+            run_timestamp = opt_result.get("timestamp", "N/A")
+            solver = opt_result.get("solver", "N/A")
+            obj_fun = opt_result.get("obj_fun", "unknown")
+            max_iter = opt_result.get("max_iter", "N/A")
+
+            lines.append(f"Run #{run_idx} - {run_timestamp}")
+            lines.append("-" * 100)
+            lines.append(f"Solver: {solver}")
+            lines.append(f"Objective Function: {obj_fun}")
+            lines.append(f"Max Iterations: {max_iter}")
+
+            # Add target dataset info if using dipole_rmse
+            if obj_fun == "dipole_rmse" and "target_data" in opt_result:
+                lines.append(f"Target Dataset: {opt_result['target_data']}")
+                if "n_trials" in opt_result:
+                    lines.append(f"Number of Trials: {opt_result['n_trials']}")
+
+            # Add frequency band info if using maximize_psd
+            if obj_fun == "maximize_psd" and "psd_f_bands" in opt_result:
+                f_bands = opt_result["psd_f_bands"]
+                rel_bandpower = opt_result["psd_relative_bandpower"]
+                for i, (band, weight) in enumerate(
+                    zip(f_bands, rel_bandpower), start=1
+                ):
+                    lines.append(
+                        f"  Frequency Band {i}: {band[0]:.1f}-{band[1]:.1f} Hz (weight: {weight:.3f})"
+                    )
+
+            lines.append("")
+
+            # Get parameter names from initial_params dict
+            param_names = list(opt_result["initial_params"].keys())
+
+            # Create header
+            header = f"{'Parameter':<40} {'Initial Value':>15} {'Final Value':>15} {'Change':>15}"
+            lines.append(header)
+            lines.append("-" * 100)
+
+            # Add each parameter
+            for param_idx, param_name in enumerate(param_names):
+                initial_val = opt_result["initial_params"][param_name]
+                # opt_params should be a list in the same order as "initial_params"
+                final_val = opt_result["opt_params"][param_idx]
+                change = final_val - initial_val
+
+                # Format the values with appropriate precision
+                param_str = f"{param_name:<40}"
+                initial_str = f"{initial_val:>15.6f}"
+                final_str = f"{final_val:>15.6f}"
+                change_str = f"{change:>+15.6f}"
+
+                line = f"{param_str} {initial_str} {final_str} {change_str}"
+                lines.append(line)
+
+            lines.append("")
+            # Display objective function values with RMSE context if applicable
+            if obj_fun == "dipole_rmse":
+                lines.append("Objective Function (RMSE) Values:")
+                lines.append(f"  First RMSE:  {opt_result['first_obj']:>15.6f}")
+                lines.append(f"  Final RMSE:  {opt_result['final_obj']:>15.6f}")
+                obj_diff = opt_result["final_obj"] - opt_result["first_obj"]
+                lines.append(f"  Change:      {obj_diff:>+15.6f}")
+            else:
+                lines.append(f"Objective Function ({obj_fun}) Values:")
+                lines.append(f"  First:  {opt_result['first_obj']:>15.6f}")
+                lines.append(f"  Final:  {opt_result['final_obj']:>15.6f}")
+                obj_diff = opt_result["final_obj"] - opt_result["first_obj"]
+                lines.append(f"  Change: {obj_diff:>+15.6f}")
+            lines.append("")
+            lines.append("=" * 100)
+            lines.append("")
+
+        return "\n".join(lines)
+
+    def _update_opt_history_button(self):
+        """Update the optimization history download button with current data."""
+        # Create the timestamps
+        time_now = datetime.now()
+        report_timestamp = time_now.strftime("%Y-%m-%d %H:%M:%S")
+        filename_timestamp = time_now.strftime("%Y%m%d_%H%M%S")
+
+        # Generate the table content
+        table_content = self._generate_opt_history_table(report_timestamp)
+
+        # Encode the content for download
+        b64 = base64.b64encode(table_content.encode())
+        payload = b64.decode()
+
+        filename = f"optimization_history_{filename_timestamp}.txt"
+
+        # Update the button
+        self.save_opt_history_button.value = self.html_download_button.format(
+            payload=payload,
+            filename=filename,
+            is_disabled="",
+            btn_height=self.layout["run_btn"].height,
+            color_theme=self.layout["theme_color"],
+            title="Save Optimization History",
+            mimetype="text/plain",
         )
 
     def add_opt_drive_accordion(self, params):
@@ -4846,8 +4998,8 @@ def _extract_prior_constraints(drive, syn_type=None):
             # Get the percentage values from the min/max widgets (raw percentages)
             min_pct = input_dict[var_name + "_opt_min"].value
             max_pct = input_dict[var_name + "_opt_max"].value
-            # Store the raw percentage values for prior state restoration
             output_constraints.update({unique_param_name: tuple([min_pct, max_pct])})
+
     return output_constraints
 
 
@@ -5281,6 +5433,10 @@ def run_opt_button_clicked(
 
             # Execute optimization
             # --------------------------------------------------------------------------
+            # Store PSD parameters for history tracking
+            psd_f_bands = None
+            psd_relative_bandpower = None
+
             try:
                 if opt_obj_fun == "dipole_rmse":
                     optim.fit(
@@ -5315,6 +5471,10 @@ def run_opt_button_clicked(
                         relative_bandpower = [
                             opt_target_widgets["psd_target_band1_proportion"].value,
                         ]
+
+                    # Store for history tracking
+                    psd_f_bands = f_bands
+                    psd_relative_bandpower = relative_bandpower
 
                     optim.fit(
                         f_bands=f_bands,
@@ -5447,8 +5607,28 @@ def run_opt_button_clicked(
         # I can't get it to artificially ".click()" to actually initiate a download. Is
         # there even a way to do this?
 
+        # Return both the optimized config and the optimizer results
         optimized_config = serialize_config(all_data, new_name)
-        return optimized_config
+        opt_result = {
+            "initial_params": optim.initial_params,
+            "opt_params": optim.opt_params_,
+            "first_obj": optim.obj_[0],
+            "final_obj": optim.obj_[-1],
+            "obj_fun": opt_obj_fun,
+            "solver": opt_solver,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "max_iter": opt_max_iter,
+        }
+
+        # Add target dataset name if using dipole_rmse
+        if opt_obj_fun == "dipole_rmse":
+            opt_result["target_data"] = opt_target_widgets["rmse_target_data"].value
+            opt_result["n_trials"] = opt_target_widgets["n_trials"].value
+        # Add frequency band parameters if using maximize_psd
+        elif opt_obj_fun == "maximize_psd":
+            opt_result["psd_f_bands"] = psd_f_bands
+            opt_result["psd_relative_bandpower"] = psd_relative_bandpower
+        return optimized_config, opt_result
 
 
 def launch():
