@@ -1614,11 +1614,20 @@ class HNNGUI:
             display(output_widgets)
 
     def add_opt_target_widgets(self):
+        # Preserve prior widget state for "target data" if widgets already exist
+        # ------------------------------------------------------------------------------
+        prior_target_state = {}
+        if self.opt_target_widgets:
+            # Save current state of all target widgets
+            for key, widget in self.opt_target_widgets.items():
+                if hasattr(widget, "value"):
+                    prior_target_state[key] = widget.value
+
         # The obj_fun="dipole_rmse" case is very simple
         # ------------------------------------------------------------------------------
         self.opt_target_widgets["rmse_target_data"] = Dropdown(
             options=self.data["simulation_data"].keys(),  # nope
-            value=None,
+            value=prior_target_state.get("rmse_target_data", None),
             description="Target Data:",
             disabled=False,
             # layout=Layout(width="74%"),
@@ -1632,7 +1641,7 @@ class HNNGUI:
         ]
 
         self.opt_target_widgets["n_trials"] = IntText(
-            value=1,
+            value=prior_target_state.get("n_trials", 1),
             description="Trials:",
             disabled=False,
             # layout=Layout(width="24%"),
@@ -1665,8 +1674,13 @@ class HNNGUI:
 
         # Parameters for obj_fun="maximize_psd" Frequency Band 1
         # ------------------------------------------------------------------------------
+        # Determine disabled states based on prior checkbox value (if it exists)
+        band2_checkbox_value = prior_target_state.get("psd_target_band2_checkbox", False)
+        band1_proportion_disabled = not band2_checkbox_value
+        band2_widgets_disabled = not band2_checkbox_value
+
         self.opt_target_widgets["psd_target_band1_min"] = BoundedFloatText(
-            value=15,
+            value=prior_target_state.get("psd_target_band1_min", 15),
             description="Min:",
             min=0,
             max=1e6,
@@ -1675,7 +1689,7 @@ class HNNGUI:
             style=minmax_style,
         )
         self.opt_target_widgets["psd_target_band1_max"] = BoundedFloatText(
-            value=25,
+            value=prior_target_state.get("psd_target_band1_max", 25),
             description="Max:",
             min=0,
             max=1e6,
@@ -1684,12 +1698,12 @@ class HNNGUI:
             style=minmax_style,
         )
         self.opt_target_widgets["psd_target_band1_proportion"] = BoundedFloatText(
-            value=1,
+            value=prior_target_state.get("psd_target_band1_proportion", 1),
             description="Proportion:",
             min=0,
             max=1,
             step=0.1,
-            disabled=True,
+            disabled=band1_proportion_disabled,
             layout=proportion_layout,
             style=proportion_style,
         )
@@ -1697,37 +1711,37 @@ class HNNGUI:
         # Parameters for obj_fun="maximize_psd" Frequency Band 2
         # ------------------------------------------------------------------------------
         self.opt_target_widgets["psd_target_band2_checkbox"] = Checkbox(
-            value=False,
+            value=band2_checkbox_value,
             layout=checkbox_layout,
             style=checkbox_style,
         )
         self.opt_target_widgets["psd_target_band2_min"] = BoundedFloatText(
-            value=9,
+            value=prior_target_state.get("psd_target_band2_min", 9),
             description="Min:",
             min=0,
             max=1e6,
             step=0.1,
-            disabled=True,
+            disabled=band2_widgets_disabled,
             layout=minmax_layout,
             style=minmax_style,
         )
         self.opt_target_widgets["psd_target_band2_max"] = BoundedFloatText(
-            value=14,
+            value=prior_target_state.get("psd_target_band2_max", 14),
             description="Max:",
             min=0,
             max=1e6,
             step=0.1,
-            disabled=True,
+            disabled=band2_widgets_disabled,
             layout=minmax_layout,
             style=minmax_style,
         )
         self.opt_target_widgets["psd_target_band2_proportion"] = BoundedFloatText(
-            value=0,
+            value=prior_target_state.get("psd_target_band2_proportion", 0),
             description="Proportion:",
             min=0,
             max=1,
             step=0.1,
-            disabled=True,
+            disabled=band2_widgets_disabled,
             layout=proportion_layout,
             style=proportion_style,
         )
