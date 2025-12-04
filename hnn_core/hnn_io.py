@@ -528,11 +528,15 @@ def dict_to_network(net_data, read_drives=True, read_external_biases=True):
     mesh_shape = (net_data["N_pyr_x"], net_data["N_pyr_y"])
 
     # Instantiating network
-    net = Network(params, mesh_shape=mesh_shape, legacy_mode=net_data["legacy_mode"])
+    net = Network(
+        params,
+        mesh_shape=mesh_shape,
+        legacy_mode=net_data["legacy_mode"],
+        pos_dict=_read_pos_dict(net_data["pos_dict"]),
+        cell_types=_read_cell_types(net_data["cell_types"]),
+    )
 
     # Setting attributes
-    # Set cell types
-    net.cell_types = _read_cell_types(net_data["cell_types"])
     # Set gid ranges
     gid_ranges_data = dict()
     for key in net_data["gid_ranges"]:
@@ -540,8 +544,6 @@ def dict_to_network(net_data, read_drives=True, read_external_biases=True):
         stop = net_data["gid_ranges"][key]["stop"]
         gid_ranges_data[key] = range(start, stop)
     net.gid_ranges = OrderedDict(gid_ranges_data)
-    # Set pos_dict
-    net.pos_dict = _read_pos_dict(net_data["pos_dict"])
     # Set cell_response
     net.cell_response = _read_cell_response(
         net_data["cell_response"], read_output=False
