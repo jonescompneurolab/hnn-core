@@ -1757,9 +1757,14 @@ class HNNGUI:
                 self.opt_target_widgets["psd_target_band2_proportion"].disabled = False
             else:
                 self.opt_target_widgets["psd_target_band1_proportion"].disabled = True
+                # Set (or reset) the proportion of band1 to 1, since it's the only
+                # active band
+                self.opt_target_widgets["psd_target_band1_proportion"].value = 1
                 self.opt_target_widgets["psd_target_band2_min"].disabled = True
                 self.opt_target_widgets["psd_target_band2_max"].disabled = True
                 self.opt_target_widgets["psd_target_band2_proportion"].disabled = True
+                # Set (or reset) the proportion of band2 to 0, since it's not active
+                self.opt_target_widgets["psd_target_band2_proportion"].value = 0
 
         self.opt_target_widgets["psd_target_band2_checkbox"].observe(
             _handle_band2_ghosting,
