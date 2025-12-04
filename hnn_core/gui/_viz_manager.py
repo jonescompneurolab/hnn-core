@@ -1200,9 +1200,13 @@ class _VizManager:
             if len(all_sim_names) == 0:
                 all_sim_names = [" "]
 
+            prior_value = self._external_data_widget.value
+            # Note updating the options of the widget resets the value
             self._external_data_widget.options = all_sim_names
-            # Update value if current value is not in new options
-            if self._external_data_widget.value not in all_sim_names:
+
+            if prior_value in all_sim_names:
+                self._external_data_widget.value = prior_value
+            else:
                 self._external_data_widget.value = all_sim_names[0]
 
     def _layout_template_change(self, template_type):
