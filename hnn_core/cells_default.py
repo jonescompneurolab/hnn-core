@@ -15,15 +15,61 @@ from .params_default import get_L2Pyr_params_default, get_L5Pyr_params_default
 # units for taur: ms
 
 
-# KD: comment: initialize membrane potential here as it's not overridden by
-# h.finitialize unless called as h.finitialize(-65)
-def _get_dends(params, cell_type, section_names, v_init={"all": -65}):
-    """Convert a flat dictionary to a nested dictionary.
+def _get_dends(
+        params,
+        cell_type,
+        section_names,
+        v_init={"all": -65},
+        is_basal_specific=False,
+):
+    """Create dendritic Section objects from flat parameter dictionary.
+
+    Extracts geometric and electrical properties (length, diameter, axial resistance,
+    membrane capacitance) from a flat parameter dictionary, takes initial membrane
+    voltage from its, and constructs Section objects for each dendritic
+    compartment. Handles parameter key name transformations (e.g., 'apical_trunk' ->
+    'apicaltrunk') required for lookup in the parameter dictionary.
+
+    Parameters
+    ----------
+    params : dict
+        Flat dictionary containing cell parameters with keys formatted as
+        '{cell_type}_{section}_{property}' (e.g., 'L5Pyr_apicaltrunk_L').
+        'Ra' and 'cm' use "dend" as the middle component rather than specific
+        section names. This 'params' dictionary is expected to be constructed using
+        functions like `params_default.py::get_L2Pyr_params_default`.
+    cell_type : str, {'L2Pyr', 'L5Pyr'}
+        Cell type identifier used as prefix in parameter key lookups.
+    section_names : list of str
+        Names of dendritic sections to create (e.g., ['apical_trunk',
+        'apical_1', 'basal_2']). Underscores are removed for parameter
+        lookups except for 'Ra' and 'cm'.
+    v_init : dict, default={"all": -65}
+        Initial membrane potential in mV. If dict contains single key "all",
+        that value is applied to all sections. Otherwise, keys must match
+        'section_names' for section-specific initialization.
+    is_basal_specific : bool, default=False
+        Flag indicating whether or not to use the (Duecker 2025) model's custom basal
+        dendrite parameters. If True, this will read the 'Ra' and 'cm' parameters from
+        'params' using '{cell_type}_basal_{property}' instead of the default
+        '{cell_type}_dend_{property}' naming scheme.
 
     Returns
     -------
     sections : dict
-        Dictionary of sections. Keys are section names
+        Dictionary mapping section names (str) to Section objects with attributes L,
+        diam, Ra, and cm set from 'params', and v0 set from argument.
+
+    Notes
+    -----
+    - KD: This function is where the initial voltages for the dendritic sections are
+      set; these voltages are not overridden by `h.finitialize` unless called with a
+      value, e.g. `h.finitialize(-65)`.
+    - The 'v0' (initial voltage) parameter is handled separately from other properties as
+      it is a newer addition not found in legacy parameter files.
+    - In the (Jones et al., 2009) model, this is used to construct both apical and basal
+      dendrite sections. In the newer (Duecker 2025) model, this is only used for the
+      apical dendrite sections.
     """
     prop_names = ["L", "diam", "Ra", "cm"]
     sections = dict()
@@ -31,7 +77,10 @@ def _get_dends(params, cell_type, section_names, v_init={"all": -65}):
         dend_prop = dict()
         for key in prop_names:
             if key in ["Ra", "cm"]:
-                middle = "dend"
+                if is_basal_specific:
+                    middle = "basal"
+                else:
+                    middle = "dend"
             else:
                 # map apicaltrunk -> apical_trunk etc.
                 middle = section_name.replace("_", "")
@@ -51,43 +100,6 @@ def _get_dends(params, cell_type, section_names, v_init={"all": -65}):
             v0=dend_prop["v0"],
         )
     return sections
-
-
-# KD: In the new `duecker_ET_model` model, tuning of the basal dendrites is different
-# from the tuning of the apical dendrites.
-def _get_basal(params, cell_type, section_names, v_init={"all": -65}):
-    """Convert a flat dictionary to a nested dictionary.
-
-    Returns
-    -------
-    sections : dict
-        Dictionary of sections. Keys are section names
-    """
-    prop_names = ["L", "diam", "Ra", "cm"]
-    sections = dict()
-    for section_name in section_names:
-        dend_prop = dict()
-        middle = section_name.replace("_", "")
-        for key in prop_names:
-            if key in ["Ra", "cm"]:
-                middle = "basal"
-            else:
-                # map apicaltrunk -> apical_trunk etc.
-                middle = section_name.replace("_", "")
-            dend_prop[key] = params[f"{cell_type}_{middle}_{key}"]
-        # v0 is handled separately since it is "newer", and will never be found in the
-        # `params` input.
-        if len(v_init) == 1:
-            dend_prop["v0"] = v_init["all"]
-        else:
-            dend_prop["v0"] = v_init[section_name]
-        sections[section_name] = Section(
-            L=dend_prop["L"],
-            diam=dend_prop["diam"],
-            Ra=dend_prop["Ra"],
-            cm=dend_prop["cm"],
-            v0=dend_prop["v0"],
-        )
 
 
 def _get_pyr_soma(p_all, cell_type, v_init=-65):
