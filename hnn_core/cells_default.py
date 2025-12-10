@@ -129,10 +129,8 @@ def _get_pyr_soma(p_all, cell_type, v_init=-65):
         `params_default.py::get_L2Pyr_params_default`.
     cell_type : {'L2Pyr', 'L5Pyr'}
         Cell type identifier used as prefix in parameter key lookups.
-    v_init : dict, default={"all": -65}
-        Initial membrane potential in mV. If dict contains single key "all", that value
-        is applied to all sections. Otherwise, keys must match 'section_names' for
-        section-specific initialization.
+    v_init : float, default=-65
+        Initial membrane potential in mV.
 
     Returns
     -------
@@ -196,9 +194,10 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         `params_default.py::get_L2Pyr_params_default`. If no overrides are desired, then
         this argument should be None.
     pos : tuple of (float, float, int), default=(0.0, 0.0, 0)
-        3-dimensional position to place the cell at.
+        Coordinates of cell soma in xyz-space.
     gid : int, default=0
-        The unique, "global ID" (GID) of the cell.
+        The unique, "global ID" (GID) of the cell. Once the GID is set, it cannot be
+        changed.
 
     Returns
     -------
@@ -338,9 +337,10 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
         `params_default.py::get_L5Pyr_params_default`. If no overrides are desired, then
         this argument should be None.
     pos : tuple of (float, float, int), default=(0.0, 0.0, 0)
-        3-dimensional position to place the cell at.
+        Coordinates of cell soma in xyz-space.
     gid : int, default=0
-        The unique, "global ID" (GID) of the cell.
+        The unique, "global ID" (GID) of the cell. Once the GID is set, it cannot be
+        changed.
 
     Returns
     -------
@@ -465,6 +465,39 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
 
 
 def _get_basket_soma(cell_name, v_init=-64.9737):
+    """Create Basket somatic Section objects.
+
+    This sets geometric and electrical properties (length, diameter, axial resistance,
+    membrane capacitance, and spatial end points) using hard-coded values, takes initial
+    membrane voltage from an argument, and constructs a Section object for each Basket
+    (inhibitory) soma compartment.
+
+    These parameters are not different between Layer 2 and Layer 5 Basket cells.
+
+    *Importantly*, "Section objects" in this context are objects of the class
+    `hnn_core/cell.py::Section`, NOT the "true" NEURON sections. The "true" NEURON
+    sections are only created later, immediately before a simulation is run, using
+    `NetworkBuilder._build`.
+
+    Parameters
+    ----------
+    cell_name : ???
+        Not actually used.
+    v_init : float, default=-64.9737
+        Initial membrane potential in mV.
+
+    Returns
+    -------
+    Section
+        A Section object with attributes 'L', 'diam', 'Ra', 'cm', and 'end_pts' set from
+        hard-coded values, and 'v0' set from argument.
+
+    Notes
+    -----
+    - KD: This function is where the initial voltages for the somata are set; these
+      voltages are not overridden by `h.finitialize` unless called with a value,
+      e.g. `h.finitialize(-65)`.
+    """
     end_pts = [[0, 0, 0], [0, 0, 39.0]]
     return Section(
         L=39.0,
@@ -477,6 +510,30 @@ def _get_basket_soma(cell_name, v_init=-64.9737):
 
 
 def _get_pyr_syn_props(p_all, cell_type):
+    """Return the default synaptic parameters for a given Pyramidal cell_type.
+
+    Extracts the 'e', 'tau1', and 'tau2' parameters for all synapse types for a
+    particular cell_type.
+
+    Parameters
+    ----------
+    p_all : dict
+        Flat dictionary containing cell parameters with keys formatted as
+        '{cell_type}_{synapse type}_{property}' (e.g., 'L2Pyr_nmda_tau1'). This 'p_all'
+        dictionary is expected to be constructed using functions like
+        `params_default.py::get_L2Pyr_params_default`.
+    cell_type : {'L2Pyr', 'L5Pyr'}
+        Cell type identifier used as prefix in parameter key lookups.
+
+    Returns
+    -------
+    dict
+        A dictionary where the keys are the four synapse types {'ampa', 'nmda', 'gabaa',
+        'gabab'}, and where the values are dictionaries whose keys are {'e', 'tau1',
+        'tau2'} and whose values are the parameter values of that case from default
+        parameter dictionaries such as from
+        `params_default.py::get_L2Pyr_params_default`.
+    """
     return {
         "ampa": {
             "e": p_all["%s_ampa_e" % cell_type],
@@ -502,6 +559,17 @@ def _get_pyr_syn_props(p_all, cell_type):
 
 
 def _get_basket_syn_props():
+    """Return the default synaptic parameters for Basket cell types.
+
+    These parameters are not different between Layer 2 and Layer 5 Basket cells.
+
+    Returns
+    -------
+    dict
+        A dictionary where the keys are three of the four synapse types {'ampa', 'nmda',
+        'gabaa'} (no 'gabab') and where the values are dictionaries whose keys are {'e',
+        'tau1', 'tau2'} and whose values are hard-coded.
+    """
     return {
         "ampa": {"e": 0, "tau1": 0.5, "tau2": 5.0},
         "gabaa": {"e": -80, "tau1": 0.5, "tau2": 5.0},
@@ -510,23 +578,29 @@ def _get_basket_syn_props():
 
 
 def _get_mechanisms(p_all, cell_type, section_names, mechanisms):
-    """Get mechanism
+    """Create dictionary of mechanism parameters for Pyramidal cells.
 
     Parameters
     ----------
-    cell_type : str
-        The cell type
-    section_names : str
-        The section_names
+    p_all : dict
+        Flat dictionary containing cell parameters with keys formatted as
+        '{cell_type}_soma_{property}' (e.g., 'L5Pyr_soma_L'). This 'p_all' dictionary
+        is expected to be constructed using functions like
+        `params_default.py::get_L2Pyr_params_default`.
+    cell_type : {'L2Pyr', 'L5Pyr'}
+        Cell type identifier used as prefix in parameter key lookups.
+    section_names : list of str
+        Names of sections.
     mechanisms : dict of list
-        The mechanism properties to extract
+        The mechanism properties to extract. Dictionary whose keys are mechanism names
+        and whose values are a list of the parameter names to be set for that mechanism.
 
     Returns
     -------
     mech_props : dict of dict of dict
         Nested dictionary of the form
-        sections -> mechanism -> mechanism properties
-        used to instantiate the mechanism in Neuron
+        "sections -> mechanism -> mechanism properties"
+        used to instantiate the mechanism in NEURON
     """
     mech_props = dict()
     for sec_name in section_names:
@@ -565,23 +639,40 @@ def _exp_g_at_dist(x, gbar_at_zero, exp_term, offset, slope=1):
 
 
 def basket(cell_name, pos=(0, 0, 0), gid=None):
-    """Get layer 2 / layer 5 basket cells.
+    """Create a Cell object of the Basket cell type.
+
+    This constructs a Basket cell type (i.e. either 'L2Basket' or 'L5Basket') using the
+    following steps:
+    1. Sets the "proximal" or "distal" section groups depending on the layer of the
+    celltype.
+    2. Creates the soma Section compartment object using hard-coded values in
+    sub-functions.
+    3. Sets the receiving synaptic types and parameters for the cell, for the three
+    valid synaptic types ('ampa', 'gabaa', and 'nmda', but not 'gabab').
+    4. Sets the mechanism of the cell to the "hh2" mechanism only, and using the default
+    values.
+
+    *Importantly*, "Cell objects" in this context are objects of the class
+    `hnn_core/cell.py::Cell`, not "true" NEURON cells. Similarly, "Section objects"
+    in this context are objects of the class `hnn_core/cell.py::Section`, NOT the "true"
+    Section objects as created and used by NEURON. The "true" NEURON sections and cells
+    are only created later, immediately before a simulation is run, using
+    `NetworkBuilder._build`.
 
     Parameters
     ----------
-    cell_name : str
-        The name of the cell.
-    pos : tuple
-        Coordinates of cell soma in xyz-space
-    gid : int or None (optional)
-        Each cell in a network is uniquely identified by it's "global ID": GID.
-        The GID is an integer from 0 to n_cells, or None if the cell is not
-        yet attached to a network. Once the GID is set, it cannot be changed.
+    cell_name : {'L2_basket', 'L5_basket'}
+        The type of basket cell to create.
+    pos : tuple of (int, int, int), default=(0, 0, 0)
+        Coordinates of cell soma in xyz-space.
+    gid : int, default=None
+        The unique, "global ID" (GID) of the cell. Once the GID is set, it cannot be
+        changed.
 
     Returns
     -------
-    cell : instance of BasketSingle
-        The basket cell.
+    Cell
+        A Cell object of either the Layer 2/3 or Layer 5 Basket cell type.
     """
     if cell_name == "L2_basket":
         sect_loc = dict(proximal=["soma"], distal=["soma"])
@@ -609,20 +700,29 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
 
 
 def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
-    """Pyramidal neuron.
+    """Create a Cell object of a Pyramidal neuron.
+
+    This is mostly just a wrapper function for distinguishing between whether to create
+    a Layer 2/3 Pyramidal cell or a Layer 5 Pyramidal cell. This calls the main
+    functions to create the Cells, either `_cell_L5Pyr` or `_cell_L2Pyr`.
 
     Parameters
     ----------
-    cell_name : str
-        'L5Pyr' or 'L2Pyr'. The pyramidal cell type.
-    pos : tuple
+    cell_name : {'L2Pyr', 'L5Pyr'}
+        The type of pyramidal cell to create.
+    pos : tuple of (int, int, int), default=(0, 0, 0)
         Coordinates of cell soma in xyz-space
     override_params : dict or None (optional)
-        Parameters specific to L2 pyramidal neurons to override the default set
+        Flat dictionary containing cell parameters with keys formatted as
+        '{cell_type}_{section}_{property}' (e.g., 'L2Pyr_apicaltrunk_L'), where
+        key-value pairs are only provided for those values where the user wants to use
+        custom, non-default parameters. The default parameters can be found in either
+        `params_default.py::get_L2Pyr_params_default` or
+        `params_default.py::get_L5Pyr_params_default`. If no overrides are desired, then
+        this argument should be None.
     gid : int or None (optional)
-        Each cell in a network is uniquely identified by it's "global ID": GID.
-        The GID is an integer from 0 to n_cells, or None if the cell is not
-        yet attached to a network. Once the GID is set, it cannot be changed.
+        The unique, "global ID" (GID) of the cell. Once the GID is set, it cannot be
+        changed.
     """
     if cell_name == "L2_pyramidal":
         return _cell_L2Pyr(override_params, pos=pos, gid=gid)
