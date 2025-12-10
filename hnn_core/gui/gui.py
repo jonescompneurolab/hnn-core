@@ -1906,7 +1906,7 @@ class HNNGUI:
             obj_fun = opt_result.get("obj_fun", "unknown")
             max_iter = opt_result.get("max_iter", "N/A")
 
-            lines.append(f"Run #{run_idx} - {run_timestamp}")
+            lines.append(f"Run #{run_idx}")
             lines.append("-" * 100)
             lines.append(f"Solver: {solver}")
             lines.append(f"Objective Function: {obj_fun}")
@@ -1959,16 +1959,15 @@ class HNNGUI:
             # Display objective function values with RMSE context if applicable
             if obj_fun == "dipole_rmse":
                 lines.append("Objective Function (RMSE) Values:")
-                lines.append(f"  First RMSE:  {opt_result['first_obj']:>15.6f}")
-                lines.append(f"  Final RMSE:  {opt_result['final_obj']:>15.6f}")
-                obj_diff = opt_result["final_obj"] - opt_result["first_obj"]
-                lines.append(f"  Change:      {obj_diff:>+15.6f}")
             else:
                 lines.append(f"Objective Function ({obj_fun}) Values:")
-                lines.append(f"  First:  {opt_result['first_obj']:>15.6f}")
-                lines.append(f"  Final:  {opt_result['final_obj']:>15.6f}")
-                obj_diff = opt_result["final_obj"] - opt_result["first_obj"]
-                lines.append(f"  Change: {obj_diff:>+15.6f}")
+
+            for obj_idx, obj_out in enumerate(opt_result["obj_values"]):
+                lines.append(f"  Iteration {obj_idx}: {obj_out:>15.6f}")
+
+            obj_diff = opt_result["obj_values"][-1] - opt_result["obj_values"][0]
+            lines.append(f"Total Change:  {obj_diff:>+15.6f}")
+
             lines.append("")
             lines.append("=" * 100)
             lines.append("")
@@ -5655,8 +5654,7 @@ def run_opt_button_clicked(
         opt_result = {
             "initial_params": optim.initial_params,
             "opt_params": optim.opt_params_,
-            "first_obj": optim.obj_[0],
-            "final_obj": optim.obj_[-1],
+            "obj_values": optim.obj_,
             "obj_fun": opt_obj_fun,
             "solver": opt_solver,
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
