@@ -2085,7 +2085,7 @@ class HNNGUI:
 
         # Set the lower (negative) and upper (positive) bounds of the initial min/max
         # constraint values
-        initial_constraint_range_percentage = 20
+        initial_constraint_range_percentage = 50
 
         # Stylin'
         # ------------------------------------------------------------------------------
