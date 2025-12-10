@@ -1901,7 +1901,6 @@ class HNNGUI:
         lines.append("")
 
         for run_idx, opt_result in enumerate(self.opt_results, start=1):
-            run_timestamp = opt_result.get("timestamp", "N/A")
             solver = opt_result.get("solver", "N/A")
             obj_fun = opt_result.get("obj_fun", "unknown")
             max_iter = opt_result.get("max_iter", "N/A")
