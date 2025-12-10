@@ -581,6 +581,25 @@ class HNNGUI:
             layout=self.layout["opt_textbox"],
             style=opt_dropdown_style,
         )
+        self.widget_opt_n_jobs = BoundedIntText(
+            value=1,
+            min=1,
+            max=self.n_cores,
+            description="Cores:",
+            disabled=False,
+            layout=self.layout["opt_textbox"],
+            style=opt_dropdown_style,
+        )
+        self.widget_opt_dt = BoundedFloatText(
+            value=0.025,
+            description="dt (ms):",
+            min=0,
+            max=10,
+            step=0.01,
+            disabled=False,
+            layout=self.layout["opt_textbox"],
+            style=opt_dropdown_style,
+        )
         self.widget_opt_smoothing = BoundedFloatText(
             value=30.0,
             description="Dipole Smoothing:",
@@ -1001,7 +1020,10 @@ class HNNGUI:
         self.cell_type_radio_buttons.observe(_cell_type_radio_change, "value")
         self.cell_layer_radio_buttons.observe(_cell_layer_radio_change, "value")
 
+        # Many Optimization tab observations, including dual-linking widgets with their
+        # equivalent in the Run tab:
         self.widget_opt_obj_fun.observe(_opt_obj_fun_change, "value")
+
         dlink(
             (self.widget_opt_tstop, "value"),
             (self.widget_tstop, "value"),
@@ -1012,6 +1034,24 @@ class HNNGUI:
         )
 
         dlink(
+            (self.widget_opt_dt, "value"),
+            (self.widget_dt, "value"),
+        )
+        dlink(
+            (self.widget_dt, "value"),
+            (self.widget_opt_dt, "value"),
+        )
+
+        dlink(
+            (self.widget_opt_n_jobs, "value"),
+            (self.widget_n_jobs, "value"),
+        )
+        dlink(
+            (self.widget_n_jobs, "value"),
+            (self.widget_opt_n_jobs, "value"),
+        )
+
+        dlink(
             (self.widget_default_smoothing, "value"),
             (self.widget_opt_smoothing, "value"),
         )
@@ -1019,6 +1059,7 @@ class HNNGUI:
             (self.widget_opt_smoothing, "value"),
             (self.widget_default_smoothing, "value"),
         )
+
         dlink(
             (self.widget_default_scaling, "value"),
             (self.widget_opt_scaling, "value"),
@@ -1183,6 +1224,7 @@ class HNNGUI:
                             [
                                 self.widget_opt_obj_fun,
                                 self.widget_opt_solver,
+                                self.widget_opt_n_jobs,
                                 self.widget_opt_smoothing,
                             ]
                         ),
@@ -1190,6 +1232,7 @@ class HNNGUI:
                             [
                                 self.widget_opt_max_iter,
                                 self.widget_opt_tstop,
+                                self.widget_opt_dt,
                                 self.widget_opt_scaling,
                             ]
                         ),
