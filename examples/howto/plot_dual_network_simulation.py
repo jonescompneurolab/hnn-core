@@ -134,14 +134,11 @@ plot_dipole(dpls, show=True)
 def plot_combined_spike_raster(net_a, net_b, title="Combined Spike Raster"):
     """Aggregate spike rasters from both networks into a single figure."""
     spikes, gids, types = [], [], []
-    for trial in range(len(net_a.cell_response.spike_times)):
-        spikes.extend(net_a.cell_response.spike_times[trial])
-        gids.extend(net_a.cell_response.spike_gids[trial])
-        types.extend(net_a.cell_response.spike_types[trial])
-    for trial in range(len(net_b.cell_response.spike_times)):
-        spikes.extend(net_b.cell_response.spike_times[trial])
-        gids.extend(net_b.cell_response.spike_gids[trial])
-        types.extend(net_b.cell_response.spike_types[trial])
+    for net in [net_a, net_b]:
+        for trial in range(len(net.cell_response.spike_times)):
+            spikes.extend(net.cell_response.spike_times[trial])
+            gids.extend(net.cell_response.spike_gids[trial])
+            types.extend(net.cell_response.spike_types[trial])
 
     if not spikes:
         print("No spikes to plot.")
