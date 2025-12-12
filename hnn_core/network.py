@@ -1636,9 +1636,9 @@ class Network:
             drive starting from the Network's max GID + 1.
 
         """
-        ll = self._n_gids if (gid_start is None) else gid_start
-        self._n_gids = ll + len(pos)
-        self.gid_ranges[cell_name] = range(ll, self._n_gids)
+        new_gid_range_start = self._n_gids if (gid_start is None) else gid_start
+        self._n_gids = new_gid_range_start + len(pos)
+        self.gid_ranges[cell_name] = range(new_gid_range_start, self._n_gids)
         self.pos_dict[cell_name] = pos
         if cell_template is not None:
             self.cell_types.update({cell_name: cell_template})
@@ -2227,13 +2227,15 @@ class Network:
     def _get_next_available_gid(self):
         """Return the next unused GID number, equal to current max GID + 1."""
         max_gid = -1
-        for rng in self.gid_ranges.values():
-            if len(rng) > 0:
-                max_gid = max(max_gid, max(rng))
+        for gid_range in self.gid_ranges.values():
+            if len(gid_range) > 0:
+                max_gid = max(max_gid, max(gid_range))
         return max_gid + 1
 
     def _shift_gid_ranges(self, gid_start):
         """Reset cell and non-drive GIDs to begin at a different number.
+
+        This function is still in-development.
 
         Parameters
         ----------
@@ -2249,8 +2251,10 @@ class Network:
           with the "second" or any additional `Network` objects, such that the first
           `Network` and additional `Networks` use a disjoint set of GIDs.
         - This successfully shifts GIDs for individual cells and for non-drive synapses,
-          but currently does NOT shift GIDs for external drives. You should shift your
-          Network's GIDs only BEFORE adding drives to the Network.
+          but currently does NOT shift GIDs for external drives. You should:
+            1. First, instantiate your `Network`s, then
+            2. Shift your Network's GIDs, then
+            3. Finally, add drives to your `Network`s.
         """
         # Shift GID ranges to start at gid_start and avoid overlap
         current_gid = gid_start
