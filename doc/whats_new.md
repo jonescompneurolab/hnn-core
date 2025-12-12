@@ -28,6 +28,16 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ## 0.5.1.dev0 In-progress Development Changes
 
+### People who contributed to this release:
+
+- [Karthikeya Kodlai][]
+
+### Changelog
+
+- Add support for syncing the y-axes limits of multi-layer PSD plots in the GUI, along
+  with some refactoring of the same code,
+  by [Karthikeya Kodlai][] in {gh}`1162`.
+
 ## 0.5.0 Release Notes
 
 ### New Features
@@ -1245,3 +1255,4 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Maira Usman]: https://github.com/Myrausman
 [Chetan Kandpal]: https://github.com/Chetank99
 [NEURON]: https://nrn.readthedocs.io
+[Karthikeya Kodlai]: https://github.com/sketch123456
