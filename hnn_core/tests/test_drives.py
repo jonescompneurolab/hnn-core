@@ -739,12 +739,13 @@ def test_add_poisson_drive(setup_net, rate_constant, cell_specific, n_drive_cell
     simulate_dipole(net, tstop=5)
 
 
-def test_shifted_drive_gid_starts(setup_net):
+@pytest.mark.parametrize("size", [3, 10])
+def test_shifted_drive_gid_starts(size):
     """Test that custom `gid_start` works across drives/biases."""
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, "param", "default.json")
     params = read_params(params_fname)
-    net = Network(params, legacy_mode=False)
+    net = Network(params, legacy_mode=False, mesh_shape=(size, size))
     gid_offset = 13
     net._shift_gid_ranges(gid_start=gid_offset)  # Just trying to break things.
 
