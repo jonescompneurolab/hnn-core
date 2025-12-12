@@ -1944,45 +1944,55 @@ def test_get_next_available_gid(base_network):
     assert net_base._get_next_available_gid() == 540
 
 
-def test_shift_gid_ranges(base_network):
+def test_shift_gid_ranges_simple(base_network):
     """Test that `Network._shift_gid_ranges` works and simulates as expected."""
     # "Base" has many connections and drives, but for now we're only interested in the
     # non-drive params config
     _, params = base_network
 
-    ######################################
-    # Let's start with the default network
-    net1 = jones_2009_model(params, add_drives_from_params=False)
-    assert net1._get_next_available_gid() == 270  # See previous test function.
-    net1._shift_gid_ranges(gid_start=100)
+    net_shifted = jones_2009_model(params, add_drives_from_params=False)
+    assert net_shifted._get_next_available_gid() == 270  # See previous test function.
+    net_shifted._shift_gid_ranges(gid_start=100)
     # GIDs of this network should now start at 100 instead of 0.
     # Therefore, next available GID should be 370:
-    assert net1._get_next_available_gid() == 370
+    assert net_shifted._get_next_available_gid() == 370
 
     # Next, let's test that our successful GID shift doesn't break the ability to
     # simulate:
-    _ = simulate_dipole(net1, tstop=20.0, n_trials=1)
+    _ = simulate_dipole(net_shifted, tstop=20.0, n_trials=1)
 
-    ######################################
-    # Now, let's do the same, but test that we can shift multiple times:
-    net2 = jones_2009_model(params, add_drives_from_params=False)
+
+def test_shift_gid_ranges_consecutive(base_network):
+    """Test that `Network._shift_gid_ranges` works with multiple shifts."""
+    # "Base" has many connections and drives, but for now we're only interested in the
+    # non-drive params config
+    _, params = base_network
+
+    net_shifted = jones_2009_model(params, add_drives_from_params=False)
     gid_offset = 42
-    net2._shift_gid_ranges(gid_start=gid_offset)
-    assert net2._get_next_available_gid() == (270 + gid_offset)
+    net_shifted._shift_gid_ranges(gid_start=gid_offset)
+    assert net_shifted._get_next_available_gid() == (270 + gid_offset)
 
     gid_offset = 37
-    net2._shift_gid_ranges(gid_start=gid_offset)
-    assert net2._get_next_available_gid() == (270 + gid_offset)
-    _ = simulate_dipole(net2, tstop=20.0, n_trials=1)
+    net_shifted._shift_gid_ranges(gid_start=gid_offset)
+    assert net_shifted._get_next_available_gid() == (270 + gid_offset)
+    _ = simulate_dipole(net_shifted, tstop=20.0, n_trials=1)
 
-    ######################################
+
+def test_shift_gid_ranges_typical_drives(base_network):
+    """Test that `Network._shift_gid_ranges` shifts work before adding typical drives.
+    """
+    # "Base" has many connections and drives, but for now we're only interested in the
+    # non-drive params config
+    _, params = base_network
+
     # Now, let's make a new network, but add drives after the GID shift:
-    net3 = jones_2009_model(params, add_drives_from_params=False)
+    net_shifted = jones_2009_model(params, add_drives_from_params=False)
     gid_offset = 69
-    net3._shift_gid_ranges(gid_start=gid_offset)
-    assert net3._get_next_available_gid() == (270 + gid_offset)
-    drive_new_gid = net3._get_next_available_gid()
-    net3.add_evoked_drive(
+    net_shifted._shift_gid_ranges(gid_start=gid_offset)
+    assert net_shifted._get_next_available_gid() == (270 + gid_offset)
+    drive_new_gid = net_shifted._get_next_available_gid()
+    net_shifted.add_evoked_drive(
         "evdist1",
         mu=5.0,
         sigma=1.0,
@@ -1991,9 +2001,9 @@ def test_shift_gid_ranges(base_network):
         weights_ampa={"L2_pyramidal": 0.1, "L5_pyramidal": 0.1},
         gid_start=drive_new_gid,
     )
-    assert net3._get_next_available_gid() == (270 + gid_offset + 200)
-    drive_new_gid = net3._get_next_available_gid()
-    net3.add_evoked_drive(
+    assert net_shifted._get_next_available_gid() == (270 + gid_offset + 200)
+    drive_new_gid = net_shifted._get_next_available_gid()
+    net_shifted.add_evoked_drive(
         "evdist2",
         mu=5.0,
         sigma=2.0,
@@ -2002,20 +2012,28 @@ def test_shift_gid_ranges(base_network):
         weights_ampa={"L2_pyramidal": 0.1, "L5_pyramidal": 0.1},
         gid_start=drive_new_gid,
     )
-    assert net3._get_next_available_gid() == (270 + gid_offset + 200 + 200)
+    assert net_shifted._get_next_available_gid() == (270 + gid_offset + 200 + 200)
 
     # Finally, let's test that our GID-shifted network and drives can still simulate:
-    _ = simulate_dipole(net3, tstop=20.0, n_trials=1)
+    _ = simulate_dipole(net_shifted, tstop=20.0, n_trials=1)
+
+
+def test_shift_gid_ranges_sub1prob_drives(base_network):
+    """Test that GID-shifting works with drives with probability<1.0.
+    """
+    # "Base" has many connections and drives, but for now we're only interested in the
+    # non-drive params config
+    _, params = base_network
 
     ######################################
     # Now, let's make a new network, but add drives with NOT all-to-all connectivity
     # after the GID shift:
-    net4 = jones_2009_model(params, add_drives_from_params=False)
+    net_shifted = jones_2009_model(params, add_drives_from_params=False)
     gid_offset = 69
-    net4._shift_gid_ranges(gid_start=gid_offset)
-    assert net4._get_next_available_gid() == (270 + gid_offset)
-    drive_new_gid = net4._get_next_available_gid()
-    net4.add_evoked_drive(
+    net_shifted._shift_gid_ranges(gid_start=gid_offset)
+    assert net_shifted._get_next_available_gid() == (270 + gid_offset)
+    drive_new_gid = net_shifted._get_next_available_gid()
+    net_shifted.add_evoked_drive(
         "evdist1",
         mu=5.0,
         sigma=1.0,
@@ -2025,9 +2043,9 @@ def test_shift_gid_ranges(base_network):
         gid_start=drive_new_gid,
         probability=0.67,  # SIX SEVEN
     )
-    assert net4._get_next_available_gid() == (270 + gid_offset + 200)
-    drive_new_gid = net4._get_next_available_gid()
-    net4.add_evoked_drive(
+    assert net_shifted._get_next_available_gid() == (270 + gid_offset + 200)
+    drive_new_gid = net_shifted._get_next_available_gid()
+    net_shifted.add_evoked_drive(
         "evdist2",
         mu=5.0,
         sigma=2.0,
@@ -2037,7 +2055,7 @@ def test_shift_gid_ranges(base_network):
         gid_start=drive_new_gid,
         probability=0.67,  # SIX SEVEN
     )
-    assert net4._get_next_available_gid() == (270 + gid_offset + 200 + 200)
+    assert net_shifted._get_next_available_gid() == (270 + gid_offset + 200 + 200)
 
     # Finally, let's test that our GID-shifted network and drives can still simulate:
-    _ = simulate_dipole(net4, tstop=20.0, n_trials=1)
+    _ = simulate_dipole(net_shifted, tstop=20.0, n_trials=1)
