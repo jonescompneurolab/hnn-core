@@ -2273,7 +2273,7 @@ class Network:
             src_type = conn["src_type"]
             target_type = conn["target_type"]
             for ct in [src_type, target_type]:
-                if not (ct in self.cell_types.keys()):
+                if ct not in self.cell_types.keys():
                     raise ValueError(
                         f"In connection {conn_idx}, source or target celltype '{ct}' "
                         "cannot be found in the Network's 'cell_types'. Please "
