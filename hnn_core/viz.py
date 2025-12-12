@@ -231,8 +231,6 @@ def plot_laminar_lfp(
             # Show all contact labels without skipping
             ax.set_yticklabels(contact_labels)
 
-
-
         if voltage_scalebar is None:
             voltage_scalebar = voltage_offset
 
