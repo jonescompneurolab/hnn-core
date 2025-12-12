@@ -10,7 +10,7 @@ from .cell import Cell, Section
 from .params import compare_dictionaries
 from .params_default import (get_L2Pyr_params_default,
                              get_L5Pyr_params_default,
-                             get_L2Pyr_params_new,
+                             get_L2Pyrhuman_params,
                              get_L5PyrET_params,
                              get_Int_params)
 # Units for e: mV
@@ -166,7 +166,7 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
         "distal": ["apical_tuft"],
     }
 
-    synapses = _get_pyr_syn_props(p_all, "L2Pyr")
+    synapses = _get_syn_props(p_all, "L2Pyr", syn_types=["ampa", "nmda", "gabaa", "gabab"])
     return Cell(
         "L2Pyr",
         pos,
@@ -266,7 +266,7 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
         "distal": ["apical_tuft"],
     }
 
-    synapses = _get_pyr_syn_props(p_all, "L5Pyr")
+    synapses = _get_syn_props(p_all, "L5Pyr", syn_types=["ampa", "nmda", "gabaa", "gabab"])
     return Cell(
         "L5Pyr",
         pos,
@@ -302,36 +302,22 @@ def _get_interneuron_soma(cell_name, v_init=-69):
     )
 
 
-def _get_pyr_syn_props(p_all, cell_type):
-    return {
-        "ampa": {
-            "e": p_all["%s_ampa_e" % cell_type],
-            "tau1": p_all["%s_ampa_tau1" % cell_type],
-            "tau2": p_all["%s_ampa_tau2" % cell_type],
-        },
-        "nmda": {
-            "e": p_all["%s_nmda_e" % cell_type],
-            "tau1": p_all["%s_nmda_tau1" % cell_type],
-            "tau2": p_all["%s_nmda_tau2" % cell_type],
-        },
-        "gabaa": {
-            "e": p_all["%s_gabaa_e" % cell_type],
-            "tau1": p_all["%s_gabaa_tau1" % cell_type],
-            "tau2": p_all["%s_gabaa_tau2" % cell_type],
-        },
-        "gabab": {
-            "e": p_all["%s_gabab_e" % cell_type],
-            "tau1": p_all["%s_gabab_tau1" % cell_type],
-            "tau2": p_all["%s_gabab_tau2" % cell_type],
-        },
-    }
+def _get_syn_props(p_all, cell_type, syn_types=["ampa", "nmda", "gabaa", "gabab"]):
 
+    synapses = dict()
+    for syn in syn_types:
+        synapses[syn] = {"e": p_all["%s_%s_e" % (cell_type, syn)],
+                "tau1": p_all["%s_%s_tau1" % (cell_type, syn)],
+                "tau2": p_all["%s_%s_tau2" % (cell_type, syn)],
+                "type": p_all["%s_%s_type" % (cell_type, syn)],
+                }
+    return synapses
 
 def _get_basket_syn_props():
     return {
-        "ampa": {"e": 0, "tau1": 0.5, "tau2": 5.0},
-        "gabaa": {"e": -80, "tau1": 0.5, "tau2": 5.0},
-        "nmda": {"e": 0, "tau1": 1.0, "tau2": 20.0},
+        "ampa": {"e": 0, "tau1": 0.5, "tau2": 5.0, "type": "Exp2Syn"},
+        "gabaa": {"e": -80, "tau1": 0.5, "tau2": 5.0, "type": "Exp2Syn"},
+        "nmda": {"e": 0, "tau1": 1.0, "tau2": 20.0, "type": "Exp2Syn"},
     }
 
 
@@ -633,7 +619,8 @@ def pyramidal_l5ET(cell_name,pos=(0,0,0), gid=None):
     mechanisms = {'NaTs2_t': ['gbar_NaTs2_t'], 
                     'SKv3_1': ['gbar_SKv3_1'],
                     'pas': ['g_pas', 'e_pas'],
-                    'Ih': ['gbar_Ih']}
+                    'Ih': ['gbar_Ih'],
+                    'CaDynamics_E2': ['decay_CaDynamics_E2', 'gamma_CaDynamics_E2']}
 
     section_names = ['basal_1', 'basal_2', 'basal_3', 'apical_oblique']
 
@@ -666,7 +653,7 @@ def pyramidal_l5ET(cell_name,pos=(0,0,0), gid=None):
     sect_loc = {'proximal': ['apical_oblique', 'basal_2', 'basal_3'],
                     'distal': ['apical_tuft']}
 
-    synapses = _get_pyr_syn_props(p_all, 'L5Pyr')
+    synapses = _get_syn_props(p_all, 'L5Pyr', syn_types=["ampa", "nmda", "gabaa", "gabab"])
 
     cell = Cell(cell_name, pos,
                     sections=sections,
@@ -681,7 +668,7 @@ def pyramidal_l5ET(cell_name,pos=(0,0,0), gid=None):
 
 def pyramidal_l23(cell_name,pos=(0,0,0), gid=None):
 
-    p_all = get_L2Pyr_params_new()
+    p_all = get_L2Pyrhuman_params()
 
     gbar_Ih = partial(_exp_g_at_dist, zero_val=p_all['L2Pyr_dend_gbar_Ih'],exp_term = 1./323, slope=2.087, offset=-.8696)
     gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=0.00001, gdend=0.002, xkink=200, hotzone=[200, 400], hotzone_factor=4)
@@ -770,7 +757,8 @@ def pyramidal_l23(cell_name,pos=(0,0,0), gid=None):
     mechanisms = {'NaTs2_t_32d': ['gbar_NaTs2_t_32d'], 
                     'SKv3_1': ['gbar_SKv3_1'],
                     'pas': ['g_pas', 'e_pas'],
-                    'Ih': ['gbar_Ih']}
+                    'Ih': ['gbar_Ih'],
+                    'CaDynamics_E2': ['decay_CaDynamics_E2', 'gamma_CaDynamics_E2']}
 
     section_names = ['basal_1', 'basal_2', 'basal_3', 'apical_oblique']
 
@@ -800,7 +788,7 @@ def pyramidal_l23(cell_name,pos=(0,0,0), gid=None):
     sect_loc = {'proximal': ['apical_oblique', 'basal_2', 'basal_3'],
                 'distal': ['apical_tuft']}
 
-    synapses = _get_pyr_syn_props(p_all, 'L2Pyr')
+    synapses = _get_syn_props(p_all, 'L2Pyr', syn_types=["ampa", "nmda", "gabaa", "gabab"])
 
     cell = Cell(cell_name, pos,
                     sections=sections,
@@ -816,7 +804,7 @@ def interneuron(cell_name,pos=(0,0,0), layer=2, gid=None):
     p_all = get_Int_params()
     sections = dict()
     sections['soma'] = _get_interneuron_soma(cell_name, v_init=-65)
-    synapses = _get_basket_syn_props()
+    synapses = _get_syn_props(p_all, 'Int', syn_types=["ampa", "nmda", "gabaa"])
     sections['soma'].syns = list(synapses.keys())
 
     if layer == 2:
@@ -830,7 +818,8 @@ def interneuron(cell_name,pos=(0,0,0), layer=2, gid=None):
                 'kdr': ['gbar_kdr'],
                 'kd': ['gbar_kd'],
                 'Ih': ['gbar_Ih'],
-                'pas': ['g_pas','e_pas']}
+                'pas': ['g_pas','e_pas'],
+                'CaDynamics_E2': ['decay_CaDynamics_E2', 'gamma_CaDynamics_E2']}
 
     sections['soma'].mechs = dict()
 

@@ -620,12 +620,11 @@ class Cell:
                 syn_key = f"{sec_name}_{receptor}"
                 seg = self._nrn_sections[sec_name](0.5)
 
-                if receptor == 'gabab':
-                    self._nrn_synapses[syn_key] = self.syn_create(
-                        seg, **synapses[receptor])
-                else:
-                    self._nrn_synapses[syn_key] = self.syn_create(
-                        seg, **synapses[receptor])
+                self._nrn_synapses[syn_key] = self.syn_create(
+                    seg, **synapses[receptor])
+
+
+            
 
     def _create_sections(self, sections, cell_tree):
         """Create soma and set geometry.
@@ -849,7 +848,7 @@ class Cell:
                     self.ca[sec_name] = h.Vector()
                     self.ca[sec_name].record(self._nrn_sections[sec_name](0.5)._ref_cai)
 
-    def syn_create(self, secloc, e, tau1, tau2):
+    def syn_create(self, secloc, e, tau1, tau2, type):
         """Create an h.Exp2Syn synapse.
 
         Parameters
@@ -862,6 +861,8 @@ class Cell:
             Rise time (in ms)
         tau2: float
             Decay time (in ms)
+        type: str
+            Name of synapse point process to create. Options are 'Exp2Syn', 'GABAB', 'MyExp2SynNMDABB'.
 
         Returns
         -------
@@ -871,35 +872,19 @@ class Cell:
         if not isinstance(secloc, nrn.Segment):
             raise TypeError(f'secloc must be instance of'
                             f'nrn.Segment. Got {type(secloc)}')
-        syn = h.Exp2Syn(secloc)
-        syn.e = e
-        syn.tau1 = tau1
-        syn.tau2 = tau2
-        return syn
-    
-    # GABAB synapse
-    def syn_create_gabab(self, secloc, e, tau1, tau2):
-        if not isinstance(secloc, nrn.Segment):
-            raise TypeError(f'secloc must be instance of'
-                            f'nrn.Segment. Got {type(secloc)}')
-        syn = h.GABAB(secloc)
-        syn.e = e
-        syn.tau1 = tau1
-        syn.tau2 = tau2
 
-        return syn
-    
-    # GABAB synapse
-    def syn_create_gabab(self, secloc, e, tau1, tau2):
-        if not isinstance(secloc, nrn.Segment):
-            raise TypeError(f'secloc must be instance of'
-                            f'nrn.Segment. Got {type(secloc)}')
-        syn = h.GABAB(secloc)
-        syn.e = e
-        syn.tau1 = tau1
-        syn.tau2 = tau2
+        synapse_class = getattr(h, type)
+        syn = synapse_class(secloc)
 
+        # some synapses have these defined in mod file
+        if hasattr(syn, 'e'):
+            syn.e = e
+        if hasattr(syn, 'tau1'):
+            syn.tau1 = tau1
+        if hasattr(syn, 'tau2'):
+            syn.tau2 = tau2
         return syn
+
 
     def setup_source_netcon(self, threshold):
         """Created for _PC.cell and specifies SOURCES of spikes.

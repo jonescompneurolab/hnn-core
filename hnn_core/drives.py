@@ -241,10 +241,10 @@ def _add_drives_from_params(net):
     # # gid offset with respect to the first cell of a population.
     # for drive_name, drive in net.external_drives.items():
     #     drive["event_seed"] += net.gid_ranges[drive_name][0]
-    for drive_name, drive in net.external_drives.items():
-        drive["event_seed"] += net.gid_ranges[drive_name][0]
+    # for drive_name, drive in net.external_drives.items():
+    #     drive["event_seed"] += net.gid_ranges[drive_name][0]
 
-        print(f"Drive {drive_name} event_seed updated to {drive['event_seed']}", flush=True)
+    #     print(f"Drive {drive_name} event_seed updated to {drive['event_seed']}", flush=True)
         
 
 

@@ -82,7 +82,7 @@ def jones_2009_model(
                 "electro_type": "inhibitory",
                 "layer": "2",
                 "measure_dipole": False,
-                "reference": "https://doi.org/10.7554/eLife.51214",
+                "reference": "https://doi.org/10.7554/eLife.51214"
             },
         },
         "L2_pyramidal": {
@@ -92,7 +92,7 @@ def jones_2009_model(
                 "electro_type": "excitatory",
                 "layer": "2",
                 "measure_dipole": True,
-                "reference": "https://doi.org/10.7554/eLife.51214",
+                "reference": "https://doi.org/10.7554/eLife.51214"
             },
         },
         "L5_basket": {
@@ -102,7 +102,7 @@ def jones_2009_model(
                 "electro_type": "inhibitory",
                 "layer": "5",
                 "measure_dipole": False,
-                "reference": "https://doi.org/10.7554/eLife.51214",
+                "reference": "https://doi.org/10.7554/eLife.51214"
             },
         },
         "L5_pyramidal": {
@@ -112,7 +112,7 @@ def jones_2009_model(
                 "electro_type": "excitatory",
                 "layer": "5",
                 "measure_dipole": True,
-                "reference": "https://doi.org/10.7554/eLife.51214",
+                "reference": "https://doi.org/10.7554/eLife.51214"
             },
         },
     }
@@ -415,7 +415,7 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
                 "electro_type": "inhibitory",
                 "layer": "2",
                 "measure_dipole": False,
-                "reference": "https://doi.org/10.7554/eLife.51214",
+                "reference": "https://doi.org/10.7554/eLife.51214"
             },
         },
         "L2_pyramidal": {
@@ -425,7 +425,7 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
                 "electro_type": "excitatory",
                 "layer": "2",
                 "measure_dipole": True,
-                "reference": "https://doi.org/10.7554/eLife.51214",
+                "reference": "https://doi.org/10.7554/eLife.51214"
             },
         },
         "L5_basket": {
@@ -435,7 +435,7 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
                 "electro_type": "inhibitory",
                 "layer": "5",
                 "measure_dipole": False,
-                "reference": "https://doi.org/10.7554/eLife.51214",
+                "reference": "https://doi.org/10.7554/eLife.51214"
             },
         },
         "L5_pyramidal": {
@@ -445,7 +445,7 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
                 "electro_type": "excitatory",
                 "layer": "5",
                 "measure_dipole": True,
-                "reference": "https://doi.org/10.7554/eLife.51214",
+                "reference": "https://doi.org/10.7554/eLife.51214"
             },
         },
     }
@@ -455,7 +455,7 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
         n_pyr_x=mesh_shape[0],
         n_pyr_y=mesh_shape[1],
         z_coord=1307.4,  # Default layer separation
-        inplane_distance=1.0,  # Default in-plane distance
+        inplane_distance=1.,  # in-plane distance appropriate for LFP recordings
     )
 
     # Map cell types to layer positions
@@ -482,7 +482,7 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
 
     # layer2 Pyr -> layer2 Pyr
     # layer5 Pyr -> layer5 Pyr
-    lamtha = 3.0
+    lamtha = 6.125                 # calculated from human data Campganola et al. 2022
     loc = 'proximal'
     target_cell ='L2_pyramidal'
     for receptor in ['nmda', 'ampa']:
@@ -508,7 +508,7 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
     # layer2 Basket -> layer2 Pyr
     src_cell = 'L2_basket'
     target_cell = 'L2_pyramidal'
-    lamtha = 50.
+    lamtha = 6.125
     loc = 'soma'
     receptor='gabaa'
     key = f'gbar_L2Basket_L2Pyr_{receptor}'
@@ -516,32 +516,35 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
     
-    receptor='gabab'
-    key = f'gbar_L2Basket_L2Pyr_{receptor}'
-    weight = params[key]
-    net.add_connection(
-        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+    # loc = 'distal'
+    # receptor='gabab'
+    # key = f'gbar_L2Basket_L2Pyr_{receptor}'
+    # weight = params[key]
+    # net.add_connection(
+    #     src_cell, target_cell, loc, receptor, weight, delay, lamtha)
         
 
     # layer5 Basket -> layer5 Pyr
     src_cell = 'L5_basket'
     target_cell = 'L5_pyramidal'
-    lamtha = 70.
+    lamtha = 6.125
     loc = 'soma'
     receptor = 'gabaa'
     key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
     weight = params[key]
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
-    receptor = 'gabab'
-    key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
-    weight = params[key]
-    net.add_connection(
-        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+    
+    # loc = 'distal'
+    # receptor = 'gabab'
+    # key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
+    # weight = params[key]
+    # net.add_connection(
+    #     src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # layer2 Pyr -> layer5 Pyr
     src_cell = 'L2_pyramidal'
-    lamtha = 3.
+    lamtha = 6.125
     receptor = 'ampa'
     for loc in ['proximal', 'distal']:
         key = f'gbar_L2Pyr_{_short_name(target_cell)}'
@@ -551,18 +554,24 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
 
     # layer2 Basket -> layer5 Pyr
     src_cell = 'L2_basket'
-    lamtha = 50.
+    lamtha = 6.125
     key = f'gbar_L2Basket_{_short_name(target_cell)}'
     weight = params[key]
-    loc = 'distal'
-    receptor = 'gabaa'
+    loc = 'apical_tuft'
+    
+    receptor = 'gabab'
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+    
+    loc = 'apical_2'
+    receptor = 'gabaa'
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight*.01, delay, lamtha)
 
     # xx -> layer2 Basket
     src_cell = 'L2_pyramidal'
     target_cell = 'L2_basket'
-    lamtha = 3.
+    lamtha = 6.125
     key = f'gbar_L2Pyr_{_short_name(target_cell)}'
     weight = params[key]
     loc = 'soma'
@@ -571,7 +580,7 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     src_cell = 'L2_basket'
-    lamtha = 20.
+    lamtha = 6.125
     key = f'gbar_L2Basket_{_short_name(target_cell)}'
     weight = params[key]
     loc = 'soma'
@@ -582,7 +591,7 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
     # xx -> layer5 Basket
     src_cell = 'L5_basket'
     target_cell = 'L5_basket'
-    lamtha = 20.
+    lamtha = 6.125
     loc = 'soma'
     receptor = 'gabaa'
     key = f'gbar_L5Basket_{_short_name(target_cell)}'
@@ -592,7 +601,7 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
         allow_autapses=False)
 
     src_cell = 'L5_pyramidal'
-    lamtha = 3.
+    lamtha = 6.125
     key = f'gbar_L5Pyr_{_short_name(target_cell)}'
     weight = params[key]
     loc = 'soma'
@@ -601,19 +610,14 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     src_cell = 'L2_pyramidal'
-    lamtha = 3.
+    lamtha = 6.125
     key = f'gbar_L2Pyr_{_short_name(target_cell)}'
     weight = params[key]
     loc = 'soma'
     receptor = 'ampa'
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
-    
-    
-    # Replace cells
 
-    
-    
     return net
 
 
