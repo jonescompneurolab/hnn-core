@@ -1979,57 +1979,44 @@ def test_shift_gid_ranges_consecutive(base_network):
     _ = simulate_dipole(net_shifted, tstop=20.0, n_trials=1)
 
 
-def test_shift_gid_ranges_typical_drives(base_network):
-    """Test that `Network._shift_gid_ranges` shifts work before adding typical drives.
-    """
+@pytest.mark.parametrize("probability", [1.0, 0.67])  # SIX SEVEN /dance
+def test_shift_gid_ranges_sub1prob_drives(base_network, probability):
+    """Test that GID-shifting works with drives."""
     # "Base" has many connections and drives, but for now we're only interested in the
     # non-drive params config
     _, params = base_network
 
-    # Now, let's make a new network, but add drives after the GID shift:
-    net_shifted = jones_2009_model(params, add_drives_from_params=False)
+    # Configuration of the test-wide parameters we're interested in:
+    prob_int = int(probability * 100)
+    conn_seed = 3141592  # Ensure every connection is connecting identically
     gid_offset = 69
-    net_shifted._shift_gid_ranges(gid_start=gid_offset)
-    assert net_shifted._get_next_available_gid() == (270 + gid_offset)
-    drive_new_gid = net_shifted._get_next_available_gid()
-    net_shifted.add_evoked_drive(
+
+    net_base = jones_2009_model(params, add_drives_from_params=False)
+    net_base.add_evoked_drive(
         "evdist1",
         mu=5.0,
         sigma=1.0,
         numspikes=1,
         location="distal",
         weights_ampa={"L2_pyramidal": 0.1, "L5_pyramidal": 0.1},
-        gid_start=drive_new_gid,
+        probability=probability,
+        conn_seed=conn_seed,
     )
-    assert net_shifted._get_next_available_gid() == (270 + gid_offset + 200)
-    drive_new_gid = net_shifted._get_next_available_gid()
-    net_shifted.add_evoked_drive(
+    net_base.add_evoked_drive(
         "evdist2",
         mu=5.0,
         sigma=2.0,
         numspikes=2,
         location="distal",
         weights_ampa={"L2_pyramidal": 0.1, "L5_pyramidal": 0.1},
-        gid_start=drive_new_gid,
+        probability=probability,
+        conn_seed=conn_seed,
     )
-    assert net_shifted._get_next_available_gid() == (270 + gid_offset + 200 + 200)
-
-    # Finally, let's test that our GID-shifted network and drives can still simulate:
-    _ = simulate_dipole(net_shifted, tstop=20.0, n_trials=1)
-
-
-def test_shift_gid_ranges_sub1prob_drives(base_network):
-    """Test that GID-shifting works with drives with probability<1.0.
-    """
-    # "Base" has many connections and drives, but for now we're only interested in the
-    # non-drive params config
-    _, params = base_network
 
     ######################################
     # Now, let's make a new network, but add drives with NOT all-to-all connectivity
     # after the GID shift:
     net_shifted = jones_2009_model(params, add_drives_from_params=False)
-    gid_offset = 69
     net_shifted._shift_gid_ranges(gid_start=gid_offset)
     assert net_shifted._get_next_available_gid() == (270 + gid_offset)
     drive_new_gid = net_shifted._get_next_available_gid()
@@ -2041,7 +2028,8 @@ def test_shift_gid_ranges_sub1prob_drives(base_network):
         location="distal",
         weights_ampa={"L2_pyramidal": 0.1, "L5_pyramidal": 0.1},
         gid_start=drive_new_gid,
-        probability=0.67,  # SIX SEVEN
+        probability=probability,
+        conn_seed=conn_seed,
     )
     assert net_shifted._get_next_available_gid() == (270 + gid_offset + 200)
     drive_new_gid = net_shifted._get_next_available_gid()
@@ -2053,9 +2041,29 @@ def test_shift_gid_ranges_sub1prob_drives(base_network):
         location="distal",
         weights_ampa={"L2_pyramidal": 0.1, "L5_pyramidal": 0.1},
         gid_start=drive_new_gid,
-        probability=0.67,  # SIX SEVEN
+        probability=probability,
+        conn_seed=conn_seed,
     )
     assert net_shifted._get_next_available_gid() == (270 + gid_offset + 200 + 200)
+
+    assert (
+        len(net_base.connectivity[-1]["gid_pairs"])
+        == len(net_shifted.connectivity[-1]["gid_pairs"])
+        == prob_int
+    )
+
+    for gids_type in ["src_gids", "target_gids"]:
+        for base_gid in net_base.connectivity[-1][gids_type]:
+            assert (base_gid + gid_offset) in net_shifted.connectivity[-1][gids_type]
+
+    shifted_pairs = net_shifted.connectivity[-1]["gid_pairs"]
+    for base_key, base_val in net_base.connectivity[-1]["gid_pairs"].items():
+        # The following assumes that the "shape" of the probabilistic connection network
+        # is identical between the equivalently-named drives in `net_base` and
+        # `net_shifted`, which is only true if their `conn_seed` is identical.
+        #
+        # Have to unpack then re-cast the value to list:
+        assert shifted_pairs[base_key + gid_offset] == [base_val[0] + gid_offset]
 
     # Finally, let's test that our GID-shifted network and drives can still simulate:
     _ = simulate_dipole(net_shifted, tstop=20.0, n_trials=1)
