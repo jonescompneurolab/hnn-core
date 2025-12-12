@@ -2073,7 +2073,7 @@ class Network:
         write_network_configuration(self, fname, overwrite)
 
     def filter_cell_types(self, **metadata_filters):
-        """ Filter cell types based on cell_metadata criteria."""
+        """Filter cell types based on cell_metadata criteria."""
         filtered_types = []
         for cell_type_name, cell_type_data in self.cell_types.items():
             cell_metadata = cell_type_data["cell_metadata"]
@@ -2269,38 +2269,39 @@ class Network:
             current_gid += n_cells
 
         # Shift connectivity GIDs to match new gid_ranges
-        for conn in self.connectivity:
-            # Shift target_gids if target_type is in mapping
-            if "target_type" in conn and conn["target_type"] in self.cell_types.keys():
-                ct = conn["target_type"]
-                gid_range = list(self.gid_ranges[ct])
-                n_targets = len(conn["target_gids"])
-                # Replace with correct GIDs from gid_ranges
-                conn["target_gids"] = gid_range[:n_targets]
-            # Shift src_gids if src_type is in mapping
-            if "src_type" in conn and conn["src_type"] in self.cell_types.keys():
-                ct = conn["src_type"]
-                gid_range = list(self.gid_ranges[ct])
-                n_srcs = len(conn["src_gids"])
-                conn["src_gids"] = gid_range[:n_srcs]
+        for conn_idx, conn in enumerate(self.connectivity):
+            src_type = conn["src_type"]
+            target_type = conn["target_type"]
+            for ct in [src_type, target_type]:
+                if not (ct in self.cell_types.keys()):
+                    raise ValueError(
+                        f"In connection {conn_idx}, source or target celltype '{ct}' "
+                        "cannot be found in the Network's 'cell_types'. Please "
+                        "reconstruct your Network's cell types and connections."
+                    )
+            ### Update the connectivity's src GIDs
+            new_src_gid_range = list(self.gid_ranges[src_type])
+            old_src_n_gids = len(conn["src_gids"])
+            # Replace with correct GIDs from gid_ranges
+            conn["src_gids"] = new_src_gid_range[:old_src_n_gids]
 
-            if "gid_pairs" in conn and conn["gid_pairs"]:
-                src_type = conn["src_type"]
-                tgt_type = conn["target_type"]
+            ### Update the connectivity's target GIDs
+            new_target_gid_range = list(self.gid_ranges[target_type])
+            old_target_n_gids = len(conn["target_gids"])
+            conn["target_gids"] = new_target_gid_range[:old_target_n_gids]
 
-                # Calculate offsets using original and new GID ranges
-                src_offset = (
-                    self.gid_ranges[src_type][0] - original_gid_ranges[src_type][0]
-                )
-                tgt_offset = (
-                    self.gid_ranges[tgt_type][0] - original_gid_ranges[tgt_type][0]
-                )
-                new_gid_pairs = {}
-                for src_gid, tgt_gids in conn["gid_pairs"].items():
-                    new_src_gid = int(src_gid) + src_offset
-                    new_tgt_gids = [int(tg) + tgt_offset for tg in tgt_gids]
-                    new_gid_pairs[new_src_gid] = new_tgt_gids
-                conn["gid_pairs"] = new_gid_pairs
+            ### Update the connectivity's GID pairs
+            # Calculate offsets using original and new GID ranges
+            src_offset = self.gid_ranges[src_type][0] - original_gid_ranges[src_type][0]
+            target_offset = (
+                self.gid_ranges[target_type][0] - original_gid_ranges[target_type][0]
+            )
+            new_gid_pairs = {}
+            for src_gid, target_gids in conn["gid_pairs"].items():
+                new_src_gid = int(src_gid) + src_offset
+                new_target_gids = [int(tg) + target_offset for tg in target_gids]
+                new_gid_pairs[new_src_gid] = new_target_gids
+            conn["gid_pairs"] = new_gid_pairs
 
 
 class _Connectivity(dict):
