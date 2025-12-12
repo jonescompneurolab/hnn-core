@@ -28,6 +28,20 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ## 0.5.1.dev0 In-progress Development Changes
 
+### People who contributed to this release:
+
+- [Maira Usman][]
+
+### Changelog
+
+- {class}`~hnn_core.Network` has new methods `Network._get_next_available_gid` and
+  `Network._shift_gid_ranges`. These are intended for future development work on
+  enabling multiple simultaneous `Network`s inside the same simulation, via enabling a
+  user to shift the GIDs of a `Network`. There is also a tutorial available in
+  `examples/howto/plot_dual_network_simulation.py`. This work was done as part of Google
+  Summer of Code 2025, organized through the International Neuroinformatics Coordinating Facility.
+  By [Maira Usman][] in {gh}`1096`.
+
 ## 0.5.0 Release Notes
 
 ### New Features
@@ -210,36 +224,7 @@ This is an emergency patch release to fix a dependency issue.
 
 ### People who contributed to this release:
 
-- {class}`~hnn_core.Network` now accepts optional arguments for its position dictionary attribute `pos_dict` and cell type dictionary attribute `cell_types`,
-  by [Chetan Kandpal][] in {gh}`1095`.
-
-### People who contributed to this release (in alphabetical order of family name):
-
-- [Chetan Kandpal][]
-- [Maira Usman][]
-
-### Changelog
-
-- {class}`~hnn_core.Network` has new methods `Network._get_next_available_gid` and
-  `Network._shift_gid_ranges`. These are intended for future development work on
-  enabling multiple simultaneous `Network`s inside the same simulation, via enabling a
-  user to shift the GIDs of a `Network`. There is also a tutorial available in
-  `examples/howto/plot_dual_network_simulation.py`. This work was done as part of Google
-  Summer of Code 2025, organized through the International Neuroinformatics Coordinating
-  Facility.
-  By [Maira Usman][] in {gh}`1096`.
-
-- Add support for {class}`~hnn_core.Network` to calculate a "layer dictionary"
-  `layer_dict` attribute whose layers can be mapped as desired to an object's
-  `cell_types` attribute. This mapping can then be used to make a more flexible position
-  dictionary `pos_dict` attribute of the object. This also adds support for optional
-  `pos_dict` and `cell_types` arguments to the {class}`~hnn_core.Network`
-  constructor. This also begins the process of moving some model-specific celltype-usage
-  from `network.py` to `network_models.py`. This is the first in a series of code
-  changes meant to allow for more flexible cell types to be used. This work was done as
-  part of Google Summer of Code 2025, organized through the International
-  Neuroinformatics Coordinating Facility.
-  By [Chetan Kandpal][] in {gh}`1095`.
+- [Austin E. Soplata][]
 
 ## 0.4.2 Patch Notes
 
