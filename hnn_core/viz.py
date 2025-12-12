@@ -216,7 +216,7 @@ def plot_laminar_lfp(
             ax.set_xlim(left=times[0], right=times[-1])
     if voltage_offset is not None:
         ax.set_ylim(-voltage_offset, n_offsets * voltage_offset)
-        ylabel = "Individual contact traces\nat depth [µm]"
+        ylabel = "Individual contact traces"
         if len(contact_labels) != n_offsets:
             raise ValueError(
                 f"contact_labels is length {len(contact_labels)},"
@@ -228,13 +228,9 @@ def plot_laminar_lfp(
             )
             ax.set_yticks(trace_ticks)
 
-            # Show every 3rd label to avoid clutter
-            ylabel_skip = 3
-            reduced_labels = [
-                label if i % ylabel_skip == 0 else ""
-                for i, label in enumerate(contact_labels)
-            ]
-            ax.set_yticklabels(reduced_labels)
+            # Show all contact labels without skipping
+            ax.set_yticklabels(contact_labels)
+
 
 
         if voltage_scalebar is None:
