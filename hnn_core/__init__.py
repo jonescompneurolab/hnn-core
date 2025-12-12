@@ -19,4 +19,4 @@ from .hnn_io import (
     write_network_configuration,
 )
 
-__version__ = "0.4.4.dev0"
+__version__ = "0.5.1.dev0"

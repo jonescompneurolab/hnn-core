@@ -8,6 +8,7 @@
 import numpy as np
 
 from .objective_functions import _rmse_evoked, _maximize_psd
+from ..externals.mne import _validate_type
 
 
 class Optimizer:
@@ -17,6 +18,7 @@ class Optimizer:
         tstop,
         constraints,
         set_params,
+        initial_params=None,
         solver="bayesian",
         obj_fun="dipole_rmse",
         max_iter=200,
@@ -38,6 +40,10 @@ class Optimizer:
 
             where ``net`` is a Network object and ``params`` is a dictionary
             of the parameters that will be set inside the function.
+        initial_params : dict, optional
+            Initial parameters for the objective function. Keys are parameter
+            names, values are initial parameters. The default is None.
+            If None, the parameters will be set to the midpoints of parameter ranges.
         solver : str
             The optimizer, 'bayesian' or 'cobyla'.
         obj_fun : str | func
@@ -52,6 +58,8 @@ class Optimizer:
         ----------
         constraints : dict
             The user-defined constraints.
+        initial_params : dict
+            Initial parameters for the objective function.
         max_iter : int
             The max number of calls to the objective function.
         solver : func
@@ -101,6 +109,35 @@ class Optimizer:
         else:
             self.obj_fun = obj_fun  # user-defined function
             self.obj_fun_name = None
+        # Initial weights for the objective function
+        if initial_params is not None:
+            # Check if initial_params is not a dict
+            _validate_type(initial_params, dict)
+
+            # Check if initial_params keys match constraints keys
+            if set(initial_params.keys()) != set(self.constraints.keys()):
+                raise ValueError(
+                    "The keys of initial_params must match the keys of constraints."
+                )
+
+            # Check if initial_params values contain only int or float
+            for val in initial_params.values():
+                _validate_type(val, (int, float))
+
+            # Check if initial_params values are within constraints
+            for key in initial_params:
+                if not (
+                    self.constraints[key][0]
+                    <= initial_params[key]
+                    <= self.constraints[key][1]
+                ):
+                    raise ValueError(
+                        f"Initial parameter '{key}' with value {initial_params[key]} is out of bounds {self.constraints[key]}."
+                    )
+            self.initial_params = initial_params
+        else:
+            self.initial_params = _get_initial_params(self.constraints)
+
         self.tstop = tstop
         self.net_ = None
         self.obj_ = list()
@@ -119,19 +156,26 @@ class Optimizer:
 
         Parameters
         ----------
-        target : instance of Dipole (if obj_fun='dipole_rmse')
+        target : instance of Dipole (Required if obj_fun='dipole_rmse')
             A dipole object with experimental data.
-        f_bands : list of tuples (if obj_fun='maximize_psd')
+        n_trials : int (Optional if obj_fun='dipole_rmse')
+            Number of trials to simulate and average.
+        f_bands : list of tuples (Required if obj_fun='maximize_psd')
             Lower and higher limit for each frequency band.
-        relative_bandpower : tuple (if obj_fun='maximize_psd')
-            Weight for each frequency band.
+        relative_bandpower : list of float | float (Required if obj_fun='maximize_psd')
+            Weight for each frequency band in f_bands. If a single float is provided,
+            the same weight is applied to all frequency bands.
         scale_factor : float, optional
             The dipole scale factor.
         smooth_window_len : float, optional
             The smooth window length.
         """
-        if self.obj_fun_name == "dipole_rmse" and "target" not in obj_fun_kwargs:
-            raise Exception("target must be specified")
+        if self.obj_fun_name == "dipole_rmse":
+            if "target" not in obj_fun_kwargs:
+                raise Exception("target must be specified")
+            elif "n_trials" not in obj_fun_kwargs:
+                obj_fun_kwargs["n_trials"] = 1
+
         elif self.obj_fun_name == "maximize_psd" and (
             "f_bands" not in obj_fun_kwargs
             or "relative_bandpower" not in obj_fun_kwargs
@@ -139,15 +183,14 @@ class Optimizer:
             raise Exception("f_bands and relative_bandpower must be specified")
 
         constraints = self._assemble_constraints(self.constraints)
-        initial_params = _get_initial_params(self.constraints)
 
         opt_params, obj, net_ = self._run_opt(
             self._initial_net,
             self.tstop,
             constraints,
             self._set_params,
+            self.initial_params,
             self.obj_fun,
-            initial_params,
             self.max_iter,
             obj_fun_kwargs,
         )
@@ -191,8 +234,11 @@ class Optimizer:
         axis.set_ylabel("Objective value")
         axis.grid(visible=True)
 
-        fig.show(show)
-        return axis.get_figure()
+        if ax is None:
+            fig.show(show)
+            return axis.get_figure()
+        else:
+            return ax.get_figure()
 
 
 def _get_initial_params(constraints):
@@ -288,8 +334,8 @@ def _run_opt_bayesian(
     tstop,
     constraints,
     set_params,
-    obj_fun,
     initial_params,
+    obj_fun,
     max_iter,
     obj_fun_kwargs,
 ):
@@ -305,12 +351,15 @@ def _run_opt_bayesian(
         Parameter constraints in solver-specific format.
     set_params : func
         User-defined function that sets parameters in network drives.
-    obj_fun : func
-        The objective function.
     initial_params : dict
         Keys are parameter names, values are initial parameters.
+    obj_fun : func
+        The objective function.
     max_iter : int
         Number of calls the optimizer makes.
+    obj_fun_kwargs : dict
+        Additional arguments along with their respective values to be passed
+        to the objective function.
 
     Returns
     -------
@@ -365,8 +414,8 @@ def _run_opt_cobyla(
     tstop,
     constraints,
     set_params,
-    obj_fun,
     initial_params,
+    obj_fun,
     max_iter,
     obj_fun_kwargs,
 ):
@@ -382,12 +431,15 @@ def _run_opt_cobyla(
         Parameter constraints in solver-specific format.
     set_params : func
         User-defined function that sets parameters in network drives.
-    obj_fun : func
-        The objective function.
     initial_params : dict
         Keys are parameter names, values are initial parameters.
+    obj_fun : func
+        The objective function.
     max_iter : int
         Number of calls the optimizer makes.
+    obj_fun_kwargs : dict
+        Additional arguments along with their respective values to be passed
+        to the objective function.
 
     Returns
     -------

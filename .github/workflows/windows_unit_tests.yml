@@ -25,10 +25,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: test
           python-version: ${{ matrix.python-version }}
+
       - name: Install Neuron on Windows separately
         shell: cmd
         run: |
@@ -38,12 +40,29 @@ jobs:
           python -c "import neuron"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Install dependencies and HNN
         shell: cmd
         run: |
           python -m pip install --upgrade pip
           pip install --verbose .[opt,parallel,test,gui]
-      - name: Test with pytest
+
+      - name: Check ruff formatting
         shell: cmd
         run: |
-          python -m pytest ./hnn_core/tests/
+          python -m ruff format hnn_core --check
+
+      - name: Lint with ruff
+        shell: cmd
+        run: |
+          python -m ruff check hnn_core
+
+      - name: Test non-MPI, embarrassingly parallel tests with pytest
+        shell: cmd
+        run: |
+          python -m pytest ./hnn_core/tests/ -m "not uses_mpi" -n auto
+
+      - name: Test MPI-using parallel tests with pytest
+        shell: cmd
+        run: |
+          python -m pytest ./hnn_core/tests/ -m "uses_mpi"

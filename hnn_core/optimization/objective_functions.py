@@ -6,7 +6,7 @@
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
 from hnn_core import simulate_dipole
-from ..dipole import _rmse
+from ..dipole import _rmse, average_dipoles
 
 
 def _rmse_evoked(
@@ -37,6 +37,8 @@ def _rmse_evoked(
         The simulated dipole's duration.
     target : instance of Dipole
         A dipole object with experimental data.
+    n_trials : int
+        Number of trials to simulate and average.
 
     Returns
     -------
@@ -49,16 +51,17 @@ def _rmse_evoked(
     # simulate dpl with predicted params
     new_net = initial_net.copy()
     set_params(new_net, params)
-    dpl = simulate_dipole(new_net, tstop=tstop, n_trials=1)[0]
+
+    dpls = simulate_dipole(new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"])
 
     # smooth & scale
     if "scale_factor" in obj_fun_kwargs:
-        dpl.scale(obj_fun_kwargs["scale_factor"])
+        [dpl.scale(obj_fun_kwargs["scale_factor"]) for dpl in dpls]
     if "smooth_window_len" in obj_fun_kwargs:
-        dpl.smooth(obj_fun_kwargs["smooth_window_len"])
+        [dpl.smooth(obj_fun_kwargs["smooth_window_len"]) for dpl in dpls]
 
+    dpl = average_dipoles(dpls)
     obj = _rmse(dpl, obj_fun_kwargs["target"], tstop=tstop)
-
     obj_values.append(obj)
 
     return obj
@@ -92,8 +95,9 @@ def _maximize_psd(
         The simulated dipole's duration.
     f_bands : list of tuples
         Lower and higher limit for each frequency band.
-    relative_bandpower : tuple
-        Weight for each frequency band.
+    relative_bandpower : list of float | float
+        Weight for each frequency band in f_bands. If a single float is provided,
+        the same weight is applied to all frequency bands.
 
     Returns
     -------
@@ -126,8 +130,6 @@ def _maximize_psd(
     if "smooth_window_len" in obj_fun_kwargs:
         dpl.smooth(obj_fun_kwargs["smooth_window_len"])
 
-    # resample?
-
     # get psd of simulated dpl
     freqs_simulated, psd_simulated = periodogram(
         dpl.data["agg"], dpl.sfreq, window="hamming"
@@ -135,16 +137,23 @@ def _maximize_psd(
 
     # for each f band
     f_bands_psds = list()
+    relative_bandpower = obj_fun_kwargs["relative_bandpower"]
+
+    # Handle float and list inputs for relative_bandpower
+    if isinstance(relative_bandpower, float):
+        relative_bandpower = [relative_bandpower] * len(obj_fun_kwargs["f_bands"])
+    elif len(relative_bandpower) != len(obj_fun_kwargs["f_bands"]):
+        raise ValueError("Length of relative_bandpower must match length of f_bands.")
+
     for idx, f_band in enumerate(obj_fun_kwargs["f_bands"]):
         f_band_idx = np.where(
             np.logical_and(freqs_simulated >= f_band[0], freqs_simulated <= f_band[1])
         )[0]
-        f_bands_psds.append(
-            -obj_fun_kwargs["relative_bandpower"][idx] * sum(psd_simulated[f_band_idx])
-        )
+        f_bands_psds.append(relative_bandpower[idx] * sum(psd_simulated[f_band_idx]))
 
-    # grand sum
-    obj = sum(f_bands_psds) / sum(psd_simulated)
+    # The optimizer is designed to minimize the objective function.
+    # Maximizing the relative band power is equivalent to minimizing its negative.
+    obj = -sum(f_bands_psds) / sum(psd_simulated)
 
     obj_values.append(obj)
 

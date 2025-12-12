@@ -33,9 +33,8 @@ author = 'HNN Developers'
 # -- Version handling --------------------------------------------------------
 
 # The short X.Y version
-version = '0.4.4.dev0'
-# The full version, including alpha/beta/rc tags
-release = '0.4.4.dev0'
+version = '0.5.1.dev0'
+release = version
 
 ### HTML theme version control
 # If you are making a stable release, then you should add entries to the file
@@ -248,11 +247,13 @@ linkcheck_anchors = False
 
 linkcheck_ignore = [
     'https://neuron.yale.edu/neuron',
+    'https://www.nsgportal.org',
     'https://doi.org/10.1152/jn.00535.2009',
     'https://doi.org/10.1152/jn.00122.2010',
     'https://doi.org/10.1101/2021.04.16.440210',
     'https://doi.org/10.7554/eLife.51214',
     'https://groups.google.com/g/hnnsolver',
+    'https://github.com/jonescompneurolab/hnn-core/settings/',
     r'(http|https):\/\/localhost:\d+',
     r'(http|https):\/\/github\.com\/jonescompneurolab\/hnn-core\/(issues|pull)\/\d+',
 ]
