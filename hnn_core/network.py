@@ -2235,7 +2235,8 @@ class Network:
     def _shift_gid_ranges(self, gid_start):
         """Reset cell and non-drive GIDs to begin at a different number.
 
-        This function is still in-development.
+        This function is still in-development, and should be used BEFORE adding any
+        drives!
 
         Parameters
         ----------
@@ -2256,6 +2257,13 @@ class Network:
             2. Shift your Network's GIDs, then
             3. Finally, add drives to your `Network`s.
         """
+        if self.external_drives or self.external_biases:
+            raise RuntimeError(
+                "Drives detected: Shifting GIDs after adding drives is currently not "
+                "supported. Please create your Networks, shift the GIDs appropriately, "
+                "and then add your drives."
+            )
+
         # Shift GID ranges to start at gid_start and avoid overlap
         current_gid = gid_start
 
