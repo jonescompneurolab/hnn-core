@@ -319,22 +319,22 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                 invert_spike_types=distal_drives,
                 color=drive_colors,
             )
-            
+
     elif plot_type in ["PSD", "layer2/3 PSD", "layer5 PSD"]:
         if len(dpls_copied) > 0:
             min_f = plot_config["min_spectral_frequency"]
             max_f = plot_config["max_spectral_frequency"]
             color = ax._get_lines.get_next_color()
-            
+
             layer_label = {
-                "PSD": "Aggregate",
-                "layer2/3 PSD": "Layer 2/3",
-                "layer5 PSD": "Layer 5",
+                "PSD": "(Aggregate)",
+                "layer2/3 PSD": "(Layer 2/3)",
+                "layer5 PSD": "(Layer 5)",
             }[plot_type]
-            label = f"{sim_name} ({layer_label})"
+            label = f"{sim_name} {layer_label}"
 
             layer = {
-                "PSD" : "agg",
+                "PSD": "agg",
                 "layer2/3 PSD": "L2",
                 "layer5 PSD": "L5",
             }[plot_type]
@@ -348,19 +348,6 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                 fmax=max_f,
                 layer=layer,
             )
-
-            if not hasattr(fig, "_psd_axes"):
-                fig._psd_axes = []
-                fig._psd_max_values = []
-
-            y_max = ax.get_ylim()[1]
-            fig._psd_axes.append(ax)
-            fig._psd_max_values.append(y_max)
-
-            if len(fig._psd_axes) > 1:
-                global_y_max = max(fig._psd_max_values)
-                for psd_ax in fig._psd_axes:
-                    psd_ax.set_ylim(top=global_y_max)
 
     elif plot_type == "spectrogram":
         if len(dpls_copied) > 0:
@@ -1027,14 +1014,13 @@ def _postprocess_template(template_name, fig, idx, use_ipympl=True, widgets=None
     this function. For example, L2 and L5 dipole plots should have the same
     y-axis range.
     """
-    if template_name not in ["Dipole Layers (3x1)"]:
+    if template_name not in ["Dipole Layers (3x1)", "PSD Layers (3x1)"]:
         return
 
-    if template_name == "Dipole Layers (3x1)":
-        # Make the L2, L5, and aggregate plots use the same y-range
-        y_lims_list = [ax.get_ylim() for ax in fig.axes]
-        y_lims = (np.min(y_lims_list), np.max(y_lims_list))
-        [ax.set_ylim(y_lims) for ax in fig.axes]
+    # Make the L2, L5, and aggregate plots use the same y-range
+    y_lims_list = [ax.get_ylim() for ax in fig.axes]
+    y_lims = (np.min(y_lims_list), np.max(y_lims_list))
+    [ax.set_ylim(y_lims) for ax in fig.axes]
 
     # Re-render
     if not use_ipympl:
