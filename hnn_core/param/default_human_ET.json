@@ -168,7 +168,7 @@
     "gbar_L2Pyr_L2Basket": 0.0001,
     "gbar_L2Basket_L2Basket": 0.01,
     "gbar_L2Pyr_L5Basket": 3e-05,
-    "gbar_L5Pyr_L5Basket": 0.0003,
+    "gbar_L5Pyr_L5Basket": 0.0006,
     "gbar_L5Basket_L5Basket": 0.02,
     "t0_input_prox": 1000.0,
     "t0_input_stdev_prox": 0.0,

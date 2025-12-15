@@ -412,7 +412,7 @@ def get_L2Pyrhuman_params():
         'L2Pyr_nmda_e': 0.,
         'L2Pyr_nmda_tau1': 15.,
         'L2Pyr_nmda_tau2': 150.,
-        'L2Pyr_nmda_type': "NMDAeee_KD",
+        'L2Pyr_nmda_type': "NMDA_gao",
 
         'L2Pyr_gabaa_e': -80.,
         'L2Pyr_gabaa_tau1': 0.5,
@@ -508,7 +508,7 @@ def get_L5PyrET_params():
         'L5Pyr_nmda_e': 0.,
         'L5Pyr_nmda_tau1': 15.,
         'L5Pyr_nmda_tau2': 150.,
-        'L5Pyr_nmda_type': "NMDAeee_KD",
+        'L5Pyr_nmda_type': "NMDA_gao",
 
         'L5Pyr_gabaa_e': -80.,
         'L5Pyr_gabaa_tau1': 0.5,
@@ -584,7 +584,7 @@ def get_Int_params():
             'Int_nmda_e': 0.,
             'Int_nmda_tau1': 15.,
             'Int_nmda_tau2': 150.,
-            'Int_nmda_type': "NMDAeee_KD",
+            'Int_nmda_type': "NMDA_gao",
 
             'Int_gabaa_e': -80.,
             'Int_gabaa_tau1': 0.5,
