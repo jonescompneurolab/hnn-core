@@ -266,7 +266,7 @@ def average_dipoles(dpls):
 
 
 def _resample_dpl(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
-    """Calculates RMSE between data in dpl and exp_dpl
+    """Resamples a simulated and experimental dpl
     Parameters
     ----------
     dpl : instance of Dipole
@@ -337,7 +337,7 @@ def _resample_dpl(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
 
 
 def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
-    """Resamples a simulated and experimental dpl
+    """Calculates RMSE between data in dpl and exp_dpl
     Parameters
     ----------
     dpl : instance of Dipole
