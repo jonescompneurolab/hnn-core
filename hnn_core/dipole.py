@@ -359,11 +359,9 @@ def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     err : float
         Weighted RMSE between data in dpl and exp_dpl
     """
-    dpl1, dpl2, weights = _resample_dpl(dpl,
-                                        exp_dpl,
-                                        tstart=tstart,
-                                        tstop=tstop,
-                                        weights=weights)
+    dpl1, dpl2, weights = _resample_dpl(
+        dpl, exp_dpl, tstart=tstart, tstop=tstop, weights=weights
+    )
 
     return np.sqrt((weights * ((dpl1 - dpl2) ** 2)).sum() / weights.sum())
 
@@ -391,13 +389,11 @@ def _corr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     err : float
         Correlation coefficient r
     """
-    dpl1, dpl2, weights = _resample_dpl(dpl,
-                                        exp_dpl,
-                                        tstart=tstart,
-                                        tstop=tstop,
-                                        weights=weights)
+    dpl1, dpl2, weights = _resample_dpl(
+        dpl, exp_dpl, tstart=tstart, tstop=tstop, weights=weights
+    )
 
-    return np.corrcoef(dpl1*weights, dpl2*weights)[0, 1]
+    return np.corrcoef(dpl1 * weights, dpl2 * weights)[0, 1]
 
 
 class Dipole(object):
