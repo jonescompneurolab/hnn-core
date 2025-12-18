@@ -6,7 +6,7 @@
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
 from hnn_core import simulate_dipole
-from ..dipole import _rmse, average_dipoles
+from ..dipole import _rmse, _corr, average_dipoles
 
 
 def _rmse_evoked(
@@ -62,6 +62,66 @@ def _rmse_evoked(
 
     dpl = average_dipoles(dpls)
     obj = _rmse(dpl, obj_fun_kwargs["target"], tstop=tstop)
+    obj_values.append(obj)
+
+    return obj
+
+
+def _corr_evoked(
+    initial_net,
+    initial_params,
+    set_params,
+    predicted_params,
+    update_params,
+    obj_values,
+    tstop,
+    obj_fun_kwargs,
+):
+    """The objective function for evoked responses.
+
+    Parameters
+    ----------
+    initial_net : instance of Network
+        The network object.
+    initial_params : dict
+        Keys are parameter names, values are initial parameters.
+    set_params : func
+        User-defined function that sets network drives and parameters.
+    predicted_params : list
+        Parameters selected by the optimizer.
+    update_params : func
+        Function to update params.
+    tstop : float
+        The simulated dipole's duration.
+    target : instance of Dipole
+        A dipole object with experimental data.
+    n_trials : int
+        Number of trials to simulate and average.
+
+    Returns
+    -------
+    obj : float
+        Correlation r returned as (-r + 1) such that a value of 0.0
+        corresponds to r = 1.0, useful for optimization.
+    """
+
+    params = update_params(initial_params, predicted_params)
+
+    # simulate dpl with predicted params
+    new_net = initial_net.copy()
+    set_params(new_net, params)
+
+    dpls = simulate_dipole(new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"])
+
+    # smooth & scale
+    if "scale_factor" in obj_fun_kwargs:
+        [dpl.scale(obj_fun_kwargs["scale_factor"]) for dpl in dpls]
+    if "smooth_window_len" in obj_fun_kwargs:
+        [dpl.smooth(obj_fun_kwargs["smooth_window_len"]) for dpl in dpls]
+
+    dpl = average_dipoles(dpls)
+    obj = _corr(dpl, obj_fun_kwargs["target"], tstop=tstop)
+    obj = -obj + 1  # Transformation to ensure obj=0.0 is best loss
     obj_values.append(obj)
 
     return obj
