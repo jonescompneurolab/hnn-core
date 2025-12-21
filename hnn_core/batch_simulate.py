@@ -324,7 +324,7 @@ class BatchSimulate(object):
         """
 
         net = self.net.copy()
-        self.set_params(param_values, net)
+        self.set_params(net, param_values)
 
         results = {"net": net, "param_values": param_values}
 

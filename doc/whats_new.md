@@ -28,6 +28,10 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ## 0.5.1.dev0 In-progress Development Changes
 
+### Public API Changes
+
+- `BatchSimulate` now expects the `set_params` callback to accept arguments in the order `(net, param_values)` instead of `(param_values, net)`, aligning it with the `Optimizer` class.
+
 ## 0.5.0 Release Notes
 
 ### New Features

@@ -47,16 +47,16 @@ n_jobs = 4
 # resulting in the complex waveforms observed.
 
 
-def set_params(param_values, net=None):
+def set_params(net, param_values):
     """
     Set parameters for the network drives.
 
     Parameters
     ----------
+    net : instance of Network
+        The network object to modify.
     param_values : dict
         Dictionary of parameter values.
-    net : instance of Network, optional
-        If None, a new network is created using the specified model type.
     """
     weights_ampa = {'L2_basket': param_values['weight_basket'],
                     'L2_pyramidal': param_values['weight_pyr'],
