@@ -99,6 +99,7 @@ Parallel backends (:py:mod:`hnn_core.parallel_backends`):
 
    MPIBackend
    JoblibBackend
+   BatchSimulate
 
 Input and Output (hierarchical JSON) (:py:mod:`hnn_core.hnn_io`):
 -----------------------------------------------------------------
