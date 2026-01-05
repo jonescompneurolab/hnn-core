@@ -578,6 +578,54 @@ def _plot_on_axes(
         fig, ax, single_simulation, sim_name, plot_type, simulation_plot_config
     )
 
+    if plot_type == "current dipole" and data_widget.value == "None":
+        sim_names = [
+            name
+            for name, sim in data["simulations"].items()
+            if _is_simulation(sim)
+        ]
+
+        if len(sim_names) >= 2 and sim_name == sim_names[-1]:
+            prev_sim_name = sim_names[-2]
+            prev_sim = data["simulations"][prev_sim_name]
+
+            prev_dpl_processed = _update_ax(
+                fig, ax, prev_sim, prev_sim_name, plot_type, simulation_plot_config
+            )[0]
+
+            t0 = 0.0
+            tstop = dpls_processed[-1].times[-1]
+            if len(dpls_processed) > 1:
+                dpl = _avg_dipole_check(dpls_processed)
+            else:
+                dpl = dpls_processed
+
+            rmse = _rmse(dpl, prev_dpl_processed, t0, tstop)
+            annotation_text = f"RMSE({sim_name}, {prev_sim_name}): {rmse:.4f}"
+
+            annotation = next(
+                (child for child in ax.get_children()
+                 if isinstance(child, plt.Annotation)),
+                None,
+            )
+
+            if annotation is not None:
+                annotation.set_text(annotation_text)
+            else:
+                ax.annotate(
+                    annotation_text,
+                    xy=(0.95, 0.05),
+                    xycoords="axes fraction",
+                    horizontalalignment="right",
+                    verticalalignment="bottom",
+                    fontsize=12,
+                )
+
+            logger.info(
+                f"Auto RMSE {rmse:.4f} "
+                f"({sim_name} vs {prev_sim_name})"
+            )
+
     # If target_simulations is not None and we are plotting a dipole,
     # we need to plot the target dipole as well.
     if (
@@ -1364,6 +1412,15 @@ class _VizManager:
         elif operation == "clear":
             buttons.children[1].click()
 
+def _get_last_two_simulations(simulations):
+    """Return (previous, latest) simulation names if possible."""
+    sim_names = [
+        name for name, sim in simulations.items()
+        if _is_simulation(sim)
+    ]
+    if len(sim_names) < 2:
+        return None, None
+    return sim_names[-2], sim_names[-1]
 
 def _is_simulation(data):
     """Determines if saved data is a simulation."""
