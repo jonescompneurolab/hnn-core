@@ -21,7 +21,7 @@ NEURON {
     SUFFIX kca
     USEION k READ ek WRITE ik
     USEION ca READ cai
-    RANGE n, gk, gbar
+    RANGE n, gk, gbar, ik
     RANGE ninf, ntau
     GLOBAL Ra, Rb, caix
     GLOBAL q10, temp, tadj, vmin, vmax, tshift
