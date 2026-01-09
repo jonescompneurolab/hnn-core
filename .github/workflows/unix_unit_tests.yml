@@ -37,6 +37,12 @@ jobs:
           fi
           conda install --yes --quiet -c conda-forge mpi4py "openmpi >5"
 
+      - name: Install minimal hnn-core
+        shell: bash -el {0}
+        run: |
+          pip install --verbose .
+          python -c "from hnn_core import jones_2009_model, simulate_dipole; simulate_dipole(jones_2009_model(), tstop=20); print('--> SUCCESS: The test worked!')"
+
       - name: Install HNN-core
         shell: bash -el {0}
         run: |
