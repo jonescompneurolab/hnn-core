@@ -13,7 +13,6 @@ import json
 import urllib.parse
 import urllib.request
 import zipfile
-import re
 from collections import defaultdict
 from copy import deepcopy
 from pathlib import Path
@@ -2694,7 +2693,6 @@ def run_button_clicked(
 
             _sim_name = f"{base}-{idx:03d}"
             widget_simulation_name.value = _sim_name
-
 
         _init_network_from_widgets(
             params,
