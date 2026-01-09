@@ -161,7 +161,6 @@ def simulate_dipole(
     _check_option("record_i_ar", record_i_ar, ["all", "soma", False])
     net._params["record_i_ar"] = record_i_ar
 
-
     net._tstop = tstop
 
     net._dt = dt

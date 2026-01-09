@@ -431,17 +431,17 @@ class NetworkBuilder(object):
         self._ca = dict()
         # [new]
         self._agg_i_mem = dict()  # aggregate tm currents
-        self._agg_ina = dict()    # aggregate tm sodium
-        self._agg_ik = dict()     # aggregate tm potassium
-        self._agg_i_cap = dict()      # aggregate capacitive current
-        self._ina_hh2 = dict()    # tm sodium from "hh2"
-        self._ik_hh2 = dict()     # tm potassium from "hh2"
-        self._ik_kca = dict()     # tm potassium from "kca"
-        self._ik_km = dict()      # tm potassium from "km"
-        self._ica_ca = dict()     # tm calcium from "ca"
-        self._ica_cat = dict()    # tm t-type calcium current from "cat"
-        self._il_hh2 = dict()     # leak current from "hh2"
-        self._i_ar = dict()       # anomalous rectifier current from "ar"
+        self._agg_ina = dict()  # aggregate tm sodium
+        self._agg_ik = dict()  # aggregate tm potassium
+        self._agg_i_cap = dict()  # aggregate capacitive current
+        self._ina_hh2 = dict()  # tm sodium from "hh2"
+        self._ik_hh2 = dict()  # tm potassium from "hh2"
+        self._ik_kca = dict()  # tm potassium from "kca"
+        self._ik_km = dict()  # tm potassium from "km"
+        self._ica_ca = dict()  # tm calcium from "ca"
+        self._ica_cat = dict()  # tm t-type calcium current from "cat"
+        self._il_hh2 = dict()  # leak current from "hh2"
+        self._i_ar = dict()  # anomalous rectifier current from "ar"
         # [end new]
         self._nrn_rec_arrays = dict()
         self._nrn_rec_callbacks = list()
@@ -466,6 +466,7 @@ class NetworkBuilder(object):
         """
         Register a CVode callback to gather i_mem for each cell at each step.
         """
+
         def _gather_all_cells_imem():
             for cell in self._cells:
                 if hasattr(cell, "_gather_imem_data"):
@@ -474,6 +475,7 @@ class NetworkBuilder(object):
         cvode = h.CVode()
         cvode.use_fast_imem(1)
         cvode.extra_scatter_gather(0, _gather_all_cells_imem)
+
     # [end new]
 
     def _build(self):
@@ -521,18 +523,18 @@ class NetworkBuilder(object):
             record_isec=record_isec,
             record_ca=record_ca,
             # [new]
-            record_agg_i_mem = record_agg_i_mem,
-            record_agg_ina = record_agg_ina,
-            record_agg_ik = record_agg_ik,
-            record_agg_i_cap = record_agg_i_cap,
-            record_ina_hh2 = record_ina_hh2,
-            record_ik_hh2 = record_ik_hh2,
-            record_ik_kca = record_ik_kca,
-            record_ik_km = record_ik_km,
-            record_ica_ca = record_ica_ca,
-            record_ica_cat = record_ica_cat,
-            record_il_hh2 = record_il_hh2,
-            record_i_ar = record_i_ar,
+            record_agg_i_mem=record_agg_i_mem,
+            record_agg_ina=record_agg_ina,
+            record_agg_ik=record_agg_ik,
+            record_agg_i_cap=record_agg_i_cap,
+            record_ina_hh2=record_ina_hh2,
+            record_ik_hh2=record_ik_hh2,
+            record_ik_kca=record_ik_kca,
+            record_ik_km=record_ik_km,
+            record_ica_ca=record_ica_ca,
+            record_ica_cat=record_ica_cat,
+            record_il_hh2=record_il_hh2,
+            record_i_ar=record_i_ar,
             # [end new]
         )
 
@@ -852,7 +854,6 @@ class NetworkBuilder(object):
             self._il_hh2[cell.gid] = cell.il_hh2
             self._i_ar[cell.gid] = cell.i_ar
             # [end new]
-
 
         # reduce across threads
         for nrn_dpl in self._nrn_dipoles.values():

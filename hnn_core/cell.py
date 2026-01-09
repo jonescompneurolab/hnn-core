@@ -397,17 +397,17 @@ class Cell:
         # [new]
         # initialize dicts to store transmenbrane (tm) current recordings
         self.agg_i_mem = dict()  # aggregate tm currents
-        self.agg_ina = dict()    # aggregate tm sodium
-        self.agg_ik = dict()     # aggregate tm potassium
-        self.agg_i_cap = dict()      # aggregate capacitive current
-        self.ina_hh2 = dict()    # tm sodium from "hh2"
-        self.ik_hh2 = dict()     # tm potassium from "hh2"
-        self.ik_kca = dict()     # tm potassium from "kca"
-        self.ik_km = dict()      # tm potassium from "km"
-        self.ica_ca = dict()     # tm calcium from "ca"
-        self.ica_cat = dict()    # tm t-type calcium current from "cat"
-        self.il_hh2 = dict()     # leak current from "hh2"
-        self.i_ar = dict()       # anomalous rectifier current from "ar"
+        self.agg_ina = dict()  # aggregate tm sodium
+        self.agg_ik = dict()  # aggregate tm potassium
+        self.agg_i_cap = dict()  # aggregate capacitive current
+        self.ina_hh2 = dict()  # tm sodium from "hh2"
+        self.ik_hh2 = dict()  # tm potassium from "hh2"
+        self.ik_kca = dict()  # tm potassium from "kca"
+        self.ik_km = dict()  # tm potassium from "km"
+        self.ica_ca = dict()  # tm calcium from "ca"
+        self.ica_cat = dict()  # tm t-type calcium current from "cat"
+        self.il_hh2 = dict()  # leak current from "hh2"
+        self.i_ar = dict()  # anomalous rectifier current from "ar"
         # [end new]
         # insert iclamp
         self.list_IClamp = list()
@@ -800,13 +800,13 @@ class Cell:
 
     # [new]
     def _record_transmembrane_currents(
-            self,
-            record_flag,
-            name,
-            section_names,
-            mech=None,
-            ref=None,
-            per_segment=False,
+        self,
+        record_flag,
+        name,
+        section_names,
+        mech=None,
+        ref=None,
+        per_segment=False,
     ):
         """
         This functions handles the recording of transmembrane currents
@@ -985,12 +985,14 @@ class Cell:
         Gathers the PtrVector values into h.Vector after each CVode step.
         """
         self._imem_ptrvec.gather(self._imem_vec)
+    # [end new]
 
     def record(
         self,
         record_vsec=False,
         record_isec=False,
         record_ca=False,
+        # [new]
         record_agg_i_mem=False,
         record_agg_ina=False,
         record_agg_ik=False,
@@ -1003,8 +1005,8 @@ class Cell:
         record_ica_cat=False,
         record_il_hh2=False,
         record_i_ar=False,
+        # [end new]
     ):
-    # [end new]
         """Record current and voltage from all sections
 
         Parameters

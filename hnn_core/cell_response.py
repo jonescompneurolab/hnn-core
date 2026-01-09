@@ -129,17 +129,17 @@ class CellResponse(object):
         # [new]
         # initialize lists to store transmenbrane (tm) current recordings
         self._agg_i_mem = list()  # aggregate tm currents
-        self._agg_ina = list()    # aggregate tm sodium
-        self._agg_ik = list()     # aggregate tm potassium
+        self._agg_ina = list()  # aggregate tm sodium
+        self._agg_ik = list()  # aggregate tm potassium
         self._agg_i_cap = list()  # aggregate capacitive current
-        self._ina_hh2 = list()    # tm sodium from "hh2"
-        self._ik_hh2 = list()     # tm potassium from "hh2"
-        self._ik_kca = list()     # tm potassium from "kca"
-        self._ik_km = list()      # tm potassium from "km"
-        self._ica_ca = list()     # tm calcium from "ca"
-        self._ica_cat = list()    # tm t-type calcium current from "cat"
-        self._il_hh2 = list()     # leak current from "hh2"
-        self._i_ar = list()       # anomalous rectifier current from "ar"
+        self._ina_hh2 = list()  # tm sodium from "hh2"
+        self._ik_hh2 = list()  # tm potassium from "hh2"
+        self._ik_kca = list()  # tm potassium from "kca"
+        self._ik_km = list()  # tm potassium from "km"
+        self._ica_ca = list()  # tm calcium from "ca"
+        self._ica_cat = list()  # tm t-type calcium current from "cat"
+        self._il_hh2 = list()  # leak current from "hh2"
+        self._i_ar = list()  # anomalous rectifier current from "ar"
         # [end new]
 
         if times is not None:
@@ -262,6 +262,7 @@ class CellResponse(object):
             "il_hh2": self._il_hh2,
             "i_ar": self._i_ar,
         }
+
     # [end new]
 
     @property
