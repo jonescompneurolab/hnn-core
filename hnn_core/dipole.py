@@ -69,7 +69,7 @@ def simulate_dipole(
         _BACKEND = JoblibBackend(n_jobs=1)
 
     if n_trials is None:
-        n_trials = net._params["N_trials"]
+        n_trials = net._params.get("N_trials", 1)
     if n_trials < 1:
         raise ValueError("Invalid number of simulations: %d" % n_trials)
 
