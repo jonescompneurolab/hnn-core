@@ -12,6 +12,7 @@ import sys
 import urllib.parse
 import urllib.request
 import zipfile
+import re
 from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime
@@ -3266,9 +3267,14 @@ def run_button_clicked(
 
         _sim_name = widget_simulation_name.value
         if simulation_data[_sim_name]["net"] is not None:
-            print("Simulation with the same name exists!")
-            simulation_status_bar.value = simulation_status_contents["failed"]
-            return
+            base = _sim_name.split("-")[0]
+            idx = 2
+            while f"{base}-{idx:03d}" in simulation_data:
+                idx += 1
+
+            _sim_name = f"{base}-{idx:03d}"
+            widget_simulation_name.value = _sim_name
+
 
         _init_network_from_widgets(
             params,
