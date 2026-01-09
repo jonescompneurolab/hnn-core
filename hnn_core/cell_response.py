@@ -131,7 +131,7 @@ class CellResponse(object):
         self._agg_i_mem = list()  # aggregate tm currents
         self._agg_ina = list()    # aggregate tm sodium
         self._agg_ik = list()     # aggregate tm potassium
-        self._agg_i_cap = list()      # aggregate capacitive current
+        self._agg_i_cap = list()  # aggregate capacitive current
         self._ina_hh2 = list()    # tm sodium from "hh2"
         self._ik_hh2 = list()     # tm potassium from "hh2"
         self._ik_kca = list()     # tm potassium from "kca"

@@ -32,16 +32,16 @@ if "dpls" not in locals():
             record_agg_i_mem="all",
             # record_agg_ina="all",
             # record_agg_ik="all",
-            # record_agg_i_cap="all",
-            # record_ina_hh2="all",
-            # record_ik_hh2="all",
-            # record_ik_kca="all",
-            # record_ik_km="all",
-            # record_ica_ca="all",
-            # record_ica_cat="all",
-            # record_il_hh2="all",
-            # record_i_ar="all",
-            # record_isec="all",
+            record_agg_i_cap="all",
+            record_ina_hh2="all",
+            record_ik_hh2="all",
+            record_ik_kca="all",
+            record_ik_km="all",
+            record_ica_ca="all",
+            record_ica_cat="all",
+            record_il_hh2="all",
+            record_i_ar="all",
+            record_isec="all",
         )
 
 scaling_factor = 3000
@@ -62,11 +62,19 @@ def postproc_tm_currents(
         trial=0,
         cell_type="L5_pyramidal",
         scaling_factor=3000,
-        tm_channels=None,
+        from_components=False,
     ):
     """
-    Function for postprocessing transmembrane currents to recreate the dipole moment
-    calculated from the axial currents in hnn_core
+    Function for processing transmembrane currents to recreate the dipole moment
+    calculated from the axial currents in hnn_core. This can be done from either the
+    total recorded transmembrane current, or from the constituent components.
+
+    Note: isec (the transmembrane synaptic current) is part of the total transmembrane
+    current, but is *not* aggregated with the other component channel currents
+    in this function. This is due to the fact that isec contains *section-specific*
+    currents (since synapses are placed at the section midpoint), as opposed to
+    *segment-specfic* currents, which are required for this method of recreating
+    the dipole.
 
     Parameters
     ----------
@@ -78,9 +86,9 @@ def postproc_tm_currents(
         The cell type to process
     scaling_factor : float
         The scaling factor to apply to the dipole
-    tm_channels : list of str
-        List of transmembrane current channels to include. If None, defaults to
-        a hard-coded list of all possible channels based on the cell type
+    from_components : bool
+        if True, use agg_i_mem to reproduce the dipole. if False, use the component
+        currents for either L5_pyramidal or L2_pyramidal
 
     Returns
     -------
@@ -108,11 +116,11 @@ def postproc_tm_currents(
         )
         rel_endpoints[sec_name] = (start, end)
 
-    if tm_channels is None:
+    if not from_components:
+        all_tm_channels = ["agg_i_mem"]
+    else:
         if cell_type == "L5_pyramidal":
             all_tm_channels = [
-                "agg_ina",
-                "agg_ik",
                 "agg_i_cap",
                 "ina_hh2",
                 "ik_hh2",
@@ -125,8 +133,6 @@ def postproc_tm_currents(
             ]
         elif cell_type == "L2_pyramidal":
             all_tm_channels = [
-                "agg_ina",
-                "agg_ik",
                 "agg_i_cap",
                 "ina_hh2",
                 "ik_hh2",
@@ -138,8 +144,6 @@ def postproc_tm_currents(
                 f"Valid channels types for {cell_type} are not known.\n"
                 "Please pass the channels types as a list of str to tm_channels"
             )
-    else:
-        all_tm_channels = tm_channels
 
     # loop through GIDs for the cell_type of interest
     for gid in net.gid_ranges[cell_type]:
@@ -239,9 +243,8 @@ def postproc_tm_currents(
                 # for i_mem, we have nA rather than mA. and 1 nA*um = 1 fAm
                 contrib = I_t * z_i
 
-                # divide by 1e6 to convert fAm to nAm and apply scaling as needed to
-                # compare to the dipoles simulated by hnn-core
-                if ch == "agg_i_mem":
+                # for agg_i_mem, divide by 1e6 to convert fAm to nAm
+                if not from_components:
                     contrib = contrib / 1e6 * scaling_factor
                 else:
                     contrib = contrib * scaling_factor
@@ -271,7 +274,7 @@ fig, ax = plt.subplots(
 
 test_imem_L5 = postproc_tm_currents(
     net=net,
-    tm_channels=["agg_i_mem"],
+    from_components=False,
 )
 
 ax[1].plot(
@@ -293,7 +296,7 @@ _ = dpl.plot(
 test_imem_L2 = postproc_tm_currents(
     net=net,
     cell_type="L2_pyramidal",
-    tm_channels=["agg_i_mem"],
+    from_components=False,
 )
 
 fig, ax = plt.subplots(
@@ -314,4 +317,3 @@ _ = dpl.plot(
     layer=["L2"],
     ax=ax[1]
 )
-

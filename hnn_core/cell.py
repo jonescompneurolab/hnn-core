@@ -1088,7 +1088,7 @@ class Cell:
 
         self._record_transmembrane_currents(
             record_agg_i_cap,
-            "i_cap",
+            "agg_i_cap",
             section_names,
             mech=None,
             ref="_ref_i_cap",
