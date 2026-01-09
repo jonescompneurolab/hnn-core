@@ -317,3 +317,215 @@ _ = dpl.plot(
     layer=["L2"],
     ax=ax[1]
 )
+
+
+# %% [markdown] ###########################################################
+## [WIP] Testing and Feature Development
+# %% ######################################################################
+
+# %% [markdown] ----------------------------------------
+### Recreating dipole for the soma only
+# %% ---------------------------------------------------
+
+def postproc_soma_dipole(
+        net,
+        trial=0,
+        cell_type="L5_pyramidal",
+        scaling_factor=3000,
+        from_components=False,
+    ):
+    """
+    """
+
+    # this function will only handle the "soma", as it's composed of exactly one
+    # segment where pos = 0.5
+    sec_name = "soma"
+    seg_key = "seg_1"
+    pos=0.5
+
+    # load custom mechanisms
+    load_custom_mechanisms()
+
+    # initialize variable to hold dipole data
+    dipole = None
+
+    # build a template cell to get "metadata" for sections
+    template_cell = pyramidal(cell_name=cell_type)
+    template_cell.build(sec_name_apical="apical_trunk")
+
+    # get the relative endpoints for the soma
+    rel_endpoints = {}
+    sec = template_cell._nrn_sections["soma"]
+    start = np.array([sec.x3d(0), sec.y3d(0), sec.z3d(0)])
+    end = np.array(
+        [sec.x3d(sec.n3d() - 1), sec.y3d(sec.n3d() - 1), sec.z3d(sec.n3d() - 1)]
+    )
+    rel_endpoints[sec_name] = (start, end)
+
+    if not from_components:
+        all_tm_channels = ["agg_i_mem"]
+    else:
+        if cell_type == "L5_pyramidal":
+            all_tm_channels = [
+                "agg_i_cap",
+                "ina_hh2",
+                "ik_hh2",
+                "ik_kca",
+                "ik_km",
+                "ica_ca",
+                "ica_cat",
+                "il_hh2",
+                "i_ar",
+            ]
+        elif cell_type == "L2_pyramidal":
+            all_tm_channels = [
+                "agg_i_cap",
+                "ina_hh2",
+                "ik_hh2",
+                "ik_km",
+                "il_hh2",
+            ]
+        else:
+            raise ValueError(
+                f"Valid channels types for {cell_type} are not known.\n"
+                "Please pass the channels types as a list of str to tm_channels"
+            )
+
+    # loop through GIDs for the cell_type of interest
+    for gid in net.gid_ranges[cell_type]:
+
+        # get the updated soma position for this instantiation of the cell
+        # index of the first cell: e.g., 170 for the first L5Pyr cell
+        start_index = net.gid_ranges[cell_type][0]
+        # get soma position from position dictionary, which uses its own indexing
+        # that does not match the GID, hence the "- start_index"
+        soma_pos = np.array(net.pos_dict[cell_type][gid - start_index])
+
+        # create a dictionary of all channel data for the cell
+        cell_channels = {
+            ch: net.cell_response.transmembrane_currents[ch][trial][gid]
+            for ch in all_tm_channels
+        }
+
+        # get the cell sections to loop over
+        # the key used shouldn't matter, but we don't want to hard code it since
+        # we can pass different channels to this function, so we get it dynamically
+        first_key = list(cell_channels.keys())[0]
+
+        start_rel, end_rel = rel_endpoints[sec_name]
+        start = start_rel + soma_pos
+        end = end_rel + soma_pos
+
+        abs_pos = start + pos * (end - start)
+        z_i = abs_pos[2]
+
+        # sum all currents for this segment
+        I_t = np.zeros_like(
+            np.array(cell_channels[first_key][sec_name][seg_key])
+        )
+
+        for ch in all_tm_channels:
+            # get channel data
+            vec = np.array(cell_channels[ch][sec_name][seg_key])
+
+            # get segment area and convert from µm^2 to cm^2
+            seg = template_cell._nrn_sections[sec_name](pos)
+            area_um2 = seg.area()  # µm^2
+            area_cm2 = area_um2 * 1e-8  # cm^2
+
+            if ch == "agg_i_mem":
+                # agg_i_mem is not recorded continuously as a density; it is
+                # recorded after each timestep. Ergo, the units conversion
+                # here is not necessary as the units are already in nA
+                #
+                # multiplying the contribution by zi in um will give us fAm,
+                # so we will later need to divide by 1e6 to convert to nAm
+                I_abs = vec
+            # convert densities (mA/cm^2) to absolute currents (mA)]
+            else:
+                I_abs = vec * area_cm2  # keep as mA
+                I_abs = I_abs * -1
+
+                if ch == "agg_i_cap":
+                    I_abs = I_abs * -1  # flip sign (?)
+
+            I_t += I_abs
+
+
+        # multiple by r_i per Naess 2015 Ch 2 (simplified to zi in this case)
+        # for ionic currents, we have 1 mA*um = 1 nAm (correct units)
+        # for i_mem, we have nA rather than mA. and 1 nA*um = 1 fAm
+        contrib = I_t * z_i
+
+        # for agg_i_mem, divide by 1e6 to convert fAm to nAm
+        if not from_components:
+            contrib = contrib / 1e6 * scaling_factor
+        else:
+            contrib = contrib * scaling_factor
+
+        if dipole is None:
+            dipole = contrib.copy()
+        else:
+            dipole += contrib
+
+    return dipole
+
+# %% ---------------------------------------------------
+
+
+fig, ax = plt.subplots(
+    nrows=2,
+    ncols=1,
+    sharex=True,
+    figsize=(8,15),
+)
+
+
+test_imem_L5 = postproc_soma_dipole(
+    net=net,
+    from_components=False,
+)
+
+ax[0].plot(
+    dpl.times[1:],
+    test_imem_L5[1:],
+)
+
+test_imem_L5 = postproc_soma_dipole(
+    net=net,
+    from_components=True,
+)
+
+ax[1].plot(
+    dpl.times[1:],
+    test_imem_L5[1:],
+)
+
+ax[0].set_ylim(-200, 100)
+ax[1].set_ylim(-200, 100)
+
+# %% [markdown] ----------------------------------------
+### Next steps
+# %% ---------------------------------------------------
+
+"""
+For feature example (code contribution):
+- Show recording of transmembrane currents individually; there is some baseline code
+  for this that I need to migrate to this repository
+- Likely remove the dipole reconstruction from_components for this PR; it's not
+  strictly necessary and not complete
+- Dipole reconstruction from i_mem (total transmembrane current) can be kept in the
+  example notebook for this PR, as it is complete and shows off new use cases. The
+  function herein should be adapted to remove the from_components section, which is
+  still a work in progress
+
+For dipole reconstruction (science contribution):
+- add isec to soma calculation function, which should be allowed since soma has only
+  one segment, and isec should be the transmembrane synaptic current component that
+  is missing
+- run function with isec, see if dipole reproduction matches
+- potentially try reconstruction for one cell only to interrogate discrepancies
+- 
+"""
+
+# %%
