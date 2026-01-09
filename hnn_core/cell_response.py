@@ -125,6 +125,23 @@ class CellResponse(object):
         self._vsec = list()
         self._isec = list()
         self._ca = list()
+
+        # [new]
+        # initialize lists to store transmenbrane (tm) current recordings
+        self._agg_i_mem = list()  # aggregate tm currents
+        self._agg_ina = list()    # aggregate tm sodium
+        self._agg_ik = list()     # aggregate tm potassium
+        self._agg_i_cap = list()      # aggregate capacitive current
+        self._ina_hh2 = list()    # tm sodium from "hh2"
+        self._ik_hh2 = list()     # tm potassium from "hh2"
+        self._ik_kca = list()     # tm potassium from "kca"
+        self._ik_km = list()      # tm potassium from "km"
+        self._ica_ca = list()     # tm calcium from "ca"
+        self._ica_cat = list()    # tm t-type calcium current from "cat"
+        self._il_hh2 = list()     # leak current from "hh2"
+        self._i_ar = list()       # anomalous rectifier current from "ar"
+        # [end new]
+
         if times is not None:
             if not isinstance(times, (list, np.ndarray)):
                 raise TypeError("'times' is an np.ndarray of simulation times")
@@ -148,9 +165,37 @@ class CellResponse(object):
             times_self == times_other
             and self._spike_gids == other._spike_gids
             and self._spike_types == other._spike_types
+            # [new]
+            and self._agg_i_mem == other._agg_i_mem
+            and self._agg_ina == other._agg_ina
+            and self._agg_ik == other._agg_ik
+            and self._agg_i_cap == other._agg_i_cap
+            and self._ina_hh2 == other._ina_hh2
+            and self._ik_hh2 == other._ik_hh2
+            and self._ik_kca == other._ik_kca
+            and self._ik_km == other._ik_km
+            and self._ica_ca == other._ica_ca
+            and self._ica_cat == other._ica_cat
+            and self._il_hh2 == other._il_hh2
+            and self._i_ar == other._i_ar
+            # [end new]
             and self._vsec == other._vsec
             and self._isec == other._isec
             and self._ca == other._ca
+            # [new]
+            and self.agg_i_mem == other.agg_i_mem
+            and self.agg_ina == other.agg_ina
+            and self.agg_ik == other.agg_ik
+            and self.agg_i_cap == other.agg_i_cap
+            and self.ina_hh2 == other.ina_hh2
+            and self.ik_hh2 == other.ik_hh2
+            and self.ik_kca == other.ik_kca
+            and self.ik_km == other.ik_km
+            and self.ica_ca == other.ica_ca
+            and self.ica_cat == other.ica_cat
+            and self.il_hh2 == other.il_hh2
+            and self.i_ar == other.i_ar
+            # [end new]
             and self.vsec == other.vsec
             and self.isec == other.isec
             and self.ca == other.ca
@@ -199,6 +244,25 @@ class CellResponse(object):
     @property
     def ca(self):
         return self._ca
+
+    # [new]
+    @property
+    def transmembrane_currents(self):
+        return {
+            "agg_i_mem": self._agg_i_mem,
+            "agg_ina": self._agg_ina,
+            "agg_ik": self._agg_ik,
+            "agg_i_cap": self._agg_i_cap,
+            "ina_hh2": self._ina_hh2,
+            "ik_hh2": self._ik_hh2,
+            "ik_kca": self._ik_kca,
+            "ik_km": self._ik_km,
+            "ica_ca": self._ica_ca,
+            "ica_cat": self._ica_cat,
+            "il_hh2": self._il_hh2,
+            "i_ar": self._i_ar,
+        }
+    # [end new]
 
     @property
     def times(self):
@@ -461,6 +525,40 @@ class CellResponse(object):
             # Turn `int` gid keys into string values for hdf5 format
             trial = dict((str(key), val) for key, val in trial.items())
             cell_response_data["ca"].append(trial)
+
+        # [new]
+        def _keys_to_strings(obj):
+            """
+            Helper function to recursively convert dict keys to
+            string values for hdf5 format
+            """
+            if isinstance(obj, dict):
+                return {str(k): _keys_to_strings(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [_keys_to_strings(v) for v in obj]
+            else:
+                return obj
+
+        transmembrane_currents_keys = [
+            "agg_i_mem",
+            "agg_ina",
+            "agg_ik",
+            "agg_i_cap",
+            "ina_hh2",
+            "ik_hh2",
+            "ik_kca",
+            "ik_km",
+            "ica_ca",
+            "ica_cat",
+            "il_hh2",
+            "i_ar",
+        ]
+
+        for name in transmembrane_currents_keys:
+            data = getattr(self, name)
+            cell_response_data[name] = _keys_to_strings(data)
+        # [end new]
+
         cell_response_data["times"] = self.times
         return cell_response_data
 
