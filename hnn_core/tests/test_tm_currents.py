@@ -525,7 +525,7 @@ For dipole reconstruction (science contribution):
   is missing
 - run function with isec, see if dipole reproduction matches
 - potentially try reconstruction for one cell only to interrogate discrepancies
-- 
+-
 """
 
 # %%

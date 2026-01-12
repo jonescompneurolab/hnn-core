@@ -6,12 +6,11 @@
 from copy import deepcopy
 
 import numpy as np
+from neuron import h, nrn
 from numpy.linalg import norm
 
-from neuron import h, nrn
-
+from .externals.mne import _check_option, _validate_type
 from .viz import plot_cell_morphology
-from .externals.mne import _validate_type, _check_option
 
 # Units for e: mV
 # Units for gbar: S/cm^2
