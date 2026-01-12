@@ -50,20 +50,21 @@ for dpl in dpls:
 
 dpl = dpls[0]
 dpl_plot = dpl.plot(
-    layer=["L5"]
+    layer=["L5"],
 )
 
 # %% [markdown] ###########################################################
 ## Function to recreate dipole from transmembrane currents
 # %% ######################################################################
 
+
 def postproc_tm_currents(
-        net,
-        trial=0,
-        cell_type="L5_pyramidal",
-        scaling_factor=3000,
-        from_components=False,
-    ):
+    net,
+    trial=0,
+    cell_type="L5_pyramidal",
+    scaling_factor=3000,
+    from_components=False,
+):
     """
     Function for processing transmembrane currents to recreate the dipole moment
     calculated from the axial currents in hnn_core. This can be done from either the
@@ -147,7 +148,6 @@ def postproc_tm_currents(
 
     # loop through GIDs for the cell_type of interest
     for gid in net.gid_ranges[cell_type]:
-
         # get the updated soma position for this instantiation of the cell
         # index of the first cell: e.g., 170 for the first L5Pyr cell
         start_index = net.gid_ranges[cell_type][0]
@@ -237,7 +237,6 @@ def postproc_tm_currents(
 
                     I_t += I_abs
 
-
                 # multiple by r_i per Naess 2015 Ch 2 (simplified to zi in this case)
                 # for ionic currents, we have 1 mA*um = 1 nAm (correct units)
                 # for i_mem, we have nA rather than mA. and 1 nA*um = 1 fAm
@@ -256,6 +255,7 @@ def postproc_tm_currents(
 
     return dipole
 
+
 # %% [markdown] ###########################################################
 ## Compare dipoles calculated from axial vs transmembrane currents
 # %% ######################################################################
@@ -269,7 +269,7 @@ fig, ax = plt.subplots(
     nrows=2,
     ncols=1,
     sharex=True,
-    figsize=(8,15),
+    figsize=(8, 15),
 )
 
 test_imem_L5 = postproc_tm_currents(
@@ -286,7 +286,7 @@ ax[1].set_ylim(-200, 100)
 
 _ = dpl.plot(
     layer=["L5"],
-    ax=ax[0]
+    ax=ax[0],
 )
 
 
@@ -303,7 +303,7 @@ fig, ax = plt.subplots(
     nrows=2,
     ncols=1,
     sharex=True,
-    figsize=(8,10),
+    figsize=(8, 10),
 )
 
 ax[0].plot(
@@ -315,7 +315,7 @@ ax[0].set_ylim(-30, 50)
 
 _ = dpl.plot(
     layer=["L2"],
-    ax=ax[1]
+    ax=ax[1],
 )
 
 
@@ -327,21 +327,21 @@ _ = dpl.plot(
 ### Recreating dipole for the soma only
 # %% ---------------------------------------------------
 
+
 def postproc_soma_dipole(
-        net,
-        trial=0,
-        cell_type="L5_pyramidal",
-        scaling_factor=3000,
-        from_components=False,
-    ):
-    """
-    """
+    net,
+    trial=0,
+    cell_type="L5_pyramidal",
+    scaling_factor=3000,
+    from_components=False,
+):
+    """ """
 
     # this function will only handle the "soma", as it's composed of exactly one
     # segment where pos = 0.5
     sec_name = "soma"
     seg_key = "seg_1"
-    pos=0.5
+    pos = 0.5
 
     # load custom mechanisms
     load_custom_mechanisms()
@@ -393,7 +393,6 @@ def postproc_soma_dipole(
 
     # loop through GIDs for the cell_type of interest
     for gid in net.gid_ranges[cell_type]:
-
         # get the updated soma position for this instantiation of the cell
         # index of the first cell: e.g., 170 for the first L5Pyr cell
         start_index = net.gid_ranges[cell_type][0]
@@ -421,7 +420,7 @@ def postproc_soma_dipole(
 
         # sum all currents for this segment
         I_t = np.zeros_like(
-            np.array(cell_channels[first_key][sec_name][seg_key])
+            np.array(cell_channels[first_key][sec_name][seg_key]),
         )
 
         for ch in all_tm_channels:
@@ -451,7 +450,6 @@ def postproc_soma_dipole(
 
             I_t += I_abs
 
-
         # multiple by r_i per Naess 2015 Ch 2 (simplified to zi in this case)
         # for ionic currents, we have 1 mA*um = 1 nAm (correct units)
         # for i_mem, we have nA rather than mA. and 1 nA*um = 1 fAm
@@ -470,6 +468,7 @@ def postproc_soma_dipole(
 
     return dipole
 
+
 # %% ---------------------------------------------------
 
 
@@ -477,7 +476,7 @@ fig, ax = plt.subplots(
     nrows=2,
     ncols=1,
     sharex=True,
-    figsize=(8,15),
+    figsize=(8, 15),
 )
 
 

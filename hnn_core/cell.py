@@ -500,18 +500,18 @@ class Cell:
         cell_data["isec"] = self.isec
         cell_data["ca"] = self.ca
         # [new]
-        cell_data["agg_i_mem"] = self.agg_i_mem,
-        cell_data["agg_ina"] = self.agg_ina,
-        cell_data["agg_ik"] = self.agg_ik,
-        cell_data["agg_i_cap"] = self.agg_i_cap,
-        cell_data["ina_hh2"] = self.ina_hh2,
-        cell_data["ik_hh2"] = self.ik_hh2,
-        cell_data["ik_kca"] = self.ik_kca,
-        cell_data["ik_km"] = self.ik_km,
-        cell_data["ica_ca"] = self.ica_ca,
-        cell_data["ica_cat"] = self.ica_cat,
-        cell_data["il_hh2"] = self.il_hh2,
-        cell_data["i_ar"] = self.i_ar,
+        cell_data["agg_i_mem"] = self.agg_i_mem
+        cell_data["agg_ina"] = self.agg_ina
+        cell_data["agg_ik"] = self.agg_ik
+        cell_data["agg_i_cap"] = self.agg_i_cap
+        cell_data["ina_hh2"] = self.ina_hh2
+        cell_data["ik_hh2"] = self.ik_hh2
+        cell_data["ik_kca"] = self.ik_kca
+        cell_data["ik_km"] = self.ik_km
+        cell_data["ica_ca"] = self.ica_ca
+        cell_data["ica_cat"] = self.ica_cat
+        cell_data["il_hh2"] = self.il_hh2
+        cell_data["i_ar"] = self.i_ar
         # [end new]
         cell_data["tonic_biases"] = self.tonic_biases
         return cell_data
@@ -984,6 +984,7 @@ class Cell:
         Gathers the PtrVector values into h.Vector after each CVode step.
         """
         self._imem_ptrvec.gather(self._imem_vec)
+
     # [end new]
 
     def record(
