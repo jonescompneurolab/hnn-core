@@ -1,3 +1,12 @@
+# HEREEEEEEEEEEE
+
+# %% [markdown] ###########################################################
+## Disclaimer
+# Note that this is **not** an actual test file and will not stay in the final
+# version. I'm using this file to draft and test some features that will
+# probably turn into a demo notebook for the new Textbook
+# %% ######################################################################
+
 # %% [markdown] ###########################################################
 ## Setup
 # %% ######################################################################
@@ -320,6 +329,100 @@ _ = dpl.plot(
 
 
 # %% [markdown] ###########################################################
+## [DEV] Visualize transmembrane currents
+# %% ######################################################################
+
+# %% ####################
+# for a single trial and current, get recordings by section, segment for each cell
+
+
+def agg_transmembrane_current_across_celltype(
+    trial_number=0,
+    cell_type="L5_pyramidal",
+    target_channel="i_mem",
+):
+    # get recordings for the target channel and trial number
+    channel_cell_recordings = (
+        net.cell_response.transmembrane_currents[target_channel][trial_number]  # noqa: E203,W503
+    )
+
+    gids = list(net.gid_ranges[cell_type])
+
+    # limit scope to gids for the specified cell_type
+    channel_cell_recordings = {gid: channel_cell_recordings[gid] for gid in gids}
+
+    aggregate = {}
+
+    for gid_data_dict in channel_cell_recordings.values():
+        for section_key, section_data_dict in gid_data_dict.items():
+            for segment_key, segment_data in section_data_dict.items():
+                values = np.array(segment_data)
+                if section_key not in aggregate:
+                    aggregate[section_key] = {}
+                if segment_key not in aggregate[section_key]:
+                    aggregate[section_key][segment_key] = np.zeros_like(values)
+                aggregate[section_key][segment_key] += values
+
+    return aggregate
+
+
+ina_hh2 = agg_transmembrane_current_across_celltype(
+    trial_number=0,
+    target_channel="ina_hh2",
+)
+
+
+def plot_segment_recordings_by_section(
+    section_name,
+    channel_data_dict,
+    channel_name="[Channel name not specified]",
+):
+    segment_data_dict = channel_data_dict[section_name]
+    fig, ax = plt.subplots(
+        nrows=len(segment_data_dict),
+        ncols=1,
+        sharex=True,
+        figsize=(8, 3 * len(segment_data_dict)),
+    )
+
+    # np.inf guarantees the values will be replaced on the first iteration
+    y_min = np.inf
+    y_max = -np.inf
+    for i, (segment_key, segment_data) in enumerate(segment_data_dict.items()):
+        ax[i].plot(segment_data)
+        ax[i].set_title(f"{segment_key.replace('seg_', 'Segment ')}")
+        y_min = min(y_min, segment_data.min())
+        y_max = max(y_max, segment_data.max())
+
+    section_title = section_name.replace("_", " ")
+    section_title = section_title.title()
+
+    # set consistent y axes, with extra padding
+    padding = 0.05 * (y_max - y_min)
+    y_limits = (y_min - padding, y_max + padding)
+
+    for axis in ax:
+        axis.set_ylim(y_limits)
+
+    fig.suptitle(
+        f"Transmembrane Recordings for {section_title} of {channel_name}",
+        fontsize=16,
+    )
+    plt.xlabel("Time (ms)")
+    plt.tight_layout()
+    plt.show()
+
+    return
+
+
+plot_segment_recordings_by_section(
+    section_name="apical_trunk",
+    channel_data_dict=ina_hh2,
+    channel_name="Na+ HH2",
+)
+
+
+# %% [markdown] ###########################################################
 ## [WIP] Testing and Feature Development
 # %% ######################################################################
 
@@ -411,6 +514,8 @@ def postproc_soma_dipole(
         # we can pass different channels to this function, so we get it dynamically
         first_key = list(cell_channels.keys())[0]
 
+        print(first_key)
+
         start_rel, end_rel = rel_endpoints[sec_name]
         start = start_rel + soma_pos
         end = end_rel + soma_pos
@@ -470,7 +575,6 @@ def postproc_soma_dipole(
 
 
 # %% ---------------------------------------------------
-
 
 fig, ax = plt.subplots(
     nrows=2,
