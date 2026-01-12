@@ -580,9 +580,7 @@ def _plot_on_axes(
 
     if plot_type == "current dipole" and data_widget.value == "None":
         sim_names = [
-            name
-            for name, sim in data["simulations"].items()
-            if _is_simulation(sim)
+            name for name, sim in data["simulations"].items() if _is_simulation(sim)
         ]
 
         if len(sim_names) >= 2 and sim_name == sim_names[-1]:
@@ -604,8 +602,11 @@ def _plot_on_axes(
             annotation_text = f"RMSE({sim_name}, {prev_sim_name}): {rmse:.4f}"
 
             annotation = next(
-                (child for child in ax.get_children()
-                 if isinstance(child, plt.Annotation)),
+                (
+                    child
+                    for child in ax.get_children()
+                    if isinstance(child, plt.Annotation)
+                ),
                 None,
             )
 
@@ -621,10 +622,7 @@ def _plot_on_axes(
                     fontsize=12,
                 )
 
-            logger.info(
-                f"Auto RMSE {rmse:.4f} "
-                f"({sim_name} vs {prev_sim_name})"
-            )
+            logger.info(f"Auto RMSE {rmse:.4f} ({sim_name} vs {prev_sim_name})")
 
     # If target_simulations is not None and we are plotting a dipole,
     # we need to plot the target dipole as well.
@@ -1412,15 +1410,14 @@ class _VizManager:
         elif operation == "clear":
             buttons.children[1].click()
 
+
 def _get_last_two_simulations(simulations):
     """Return (previous, latest) simulation names if possible."""
-    sim_names = [
-        name for name, sim in simulations.items()
-        if _is_simulation(sim)
-    ]
+    sim_names = [name for name, sim in simulations.items() if _is_simulation(sim)]
     if len(sim_names) < 2:
         return None, None
     return sim_names[-2], sim_names[-1]
+
 
 def _is_simulation(data):
     """Determines if saved data is a simulation."""
