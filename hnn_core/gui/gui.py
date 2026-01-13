@@ -2688,10 +2688,10 @@ def run_button_clicked(
         if simulation_data[_sim_name]["net"] is not None:
             base = _sim_name.split("-")[0]
             idx = 2
-            while f"{base}-{idx:03d}" in simulation_data:
+            while f"{base}-{idx}" in simulation_data:
                 idx += 1
 
-            _sim_name = f"{base}-{idx:03d}"
+            _sim_name = f"{base}-{idx}"
             widget_simulation_name.value = _sim_name
 
         _init_network_from_widgets(
