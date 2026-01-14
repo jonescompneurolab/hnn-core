@@ -13,6 +13,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.lines import Line2D
 
 from hnn_core import (
     JoblibBackend,
@@ -332,13 +333,19 @@ _ = dpl.plot(
 ## [DEV] Visualize transmembrane currents
 # %% ######################################################################
 
-# %% ####################
-# for a single trial and current, get recordings by section, segment for each cell
+# %% [markdown] ----------------------------------------
+# For a single trial and current, get recordings by
+# section, segment for each cell
+# %% ---------------------------------------------------
 
 
-def agg_transmembrane_current_across_celltype(
+def agg_transmembrane_segment_recordings_by_celltype(
+    net,
     trial_number=0,
-    cell_type="L5_pyramidal",
+    cell_type=[
+        "L2_pyramidal",
+        "L5_pyramidal",
+    ],
     target_channel="i_mem",
 ):
     # get recordings for the target channel and trial number
@@ -346,44 +353,69 @@ def agg_transmembrane_current_across_celltype(
         net.cell_response.transmembrane_currents[target_channel][trial_number]  # noqa: E203,W503
     )
 
-    gids = list(net.gid_ranges[cell_type])
+    agg_output = {}
+    agg_output[target_channel] = {}
 
-    # limit scope to gids for the specified cell_type
-    channel_cell_recordings = {gid: channel_cell_recordings[gid] for gid in gids}
+    for type in cell_type:
+        # limit scope to gids for the specified cell_type
+        gids = list(net.gid_ranges[type])
+        channel_celltype_recordings = {
+            gid: channel_cell_recordings[gid] for gid in gids
+        }
 
-    aggregate = {}
+        aggregate = {}
 
-    for gid_data_dict in channel_cell_recordings.values():
-        for section_key, section_data_dict in gid_data_dict.items():
-            for segment_key, segment_data in section_data_dict.items():
-                values = np.array(segment_data)
-                if section_key not in aggregate:
-                    aggregate[section_key] = {}
-                if segment_key not in aggregate[section_key]:
-                    aggregate[section_key][segment_key] = np.zeros_like(values)
-                aggregate[section_key][segment_key] += values
+        for gid_data_dict in channel_celltype_recordings.values():
+            for section_key, section_data_dict in gid_data_dict.items():
+                for segment_key, segment_data in section_data_dict.items():
+                    values = np.array(segment_data)
+                    if section_key not in aggregate:
+                        aggregate[section_key] = {}
+                    if segment_key not in aggregate[section_key]:
+                        aggregate[section_key][segment_key] = np.zeros_like(values)
+                    aggregate[section_key][segment_key] += values
 
-    return aggregate
+        agg_output[target_channel][type] = aggregate
+
+    return agg_output
 
 
-ina_hh2 = agg_transmembrane_current_across_celltype(
+ina_hh2_segment_data = agg_transmembrane_segment_recordings_by_celltype(
+    net,
     trial_number=0,
     target_channel="ina_hh2",
 )
+
+# %%
 
 
 def plot_segment_recordings_by_section(
     section_name,
     channel_data_dict,
-    channel_name="[Channel name not specified]",
+    cell_type="L5_pyramidal",
+    overwrite_channel_name=False,
 ):
-    segment_data_dict = channel_data_dict[section_name]
+    channel_name = list(channel_data_dict.keys())[0]
+    channel_cell_data = channel_data_dict[channel_name][cell_type]
+
+    if section_name not in list(channel_cell_data.keys()):
+        raise ValueError(
+            f"Section '{section_name}' not in data dictionary for cell type "
+            f"'{cell_type}' and channel '{channel_name}'"
+        )
+
+    segment_data_dict = channel_cell_data[section_name]
+
     fig, ax = plt.subplots(
         nrows=len(segment_data_dict),
         ncols=1,
         sharex=True,
         figsize=(8, 3 * len(segment_data_dict)),
     )
+
+    # make ax always a list
+    if len(segment_data_dict) == 1:
+        ax = [ax]
 
     # np.inf guarantees the values will be replaced on the first iteration
     y_min = np.inf
@@ -394,8 +426,142 @@ def plot_segment_recordings_by_section(
         y_min = min(y_min, segment_data.min())
         y_max = max(y_max, segment_data.max())
 
-    section_title = section_name.replace("_", " ")
-    section_title = section_title.title()
+    # set consistent y axes, with extra padding
+    padding = 0.05 * (y_max - y_min)
+    y_limits = (y_min - padding, y_max + padding)
+
+    for axis in ax:
+        axis.set_ylim(y_limits)
+
+    if overwrite_channel_name:
+        channel_name = overwrite_channel_name
+
+    section_title = section_name.replace("_", " ").title()
+    celltype_title = cell_type.replace("_", " ").title()
+
+    fig.suptitle(
+        f"Transmembrane Recordings for {celltype_title}\n"
+        f"{section_title} of {channel_name}",
+        fontsize=16,
+    )
+    plt.xlabel("Time (ms)")
+    plt.tight_layout()
+    plt.close(fig)
+
+    return fig
+
+
+l5_seg_fig = plot_segment_recordings_by_section(
+    section_name="apical_trunk",
+    channel_data_dict=ina_hh2_segment_data,
+    cell_type="L5_pyramidal",
+    overwrite_channel_name="Na+ HH2",
+)
+
+l2_seg_fig = plot_segment_recordings_by_section(
+    section_name="apical_trunk",
+    channel_data_dict=ina_hh2_segment_data,
+    cell_type="L2_pyramidal",
+    overwrite_channel_name="Na+ HH2",
+)
+
+
+# %% [markdown] ----------------------------------------
+# For a single trial and current, get recordings by
+# section, adding the segments together
+# %% ---------------------------------------------------
+
+
+def agg_transmembrane_section_recordings_by_celltype(
+    net,
+    trial_number=0,
+    cell_type=[
+        "L2_pyramidal",
+        "L5_pyramidal",
+    ],
+    target_channel="i_mem",
+):
+    # get recordings for the target channel and trial number
+    channel_cell_recordings = (
+        net.cell_response.transmembrane_currents[target_channel][trial_number]  # noqa: E203,W503
+    )
+
+    agg_output = {}
+    agg_output[target_channel] = {}
+
+    for type in cell_type:
+        # limit scope to gids for the specified cell_type
+        gids = list(net.gid_ranges[type])
+        channel_celltype_recordings = {
+            gid: channel_cell_recordings[gid] for gid in gids
+        }
+
+        aggregate = {}
+
+        for gid_data_dict in channel_celltype_recordings.values():
+            for section_key, section_data_dict in gid_data_dict.items():
+                for segment_key, segment_data in section_data_dict.items():
+                    values = np.array(segment_data)
+                    if section_key not in aggregate:
+                        aggregate[section_key] = np.zeros_like(values)
+                    aggregate[section_key] += values
+
+        agg_output[target_channel][type] = aggregate
+
+    return agg_output
+
+
+ina_hh2_section_data = agg_transmembrane_section_recordings_by_celltype(
+    net,
+    trial_number=0,
+    target_channel="ina_hh2",
+)
+
+# %%
+
+
+def plot_section_recordings_by_celltype(
+    channel_data_dict,
+    cell_type="L5_pyramidal",
+    overwrite_channel_name=False,
+):
+    # top to bottom section order
+    section_plot_order = [
+        "apical_tuft",
+        "apical_2",
+        "apical_1",
+        "apical_trunk",
+        "apical_oblique",
+        "soma",
+        "basal_1",
+        "basal_2",
+        "basal_3",
+    ]
+
+    channel_name = list(channel_data_dict.keys())[0]
+    channel_cell_data = channel_data_dict[channel_name][cell_type]
+    cell_sections = list(channel_cell_data.keys())
+
+    fig, ax = plt.subplots(
+        nrows=len(cell_sections),
+        ncols=1,
+        sharex=True,
+        figsize=(8, 3 * len(cell_sections)),
+    )
+
+    # make ax always a list
+    if len(cell_sections) == 1:
+        ax = [ax]
+
+    # np.inf guarantees the values will be replaced on the first iteration
+    y_min = np.inf
+    y_max = -np.inf
+    for section_key, section_data in channel_cell_data.items():
+        i = section_plot_order.index(section_key)
+        ax[i].plot(section_data)
+        ax[i].set_title(f"{section_key.replace('_', ' ').title()}")
+        y_min = min(y_min, section_data.min())
+        y_max = max(y_max, section_data.max())
 
     # set consistent y axes, with extra padding
     padding = 0.05 * (y_max - y_min)
@@ -404,21 +570,280 @@ def plot_segment_recordings_by_section(
     for axis in ax:
         axis.set_ylim(y_limits)
 
+    if overwrite_channel_name:
+        channel_name = overwrite_channel_name
+
+    celltype_title = cell_type.replace("_", " ").title()
+
     fig.suptitle(
-        f"Transmembrane Recordings for {section_title} of {channel_name}",
+        f"Transmembrane Recordings for {celltype_title} of {channel_name}",
         fontsize=16,
     )
     plt.xlabel("Time (ms)")
-    plt.tight_layout()
+    # leave space for suptitle
+    plt.tight_layout(rect=[0, 0, 1, 0.98])
+    plt.close(fig)
+
+    return fig
+
+
+plot_section_recordings_by_celltype(
+    ina_hh2_section_data,
+    cell_type="L5_pyramidal",
+    overwrite_channel_name="Na+ HH2",
+)
+
+# %% [markdown] ----------------------------------------
+# plot cell morphology
+# %% ---------------------------------------------------
+
+def extract_diameters(
+    section_names,
+    cell_params,
+):
+    """
+    Helper to map section names to their corresponding diameters as specified in
+    params_default.py
+    """
+    extracted = {}
+    for name in section_names:
+        # adjust the section names to match the default keys
+        search_key = name.replace("_", "").lower()
+
+        # look for a key in defaults that contains search_key and "diam"
+        found = False
+
+        for cell_param, cell_val in cell_params.items():
+
+            clean_cell_param = cell_param.lower()
+
+            if search_key in clean_cell_param and "diam" in clean_cell_param:
+                extracted[name] = cell_val
+                found = True
+                break
+
+        if not found:
+            raise KeyError(
+                f"Could not find diameter for section '{name}' in cell_params"
+            )
+
+    return extracted
+
+
+def plot_flat_neuron(
+    end_pts,
+    defaults,
+    x_offsets=None,
+    gap=0,
+    colors=None,
+    figsize=(6, 12),
+    width_scale=1.0,
+):
+    # get diameters to set widths
+    diameters = extract_diameters(
+        end_pts.keys(),
+        defaults,
+    )
+
+    # handle horizontal offsets
+    x_offs = x_offsets if x_offsets else {k: 0 for k in end_pts.keys()}
+    y_shift = {k: 0 for k in end_pts.keys()}
+
+    # handle vertical offsets ("gap")
+
+    # sort sections by how close they are to soma
+    # determine the order in which vertical gaps are processed, since the gaps need
+    # to be accumulated as you move away from the soma towards the ends of the
+    # dendrites. E.g.:
+    # - "soma" is the parent of "apical_trunk", which is the parent of "apical_1" ...
+    sorted_sections = sorted(
+        # sections
+        end_pts.keys(),
+        # absolute value of distance from soma on the Z axis
+        key=lambda x: abs(end_pts[x][0][2]),
+    )
+
+    for child_section in sorted_sections:
+        child_section_start = end_pts[child_section][0]
+
+        # set shift for basal_1, which shoud move in the negative direction along
+        # the Z axis
+        if child_section != "soma" and child_section_start == end_pts["soma"][0]:
+            y_shift[child_section] = -gap
+
+        # as we move out from the soma, inherit the gap from the parent section
+        for parent_section in end_pts.keys():
+            parent_section_end = end_pts[parent_section][1]
+            if child_section_start == parent_section_end:
+                # for apical_oblique, inherit the parent_section shift, but add 0 gap
+                # this keeps it in line with apical_trunk, while allowing apical_1
+                # to movie higher
+                if "oblique" in child_section:
+                    y_shift[child_section] = y_shift[parent_section]
+                else:
+                    current_gap = -gap if "basal" in child_section else gap
+                    y_shift[child_section] = y_shift[parent_section] + current_gap
+                break
+
+    # use normalized diameter to set line width for sections
+    diam_values = list(diameters.values())
+    d_min, d_max = min(diam_values), max(diam_values)
+
+    # allow the user to scale the width
+    def diam_to_width(d):
+        if d_max > d_min:
+            # apply the width_scale multiplier
+            base_width = 1 + (d - d_min) / (d_max - d_min) * 14
+            return base_width * width_scale
+        return 5 * width_scale
+
+    plt.figure(figsize=figsize)
+    legend_elements = []
+
+    # plot geometry
+    for name, seg in end_pts.items():
+        dx = x_offs.get(name, 0)
+        dy = y_shift.get(name, 0)
+
+        x = [seg[0][0] + dx, seg[1][0] + dx]
+        y = [seg[0][2] + dy, seg[1][2] + dy]
+
+        width = diam_to_width(
+            diameters[name],
+        )
+        color = colors.get(name, "b") if colors else "b"
+
+        # "butt" (lol) capstyle ensures sections to not overlab
+        plt.plot(
+            x,
+            y,
+            color=color,
+            linewidth=width,
+            solid_capstyle="butt",
+        )
+
+        # use uniform line thickness in the legend
+        if colors and name in colors:
+            legend_elements.append(
+                Line2D(
+                    [0],
+                    [0],
+                    color=color,
+                    lw=2,
+                    label=name,
+                ),
+            )
+
+        plt.text(
+            x[1],
+            y[1],
+            name,
+            fontsize=8,
+            va="bottom",
+            ha="center",
+        )
+
+    plt.axis("off")
+    if colors:
+        plt.legend(
+            handles=legend_elements,
+            loc="upper right",
+            fontsize=8,
+        )
     plt.show()
 
-    return
+# defaults extracted from params_default.py for L5Pyr, but can be grabbed from
+# net._params
+
+cell_type = "L5_pyramidal"
+default_cell_searchkey = net.cell_types[cell_type]["cell_object"].name
+celltype_sections = list(
+    net.cell_types["L5_pyramidal"]["cell_object"].sections.keys(),
+)
+
+# reduce _params down to current cell_type only
+default_cell_keymatches = [
+    key
+    for key in list(net._params.keys())
+    if default_cell_searchkey in key
+]
+
+defaults = {
+    key: value for key, value in net._params.items() if key in default_cell_keymatches
+}
 
 
-plot_segment_recordings_by_section(
-    section_name="apical_trunk",
-    channel_data_dict=ina_hh2,
-    channel_name="Na+ HH2",
+
+# values pulled directly from _cell_L5Pyr in cells_default
+end_pts = {
+    "soma": [[0, 0, 0], [0, 0, 23]],
+    "apical_trunk": [[0, 0, 23], [0, 0, 83]],
+    "apical_oblique": [[0, 0, 83], [-150, 0, 83]],
+    "apical_1": [[0, 0, 83], [0, 0, 483]],
+    "apical_2": [[0, 0, 483], [0, 0, 883]],
+    "apical_tuft": [[0, 0, 883], [0, 0, 1133]],
+    "basal_1": [[0, 0, 0], [0, 0, -50]],
+    "basal_2": [[0, 0, -50], [-106, 0, -156]],
+    "basal_3": [[0, 0, -50], [106, 0, -156]],
+}
+
+# endpoints grabbed from procedurally-generated cell
+procedural_end_pts = {}
+for section in celltype_sections:
+    procedural_end_pts[section] = (
+        net.cell_types[cell_type]["cell_object"].sections[section].end_pts
+    )
+
+x_offsets = {
+    "apical_oblique": -5,
+    "apical_1": 0,
+    "apical_2": 0,
+    "apical_tuft": 0,
+    "basal_2": -5,
+    "basal_3": 5,
+}
+
+
+distinct_colors = {
+    "soma": "orange",
+    "apical_trunk": "red",
+    "apical_oblique": "purple",
+    "apical_1": "magenta",
+    "apical_2": "pink",
+    "apical_tuft": "brown",
+    "basal_1": "yellow",
+    "basal_2": "olive",
+    "basal_3": "darkgreen",
+}
+
+blues = {
+    "soma": "#4895ef",
+    "apical_trunk": "#4cc9f0",
+    "apical_oblique": "#caf0f8",
+    "apical_1": "#90e0ef",
+    "apical_2": "#ade8f4",
+    "apical_tuft": "#e0f7fa",
+    "basal_1": "#4cc9f0",
+    "basal_2": "#90e0ef",
+    "basal_3": "#ade8f4",
+}
+
+plot_flat_neuron(
+    end_pts,
+    defaults,
+    x_offsets=x_offsets,
+    gap=30,
+    colors=blues,
+    width_scale=2,
+)
+
+plot_flat_neuron(
+    procedural_end_pts,
+    defaults,
+    x_offsets=x_offsets,
+    gap=0,
+    colors=distinct_colors,
+    width_scale=2,
 )
 
 
@@ -628,7 +1053,7 @@ For dipole reconstruction (science contribution):
   is missing
 - run function with isec, see if dipole reproduction matches
 - potentially try reconstruction for one cell only to interrogate discrepancies
--
+- don't need vars exposed here: net.cell_types["L5_pyramidal"]["cell_object"].to_dict()
 """
 
 # %%
