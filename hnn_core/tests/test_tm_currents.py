@@ -1,5 +1,3 @@
-# HEREEEEEEEEEEE
-
 # %% [markdown] ###########################################################
 ## Disclaimer
 # Note that this is **not** an actual test file and will not stay in the final
@@ -438,6 +436,42 @@ ina_hh2_section_data = agg_transmembrane_section_recordings_by_celltype(
     target_channel="ina_hh2",
 )
 
+# %%
+
+
+def get_channel_section_data(
+    net,
+    trial_number=0,
+    channels=None,
+):
+    channel_section_data = {}
+
+    if channels is None:
+        channels = list(net.cell_response.transmembrane_currents.keys())
+
+    for channel in channels:
+        agg_data_dict = agg_transmembrane_section_recordings_by_celltype(
+            net,
+            trial_number=trial_number,
+            target_channel=channel,
+        )
+        channel_section_data[channel] = agg_data_dict[channel]
+
+    return channel_section_data
+
+channel_section_data = get_channel_section_data(
+    net,
+    channels=[
+        "ina_hh2",
+        "ik_hh2",
+        "ik_kca",
+        "ik_km",
+        "ica_ca",
+        "ica_cat",
+        "il_hh2",
+        "i_ar",
+    ],
+)
 
 # %% [markdown] ###########################################################
 ## [DEV] Visualize transmembrane currents
@@ -494,7 +528,7 @@ def calculate_flat_neuron_geometry(
         else {
             k: 0
             for k in end_pts.keys()  # noqa: E203,W503
-        },
+        }
     )
     y_shift = {k: 0 for k in end_pts.keys()}
 
@@ -769,12 +803,12 @@ plot_flat_neuron(
 
 def plot_segment_recordings_by_section(
     section_name,
-    channel_data_dict,
+    single_channel_data,
     cell_type="L5_pyramidal",
     overwrite_channel_name=False,
 ):
-    channel_name = list(channel_data_dict.keys())[0]
-    channel_cell_data = channel_data_dict[channel_name][cell_type]
+    channel_name = list(single_channel_data.keys())[0]
+    channel_cell_data = single_channel_data[channel_name][cell_type]
 
     if section_name not in list(channel_cell_data.keys()):
         raise ValueError(
@@ -831,14 +865,14 @@ def plot_segment_recordings_by_section(
 
 l5_seg_fig = plot_segment_recordings_by_section(
     section_name="apical_trunk",
-    channel_data_dict=ina_hh2_segment_data,
+    single_channel_data=ina_hh2_segment_data,
     cell_type="L5_pyramidal",
     overwrite_channel_name="Na+ HH2",
 )
 
 l2_seg_fig = plot_segment_recordings_by_section(
     section_name="apical_trunk",
-    channel_data_dict=ina_hh2_segment_data,
+    single_channel_data=ina_hh2_segment_data,
     cell_type="L2_pyramidal",
     overwrite_channel_name="Na+ HH2",
 )
@@ -848,7 +882,7 @@ l2_seg_fig = plot_segment_recordings_by_section(
 # %% ---------------------------------------------------
 
 def plot_single_channel_by_section_celltype(
-    channel_data_dict,
+    single_channel_data,
     end_pts=None,
     defaults=None,
     cell_type="L5_pyramidal",
@@ -868,8 +902,8 @@ def plot_single_channel_by_section_celltype(
         "basal_3",
     ]
 
-    channel_name = list(channel_data_dict.keys())[0]
-    channel_cell_data = channel_data_dict[channel_name][cell_type]
+    channel_name = list(single_channel_data.keys())[0]
+    channel_cell_data = single_channel_data[channel_name][cell_type]
     cell_sections = list(channel_cell_data.keys())
 
     # determine grid dimensions
@@ -956,13 +990,142 @@ def plot_single_channel_by_section_celltype(
 
 
 plot_single_channel_by_section_celltype(
-    channel_data_dict=ina_hh2_section_data,
+    single_channel_data=ina_hh2_section_data,
     end_pts=end_pts,
     defaults=defaults,
     cell_type="L5_pyramidal",
     overwrite_channel_name="Na+ HH2",
     show_neuron_previews=True,
 )
+
+# %%
+
+def plot_overlay_channels_by_section_celltype(
+    channel_section_data,
+    times,
+    end_pts=None,
+    defaults=None,
+    cell_type="L5_pyramidal",
+    show_neuron_previews=False,
+):
+    # top to bottom section order
+    section_plot_order = [
+        "apical_tuft",
+        "apical_2",
+        "apical_1",
+        "apical_trunk",
+        "apical_oblique",
+        "soma",
+        "basal_1",
+        "basal_2",
+        "basal_3",
+    ]
+
+    # get the channels and sections for the selected cell_type
+    channel_names = list(channel_section_data.keys())
+    first_channel = channel_names[0]
+    cell_sections = list(channel_section_data[first_channel][cell_type].keys())
+
+    # get the grid dimensions
+    num_cols = 2 if show_neuron_previews else 1
+    width_ratios = [1, 4] if show_neuron_previews else [1]
+
+    fig, axes = plt.subplots(
+        nrows=len(cell_sections),
+        ncols=num_cols,
+        sharex="col",
+        figsize=(
+            10 if show_neuron_previews else 8,
+            3 * len(cell_sections),
+        ),
+        gridspec_kw={"width_ratios": width_ratios},
+    )
+
+    # make axes always 2D
+    if len(cell_sections) == 1:
+        axes = np.expand_dims(axes, axis=0)
+    if num_cols == 1:
+        axes = np.expand_dims(axes, axis=-1)
+
+    # get the y-limits across all channels / sections
+    y_min = np.inf
+    y_max = -np.inf
+    for chan in channel_names:
+        chan_cell_data = channel_section_data[chan][cell_type]
+        for section_key, section_data in chan_cell_data.items():
+            y_min = min(y_min, section_data.min())
+            y_max = max(y_max, section_data.max())
+
+    padding = 0.05 * (y_max - y_min)
+    y_limits = (y_min - padding, y_max + padding)
+
+    x_offsets = {
+        "apical_oblique": -10,
+        "basal_2": -10,
+        "basal_3": 10,
+    }
+
+    for section_key in cell_sections:
+        # get index from section_plot_order
+        i = section_plot_order.index(section_key)
+
+        # optionally plot neuron morphology
+        if show_neuron_previews and end_pts and defaults:
+            neuron_colors = {k: "lightgrey" for k in end_pts.keys()}
+            neuron_colors[section_key] = "#004a9e"
+
+            plot_flat_neuron(
+                end_pts,
+                defaults,
+                x_offsets=x_offsets,
+                gap=10,
+                colors=neuron_colors,
+                ax=axes[i, 0],
+                show_labels=False,
+                width_scale=1.5,
+            )
+
+        # plot overlaid channel recordings
+        col_idx = 1 if show_neuron_previews else 0
+
+        for chan in channel_names:
+            section_data = channel_section_data[chan][cell_type][section_key]
+            # use the times vector for the x-axis
+            axes[i, col_idx].plot(times, section_data, label=chan)
+
+        axes[i, col_idx].set_title(
+            f"{section_key.replace('_', ' ').title()}",
+        )
+        axes[i, col_idx].set_ylim(y_limits)
+
+        # place legend outside and to the right of each plot
+        axes[i, col_idx].legend(
+            loc="upper left",
+            bbox_to_anchor=(1, 1),
+            fontsize=8
+        )
+
+    celltype_title = cell_type.replace("_", " ").title()
+    fig.suptitle(
+        f"Transmembrane Current Recordings for {celltype_title}",
+        fontsize=16,
+    )
+
+    plt.xlabel("Time (ms)")
+    plt.tight_layout(rect=[0, 0, 1, 0.98])
+    plt.close(fig)
+
+    return fig
+
+plot_overlay_channels_by_section_celltype(
+    channel_section_data,
+    times=net.cell_response.times,
+    end_pts=end_pts,
+    defaults=defaults,
+    cell_type="L5_pyramidal",
+    show_neuron_previews=True,
+)
+
 
 
 # %% [markdown] ###########################################################
