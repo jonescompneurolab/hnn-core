@@ -30,7 +30,7 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### Public API Changes
 
-- `BatchSimulate` now expects the `set_params` callback to accept arguments in the order `(net, param_values)` instead of `(param_values, net)`, aligning it with the `Optimizer` class.
+- `BatchSimulate` now expects the `set_params` callback to accept arguments in the order `(net, param_values)` instead of `(param_values, net)`, aligning it with the `Optimizer` class, by [Rahul Tripathi][] in {gh}`1208`.
 
 ## 0.5.0 Release Notes
 
@@ -1248,4 +1248,5 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Mohamed W. ElSayed]: https://github.com/wagdy88
 [Maira Usman]: https://github.com/Myrausman
 [Chetan Kandpal]: https://github.com/Chetank99
+[Rahul Tripathi]: https://github.com/Rahul-2k4
 [NEURON]: https://nrn.readthedocs.io
