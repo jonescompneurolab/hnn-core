@@ -115,7 +115,7 @@ BREAKPOINT {
 	g = (Ron + Roff)* gmax * B
 	iNMDA = g*(v - e)
 	i = iNMDA
-    ica = iNMDA/10   :(5-10 times more permeable to Ca++ than Na+ or K+, Ascher and Nowak, 1988)
+    	ica = iNMDA/10   :(5-10 times more permeable to Ca++ than Na+ or K+, Ascher and Nowak, 1988)
    : iNMDA = 3*iNMDA/10
 
 }

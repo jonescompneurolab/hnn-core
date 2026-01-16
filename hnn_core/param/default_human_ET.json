@@ -163,7 +163,7 @@
     "gbar_L2Basket_L5Pyr": 0.35,
     "gbar_L5Pyr_L5Pyr_ampa": 0.0005,
     "gbar_L5Pyr_L5Pyr_nmda": 0.00025,
-    "gbar_L5Basket_L5Pyr_gabaa": 0.1,
+    "gbar_L5Basket_L5Pyr_gabaa": 0.075,
     "gbar_L5Basket_L5Pyr_gabab": 0.025,
     "gbar_L2Pyr_L2Basket": 0.0001,
     "gbar_L2Basket_L2Basket": 0.01,
