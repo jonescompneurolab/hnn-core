@@ -459,6 +459,7 @@ def get_channel_section_data(
 
     return channel_section_data
 
+
 channel_section_data = get_channel_section_data(
     net,
     channels=[
@@ -481,6 +482,7 @@ channel_section_data = get_channel_section_data(
 # helper functions to plot cell morphology
 # %% ---------------------------------------------------
 
+
 def extract_diameters(
     section_names,
     cell_params,
@@ -498,7 +500,6 @@ def extract_diameters(
         found = False
 
         for cell_param, cell_val in cell_params.items():
-
             clean_cell_param = cell_param.lower()
 
             if search_key in clean_cell_param and "diam" in clean_cell_param:
@@ -512,6 +513,7 @@ def extract_diameters(
             )
 
     return extracted
+
 
 def calculate_flat_neuron_geometry(
     end_pts,
@@ -703,6 +705,7 @@ def plot_flat_neuron(
     if ax is None:
         plt.show()
 
+
 # defaults extracted from params_default.py for L5Pyr, but can be grabbed from
 # net._params
 
@@ -722,7 +725,6 @@ default_cell_keymatches = [
 defaults = {
     key: value for key, value in net._params.items() if key in default_cell_keymatches
 }
-
 
 
 # values pulled directly from _cell_L5Pyr in cells_default
@@ -800,6 +802,7 @@ plot_flat_neuron(
 # %% [markdown] ----------------------------------------
 # plotting functions for segment-specific recordings
 # %% ---------------------------------------------------
+
 
 def plot_segment_recordings_by_section(
     section_name,
@@ -880,6 +883,7 @@ l2_seg_fig = plot_segment_recordings_by_section(
 # %% [markdown] ----------------------------------------
 # plotting functions for section recordings
 # %% ---------------------------------------------------
+
 
 def plot_single_channel_by_section_celltype(
     single_channel_data,
@@ -1000,6 +1004,181 @@ plot_single_channel_by_section_celltype(
 
 # %%
 
+def plot_channels_by_single_section(
+    channel_section_data,
+    times,
+    section_key,
+    end_pts=None,
+    defaults=None,
+    cell_type="L5_pyramidal",
+    show_neuron_preview=True,
+):
+    # get the channels for the selected cell_type
+    channel_names = list(channel_section_data.keys())
+
+    # get the grid dimensions
+    num_channels = len(channel_names)
+    num_cols = 2 if show_neuron_preview else 1
+    start_col = 1 if show_neuron_preview else 0
+
+    width_ratios = [1, 3] if show_neuron_preview else [1]
+
+    fig, axes = plt.subplots(
+        nrows=num_channels,
+        ncols=num_cols,
+        sharex=False,
+        figsize=(
+            16,
+            4 * num_channels,
+        ),
+        dpi=300,
+        gridspec_kw={"width_ratios": width_ratios},
+    )
+
+    # ensure axes is 2D for consistent indexing
+    if num_channels == 1:
+        axes = np.expand_dims(axes, axis=0)
+    if num_cols == 1:
+        axes = np.expand_dims(axes, axis=-1)
+
+    # share x axis for the data column
+    # if num_channels > 1:
+    #     for r in range(num_channels - 1):
+    #         axes[r, start_col].sharex(axes[num_channels - 1, start_col])
+    #         plt.setp(axes[r, start_col].get_xticklabels(), visible=False)
+
+    # calculate max absolute value for all channels in the section
+    section_max = 0
+    for chan in channel_names:
+        section_data_tmp = channel_section_data[chan][cell_type][section_key]
+        section_max = max(
+            section_max,
+            np.abs(section_data_tmp).max(),
+        )
+
+    if section_max == 0:
+        section_max = 1e-9  # prevent divide by zero
+    padding_section = 1.1 * section_max
+
+    for i, chan in enumerate(channel_names):
+        # plot neuron preview in the first column for every row
+        if show_neuron_preview and end_pts and defaults:
+            neuron_colors = {k: "lightgrey" for k in end_pts.keys()}
+            neuron_colors[section_key] = "#004a9e"
+
+            plot_flat_neuron(
+                end_pts,
+                defaults,
+                x_offsets={
+                    "apical_oblique": -10,
+                    "basal_2": -10,
+                    "basal_3": 10,
+                },
+                gap=10,
+                colors=neuron_colors,
+                ax=axes[i, 0],
+                show_labels=False,
+                width_scale=1.5,
+            )
+            axes[i, 0].set_ylabel(
+                section_key.replace("_", " ").title(),
+                rotation=0,
+                ha="right",
+                va="center",
+                labelpad=15,
+            )
+
+        ax_local = axes[i, start_col]
+        section_data = channel_section_data[chan][cell_type][section_key]
+
+        # normally-scaled plot
+        abs_max = np.abs(section_data).max()
+        if abs_max == 0:
+            abs_max = 1e-9  # prevent divide by zero
+        padding_local = 1.1 * abs_max
+
+        lns = []
+
+        ln1 = ax_local.plot(
+            times,
+            section_data,
+            color="grey",
+            label="Scaled to Self",
+        )
+        ax_local.set_ylim(
+            -padding_local,
+            padding_local,
+        )
+        ax_local.axhline(
+            0,
+            color="grey",
+            linestyle="--",
+            alpha=0.3,
+        )
+
+        ax_local.set_title(
+            f'Channel: "{chan}"',
+        )
+        lns += ln1
+
+        # secondary axis for section scaling
+        ax_secondary = ax_local.twinx()
+        ln2 = ax_secondary.plot(
+            times,
+            section_data,
+            color="#004a9e",
+            label="Scaled to Section",
+        )
+        ax_secondary.set_ylim(
+            -padding_section,
+            padding_section,
+        )
+        ax_secondary.tick_params(
+            axis="y",
+            labelcolor="#004a9e",
+        )
+        lns += ln2
+
+        # add legends
+        labs = [lab.get_label() for lab in lns]
+        ax_local.legend(
+            lns,
+            labs,
+            loc="upper left",
+            fontsize=12,
+        )
+
+        # only add x-label to the bottom subplot
+        if i == num_channels - 1:
+            ax_local.set_xlabel("Time (ms)")
+
+    fig.suptitle(
+        f"Transmembrane Current Recordings for {cell_type.replace('_', ' ').title()} "
+        f"{section_key.replace('_', ' ').title()}",
+        y=0.98,
+        fontsize=18,
+    )
+
+    plt.tight_layout(rect=[0, 0, 1, 0.98])
+    plt.close(fig)
+
+    return fig
+
+
+plot_channels_by_single_section(
+    channel_section_data,
+    dpl.times,
+    section_key="soma",
+    end_pts=end_pts,
+    defaults=defaults,
+    cell_type="L5_pyramidal",
+    show_neuron_preview=True,
+)
+
+
+# %%
+
+
 def plot_overlay_channels_by_section_celltype(
     channel_section_data,
     times,
@@ -1099,11 +1278,7 @@ def plot_overlay_channels_by_section_celltype(
         axes[i, col_idx].set_ylim(y_limits)
 
         # place legend outside and to the right of each plot
-        axes[i, col_idx].legend(
-            loc="upper left",
-            bbox_to_anchor=(1, 1),
-            fontsize=8
-        )
+        axes[i, col_idx].legend(loc="upper left", bbox_to_anchor=(1, 1), fontsize=8)
 
     celltype_title = cell_type.replace("_", " ").title()
     fig.suptitle(
@@ -1117,6 +1292,7 @@ def plot_overlay_channels_by_section_celltype(
 
     return fig
 
+
 plot_overlay_channels_by_section_celltype(
     channel_section_data,
     times=net.cell_response.times,
@@ -1127,6 +1303,232 @@ plot_overlay_channels_by_section_celltype(
 )
 
 
+# %%
+
+
+def plot_distinct_channels_by_section_celltype(
+    channel_section_data,
+    times,
+    end_pts=None,
+    defaults=None,
+    cell_type="L5_pyramidal",
+    show_neuron_previews=False,
+    scaling_type=None,
+    cell_sections=None,
+):
+    # top to bottom section order for full neuron plot
+    section_plot_order = [
+        "apical_tuft",
+        "apical_2",
+        "apical_1",
+        "apical_trunk",
+        "apical_oblique",
+        "soma",
+        "basal_1",
+        "basal_2",
+        "basal_3",
+    ]
+
+    # get the channels and sections for the selected cell_type
+    channel_names = list(channel_section_data.keys())
+    first_channel = channel_names[0]
+
+    if cell_sections is None:
+        cell_sections = list(channel_section_data[first_channel][cell_type].keys())
+
+    # update section plot order based on actual cell_sections used
+    section_plot_order = [sec for sec in section_plot_order if sec in cell_sections]
+
+    # get the grid dimensions
+    num_channels = len(channel_names)
+    start_col = 1 if show_neuron_previews else 0
+    total_cols = num_channels + start_col
+
+    width_ratios = ([1] if show_neuron_previews else []) + [4] * num_channels
+
+    fig, axes = plt.subplots(
+        nrows=len(cell_sections),
+        ncols=total_cols,
+        sharex="col",
+        figsize=(
+            6 * total_cols,
+            6 * len(cell_sections),
+        ),
+        dpi=300,
+        gridspec_kw={"width_ratios": width_ratios},
+    )
+
+    if len(cell_sections) == 1:
+        axes = np.expand_dims(axes, axis=0)
+    if total_cols == 1:
+        axes = np.expand_dims(axes, axis=-1)
+
+    # get "global" y limit for scaled axes plots
+    global_max = 0
+    for chan in channel_names:
+        chan_cell_data = channel_section_data[chan][cell_type]
+        for section_data in chan_cell_data.values():
+            global_max = max(
+                global_max,
+                np.abs(section_data).max(),
+            )
+
+    padding_global = 1.05 * global_max
+    global_y_limits = (
+        -padding_global,
+        padding_global,
+    )
+
+    x_offsets = {
+        "apical_oblique": -10,
+        "basal_2": -10,
+        "basal_3": 10,
+    }
+
+    for section_key in cell_sections:
+        i = section_plot_order.index(section_key)
+
+        # get y limit for all channels in the section
+        section_max = 0
+        for chan in channel_names:
+            section_data_tmp = channel_section_data[chan][cell_type][section_key]
+            section_max = max(section_max, np.abs(section_data_tmp).max())
+
+        if section_max == 0:
+            section_max = 1e-9  # prevent divide by zero
+        padding_section = 1.1 * section_max
+
+        if show_neuron_previews and end_pts and defaults:
+            neuron_colors = {k: "lightgrey" for k in end_pts.keys()}
+            neuron_colors[section_key] = "#004a9e"
+            plot_flat_neuron(
+                end_pts,
+                defaults,
+                x_offsets=x_offsets,
+                gap=10,
+                colors=neuron_colors,
+                ax=axes[i, 0],
+                show_labels=False,
+                width_scale=1.5,
+            )
+            axes[i, 0].set_ylabel(
+                section_key.replace("_", " ").title(),
+                rotation=0,
+                ha="right",
+                va="center",
+                labelpad=15,
+            )
+
+        for j, chan in enumerate(channel_names):
+            ax_local = axes[i, start_col + j]
+            section_data = channel_section_data[chan][cell_type][section_key]
+
+            # normally-scaled plot
+            abs_max = np.abs(section_data).max()
+            if abs_max == 0:
+                abs_max = 1e-9  # prevent divide by zero
+            padding_local = 1.1 * abs_max
+
+            lns = []
+
+            ln1 = ax_local.plot(
+                times,
+                section_data,
+                color="grey",
+                label="Scaled to Self",
+            )
+            ax_local.set_ylim(
+                -padding_local,
+                padding_local,
+            )
+            ax_local.axhline(
+                0,
+                color="grey",
+                linestyle="--",
+                alpha=0.3,
+            )
+            ax_local.tick_params(
+                axis="y",
+                labelsize=7,
+            )
+
+            ax_local.set_title(
+                f'Section: "{section_key}"; Channel: "{chan}"',
+                fontsize=10,
+                fontweight="bold",
+            )
+            lns += ln1
+
+            if scaling_type is not None:
+                # secondary axis for global/section scaling
+                ax_secondary = ax_local.twinx()
+
+                if scaling_type == "section":
+                    ln2 = ax_secondary.plot(
+                        times,
+                        section_data,
+                        color="#004a9e",
+                        label="Scaled to Section Data",
+                    )
+                    ax_secondary.set_ylim(-padding_section, padding_section)
+                    ax_secondary.tick_params(
+                        axis="y",
+                        labelcolor="#004a9e",
+                        labelsize=7,
+                    )
+                    lns += ln2
+
+                elif scaling_type == "global":
+                    ln2 = ax_secondary.plot(
+                        times,
+                        section_data,
+                        color="#004a9e",
+                        label="Scaled to All Data",
+                    )
+                    ax_secondary.set_ylim(global_y_limits)
+                    ax_secondary.tick_params(
+                        axis="y",
+                        labelcolor="#004a9e",
+                        labelsize=7,
+                    )
+                    lns += ln2
+
+            # add legends
+            labs = [lab.get_label() for lab in lns]
+            ax_local.legend(lns, labs, loc="upper right", fontsize=7)
+
+            if not show_neuron_previews and j == 0:
+                ax_local.set_ylabel(
+                    section_key.replace("_", " ").title(),
+                )
+
+    celltype_title = cell_type.replace("_", " ").title()
+
+    fig.suptitle(
+        f"Transmembrane Current Recordings for {celltype_title}",
+        fontsize=50,
+        y=0.97,
+    )
+
+    plt.xlabel("Time (ms)")
+
+    plt.tight_layout(rect=[0, 0, 1, 0.97])
+    plt.close(fig)
+
+    return fig
+
+
+plot_distinct_channels_by_section_celltype(
+    channel_section_data,
+    dpl.times,
+    end_pts=end_pts,
+    defaults=defaults,
+    cell_type="L5_pyramidal",
+    show_neuron_previews=True,
+    scaling_type="section",
+    cell_sections=["soma"],
+)
+
 
 # %% [markdown] ###########################################################
 ## [WIP] Testing and Feature Development
@@ -1135,7 +1537,6 @@ plot_overlay_channels_by_section_celltype(
 # %% [markdown] ----------------------------------------
 ### Recreating dipole for the soma only
 # %% ---------------------------------------------------
-
 
 def postproc_soma_dipole(
     net,
@@ -1220,8 +1621,6 @@ def postproc_soma_dipole(
         # we can pass different channels to this function, so we get it dynamically
         first_key = list(cell_channels.keys())[0]
 
-        print(first_key)
-
         start_rel, end_rel = rel_endpoints[sec_name]
         start = start_rel + soma_pos
         end = end_rel + soma_pos
@@ -1254,12 +1653,16 @@ def postproc_soma_dipole(
             # convert densities (mA/cm^2) to absolute currents (mA)]
             else:
                 I_abs = vec * area_cm2  # keep as mA
-                I_abs = I_abs * -1
-
-                if ch == "agg_i_cap":
-                    I_abs = I_abs * -1  # flip sign (?)
 
             I_t += I_abs
+
+        # arround for different structure for isec when recontructing from components
+        if from_components:
+            soma_isec = net.cell_response.isec[trial][gid].get(sec_name, {})
+            for syn_key in soma_isec:
+                # isec is measured in nA, so we need to divide by 1e6 to
+                # convert nA to mA before we add to I_t
+                I_t += np.array(soma_isec[syn_key]) / 1e6
 
         # multiple by r_i per Naess 2015 Ch 2 (simplified to zi in this case)
         # for ionic currents, we have 1 mA*um = 1 nAm (correct units)
@@ -1278,9 +1681,6 @@ def postproc_soma_dipole(
             dipole += contrib
 
     return dipole
-
-
-# %% ---------------------------------------------------
 
 fig, ax = plt.subplots(
     nrows=2,
@@ -1313,28 +1713,167 @@ ax[1].plot(
 ax[0].set_ylim(-200, 100)
 ax[1].set_ylim(-200, 100)
 
+# %%
+
+def check_rmse_and_residuals(
+    net,
+    trial=0,
+    cell_type="L5_pyramidal",
+):
+    times = net.cell_response.times
+
+    # get dipole from i_mem
+    dpl_imem = postproc_soma_dipole(
+        net,
+        trial=trial,
+        cell_type=cell_type,
+        from_components=False,
+    )
+    # get the dipole reconstructed from the constituent components
+    dpl_comp = postproc_soma_dipole(
+        net,
+        trial=trial,
+        cell_type=cell_type,
+        from_components=True,
+    )
+
+    if dpl_imem is None or dpl_comp is None:
+        raise ValueError(
+            "Dipole data could not be computed",
+        )
+
+    # calculate residual and rmse
+    residual = dpl_imem - dpl_comp
+    rmse = np.sqrt(np.mean(residual**2))
+
+    # normalize by the peak-to-peak range of agg_i_mem (our "ground truth")
+    dpl_range = np.max(dpl_imem) - np.min(dpl_imem)
+    nrmse_pct = (rmse / dpl_range) * 100 if dpl_range != 0 else 0
+
+    fig, ax = plt.subplots(
+        2,
+        1,
+        figsize=(10, 10),
+        sharex=True,
+    )
+
+    # overlay plot
+    ax[0].plot(
+        times[1:],
+        dpl_imem[1:],
+        label="From agg_i_mem",
+        alpha=0.8,
+    )
+    ax[0].plot(
+        times[1:],
+        dpl_comp[1:],
+        label="From components",
+        linestyle="--",
+        alpha=0.8,
+    )
+
+    # text box for rmse
+    error_text = f" RMSE: {rmse:.2f}\nNRMSE:  {nrmse_pct:.2f}%"
+    ax[0].text(
+        x=0.05,
+        y=0.95,
+        s=error_text,
+        transform=ax[0].transAxes,
+        verticalalignment="top",
+        fontsize=12,
+        fontfamily="Menlo",
+        bbox=dict(
+            boxstyle="round",
+            facecolor="white",
+            alpha=0.2,
+        ),
+    )
+
+    ax[0].set_title(
+        f"Computed Dipole Comparison for {cell_type.replace("_", " ").title()} Soma",
+    )
+    ax[0].set_ylabel("nAm")
+    ax[0].grid(True, alpha=0.3)
+    ax[0].legend(loc="upper right")
+
+    ymin, ymax = ax[0].get_ylim()
+    ylim = (max(abs(ymin), abs(ymax)))*1.05
+    ax[0].set_ylim(-ylim, ylim)
+
+    # residual dipole plot
+    ax[1].plot(
+        times[1:],
+        residual[1:],
+        color="red",
+        label="(i_mem - reconstructed), scaled",
+    )
+    ax[1].set_title(
+        "Residual (Error)",
+    )
+    ax[1].set_ylabel("nAm")
+    ax[1].set_ylim(-ylim, ylim)
+    ax[1].grid(True, alpha=0.3)
+    # ax[1].legend()
+
+    rightax = ax[1].twinx()
+    rightax.plot(
+        times[1:],
+        residual[1:],
+        alpha=0.2,
+        label="(i_mem - reconstructed), zoomed",
+    )
+    ymin, ymax = rightax.get_ylim()
+    ylim = (max(abs(ymin), abs(ymax)))
+    rightax.set_ylim(-ylim, ylim)
+
+    lines1, labels1 = ax[1].get_legend_handles_labels()
+    lines2, labels2 = rightax.get_legend_handles_labels()
+
+    ax[1].legend(lines1 + lines2, labels1 + labels2)
+
+    plt.tight_layout()
+    plt.show()
+
+
+check_rmse_and_residuals(net)
+
+
 # %% [markdown] ----------------------------------------
 ### Next steps
 # %% ---------------------------------------------------
 
 """
-For feature example (code contribution):
-- Show recording of transmembrane currents individually; there is some baseline code
-  for this that I need to migrate to this repository
-- Likely remove the dipole reconstruction from_components for this PR; it's not
+# For feature example (code contribution):
+[x] Show recording of transmembrane currents individually; there is some baseline code
+    for this that I need to migrate to this repository
+[-] Likely remove the dipole reconstruction from_components for this PR; it's not
   strictly necessary and not complete
-- Dipole reconstruction from i_mem (total transmembrane current) can be kept in the
-  example notebook for this PR, as it is complete and shows off new use cases. The
-  function herein should be adapted to remove the from_components section, which is
-  still a work in progress
+[x] Dipole reconstruction from i_mem (total transmembrane current) can be kept in the
+    example notebook for this PR, as it is complete and shows off new use cases. The
+    function herein should be adapted to remove the from_components section, which is
+    still a work in progress
 
-For dipole reconstruction (science contribution):
-- add isec to soma calculation function, which should be allowed since soma has only
-  one segment, and isec should be the transmembrane synaptic current component that
-  is missing
-- run function with isec, see if dipole reproduction matches
-- potentially try reconstruction for one cell only to interrogate discrepancies
-- don't need vars exposed here: net.cell_types["L5_pyramidal"]["cell_object"].to_dict()
+# For dipole reconstruction (science contribution):
+[x] add isec to soma calculation function, which should be allowed since soma has only
+    one segment, and isec should be the transmembrane synaptic current component that
+    is missing
+[x] run function with isec, see if dipole reproduction matches
+[ ] potentially try reconstruction for one cell only to interrogate discrepancies
+[ ] don't need vars exposed here:
+      - net.cell_types["L5_pyramidal"]["cell_object"].to_dict()
+
+# Notes on outcome of dipole reconstruction
+- The normalized RMSE (NRMSE) in the example above is 1.21%
+- Over 98.7% of the variance in the i_mem dipole is accounted for by our reconstruction
+  from summing over the individual current components
+- The remaining 1.21% of unexplained variance is likely due to noise from small timing
+  offsets in how NEURON updates versus records variables, or from floating-point
+  (rounding) differences that compound when summing over many arrays
+  - Re: NEURON timing offsets: Some currents (e.g., ina) are updated at the beginning
+    of a timestep, while others (e.g., agg_i_cap) depend on the voltage change across
+    the timestep. agg_i_mem captures the exact timing used by the solver, whereas
+    the sum in our reconstructed dipole might be slightly "out of phase" at times due
+    to how the currents are updated
 """
 
 # %%
