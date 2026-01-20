@@ -440,7 +440,11 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                 io_buf.seek(0)
                 img_arr = np.reshape(
                     np.frombuffer(io_buf.getvalue(), dtype=np.uint8),
-                    shape=(int(_fig.bbox.bounds[3]), int(_fig.bbox.bounds[2]), -1),
+                    (
+                        int(_fig.bbox.bounds[3]),
+                        int(_fig.bbox.bounds[2]),
+                        -1,
+                    ),
                 )
                 io_buf.close()
                 _ = ax.imshow(img_arr)
