@@ -70,6 +70,8 @@ def simulate_dipole(
 
     if n_trials is None:
         n_trials = net._params.get("N_trials", 1)
+        net._params["N_trials"] = n_trials
+
     if n_trials < 1:
         raise ValueError("Invalid number of simulations: %d" % n_trials)
 
