@@ -88,7 +88,6 @@ def _get_gaussian_connection(src_pos, target_pos, nc_dict, inplane_distance=1.0)
     cell_dist = np.sqrt(x_dist**2 + y_dist**2)
     scaled_lamtha = nc_dict["lamtha"] * inplane_distance
 
-
     weight = _calculate_gaussian(cell_dist, nc_dict["A_weight"], scaled_lamtha)
     delay = nc_dict["A_delay"] / _calculate_gaussian(cell_dist, 1, scaled_lamtha)
     return weight, delay
