@@ -44,8 +44,8 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../../_static/documentation_options.js?v=215e94d7"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/workflows/plot_simulate_somato';</script>
@@ -484,7 +484,7 @@
   <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p><a class="reference internal" href="#sphx-glr-download-auto-examples-workflows-plot-simulate-somato-py"><span class="std std-ref">Go to the end</span></a>
-to download the full example code. or to run this example in your browser via Binder</p>
+to download the full example code or to run this example in your browser via Binder.</p>
 </div>
 <section class="sphx-glr-example-title" id="from-meg-sensor-space-data-to-hnn-simulation">
 <span id="sphx-glr-auto-examples-workflows-plot-simulate-somato-py"></span><h1>04. From MEG sensor-space data to HNN simulation<a class="headerlink" href="#from-meg-sensor-space-data-to-hnn-simulation" title="Link to this heading">#</a></h1>
@@ -531,58 +531,61 @@ importing <code class="docutils literal notranslate"><span class="pre">somato</s
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Using default location ~/mne_data for somato...
 Creating /home/circleci/mne_data
 Downloading file &#39;MNE-somato-data.tar.gz&#39; from &#39;https://osf.io/download/tp4sg?version=7&#39; to &#39;/home/circleci/mne_data&#39;.
+Failed to download &#39;MNE-somato-data.tar.gz&#39;. Will attempt the download again 2 more times.
+Failed to download &#39;MNE-somato-data.tar.gz&#39;. Will attempt the download again 1 more time.
 
   0%|                                               | 0.00/611M [00:00&lt;?, ?B/s]
-  0%|                                       | 146k/611M [00:00&lt;07:25, 1.37MB/s]
-  1%|▌                                     | 9.05M/611M [00:00&lt;00:11, 51.6MB/s]
-  2%|▉                                     | 14.3M/611M [00:00&lt;00:14, 41.6MB/s]
-  4%|█▌                                    | 25.3M/611M [00:00&lt;00:09, 64.7MB/s]
-  5%|██                                    | 32.3M/611M [00:00&lt;00:10, 56.9MB/s]
-  7%|██▋                                   | 43.8M/611M [00:00&lt;00:07, 73.5MB/s]
-  8%|███▏                                  | 51.8M/611M [00:00&lt;00:08, 68.4MB/s]
- 10%|███▊                                  | 62.0M/611M [00:00&lt;00:07, 77.5MB/s]
- 13%|████▉                                  | 77.8M/611M [00:01&lt;00:05, 100MB/s]
- 15%|█████▊                                 | 90.6M/611M [00:01&lt;00:04, 108MB/s]
- 17%|██████▉                                 | 106M/611M [00:01&lt;00:04, 123MB/s]
- 20%|███████▉                                | 122M/611M [00:01&lt;00:03, 132MB/s]
- 22%|████████▉                               | 136M/611M [00:01&lt;00:04, 102MB/s]
- 25%|█████████▊                              | 150M/611M [00:01&lt;00:04, 112MB/s]
- 27%|██████████▊                             | 166M/611M [00:01&lt;00:03, 124MB/s]
- 29%|███████████▋                            | 179M/611M [00:01&lt;00:03, 118MB/s]
- 31%|████████████▌                           | 192M/611M [00:01&lt;00:03, 120MB/s]
- 33%|█████████████▍                          | 204M/611M [00:02&lt;00:03, 119MB/s]
- 36%|██████████████▍                         | 220M/611M [00:02&lt;00:02, 131MB/s]
- 38%|███████████████▍                        | 235M/611M [00:02&lt;00:02, 129MB/s]
- 41%|████████████████▍                       | 251M/611M [00:02&lt;00:02, 137MB/s]
- 44%|█████████████████▍                      | 267M/611M [00:02&lt;00:02, 144MB/s]
- 46%|██████████████████▍                     | 281M/611M [00:02&lt;00:02, 145MB/s]
- 49%|███████████████████▍                    | 297M/611M [00:02&lt;00:02, 149MB/s]
- 51%|████████████████████▍                   | 312M/611M [00:02&lt;00:02, 134MB/s]
- 54%|█████████████████████▌                  | 329M/611M [00:02&lt;00:01, 141MB/s]
- 56%|██████████████████████▌                 | 345M/611M [00:03&lt;00:01, 147MB/s]
- 59%|███████████████████████▌                | 359M/611M [00:03&lt;00:01, 132MB/s]
- 62%|████████████████████████▌               | 375M/611M [00:03&lt;00:01, 139MB/s]
- 64%|█████████████████████████▋              | 392M/611M [00:03&lt;00:01, 145MB/s]
- 67%|██████████████████████████▋             | 408M/611M [00:03&lt;00:01, 150MB/s]
- 69%|███████████████████████████▊            | 424M/611M [00:03&lt;00:01, 153MB/s]
- 72%|████████████████████████████▊           | 439M/611M [00:03&lt;00:01, 154MB/s]
- 75%|█████████████████████████████▊          | 455M/611M [00:03&lt;00:01, 138MB/s]
- 77%|██████████████████████████████▊         | 471M/611M [00:03&lt;00:00, 144MB/s]
- 80%|███████████████████████████████▉        | 487M/611M [00:04&lt;00:00, 149MB/s]
- 82%|████████████████████████████████▉       | 502M/611M [00:04&lt;00:00, 150MB/s]
- 85%|█████████████████████████████████▉      | 518M/611M [00:04&lt;00:00, 133MB/s]
- 87%|██████████████████████████████████▉     | 534M/611M [00:04&lt;00:00, 140MB/s]
- 90%|████████████████████████████████████    | 550M/611M [00:04&lt;00:00, 146MB/s]
- 93%|█████████████████████████████████████   | 566M/611M [00:04&lt;00:00, 150MB/s]
- 95%|██████████████████████████████████████  | 581M/611M [00:04&lt;00:00, 149MB/s]
- 98%|███████████████████████████████████████▏| 598M/611M [00:04&lt;00:00, 152MB/s]
+  1%|▌                                     | 8.39M/611M [00:00&lt;00:07, 76.0MB/s]
+  4%|█▍                                     | 22.3M/611M [00:00&lt;00:05, 112MB/s]
+  6%|██▎                                    | 35.5M/611M [00:00&lt;00:04, 121MB/s]
+  8%|███                                    | 47.7M/611M [00:00&lt;00:04, 118MB/s]
+ 10%|███▉                                   | 61.8M/611M [00:00&lt;00:04, 126MB/s]
+ 12%|████▊                                  | 75.9M/611M [00:00&lt;00:04, 131MB/s]
+ 15%|█████▋                                 | 90.0M/611M [00:00&lt;00:03, 134MB/s]
+ 17%|██████▊                                 | 104M/611M [00:00&lt;00:03, 136MB/s]
+ 19%|███████▋                                | 118M/611M [00:00&lt;00:03, 124MB/s]
+ 22%|████████▌                               | 132M/611M [00:01&lt;00:03, 129MB/s]
+ 24%|█████████▌                              | 146M/611M [00:01&lt;00:03, 132MB/s]
+ 26%|██████████▍                             | 160M/611M [00:01&lt;00:03, 135MB/s]
+ 28%|███████████▎                            | 173M/611M [00:01&lt;00:03, 133MB/s]
+ 31%|████████████▎                           | 187M/611M [00:01&lt;00:03, 135MB/s]
+ 33%|█████████████▏                          | 201M/611M [00:01&lt;00:03, 130MB/s]
+ 35%|██████████████                          | 215M/611M [00:01&lt;00:02, 133MB/s]
+ 38%|███████████████                         | 229M/611M [00:01&lt;00:02, 136MB/s]
+ 40%|███████████████▉                        | 243M/611M [00:01&lt;00:02, 124MB/s]
+ 42%|████████████████▊                       | 257M/611M [00:02&lt;00:02, 128MB/s]
+ 44%|█████████████████▊                      | 271M/611M [00:02&lt;00:02, 132MB/s]
+ 47%|██████████████████▋                     | 285M/611M [00:02&lt;00:02, 134MB/s]
+ 49%|███████████████████▌                    | 299M/611M [00:02&lt;00:02, 136MB/s]
+ 51%|████████████████████▍                   | 313M/611M [00:02&lt;00:02, 127MB/s]
+ 54%|█████████████████████▍                  | 327M/611M [00:02&lt;00:02, 131MB/s]
+ 56%|██████████████████████▎                 | 341M/611M [00:02&lt;00:02, 134MB/s]
+ 58%|███████████████████████▎                | 355M/611M [00:02&lt;00:01, 136MB/s]
+ 60%|████████████████████████▏               | 369M/611M [00:02&lt;00:01, 138MB/s]
+ 63%|█████████████████████████               | 383M/611M [00:02&lt;00:01, 138MB/s]
+ 65%|██████████████████████████              | 397M/611M [00:03&lt;00:01, 138MB/s]
+ 67%|██████████████████████████▉             | 411M/611M [00:03&lt;00:01, 139MB/s]
+ 70%|███████████████████████████▊            | 425M/611M [00:03&lt;00:01, 140MB/s]
+ 72%|████████████████████████████▊           | 439M/611M [00:03&lt;00:01, 140MB/s]
+ 74%|█████████████████████████████▋          | 453M/611M [00:03&lt;00:01, 135MB/s]
+ 77%|██████████████████████████████▋         | 467M/611M [00:03&lt;00:01, 137MB/s]
+ 79%|███████████████████████████████▌        | 481M/611M [00:03&lt;00:00, 138MB/s]
+ 81%|████████████████████████████████▍       | 496M/611M [00:03&lt;00:00, 139MB/s]
+ 83%|█████████████████████████████████▍      | 510M/611M [00:03&lt;00:00, 127MB/s]
+ 86%|██████████████████████████████████▎     | 524M/611M [00:03&lt;00:00, 131MB/s]
+ 88%|███████████████████████████████████▏    | 537M/611M [00:04&lt;00:00, 120MB/s]
+ 90%|███████████████████████████████████▉    | 549M/611M [00:04&lt;00:00, 120MB/s]
+ 92%|████████████████████████████████████▉   | 563M/611M [00:04&lt;00:00, 126MB/s]
+ 94%|█████████████████████████████████████▋  | 576M/611M [00:04&lt;00:00, 125MB/s]
+ 96%|██████████████████████████████████████▌ | 589M/611M [00:04&lt;00:00, 117MB/s]
+ 99%|███████████████████████████████████████▍| 603M/611M [00:04&lt;00:00, 123MB/s]
   0%|                                               | 0.00/611M [00:00&lt;?, ?B/s]
-100%|███████████████████████████████████████| 611M/611M [00:00&lt;00:00, 1.93TB/s]
+100%|███████████████████████████████████████| 611M/611M [00:00&lt;00:00, 1.95TB/s]
 Untarring contents of &#39;/home/circleci/mne_data/MNE-somato-data.tar.gz&#39; to &#39;/home/circleci/mne_data&#39;
 Attempting to create new mne-python configuration file:
 /home/circleci/.mne/mne-python.json
 Could not read the /home/circleci/.mne/mne-python.json json file during the writing. Assuming it is empty. Got: Expecting value: line 1 column 1 (char 0)
-Download complete in 15s (582.2 MB)
+Download complete in 53s (582.2 MB)
 </pre></div>
 </div>
 <p>Then, we load the raw data and estimate the inverse operator.</p>
@@ -742,8 +745,8 @@ images.</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&quot;\nBrain = mne.viz.get_brain_class()\nbrain_label = Brain(subject, hemi, &#39;white&#39;, subjects_dir=subjects_dir)\nbrain_label.add_label(label_s1, color=&#39;green&#39;, alpha=0.9)\nstc_label = stc.in_label(label_s1)\nbrain = stc_label.plot(subjects_dir=subjects_dir, hemi=hemi, surface=&#39;white&#39;,\n                       view_layout=&#39;horizontal&#39;, initial_time=0.04,\n                       backend=&#39;pyvista&#39;)\n&quot;
 </pre></div>
 </div>
-<p><a class="reference internal" href="https://user-images.githubusercontent.com/20212206/106524603-cfe75c80-64b0-11eb-9607-3415195c3e7a.png"><img alt="mne_label_fig" src="https://user-images.githubusercontent.com/20212206/106524603-cfe75c80-64b0-11eb-9607-3415195c3e7a.png" style="width: 400px;" /></a></p>
-<p><a class="reference internal" href="https://user-images.githubusercontent.com/20212206/106524542-b514e800-64b0-11eb-835e-497454e75eb9.png"><img alt="mne_activity_fig" src="https://user-images.githubusercontent.com/20212206/106524542-b514e800-64b0-11eb-835e-497454e75eb9.png" style="width: 400px;" /></a></p>
+<p><a class="reference internal" href="https://user-images.githubusercontent.com/20212206/106524603-cfe75c80-64b0-11eb-9607-3415195c3e7a.png"><img alt="mne_label_fig" src="https://user-images.githubusercontent.com/20212206/106524603-cfe75c80-64b0-11eb-9607-3415195c3e7a.png" width="400" /></a></p>
+<p><a class="reference internal" href="https://user-images.githubusercontent.com/20212206/106524542-b514e800-64b0-11eb-835e-497454e75eb9.png"><img alt="mne_activity_fig" src="https://user-images.githubusercontent.com/20212206/106524542-b514e800-64b0-11eb-835e-497454e75eb9.png" width="400" /></a></p>
 <p>Now we extract the representative time course of dipole activation in our
 labeled brain region using <code class="docutils literal notranslate"><span class="pre">mode='pca_flip'</span></code> (see <a class="reference external" href="https://mne.tools/stable/auto_examples/inverse/plot_label_source_activations.html">this MNE-python
 example</a> for more details). Note that the most prominent component of the
@@ -909,7 +912,7 @@ network origin of human MEG/EEG data. eLife 9, e51214 (2020).
 <a class="reference external" href="https://doi.org/10.7554/eLife.51214">https://doi.org/10.7554/eLife.51214</a></p>
 </aside>
 </aside>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 42.335 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (1 minutes 29.715 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-workflows-plot-simulate-somato-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/workflows/plot_simulate_somato.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo1.svg" style="width: 150px;" />
@@ -1023,7 +1026,7 @@ network origin of human MEG/EEG data. eLife 9, e51214 (2020).
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
     <br/>
   </p>
 </div>

@@ -35,7 +35,7 @@ sets are provided to help users get started.
   .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_evoked_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_workflows_plot_simulate_evoked.py`
+  :doc:`/auto_examples/workflows/plot_simulate_evoked`
 
 .. raw:: html
 
@@ -52,7 +52,7 @@ sets are provided to help users get started.
   .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_alpha_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_workflows_plot_simulate_alpha.py`
+  :doc:`/auto_examples/workflows/plot_simulate_alpha`
 
 .. raw:: html
 
@@ -69,7 +69,7 @@ sets are provided to help users get started.
   .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_gamma_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_workflows_plot_simulate_gamma.py`
+  :doc:`/auto_examples/workflows/plot_simulate_gamma`
 
 .. raw:: html
 
@@ -86,7 +86,7 @@ sets are provided to help users get started.
   .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_somato_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_workflows_plot_simulate_somato.py`
+  :doc:`/auto_examples/workflows/plot_simulate_somato`
 
 .. raw:: html
 
@@ -103,7 +103,7 @@ sets are provided to help users get started.
   .. image:: /auto_examples/workflows/images/thumb/sphx_glr_plot_simulate_beta_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_examples_workflows_plot_simulate_beta.py`
+  :doc:`/auto_examples/workflows/plot_simulate_beta`
 
 .. raw:: html
 

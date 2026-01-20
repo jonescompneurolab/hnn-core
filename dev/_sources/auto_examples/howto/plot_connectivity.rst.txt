@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_howto_plot_connectivity.py>`
-        to download the full example code. or to run this example in your browser via Binder
+        to download the full example code or to run this example in your browser via Binder.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -524,7 +524,7 @@ the aggregate current dipole.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 11.864 seconds)
+   **Total running time of the script:** (1 minutes 36.146 seconds)
 
 
 .. _sphx_glr_download_auto_examples_howto_plot_connectivity.py:

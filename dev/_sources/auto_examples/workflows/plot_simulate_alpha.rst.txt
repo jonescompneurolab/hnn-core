@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_workflows_plot_simulate_alpha.py>`
-        to download the full example code. or to run this example in your browser via Binder
+        to download the full example code or to run this example in your browser via Binder.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -147,7 +147,7 @@ time with unique randomization. The drive is only connected to the
     Trial 1: 290.0 ms...
     Trial 1: 300.0 ms...
 
-    <hnn_core.dipole.Dipole object at 0x74658e172060>
+    <hnn_core.dipole.Dipole object at 0x7a2f47c276f0>
 
 
 
@@ -326,7 +326,7 @@ References
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (1 minutes 20.185 seconds)
+   **Total running time of the script:** (1 minutes 35.060 seconds)
 
 
 .. _sphx_glr_download_auto_examples_workflows_plot_simulate_alpha.py:
