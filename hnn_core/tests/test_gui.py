@@ -262,6 +262,7 @@ def test_gui_upload_drives():
 
     plt.close("all")
 
+
 def test_gui_rerun_saved_network_without_n_trials():
     """Test rerunning a GUI-saved network without N_trials defined.
     Ensures simulate_dipole defaults correctly instead of raising KeyError.
@@ -289,6 +290,7 @@ def test_gui_rerun_saved_network_without_n_trials():
 
     assert isinstance(dpls, list)
     assert len(dpls) == 1
+
 
 def test_gui_upload_data():
     """Test if gui handles uploaded data"""
