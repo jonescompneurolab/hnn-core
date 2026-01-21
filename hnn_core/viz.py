@@ -227,6 +227,8 @@ def plot_laminar_lfp(
                 0, len(contact_labels) * voltage_offset, voltage_offset
             )
             ax.set_yticks(trace_ticks)
+
+            # Show all contact labels without skipping
             ax.set_yticklabels(contact_labels)
 
         if voltage_scalebar is None:
@@ -1857,7 +1859,7 @@ def plot_laminar_csd(
         times, new_depths, data, cmap=cmap, shading="auto", vmin=vmin, vmax=vmax
     )
     ax.set_xlabel("time (s)")
-    ax.set_ylabel("electrode depth")
+    ax.set_ylabel("electrode depth [µm]")
     if colorbar:
         color_axis = ax.inset_axes([1.05, 0, 0.02, 1], transform=ax.transAxes)
         plt.colorbar(im, ax=ax, cax=color_axis).set_label(r"$CSD (uV/um^{2})$")
