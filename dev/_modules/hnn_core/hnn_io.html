@@ -1012,11 +1012,15 @@
     <span class="n">mesh_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">net_data</span><span class="p">[</span><span class="s2">&quot;N_pyr_x&quot;</span><span class="p">],</span> <span class="n">net_data</span><span class="p">[</span><span class="s2">&quot;N_pyr_y&quot;</span><span class="p">])</span>
 
     <span class="c1"># Instantiating network</span>
-    <span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">mesh_shape</span><span class="o">=</span><span class="n">mesh_shape</span><span class="p">,</span> <span class="n">legacy_mode</span><span class="o">=</span><span class="n">net_data</span><span class="p">[</span><span class="s2">&quot;legacy_mode&quot;</span><span class="p">])</span>
+    <span class="n">net</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span>
+        <span class="n">params</span><span class="p">,</span>
+        <span class="n">mesh_shape</span><span class="o">=</span><span class="n">mesh_shape</span><span class="p">,</span>
+        <span class="n">legacy_mode</span><span class="o">=</span><span class="n">net_data</span><span class="p">[</span><span class="s2">&quot;legacy_mode&quot;</span><span class="p">],</span>
+        <span class="n">pos_dict</span><span class="o">=</span><span class="n">_read_pos_dict</span><span class="p">(</span><span class="n">net_data</span><span class="p">[</span><span class="s2">&quot;pos_dict&quot;</span><span class="p">]),</span>
+        <span class="n">cell_types</span><span class="o">=</span><span class="n">_read_cell_types</span><span class="p">(</span><span class="n">net_data</span><span class="p">[</span><span class="s2">&quot;cell_types&quot;</span><span class="p">]),</span>
+    <span class="p">)</span>
 
     <span class="c1"># Setting attributes</span>
-    <span class="c1"># Set cell types</span>
-    <span class="n">net</span><span class="o">.</span><span class="n">cell_types</span> <span class="o">=</span> <span class="n">_read_cell_types</span><span class="p">(</span><span class="n">net_data</span><span class="p">[</span><span class="s2">&quot;cell_types&quot;</span><span class="p">])</span>
     <span class="c1"># Set gid ranges</span>
     <span class="n">gid_ranges_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">net_data</span><span class="p">[</span><span class="s2">&quot;gid_ranges&quot;</span><span class="p">]:</span>
@@ -1024,8 +1028,6 @@
         <span class="n">stop</span> <span class="o">=</span> <span class="n">net_data</span><span class="p">[</span><span class="s2">&quot;gid_ranges&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;stop&quot;</span><span class="p">]</span>
         <span class="n">gid_ranges_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
     <span class="n">net</span><span class="o">.</span><span class="n">gid_ranges</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="n">gid_ranges_data</span><span class="p">)</span>
-    <span class="c1"># Set pos_dict</span>
-    <span class="n">net</span><span class="o">.</span><span class="n">pos_dict</span> <span class="o">=</span> <span class="n">_read_pos_dict</span><span class="p">(</span><span class="n">net_data</span><span class="p">[</span><span class="s2">&quot;pos_dict&quot;</span><span class="p">])</span>
     <span class="c1"># Set cell_response</span>
     <span class="n">net</span><span class="o">.</span><span class="n">cell_response</span> <span class="o">=</span> <span class="n">_read_cell_response</span><span class="p">(</span>
         <span class="n">net_data</span><span class="p">[</span><span class="s2">&quot;cell_response&quot;</span><span class="p">],</span> <span class="n">read_output</span><span class="o">=</span><span class="kc">False</span>
