@@ -192,7 +192,7 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
 
         if sec_name != "soma":
             sections[sec_name].mechs["ar"]["gbar_ar"] = partial(
-                _exp_g_at_dist, zero_val=1e-6, exp_term=3e-3, offset=0.0
+                _exp_g_at_dist, gbar_at_zero=1e-6, exp_term=3e-3, offset=0.0
             )
 
     cell_tree = {
@@ -303,23 +303,24 @@ def _get_mechanisms(p_all, cell_type, section_names, mechanisms):
     return mech_props
 
 
-def _exp_g_at_dist(x, zero_val, exp_term, offset):
+def _exp_g_at_dist(x, gbar_at_zero, exp_term, offset, slope=1):
     """Compute exponential distance-dependent ionic conductance.
 
     Parameters
     ----------
     x : float | int
         Distance from soma
-    zero_val : float | int
+    gbar_at_zero : float | int
         Value of function when x = 0
     exp_term : float | int
         Multiplier of x in the exponent
-    offset: float |int
+    offset : float | int
         Offset value added to output
-
+    slope : int | float, default=1
+        Slope of the exponential component
     """
-
-    return zero_val * np.exp(exp_term * x) + offset
+    gbar = gbar_at_zero * (slope * np.exp(exp_term * x) + offset)
+    return gbar
 
 
 def basket(cell_name, pos=(0, 0, 0), gid=None):
@@ -390,7 +391,9 @@ def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
         raise ValueError(f"Unknown pyramidal cell type: {cell_name}")
 
 
-def _linear_g_at_dist(x, gsoma, gdend, xkink):
+def _linear_g_at_dist(
+    x, gsoma, gdend, xkink, hotzone_factor=1, hotzone_boundaries=[0, 0]
+):
     """Compute linear distance-dependent ionic conductance.
 
     Parameters
@@ -403,13 +406,22 @@ def _linear_g_at_dist(x, gsoma, gdend, xkink):
         Dendritic conductance
     xkink : float | int
         Plateau value where conductance is fixed at gdend.
+    hotzone_factor: int | float, default=1
+        Increase in conducivity that creates a hotzone.
+    hotzone_boundaries : [float, float]
+        Start and end of hotzone if hotzone_factor > 1. Units are the same as that of
+        `x`.
 
     Notes
     -----
     Linearly scales conductance along dendrite.
     Returns gdend when x > xkink.
     """
-    return gsoma + np.min([xkink, x]) * (gdend - gsoma) / xkink
+    gbar = gsoma + np.min([xkink, x]) * (gdend - gsoma) / xkink
+    if hotzone_boundaries[0] < x < hotzone_boundaries[1]:
+        gbar *= hotzone_factor
+
+    return gbar
 
 
 def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
@@ -430,7 +442,7 @@ def pyramidal_ca(cell_name, pos, override_params=None, gid=None):
     )
     gbar_k = partial(
         _exp_g_at_dist,
-        zero_val=override_params["L5Pyr_soma_gkbar_hh2"],
+        gbar_at_zero=override_params["L5Pyr_soma_gkbar_hh2"],
         exp_term=-0.006,
         offset=1e-4,
     )
