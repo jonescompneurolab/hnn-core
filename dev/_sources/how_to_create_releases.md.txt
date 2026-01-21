@@ -224,7 +224,8 @@ python -c "from hnn_core import jones_2009_model, simulate_dipole ; simulate_dip
 ```
 pip install --extra-index-url https://test.pypi.org/simple/ "hnn-core"
 ```
-7. Finally, manually download a copy of your new package directly from <https://pypi.org/project/hnn-core/#files>, then save it somewhere like your Downloads.
+7. Now that the release is on PyPI, you need to test that our "cloud installs" at Google CoLab work too. In the "HNN" Google Drive folder, go to "CoLab" (you can also click here if you have permissions https://drive.google.com/drive/u/1/folders/1y4qOLnVaVMufESiYpm94GDnlttpYH0NE ), go to each of the notebooks, and run them to make sure the new version works. You will probably want to add a cell with `pip show hnn-core` to make sure it's using the latest version. After you verify they work, make sure to clean them up! These are the notebooks that users see!
+8. Finally, manually download a copy of your new package directly from <https://pypi.org/project/hnn-core/#files>, then save it somewhere like your Downloads.
 
 ## 8. More Github release steps
 
