@@ -83,39 +83,6 @@ def _get_basal(params, cell_type, section_names, v_init = {'all': -65}):
     return sections
 
 
-# In the new model, the basal dendrites are differently tuned from the apical dendrites.
-def _get_basal(params, cell_type, section_names, v_init = {'all': -65}):
-    """Convert a flat dictionary to a nested dictionary.
-
-    Returns
-    -------
-    sections : dict
-        Dictionary of sections. Keys are section names
-    """
-    prop_names = ['L', 'diam', 'Ra', 'cm']
-    sections = dict()
-    for section_name in section_names:
-        dend_prop = dict()
-        middle = section_name.replace('_', '')
-        for key in prop_names:
-            if key in ['Ra', 'cm']:
-                middle = 'basal'
-            else:
-                # map apicaltrunk -> apical_trunk etc.
-                middle = section_name.replace('_', '')
-            dend_prop[key] = params[f'{cell_type}_{middle}_{key}']
-            if len(v_init) == 1:
-                v = v_init['all']
-            else:
-                v = v_init[section_name]
-        sections[section_name] = Section(L=dend_prop['L'],
-                                         diam=dend_prop['diam'],
-                                         Ra=dend_prop['Ra'],
-                                         cm=dend_prop['cm'],
-                                         v = v)
-    return sections
-
-
 def _get_pyr_soma(p_all, cell_type, v_init = -65):
     """Get somatic properties."""
     return Section(
@@ -551,12 +518,6 @@ def pyramidal_l5ET(cell_name,pos=(0,0,0), gid=None):
     gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=2.78e-5/2*1., gdend=2.78e-5/2*12.0, xkink=1500, hotzone=[1500, 1700], hotzone_factor=4.5)
     gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=93.5e-6/2, gdend=93.5e-6/2*2.25, xkink=1500, hotzone=[1500, 1700], hotzone_factor=2.25)
     gbar_Ih = partial(_exp_g_at_dist, zero_val=p_all['L5Pyr_dend_gbar_Ih'],exp_term = 1./323, slope=2.087, offset=-.8696)
-    gbar_pas = partial(_increase_step, gbar=p_all['L5Pyr_dend_g_pas'], xkink = 1500, factor=1.2)
-
-    # basal dendrites
-    gbar_NaTs2_t = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_basal_gbar_NaTs2_t'], gdend=0, xkink=255)
-    gbar_SKv3_1 = partial(_linear_g_at_dist, gsoma=0, gdend=p_all['L5Pyr_basal_gbar_SKv3_1'], xkink=255)
-
 
     # basal dendrites
     gbar_NaTs2_t = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_basal_gbar_NaTs2_t'], gdend=0, xkink=255)

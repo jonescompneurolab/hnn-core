@@ -1,4 +1,4 @@
-n"""Network class."""
+"""Network class."""
 
 # Authors: Mainak Jas <mjas@mgh.harvard.edu>
 #          Sam Neymotin <samnemo@gmail.com>

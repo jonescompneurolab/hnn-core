@@ -203,6 +203,8 @@ class Section:
         axial resistivity in ohm-cm.
     v : float
         start value for membrane potential.
+    v : float
+        start value for membrane potential.
     nseg : int
         Number of segments in the section
     """

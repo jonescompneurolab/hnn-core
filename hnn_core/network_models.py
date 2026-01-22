@@ -11,8 +11,6 @@ from .cells_default import basket, pyramidal, pyramidal_ca, pyramidal_l5ET, pyra
 from .externals.mne import _validate_type
 
 import random
-# ToDO -> direct _cell_L2Pyr calling
-
 
 def jones_2009_model(
     params=None,
