@@ -694,6 +694,8 @@ def pyramidal_l23(cell_name,pos=(0,0,0), gid=None):
             'basal_3': [[-50, 0, 715], [56, 0, 609]],
         }
 
+    
+
     cell_tree = {
     ('apical_trunk', 0): [('apical_trunk', 1)],
     ('apical_1', 0): [('apical_1', 1)],
