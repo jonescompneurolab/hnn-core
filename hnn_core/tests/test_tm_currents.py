@@ -11,6 +11,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+from IPython.core.getipython import get_ipython
 from matplotlib.lines import Line2D
 
 from hnn_core import (
@@ -21,6 +22,8 @@ from hnn_core import (
 from hnn_core.cells_default import pyramidal
 from hnn_core.network_builder import load_custom_mechanisms
 from hnn_core.network_models import add_erp_drives_to_jones_model
+
+# pyright: reportOptionalMemberAccess=false
 
 # %% [markdown] ###########################################################
 ## Simulation
@@ -488,7 +491,7 @@ def extract_diameters(
     cell_params,
 ):
     """
-    Helper to map section names to their corresponding diameters as specified in
+    helper to map section names to their corresponding diameters from
     params_default.py
     """
     extracted = {}
@@ -515,13 +518,14 @@ def extract_diameters(
     return extracted
 
 
-def calculate_flat_neuron_geometry(
+
+def calculate_neuron_geometry(
     end_pts,
     gap=0,
     x_offsets=None,
 ):
     """
-    helper to calculate the vertical and horizontal shifts for each cell section
+    calculate the 3D geometry
     """
     # handle horizontal offsets
     x_offs = (
@@ -532,7 +536,7 @@ def calculate_flat_neuron_geometry(
             for k in end_pts.keys()  # noqa: E203,W503
         }
     )
-    y_shift = {k: 0 for k in end_pts.keys()}
+    z_shift = {k: 0 for k in end_pts.keys()}
 
     # handle vertical offsets ("gap")
 
@@ -552,9 +556,10 @@ def calculate_flat_neuron_geometry(
         child_section_start = end_pts[child_section][0]
 
         # set shift for basal_1, which shoud move in the negative direction along
-        # the Z axis
+        # the z axis
         if child_section != "soma" and child_section_start == end_pts["soma"][0]:
-            y_shift[child_section] = -gap
+            # the vertical offset for basal 2/3 should be negative
+            z_shift[child_section] = -gap
 
         # as we move out from the soma, inherit the gap from the parent section
         for parent_section in end_pts.keys():
@@ -564,21 +569,20 @@ def calculate_flat_neuron_geometry(
                 # this keeps it in line with apical_trunk, while allowing apical_1
                 # to move higher
                 if "oblique" in child_section:
-                    y_shift[child_section] = y_shift[parent_section]
+                    z_shift[child_section] = z_shift[parent_section]
                 else:
                     current_gap = -gap if "basal" in child_section else gap
-                    y_shift[child_section] = y_shift[parent_section] + current_gap
+                    z_shift[child_section] = z_shift[parent_section] + current_gap
                 break
 
-    # generate the final shifted coordinates
     shifted_coords = {}
     for section, coords in end_pts.items():
         dx = x_offs.get(section, 0)
-        dy = y_shift.get(section, 0)
-
+        dz = z_shift.get(section, 0)
         shifted_coords[section] = {
             "x": [coords[0][0] + dx, coords[1][0] + dx],
-            "y": [coords[0][2] + dy, coords[1][2] + dy],
+            "y": [coords[0][1], coords[1][1]],
+            "z": [coords[0][2] + dz, coords[1][2] + dz],
         }
 
     return shifted_coords
@@ -621,7 +625,7 @@ def draw_neuron_on_axis(
         # "butt" capstyle ensures sections to not overlab
         ax.plot(
             coords["x"],
-            coords["y"],
+            coords["z"],
             color=color,
             linewidth=width,
             solid_capstyle="butt",
@@ -645,10 +649,21 @@ def plot_flat_neuron(
         defaults,
     )
 
-    # helper 1: geometry engine
-    coords = calculate_flat_neuron_geometry(
-        end_pts=end_pts, gap=gap, x_offsets=x_offsets
+    # get full 3D geometry
+    full_coords = calculate_neuron_geometry(
+        end_pts=end_pts,
+        gap=gap,
+        x_offsets=x_offsets,
     )
+
+    # get 2D geometry used for plotting from the 3D geometry
+    # note that "z" is the vertical component
+    coords = {}
+    for name, c in full_coords.items():
+        coords[name] = {
+            "x": c["x"],
+            "z": c["z"],
+        }
 
     # if no axis is provided, create a new figure
     if ax is None:
@@ -668,7 +683,8 @@ def plot_flat_neuron(
     # handle labels and legend
     for name, seg_coords in coords.items():
         x = seg_coords["x"]
-        y = seg_coords["y"]
+        # renaming the vertical component "z" to "y" since we're in 2D
+        y = seg_coords["z"]
         color = colors.get(name, "b") if colors else "b"
 
         # use uniform line thickness in the legend
@@ -1836,6 +1852,315 @@ def check_rmse_and_residuals(
 
 
 check_rmse_and_residuals(net)
+
+# %% [markdown] ###########################################################
+## [DEV] 3D Visualization
+# %% ######################################################################
+def draw_neuron_3d(
+    ax,
+    shifted_coords,
+    diameters,
+    colors=None,
+    width_scale=1.0,
+    shade=True,
+):
+    """
+    draw the neuron in 3D using smoothed cylindrical surfaces
+    """
+    # number of "planes" used to form each cylinder
+    # increase for a smoother object
+    resolution = 25
+
+    # iterate through segments
+    for name, coords in shifted_coords.items():
+        # define start and end vectors for the current segment
+        start_pt = np.array(
+            [
+                coords["x"][0],
+                coords["y"][0],
+                coords["z"][0],
+            ]
+        )
+        end_pt = np.array(
+            [
+                coords["x"][1],
+                coords["y"][1],
+                coords["z"][1],
+            ]
+        )
+
+        # get the segment vector (directional) and its length (magnitude only)
+        branch_vec = end_pt - start_pt
+        length = np.linalg.norm(branch_vec)
+
+        # failsafe to skip segments with no length
+        if length == 0:
+            continue
+
+        # get the cylinder radius
+        radius = (diameters[name] / 2.0) * width_scale
+
+        # define the cylinder's longitudinal profile (z) and its thickness (r)
+        #  - for z_steps, we start at the base, then stay at base for drawing the
+        #    "cap", we move to length, then stay at the length for drawing the "cap"
+        #  - for r_steps, we start at center, then expand to radius, we stay at radius
+        #    while we move to length, then return to the center to create the cap
+        z_steps = np.array([0, 0, length, length])
+        r_steps = np.array([0, radius, radius, 0])
+
+        # get the angles around the circle for rotation (i.e., 0 to 360 degrees)
+        theta = np.linspace(0, 2 * np.pi, resolution)
+
+        # generate coordinates for the cylinder circumference
+        theta_grid, z_idx = np.meshgrid(theta, np.arange(len(z_steps)))
+
+        # store the radius for every point on the cylinder surface
+        r_grid = r_steps[z_idx]
+
+        # transform r_grid into 3D coordinates
+        x_circle = r_grid * np.cos(theta_grid)
+        y_circle = r_grid * np.sin(theta_grid)
+
+        # store the height for every point on the cylinder surface
+        # does not requite 3D coordinates
+        z_grid = z_steps[z_idx]
+
+        # we need to normalize the segment vector by dividing it by its own length
+        # this gives us the "pure" direction, which we will use to build our rotation
+        # vectors (side_vec and up_vec)
+        # if we used the un-normalized vector, the rotation math would scale the
+        # cylinder's thickness or stretch the mesh in weird ways
+        direction = branch_vec / length
+
+        # rotate and translate the cylinder to match the segment vector
+        if np.allclose(direction, [0, 0, 1]) or np.allclose(direction, [0, 0, -1]):
+            # handle segments already aligned with the z-axis where no rotation
+            # is needed
+            x_final = start_pt[0] + x_circle
+            y_final = start_pt[1] + y_circle
+            z_final = start_pt[2] + (z_grid if direction[2] > 0 else -z_grid)
+        else:
+            # when rotation is needed, find a "side" vector perpendicular to the branch
+            ref_vec = (
+                np.array([1, 0, 0]) if abs(direction[0]) < 0.9 else np.array([0, 1, 0])
+            )
+            side_vec = np.cross(ref_vec, direction)
+            side_vec /= np.linalg.norm(side_vec)
+
+            # find an "up" vector perpendicular to both the branch and the side
+            up_vec = np.cross(direction, side_vec)
+
+            # transform raw coordinates into the new 3D basis oriented from the
+            # start_pt toward the end_pt
+            x_final = (
+                start_pt[0]
+                + direction[0] * z_grid
+                + side_vec[0] * x_circle
+                + up_vec[0] * y_circle
+            )
+            y_final = (
+                start_pt[1]
+                + direction[1] * z_grid
+                + side_vec[1] * x_circle
+                + up_vec[1] * y_circle
+            )
+            z_final = (
+                start_pt[2]
+                + direction[2] * z_grid
+                + side_vec[2] * x_circle
+                + up_vec[2] * y_circle
+            )
+
+        color = colors.get(name, "b") if colors else "b"
+        ax.plot_surface(
+            x_final,
+            y_final,
+            z_final,
+            color=color,
+            linewidth=0,
+            antialiased=False,
+            shade=shade,
+            alpha=1.0,
+        )
+
+
+def plot_3d_neuron(
+    end_pts,
+    defaults,
+    x_offsets=None,
+    gap=0,
+    colors=None,
+    shade=True,
+    figsize=(10, 10),
+    width_scale=1.0,
+    ax=None,
+    show_labels=True,
+    show_section_labels=False,
+):
+    diameters = extract_diameters(
+        end_pts.keys(),
+        defaults,
+    )
+
+    coords = calculate_neuron_geometry(
+        end_pts=end_pts,
+        gap=gap,
+        x_offsets=x_offsets,
+    )
+
+    if ax is None:
+        fig = plt.figure(
+            figsize=figsize,
+        )
+        ax = fig.add_subplot(
+            111,
+            projection="3d",
+        )
+
+    draw_neuron_3d(
+        ax=ax,
+        shifted_coords=coords,
+        diameters=diameters,
+        colors=colors,
+        width_scale=width_scale,
+        shade=shade,
+    )
+
+    # handle legend / labels
+    legend_elements = []
+    for name, seg_coords in coords.items():
+        color = (
+            colors.get(
+                name,
+                "b",
+            )
+            if colors
+            else "b"
+        )
+
+        # optionally add section labels in the 3D space
+        if show_section_labels:
+            ax.text(
+                seg_coords["x"][1],
+                seg_coords["y"][1],
+                seg_coords["z"][1],
+                name,
+                fontsize=8,
+            )
+
+        if colors and name in colors:
+            legend_elements.append(
+                Line2D(
+                    [0],
+                    [0],
+                    color=color,
+                    lw=2,
+                    label=name,
+                ),
+            )
+
+    # force equal axis scaling to prevent neurons from looking stretched
+    # ------------------------------
+    # matplotlib stretches whatever ranges we give it to fill a square area in 3d
+    # space. so we need to ensure that the "span" is the same for each axis,
+    # otherwise axes may be stretched to fill the cube, distorting the shapes
+
+    # get the ranges
+    x_lim = ax.get_xlim3d()
+    y_lim = ax.get_ylim3d()
+    z_lim = ax.get_zlim3d()
+
+    # get the widest range, divide by two since we'll center around the midpoint
+    half_max_range = (
+        max(
+            np.diff(x_lim),
+            np.diff(y_lim),
+            np.diff(z_lim),
+        )[0]
+        / 2.0
+    )
+
+    # get the midpoint for each range for centering
+    mid_x = np.median(x_lim)
+    mid_y = np.median(y_lim)
+    mid_z = np.median(z_lim)
+
+    # center around the midpoint using half of the maximum range
+    ax.set_xlim3d(mid_x - half_max_range, mid_x + half_max_range)
+    ax.set_ylim3d(mid_y - half_max_range, mid_y + half_max_range)
+    ax.set_zlim3d(mid_z - half_max_range, mid_z + half_max_range)
+
+    ax.set_xlabel("x (µm)")
+    ax.set_ylabel("y (µm)")
+    ax.set_zlabel("z (µm)")
+    ax.set_box_aspect((1, 1, 1))
+
+    # adjust style of the grid
+    ax.xaxis._axinfo["grid"]["linewidth"] = 0.5
+    ax.yaxis._axinfo["grid"]["linewidth"] = 0.5
+    ax.zaxis._axinfo["grid"]["linewidth"] = 0.5
+    ax.xaxis._axinfo["grid"]["color"] = (0.5, 0.5, 0.5, 0.1)
+    ax.yaxis._axinfo["grid"]["color"] = (0.5, 0.5, 0.5, 0.1)
+    ax.zaxis._axinfo["grid"]["color"] = (0.5, 0.5, 0.5, 0.1)
+
+    if colors and show_labels:
+        unique_handles = []
+        seen = set()
+        for h in legend_elements:
+            if h.get_label() not in seen:
+                unique_handles.append(h)
+                seen.add(h.get_label())
+        ax.legend(
+            handles=unique_handles,
+            loc="upper left",
+            fontsize=8,
+        )
+
+    return ax
+
+
+# %%
+get_ipython().run_line_magic("matplotlib", "tk")
+
+add_gap = False
+
+if add_gap:
+    gap = 20
+    x_offsets = {
+        "apical_oblique": -20,
+        "apical_1": 0,
+        "apical_2": 0,
+        "apical_tuft": 0,
+        "basal_2": -20,
+        "basal_3": 20,
+    }
+else:
+    gap = 0
+    x_offsets = {
+        "apical_oblique": 0,
+        "apical_1": 0,
+        "apical_2": 0,
+        "apical_tuft": 0,
+        "basal_2": 0,
+        "basal_3": 0,
+    }
+
+ax_main = plot_3d_neuron(
+    end_pts,
+    defaults,
+    x_offsets=x_offsets,
+    gap=gap,
+    colors=distinct_colors,
+    shade=True,
+    width_scale=2,
+    show_section_labels=False,
+)
+
+plt.show()
+
+# %%
+# reset to inline
+get_ipython().run_line_magic("matplotlib", "inline")
 
 
 # %% [markdown] ----------------------------------------
