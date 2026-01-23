@@ -518,7 +518,6 @@ def extract_diameters(
     return extracted
 
 
-
 def calculate_neuron_geometry(
     end_pts,
     gap=0,
@@ -733,9 +732,7 @@ celltype_sections = list(
 
 # reduce _params down to current cell_type only
 default_cell_keymatches = [
-    key
-    for key in list(net._params.keys())
-    if default_cell_searchkey in key
+    key for key in list(net._params.keys()) if default_cell_searchkey in key
 ]
 
 defaults = {
@@ -1019,6 +1016,7 @@ plot_single_channel_by_section_celltype(
 )
 
 # %%
+
 
 def plot_channels_by_single_section(
     channel_section_data,
@@ -1554,6 +1552,7 @@ plot_distinct_channels_by_section_celltype(
 ### Recreating dipole for the soma only
 # %% ---------------------------------------------------
 
+
 def postproc_soma_dipole(
     net,
     trial=0,
@@ -1698,6 +1697,7 @@ def postproc_soma_dipole(
 
     return dipole
 
+
 fig, ax = plt.subplots(
     nrows=2,
     ncols=1,
@@ -1730,6 +1730,7 @@ ax[0].set_ylim(-200, 100)
 ax[1].set_ylim(-200, 100)
 
 # %%
+
 
 def check_rmse_and_residuals(
     net,
@@ -1806,14 +1807,14 @@ def check_rmse_and_residuals(
     )
 
     ax[0].set_title(
-        f"Computed Dipole Comparison for {cell_type.replace("_", " ").title()} Soma",
+        f"Computed Dipole Comparison for {cell_type.replace('_', ' ').title()} Soma",
     )
     ax[0].set_ylabel("nAm")
     ax[0].grid(True, alpha=0.3)
     ax[0].legend(loc="upper right")
 
     ymin, ymax = ax[0].get_ylim()
-    ylim = (max(abs(ymin), abs(ymax)))*1.05
+    ylim = (max(abs(ymin), abs(ymax))) * 1.05
     ax[0].set_ylim(-ylim, ylim)
 
     # residual dipole plot
@@ -1839,7 +1840,7 @@ def check_rmse_and_residuals(
         label="(i_mem - reconstructed), zoomed",
     )
     ymin, ymax = rightax.get_ylim()
-    ylim = (max(abs(ymin), abs(ymax)))
+    ylim = max(abs(ymin), abs(ymax))
     rightax.set_ylim(-ylim, ylim)
 
     lines1, labels1 = ax[1].get_legend_handles_labels()
@@ -1852,6 +1853,7 @@ def check_rmse_and_residuals(
 
 
 check_rmse_and_residuals(net)
+
 
 # %% [markdown] ###########################################################
 ## [DEV] 3D Visualization
