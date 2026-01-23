@@ -19,7 +19,7 @@ INDEPENDENT {t FROM 0 TO 1 WITH 1 (ms)}
 NEURON {
     SUFFIX ca
     USEION ca READ eca WRITE ica
-    RANGE m, h, gca, gbar
+    RANGE m, h, gca, gbar, ica
     RANGE minf, hinf, mtau, htau
     GLOBAL q10, temp, tadj, vmin, vmax, vshift, tshift
 }

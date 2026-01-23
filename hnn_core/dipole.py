@@ -23,6 +23,20 @@ def simulate_dipole(
     record_vsec=False,
     record_isec=False,
     record_ca=False,
+    # [new]
+    record_agg_i_mem=False,
+    record_agg_ina=False,
+    record_agg_ik=False,
+    record_agg_i_cap=False,
+    record_ina_hh2=False,
+    record_ik_hh2=False,
+    record_ik_kca=False,
+    record_ik_km=False,
+    record_ica_ca=False,
+    record_ica_cat=False,
+    record_il_hh2=False,
+    record_i_ar=False,
+    # [end new]
     postproc=False,
 ):
     """Simulate a dipole given the experiment parameters.
@@ -103,16 +117,49 @@ def simulate_dipole(
     net._reset_rec_arrays()
 
     _check_option("record_vsec", record_vsec, ["all", "soma", False])
-
     net._params["record_vsec"] = record_vsec
 
     _check_option("record_isec", record_isec, ["all", "soma", False])
-
     net._params["record_isec"] = record_isec
 
     _check_option("record_ca", record_ca, ["all", "soma", False])
-
     net._params["record_ca"] = record_ca
+
+    _check_option("record_agg_i_mem", record_agg_i_mem, ["all", "soma", False])
+    net._params["record_agg_i_mem"] = record_agg_i_mem
+
+    _check_option("record_agg_ina", record_agg_ina, ["all", "soma", False])
+    net._params["record_agg_ina"] = record_agg_ina
+
+    _check_option("record_agg_ik", record_agg_ik, ["all", "soma", False])
+    net._params["record_agg_ik"] = record_agg_ik
+
+    _check_option("record_agg_i_cap", record_agg_i_cap, ["all", "soma", False])
+    net._params["record_agg_i_cap"] = record_agg_i_cap
+
+    _check_option("record_ina_hh2", record_ina_hh2, ["all", "soma", False])
+    net._params["record_ina_hh2"] = record_ina_hh2
+
+    _check_option("record_ik_hh2", record_ik_hh2, ["all", "soma", False])
+    net._params["record_ik_hh2"] = record_ik_hh2
+
+    _check_option("record_ik_kca", record_ik_kca, ["all", "soma", False])
+    net._params["record_ik_kca"] = record_ik_kca
+
+    _check_option("record_ik_km", record_ik_km, ["all", "soma", False])
+    net._params["record_ik_km"] = record_ik_km
+
+    _check_option("record_ica_ca", record_ica_ca, ["all", "soma", False])
+    net._params["record_ica_ca"] = record_ica_ca
+
+    _check_option("record_ica_cat", record_ica_cat, ["all", "soma", False])
+    net._params["record_ica_cat"] = record_ica_cat
+
+    _check_option("record_il_hh2", record_il_hh2, ["all", "soma", False])
+    net._params["record_il_hh2"] = record_il_hh2
+
+    _check_option("record_i_ar", record_i_ar, ["all", "soma", False])
+    net._params["record_i_ar"] = record_i_ar
 
     net._tstop = tstop
 

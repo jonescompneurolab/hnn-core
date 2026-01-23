@@ -134,6 +134,20 @@ def get_params_default(nprox=2, ndist=1):
         "record_vsec": 0,  # whether to record voltages
         "record_isec": 0,  # whether to record currents
         "record_ca": 0,  # whether to record calcium concentration
+        # [new]
+        "record_agg_i_mem": 0,  # whether to record total currents
+        "record_agg_ina": 0,  # whether to record aggregate sodium currents
+        "record_agg_ik": 0,  # whether to record aggregate potassium currents
+        "record_agg_i_cap": 0,  # whether to record aggregate capacitive currents
+        "record_ina_hh2": 0,  # whether to record hh2 sodium currents
+        "record_ik_hh2": 0,  # whether to record hh2 potassium currents
+        "record_ik_kca": 0,  # whether to record kca potassium currents
+        "record_ik_km": 0,  # whether to record km potassium currents
+        "record_ica_ca": 0,  # whether to record ica calcium currents
+        "record_ica_cat": 0,  # whether to record cat calcium currents
+        "record_il_hh2": 0,  # whether to record hh2 leak currents currents
+        "record_i_ar": 0,  # whether to record anomalous rectifier currents
+        # [end new]
         # numerics
         # N_trials of 1 means that seed is set by rank
         "N_trials": 1,
