@@ -70,7 +70,7 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
     def simulation_time():
         print(f"Trial {trial_idx + 1}: {round(h.t, 2)} ms...")
 
-    if rank == 0:
+    if rank == 0 and net._verbose:
         for tt in range(0, int(h.tstop), 10):
             _CVODE.event(tt, simulation_time)
 
@@ -177,7 +177,7 @@ def _is_loaded_mechanisms():
         return True
 
 
-def load_custom_mechanisms():
+def load_custom_mechanisms(verbose):
     if _is_loaded_mechanisms():
         return
 
@@ -194,7 +194,8 @@ def load_custom_mechanisms():
         raise FileNotFoundError(f"No .so or .dll file found in {mod_dir}")
 
     h.nrn_load_dll(mech_fname[0])
-    print("Loading custom mechanism files from %s" % mech_fname[0])
+    if verbose:
+        print("Loading custom mechanism files from %s" % mech_fname[0])
     if not _is_loaded_mechanisms():
         raise ValueError("The custom mechanisms could not be loaded")
 
@@ -348,9 +349,9 @@ class NetworkBuilder(object):
         self._rank = _get_rank()
 
         # load mechanisms needs ParallelContext for get_rank
-        load_custom_mechanisms()
+        load_custom_mechanisms(self.net._verbose)
 
-        if self._rank == 0:
+        if self._rank == 0 and self.net._verbose:
             print("Building the NEURON model")
 
         self._clear_last_network_objects()
@@ -387,7 +388,7 @@ class NetworkBuilder(object):
         if len(self.net.rec_arrays) > 0:
             self._record_extracellular()
 
-        if self._rank == 0:
+        if self._rank == 0 and self.net._verbose:
             print("[Done]")
 
     def _gid_assign(self, rank=None, n_hosts=None):

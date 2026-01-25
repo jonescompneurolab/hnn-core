@@ -24,6 +24,7 @@ def simulate_dipole(
     record_isec=False,
     record_ca=False,
     postproc=False,
+    verbose=True
 ):
     """Simulate a dipole given the experiment parameters.
 
@@ -56,6 +57,8 @@ def simulate_dipole(
         extracellular recordings etc. The preferred way is to use the
         :meth:`~hnn_core.dipole.Dipole.smooth` and
         :meth:`~hnn_core.dipole.Dipole.scale` methods instead. Default: False.
+    verbose : bool
+        If True, print simulation time outputs. Default: True.
 
     Returns
     -------
@@ -67,6 +70,8 @@ def simulate_dipole(
 
     if _BACKEND is None:
         _BACKEND = JoblibBackend(n_jobs=1)
+
+    net._verbose = verbose
 
     if n_trials is None:
         n_trials = net._params["N_trials"]
@@ -330,6 +335,74 @@ def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
         dpl2 = signal.resample(dpl2, sim_length)
 
     return np.sqrt((weights * ((dpl1 - dpl2) ** 2)).sum() / weights.sum())
+
+
+def _corr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
+    """Calculates Correlation between data in dpl and exp_dpl
+    Parameters
+    ----------
+    dpl : instance of Dipole
+        A dipole object with simulated data
+    exp_dpl : instance of Dipole
+        A dipole object with experimental data
+    tstart : None | float
+        Time at beginning of range over which to calculate RMSE
+    tstop : None | float
+        Time at end of range over which to calculate RMSE
+    weights : None | array
+        An array of weights to be applied to each point in
+        simulated dpl. Must have length >= dpl.data
+        If None, weights will be replaced with 1's for typical RMSE
+        calculation.
+
+    Returns
+    -------
+    err : float
+        Weighted RMSE between data in dpl and exp_dpl
+    """
+    from scipy import signal
+
+    exp_times = exp_dpl.times
+    sim_times = dpl.times
+
+    # do tstart and tstop fall within both datasets?
+    # if not, use the closest data point as the new tstop/tstart
+    for tseries in [exp_times, sim_times]:
+        if tstart < tseries[0]:
+            tstart = tseries[0]
+        if tstop > tseries[-1]:
+            tstop = tseries[-1]
+
+    # make sure start and end times are valid for both dipoles
+    exp_start_index = (np.abs(exp_times - tstart)).argmin()
+    exp_end_index = (np.abs(exp_times - tstop)).argmin()
+    exp_length = exp_end_index - exp_start_index
+
+    sim_start_index = (np.abs(sim_times - tstart)).argmin()
+    sim_end_index = (np.abs(sim_times - tstop)).argmin()
+    sim_length = sim_end_index - sim_start_index
+
+    if weights is None:
+        # weighted RMSE with weights of all 1's is equivalent to
+        # normal RMSE
+        weights = np.ones(len(sim_times[0:sim_end_index]))
+    weights = weights[sim_start_index:sim_end_index]
+
+    dpl1 = dpl.data["agg"][sim_start_index:sim_end_index]
+    dpl2 = exp_dpl.data["agg"][exp_start_index:exp_end_index]
+
+    if sim_length > exp_length:
+        # downsample simulation timeseries to match exp data
+        dpl1 = signal.resample(dpl1, exp_length)
+        weights = signal.resample(weights, exp_length)
+        indices = np.where(weights < 1e-4)
+        weights[indices] = 0
+    elif sim_length < exp_length:
+        # downsample exp timeseries to match simulation data
+        dpl2 = signal.resample(dpl2, sim_length)
+
+    obj = (-1 * np.corrcoef(dpl1 * weights, dpl2 * weights)[0, 1]) + 1 # transform so that 0 is a perfect fit
+    return obj
 
 
 class Dipole(object):

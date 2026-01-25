@@ -460,6 +460,10 @@ class Network:
 
         # XXX this can be removed once tests are made independent of HNN GUI
         # creates nc_dict-entries for ALL cell types
+
+        # Used to determine if simulation time is printed when simulating this network
+        self._verbose = True
+
         self._legacy_mode = legacy_mode
         if self._legacy_mode:
             warnings.warn(

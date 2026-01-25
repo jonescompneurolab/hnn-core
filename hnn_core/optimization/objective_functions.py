@@ -5,9 +5,10 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
+import numpy as np
 from hnn_core import simulate_dipole
-from ..dipole import _rmse, average_dipoles
-
+from ..dipole import _rmse, _corr, average_dipoles
+from ..batch_simulate import BatchSimulate
 
 def _rmse_evoked(
     initial_net,
@@ -156,5 +157,85 @@ def _maximize_psd(
     obj = -sum(f_bands_psds) / sum(psd_simulated)
 
     obj_values.append(obj)
+
+    return obj
+
+def _corr_evoked(
+    initial_net,
+    initial_params,
+    set_params,
+    predicted_params,
+    update_params,
+    obj_values,
+    tstop,
+    obj_fun_kwargs,
+):
+    """The objective function for evoked responses.
+
+    Parameters
+    ----------
+    initial_net : instance of Network
+        The network object.
+    initial_params : dict
+        Keys are parameter names, values are initial parameters.
+    set_params : func
+        User-defined function that sets network drives and parameters.
+    predicted_params : list
+        Parameters selected by the optimizer.
+    update_params : func
+        Function to update params.
+    tstop : float
+        The simulated dipole's duration.
+    target : instance of Dipole
+        A dipole object with experimental data.
+    n_trials : int
+        Number of trials to simulate and average.
+
+    Returns
+    -------
+    obj : float
+        Normalized RMSE between recorded and simulated dipole.
+    """
+
+    # params = update_params(initial_params, predicted_params)
+    predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
+    print(predicted_params.shape)
+    params_batch = {name: predicted_params[:, idx] for idx, name in enumerate(initial_params.keys())}
+
+    # simulate dpl with predicted params
+    new_net = initial_net.copy()
+
+    set_params_batch = lambda a,b: set_params(b, a) # need to fix this
+    batch_simulation = BatchSimulate(net=new_net,
+                                    set_params=set_params_batch,
+                                    save_outputs=False,
+                                    save_dpl=True,
+                                    tstop=tstop,
+                                    dt=0.5,
+                                    overwrite=False,
+                                    clear_cache=False,
+                                    verbose=0)
+
+    res = batch_simulation.run(params_batch,
+                            n_jobs=50,
+                            combinations=False,
+                            backend='loky',
+                            verbose=0)
+ 
+    dpls = list()
+    for batch_res in res['simulated_data']:
+        for data in batch_res:
+            dpls.append(data['dpl'][0])
+
+    # smooth & scale
+    if "scale_factor" in obj_fun_kwargs:
+        [dpl.scale(obj_fun_kwargs["scale_factor"]) for dpl in dpls]
+    if "smooth_window_len" in obj_fun_kwargs:
+        [dpl.smooth(obj_fun_kwargs["smooth_window_len"]) for dpl in dpls]
+
+    obj = [_corr(dpl, obj_fun_kwargs["target"], tstop=tstop) for dpl in dpls]
+    obj_values.append(obj)
+
+    print(f'Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}')
 
     return obj
