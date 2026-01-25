@@ -71,7 +71,7 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
         if net._verbose:
             print(f"Trial {trial_idx + 1}: {round(h.t, 2)} ms...")
 
-    if rank == 0:
+    if rank == 0 and net._verbose:
         for tt in range(0, int(h.tstop), 10):
             _CVODE.event(tt, simulation_time)
 
