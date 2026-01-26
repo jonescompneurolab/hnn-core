@@ -560,10 +560,11 @@ class JoblibBackend(object):
             The Dipole results from each simulation trial
         """
 
-        print(
-            f"Joblib will run {n_trials} trial(s) in parallel by "
-            f"distributing trials over {self.n_jobs} jobs."
-        )
+        if net._verbose:
+            print(
+                f"Joblib will run {n_trials} trial(s) in parallel by "
+                f"distributing trials over {self.n_jobs} jobs."
+            )
         parallel, myfunc = self._parallel_func(_simulate_single_trial)
         sim_data = parallel(
             myfunc(net, tstop, dt, trial_idx) for trial_idx in range(n_trials)
