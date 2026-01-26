@@ -18,5 +18,7 @@ from .hnn_io import (
     read_network_configuration,
     write_network_configuration,
 )
+from .batch_simulate import BatchSimulate
+
 
 __version__ = "0.5.1.dev0"
