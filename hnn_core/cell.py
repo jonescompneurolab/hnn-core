@@ -180,7 +180,9 @@ class Section:
         membrane capacitance in micro-Farads.
     Ra : float
         axial resistivity in ohm-cm
-    end_pts : list of [x, y, z]
+    v0 : float
+        start value for membrane potential in millivolts.
+    end_pts : list of [x, y, z], optional
         The start and stop points of the section.
 
     Attributes
@@ -201,15 +203,18 @@ class Section:
         membrane capacitance in micro-Farads.
     Ra : float
         axial resistivity in ohm-cm.
+    v0 : float
+        Initial value for membrane potential in millivolts.
     nseg : int
         Number of segments in the section
     """
 
-    def __init__(self, L, diam, Ra, cm, end_pts=None):
+    def __init__(self, L, diam, Ra, cm, v0=-65, end_pts=None):
         self._L = L
         self._diam = diam
         self._Ra = Ra
         self._cm = cm
+        self._v0 = v0
         if end_pts is None:
             end_pts = list()
         self._end_pts = end_pts
@@ -221,7 +226,7 @@ class Section:
         self.nseg = _get_nseg(self.L)
 
     def __repr__(self):
-        return f"L={self.L}, diam={self.diam}, cm={self.cm}, Ra={self.Ra}"
+        return f"L={self.L}, diam={self.diam}, cm={self.cm}, Ra={self.Ra}, v0={self.v0}"
 
     def __eq__(self, other):
         if not isinstance(other, Section):
@@ -266,6 +271,7 @@ class Section:
         section_data["Ra"] = self.Ra
         section_data["end_pts"] = self.end_pts
         section_data["nseg"] = self.nseg
+        section_data["v0"] = self.v0
         # Need to solve the partial function problem
         # in mechs
         section_data["mechs"] = self.mechs
@@ -287,6 +293,10 @@ class Section:
     @property
     def Ra(self):
         return self._Ra
+
+    @property
+    def v0(self):
+        return self._v0
 
     @property
     def end_pts(self):
@@ -574,6 +584,9 @@ class Cell:
             sec = self._nrn_sections[sec_name]
             for mech_name, p_mech in section.mechs.items():
                 sec.insert(mech_name)
+                # This is one of the two places where we are actually applying our
+                # initial voltage
+                setattr(sec, "v", section.v0)
                 for attr, val in p_mech.items():
                     if isinstance(val, list):
                         seg_xs, seg_vals = val[0], val[1]
@@ -642,6 +655,9 @@ class Cell:
             sec.Ra = sections[sec_name].Ra
             sec.cm = sections[sec_name].cm
             sec.nseg = sections[sec_name].nseg
+            # This is one of the two places where we are actually applying our initial
+            # voltage
+            sec.v = sections[sec_name].v0
 
         if cell_tree is None:
             cell_tree = dict()
@@ -1062,7 +1078,7 @@ class Cell:
         # of sections.
         self.define_shape(("soma", 0))
 
-    def modify_section(self, sec_name, L=None, diam=None, cm=None, Ra=None):
+    def modify_section(self, sec_name, L=None, diam=None, cm=None, Ra=None, v0=None):
         """Change attributes of section specified by `sec_name`
 
         Parameters
@@ -1077,6 +1093,8 @@ class Cell:
             membrane capacitance in micro-Farads.
         Ra : float | int | None
             axial resistivity in ohm-cm.
+        v0 : float | int | None
+            start value for membrane potential in millivolts.
 
         Notes
         -----
@@ -1100,5 +1118,9 @@ class Cell:
         if Ra is not None:
             _validate_type(Ra, (float, int), "Ra")
             self.sections[sec_name]._Ra = Ra
+
+        if v0 is not None:
+            _validate_type(v0, (float, int), "v0")
+            self.sections[sec_name]._v0 = v0
 
         self._update_end_pts()

@@ -15,13 +15,66 @@ from .params_default import get_L2Pyr_params_default, get_L5Pyr_params_default
 # units for taur: ms
 
 
-def _get_dends(params, cell_type, section_names):
-    """Convert a flat dictionary to a nested dictionary.
+def _get_dends(
+    params,
+    cell_type,
+    section_names,
+    v_init={"all": -65},
+    is_basal_specific=False,
+):
+    """Create dendritic Section objects from flat parameter dictionary.
+
+    Extracts geometric and electrical properties (length, diameter, axial resistance,
+    membrane capacitance) from a flat parameter dictionary, takes initial membrane
+    voltage from an argument, and constructs Section objects for each dendritic
+    compartment. Handles parameter key name transformations (e.g., 'apical_trunk' ->
+    'apicaltrunk') required for lookup in the parameter dictionary.
+
+    *Importantly*, "Section objects" in this context are objects of the class
+    `hnn_core/cell.py::Section`, NOT the "true" NEURON sections. The "true" NEURON
+    sections are only created later, immediately before a simulation is run, using
+    `NetworkBuilder._build`.
+
+    Parameters
+    ----------
+    params : dict
+        Flat dictionary containing cell parameters with keys formatted as
+        '{cell_type}_{section}_{property}' (e.g., 'L5Pyr_apicaltrunk_L'). 'Ra' and 'cm'
+        use "dend" as the middle component rather than specific section names. This
+        'params' dictionary is expected to be constructed using
+        functions like `params_default.py::get_L2Pyr_params_default`.
+    cell_type : {'L2Pyr', 'L5Pyr'}
+        Cell type identifier used as prefix in parameter key lookups.
+    section_names : list of str
+        Names of dendritic sections to create (e.g., ['apical_trunk', 'apical_1',
+        'basal_2']). Underscores are removed for parameter lookups except for 'Ra' and
+        'cm'.
+    v_init : dict, default={"all": -65}
+        Initial membrane potential in mV. If dict contains single key "all", that value
+        is applied to all sections. Otherwise, keys must match 'section_names' for
+        section-specific initialization.
+    is_basal_specific : bool, default=False
+        Flag indicating whether or not to use the (Duecker 2025) model's custom basal
+        dendrite parameters. If True, this will read the 'Ra' and 'cm' parameters from
+        'params' using '{cell_type}_basal_{property}' instead of the default
+        '{cell_type}_dend_{property}' naming scheme.
 
     Returns
     -------
     sections : dict
-        Dictionary of sections. Keys are section names
+        Dictionary mapping section names (str) to Section objects with attributes 'L',
+        'diam', 'Ra', and 'cm' set from 'params', and 'v0' set from argument.
+
+    Notes
+    -----
+    - KD: This function is where the initial voltages for the dendritic sections are
+      set; these voltages are not overridden by `h.finitialize` unless called with a
+      value, e.g. `h.finitialize(-65)`.
+    - The 'v0' (initial voltage) parameter is handled separately from other properties
+      as it is a newer addition not found in legacy parameter files.
+    - In the (Jones et al., 2009) model, this is used to construct both apical and basal
+      dendrite sections. In the newer (Duecker 2025) model, this is only used for the
+      apical dendrite sections.
     """
     prop_names = ["L", "diam", "Ra", "cm"]
     sections = dict()
@@ -29,36 +82,135 @@ def _get_dends(params, cell_type, section_names):
         dend_prop = dict()
         for key in prop_names:
             if key in ["Ra", "cm"]:
-                middle = "dend"
+                if is_basal_specific:
+                    middle = "basal"
+                else:
+                    middle = "dend"
             else:
                 # map apicaltrunk -> apical_trunk etc.
                 middle = section_name.replace("_", "")
             dend_prop[key] = params[f"{cell_type}_{middle}_{key}"]
+        # v0 is handled separately since it is "newer", and will never be found in the
+        # `params` input.
+        if len(v_init) == 1:
+            dend_prop["v0"] = v_init["all"]
+        else:
+            dend_prop["v0"] = v_init[section_name]
+
         sections[section_name] = Section(
             L=dend_prop["L"],
             diam=dend_prop["diam"],
             Ra=dend_prop["Ra"],
             cm=dend_prop["cm"],
+            v0=dend_prop["v0"],
         )
     return sections
 
 
-def _get_pyr_soma(p_all, cell_type):
-    """Get somatic properties."""
+def _get_pyr_soma(p_all, cell_type, v_init=-65):
+    """Create Pyramidal somatic Section objects from flat parameter dictionary.
+
+    Extracts geometric and electrical properties (length, diameter, axial resistance,
+    membrane capacitance) from a flat parameter dictionary, takes initial membrane
+    voltage from an argument, and constructs a Section object for each Pyramidal soma
+    compartment.
+
+    *Importantly*, "Section objects" in this context are objects of the class
+    `hnn_core/cell.py::Section`, NOT the "true" NEURON sections. The "true" NEURON
+    sections are only created later, immediately before a simulation is run, using
+    `NetworkBuilder._build`.
+
+    Parameters
+    ----------
+    p_all : dict
+        Flat dictionary containing cell parameters with keys formatted as
+        '{cell_type}_soma_{property}' (e.g., 'L5Pyr_soma_L'). This 'p_all' dictionary
+        is expected to be constructed using functions like
+        `params_default.py::get_L2Pyr_params_default`.
+    cell_type : {'L2Pyr', 'L5Pyr'}
+        Cell type identifier used as prefix in parameter key lookups.
+    v_init : float, default=-65
+        Initial membrane potential in mV.
+
+    Returns
+    -------
+    Section
+        A Section object with attributes 'L', 'diam', 'Ra', and 'cm' set from 'p_all',
+        and 'v0' set from argument.
+
+    Notes
+    -----
+    - KD: This function is where the initial voltages for the somata are set; these
+      voltages are not overridden by `h.finitialize` unless called with a value,
+      e.g. `h.finitialize(-65)`.
+    - The 'v0' (initial voltage) parameter is handled separately from other properties
+      as it is a newer addition not found in legacy parameter files.
+    """
     return Section(
         L=p_all[f"{cell_type}_soma_L"],
         diam=p_all[f"{cell_type}_soma_diam"],
         cm=p_all[f"{cell_type}_soma_cm"],
         Ra=p_all[f"{cell_type}_soma_Ra"],
+        v0=v_init,
     )
 
 
-def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
-    """The geometry of the default sections in L2Pyr neuron."""
+def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
+    """Create a Cell object of the Layer 2/3 Pyramidal cell type.
+
+    This constructs a Layer 2/3 Pyramidal cell type (i.e. 'L2Pyr') using the following
+    steps:
+    1. "Loads" the default parameters for this celltype using
+      `params_default.py::get_L2Pyr_params_default`.
+    2. Overrides the default parameters based on the 'override_params' argument.
+    3. Creates all dendrite Section compartment objects, including initializing their
+      voltages.
+    4. Creates the soma Section compartment object, including initializing its voltage.
+    5. Programs the 'end_pts' of each Section using hard-coded values.
+    6. Sets the mechanisms for each Section. In this celltype, all Sections contain the
+      same set of mechanisms.
+    7. Sets the receiving synapse types for each Section. Somata only receive inhibitory
+      synapses, while dendrites receive all types.
+    8. Constructs a map of the cell tree, connecting each Section appropriately.
+    9. Assigns different dendritic Sections to either the 'proximal' or 'distal' groups.
+    10. Sets parameters for all synaptic types.
+    11. Finally, creates the Cell object with all of the above information, including
+      'pos' cell position and 'gid' identifier that are set by arguments.
+
+    *Importantly*, "Cell objects" in this context are objects of the class
+    `hnn_core/cell.py::Cell`, not "true" NEURON cells. Similarly, "Section objects"
+    in this context are objects of the class `hnn_core/cell.py::Section`, NOT the "true"
+    Section objects as created and used by NEURON. The "true" NEURON sections and cells
+    are only created later, immediately before a simulation is run, using
+    `NetworkBuilder._build`.
+
+    Parameters
+    ----------
+    override_params : dict
+        Flat dictionary containing cell parameters with keys formatted as
+        '{cell_type}_{section}_{property}' (e.g., 'L2Pyr_apicaltrunk_L'), where
+        key-value pairs are only provided for those values where the user wants to use
+        custom, non-default parameters. The default parameters can be found in
+        `params_default.py::get_L2Pyr_params_default`. If no overrides are desired, then
+        this argument should be None.
+    pos : tuple of (float, float, int), default=(0.0, 0.0, 0)
+        Coordinates of cell soma in xyz-space.
+    gid : int, default=0
+        The unique, "global ID" (GID) of the cell. Once the GID is set, it cannot be
+        changed.
+
+    Returns
+    -------
+    Cell
+        A Cell object of the Layer 2/3 Pyramidal cell type.
+    """
     p_all = get_L2Pyr_params_default()
     if override_params is not None:
         assert isinstance(override_params, dict)
         p_all = compare_dictionaries(p_all, override_params)
+
+    # All sections of this cell type use the same initial membrane voltage:
+    all_v_init = -71.46
 
     section_names = [
         "apical_trunk",
@@ -70,8 +222,19 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
         "basal_3",
     ]
 
-    sections = _get_dends(p_all, cell_type="L2Pyr", section_names=section_names)
-    sections["soma"] = _get_pyr_soma(p_all, "L2Pyr")
+    sections = _get_dends(
+        p_all,
+        cell_type="L2Pyr",
+        section_names=section_names,
+        v_init={
+            "all": all_v_init,
+        },
+    )
+    sections["soma"] = _get_pyr_soma(
+        p_all,
+        "L2Pyr",
+        v_init=all_v_init,
+    )
 
     end_pts = {
         "soma": [[-50, 0, 765], [-50, 0, 778]],
@@ -134,8 +297,56 @@ def _cell_L2Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
     )
 
 
-def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
-    """The geometry of the default sections in L5Pyr Neuron."""
+def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
+    """Create a Cell object of the Layer 5 Pyramidal cell type.
+
+    This constructs a Layer 5 Pyramidal cell type (i.e. 'L5Pyr') using the following
+    steps:
+    1. "Loads" the default parameters for this celltype using
+      `params_default.py::get_L5Pyr_params_default`.
+    2. Overrides the default parameters based on the 'override_params' argument.
+    3. Creates all dendrite Section compartment objects, including initializing their
+      voltages.
+    4. Creates the soma Section compartment object, including initializing its voltage.
+    5. Programs the 'end_pts' of each Section using hard-coded values.
+    6. Sets the mechanisms for each Section. In this celltype, all Sections contain the
+      same set of mechanisms.
+    7. Sets the receiving synapse types for each Section. Somata only receive inhibitory
+      synapses, while dendrites receive all types.
+    8. Sets the AR current maximal conductance according to a spatial algorithm.
+    9. Constructs a map of the cell tree, connecting each Section appropriately.
+    10. Assigns different dendritic Sections to either the 'proximal' or 'distal' groups.
+    11. Sets parameters for all synaptic types.
+    12. Finally, creates the Cell object with all of the above information, including
+      'pos' cell position and 'gid' identifier that are set by arguments.
+
+    *Importantly*, "Cell objects" in this context are objects of the class
+    `hnn_core/cell.py::Cell`, not "true" NEURON cells. Similarly, "Section objects"
+    in this context are objects of the class `hnn_core/cell.py::Section`, NOT the "true"
+    Section objects as created and used by NEURON. The "true" NEURON sections and cells
+    are only created later, immediately before a simulation is run, using
+    `NetworkBuilder._build`.
+
+    Parameters
+    ----------
+    override_params : dict
+        Flat dictionary containing cell parameters with keys formatted as
+        '{cell_type}_{section}_{property}' (e.g., 'L5Pyr_apicaltrunk_L'), where
+        key-value pairs are only provided for those values where the user wants to use
+        custom, non-default parameters. The default parameters can be found in
+        `params_default.py::get_L5Pyr_params_default`. If no overrides are desired, then
+        this argument should be None.
+    pos : tuple of (float, float, int), default=(0.0, 0.0, 0)
+        Coordinates of cell soma in xyz-space.
+    gid : int, default=0
+        The unique, "global ID" (GID) of the cell. Once the GID is set, it cannot be
+        changed.
+
+    Returns
+    -------
+    Cell
+        A Cell object of the Layer 5 Pyramidal cell type.
+    """
 
     p_all = get_L5Pyr_params_default()
     if override_params is not None:
@@ -153,8 +364,30 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
         "basal_3",
     ]
 
-    sections = _get_dends(p_all, cell_type="L5Pyr", section_names=section_names)
-    sections["soma"] = _get_pyr_soma(p_all, "L5Pyr")
+    # Different sections of this cell type use different initial membrane voltages:
+    v_init = {
+        "apical_1": -71.32,
+        "apical_2": -69.08,
+        "apical_tuft": -67.30,
+        "apical_trunk": -72,
+        "soma": -72.0,
+        "basal_1": -72,
+        "basal_2": -72,
+        "basal_3": -72,
+        "apical_oblique": -72,
+    }
+
+    sections = _get_dends(
+        p_all,
+        cell_type="L5Pyr",
+        section_names=section_names,
+        v_init=v_init,
+    )
+    sections["soma"] = _get_pyr_soma(
+        p_all,
+        "L5Pyr",
+        v_init=-72,
+    )
 
     end_pts = {
         "soma": [[0, 0, 0], [0, 0, 23]],
@@ -168,6 +401,7 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
         "basal_3": [[0, 0, -50], [106, 0, -156]],
     }
 
+    # AES TODO: what's up with this units comment?
     # units = ['pS/um^2', 'S/cm^2', 'pS/um^2', '??', 'tau', '??']
     mechanisms = {
         "hh2": ["gkbar_hh2", "gnabar_hh2", "gl_hh2", "el_hh2"],
@@ -230,12 +464,76 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0.0):
     )
 
 
-def _get_basket_soma(cell_name):
+def _get_basket_soma(cell_name, v_init=-64.9737):
+    """Create Basket somatic Section objects.
+
+    This sets geometric and electrical properties (length, diameter, axial resistance,
+    membrane capacitance, and spatial end points) using hard-coded values, takes initial
+    membrane voltage from an argument, and constructs a Section object for each Basket
+    (inhibitory) soma compartment.
+
+    These parameters are not different between Layer 2 and Layer 5 Basket cells.
+
+    *Importantly*, "Section objects" in this context are objects of the class
+    `hnn_core/cell.py::Section`, NOT the "true" NEURON sections. The "true" NEURON
+    sections are only created later, immediately before a simulation is run, using
+    `NetworkBuilder._build`.
+
+    Parameters
+    ----------
+    cell_name : ???
+        Not actually used.
+    v_init : float, default=-64.9737
+        Initial membrane potential in mV.
+
+    Returns
+    -------
+    Section
+        A Section object with attributes 'L', 'diam', 'Ra', 'cm', and 'end_pts' set from
+        hard-coded values, and 'v0' set from argument.
+
+    Notes
+    -----
+    - KD: This function is where the initial voltages for the somata are set; these
+      voltages are not overridden by `h.finitialize` unless called with a value,
+      e.g. `h.finitialize(-65)`.
+    """
     end_pts = [[0, 0, 0], [0, 0, 39.0]]
-    return Section(L=39.0, diam=20.0, cm=0.85, Ra=200.0, end_pts=end_pts)
+    return Section(
+        L=39.0,
+        diam=20.0,
+        cm=0.85,
+        Ra=200.0,
+        v0=v_init,
+        end_pts=end_pts,
+    )
 
 
 def _get_pyr_syn_props(p_all, cell_type):
+    """Return the default synaptic parameters for a given Pyramidal cell_type.
+
+    Extracts the 'e', 'tau1', and 'tau2' parameters for all synapse types for a
+    particular cell_type.
+
+    Parameters
+    ----------
+    p_all : dict
+        Flat dictionary containing cell parameters with keys formatted as
+        '{cell_type}_{synapse type}_{property}' (e.g., 'L2Pyr_nmda_tau1'). This 'p_all'
+        dictionary is expected to be constructed using functions like
+        `params_default.py::get_L2Pyr_params_default`.
+    cell_type : {'L2Pyr', 'L5Pyr'}
+        Cell type identifier used as prefix in parameter key lookups.
+
+    Returns
+    -------
+    dict
+        A dictionary where the keys are the four synapse types {'ampa', 'nmda', 'gabaa',
+        'gabab'}, and where the values are dictionaries whose keys are {'e', 'tau1',
+        'tau2'} and whose values are the parameter values of that case from default
+        parameter dictionaries such as from
+        `params_default.py::get_L2Pyr_params_default`.
+    """
     return {
         "ampa": {
             "e": p_all["%s_ampa_e" % cell_type],
@@ -261,6 +559,17 @@ def _get_pyr_syn_props(p_all, cell_type):
 
 
 def _get_basket_syn_props():
+    """Return the default synaptic parameters for Basket cell types.
+
+    These parameters are not different between Layer 2 and Layer 5 Basket cells.
+
+    Returns
+    -------
+    dict
+        A dictionary where the keys are three of the four synapse types {'ampa', 'nmda',
+        'gabaa'} (no 'gabab') and where the values are dictionaries whose keys are {'e',
+        'tau1', 'tau2'} and whose values are hard-coded.
+    """
     return {
         "ampa": {"e": 0, "tau1": 0.5, "tau2": 5.0},
         "gabaa": {"e": -80, "tau1": 0.5, "tau2": 5.0},
@@ -269,23 +578,29 @@ def _get_basket_syn_props():
 
 
 def _get_mechanisms(p_all, cell_type, section_names, mechanisms):
-    """Get mechanism
+    """Create dictionary of mechanism parameters for Pyramidal cells.
 
     Parameters
     ----------
-    cell_type : str
-        The cell type
-    section_names : str
-        The section_names
+    p_all : dict
+        Flat dictionary containing cell parameters with keys formatted as
+        '{cell_type}_soma_{property}' (e.g., 'L5Pyr_soma_L'). This 'p_all' dictionary
+        is expected to be constructed using functions like
+        `params_default.py::get_L2Pyr_params_default`.
+    cell_type : {'L2Pyr', 'L5Pyr'}
+        Cell type identifier used as prefix in parameter key lookups.
+    section_names : list of str
+        Names of sections.
     mechanisms : dict of list
-        The mechanism properties to extract
+        The mechanism properties to extract. Dictionary whose keys are mechanism names
+        and whose values are a list of the parameter names to be set for that mechanism.
 
     Returns
     -------
     mech_props : dict of dict of dict
         Nested dictionary of the form
-        sections -> mechanism -> mechanism properties
-        used to instantiate the mechanism in Neuron
+        "sections -> mechanism -> mechanism properties"
+        used to instantiate the mechanism in NEURON
     """
     mech_props = dict()
     for sec_name in section_names:
@@ -324,23 +639,40 @@ def _exp_g_at_dist(x, gbar_at_zero, exp_term, offset, slope=1):
 
 
 def basket(cell_name, pos=(0, 0, 0), gid=None):
-    """Get layer 2 / layer 5 basket cells.
+    """Create a Cell object of the Basket cell type.
+
+    This constructs a Basket cell type (i.e. either 'L2Basket' or 'L5Basket') using the
+    following steps:
+    1. Sets the "proximal" or "distal" section groups depending on the layer of the
+    celltype.
+    2. Creates the soma Section compartment object using hard-coded values in
+    sub-functions.
+    3. Sets the receiving synaptic types and parameters for the cell, for the three
+    valid synaptic types ('ampa', 'gabaa', and 'nmda', but not 'gabab').
+    4. Sets the mechanism of the cell to the "hh2" mechanism only, and using the default
+    values.
+
+    *Importantly*, "Cell objects" in this context are objects of the class
+    `hnn_core/cell.py::Cell`, not "true" NEURON cells. Similarly, "Section objects"
+    in this context are objects of the class `hnn_core/cell.py::Section`, NOT the "true"
+    Section objects as created and used by NEURON. The "true" NEURON sections and cells
+    are only created later, immediately before a simulation is run, using
+    `NetworkBuilder._build`.
 
     Parameters
     ----------
-    cell_name : str
-        The name of the cell.
-    pos : tuple
-        Coordinates of cell soma in xyz-space
-    gid : int or None (optional)
-        Each cell in a network is uniquely identified by it's "global ID": GID.
-        The GID is an integer from 0 to n_cells, or None if the cell is not
-        yet attached to a network. Once the GID is set, it cannot be changed.
+    cell_name : {'L2_basket', 'L5_basket'}
+        The type of basket cell to create.
+    pos : tuple of (int, int, int), default=(0, 0, 0)
+        Coordinates of cell soma in xyz-space.
+    gid : int, default=None
+        The unique, "global ID" (GID) of the cell. Once the GID is set, it cannot be
+        changed.
 
     Returns
     -------
-    cell : instance of BasketSingle
-        The basket cell.
+    Cell
+        A Cell object of either the Layer 2/3 or Layer 5 Basket cell type.
     """
     if cell_name == "L2_basket":
         sect_loc = dict(proximal=["soma"], distal=["soma"])
@@ -368,20 +700,29 @@ def basket(cell_name, pos=(0, 0, 0), gid=None):
 
 
 def pyramidal(cell_name, pos=(0, 0, 0), override_params=None, gid=None):
-    """Pyramidal neuron.
+    """Create a Cell object of a Pyramidal neuron.
+
+    This is mostly just a wrapper function for distinguishing between whether to create
+    a Layer 2/3 Pyramidal cell or a Layer 5 Pyramidal cell. This calls the main
+    functions to create the Cells, either `_cell_L5Pyr` or `_cell_L2Pyr`.
 
     Parameters
     ----------
-    cell_name : str
-        'L5Pyr' or 'L2Pyr'. The pyramidal cell type.
-    pos : tuple
+    cell_name : {'L2Pyr', 'L5Pyr'}
+        The type of pyramidal cell to create.
+    pos : tuple of (int, int, int), default=(0, 0, 0)
         Coordinates of cell soma in xyz-space
     override_params : dict or None (optional)
-        Parameters specific to L2 pyramidal neurons to override the default set
+        Flat dictionary containing cell parameters with keys formatted as
+        '{cell_type}_{section}_{property}' (e.g., 'L2Pyr_apicaltrunk_L'), where
+        key-value pairs are only provided for those values where the user wants to use
+        custom, non-default parameters. The default parameters can be found in either
+        `params_default.py::get_L2Pyr_params_default` or
+        `params_default.py::get_L5Pyr_params_default`. If no overrides are desired, then
+        this argument should be None.
     gid : int or None (optional)
-        Each cell in a network is uniquely identified by it's "global ID": GID.
-        The GID is an integer from 0 to n_cells, or None if the cell is not
-        yet attached to a network. Once the GID is set, it cannot be changed.
+        The unique, "global ID" (GID) of the cell. Once the GID is set, it cannot be
+        changed.
     """
     if cell_name == "L2_pyramidal":
         return _cell_L2Pyr(override_params, pos=pos, gid=gid)

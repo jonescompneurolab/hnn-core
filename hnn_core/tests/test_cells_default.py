@@ -238,3 +238,128 @@ def test_linear_g_at_dist():
     expected = 40.0 + 500 * (10.0 - 40.0) / 1000
     assert np.isclose(gbar, expected)
     assert gbar < 40.0  # Should be less than gsoma
+
+
+def test_basket_voltage_init():
+    """Test voltage initialization for Basket cell types."""
+    # Current section initial voltage, for soma (only section) of both basket types
+    expected_basket_v0 = -64.9737
+
+    # Initial setup
+    load_custom_mechanisms()
+    l5b = basket(cell_name="L5_basket")
+    l2b = basket(cell_name="L2_basket")
+
+    # Test initial voltages (v0) for basket cells
+    assert np.isclose(l5b.sections["soma"].v0, expected_basket_v0), (
+        f"L5_basket soma v0={l5b.sections['soma'].v0}, expected {expected_basket_v0}"
+    )
+    assert np.isclose(l2b.sections["soma"].v0, expected_basket_v0), (
+        f"L2_basket soma v0={l2b.sections['soma'].v0}, expected {expected_basket_v0}"
+    )
+
+    # Test that v0 values are correctly applied to built NEURON sections
+    l2b.build()
+    l5b.build()
+
+    # Initialize with finitialize() which should use the v0 values
+    h.finitialize()
+
+    # All L2Pyr sections should have the same v0
+    l2b_soma_v = l2b._nrn_sections["soma"](0.5).v
+    l5b_soma_v = l5b._nrn_sections["soma"](0.5).v
+
+    assert np.isclose(l2b_soma_v, expected_basket_v0, atol=0.1), (
+        f"L2_Basket soma initial voltage is {l2b_soma_v}, expected {expected_basket_v0}"
+    )
+    assert np.isclose(l5b_soma_v, expected_basket_v0, atol=0.1), (
+        f"L5_Basket soma initial voltage is {l5b_soma_v}, expected {expected_basket_v0}"
+    )
+
+
+def test_l2pyr_voltage_init():
+    """Test voltage initialization for Layer 2/3 Pyramidal cell type."""
+    # Current section initial voltage, for all sections
+    expected_l2pyr_v0 = -71.46
+
+    # Initial setup
+    load_custom_mechanisms()
+    l2pyr = pyramidal(cell_name="L2_pyramidal")
+
+    # Test initial voltages (v0) for L2Pyr
+    for sec_name, sec in l2pyr.sections.items():
+        assert np.isclose(sec.v0, expected_l2pyr_v0), (
+            f"L2Pyr {sec_name} v0={sec.v0}, expected {expected_l2pyr_v0}"
+        )
+
+    # Test that v0 values are correctly applied to built NEURON sections
+    l2pyr.build(sec_name_apical="apical_trunk")
+
+    # Initialize with finitialize() which should use the v0 values
+    h.finitialize()
+
+    # All L2Pyr sections should have the same v0
+    soma_v = l2pyr._nrn_sections["soma"](0.5).v
+    apical_1_v = l2pyr._nrn_sections["apical_1"](0.5).v
+    basal_1_v = l2pyr._nrn_sections["basal_1"](0.5).v
+
+    assert np.isclose(soma_v, expected_l2pyr_v0, atol=0.1), (
+        f"L2Pyr soma initial voltage is {soma_v}, expected {expected_l2pyr_v0}"
+    )
+    assert np.isclose(apical_1_v, expected_l2pyr_v0, atol=0.1), (
+        f"L2Pyr apical_1 initial voltage is {apical_1_v}, expected {expected_l2pyr_v0}"
+    )
+    assert np.isclose(basal_1_v, expected_l2pyr_v0, atol=0.1), (
+        f"L2Pyr basal_1 initial voltage is {basal_1_v}, expected {expected_l2pyr_v0}"
+    )
+
+
+def test_l5pyr_voltage_init():
+    """Test voltage initialization for Layer 2/3 Pyramidal cell type."""
+    # Current section initial voltages
+    expected_l5pyr_v0 = {
+        "apical_1": -71.32,
+        "apical_2": -69.08,
+        "apical_tuft": -67.30,
+        "apical_trunk": -72,
+        "soma": -72.0,
+        "basal_1": -72,
+        "basal_2": -72,
+        "basal_3": -72,
+        "apical_oblique": -72,
+    }
+
+    # Initial setup
+    load_custom_mechanisms()
+    l5pyr = pyramidal(cell_name="L5_pyramidal")
+
+    # Test initial voltages (v0) for L5Pyr - different sections have different values
+    for sec_name, sec in l5pyr.sections.items():
+        expected_v0 = expected_l5pyr_v0[sec_name]
+        assert np.isclose(sec.v0, expected_v0), (
+            f"L5Pyr {sec_name} v0={sec.v0}, expected {expected_v0}"
+        )
+
+    # Test that v0 values are correctly applied to built NEURON sections
+    l5pyr.build(sec_name_apical="apical_trunk")
+
+    # After building, NEURON sections should have v initialized to v0
+    # Check a few key sections with different v0 values
+    apical_2_nrn_sec = l5pyr._nrn_sections["apical_2"]
+    apical_tuft_nrn_sec = l5pyr._nrn_sections["apical_tuft"]
+    soma_nrn_sec = l5pyr._nrn_sections["soma"]
+
+    # Initialize with finitialize() which should use the v0 values
+    h.finitialize()
+
+    # Check that voltages match expected v0 values
+    # Note: We check at the midpoint (0.5) of each section
+    assert np.isclose(apical_2_nrn_sec(0.5).v, -69.08, atol=0.1), (
+        f"apical_2 initial voltage is {apical_2_nrn_sec(0.5).v}, expected -69.08"
+    )
+    assert np.isclose(apical_tuft_nrn_sec(0.5).v, -67.30, atol=0.1), (
+        f"apical_tuft initial voltage is {apical_tuft_nrn_sec(0.5).v}, expected -67.30"
+    )
+    assert np.isclose(soma_nrn_sec(0.5).v, -72.0, atol=0.1), (
+        f"soma initial voltage is {soma_nrn_sec(0.5).v}, expected -72.0"
+    )
