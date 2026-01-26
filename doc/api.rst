@@ -20,6 +20,7 @@ Simulation (:py:mod:`hnn_core`):
    :toctree: generated/
 
    simulate_dipole
+   BatchSimulate
    Network
    Cell
    CellResponse
