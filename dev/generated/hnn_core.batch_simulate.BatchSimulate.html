@@ -1,0 +1,829 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>hnn_core.batch_simulate.BatchSimulate &#8212; hnn-core 0.5.1.dev0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=215e94d7"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=fd10adb8"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'generated/hnn_core.batch_simulate.BatchSimulate';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="hnn_core.dipole.Dipole" href="hnn_core.dipole.Dipole.html" />
+    <link rel="prev" title="hnn_core.optimization.Optimizer" href="hnn_core.optimization.Optimizer.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.5.1.dev0" />
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-199741045-1');
+</script>
+
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/hnn-medium.png" class="logo__image only-light" alt="hnn-core 0.5.1.dev0 documentation - Home"/>
+    <img src="../_static/hnn-medium.png" class="logo__image only-dark pst-js-only" alt="hnn-core 0.5.1.dev0 documentation - Home"/>
+  
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Install (Textbook)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI package
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-external" href="https://anaconda.org/jonescompneurolab/repo">
+    Conda packages
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../install.html">
+    Install (Textbook)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../auto_examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../api.html">
+    API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../whats_new.html">
+    What’s new?
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://github.com/jonescompneurolab/hnn-core">
+    GitHub (Code)
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://hnn.brown.edu/">
+    HNN Frontpage
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">
+    HNN Textbook
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://pypi.org/project/hnn-core/">
+    PyPI package
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-external" href="https://anaconda.org/jonescompneurolab/repo">
+    Conda packages
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../api.html" class="nav-link">API Documentation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">hnn_core.batch_simulate.BatchSimulate</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="hnn-core-batch-simulate-batchsimulate">
+<h1>hnn_core.batch_simulate.BatchSimulate<a class="headerlink" href="#hnn-core-batch-simulate-batchsimulate" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="hnn_core.batch_simulate.BatchSimulate">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">hnn_core.batch_simulate.</span></span><span class="sig-name descname"><span class="pre">BatchSimulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">set_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">net</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;Network</span> <span class="pre">|</span> <span class="pre">35</span> <span class="pre">L2_basket</span> <span class="pre">cells</span> <span class="pre">100</span> <span class="pre">L2_pyramidal</span> <span class="pre">cells</span> <span class="pre">35</span> <span class="pre">L5_basket</span> <span class="pre">cells</span> <span class="pre">100</span> <span class="pre">L5_pyramidal</span> <span class="pre">cells&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tstop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">170</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.025</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_trials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./sim_results'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_outputs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dpl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_spiking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_lfp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_voltages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_currents</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_calcium</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_vsec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_isec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postproc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear_cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summary_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/batch_simulate.html#BatchSimulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.batch_simulate.BatchSimulate" title="Link to this definition">#</a></dt>
+<dd><p>The BatchSimulate class.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>set_params</strong><span class="classifier">func</span></dt><dd><p>User-defined function that sets parameters in network drives.</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">set_params(net,</span> <span class="pre">params)</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code></p>
+</div></blockquote>
+<p>where <code class="docutils literal notranslate"><span class="pre">net</span></code> is a Network object and <code class="docutils literal notranslate"><span class="pre">params</span></code> is a dictionary
+of the parameters that will be set inside the function.</p>
+</dd>
+<dt><strong>net</strong><span class="classifier">Network object, optional</span></dt><dd><p>The network model to use for simulations. Examples include the
+returned value of the following functions:</p>
+<ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">jones_2009_model</span></code>: A network model based on Jones et al. (2009).</p></li>
+<li><p><em class="xref py py-obj">law_2021_model</em>: A network model based on Law et al. (2021).</p></li>
+<li><p><em class="xref py py-obj">calcium_model</em>: A network model incorporating calcium dynamics.</p></li>
+</ul>
+<p>Default is <code class="docutils literal notranslate"><span class="pre">jones_2009_model()</span></code>.</p>
+</dd>
+<dt><strong>tstop</strong><span class="classifier">float, optional</span></dt><dd><p>The stop time for the simulation. Default is 170 ms.</p>
+</dd>
+<dt><strong>dt</strong><span class="classifier">float, optional</span></dt><dd><p>The time step for the simulation. Default is 0.025 ms.</p>
+</dd>
+<dt><strong>n_trials</strong><span class="classifier">int, optional</span></dt><dd><p>The number of trials for the simulation. Default is 1.</p>
+</dd>
+<dt><strong>save_folder</strong><span class="classifier">str, optional</span></dt><dd><p>The path to save the simulation outputs.
+Default is ‘./sim_results’.</p>
+</dd>
+<dt><strong>batch_size</strong><span class="classifier">int, optional</span></dt><dd><p>The maximum number of simulations saved in a single file.
+Default is 100.</p>
+</dd>
+<dt><strong>overwrite</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to overwrite existing files and create file paths
+if they do not exist. Default is True.</p>
+</dd>
+<dt><strong>save_outputs</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to save the simulation outputs to files. Default is False.</p>
+</dd>
+<dt><strong>save_dpl</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, save dipole results. Note, <em class="xref py py-obj">save_outputs</em> must be True.
+Default: True.</p>
+</dd>
+<dt><strong>save_spiking</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, save spiking results. Note, <em class="xref py py-obj">save_outputs</em> must be True.
+Default: False.</p>
+</dd>
+<dt><strong>save_lfp</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, save local field potential (lfp) results.
+Note, <em class="xref py py-obj">save_outputs</em> must be True.
+Default: False.</p>
+</dd>
+<dt><strong>save_voltages</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, save voltages results. Note, <em class="xref py py-obj">save_outputs</em> must be True.
+Default: False.</p>
+</dd>
+<dt><strong>save_currents</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, save currents results. Note, <em class="xref py py-obj">save_outputs</em> must be True.
+Default: False.</p>
+</dd>
+<dt><strong>save_calcium</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, save calcium concentrations.
+Note, <em class="xref py py-obj">save_outputs</em> must be True.
+Default: False.</p>
+</dd>
+<dt><strong>record_vsec</strong><span class="classifier">{False, ‘all’, ‘soma’}</span></dt><dd><p>Option to record voltages from all sections (‘all’), or just
+the soma (‘soma’). Default: False.</p>
+</dd>
+<dt><strong>record_isec</strong><span class="classifier">{False, ‘all’, ‘soma’}</span></dt><dd><p>Option to record voltages from all sections (‘all’), or just
+the soma (‘soma’). Default: False.</p>
+</dd>
+<dt><strong>postproc</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, smoothing (<code class="docutils literal notranslate"><span class="pre">dipole_smooth_win</span></code>) and scaling
+(<code class="docutils literal notranslate"><span class="pre">dipole_scalefctr</span></code>) values are read from the parameter file, and
+applied to the dipole objects before returning.
+Default: False.</p>
+</dd>
+<dt><strong>clear_cache</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to clear the results cache after saving each batch.
+Default is False.</p>
+</dd>
+<dt><strong>summary_func</strong><span class="classifier">func, optional</span></dt><dd><p>A function to calculate summary statistics from the simulation
+results. Default is None.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Methods</p>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.batch_simulate.BatchSimulate.load_all_results" title="hnn_core.batch_simulate.BatchSimulate.load_all_results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_all_results</span></code></a>()</p></td>
+<td><p>Load all simulation results from the files in <em class="xref py py-obj">self.save_folder</em>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.batch_simulate.BatchSimulate.load_results" title="hnn_core.batch_simulate.BatchSimulate.load_results"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_results</span></code></a>(file_path[, return_data])</p></td>
+<td><p>Load simulation results from a file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.batch_simulate.BatchSimulate.run" title="hnn_core.batch_simulate.BatchSimulate.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a>(param_grid[, return_output, ...])</p></td>
+<td><p>Run batch simulations.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.batch_simulate.BatchSimulate.simulate_batch" title="hnn_core.batch_simulate.BatchSimulate.simulate_batch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simulate_batch</span></code></a>(param_combinations[, n_jobs, ...])</p></td>
+<td><p>Simulate a batch of parameter sets in parallel.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Notes</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">save_output=True</span></code>, the saved files will appear as
+<code class="docutils literal notranslate"><span class="pre">sim_run_{start_idx}-{end_idx}.npz</span></code> in the specified <em class="xref py py-obj">save_folder</em>
+directory. The <em class="xref py py-obj">start_idx</em> and <em class="xref py py-obj">end_idx</em> indicate the range of
+simulation indices contained in each file. Each file will contain
+a maximum of <em class="xref py py-obj">batch_size</em> simulations, split evenly among the
+available files. If <code class="docutils literal notranslate"><span class="pre">overwrite=True</span></code>, existing files with the same name
+will be overwritten.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.batch_simulate.BatchSimulate.load_all_results">
+<span class="sig-name descname"><span class="pre">load_all_results</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/batch_simulate.html#BatchSimulate.load_all_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.batch_simulate.BatchSimulate.load_all_results" title="Link to this definition">#</a></dt>
+<dd><p>Load all simulation results from the files in <em class="xref py py-obj">self.save_folder</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>all_results</strong><span class="classifier">list</span></dt><dd><p>List of dictionaries containing all loaded simulation results.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.batch_simulate.BatchSimulate.load_results">
+<span class="sig-name descname"><span class="pre">load_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/batch_simulate.html#BatchSimulate.load_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.batch_simulate.BatchSimulate.load_results" title="Link to this definition">#</a></dt>
+<dd><p>Load simulation results from a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>file_path</strong><span class="classifier">str</span></dt><dd><p>The path to the file containing the simulation results.</p>
+</dd>
+<dt><strong>return_data</strong><span class="classifier">list of str, optional</span></dt><dd><p>List of data types to return. If None, returns the types specified
+during initialization. Defaults to None.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>results</strong><span class="classifier">dict</span></dt><dd><p>Dictionary containing the loaded results and parameter values.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.batch_simulate.BatchSimulate.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">combinations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'loky'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/batch_simulate.html#BatchSimulate.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.batch_simulate.BatchSimulate.run" title="Link to this definition">#</a></dt>
+<dd><p>Run batch simulations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>param_grid</strong><span class="classifier">dict</span></dt><dd><p>Dictionary with parameter names and ranges.</p>
+</dd>
+<dt><strong>return_output</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to return the simulation outputs. Default is True.</p>
+</dd>
+<dt><strong>combinations</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to generate the Cartesian product of the parameter ranges.
+If False, generate combinations based on corresponding indices.
+Default is True.</p>
+</dd>
+<dt><strong>n_jobs</strong><span class="classifier">int, optional</span></dt><dd><p>Number of parallel jobs. Default is 1.</p>
+</dd>
+<dt><strong>backend</strong><span class="classifier">str or joblib.parallel.ParallelBackendBase instance, optional</span></dt><dd><p>The parallel backend to use. Can be one of <em class="xref py py-obj">loky</em>, <a class="reference external" href="https://docs.python.org/3/library/threading.html#module-threading" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">threading</span></code></a>,
+<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#module-multiprocessing" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">multiprocessing</span></code></a>, or <em class="xref py py-obj">dask</em>. WARNING: currently only <em class="xref py py-obj">loky</em> is
+completely operationable; all other backends are in
+development. Default is <em class="xref py py-obj">loky</em>.</p>
+</dd>
+<dt><strong>verbose</strong><span class="classifier">int, optional</span></dt><dd><p>The verbosity level for parallel execution. Default is 50.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>results</strong><span class="classifier">dict</span></dt><dd><p>Dictionary containing ‘summary_statistics’ and optionally
+‘simulated_data’. ‘simulated_data’ may include keys: ‘dpl’, ‘lfp’,
+‘spikes’, ‘voltages’, ‘param_values’, ‘net’, ‘times’.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Return content depends on <em class="xref py py-obj">summary_func</em>, <em class="xref py py-obj">return_output</em>, and
+<em class="xref py py-obj">clear_cache</em> settings.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hnn_core.batch_simulate.BatchSimulate.simulate_batch">
+<span class="sig-name descname"><span class="pre">simulate_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_combinations</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'loky'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/batch_simulate.html#BatchSimulate.simulate_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.batch_simulate.BatchSimulate.simulate_batch" title="Link to this definition">#</a></dt>
+<dd><p>Simulate a batch of parameter sets in parallel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>param_combinations</strong><span class="classifier">list</span></dt><dd><p>List of parameter combinations.</p>
+</dd>
+<dt><strong>n_jobs</strong><span class="classifier">int, optional</span></dt><dd><p>Number of parallel jobs. Default is 1.</p>
+</dd>
+<dt><strong>backend</strong><span class="classifier">str or joblib.parallel.ParallelBackendBase instance, optional</span></dt><dd><p>The parallel backend to use. Can be one of <em class="xref py py-obj">loky</em>, <a class="reference external" href="https://docs.python.org/3/library/threading.html#module-threading" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">threading</span></code></a>,
+<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#module-multiprocessing" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">multiprocessing</span></code></a>, or <em class="xref py py-obj">dask</em>. WARNING: currently only <em class="xref py py-obj">loky</em> is
+completely operationable; all other backends are in
+development. Default is <em class="xref py py-obj">loky</em>.</p>
+</dd>
+<dt><strong>verbose</strong><span class="classifier">int, optional</span></dt><dd><p>The verbosity level for parallel execution. Default is 50.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>res: list</dt><dd><p>List of dictionaries containing simulation results.
+Each dictionary contains the following keys along with their
+associated values:</p>
+<ul class="simple">
+<li><p><em class="xref py py-obj">net</em>: The network model used for the simulation.</p></li>
+<li><p><em class="xref py py-obj">dpl</em>: The simulated dipole.</p></li>
+<li><p><em class="xref py py-obj">param_values</em>: The parameter values used for the simulation.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<span class="target" id="sphx-glr-backreferences-hnn-core-batch-simulate-batchsimulate"></span></section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="hnn_core.optimization.Optimizer.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">hnn_core.optimization.Optimizer</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="hnn_core.dipole.Dipole.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">hnn_core.dipole.Dipole</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.batch_simulate.BatchSimulate"><code class="docutils literal notranslate"><span class="pre">BatchSimulate</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.batch_simulate.BatchSimulate.load_all_results"><code class="docutils literal notranslate"><span class="pre">BatchSimulate.load_all_results()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.batch_simulate.BatchSimulate.load_results"><code class="docutils literal notranslate"><span class="pre">BatchSimulate.load_results()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.batch_simulate.BatchSimulate.run"><code class="docutils literal notranslate"><span class="pre">BatchSimulate.run()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hnn_core.batch_simulate.BatchSimulate.simulate_batch"><code class="docutils literal notranslate"><span class="pre">BatchSimulate.simulate_batch()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/generated/hnn_core.batch_simulate.BatchSimulate.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2025, HNN Developers.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
