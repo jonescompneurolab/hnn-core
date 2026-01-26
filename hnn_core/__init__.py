@@ -5,6 +5,10 @@ from .dipole import (
     Dipole,
     _read_dipole_txt,
 )
+from .dipole_contributions import (
+    plot_dipole_contributions,
+    analyze_dipole_contributions,
+)
 from .params import Params, read_params, convert_to_json
 from .network import Network, pick_connection
 from .network_models import jones_2009_model, law_2021_model, calcium_model
