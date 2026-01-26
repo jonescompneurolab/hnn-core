@@ -57,6 +57,17 @@ Optimization (:py:mod:`hnn_core.optimization`):
 
    Optimizer
 
+Batch Simulation (:py:mod:`hnn_core.batch_simulate`):
+-----------------------------------------------------
+
+.. currentmodule:: hnn_core.batch_simulate
+
+.. autosummary::
+   :toctree: generated/
+
+   BatchSimulate
+
+
 Dipole (:py:mod:`hnn_core.dipole`):
 -----------------------------------
 
