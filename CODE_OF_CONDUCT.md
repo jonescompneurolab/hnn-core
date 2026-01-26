@@ -15,6 +15,10 @@ Examples of behavior that contributes to a positive environment for our communit
 * Giving and gracefully accepting constructive feedback
 * Accepting responsibility and apologizing to those affected by our mistakes, and learning from the experience
 * Focusing on what is best not just for us as individuals, but for the overall community
+* Demonstrating patience toward all contributors and developers
+    * Please keep in mind that almost everyone who works on HNN is a researcher (e.g. a graduate student, post-doc, professor, etc.) who has **many** time-intensive obligations in addition to HNN. Almost everyone working on HNN is volunteering their time, including most of the development team.
+    * We will do our best to provide an initial response to any contribution submissions ASAP, preferably within a week of submission.
+* Keeping all communications public where possible, including only communicating on Github Issues, Pull Requests, and Discussions
 
 Examples of unacceptable behavior include:
 
@@ -24,6 +28,7 @@ Examples of unacceptable behavior include:
 * Public or private harassment
 * Publishing others' private information, such as a physical or email
   address, without their explicit permission
+* Privately emailing contributors or developers in an effort to get a faster response
 * Other conduct which could reasonably be considered inappropriate in a
   professional setting
 
@@ -70,6 +75,16 @@ Community leaders will follow these Community Impact Guidelines in determining t
 **Community Impact**: Demonstrating a pattern of violation of community standards, including sustained inappropriate behavior,  harassment of an individual, or aggression toward or disparagement of classes of individuals.
 
 **Consequence**: A permanent ban from any sort of public interaction within the community.
+
+## Google Summer of Code (GSoC)
+
+For those interested in becoming GSoC Contributors: please do not reach out to us privately, but instead make your initial contact via the [INCF GSoC recommendations here](https://www.incf.org/recommendations-gsoc-contributors). We will reach out if and when we are able. 
+
+Every year, we receive significantly more GSoC interest than we are able to support (approximately two projects). Some good guidance on common expectations and tips for improving your chances in general are available [here at the Jenkins project's GSoC information page](https://www.jenkins.io/projects/gsoc/contributors/).
+
+## AI and LLM Policy
+
+We do allow AI- and LLM- based code and documentation contributions. However, *the contributor is responsible for every line of code and text submitted* as part of their contributions. We reserve the right to close or ignore any contributions which may have been colloquially "vibe-coded", meaning the contributor does not fully understand the code or text changes themself, or there is a strong mismatch between a contribution's documentation versus its code changes, or the contributions exhibit other signs of having been submitted without the contributor fully understanding or double-checking the contents. Again, if you submit AI-generated code, please double-check every line.
 
 ## Attribution
 
