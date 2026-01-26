@@ -28,6 +28,15 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ## 0.5.1.dev0 In-progress Development Changes
 
+### People who contributed to this release:
+
+- [Tushar Jamdade][]
+
+### Changelog
+
+- Add progressive minimal install and test to Github Actions,
+  by [Tushar Jamdade][] in {gh}`1214`.
+
 ## 0.5.0 Release Notes
 
 ### New Features
@@ -1245,3 +1254,4 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Maira Usman]: https://github.com/Myrausman
 [Chetan Kandpal]: https://github.com/Chetank99
 [NEURON]: https://nrn.readthedocs.io
+[Tushar Jamdade]: https://github.com/Tusharjamdade
