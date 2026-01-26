@@ -25,7 +25,6 @@ Simulation (:py:mod:`hnn_core`):
    CellResponse
    pick_connection
 
-
 Network Models (:py:mod:`hnn_core`):
 ------------------------------------
 
@@ -57,7 +56,6 @@ Batch Simulation (:py:mod:`hnn_core.batch_simulate`):
    :toctree: generated/
 
    BatchSimulate
-
 
 Dipole (:py:mod:`hnn_core.dipole`):
 -----------------------------------
