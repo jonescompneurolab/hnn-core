@@ -363,4 +363,3 @@ def test_l5pyr_voltage_init():
     assert np.isclose(soma_nrn_sec(0.5).v, -72.0, atol=0.1), (
         f"soma initial voltage is {soma_nrn_sec(0.5).v}, expected -72.0"
     )
-
