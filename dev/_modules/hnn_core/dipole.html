@@ -547,7 +547,9 @@
         <span class="n">_BACKEND</span> <span class="o">=</span> <span class="n">JoblibBackend</span><span class="p">(</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">n_trials</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">n_trials</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s2">&quot;N_trials&quot;</span><span class="p">]</span>
+        <span class="n">n_trials</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;N_trials&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">net</span><span class="o">.</span><span class="n">_params</span><span class="p">[</span><span class="s2">&quot;N_trials&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_trials</span>
+
     <span class="k">if</span> <span class="n">n_trials</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid number of simulations: </span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">n_trials</span><span class="p">)</span>
 
