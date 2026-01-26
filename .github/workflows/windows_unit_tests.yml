@@ -41,10 +41,22 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install dependencies and HNN
+      - name: Install HNN-Core with minimal dependencies and test
         shell: cmd
         run: |
           python -m pip install --upgrade pip
+          pip install --verbose .
+          python -c "from hnn_core import jones_2009_model, simulate_dipole; simulate_dipole(jones_2009_model(), tstop=20); print('--> SUCCESS: The test worked!')"
+
+      - name: Clean minimal dependencies install
+        shell: cmd
+        run: |
+          pip uninstall --yes hnn_core
+          rmdir /s /q build
+
+      - name: Install HNN-Core with full dependencies
+        shell: cmd
+        run: |
           pip install --verbose .[opt,parallel,test,gui]
 
       - name: Check ruff formatting
