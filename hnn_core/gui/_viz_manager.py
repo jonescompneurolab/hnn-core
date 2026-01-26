@@ -1145,11 +1145,19 @@ class _VizManager:
             for ax_control in controls.children:
                 # Update the options for the simulation data selection dropdown
                 simulation_data_selection = ax_control.children[1]
+                prev_value = simulation_data_selection.value
                 simulation_data_selection.options = simulation_names
+                if prev_value in simulation_names:
+                    simulation_data_selection.value = prev_value
 
                 # Update the options for the data to compare dropdown
                 simulation_to_compare = ax_control.children[4]
-                simulation_to_compare.options = simulation_names
+                prev_target = simulation_to_compare.value
+                simulation_to_compare.options = simulation_names + ("None",)
+                if prev_target in simulation_names:
+                    simulation_to_compare.value = prev_target
+                else:
+                    simulation_to_compare.value = "None"
 
         # recover the default layout
         if template_name is None:
