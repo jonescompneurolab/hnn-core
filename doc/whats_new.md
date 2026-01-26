@@ -28,6 +28,18 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ## 0.5.1.dev0 In-progress Development Changes
 
+### People who contributed to this release:
+
+- [Karthikeya Kodlai][]
+
+### Changelog
+
+- Add support for printing a welcome message that asks the user to fill out the HNN
+  survey, which is printed to the standard output after (and only after) the first time
+  the `hnn_core` module is imported. Whether or not the message is displayed is
+  determined by the presence of a new file created in the module after first run.
+  by [Karthikeya Kodlai][] in {gh}`1158`. This was their first PR, thanks Karthikeya!
+
 ## 0.5.0 Release Notes
 
 ### New Features
@@ -1245,3 +1257,4 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Maira Usman]: https://github.com/Myrausman
 [Chetan Kandpal]: https://github.com/Chetank99
 [NEURON]: https://nrn.readthedocs.io
+[Karthikeya Kodlai]: https://github.com/sketch123456

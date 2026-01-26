@@ -20,3 +20,19 @@ from .hnn_io import (
 )
 
 __version__ = "0.5.1.dev0"
+
+
+def _print_survey_handler():
+    try:
+        from .print_survey_link import _print_survey_link
+
+        _print_survey_link()
+    except ImportError as e:
+        print(
+            "Warning: Could not run `_print_survey_link`, something is wrong "
+            "with your HNN-Core import:",
+            e,
+        )
+
+
+_print_survey_handler()
