@@ -46,10 +46,12 @@ class Optimizer:
             If None, the parameters will be set to the midpoints of parameter ranges.
         solver : str
             The optimizer, 'bayesian' or 'cobyla'.
-        obj_fun : str | func
+        obj_fun : str | callable
             The objective function to be minimized. Can be 'dipole_rmse',
-            'maximize_psd', or a user-defined function. The default is
-            'dipole_rmse'.
+            'maximize_psd', or a user-defined callable function. The default is
+            'dipole_rmse'. Custom functions must have the signature:
+            ``obj_fun(initial_net, initial_params, set_params, predicted_params,
+            update_params, obj_values, tstop, obj_fun_kwargs) -> float``
         max_iter : int, optional
             The max number of calls to the objective function. The default is
             200.
@@ -106,9 +108,16 @@ class Optimizer:
         elif obj_fun == "maximize_psd":
             self.obj_fun = _maximize_psd
             self.obj_fun_name = "maximize_psd"
+        elif callable(obj_fun):
+            # Validate custom objective function signature
+            self._validate_custom_objective_function(obj_fun)
+            self.obj_fun = obj_fun
+            self.obj_fun_name = "custom"
         else:
-            self.obj_fun = obj_fun  # user-defined function
-            self.obj_fun_name = None
+            raise ValueError(
+                "obj_fun must be 'dipole_rmse', 'maximize_psd', or a callable "
+                "function with the required signature."
+            )
         # Initial weights for the objective function
         if initial_params is not None:
             # Check if initial_params is not a dict
@@ -142,6 +151,49 @@ class Optimizer:
         self.net_ = None
         self.obj_ = list()
         self.opt_params_ = None
+
+    def _validate_custom_objective_function(self, obj_fun):
+        """Validate that a custom objective function has the correct signature.
+        
+        Parameters
+        ----------
+        obj_fun : callable
+            The custom objective function to validate.
+            
+        Raises
+        ------
+        ValueError
+            If the function signature is invalid.
+        """
+        import inspect
+        
+        try:
+            sig = inspect.signature(obj_fun)
+            params = list(sig.parameters.keys())
+            
+            expected_params = [
+                'initial_net', 'initial_params', 'set_params', 'predicted_params',
+                'update_params', 'obj_values', 'tstop', 'obj_fun_kwargs'
+            ]
+            
+            if len(params) != len(expected_params):
+                raise ValueError(
+                    f"Custom objective function must have exactly {len(expected_params)} "
+                    f"parameters, got {len(params)}"
+                )
+                
+            for i, (expected, actual) in enumerate(zip(expected_params, params)):
+                if expected != actual:
+                    raise ValueError(
+                        f"Parameter {i+1} should be '{expected}', got '{actual}'"
+                    )
+                    
+        except Exception as e:
+            raise ValueError(
+                f"Invalid custom objective function signature: {e}. "
+                "Expected signature: obj_fun(initial_net, initial_params, set_params, "
+                "predicted_params, update_params, obj_values, tstop, obj_fun_kwargs)"
+            )
 
     def __repr__(self):
         is_fit = False
@@ -181,6 +233,9 @@ class Optimizer:
             or "relative_bandpower" not in obj_fun_kwargs
         ):
             raise Exception("f_bands and relative_bandpower must be specified")
+        
+        # For custom objective functions, no specific validation is performed
+        # as the requirements depend on the user's implementation
 
         constraints = self._assemble_constraints(self.constraints)
 
