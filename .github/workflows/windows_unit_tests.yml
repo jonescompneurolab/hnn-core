@@ -48,6 +48,12 @@ jobs:
           pip install --verbose .
           python -c "from hnn_core import jones_2009_model, simulate_dipole; simulate_dipole(jones_2009_model(), tstop=20); print('--> SUCCESS: The test worked!')"
 
+      - name: Clean minimal dependencies install
+        shell: cmd
+        run: |
+          pip uninstall --yes hnn_core
+          rmdir /s /q build
+
       - name: Install HNN-Core with full dependencies
         shell: cmd
         run: |
