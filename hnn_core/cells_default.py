@@ -515,9 +515,9 @@ def pyramidal_l5ET(cell_name,pos=(0,0,0), gid=None):
     p_all = get_L5PyrET_params()
 
     # override params according to function
-    gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=2.78e-5/2*1., gdend=2.78e-5/2*12.0, xkink=1500, hotzone=[1500, 1700], hotzone_factor=4.5)
-    gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=93.5e-6/2, gdend=93.5e-6/2*2.25, xkink=1500, hotzone=[1500, 1700], hotzone_factor=2.25)
-    gbar_Ih = partial(_exp_g_at_dist, zero_val=p_all['L5Pyr_dend_gbar_Ih'],exp_term = 1./323, slope=2.087, offset=-.8696)
+    gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=2.78e-5/2*1., gdend=2.78e-5/2*12.0, xkink=1500, hotzone_factor=4.5, hotzone_boundaries=[1500, 1700])
+    gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=93.5e-6/2, gdend=93.5e-6/2*2.25, xkink=1500, hotzone_factor=2.25, hotzone_boundaries=[1500, 1700])
+    gbar_Ih = partial(_exp_g_at_dist, gbar_at_zero=p_all['L5Pyr_dend_gbar_Ih'], exp_term = 1./323, offset=-.8696, slope=2.087)
 
     # basal dendrites
     gbar_NaTs2_t = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_basal_gbar_NaTs2_t'], gdend=0, xkink=255)
@@ -672,10 +672,10 @@ def pyramidal_l23(cell_name,pos=(0,0,0), gid=None):
 
     p_all = get_L2Pyrhuman_params()
 
-    gbar_Ih = partial(_exp_g_at_dist, zero_val=p_all['L2Pyr_dend_gbar_Ih'],exp_term = 1./323, slope=2.087, offset=-.8696)
-    gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=0.00001, gdend=0.002, xkink=200, hotzone=[200, 400], hotzone_factor=4)
-    gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=0.0000001, gdend=0.001, xkink=200, hotzone=[200, 400], hotzone_factor=4)
-    gbar_SK_E2 = partial(_linear_g_at_dist, gsoma=3.e-06, gdend=3.e-03, xkink=200, hotzone=[200, 400], hotzone_factor=10)
+    gbar_Ih = partial(_exp_g_at_dist, gbar_at_zero=p_all['L2Pyr_dend_gbar_Ih'], exp_term = 1./323, offset=-.8696, slope=2.087)
+    gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=0.00001, gdend=0.002, xkink=200, hotzone_factor=4, hotzone_boundaries=[200, 400])
+    gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=0.0000001, gdend=0.001, xkink=200, hotzone_factor=4, hotzone_boundaries=[200, 400])
+    gbar_SK_E2 = partial(_linear_g_at_dist, gsoma=3.e-06, gdend=3.e-03, xkink=200, hotzone_factor=10, hotzone_boundaries=[200, 400])
 
     override_params = dict()
     override_params['L2Pyr_dend_gbar_Ih'] = gbar_Ih
