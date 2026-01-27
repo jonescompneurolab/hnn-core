@@ -47,7 +47,7 @@ def test_optimize_evoked(solver):
     # define set_params function and constraints
     net_offset = jones_2009_model(mesh_shape=(3, 3))
 
-    def set_params(net_offset, params):
+    def set_params(params, net_offset):
         weights_ampa = {
             "L2_basket": 0.5,
             "L2_pyramidal": 0.5,
@@ -136,7 +136,7 @@ def test_rhythmic(solver):
     net_offset = jones_2009_model(mesh_shape=(3, 3))
 
     # define set_params function and constraints
-    def set_params(net_offset, params):
+    def set_params(params, net_offset):
         # Proximal (alpha)
         weights_ampa_p = {
             "L2_pyramidal": params["alpha_prox_weight"],
@@ -270,7 +270,7 @@ def test_user_obj_fun(solver):
 
         # simulate dpl with predicted params
         new_net = initial_net.copy()
-        set_params(new_net, params)
+        set_params(params, new_net)
 
         # set electrode array
         depths = list(range(-325, 2150, 100))
@@ -311,7 +311,7 @@ def test_user_obj_fun(solver):
 
         return obj
 
-    def set_params(net_offset, params):
+    def set_params(params, net_offset):
         weights_ampa = {
             "L2_basket": 0.5,
             "L2_pyramidal": 0.5,
@@ -430,7 +430,7 @@ def test_initial_params(solver):
     # define set_params function and constraints
     net_offset = jones_2009_model(mesh_shape=(3, 3))
 
-    def set_params(net_offset, params):
+    def set_params(params, net_offset):
         weights_ampa = {
             "L2_basket": 0.5,
             "L2_pyramidal": 0.5,
@@ -499,7 +499,7 @@ def test_initial_params_validation(solver, initial_params, error_type):
     tstop = 10.0
     net_offset = jones_2009_model(mesh_shape=(3, 3))
 
-    def set_params(net_offset, params):
+    def set_params(params, net_offset):
         weights_ampa = {
             "L2_basket": 0.5,
             "L2_pyramidal": 0.5,
