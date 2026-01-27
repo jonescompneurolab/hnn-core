@@ -8,6 +8,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
+import tempfile
 import traitlets
 import os
 
@@ -32,6 +33,7 @@ from hnn_core.parallel_backends import requires_mpi4py, requires_psutil
 from hnn_core.hnn_io import (
     dict_to_network,
     read_network_configuration,
+    write_network_configuration,
 )
 from IPython.display import IFrame
 from ipywidgets import Tab, Text, link
@@ -48,6 +50,22 @@ def setup_gui():
     gui.widget_dt.value = 0.5  # speed up tests
     gui.widget_tstop.value = 70  # speed up tests
     return gui
+
+
+def _conn_widget_lookup(gui, src_type, target_type):
+    """Convenience function for searching the connectivity accordion."""
+    conn_widget = None
+    for connectivity_field in gui.connectivity_widgets:
+        for widget in connectivity_field:
+            if (
+                widget._belongsto["src_gids"] == src_type
+                and widget._belongsto["target_gids"] == target_type
+            ):
+                conn_widget = widget
+                break
+        if conn_widget is not None:
+            break
+    return conn_widget
 
 
 def check_equal_networks(net1, net2):
@@ -199,6 +217,51 @@ def test_gui_upload_connectivity():
     # Load drives and make sure connectivity does not change
     gui._simulate_upload_drives(file1_path)
     assert gui.connectivity_widgets[0][0].children[1].children[0].value == 0.01
+
+
+def test_gui_smart_gains_upload_connectivity():
+    """Test if gui 'smartly' handles upload of Network with non-default global gains."""
+    gui = HNNGUI()
+    _ = gui.compose()
+
+    # Let's set some custom global gains
+    gui.global_gain_widgets["i_e"].value = 1.2
+    gui.global_gain_widgets["i_i"].value = 0.9
+
+    # We need to run a simulation in order to download a Network
+    sim_name = "sim1"
+    gui.widget_simulation_name.value = sim_name
+    gui.widget_tstop.value = 70
+    gui.widget_dt.value = 0.5
+    gui.widget_backend_selection.value = "Joblib"
+    gui.widget_ntrials.value = 1
+    gui.run_button.click()
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        # Get network from data dictionary and save it to temporary file
+        net = gui.data["simulation_data"][sim_name]["net"]
+        file1_path = Path(tmp_dir) / "custom_global_gains.json"
+        write_network_configuration(net, file1_path)
+
+        # Set the GUI global gains back to defaults
+        gui.global_gain_widgets["i_e"].value = 1.0
+        gui.global_gain_widgets["i_i"].value = 1.0
+
+        gui._simulate_upload_connectivity(file1_path)
+
+    # Check that our GUI global gains are "smartly" loaded properly
+    assert gui.global_gain_widgets["i_e"].value == 1.2
+    assert gui.global_gain_widgets["i_i"].value == 0.9
+
+    # Finally, check that the GUI single gain for one of the synapses affected is NOT
+    # the changed value, but instead the default:
+    conn_widget = _conn_widget_lookup(gui, "L2_basket", "L2_pyramidal")
+    single_gain_widget = conn_widget.children[2].children[0]
+    assert single_gain_widget.value == 1.0
+
+    conn_widget = _conn_widget_lookup(gui, "L2_basket", "L2_basket")
+    single_gain_widget = conn_widget.children[2].children[0]
+    assert single_gain_widget.value == 1.0
 
     plt.close("all")
 
@@ -1457,17 +1520,7 @@ def test_combined_gain_indicator_updates(setup_gui):
 
     # Get a connectivity widget that has gain indicators
     # Find a L2_pyramidal->L2_pyramidal connection to test e_e type
-    conn_widget = None
-    for connectivity_field in gui.connectivity_widgets:
-        for widget in connectivity_field:
-            if (
-                widget._belongsto["src_gids"] == "L2_pyramidal"
-                and widget._belongsto["target_gids"] == "L2_pyramidal"
-            ):
-                conn_widget = widget
-                break
-        if conn_widget is not None:
-            break
+    conn_widget = _conn_widget_lookup(gui, "L2_pyramidal", "L2_pyramidal")
 
     # Extract single gain widget and combined gain indicator
     # Structure: children[2] is HBox containing [single_gain_input, combined_indicator]
@@ -1506,17 +1559,8 @@ def test_custom_gains_simulate_and_download(setup_gui):
     src_type = "L5_basket"
     target_type = "L5_basket"
     single_custom_gain = 2.0
-    conn_widget = None
-    for connectivity_field in gui.connectivity_widgets:
-        for widget in connectivity_field:
-            if (widget._belongsto["src_gids"] == src_type) and (
-                widget._belongsto["target_gids"] == target_type
-            ):
-                widget.children[2].children[0].value = single_custom_gain
-                break
-        if conn_widget is not None:
-            break
-
+    conn_widget = _conn_widget_lookup(gui, src_type, target_type)
+    conn_widget.children[2].children[0].value = single_custom_gain
     # Run a simulation to create a network with these gains
     sim_name = "test_gains"
     gui.widget_simulation_name.value = sim_name
