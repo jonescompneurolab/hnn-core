@@ -849,9 +849,11 @@ class HNNGUI:
             # global drive_widgets; drive_widgets = list()
             while len(self.drive_widgets) > 0:
                 self.drive_widgets.pop()
+            while len(self.drive_boxes) > 0:
                 self.drive_boxes.pop()
             while len(self.opt_drive_widgets) > 0:
                 self.opt_drive_widgets.pop()
+            while len(self.opt_drive_boxes) > 0:
                 self.opt_drive_boxes.pop()
 
         def _on_upload_connectivity(change):
