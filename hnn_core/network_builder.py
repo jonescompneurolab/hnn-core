@@ -65,7 +65,7 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
 
     # initialize cells to -65 mV, after all the NetCon
     # delays have been specified
-    h.finitialize()
+    h.finitialize()                 # the initial membrane potential seems to be different for each cell, this does not seem to be the same as h.finitialize(-65)
 
     def simulation_time():
         print(f"Trial {trial_idx + 1}: {round(h.t, 2)} ms...")
@@ -371,7 +371,7 @@ class NetworkBuilder(object):
             record_ca=record_ca,
         )
 
-        self.state_init()
+        # self.state_init()
 
         # set to record spikes, somatic voltages, and extracellular potentials
         self._spike_times = h.Vector()
@@ -649,36 +649,29 @@ class NetworkBuilder(object):
 
         _PC.barrier()  # get all nodes to this place before continuing
 
-    def state_init(self):
-        """Initializes the state closer to baseline."""
+    # def state_init(self):
+    #     """Initializes the state closer to baseline."""
 
-        for cell in self._cells:
-            seclist = h.SectionList()
-            seclist.wholetree(sec=cell._nrn_sections["soma"])
-            src_type = self.net.gid_to_type(cell.gid)
-            cell_metadata = self.net.cell_types[src_type]["cell_metadata"]
-            # initializing segment voltages from cell_metadata
-            for sect in seclist:
-                for seg in sect:
-                    if (
-                        cell_metadata.get("morpho_type") == "pyramidal"
-                        and cell_metadata.get("layer") == "2"
-                    ):
-                        seg.v = -71.46
-                    elif (
-                        cell_metadata.get("morpho_type") == "pyramidal"
-                        and cell_metadata.get("layer") == "5"
-                    ):
-                        if sect.name() == f"{_short_name(src_type)}_apical_1":
-                            seg.v = -71.32
-                        elif sect.name() == f"{_short_name(src_type)}_apical_2":
-                            seg.v = -69.08
-                        elif sect.name() == f"{_short_name(src_type)}_apical_tuft":
-                            seg.v = -67.30
-                        else:
-                            seg.v = -72.0
-                    elif cell_metadata.get("morpho_type") == "basket":
-                        seg.v = -64.9737
+    #     for cell in self._cells:
+    #         seclist = h.SectionList()
+    #         seclist.wholetree(sec=cell._nrn_sections['soma'])
+    #         for sect in seclist:
+    #             for seg in sect:
+    #                 if cell.name == 'L2Pyr':
+    #                     seg.v = -71.46
+    #                 elif cell.name == 'L5Pyr':
+    #                     if sect.name() == 'L5Pyr_apical_1':
+    #                         seg.v = -71.32
+    #                     elif sect.name() == 'L5Pyr_apical_2':
+    #                         seg.v = -69.08
+    #                     elif sect.name() == 'L5Pyr_apical_tuft':
+    #                         seg.v = -67.30
+    #                     else:
+    #                         seg.v = -72.
+    #                 elif cell.name == 'L2Basket':
+    #                     seg.v = -64.9737
+    #                 elif cell.name == 'L5Basket':
+    #                     seg.v = -64.9737
 
     def _clear_neuron_objects(self):
         """Clear up NEURON internal gid and reference information.

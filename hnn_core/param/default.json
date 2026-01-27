@@ -115,6 +115,8 @@
     "L5Pyr_dend_gbar_km": 200.0,
     "L5Pyr_dend_gbar_cat": 0.0002,
     "L5Pyr_dend_gbar_ar": 1e-06,
+    
+    
     "N_pyr_x": 10,
     "N_pyr_y": 10,
     "gbar_L2Pyr_L2Pyr_ampa": 0.0005,
@@ -129,7 +131,7 @@
     "gbar_L5Basket_L5Pyr_gabab": 0.025,
     "gbar_L2Pyr_L2Basket": 0.0005,
     "gbar_L2Basket_L2Basket": 0.02,
-    "gbar_L2Pyr_L5Basket": 0.00025,
+    "gbar_L2Pyr_L5Basket": 0.02,
     "gbar_L5Pyr_L5Basket": 0.0005,
     "gbar_L5Basket_L5Basket": 0.02,
     "t0_input_prox": 1000.0,
