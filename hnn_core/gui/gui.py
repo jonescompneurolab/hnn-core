@@ -41,7 +41,7 @@ from ipywidgets import (
     Text,
     Checkbox,
     Box,
-    dlink,
+    link,
 )
 from ipywidgets.embed import embed_minimal_html
 import hnn_core
@@ -1024,49 +1024,25 @@ class HNNGUI:
         # equivalent in the Run tab:
         self.widget_opt_obj_fun.observe(_opt_obj_fun_change, "value")
 
-        dlink(
+        link(
             (self.widget_opt_tstop, "value"),
             (self.widget_tstop, "value"),
         )
-        dlink(
-            (self.widget_tstop, "value"),
-            (self.widget_opt_tstop, "value"),
-        )
-
-        dlink(
+        link(
             (self.widget_opt_dt, "value"),
             (self.widget_dt, "value"),
         )
-        dlink(
-            (self.widget_dt, "value"),
-            (self.widget_opt_dt, "value"),
-        )
-
-        dlink(
+        link(
             (self.widget_opt_n_jobs, "value"),
             (self.widget_n_jobs, "value"),
         )
-        dlink(
-            (self.widget_n_jobs, "value"),
-            (self.widget_opt_n_jobs, "value"),
-        )
-
-        dlink(
+        link(
             (self.widget_default_smoothing, "value"),
             (self.widget_opt_smoothing, "value"),
         )
-        dlink(
-            (self.widget_opt_smoothing, "value"),
-            (self.widget_default_smoothing, "value"),
-        )
-
-        dlink(
+        link(
             (self.widget_default_scaling, "value"),
             (self.widget_opt_scaling, "value"),
-        )
-        dlink(
-            (self.widget_opt_scaling, "value"),
-            (self.widget_default_scaling, "value"),
         )
 
     def _delete_single_drive(self, b):
@@ -1712,13 +1688,9 @@ class HNNGUI:
             layout=Layout(width="120px"),
             style={"description_width": "60px"},
         )
-        dlink(
+        link(
             (self.opt_target_widgets["n_trials"], "value"),
             (self.widget_ntrials, "value"),
-        )
-        dlink(
-            (self.widget_ntrials, "value"),
-            (self.opt_target_widgets["n_trials"], "value"),
         )
 
         # The obj_fun="maximize_psd" case is much more complex
