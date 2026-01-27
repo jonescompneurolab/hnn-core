@@ -2073,3 +2073,159 @@ def test_check_global_synaptic_gains_uniformity():
     assert result is False
     assert "WARNING" in stdout
     assert "custom synaptic gain values" in stdout
+
+
+def test_get_next_available_gid(base_network):
+    """Test that `Network._get_next_available_gid` returns correctly."""
+    # "Base" has many connections and drives, but for now we're only interested in the
+    # non-drive params config
+    net_base, params = base_network
+
+    # Let's start with a simpler network
+    mesh_shape = (3, 3)
+    net1 = jones_2009_model(
+        params,
+        add_drives_from_params=False,
+        mesh_shape=mesh_shape,
+    )
+    # 2 * (9) pyramidals + 2 * (3) baskets = 24 total cells.
+    # 24 cells without any drives etc. should mean our max used GID is 23 (aka
+    # `_n_cells` - 1), since GIDs start with and include 0.
+    # Therefore, the next available GID should be 24.
+    assert net1._get_next_available_gid() == 24
+
+    # Next, let's do the default network, but with no drives
+    # 2 * (100) pyramidals + 2 * (35) baskets = 270 total cells.
+    # Therefore, max used GID is 269, so next available GID should be 270:
+    net2 = jones_2009_model(params, add_drives_from_params=False)
+    assert net2._get_next_available_gid() == 270
+
+    # Different drives add different numbers of GIDs. Therefore, this next test is
+    # testing the main function of this test, but is also heavily dependent on the
+    # defaults of the drives themselves and Network construction.
+    assert net_base._get_next_available_gid() == 540
+
+
+def test_shift_gid_ranges_simple(base_network):
+    """Test that `Network._shift_gid_ranges` works and simulates as expected."""
+    # "Base" has many connections and drives, but for now we're only interested in the
+    # non-drive params config
+    _, params = base_network
+
+    net_shifted = jones_2009_model(params, add_drives_from_params=False)
+    assert net_shifted._get_next_available_gid() == 270  # See previous test function.
+    net_shifted._shift_gid_ranges(gid_start=100)
+    # GIDs of this network should now start at 100 instead of 0.
+    # Therefore, next available GID should be 370:
+    assert net_shifted._get_next_available_gid() == 370
+
+    # Next, let's test that our successful GID shift doesn't break the ability to
+    # simulate:
+    _ = simulate_dipole(net_shifted, tstop=20.0, n_trials=1)
+
+
+def test_shift_gid_ranges_consecutive(base_network):
+    """Test that `Network._shift_gid_ranges` works with multiple shifts."""
+    # "Base" has many connections and drives, but for now we're only interested in the
+    # non-drive params config
+    _, params = base_network
+
+    net_shifted = jones_2009_model(params, add_drives_from_params=False)
+    gid_offset = 42
+    net_shifted._shift_gid_ranges(gid_start=gid_offset)
+    assert net_shifted._get_next_available_gid() == (270 + gid_offset)
+
+    gid_offset = 37
+    net_shifted._shift_gid_ranges(gid_start=gid_offset)
+    assert net_shifted._get_next_available_gid() == (270 + gid_offset)
+    _ = simulate_dipole(net_shifted, tstop=20.0, n_trials=1)
+
+
+@pytest.mark.parametrize("probability", [1.0, 0.67])  # SIX SEVEN /dance
+def test_shift_gid_ranges_sub1prob_drives(base_network, probability):
+    """Test that GID-shifting works with drives."""
+    # "Base" has many connections and drives, but for now we're only interested in the
+    # non-drive params config
+    _, params = base_network
+
+    # Configuration of the test-wide parameters we're interested in:
+    prob_int = int(probability * 100)
+    conn_seed = 3141592  # Ensure every connection is connecting identically
+    gid_offset = 69
+
+    net_base = jones_2009_model(params, add_drives_from_params=False)
+    net_base.add_evoked_drive(
+        "evdist1",
+        mu=5.0,
+        sigma=1.0,
+        numspikes=1,
+        location="distal",
+        weights_ampa={"L2_pyramidal": 0.1, "L5_pyramidal": 0.1},
+        probability=probability,
+        conn_seed=conn_seed,
+    )
+    net_base.add_evoked_drive(
+        "evdist2",
+        mu=5.0,
+        sigma=2.0,
+        numspikes=2,
+        location="distal",
+        weights_ampa={"L2_pyramidal": 0.1, "L5_pyramidal": 0.1},
+        probability=probability,
+        conn_seed=conn_seed,
+    )
+
+    ######################################
+    # Now, let's make a new network, but add drives with NOT all-to-all connectivity
+    # after the GID shift:
+    net_shifted = jones_2009_model(params, add_drives_from_params=False)
+    net_shifted._shift_gid_ranges(gid_start=gid_offset)
+    assert net_shifted._get_next_available_gid() == (270 + gid_offset)
+    drive_new_gid = net_shifted._get_next_available_gid()
+    net_shifted.add_evoked_drive(
+        "evdist1",
+        mu=5.0,
+        sigma=1.0,
+        numspikes=1,
+        location="distal",
+        weights_ampa={"L2_pyramidal": 0.1, "L5_pyramidal": 0.1},
+        gid_start=drive_new_gid,
+        probability=probability,
+        conn_seed=conn_seed,
+    )
+    assert net_shifted._get_next_available_gid() == (270 + gid_offset + 200)
+    drive_new_gid = net_shifted._get_next_available_gid()
+    net_shifted.add_evoked_drive(
+        "evdist2",
+        mu=5.0,
+        sigma=2.0,
+        numspikes=2,
+        location="distal",
+        weights_ampa={"L2_pyramidal": 0.1, "L5_pyramidal": 0.1},
+        gid_start=drive_new_gid,
+        probability=probability,
+        conn_seed=conn_seed,
+    )
+    assert net_shifted._get_next_available_gid() == (270 + gid_offset + 200 + 200)
+
+    assert (
+        len(net_base.connectivity[-1]["gid_pairs"])
+        == len(net_shifted.connectivity[-1]["gid_pairs"])
+        == prob_int
+    )
+
+    for gids_type in ["src_gids", "target_gids"]:
+        for base_gid in net_base.connectivity[-1][gids_type]:
+            assert (base_gid + gid_offset) in net_shifted.connectivity[-1][gids_type]
+
+    shifted_pairs = net_shifted.connectivity[-1]["gid_pairs"]
+    for base_key, base_val in net_base.connectivity[-1]["gid_pairs"].items():
+        # The following assumes that the "shape" of the probabilistic connection network
+        # is identical between the equivalently-named drives in `net_base` and
+        # `net_shifted`, which is only true if their `conn_seed` is identical.
+        #
+        # Have to unpack then re-cast the value to list:
+        assert shifted_pairs[base_key + gid_offset] == [base_val[0] + gid_offset]
+
+    # Finally, let's test that our GID-shifted network and drives can still simulate:
+    _ = simulate_dipole(net_shifted, tstop=20.0, n_trials=1)

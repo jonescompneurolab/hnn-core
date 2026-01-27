@@ -28,6 +28,20 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ## 0.5.1.dev0 In-progress Development Changes
 
+### People who contributed to this release:
+
+- [Maira Usman][]
+
+### Changelog
+
+- {class}`~hnn_core.Network` has new methods `Network._get_next_available_gid` and
+  `Network._shift_gid_ranges`. These are intended for future development work on
+  enabling multiple simultaneous `Network`s inside the same simulation, via enabling a
+  user to shift the GIDs of a `Network`. There is also a tutorial available in
+  `examples/howto/plot_dual_network_simulation.py`. This work was done as part of Google
+  Summer of Code 2025, organized through the International Neuroinformatics Coordinating Facility.
+  By [Maira Usman][] in {gh}`1096`.
+
 ## 0.5.0 Release Notes
 
 ### New Features
