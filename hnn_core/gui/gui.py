@@ -936,7 +936,7 @@ class HNNGUI:
                 # Rebuild the drives' widgets in the Drives and Optimization tabs from
                 # the returned parameters after optimization:
                 self.params = json.loads(output_config)
-                self.load_conn_drives_opt()
+                self.load_conn_drives_opt_widgets()
 
                 # Add and use the output of the latest optimization run to the history:
                 self.opt_results.append(opt_result)
@@ -1282,7 +1282,7 @@ class HNNGUI:
         self._link_callbacks()
 
         # initialize connectivity, drives, and optimization ipywidgets
-        self.load_conn_drives_opt()
+        self.load_conn_drives_opt_widgets()
 
         if not return_layout:
             return
@@ -1438,7 +1438,7 @@ class HNNGUI:
         self.drive_accordion.selected_index = idx
         self.drive_boxes[idx].children[-1].click()
 
-    def load_conn_drives_opt(self):
+    def load_conn_drives_opt_widgets(self):
         """Add connectivity, drives, and optimization ipywidgets from params."""
         with self._log_out:
             # Add connectivity
@@ -1479,7 +1479,9 @@ class HNNGUI:
         """Add a widget for a new drive."""
 
         # Check only adds 1 tonic input widget
-        if drive_type == "Tonic" and not _is_valid_add_tonic_input(self.drive_widgets):
+        if drive_type == "Tonic" and not _check_if_tonic_bias_exists(
+            self.drive_widgets
+        ):
             return
 
         # Build drive widget objects
@@ -1628,14 +1630,14 @@ class HNNGUI:
         self._opt_target_out.clear_output()
 
         if opt_obj_fun == "dipole_rmse":
-            output_widgets = HBox(
+            displayed_target_widgets = HBox(
                 [
                     self.opt_target_widgets["rmse_target_data"],
                     self.opt_target_widgets["n_trials"],
                 ]
             )
         elif opt_obj_fun == "maximize_psd":
-            output_widgets = VBox(
+            displayed_target_widgets = VBox(
                 [
                     HBox(
                         [
@@ -1661,7 +1663,7 @@ class HNNGUI:
             )
 
         with self._opt_target_out:
-            display(output_widgets)
+            display(displayed_target_widgets)
 
     def add_opt_target_widgets(self):
         # Preserve prior widget state for "target data" if widgets already exist
@@ -1797,7 +1799,7 @@ class HNNGUI:
         # Let's have the PSD band2 checkbox control the ghosting/disabling of its other
         # band2 widgets, AND the band1 proportion widget
         # ------------------------------------------------------------------------------
-        def _handle_band2_ghosting(change):
+        def _band2_ghosting_callback(change):
             if self.opt_target_widgets["psd_target_band2_min"].disabled:
                 self.opt_target_widgets["psd_target_band1_proportion"].disabled = False
                 self.opt_target_widgets["psd_target_band2_min"].disabled = False
@@ -1815,7 +1817,7 @@ class HNNGUI:
                 self.opt_target_widgets["psd_target_band2_proportion"].value = 0
 
         self.opt_target_widgets["psd_target_band2_checkbox"].observe(
-            _handle_band2_ghosting,
+            _band2_ghosting_callback,
             names="value",
         )
 
@@ -2091,7 +2093,7 @@ class HNNGUI:
         # self.drive_widgets, on the other hand, have already been built by this point,
         # and if there is a tonic drive, it will be present in self.drive_widgets but
         # not in self.opt_drive_widgets):
-        if drive_type == "Tonic" and not _is_valid_add_tonic_input(
+        if drive_type == "Tonic" and not _check_if_tonic_bias_exists(
             self.opt_drive_widgets
         ):
             return
@@ -3843,14 +3845,14 @@ def handle_backend_change(backend_type, backend_config, mpi_cmd, n_jobs):
             display(n_jobs)
 
 
-def _is_valid_add_tonic_input(drive_widgets):
+def _check_if_tonic_bias_exists(drive_widgets):
     for drive in drive_widgets:
         if drive["type"] == "Tonic":
             return False
     return True
 
 
-def _make_observers(var_widget, var_key, drive_widgets, drive_idx, syn_type=None):
+def _make_opt_observers(var_widget, var_key, drive_widgets, drive_idx, syn_type=None):
     """Create & set an 'observe' handler for an Optimization widget to a Drive widget.
 
     Cyclomatic complexity = To infinity, and beyond!
@@ -3889,7 +3891,7 @@ def _make_observers(var_widget, var_key, drive_widgets, drive_idx, syn_type=None
         var_widget.observe(_fn2, names="value")
 
 
-def _create_opt_widgets_for_var(
+def _create_opt_widgets_for_drive_var(
     var_name,
     initial_value,
     var_description,
@@ -3991,7 +3993,7 @@ def _create_opt_widgets_for_var(
     )
 
     # Connect the main var_widget to its observed Drives tab equivalent, and vice-versa
-    _make_observers(var_widget, var_name, drive_widgets, drive_idx, syn_type)
+    _make_opt_observers(var_widget, var_name, drive_widgets, drive_idx, syn_type)
 
     return {
         f"{var_name}": var_widget,
@@ -4115,7 +4117,7 @@ def _create_synaptic_widgets_for_opt(
     for cell_type in cell_types:
         # Create the widgets and their placement, for AMPA weights
         syn_widgets_dict["weights_ampa"].update(
-            _create_opt_widgets_for_var(
+            _create_opt_widgets_for_drive_var(
                 cell_type,
                 default_data["weights_ampa"][cell_type],
                 f"{cell_type}:",
@@ -4132,7 +4134,7 @@ def _create_synaptic_widgets_for_opt(
         )
         # Create the widgets and their placement, for NMDA weights
         syn_widgets_dict["weights_nmda"].update(
-            _create_opt_widgets_for_var(
+            _create_opt_widgets_for_drive_var(
                 cell_type,
                 default_data["weights_nmda"][cell_type],
                 f"{cell_type}:",
@@ -4149,7 +4151,7 @@ def _create_synaptic_widgets_for_opt(
         )
         # Create the widgets and their placement, for synaptic delays
         syn_widgets_dict["delays"].update(
-            _create_opt_widgets_for_var(
+            _create_opt_widgets_for_drive_var(
                 cell_type,
                 default_data["delays"][cell_type],
                 f"{cell_type}:",
@@ -4167,7 +4169,7 @@ def _create_synaptic_widgets_for_opt(
         if if_poisson:
             # Create the widgets and their placement, for Poisson rate constants
             syn_widgets_dict["rate_constant"].update(
-                _create_opt_widgets_for_var(
+                _create_opt_widgets_for_drive_var(
                     cell_type,
                     default_data["rate_constant"][cell_type],
                     f"{cell_type}:",
@@ -4264,13 +4266,13 @@ def _create_evoked_widget_for_opt(
     # against, along with new widgets to control their constraints:
     # ----------------------------------------------------------------------------------
     opt_drive_widget.update(
-        _create_opt_widgets_for_var(
+        _create_opt_widgets_for_drive_var(
             "mu",
             default_data["mu"],
             "Mean time (ms):",
             **_autogen_opt_widget_kwargs,
         )
-        | _create_opt_widgets_for_var(
+        | _create_opt_widgets_for_drive_var(
             "sigma",
             default_data["sigma"],
             "Std dev time (ms):",
@@ -4293,7 +4295,7 @@ def _create_evoked_widget_for_opt(
         layout=var_layout,
         style=var_style,
     )
-    _make_observers(numspikes, "numspikes", drive_widgets, drive_idx)
+    _make_opt_observers(numspikes, "numspikes", drive_widgets, drive_idx)
 
     n_drive_cells = IntText(
         value=default_data["n_drive_cells"],
@@ -4302,7 +4304,7 @@ def _create_evoked_widget_for_opt(
         layout=var_layout,
         style=var_style,
     )
-    _make_observers(n_drive_cells, "n_drive_cells", drive_widgets, drive_idx)
+    _make_opt_observers(n_drive_cells, "n_drive_cells", drive_widgets, drive_idx)
 
     cell_specific = Checkbox(
         value=default_data["cell_specific"],
@@ -4310,7 +4312,7 @@ def _create_evoked_widget_for_opt(
         layout=var_layout,
         style=var_style,
     )
-    _make_observers(cell_specific, "is_cell_specific", drive_widgets, drive_idx)
+    _make_opt_observers(cell_specific, "is_cell_specific", drive_widgets, drive_idx)
     # Disable n_drive_cells widget based on Optimization version of the cell_specific
     # checkbox
     cell_specific.observe(
@@ -4323,7 +4325,7 @@ def _create_evoked_widget_for_opt(
         layout=var_layout,
         style=var_style,
     )
-    _make_observers(seedcore, "seedcore", drive_widgets, drive_idx)
+    _make_opt_observers(seedcore, "seedcore", drive_widgets, drive_idx)
 
     opt_drive_widget.update(
         dict(
@@ -4438,13 +4440,13 @@ def _create_poisson_widget_for_opt(
     # against, along with new widgets to control their constraints:
     # ----------------------------------------------------------------------------------
     opt_drive_widget.update(
-        _create_opt_widgets_for_var(
+        _create_opt_widgets_for_drive_var(
             "tstart",
             default_data["tstart"],
             "Start time (ms):",
             **_autogen_opt_widget_kwargs,
         )
-        | _create_opt_widgets_for_var(
+        | _create_opt_widgets_for_drive_var(
             "tstop",
             default_data["tstop"],
             "Stop time (ms):",
@@ -4462,7 +4464,7 @@ def _create_poisson_widget_for_opt(
         layout=var_layout,
         style=var_style,
     )
-    _make_observers(n_drive_cells, "n_drive_cells", drive_widgets, drive_idx)
+    _make_opt_observers(n_drive_cells, "n_drive_cells", drive_widgets, drive_idx)
 
     cell_specific = Checkbox(
         value=default_data["cell_specific"],
@@ -4470,7 +4472,7 @@ def _create_poisson_widget_for_opt(
         layout=var_layout,
         style=var_style,
     )
-    _make_observers(cell_specific, "is_cell_specific", drive_widgets, drive_idx)
+    _make_opt_observers(cell_specific, "is_cell_specific", drive_widgets, drive_idx)
     # Disable n_drive_cells widget based on Optimization version of the cell_specific
     # checkbox
     cell_specific.observe(
@@ -4483,7 +4485,7 @@ def _create_poisson_widget_for_opt(
         layout=var_layout,
         style=var_style,
     )
-    _make_observers(seedcore, "seedcore", drive_widgets, drive_idx)
+    _make_opt_observers(seedcore, "seedcore", drive_widgets, drive_idx)
 
     opt_drive_widget.update(
         dict(
@@ -4602,31 +4604,31 @@ def _create_rhythmic_widget_for_opt(
     # against, along with new widgets to control their constraints:
     # ----------------------------------------------------------------------------------
     opt_drive_widget.update(
-        _create_opt_widgets_for_var(
+        _create_opt_widgets_for_drive_var(
             "burst_rate",
             default_data["burst_rate"],
             "Burst rate (Hz):",
             **_autogen_opt_widget_kwargs,
         )
-        | _create_opt_widgets_for_var(
+        | _create_opt_widgets_for_drive_var(
             "burst_std",
             default_data["burst_std"],
             "Burst std dev (Hz):",
             **_autogen_opt_widget_kwargs,
         )
-        | _create_opt_widgets_for_var(
+        | _create_opt_widgets_for_drive_var(
             "tstart",
             default_data["tstart"],
             "Start time (ms):",
             **_autogen_opt_widget_kwargs,
         )
-        | _create_opt_widgets_for_var(
+        | _create_opt_widgets_for_drive_var(
             "tstart_std",
             default_data["tstart_std"],
             "Start std dev (ms):",
             **_autogen_opt_widget_kwargs,
         )
-        | _create_opt_widgets_for_var(
+        | _create_opt_widgets_for_drive_var(
             "tstop",
             default_data["tstop"],
             "Stop time (ms):",
@@ -4649,7 +4651,7 @@ def _create_rhythmic_widget_for_opt(
         layout=var_layout,
         style=var_style,
     )
-    _make_observers(numspikes, "numspikes", drive_widgets, drive_idx)
+    _make_opt_observers(numspikes, "numspikes", drive_widgets, drive_idx)
 
     n_drive_cells = IntText(
         value=default_data["n_drive_cells"],
@@ -4658,7 +4660,7 @@ def _create_rhythmic_widget_for_opt(
         layout=var_layout,
         style=var_style,
     )
-    _make_observers(n_drive_cells, "n_drive_cells", drive_widgets, drive_idx)
+    _make_opt_observers(n_drive_cells, "n_drive_cells", drive_widgets, drive_idx)
 
     cell_specific = Checkbox(
         value=default_data["cell_specific"],
@@ -4666,7 +4668,7 @@ def _create_rhythmic_widget_for_opt(
         layout=var_layout,
         style=var_style,
     )
-    _make_observers(cell_specific, "is_cell_specific", drive_widgets, drive_idx)
+    _make_opt_observers(cell_specific, "is_cell_specific", drive_widgets, drive_idx)
     # Disable n_drive_cells widget based on Optimization version of the cell_specific
     # checkbox
     cell_specific.observe(
@@ -4679,7 +4681,7 @@ def _create_rhythmic_widget_for_opt(
         layout=var_layout,
         style=var_style,
     )
-    _make_observers(seedcore, "seedcore", drive_widgets, drive_idx)
+    _make_opt_observers(seedcore, "seedcore", drive_widgets, drive_idx)
 
     opt_drive_widget.update(
         dict(
@@ -4800,13 +4802,13 @@ def _create_tonic_widget_for_opt(
         name=name,
     )
     opt_drive_widget.update(
-        _create_opt_widgets_for_var(
+        _create_opt_widgets_for_drive_var(
             "t0",
             default_data["t0"],
             "Start time (ms):",
             **_autogen_opt_widget_kwargs,
         )
-        | _create_opt_widgets_for_var(
+        | _create_opt_widgets_for_drive_var(
             "tstop",
             default_data["tstop"],
             "Stop time (ms):",
@@ -4823,7 +4825,7 @@ def _create_tonic_widget_for_opt(
     # constraints:
     for cell_type in ["L5_pyramidal", "L2_pyramidal", "L5_basket", "L2_basket"]:
         syn_widgets_dict["amplitude"].update(
-            _create_opt_widgets_for_var(
+            _create_opt_widgets_for_drive_var(
                 cell_type,
                 default_data["amplitude"][cell_type],
                 f"{cell_type}:",
