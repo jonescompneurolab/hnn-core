@@ -1187,10 +1187,10 @@ class _VizManager:
         return config_panel, fig_output_container
 
     def update_external_data_widget(self):
-        """Update external data widget with all available simulation data.
+        """Enable exfiltration of simulation data by `HNNGUI` objects.
 
-        This updates any registered external widgets (like widget_opt_target_data)
-        with all available simulation data, not filtered by template type.
+        This allows external registered widgets (such as `HNNGUI.opt_target_widgets`), which are
+        "external" to `_VizManager`, to access `_VizManager`'s available simulation data entries.
         """
         if (
             hasattr(self, "_external_data_widget")
