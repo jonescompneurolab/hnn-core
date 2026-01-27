@@ -1669,6 +1669,8 @@ class HNNGUI:
         # Preserve prior widget state for "target data" if widgets already exist
         # ------------------------------------------------------------------------------
         prior_target_state = {}
+        # Target data widgets are unfortunately reset after run. The below functions to restore the
+        # previous states:
         if self.opt_target_widgets:
             # Save current state of all target widgets
             for key, widget in self.opt_target_widgets.items():
@@ -1678,15 +1680,14 @@ class HNNGUI:
         # The obj_fun="dipole_rmse" case is very simple
         # ------------------------------------------------------------------------------
         self.opt_target_widgets["rmse_target_data"] = Dropdown(
-            options=self.data["simulation_data"].keys(),  # nope
+            options=self.data["simulation_data"].keys(),
             value=prior_target_state.get("rmse_target_data", None),
             description="Target Data:",
             disabled=False,
-            # layout=Layout(width="74%"),
             layout=Layout(width="500px"),
             style={"description_width": "80px"},
         )
-        # Register opt_target_widgets["rmse_target_data"] to be updated when simulation
+        # Set `_external_data_widget` to `opt_target_widgets["rmse_target_data"]` when simulation
         # data changes
         self.viz_manager._external_data_widget = self.opt_target_widgets[
             "rmse_target_data"
@@ -1696,7 +1697,6 @@ class HNNGUI:
             value=prior_target_state.get("n_trials", 1),
             description="Trials:",
             disabled=False,
-            # layout=Layout(width="24%"),
             layout=Layout(width="120px"),
             style={"description_width": "60px"},
         )
@@ -1863,9 +1863,8 @@ class HNNGUI:
         Parameters
         ----------
         report_timestamp : str
-            A timestamp, formatted however you choose, which will be used to indicate
-            the time when the report was generated. This will represent the same time as
-            the time used to generate the filename for the report.
+            A timestamp which will be used to indicate the time when the report was generated. This
+            will represent the same time as the time used to generate the filename for the report.
 
         Returns
         -------
@@ -2115,9 +2114,7 @@ class HNNGUI:
         # Stylin'
         # ------------------------------------------------------------------------------
         # Visual config for "main variable" widgets
-        # var_layout = Layout(width="225px")
         var_layout = Layout(width="230px")
-        # var_style = {"description_width": "100px"}
         var_style = {"description_width": "120px"}
         # Visual config for checkbox widgets
         checkbox_layout = Layout(width="30px")
@@ -2767,7 +2764,7 @@ def _get_poisson_widget_for_drives(
         tstop=tstop,
         rate_constant=rate_constant,
         seedcore=seedcore,
-        location=location,  # notice this is a widget but a str!
+        location=location,  # notice this is not a widget but a str!
         n_drive_cells=n_drive_cells,
         is_cell_specific=cell_specific,
     )
@@ -4433,7 +4430,7 @@ def _create_poisson_widget_for_opt(
     opt_drive_widget = dict(
         type="Poisson",
         name=name,
-        location=location,  # notice this is a widget but a str!
+        location=location,  # notice this is not a widget but a str!
     )
 
     # Add the non-synaptic widgets that we are interested in constraining/optimizing
@@ -4829,7 +4826,7 @@ def _create_tonic_widget_for_opt(
                 cell_type,
                 default_data["amplitude"][cell_type],
                 f"{cell_type}:",
-                syn_type="amplitude",  # Note that the drive_widgets use singular 'amplitude'
+                syn_type="amplitude",  # Note that amplitude is singular, not plural
                 **_autogen_opt_widget_kwargs,
             )
         )
@@ -4890,8 +4887,8 @@ def _build_opt_drive_widget(
 
     Also note that the "Drive" itself (as opposed to its widgets) does not necessarily
     exist at this point in time, just like it's possible that no Network objects
-    exists. This does create the Drives themselves; it only creates Optimization widgets
-    that are based on, and observing of, existing Drive widgets. The Drives themselves
+    exists. This does not create the Drives themselves; it only creates Optimization widgets
+    that are based on, and are observing, existing Drive widgets. The Drives themselves
     are only created *later* during one of the `run_..._clicked` actions.
 
     This is analogous to, and was built from, the Drives-tab equivalent
