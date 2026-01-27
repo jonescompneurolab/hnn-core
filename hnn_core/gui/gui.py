@@ -1990,6 +1990,7 @@ class HNNGUI:
         tonic_specs = net.external_biases
 
         prior_opt_widget_values = {}
+        # This is a check for if there's existing "state" in the Optimization drive widgets:
         if self.opt_drive_widgets:
             # This means there's existing "state" in the Optimization drive widgets,
             # such as if we're doing a second round of optimization after the user has
