@@ -1191,9 +1191,16 @@ class HNNGUI:
 
         config_panel, figs_output = self.viz_manager.compose()
 
-        # Create optimizer tab
+        # Create optimization tab
+        # -----------------------------------------
+        # The Optimization tab is divided into 4 main sections:
+        # 1. The always-shown top-level optimization parameters
+        # 2. The "target" parameters box (dynamic, depending on your objective function)
+        # 3. The always-shown "Run Optimization" and "Save Optimization History" buttons
+        # 4. The drives accordion (dynamic, depending on existing drives in the Drives tab)
         opt_box = VBox(
             [
+                # 1. Top-level optimization parameters
                 HBox(
                     [
                         VBox(
@@ -1214,7 +1221,9 @@ class HNNGUI:
                         ),
                     ]
                 ),
+                # 2. Target parameters box (a dynamic Output widget)
                 self._opt_target_out,
+                # 3. Run and Save History buttons
                 HBox(
                     [
                         self.run_opt_button,
@@ -1222,6 +1231,7 @@ class HNNGUI:
                     ],
                     layout=Layout(width="100%"),
                 ),
+                # 4. Drives accordion (a dynamic Output widget)
                 self._opt_drives_out,
             ]
         )
