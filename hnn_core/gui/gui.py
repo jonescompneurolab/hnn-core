@@ -46,7 +46,7 @@ from ipywidgets import (
 from ipywidgets.embed import embed_minimal_html
 import hnn_core
 from hnn_core import JoblibBackend, MPIBackend, simulate_dipole
-from hnn_core.optimization import Optimizer
+from hnn_core.optimization import Optimizer, generate_opt_history_table
 from hnn_core.gui._logging import logger
 from hnn_core.gui._viz_manager import _VizManager, _idx2figname
 from hnn_core.network import pick_connection
@@ -1859,105 +1859,6 @@ class HNNGUI:
             self.widget_opt_obj_fun.value,
         )
 
-    def _generate_opt_history_table(self, report_timestamp):
-        """Generate a human-readable text table of optimization history.
-
-        Parameters
-        ----------
-        report_timestamp : str
-            A timestamp which will be used to indicate the time when the report was generated. This
-            will represent the same time as the time used to generate the filename for the report.
-
-        Returns
-        -------
-        str
-            A formatted text table documenting the initial and final values
-            of optimized parameters and the first/final objective function values
-            for each full optimization run.
-        """
-        if not self.opt_results:
-            return "No optimization runs have been completed yet."
-
-        lines = []
-        lines.append("=" * 100)
-        lines.append("OPTIMIZATION HISTORY")
-        lines.append(f"Generated: {report_timestamp}")
-        lines.append("=" * 100)
-        lines.append("")
-
-        for run_idx, opt_result in enumerate(self.opt_results, start=1):
-            solver = opt_result.get("solver", "N/A")
-            obj_fun = opt_result.get("obj_fun", "unknown")
-            max_iter = opt_result.get("max_iter", "N/A")
-
-            lines.append(f"Run #{run_idx}")
-            lines.append("-" * 100)
-            lines.append(f"Solver: {solver}")
-            lines.append(f"Objective Function: {obj_fun}")
-            lines.append(f"Max Iterations: {max_iter}")
-
-            # Add target dataset info if using dipole_rmse
-            if obj_fun == "dipole_rmse" and "target_data" in opt_result:
-                lines.append(f"Target Dataset: {opt_result['target_data']}")
-                if "n_trials" in opt_result:
-                    lines.append(f"Number of Trials: {opt_result['n_trials']}")
-
-            # Add frequency band info if using maximize_psd
-            if obj_fun == "maximize_psd" and "psd_f_bands" in opt_result:
-                f_bands = opt_result["psd_f_bands"]
-                rel_bandpower = opt_result["psd_relative_bandpower"]
-                for i, (band, weight) in enumerate(
-                    zip(f_bands, rel_bandpower), start=1
-                ):
-                    lines.append(
-                        f"  Frequency Band {i}: {band[0]:.1f}-{band[1]:.1f} Hz (weight: {weight:.3f})"
-                    )
-
-            lines.append("")
-
-            # Get parameter names from initial_params dict
-            param_names = list(opt_result["initial_params"].keys())
-
-            # Create header
-            header = f"{'Parameter':<40} {'Initial Value':>15} {'Final Value':>15} {'Change':>15}"
-            lines.append(header)
-            lines.append("-" * 100)
-
-            # Add each parameter
-            for param_idx, param_name in enumerate(param_names):
-                initial_val = opt_result["initial_params"][param_name]
-                # opt_params should be a list in the same order as "initial_params"
-                final_val = opt_result["opt_params"][param_idx]
-                change = final_val - initial_val
-
-                # Format the values with appropriate precision
-                param_str = f"{param_name:<40}"
-                initial_str = f"{initial_val:>15.6f}"
-                final_str = f"{final_val:>15.6f}"
-                change_str = f"{change:>+15.6f}"
-
-                line = f"{param_str} {initial_str} {final_str} {change_str}"
-                lines.append(line)
-
-            lines.append("")
-            # Display objective function values with RMSE context if applicable
-            if obj_fun == "dipole_rmse":
-                lines.append("Objective Function (RMSE) Values:")
-            else:
-                lines.append(f"Objective Function ({obj_fun}) Values:")
-
-            for obj_idx, obj_out in enumerate(opt_result["obj_values"]):
-                lines.append(f"  Iteration {obj_idx}: {obj_out:>15.6f}")
-
-            obj_diff = opt_result["obj_values"][-1] - opt_result["obj_values"][0]
-            lines.append(f"Total Change:  {obj_diff:>+15.6f}")
-
-            lines.append("")
-            lines.append("=" * 100)
-            lines.append("")
-
-        return "\n".join(lines)
-
     def _update_opt_history_button(self):
         """Update the optimization history download button with current data."""
         # Create the timestamps
@@ -1966,7 +1867,7 @@ class HNNGUI:
         filename_timestamp = time_now.strftime("%Y%m%d_%H%M%S")
 
         # Generate the table content
-        table_content = self._generate_opt_history_table(report_timestamp)
+        table_content = generate_opt_history_table(self.opt_results, report_timestamp)
 
         # Encode the content for download
         b64 = base64.b64encode(table_content.encode())
