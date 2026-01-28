@@ -11,6 +11,279 @@ import warnings
 from .externals.mne import _validate_type
 
 
+def _aggregate_connection_currents(net, trial_idx, times):
+    current_data = {}
+
+    # connection map from connectivity list
+    for conn in net.connectivity:
+        src_type = conn["src_type"]
+        target_type = conn["target_type"]
+        receptor = conn["receptor"]
+
+        # skip if target is not a valid cell type
+        if target_type not in net.cell_types:
+            continue
+
+        key = (src_type, target_type)
+        if key not in current_data:
+            current_data[key] = np.zeros(len(times))
+
+        # summing the currents across all target cells
+        for target_gid in net.gid_ranges[target_type]:
+            if target_gid not in net.cell_response.isec[trial_idx]:
+                continue
+
+            cell_isec = net.cell_response.isec[trial_idx][target_gid]
+
+            # summing across sections and synapses
+            for sec_currents in cell_isec.values():
+                for syn_name, syn_current in sec_currents.items():
+                    # matching synapse by receptor type
+                    if syn_name.split("_")[-1] == receptor:
+                        current_array = np.array(syn_current)
+                        if len(current_array) == len(times):
+                            current_data[key] += np.abs(current_array)
+
+    return current_data
+
+
+def _get_layer_groups(net):
+    """
+    layer groups using the filter_cell_types() for meta data
+    """
+    layer_groups = {}
+
+    unique_layers = set()
+    for cell_data in net.cell_types.values():
+        layer = cell_data.get("cell_metadata", {}).get("layer")
+        if layer:
+            unique_layers.add(layer)
+
+    for layer in unique_layers:
+        layer_name = f"L{layer}"
+        layer_groups[layer_name] = net.filter_cell_types(layer=layer)
+
+    return layer_groups
+
+
+def plot_current_exchange(
+    net,
+    trial_idx=0,
+    ax=None,
+    times=None,
+    decim=None,
+    show=True,
+    colormap="viridis",
+    normalize=True,
+):
+    from hnn_core.viz import _decimate_plot_data, plt_show
+    from matplotlib.gridspec import GridSpec
+    import matplotlib.pyplot as plt
+
+    if net.cell_response is None:
+        raise ValueError("Network must be simulated before plotting")
+    if not net.cell_response.isec:
+        raise ValueError("Network must be simulated with record_isec='all'")
+
+    times = np.array(net.cell_response.times if times is None else times)
+
+    # getting sources (drives + cell types) and targets (cell types only, drives can't receive current?)
+    # will delete this comment after discussing with y'all tho^
+    all_sources = list(net.external_drives.keys()) + list(net.cell_types.keys())
+    target_types = list(net.cell_types.keys())
+
+    # aggregate currents by connection type
+    current_data = _aggregate_connection_currents(net, trial_idx, times)
+
+    n_sources, n_targets = len(all_sources), len(target_types)
+
+    if ax is None:
+        fig = plt.figure(figsize=(3 * n_targets, 2.5 * n_sources))
+        gs = GridSpec(n_sources, n_targets, figure=fig, hspace=0.35, wspace=0.35)
+        axes = [
+            [fig.add_subplot(gs[i, j]) for j in range(n_targets)]
+            for i in range(n_sources)
+        ]
+    else:
+        fig = ax[0][0].get_figure()
+        axes = ax
+
+    cmap = plt.get_cmap(colormap)
+    colors = [cmap(i / max(1, n_sources - 1)) for i in range(n_sources)]
+
+    # plotting each source-target pair
+    for i, src_type in enumerate(all_sources):
+        for j, target_type in enumerate(target_types):
+            ax_curr = axes[i][j]
+            key = (src_type, target_type)
+
+            if key in current_data and np.any(current_data[key] != 0):
+                data = current_data[key].copy()
+                plot_times = times.copy()
+
+                if normalize and np.max(np.abs(data)) > 0:
+                    data = data / np.max(np.abs(data))
+
+                if decim is not None:
+                    data, plot_times = _decimate_plot_data(decim, data, plot_times)
+
+                ax_curr.plot(plot_times, data, color=colors[i], linewidth=1.5)
+                ax_curr.set_xlim([plot_times[0], plot_times[-1]])
+                ax_curr.set_ylim([0, 1.1] if normalize else None)
+
+                if not normalize:
+                    ax_curr.ticklabel_format(axis="y", style="sci", scilimits=(-2, 2))
+            else:
+                ax_curr.text(
+                    0.5,
+                    0.5,
+                    "No\nConnection",
+                    ha="center",
+                    va="center",
+                    transform=ax_curr.transAxes,
+                    fontsize=9,
+                    alpha=0.5,
+                )
+                ax_curr.set_xticks([])
+                ax_curr.set_yticks([])
+
+            if i == 0:
+                ax_curr.set_title(f"→ {target_type}", fontsize=9, pad=5)
+            if j == 0:
+                ax_curr.set_ylabel(
+                    f"{src_type}\n→",
+                    fontsize=9,
+                    rotation=0,
+                    ha="right",
+                    va="center",
+                    labelpad=15,
+                )
+            if i == n_sources - 1:
+                ax_curr.set_xlabel("Time (ms)", fontsize=8)
+
+            ax_curr.grid(True, alpha=0.3, linewidth=0.5)
+            ax_curr.tick_params(labelsize=7)
+
+    title = "Synaptic Current Exchange Matrix"
+    if normalize:
+        title += " (Normalized)"
+    plt.suptitle(title, fontsize=14, y=0.998)
+
+    plt_show(show)
+    return fig
+
+
+def plot_layer_comparison(
+    net, trial_idx=0, ax=None, times=None, decim=None, show=True, normalize=False
+):
+    from hnn_core.viz import _decimate_plot_data, plt_show
+    import matplotlib.pyplot as plt
+
+    times = np.array(net.cell_response.times if times is None else times)
+
+    layer_groups = _get_layer_groups(net)
+
+    source_groups = layer_groups.copy()
+    for drive_name in net.external_drives.keys():
+        source_groups[drive_name] = [drive_name]
+
+    target_groups = layer_groups.copy()
+
+    group_currents = {}
+    current_data = _aggregate_connection_currents(net, trial_idx, times)
+
+    for src_group_name, src_types in source_groups.items():
+        for target_group_name, target_types in target_groups.items():
+            total_current = np.zeros(len(times))
+
+            for src_type in src_types:
+                for target_type in target_types:
+                    key = (src_type, target_type)
+                    if key in current_data:
+                        total_current += current_data[key]
+
+            group_currents[(src_group_name, target_group_name)] = total_current
+
+    source_names = list(source_groups.keys())
+    target_names = list(target_groups.keys())
+    n_sources, n_targets = len(source_names), len(target_names)
+
+    if ax is None:
+        fig, axes = plt.subplots(
+            n_sources, n_targets, figsize=(4 * n_targets, 3 * n_sources), squeeze=False
+        )
+    else:
+        fig = ax.get_figure() if hasattr(ax, "get_figure") else ax[0][0].get_figure()
+        axes = np.array(ax).reshape(n_sources, n_targets)
+
+    if normalize:
+        total_all = np.zeros(len(times))
+        for curr in group_currents.values():
+            total_all += curr
+        total_all[total_all == 0] = 1
+
+    # plotting each source-target group pair
+    for i, src_group in enumerate(source_names):
+        for j, target_group in enumerate(target_names):
+            ax_curr = axes[i, j]
+            key = (src_group, target_group)
+            data = group_currents[key].copy()
+            plot_times = times.copy()
+
+            if np.any(data != 0):
+                if normalize:
+                    plot_data = 100 * data / total_all
+                else:
+                    plot_data = data
+
+                if decim is not None:
+                    plot_data, plot_times = _decimate_plot_data(
+                        decim, plot_data, plot_times
+                    )
+
+                ax_curr.plot(plot_times, plot_data, linewidth=2, color="C0")
+                ax_curr.fill_between(plot_times, plot_data, alpha=0.3, color="C0")
+                ax_curr.set_xlim([plot_times[0], plot_times[-1]])
+
+                if normalize:
+                    ax_curr.set_ylim([0, max(5, np.max(plot_data) * 1.1)])
+                else:
+                    ax_curr.ticklabel_format(axis="y", style="sci", scilimits=(-2, 2))
+            else:
+                ax_curr.text(
+                    0.5,
+                    0.5,
+                    "No Current",
+                    ha="center",
+                    va="center",
+                    transform=ax_curr.transAxes,
+                    fontsize=10,
+                    alpha=0.5,
+                )
+
+            if i == 0:
+                ax_curr.set_title(f"→ {target_group}", fontsize=11, fontweight="bold")
+            if j == 0:
+                ylabel = "% of Total\nCurrent" if normalize else "Current (nA)"
+                ax_curr.set_ylabel(
+                    f"{src_group}\n→\n{ylabel}", fontsize=10, fontweight="bold"
+                )
+            if i == n_sources - 1:
+                ax_curr.set_xlabel("Time (ms)", fontsize=9)
+
+            ax_curr.grid(True, alpha=0.3)
+            ax_curr.tick_params(labelsize=8)
+
+    title = "Layer-wise Current Exchange"
+    if normalize:
+        title += " (% of Total)"
+    plt.suptitle(title, fontsize=14, y=0.998)
+    plt.tight_layout()
+
+    plt_show(show)
+    return fig
+
+
 def _lighten_color(color, amount=0.5):
     import matplotlib.colors as mc
 
