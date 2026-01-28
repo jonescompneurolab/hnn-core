@@ -3811,30 +3811,34 @@ def _create_opt_widgets_for_drive_var(
 ):
     """For a drive variable, create its multiple Optimization widgets and observers.
 
-    For each drive's variable that we want to allow Optimization for, we need to create
-    4 widgets:
+    For each drive's variable that we want to allow Optimization for, we need to create 4 widgets.
+    If the user has previously indicated (by checking a checkbox) that they want to optimize this
+    variable, then the widget will be initialized with those prior values. The four widgets are:
 
         1. The widget showing that variable inside the drive's accordion entry. This
-        widget is disabled/ghosted by default, since contains the same information as
-        the variable's value in the equivalent widget in the Drives tab. Towards the end
-        of this function, we create an observation such that the Optimization version of
-        the widget updates its value based on changes in the Drive version of the
-        widget.
+        widget is disabled/ghosted by default, since contains the same information as the variable's
+        value in the equivalent widget in the Drives tab. Towards the end of this function, we
+        create an observation such that the Optimization version of the widget updates its value
+        based on changes in the Drive version of the widget.
 
         2. A checkbox widget for whether this variable should have its value and
-        constraints used during the Optimization. This checkbox is False by default, and
-        is used later in `_generate_constraints_and_func` to build the "parameters
-        update function" (`set_params`) that is needed by the Optimization process.
+        constraints used during the Optimization. This checkbox is False by default, and is used
+        later in `_generate_constraints_and_func` to build the "parameters update function"
+        (`set_params`) that is needed by the Optimization process.
 
         3. A widget for the "minimum" percentage of the current value of the drive
-        variable, to be used as the minimum of the constraint range. This will only be
-        actually used if the checkbox is checked.
+        variable, to be used as the minimum of the constraint range. This will only be actually used
+        if the checkbox is checked.
 
         4. A widget for the "maximum" percentage of the current value of the drive
-        variable, to be used as the maximum of the constraint range. This will only be
-        actually used if the checkbox is checked.
+        variable, to be used as the maximum of the constraint range. This will only be actually used
+        if the checkbox is checked.
     """
 
+    # These variables will hold prior Optimization widget values, if they exist. This way, if the
+    # user has previously executed GUI Optimization runs and set certain variables to be optimized
+    # with specific constraint ranges, those values will be retained and used to initialize the
+    # widgets below.
     prior_checkbox, prior_min_pct, prior_max_pct = None, None, None
     if prior_opt_widget_values:
         unique_param_name = str(
