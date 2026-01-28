@@ -516,7 +516,6 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
     
-    # loc = 'distal'
     # receptor='gabab'
     # key = f'gbar_L2Basket_L2Pyr_{receptor}'
     # weight = params[key]
@@ -534,13 +533,6 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
     weight = params[key]
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
-    
-    # loc = 'distal'
-    # receptor = 'gabab'
-    # key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
-    # weight = params[key]
-    # net.add_connection(
-    #     src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # layer2 Pyr -> layer5 Pyr
     src_cell = 'L2_pyramidal'
