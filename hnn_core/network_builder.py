@@ -68,7 +68,8 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
     h.finitialize()
 
     def simulation_time():
-        print(f"Trial {trial_idx + 1}: {round(h.t, 2)} ms...")
+        if net._verbose:
+            print(f"Trial {trial_idx + 1}: {round(h.t, 2)} ms...")
 
     if rank == 0:
         for tt in range(0, int(h.tstop), 10):
@@ -177,7 +178,7 @@ def _is_loaded_mechanisms():
         return True
 
 
-def load_custom_mechanisms():
+def load_custom_mechanisms(net_verbose=False):
     if _is_loaded_mechanisms():
         return
 
@@ -194,7 +195,9 @@ def load_custom_mechanisms():
         raise FileNotFoundError(f"No .so or .dll file found in {mod_dir}")
 
     h.nrn_load_dll(mech_fname[0])
-    print("Loading custom mechanism files from %s" % mech_fname[0])
+
+    if net_verbose:
+        print("Loading custom mechanism files from %s" % mech_fname[0])
     if not _is_loaded_mechanisms():
         raise ValueError("The custom mechanisms could not be loaded")
 
@@ -348,7 +351,7 @@ class NetworkBuilder(object):
         self._rank = _get_rank()
 
         # load mechanisms needs ParallelContext for get_rank
-        load_custom_mechanisms()
+        load_custom_mechanisms(self.net._verbose)
 
         if self._rank == 0:
             print("Building the NEURON model")
