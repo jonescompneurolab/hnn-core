@@ -5,31 +5,33 @@
 import base64
 import codecs
 import io
+import json
 import logging
 import mimetypes
-import numpy as np
 import sys
-import json
 import urllib.parse
 import urllib.request
 import zipfile
 from collections import defaultdict
 from copy import deepcopy
-from pathlib import Path
 from datetime import datetime
 from functools import partial
+from pathlib import Path
+
+import numpy as np
 from IPython.display import IFrame, display
 from ipywidgets import (
     HTML,
     Accordion,
     AppLayout,
-    FloatText,
     BoundedFloatText,
     BoundedIntText,
+    Box,
     Button,
+    Checkbox,
     Dropdown,
     FileUpload,
-    VBox,
+    FloatText,
     HBox,
     IntText,
     Layout,
@@ -37,24 +39,24 @@ from ipywidgets import (
     RadioButtons,
     Tab,
     Text,
-    Checkbox,
-    Box,
+    VBox,
 )
 from ipywidgets.embed import embed_minimal_html
+
 import hnn_core
 from hnn_core import JoblibBackend, MPIBackend, simulate_dipole
-from hnn_core.gui._logging import logger
-from hnn_core.gui._viz_manager import _VizManager, _idx2figname
-from hnn_core.network import pick_connection
-from hnn_core.dipole import _read_dipole_txt
-from hnn_core.params_default import get_L2Pyr_params_default, get_L5Pyr_params_default
-from hnn_core.hnn_io import dict_to_network, write_network_configuration
 from hnn_core.cells_default import _exp_g_at_dist
+from hnn_core.dipole import _read_dipole_txt
+from hnn_core.gui._logging import logger
+from hnn_core.gui._viz_manager import _idx2figname, _VizManager
+from hnn_core.hnn_io import dict_to_network, write_network_configuration
+from hnn_core.network import pick_connection
 from hnn_core.parallel_backends import (
     _determine_cores_hwthreading,
     _has_mpi4py,
     _has_psutil,
 )
+from hnn_core.params_default import get_L2Pyr_params_default, get_L5Pyr_params_default
 
 hnn_core_root = Path(hnn_core.__file__).parent
 default_network_configuration = hnn_core_root / "param" / "jones2009_base.json"
@@ -189,7 +191,7 @@ class _OutputWidgetHandler(logging.Handler):
         try:
             formatted_record = formatted_record.replace("  - ", "\n")
             formatted_record = "[TIME] " + formatted_record + "\n"
-        except:
+        except Exception:
             pass
         new_output = {
             "name": "stdout",
@@ -2533,7 +2535,8 @@ def _init_network_from_widgets(
                     "A_weight"
                 ] = vbox_key.children[1].children[0].value
 
-                # 1. identify which case of global_gain_textfield applies to this src/target
+                # 1. identify which case of global_gain_textfield applies to this
+                #    src/target
                 global_gain_type = global_gain_type_lookup_dict[
                     (
                         vbox_key._belongsto["src_gids"],
