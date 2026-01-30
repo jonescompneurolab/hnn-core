@@ -403,9 +403,6 @@ class HNNGUI:
         self.params = self.load_parameters(network_configuration)
 
         # Number of available cores
-        # TODO BUG @asoplata I don't think this is working as expected. I am locked
-        # at 1 core no matter what, even when I change the backend to MPI via
-        # widget_backend_selection and then try to select the number of cores
         [self.n_cores, _] = _determine_cores_hwthreading(
             use_hwthreading_if_found=False,
             sensible_default_cores=True,
@@ -496,9 +493,7 @@ class HNNGUI:
             disabled=False,
         )
         # TODO [REVERT]
-        # manually overwriting for now as GUI is not finding number of
-        # available cores corrently and does not allow the user to override the preset
-        # due to "max=self.n_cores"
+        # manually overwriting for now
         self.widget_n_jobs = BoundedIntText(
             value=8,
             min=1,
