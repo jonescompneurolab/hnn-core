@@ -320,7 +320,7 @@ class HNNGUI:
         viz_win_width = self.total_width - left_sidebar_width
         main_content_height = self.total_height - status_height
 
-        config_box_height = main_content_height - (
+        sim_container_height = main_content_height - (
             log_window_height + operation_box_height
         )
         self.layout = {
@@ -350,20 +350,33 @@ class HNNGUI:
                 border="1px solid gray",
                 overflow="scroll",
             ),
+            # "left_sidebar" is a container that wraps the leftmost tabs as well as
+            # the log window
             "left_sidebar": Layout(
                 width=f"{left_sidebar_width}px", height=f"{main_content_height}px"
             ),
-            "left_tab": Layout(
-                width=f"{left_sidebar_width}px", height=f"{config_box_height}px"
+            # TODO DSD Refactor note:
+            # renamed "left_tab" to "param_tabs_container"
+            # this is a container that sets the outer boundry for all of the parameter
+            # tabs, but is not the tabs themselves
+            "param_tabs_container": Layout(
+                width=f"{left_sidebar_width}px", height=f"{sim_container_height}px"
             ),
+            # TODO DSD Depracation warning:
+            # - _operation_buttons will no longer be separate from the simulation tab,
+            #   and so "operation_box" will be removed
             "operation_box": Layout(
                 width=f"{left_sidebar_width}px",
                 height=f"{operation_box_height}px",
                 flex_wrap="wrap",
             ),
-            "config_box": Layout(
+            # TODO DSD Refactor note:
+            # formerly "config_box"
+            # This container is specific to the Simulation tab that sets the
+            # boundary for the parameters therein
+            "sim_container": Layout(
                 width=f"{left_sidebar_width - 40}px",
-                height=f"{config_box_height - 100}px",
+                height=f"{sim_container_height - 100}px",
             ),
             "drive_widget": Layout(width="auto"),
             "drive_textbox": Layout(width="270px", height="auto"),
@@ -390,6 +403,9 @@ class HNNGUI:
         self.params = self.load_parameters(network_configuration)
 
         # Number of available cores
+        # TODO BUG @asoplata I don't think this is working as expected. I am locked
+        # at 1 core no matter what, even when I change the backend to MPI via
+        # widget_backend_selection and then try to select the number of cores
         [self.n_cores, _] = _determine_cores_hwthreading(
             use_hwthreading_if_found=False,
             sensible_default_cores=True,
@@ -479,8 +495,17 @@ class HNNGUI:
             description="MPI cmd:",
             disabled=False,
         )
+        # TODO [REVERT]
+        # manually overwriting for now as GUI is not finding number of
+        # available cores corrently and does not allow the user to override the preset
+        # due to "max=self.n_cores"
         self.widget_n_jobs = BoundedIntText(
-            value=1, min=1, max=self.n_cores, description="Cores:", disabled=False
+            value=8,
+            min=1,
+            # max=self.n_cores,
+            max=8,
+            description="Cores:",
+            disabled=False,
         )
         self.load_data_button = FileUpload(
             accept=".txt,.csv",
@@ -663,6 +688,9 @@ class HNNGUI:
         )
 
         self._log_window = HBox([self._log_out], layout=self.layout["log_out"])
+
+        # TODO [DEPRECATE]
+        # "_operation_buttons" will no longer be separated from the simulation tab
         self._operation_buttons = HBox(
             [
                 self.run_button,
@@ -675,10 +703,15 @@ class HNNGUI:
         )
         # title
         self._header = HTML(
-            value=f"""<div
-            style='background:{self.layout["theme_color"]};
-            text-align:center;color:white;'>
-            HUMAN NEOCORTICAL NEUROSOLVER</div>"""
+            value=f"""
+                <div style='
+                    background:{self.layout["theme_color"]};
+                    text-align:center;
+                    color:white;
+                '>
+                    HUMAN NEOCORTICAL NEUROSOLVER
+                </div>
+            """
         )
 
     @property
@@ -911,8 +944,9 @@ class HNNGUI:
                     ]
                 ),
             ],
-            layout=self.layout["config_box"],
-        )
+            layout=self.layout["sim_container"],
+        ).add_class("simulation-container")
+
         # Displays the default backend options
         handle_backend_change(
             self.widget_backend_selection.value,
@@ -921,7 +955,7 @@ class HNNGUI:
             self.widget_n_jobs,
         )
 
-        connectivity_configuration = Tab()
+        connectivity_configuration = Tab().add_class("network-container")
 
         connectivity_box = VBox(
             [
@@ -937,14 +971,14 @@ class HNNGUI:
                 ),
                 self._connectivity_out,
             ]
-        )
+        ).add_class("connectivity-params")
 
         cell_parameters = VBox(
             [
                 HBox([self.cell_type_radio_buttons, self.cell_layer_radio_buttons]),
                 self._cell_params_out,
             ]
-        )
+        ).add_class("cell-params")
 
         connectivity_configuration.children = [
             connectivity_box,
@@ -962,14 +996,17 @@ class HNNGUI:
                 self.widget_location_selection,
             ],
             layout=Layout(flex="1"),
-        )
+        ).add_class("drive-container")
 
         drives_options = VBox(
             [
                 HBox(
                     [
                         VBox(
-                            [self.load_drives_button, self.delete_drive_button],
+                            [
+                                self.load_drives_button,
+                                self.delete_drive_button,
+                            ],
                             layout=Layout(flex="1"),
                         ),
                         drive_selections,
@@ -989,16 +1026,22 @@ class HNNGUI:
             drives_options,
             config_panel,
         ]
-        titles = ("Simulation", "Network", "External drives", "Visualization")
+        titles = (
+            "Simulation",
+            "Network",
+            "External drives",
+            "Visualization"
+        )
         for idx, title in enumerate(titles):
             left_tab.set_title(idx, title)
+            left_tab.add_class("left-tab")
 
         self.app_layout = AppLayout(
             header=self._header,
             left_sidebar=VBox(
                 [
-                    VBox([left_tab], layout=self.layout["left_tab"]),
-                    self._operation_buttons,
+                    VBox([left_tab], layout=self.layout["param_tabs_container"]),
+                    self._operation_buttons,  # TODO [DEPRECATE]
                     self._log_window,
                 ],
                 layout=self.layout["left_sidebar"],
@@ -1016,6 +1059,10 @@ class HNNGUI:
                 self.layout["simulation_status_height"],
             ],
         )
+
+        self.app_layout.left_sidebar.add_class("left-sidebar")
+        self.app_layout.right_sidebar.add_class("right-sidebar")
+        self._header.add_class("top_header")
 
         self._link_callbacks()
 
