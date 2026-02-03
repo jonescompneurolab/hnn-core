@@ -983,7 +983,15 @@ def _add_figure(
     b, widgets, data, fig_default_params, template_type, scale=0.95, dpi=96
 ):
     fig_idx = data["fig_idx"]["idx"]
-    viz_output_layout = data["visualization_output"]
+    # viz_output_layout = data["visualization_output"]  # TODO remove
+
+    viz_window_width = int(data["visualization_window"].width[:-2])
+    viz_window_height = int(data["visualization_window"].height[:-2])
+    viz_out_width_prct = int(data["visualization_output"].width[:-1])
+    viz_out_height_prct = int(data["visualization_output"].height[:-1])
+    viz_out_width = int(viz_window_width*viz_out_width_prct/100)
+    viz_out_height = int(viz_window_height*viz_out_height_prct/100)
+
     fig_outputs = Output()
     n_tabs = len(widgets["figs_tabs"].children)
 
@@ -997,10 +1005,11 @@ def _add_figure(
     ]
     widgets["figs_tabs"].set_title(n_tabs, _idx2figname(fig_idx))
 
+
     with fig_outputs:
         figsize = (
-            scale * ((int(viz_output_layout.width[:-2]) - 10) / dpi),
-            scale * ((int(viz_output_layout.height[:-2]) - 10) / dpi),
+            scale * (viz_out_width / dpi),
+            scale * (viz_out_height / dpi),
         )
         mosaic = template_type["mosaic"]
         kwargs = template_type["kwargs"]
@@ -1076,7 +1085,7 @@ class _VizManager:
 
         # widgets
         self.axes_config_tabs = Tab()
-        self.figs_tabs = Tab()
+        self.figs_tabs = Tab().add_class("fig-tabs")
         self.axes_config_tabs.selected_index = None
         self.figs_tabs.selected_index = None
         self.figs_config_tab_link = link(
@@ -1133,6 +1142,7 @@ class _VizManager:
             "use_ipympl": self.use_ipympl,
             "simulations": self.gui_data["simulation_data"],
             "fig_idx": self.fig_idx,
+            "visualization_window": self.viz_layout["visualization_window"],
             "visualization_output": self.viz_layout["visualization_output"],
             "figs": self.figs,
         }

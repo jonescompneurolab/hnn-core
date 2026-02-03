@@ -239,7 +239,7 @@ class HNNGUI:
         The operation_box_height of operations box.
     drive_widget_width : int
         The width of GUI drive box.
-    left_sidebar_width : int
+    parameters_window_width : int
         The width of left sidebad.
     log_window_height : int
         The height of logging window.
@@ -304,88 +304,144 @@ class HNNGUI:
         total_height=800,
         total_width=1300,
         header_height=50,
-        button_height=30,
-        operation_box_height=60,
-        drive_widget_width=200,
-        left_sidebar_width=576,
-        log_window_height=150,
         status_height=30,
+        button_height=30,
+        # operation_box_height=60,  # TODO remove
+        # drive_widget_width=200,  # TODO remove
+        param_window_width_prct=0.45,
+        log_window_height_prct=0.25,
         dpi=96,
         network_configuration=default_network_configuration,
     ):
-        # set up styling.
+        # Set up container height / width parameters
+        # ----------------------------------------------------------------------
+        # Containers properties are computed relative to total height/width,
+        # allowing us to scale the GUI size without needed to figure out what the
+        # exact pixel values need to be for each element
         self.total_height = total_height
         self.total_width = total_width
 
-        viz_win_width = self.total_width - left_sidebar_width
-        main_content_height = self.total_height - status_height
+        # We'll compute pixels for the "fixed" outer containers (per AppLayout), but
+        # we'll be able to use percentages for most of the "inner" containers
+        # Note that we must use int() as we cannot have fractional pixel values
+        parameters_window_width = int(total_width * param_window_width_prct)
+        figures_window_width = int(total_width - parameters_window_width)
+        main_content_height = total_height - status_height
 
-        sim_container_height = main_content_height - (
-            log_window_height + operation_box_height
-        )
+        # TODO remove unused variables
+        # - move towards using % for nested containers
+        # log_window_height = int(total_height * log_window_prct)
+        # sim_container_height = (
+        #     total_height
+        #     - status_height
+        #     - log_window_height
+        # )
+
+        # ----------------------------------------------------------------------
+        # Set the layout properties for various GUI components
+        # ----------------------------------------------------------------------
         self.layout = {
+
+            # TODO aggregate and remove unused code
+            # "viz_config": Layout(width="99%"),
+            # "simulations_list": Layout(width=f"{parameters_window_width - 50}px")
+
             "dpi": dpi,
-            "header_height": f"{header_height}px",
             "theme_color": theme_color,
+
+            # button styling
+            # --------------------------------------------------
             "btn": Layout(height=f"{button_height}px", width="auto"),
             "run_btn": Layout(height=f"{button_height}px", width="10%"),
             "btn_full_w": Layout(height=f"{button_height}px", width="100%"),
             "del_fig_btn": Layout(height=f"{button_height}px", width="auto"),
-            "log_out": Layout(
-                border="1px solid gray",
-                height=f"{log_window_height - 10}px",
-                overflow="auto",
+
+            # "Outer" container styling
+            # --------------------------------------------------
+            # Define layout properties for the outer-most containers of AppLayout
+            # Note that we do not (currently) utilize the "center" container,
+            # which is set to 0px in our AppLayout instantiation
+
+            # For reference, AppLayout uses the following structure:
+            # | -------------- header --------------- |
+            # | left-sidebar | center | right-sidebar |
+            # | -------------- footer --------------- |
+
+            # html class: "title-bar"
+            "header_height": f"{header_height}px",
+
+            # Container for parameter specification and the logger output that
+            # fills the "left_sidebar" parameter in AppLayout
+            # html class: "parameters-window"
+            "parameters_window": Layout(
+                width=f"{parameters_window_width}px",
+                height=f"{main_content_height}px",
+                # border="2px solid yellow",  # debug
             ),
-            "viz_config": Layout(width="99%"),
-            "simulations_list": Layout(width=f"{left_sidebar_width - 50}px"),
+
+            # Container for simulation output and visualizations that fills
+            # the "right_sidebar" parameter in AppLayout
+            # html class: "visualization-window"
             "visualization_window": Layout(
-                width=f"{viz_win_width - 10}px",
-                height=f"{main_content_height - 10}px",
-                border="1px solid gray",
-                overflow="scroll",
+                width=f"{figures_window_width}px",
+                height=f"{main_content_height}px",
+                border="1px solid lightgrey",
+                # overflow="scroll",
             ),
-            "visualization_output": Layout(
-                width=f"{viz_win_width - 50}px",
-                height=f"{main_content_height - 100}px",
-                border="1px solid gray",
-                overflow="scroll",
-            ),
-            # "left_sidebar" is a container that wraps the leftmost tabs as well as
-            # the log window
-            "left_sidebar": Layout(
-                width=f"{left_sidebar_width}px", height=f"{main_content_height}px"
-            ),
-            # TODO DSD Refactor note:
-            # renamed "left_tab" to "param_tabs_container"
-            # this is a container that sets the outer boundry for all of the parameter
-            # tabs, but is not the tabs themselves
-            "param_tabs_container": Layout(
-                width=f"{left_sidebar_width}px", height=f"{sim_container_height}px"
-            ),
-            # TODO DSD Depracation warning:
-            # - _operation_buttons will no longer be separate from the simulation tab,
-            #   and so "operation_box" will be removed
-            "operation_box": Layout(
-                width=f"{left_sidebar_width}px",
-                height=f"{operation_box_height}px",
-                flex_wrap="wrap",
-            ),
-            # TODO DSD Refactor note:
-            # formerly "config_box"
-            # This container is specific to the Simulation tab that sets the
-            # boundary for the parameters therein
-            "sim_container": Layout(
-                width=f"{left_sidebar_width - 40}px",
-                height=f"{sim_container_height - 100}px",
-            ),
-            "drive_widget": Layout(width="auto"),
-            "drive_textbox": Layout(width="270px", height="auto"),
-            # simulation status related
+
+            # Container for simulation status that fills the "footer" parameter
+            # in AppLayout
+            # html class: "status-bar"
             "simulation_status_height": f"{status_height}px",
             "simulation_status_common": "background:gray;padding-left:10px",
             "simulation_status_running": "background:orange;padding-left:10px",
             "simulation_status_failed": "background:red;padding-left:10px",
             "simulation_status_finished": "background:green;padding-left:10px",
+
+            # "Inner" container styling
+            # --------------------------------------------------
+            # child of parameters_window
+            "log_out": Layout(
+                border="1px solid lightgray",
+                height="25%",  # TODO get this from log_window_prct
+                width="98%",
+                margin="0px 0px 10px 0px",
+                overflow="auto",
+            ),
+
+            # child of visualization_window
+            # downstream, this determines the dimensions of:
+            #   a. the static figure image: <img src="data:img/png;base64,...>", OR
+            #   b. the dynamic figure: <div class="jupyter-matplotlib-figure">
+            # Note: figure sizes are set in _add_figure in _viz_manager, where
+            # percents are converted to pixels
+            "visualization_output": Layout(
+                width="100%",
+                height="95%",
+                border="1px solid lightgray",
+                # overflow="scroll",
+            ),
+
+            # child of parameters_window
+            # html class: "param-tabs-container"
+            "param_tabs_container": Layout(
+                width="100%",
+                height="100%",
+                # border="2px solid blue",  # debug
+            ),
+
+            # The container below is specific to the Simulation tab and
+            # sets the boundary for the parameters therein
+            # child of "param_tabs_container"
+            # html class: simulation-container
+            "sim_container": Layout(
+                width="100%",
+                height="100%",
+                border="2px solid red"  # debug
+            ),
+
+            "drive_widget": Layout(width="auto"),
+            "drive_textbox": Layout(width="270px", height="auto"),
         }
 
         self._simulation_status_contents = {
@@ -399,6 +455,9 @@ class HNNGUI:
             color:white;'>Simulation failed</div>""",
         }
 
+        # ----------------------------------------------------------------------
+        # Parameters
+        # ----------------------------------------------------------------------
         # load default parameters
         self.params = self.load_parameters(network_configuration)
 
@@ -588,6 +647,7 @@ class HNNGUI:
         )
 
         # Plotting window
+        # --------------------------------------------------
 
         # Visualization figure related dicts
         self.plot_outputs_dict = dict()
@@ -686,16 +746,16 @@ class HNNGUI:
 
         # TODO [DEPRECATE]
         # "_operation_buttons" will no longer be separated from the simulation tab
-        self._operation_buttons = HBox(
-            [
-                self.run_button,
-                self.load_data_button,
-                self.save_config_button,
-                self.save_simuation_button,
-                self.simulation_list_widget,
-            ],
-            layout=self.layout["operation_box"],
-        )
+        # self._operation_buttons = HBox(
+        #     [
+        #         self.run_button,
+        #         self.load_data_button,
+        #         self.save_config_button,
+        #         self.save_simuation_button,
+        #         self.simulation_list_widget,
+        #     ],
+        #     layout=self.layout["operation_box"],
+        # )
         # title
         self._header = HTML(
             value=f"""
@@ -938,6 +998,23 @@ class HNNGUI:
                         self.widget_max_frequency,
                     ]
                 ),
+                VBox(
+                    [
+                        HBox(
+                            [
+                                self.run_button,
+                                self.load_data_button,
+                                self.save_config_button,
+                                self.save_simuation_button,  # TODO fix "simuation" typo
+                                self.simulation_list_widget,
+                            ]
+                        )
+                    ],
+                    layout=Layout(
+                        flex="1",
+                        justify_content="flex-end",
+                    ),
+                ),
             ],
             layout=self.layout["sim_container"],
         ).add_class("simulation-container")
@@ -1015,6 +1092,10 @@ class HNNGUI:
 
         # Tabs for left pane
         left_tab = Tab()
+
+        left_tab.layout.height = "98%"
+        left_tab.layout.width = "98%"
+
         left_tab.children = [
             simulation_box,
             connectivity_configuration,
@@ -1029,23 +1110,22 @@ class HNNGUI:
         )
         for idx, title in enumerate(titles):
             left_tab.set_title(idx, title)
-            left_tab.add_class("left-tab")
+            left_tab.add_class("param-tabs-container")
 
         self.app_layout = AppLayout(
             header=self._header,
             left_sidebar=VBox(
                 [
                     VBox([left_tab], layout=self.layout["param_tabs_container"]),
-                    self._operation_buttons,  # TODO [DEPRECATE]
                     self._log_window,
                 ],
-                layout=self.layout["left_sidebar"],
+                layout=self.layout["parameters_window"],
             ),
             right_sidebar=figs_output,
             footer=self._simulation_status_bar,
             pane_widths=[
-                self.layout["left_sidebar"].width,
-                "0px",
+                self.layout["parameters_window"].width,
+                "0px",  # center container width, currently unused
                 self.layout["visualization_window"].width,
             ],
             pane_heights=[
@@ -1055,9 +1135,11 @@ class HNNGUI:
             ],
         )
 
-        self.app_layout.left_sidebar.add_class("left-sidebar")
-        self.app_layout.right_sidebar.add_class("right-sidebar")
-        self._header.add_class("top_header")
+        # add classes to "outer" containers
+        self.app_layout.left_sidebar.add_class("parameters-window")
+        self.app_layout.right_sidebar.add_class("visualization-window")
+        self.app_layout.header.add_class("title-bar")
+        self.app_layout.footer.add_class("status-bar")
 
         self._link_callbacks()
 
