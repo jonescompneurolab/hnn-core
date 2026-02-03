@@ -3,19 +3,37 @@
 
 Please read the contribution guide **until the end** before beginning contributions.
 
-Contributions are welcome in the form of Pull Requests. You must abide by our [Code of
+Contributions are welcome in the form of Pull Requests (PR's). You must abide by our [Code of
 Conduct, found
-here](https://github.com/jonescompneurolab/hnn-core/blob/master/CODE_OF_CONDUCT.md), which includes instructions on what kind of AI- and LLM-generated code contributions we accept. Our
-{doc}`Governance Model can be found here <governance>`. Please tie your Pull Requests to specific Issues.
+here](https://github.com/jonescompneurolab/hnn-core/blob/master/CODE_OF_CONDUCT.md),
+which includes instructions on what kind of AI- and LLM-generated code contributions we
+accept. Our {doc}`Governance Model can be found here <governance>`.
 
-Once the implementation of a piece of functionality is considered to be bug free and
-properly documented (both API docs and an example script), it can be incorporated into
-the `master` branch, which is where our releases come from.
+Please **double-check that your new Pull Request does not accomplish the same task as
+any existing Pull Request**! We reserve the right to close any new PRs that are
+"duplicates" of work (and any PR in general). Please tie your Pull Requests to specific
+Issues. Once the implementation of a piece of functionality is considered to be bug free
+and properly documented (both API docs and possibly an example script), and we have
+reviewed it, we may merge it into the `master` branch, which is where our releases come
+from.
 
-To contribute to `hnn-core` development, you need a special kind of installation, see the
-["`pip` Source Installation" section of our Installation Guide][] on our [Textbook website][]. Note that this is **different** from the "`pip` Package Installation" type on that webpage!
+If you are interested in contributing to `hnn-core` as part of Google Summer of Code
+2026, [please see the Issue here for the latest
+information](https://github.com/jonescompneurolab/hnn-core/issues/1202).
 
-We are experimenting with having once-monthly HNN Development meetings which are open to the public. These take place on the first Monday of every month at 1:00 PM, United States Eastern time (the [timezone of Providence, RI, viewable here](https://www.timeanddate.com/worldclock/usa/providence)). You can access the Zoom room here [https://brown.zoom.us/j/99212200748](https://brown.zoom.us/j/99212200748). Note that there is a waiting room and you *must raise your hand* before you will be granted audio privileges. We reserve the right to kick out anyone causing disruptions during the meeting.
+To contribute to `hnn-core` development, you need a special kind of installation, see
+the ["`pip` Source Installation" section of our Installation Guide][] on our [Textbook
+website][]. Note that this is **different** from the "`pip` Package Installation" type
+on that webpage!
+
+We are experimenting with having once-monthly HNN Development meetings which are open to
+the public. These take place on the first Monday of every month at 1:00 PM, United
+States Eastern time (the [timezone of Providence, RI, viewable
+here](https://www.timeanddate.com/worldclock/usa/providence)). You can access the Zoom
+room here
+[https://brown.zoom.us/j/99212200748](https://brown.zoom.us/j/99212200748). Note that
+there is a waiting room and you *must raise your hand* before you will be granted
+audio/video privileges. We will kick out anyone causing disruptions during the meeting.
 
 ## How to contribute code
 
