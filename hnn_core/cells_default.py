@@ -808,7 +808,7 @@ def interneuron(cell_name,pos=(0,0,0), layer=2, gid=None):
     p_all = get_Int_params()
     sections = dict()
     sections['soma'] = _get_interneuron_soma(cell_name, v_init=-65)
-    synapses = _get_syn_props(p_all, 'Int', syn_types=["ampa", "nmda", "gabaa"])
+    synapses = _get_syn_props(p_all, 'Int', syn_types=["ampa", "nmda", "gabaa", "gabab"])
     sections['soma'].syns = list(synapses.keys())
 
     if layer == 2:

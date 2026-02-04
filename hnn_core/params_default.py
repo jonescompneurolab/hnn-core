@@ -510,4 +510,8 @@ def get_Int_params():
         "Int_gabaa_tau1": 0.5,
         "Int_gabaa_tau2": 5.0,
         "Int_gabaa_type": "Exp2Syn",
+        "Int_gabab_e": -80.0,
+        "Int_gabab_tau1": 45,
+        "Int_gabab_tau2": 200,
+        "Int_gabab_type": "gabab"
     }
