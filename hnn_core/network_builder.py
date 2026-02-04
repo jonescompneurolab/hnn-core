@@ -198,6 +198,7 @@ def load_custom_mechanisms(net_verbose=False):
 
     if net_verbose:
         print("Loading custom mechanism files from %s" % mech_fname[0])
+
     if not _is_loaded_mechanisms():
         raise ValueError("The custom mechanisms could not be loaded")
 
@@ -353,7 +354,7 @@ class NetworkBuilder(object):
         # load mechanisms needs ParallelContext for get_rank
         load_custom_mechanisms(self.net._verbose)
 
-        if self._rank == 0:
+        if self._rank == 0 and self.net._verbose:
             print("Building the NEURON model")
 
         self._clear_last_network_objects()
@@ -390,7 +391,7 @@ class NetworkBuilder(object):
         if len(self.net.rec_arrays) > 0:
             self._record_extracellular()
 
-        if self._rank == 0:
+        if self._rank == 0 and self.net._verbose:
             print("[Done]")
 
     def _gid_assign(self, rank=None, n_hosts=None):
