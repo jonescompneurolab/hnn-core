@@ -5,7 +5,7 @@ from hnn_core import jones_2009_model, MPIBackend, simulate_dipole
 net = jones_2009_model()
 
 # (for now) manually attach a new attribute to net
-net._verbose = False
+#net._verbose = False
 
 #breakpoint()
 #print(net)
