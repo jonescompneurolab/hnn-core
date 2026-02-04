@@ -11,11 +11,12 @@ from copy import deepcopy
 import numpy as np
 from neuron import h
 
-# This is due to: https://github.com/neuronsimulator/nrn/pull/746
-from neuron import __version__
+# # This is due to: https://github.com/neuronsimulator/nrn/pull/746
+# from neuron import __version__
 
-if int(__version__[0]) >= 8:
-    h.nrnunit_use_legacy(1)
+# TODO AES ugh need to check all units?????
+# if int(__version__[0]) >= 8:
+#     h.nrnunit_use_legacy(1)
 
 from .cell import _ArtificialCell
 from .params import _long_name, _short_name
@@ -186,7 +187,7 @@ def load_custom_mechanisms():
     mod_dir = op.join(op.dirname(__file__), "mod")
     for root, dirnames, filenames in os.walk(mod_dir):
         for filename in filenames:
-            if filename.endswith((".so", ".dll")):
+            if filename.endswith((".so", ".dll", ".dylib")):
                 mech_fname.append(os.path.join(root, filename))
                 break
 
