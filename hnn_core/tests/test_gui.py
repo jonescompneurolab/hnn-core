@@ -263,6 +263,35 @@ def test_gui_upload_drives():
     plt.close("all")
 
 
+def test_gui_rerun_saved_network_without_n_trials():
+    """Test rerunning a GUI-saved network without N_trials defined.
+    Ensures simulate_dipole defaults correctly instead of raising KeyError.
+    """
+
+    gui = HNNGUI()
+    gui.compose()
+
+    gui.widget_tstop.value = 20
+    gui.widget_dt.value = 0.5
+    gui.widget_ntrials.value = 1
+
+    gui.run_button.click()
+
+    sim_name = gui.widget_simulation_name.value
+    net = gui.simulation_data[sim_name]["net"]
+
+    cfg_path = Path("saved_network.json")
+    net.write_configuration(cfg_path)
+
+    loaded_net = read_network_configuration(cfg_path)
+    loaded_net._params.pop("N_trials", None)
+
+    dpls = simulate_dipole(loaded_net, tstop=20.0, dt=0.5)
+
+    assert isinstance(dpls, list)
+    assert len(dpls) == 1
+
+
 def test_gui_upload_data():
     """Test if gui handles uploaded data"""
     gui = HNNGUI()
