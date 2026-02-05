@@ -22,17 +22,32 @@ from .hnn_io import (
 __version__ = "0.5.1.dev0"
 
 
-def _print_survey_handler():
-    try:
-        from .print_survey_link import _print_survey_link
+import json
+from pathlib import Path
+from textwrap import dedent
 
-        _print_survey_link()
-    except ImportError as e:
+
+def _print_survey_link():
+    """Print the survey link, unless the "seen" file already exists."""
+    storage_dir = Path(__file__).parent
+    storage_file = storage_dir / "survey_seen.json"
+
+    if not storage_file.exists():
         print(
-            "Warning: Could not run `_print_survey_link`, something is wrong "
-            "with your HNN-Core import:",
-            e,
+            dedent("""
+        -------------------------------------------------------------------------------------------------------
+        Thank you for installing HNN-Core! Please fill out our survey at:
+
+            https://docs.google.com/forms/d/e/1FAIpQLSfN2F4IkGATs6cy1QBO78C6QJqvm9y14TqsCUsuR4Rrkmr1Mg/viewform
+
+        Filling out our survey REALLY helps us to provide support and maintenance for HNN-Core.
+
+        This message should only display once, after you have first installed HNN-Core. Happy modeling!
+        -------------------------------------------------------------------------------------------------------
+        """)
         )
+        with open(storage_file, "w") as f:
+            json.dump({"survey_seen": True}, f)
 
 
-_print_survey_handler()
+_print_survey_link()
