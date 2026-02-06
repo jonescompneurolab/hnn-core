@@ -206,18 +206,20 @@ def _corr_evoked(
     new_net = initial_net.copy()
 
     set_params_batch = lambda a,b: set_params(b, a) # need to fix this
+    
     batch_simulation = BatchSimulate(net=new_net,
                                     set_params=set_params_batch,
                                     save_outputs=False,
                                     save_dpl=True,
+                                    dt=obj_fun_kwargs.get('dt', 0.025),
+                                    n_trials=obj_fun_kwargs.get('n_trials', 1),
                                     tstop=tstop,
-                                    dt=0.5,
                                     overwrite=False,
                                     clear_cache=False,
                                     verbose=0)
 
     res = batch_simulation.run(params_batch,
-                            n_jobs=50,
+                            n_jobs=obj_fun_kwargs.get('n_jobs', 50),
                             combinations=False,
                             backend='loky',
                             verbose=0)
@@ -225,13 +227,14 @@ def _corr_evoked(
     dpls = list()
     for batch_res in res['simulated_data']:
         for data in batch_res:
-            dpls.append(data['dpl'][0])
-
-    # smooth & scale
-    if "scale_factor" in obj_fun_kwargs:
-        [dpl.scale(obj_fun_kwargs["scale_factor"]) for dpl in dpls]
-    if "smooth_window_len" in obj_fun_kwargs:
-        [dpl.smooth(obj_fun_kwargs["smooth_window_len"]) for dpl in dpls]
+            # smooth & scale all dipoles in this population (defined by n_trials)
+            if "scale_factor" in obj_fun_kwargs:
+                [trl_dpl.scale(obj_fun_kwargs["scale_factor"]) for trl_dpl in data['dpl']]
+            if "smooth_window_len" in obj_fun_kwargs:
+                [trl_dpl.smooth(obj_fun_kwargs["smooth_window_len"]) for trl_dpl in data['dpl']]
+            
+            # average dipoles per population
+            dpls.append(average_dipoles(data['dpl']))
 
     obj = [_corr(dpl, obj_fun_kwargs["target"], tstop=tstop) for dpl in dpls]
     obj_values.append(obj)
