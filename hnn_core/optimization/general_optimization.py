@@ -611,8 +611,8 @@ def _run_opt_cobyla(
 def add_opt_drives(net, tstop=200, n_prox=2, n_dist=1):
     prox_cell_type = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
     dist_cell_type = ['L5_pyramidal', 'L2_pyramidal', 'L2_basket']
-    default_range = {'mu': (0, tstop), 'sigma': (0, 20), 'ampa': (-5, 1), 'nmda': (-5, 1)}
-    default_values = {'mu': tstop // 2, 'sigma': 2, 'ampa': -3, 'nmda': -3}
+    default_range = {'mu': (0, tstop), 'sigma': (0, 20), 'numspikes':(0,1), 'ampa': (-5, 1), 'nmda': (-5, 1)}
+    #default_values = {'mu': tstop // 2, 'sigma': 2, 'numspikes':1, 'ampa': -3, 'nmda': -3}
 
     prox_weights  = {cell_type: 0.0 for cell_type in prox_cell_type}
     dist_weights  = {cell_type: 0.0 for cell_type in dist_cell_type}
@@ -629,6 +629,9 @@ def add_opt_drives(net, tstop=200, n_prox=2, n_dist=1):
 
         constraints[f'{name}_sigma'] = default_range['sigma']
         initial_params[f'{name}_sigma'] = np.random.uniform(*default_range['sigma'])
+
+        constraints[f'{name}_numspikes'] = default_range['numspikes']
+        initial_params[f'{name}_numspikes'] = 1
 
         for cell_type in prox_cell_type:
             constraints[f'{name}_{cell_type}_ampa'] = default_range['ampa']
@@ -655,6 +658,9 @@ def add_opt_drives(net, tstop=200, n_prox=2, n_dist=1):
         constraints[f'{name}_sigma'] = default_range['sigma']
         initial_params[f'{name}_sigma'] = np.random.uniform(*default_range['sigma'])
 
+        constraints[f'{name}_numspikes'] = default_range['numspikes']
+        initial_params[f'{name}_numspikes'] = 1
+
         for cell_type in prox_cell_type:
             constraints[f'{name}_{cell_type}_ampa'] = default_range['ampa']
             initial_params[f'{name}_{cell_type}_ampa'] = np.random.uniform(*default_range['ampa'])
@@ -680,12 +686,22 @@ def set_params_opt_drives(net, param_values):
         target_cell_types = net.external_drives[name]['target_types']
 
         net.external_drives[name]['dynamics']['mu'] = param_values[f'{name}_mu']
-        
-        # Very important this remains above 0.0
-        net.external_drives[name]['dynamics']['sigma'] = max(0.01, param_values[f'{name}_sigma'])
+        net.external_drives[name]['dynamics']['sigma'] = param_values[f'{name}_sigma']
+        net.external_drives[name]['dynamics']['numspikes'] = max(1, int(np.round(param_values[f'{name}_numspikes'])))
+
+        # reinstate external drives to be able to fill in below
+        for receptor in ['ampa', 'nmda']:
+                        net.external_drives[name][f'weights_{receptor}'] = {
+                        ct: 0.0 for ct in target_cell_types
+                    }
 
         for cell_type in target_cell_types:
             for receptor in ['ampa', 'nmda']:
+
                 conn_idx = pick_connection(net, src_gids=name, target_gids=cell_type, receptor=receptor)
                 assert len(conn_idx) == 1
+
+                # KD: I still think this isn't the user-friendliest way as this is pretty hidden. 
+                # Will fix.
                 net.connectivity[conn_idx[0]]['nc_dict']['A_weight'] = 10 ** param_values[f'{name}_{cell_type}_{receptor}']
+                net.external_drives[name][f'weights_{receptor}'][cell_type] = 10 ** param_values[f'{name}_{cell_type}_{receptor}']
