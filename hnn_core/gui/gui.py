@@ -423,21 +423,31 @@ class HNNGUI:
             ),
 
             # child of parameters_window
-            # html class: "param-tabs-container"
-            "param_tabs_container": Layout(
+            # html class: "param-tabs-outer-container"
+            "param_tabs_outer_container": Layout(
                 width="100%",
                 height="100%",
                 # border="2px solid blue",  # debug
             ),
 
+            # child of param_tabs_outer_container
+            # html class: "patam-tabs-widget-container"
+            "param_tabs_widget_container": Layout(
+                width="98%",
+                height="98%",
+                margin="0px 0px 0px 0px",
+                # border="1px solid lightgrey",
+                # border="1px solid yellow",  # debug
+            ),
+
             # The container below is specific to the Simulation tab and
             # sets the boundary for the parameters therein
-            # child of "param_tabs_container"
+            # child of "param_tabs_outer_container"
             # html class: simulation-container
             "sim_container": Layout(
                 width="100%",
                 height="100%",
-                border="2px solid red"  # debug
+                # border="2px solid red"  # debug
             ),
 
             "drive_widget": Layout(width="auto"),
@@ -742,7 +752,10 @@ class HNNGUI:
             value=self._simulation_status_contents["not_running"]
         )
 
-        self._log_window = HBox([self._log_out], layout=self.layout["log_out"])
+        self._log_window = HBox(
+            [self._log_out],
+            layout=self.layout["log_out"]
+        ).add_class("log-out")
 
         # TODO [DEPRECATE]
         # "_operation_buttons" will no longer be separated from the simulation tab
@@ -1093,8 +1106,10 @@ class HNNGUI:
         # Tabs for left pane
         left_tab = Tab()
 
-        left_tab.layout.height = "98%"
-        left_tab.layout.width = "98%"
+        # left_tab.layout.height = "98%"
+        # left_tab.layout.width = "98%"
+
+        left_tab.layout = self.layout["param_tabs_widget_container"]
 
         left_tab.children = [
             simulation_box,
@@ -1110,13 +1125,15 @@ class HNNGUI:
         )
         for idx, title in enumerate(titles):
             left_tab.set_title(idx, title)
-            left_tab.add_class("param-tabs-container")
+            left_tab.add_class("param-tabs-widget-container")
 
         self.app_layout = AppLayout(
             header=self._header,
             left_sidebar=VBox(
                 [
-                    VBox([left_tab], layout=self.layout["param_tabs_container"]),
+                    VBox(
+                        [left_tab], layout=self.layout["param_tabs_outer_container"]
+                    ).add_class("param-tabs-outer-container"),
                     self._log_window,
                 ],
                 layout=self.layout["parameters_window"],
@@ -1140,6 +1157,23 @@ class HNNGUI:
         self.app_layout.right_sidebar.add_class("visualization-window")
         self.app_layout.header.add_class("title-bar")
         self.app_layout.footer.add_class("status-bar")
+
+        # add styling to children of param-tabs-widget-container
+        tab_styling = HTML(
+            value="""
+            <style>
+                .param-tabs-widget-container .widget-tab-bar {
+                    border: 0px solid lightgrey;
+                }
+                .param-tabs-widget-container .widget-tab-contents {
+                    border-left: 1px solid lightgrey !important;
+                    border-right: 1px solid lightgrey !important;
+                    border-bottom: 1px solid lightgrey !important;
+                }
+            </style>
+            """,
+        )
+        display(tab_styling)
 
         self._link_callbacks()
 
