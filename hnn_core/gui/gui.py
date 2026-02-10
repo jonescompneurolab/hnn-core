@@ -1307,6 +1307,52 @@ class HNNGUI:
         )
         display(log_toggle)
 
+
+        drives_tab_scrollbar_fix = HTML(
+            value="""
+            <style>
+                /*
+                    identify the tab bar
+                    check if its 3rd tab (external drives) is active
+                    selectively style the contents container for that tab
+                */
+                .widget-tab-bar:has(.lm-TabBar-tab:nth-child(3).lm-mod-current) +
+                .widget-tab-contents {
+                    scrollbar-gutter: stable !important;
+                    overflow-y: auto !important;
+                    padding-right: 10px !important;
+                }
+            </style>
+            """,
+        )
+        display(drives_tab_scrollbar_fix)
+
+        stabilize_tabs_height = HTML(
+            value="""
+            <style>
+                /* prevent small pixel shifts when switching between tabs */
+                .jupyter-widget-TabPanel > .widget-tab-contents {
+                    /*
+                        force the tab parent container to use a 'fixed' flex-basis
+                        instead of 'auto', ensuring sizes are calculate based on the
+                        parent's dimensions rather than the child's content. this
+                        prevents height recalculation when the layout changes (e.g.,
+                        when a new scrollbar appears), which can otherwise cause
+                        visible pixel 'jumps'
+                    */
+                    flex-basis: 100% !important;
+
+                    /*
+                        ensure borders and padding are contained within the height
+                        to prevent shifts when the layout changes
+                    */
+                    box-sizing: border-box !important;
+                }
+            </style>
+            """,
+        )
+        display(stabilize_tabs_height)
+
         self._link_callbacks()
 
         # initialize drive and connectivity ipywidgets
