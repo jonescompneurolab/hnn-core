@@ -1241,6 +1241,7 @@ class HNNGUI:
                         # --jp-widgets-input-focus-border-color: var(
                         #     --default-blue-accent
                         # ) !important;
+
                         --jp-widgets-input-focus-border-color: var(
                             --textbook-light-purple
                         ) !important;
@@ -1256,13 +1257,24 @@ class HNNGUI:
                     /* adjust border width on focus for input fields */
                     .jupyter-widgets input:focus,
                     .jupyter-widgets select:focus,
-                    .jupyter-widgets textarea:focus,
-                    .jupyter-widgets .widget-text:focus-within {
-                        --jp-widgets-input-border-width: 3px !important;
+                    .jupyter-widgets textarea:focus {
+                        --jp-widgets-input-border-width: 2px !important;
 
-                        /* change border-width property directly to force update. */
+                        /*  change border-width property directly to force update.  */
                         border-width: var(--jp-widgets-input-border-width) !important;
+
+                        /*
+                            adjust text padding on focus to account for increase
+                            in border thickness from 1px to 2px
+                        */
+                        padding:
+                            var(--jp-widgets-input-padding)
+                            0
+                            var(--jp-widgets-input-padding)
+                            calc(var(--jp-widgets-input-padding) * 2 - 1px)
+                            !important;
                     }
+
                 </style>
             """
         )
