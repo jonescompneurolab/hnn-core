@@ -328,6 +328,9 @@ class HNNGUI:
         figures_window_width = int(total_width - parameters_window_width)
         main_content_height = total_height - status_height
 
+        # specify gap between vertical AppLayout panels
+        footer_gap = 10
+
         # TODO remove unused variables
         # - move towards using % for nested containers
         # log_window_height = int(total_height * log_window_prct)
@@ -384,7 +387,8 @@ class HNNGUI:
             # html class: "visualization-window"
             "visualization_window": Layout(
                 width=f"{figures_window_width}px",
-                height=f"{main_content_height}px",
+                height=f"{main_content_height-footer_gap}px",
+                # border="1px solid lightgrey",
                 border="1px solid lightgrey",
                 # overflow="scroll",
             ),
@@ -405,7 +409,7 @@ class HNNGUI:
                 border="1px solid lightgray",
                 height="25%",  # TODO get this from log_window_prct
                 width="98%",
-                margin="0px 0px 10px 0px",
+                margin=f"0px 0px {footer_gap}px 0px",
                 overflow="auto",
             ),
 
@@ -1147,7 +1151,7 @@ class HNNGUI:
             ],
             pane_heights=[
                 self.layout["header_height"],
-                self.layout["visualization_window"].height,
+                self.layout["parameters_window"].height,
                 self.layout["simulation_status_height"],
             ],
         )
