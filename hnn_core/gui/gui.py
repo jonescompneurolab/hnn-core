@@ -1163,7 +1163,7 @@ class HNNGUI:
         self.app_layout.footer.add_class("status-bar")
 
         # add styling to children of param-tabs-widget-container
-        tab_styling = HTML(
+        param_tabs_styling = HTML(
             value="""
             <style>
                 .param-tabs-widget-container .widget-tab-bar {
@@ -1177,7 +1177,20 @@ class HNNGUI:
             </style>
             """,
         )
-        display(tab_styling)
+        display(param_tabs_styling)
+
+        # make subtabs (e.g., the Connectivity tab under Network) "sticky"
+        make_subtabs_sticky = HTML(
+            value="""
+            <style>
+                .network-container {
+                    height: 99% !important;
+                    flex: none !important;
+                }
+            </style>
+            """,
+        )
+        display(make_subtabs_sticky)
 
         self._link_callbacks()
 
