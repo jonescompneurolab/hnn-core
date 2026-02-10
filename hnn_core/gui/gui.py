@@ -1192,6 +1192,46 @@ class HNNGUI:
         )
         display(make_subtabs_sticky)
 
+        adjust_accent_colors = HTML(
+            value="""
+                <style>
+                    /* set or overwrite root variables */
+                    :root {
+                        /* set color variables */
+                        --theme-color: #802989;
+                        --textbook-light-purple: #ba83be;
+                        --textbook-sidebar-purple: #88548c;
+                        --default-blue-accent: #64b5f6;
+
+                        /* adjust border colors around input fields */
+                        # --jp-widgets-input-focus-border-color: var(
+                        #     --default-blue-accent
+                        # ) !important;
+                        --jp-widgets-input-focus-border-color: var(
+                            --textbook-light-purple
+                        ) !important;
+                    }
+
+                    /* adjust the accent line above the selected tab */
+                    .lm-TabBar-tab.lm-mod-current::before {
+                        background-color: var(--theme-color) !important;
+                    }
+
+                    /* adjust border width on focus for input fields */
+                    .jupyter-widgets input:focus,
+                    .jupyter-widgets select:focus,
+                    .jupyter-widgets textarea:focus,
+                    .jupyter-widgets .widget-text:focus-within {
+                        --jp-widgets-input-border-width: 3px !important;
+
+                        /* change border-width property directly to force update. */
+                        border-width: var(--jp-widgets-input-border-width) !important;
+                    }
+                </style>
+            """
+        )
+        display(adjust_accent_colors)
+
         self._link_callbacks()
 
         # initialize drive and connectivity ipywidgets
