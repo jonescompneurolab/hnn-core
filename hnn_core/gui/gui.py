@@ -1116,7 +1116,7 @@ class HNNGUI:
                 self.widget_location_selection,
             ],
             layout=Layout(flex="1"),
-        ).add_class("drive-container")
+        )
 
         drives_options = VBox(
             [
@@ -1134,7 +1134,7 @@ class HNNGUI:
                 ),
                 self._drives_out,
             ]
-        )
+        ).add_class("drive-container")
 
         config_panel, figs_output = self.viz_manager.compose()
 
@@ -1223,6 +1223,7 @@ class HNNGUI:
         )
         display(make_subtabs_sticky)
 
+        # adjust colors and accents
         adjust_accent_colors = HTML(
             value="""
                 <style>
