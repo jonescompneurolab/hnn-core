@@ -399,8 +399,14 @@ class HNNGUI:
             "simulation_status_height": f"{status_height}px",
             "simulation_status_common": "background:gray;padding-left:10px",
             "simulation_status_running": "background:orange;padding-left:10px",
-            "simulation_status_failed": "background:red;padding-left:10px",
-            "simulation_status_finished": "background:green;padding-left:10px",
+            "simulation_status_failed": """
+                background:var(--gentle-red);
+                padding-left:10px;
+            """,
+            "simulation_status_finished": """
+                background:var(--gentle-green);
+                padding-left:10px;
+            """,
 
             # "Inner" container styling
             # --------------------------------------------------
@@ -1227,6 +1233,8 @@ class HNNGUI:
                         --textbook-light-purple: #ba83be;
                         --textbook-sidebar-purple: #88548c;
                         --default-blue-accent: #64b5f6;
+                        --gentle-red: #ed665e;
+                        --gentle-green: #77aa77;
 
                         /* adjust border colors around input fields */
                         # --jp-widgets-input-focus-border-color: var(
@@ -1235,6 +1243,8 @@ class HNNGUI:
                         --jp-widgets-input-focus-border-color: var(
                             --textbook-light-purple
                         ) !important;
+
+                        --jp-error-color1: var(--gentle-red) !important;
                     }
 
                     /* adjust the accent line above the selected tab */
