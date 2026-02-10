@@ -585,7 +585,7 @@ class HNNGUI:
         )
 
         # Create save simulation widget wrapper
-        self.save_simuation_button = self._init_html_download_button(
+        self.save_simulation_button = self._init_html_download_button(
             title="Save Simulation", mimetype="text/csv"
         )
         self.save_config_button = self._init_html_download_button(
@@ -768,7 +768,7 @@ class HNNGUI:
         #         self.run_button,
         #         self.load_data_button,
         #         self.save_config_button,
-        #         self.save_simuation_button,
+        #         self.save_simulation_button,
         #         self.simulation_list_widget,
         #     ],
         #     layout=self.layout["operation_box"],
@@ -893,7 +893,7 @@ class HNNGUI:
                 b64 = base64.b64encode(_simulation_data)
 
             payload = b64.decode()
-            self.save_simuation_button.value = self.html_download_button.format(
+            self.save_simulation_button.value = self.html_download_button.format(
                 payload=payload,
                 filename=result_file,
                 is_disabled="",
@@ -1022,7 +1022,7 @@ class HNNGUI:
                                 self.run_button,
                                 self.load_data_button,
                                 self.save_config_button,
-                                self.save_simuation_button,  # TODO fix "simuation" typo
+                                self.save_simulation_button,
                                 self.simulation_list_widget,
                             ]
                         )
