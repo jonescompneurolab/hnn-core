@@ -756,10 +756,35 @@ class HNNGUI:
             value=self._simulation_status_contents["not_running"]
         )
 
+        # log window with toggle
+        # --------------------------------------------------
+        # toggle button
+        self._log_toggle_btn = Button(
+            icon="chevron-down",
+            layout=Layout(width="30px", height="30px"),
+            tooltip="Toggle Log View"
+        ).add_class("log-toggle-icon")
+
+        # log window
         self._log_window = HBox(
-            [self._log_out],
+            [self._log_out, self._log_toggle_btn],
             layout=self.layout["log_out"]
         ).add_class("log-out")
+
+        # store the expanded height *directly* for use in toggle_logs() below
+        self._log_expanded_height = self.layout["log_out"].height
+
+        # function to toggle log window height
+        def toggle_logs(_):
+            if self._log_window.layout.height == "3em":
+                self._log_window.layout.height = self._log_expanded_height
+                self._log_toggle_btn.icon = "chevron-down"
+            else:
+                self._log_window.layout.height = "3em"
+                self._log_toggle_btn.icon = "chevron-up"
+
+        # apply function when button is clicked
+        self._log_toggle_btn.on_click(toggle_logs)
 
         # TODO [DEPRECATE]
         # "_operation_buttons" will no longer be separated from the simulation tab
@@ -1231,6 +1256,45 @@ class HNNGUI:
             """
         )
         display(adjust_accent_colors)
+
+        log_toggle = HTML(
+            value="""
+            <style>
+                .log-toggle-icon {
+                    overflow: visible !important;
+                    position: absolute !important;
+                    top: 0px !important;
+                    left: 0px !important;
+                    z-index: 10;
+                    color: var(--textbook-light-purple);
+                    background: transparent !important;
+                    border: none !important;
+                }
+
+                /* ensure the log output doesn't overlap the button */
+                .log-out > .widget-output {
+                    padding-left: 30px !important;
+                    padding-right: 10px !important;
+                }
+
+                /* remove focus and hover effects */
+                .log-toggle-icon:focus {
+                    outline: none !important;
+                    border: none !important;
+                    box-shadow: none !important;
+                    --jp-widgets-input-focus-border-color: transparent !important;
+                    --jp-widgets-input-focus-shadow: none !important;
+                }
+
+                .log-toggle-icon:hover {
+                    color: var(--theme-color);
+                    box-shadow: none !important;
+                    # transform: scale(1.2) !important;
+                }
+            </style>
+            """,
+        )
+        display(log_toggle)
 
         self._link_callbacks()
 
