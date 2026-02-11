@@ -149,11 +149,12 @@ def jones_2009_model(
         mesh_shape=mesh_shape,
         pos_dict=pos_dict,
         cell_types=cell_types,
+        verbose=verbose,
     )
 
     # Hidden flag used by downstream builders to control verbose output.
     # Set from the `verbose` argument so callers can control verbosity.
-    net._verbose = bool(verbose)
+    # net._verbose = bool(verbose)
 
     delay = net.delay
 
@@ -319,7 +320,7 @@ def law_2021_model(
         add_drives_from_params,
         legacy_mode,
         mesh_shape=mesh_shape,
-        verbose=verbose,
+        verbose=False,
     )
 
     # Update biophysics (increase gabab duration of inhibition)
