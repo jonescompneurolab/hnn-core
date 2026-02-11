@@ -80,7 +80,7 @@ if __name__ == "__main__":
         'parallel': ['joblib', 'psutil'],
         'test': ['codespell', 'pytest', 'pytest-cov', 'pytest-xdist', 'ruff'],
         'docs': ['mne', 'myst-parser', 'nibabel', 'numpydoc', 'pillow',
-                 'pooch', 'pydata-sphinx-theme', 'sphinx', 'sphinx-gallery',
+                 'pooch<1.9.0', 'pydata-sphinx-theme', 'sphinx', 'sphinx-gallery',
                  'sphinx-copybutton', 'tdqm'],
         'gui': ['ipywidgets>=8.0.0', 'ipykernel', 'ipympl', 'voila'],
     }
