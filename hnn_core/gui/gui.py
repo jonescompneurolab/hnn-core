@@ -1365,6 +1365,120 @@ class HNNGUI:
         )
         display(stabilize_tabs_height)
 
+        adjust_viz_window_spacing = HTML(
+            value="""
+                <style>
+
+                    /* adjust the tab border color to match the container */
+                    .visualization-window .lm-TabBar-tab {
+                        border-color: lightgrey !important;
+                    }
+
+                    /* remove the automatically-added margins */
+                    .visualization-window > .widget-output,
+                    .visualization-window .fig-tabs {
+                        margin: 0px 0px 0px 0px !important;
+                    }
+
+                    /*
+                        make the visualization-window border transparent if
+                        fig-tabs is not empty
+                    */
+                    .visualization-window:has(.fig-tabs:not(:empty)) {
+                        border-color: transparent !important;
+                    }
+
+                    /*
+                        align TabBar to the *top* rather than the bottom, and shift
+                        the top margin to reduce excess space
+                    */
+                    .visualization-window .lm-TabBar {
+                        align-items: flex-start !important;
+                        margin-top: -1px !important;
+                    }
+
+                    .visualization-window .lm-TabBar-content {
+                        margin-top: 0 !important;
+                    }
+
+                    /*
+                        set 'display: flex' on visualization-window to enable its
+                        children to grow to fill available space
+                    */
+                    .visualization-window {
+                        display: flex !important;
+                        flex-direction: column !important;
+                    }
+
+                    /*
+                        target child elements inside visualization window to allow
+                        them to grow to fill the available space. This looks more
+                        complicated than it actually is, we just need to target
+                        all of the children manually, which necessitates understanding
+                        the 'hierarchy' of automatically-generated containers
+                    */
+                    .visualization-window > .widget-output,
+                    .visualization-window > .widget-output > .jp-OutputArea,
+                    .visualization-window .jp-OutputArea > .jp-OutputArea-child,
+                    .visualization-window .jp-OutputArea-child > .jp-OutputArea-output,
+                    .visualization-window .jp-OutputArea-output > .fig-tabs,
+                    .visualization-window .widget-tab-contents {
+                        display: flex !important;
+                        flex-direction: column !important;
+                        flex: 1 1 0% !important;
+                        height: auto !important;
+                        min-height: 0 !important;
+                    }
+
+                    /* style the tab container that holds the output */
+                    .visualization-window .widget-tab-contents {
+                        /* border: 1px solid red !important; */  /* debug */
+                        border: 1px solid lightgrey !important;
+                        box-sizing: border-box !important;
+                        margin: 0px !important;
+                        width: 100% !important;
+                    }
+
+                    /* fix interactive matplotlib plot sizing issues */
+                    /* --------------------------------------------- */
+                    /*
+                        collapse the actual height and force the container to
+                        have height via padding; this change is necessary to force
+                        the interactive plots to respect the parent container's
+                        constraints
+                    */
+                    .visualization-window .jupyter-matplotlib-canvas-div {
+                        width: 100% !important;
+                        max-width: 100% !important;
+                        height: 0 !important;
+                        padding-bottom: 100% !important;
+                        position: relative !important;
+                        display: block !important;
+                    }
+
+                    /* scale both canvases to fit that padded container */
+                    .visualization-window .jupyter-matplotlib-canvas-div canvas {
+                        width: 100% !important;
+                        height: 100% !important;
+                        position: absolute !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                    }
+
+                    /* manually set figure dimensions so the canvas actually renders */
+                    .visualization-window .jupyter-matplotlib,
+                    .visualization-window .jupyter-matplotlib-figure,
+                    .visualization-window .jupyter-matplotlib-canvas-container {
+                        width: 650px !important;
+                        height: auto !important;
+                        min-height: 0 !important;
+                        overflow: visible !important;
+                    }
+                </style>
+            """
+        )
+        display(adjust_viz_window_spacing)
+
         self._link_callbacks()
 
         # initialize drive and connectivity ipywidgets
