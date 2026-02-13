@@ -2106,6 +2106,25 @@ def test_get_next_available_gid(base_network):
     assert net_base._get_next_available_gid() == 540
 
 
+def test_shift_gid_ranges_error(base_network):
+    """Test that _shift_gid_ranges raises RuntimeError if drives exist."""
+    _, params = base_network
+
+    # Error when external_drives are present
+    net = jones_2009_model(params, add_drives_from_params=True)
+    assert len(net.external_drives) > 0
+    with pytest.raises(RuntimeError, match="Drives detected"):
+        net._shift_gid_ranges(gid_start=100)
+
+    # Error when external_biases are present (but no drives)
+    net = jones_2009_model(params, add_drives_from_params=False)
+    assert len(net.external_drives) == 0
+    net.add_tonic_bias(cell_type="L5_pyramidal", amplitude=1.0)
+    assert len(net.external_biases) > 0
+    with pytest.raises(RuntimeError, match="Drives detected"):
+        net._shift_gid_ranges(gid_start=100)
+
+
 def test_shift_gid_ranges_simple(base_network):
     """Test that `Network._shift_gid_ranges` works and simulates as expected."""
     # "Base" has many connections and drives, but for now we're only interested in the
