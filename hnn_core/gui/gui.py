@@ -1346,7 +1346,7 @@ class HNNGUI:
         display(log_toggle)
 
 
-        drives_tab_scrollbar_fix = HTML(
+        tabs_add_scrollbar_gutter = HTML(
             value="""
             <style>
                 /*
@@ -1360,10 +1360,18 @@ class HNNGUI:
                     overflow-y: auto !important;
                     padding-right: 10px !important;
                 }
+
+                /* same for 4th tab (visualization) */
+                .widget-tab-bar:has(.lm-TabBar-tab:nth-child(4).lm-mod-current) +
+                .widget-tab-contents {
+                    scrollbar-gutter: stable !important;
+                    overflow-y: auto !important;
+                    padding-right: 10px !important;
+                }
             </style>
             """,
         )
-        display(drives_tab_scrollbar_fix)
+        display(tabs_add_scrollbar_gutter)
 
         stabilize_tabs_height = HTML(
             value="""

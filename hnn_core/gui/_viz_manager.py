@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from IPython.display import display
 from ipywidgets import (
+    HTML,
     Box,
     Button,
     Dropdown,
@@ -23,6 +24,7 @@ from ipywidgets import (
     Tab,
     VBox,
     link,
+    HTML,
 )
 
 from hnn_core.dipole import average_dipoles, _rmse
@@ -1096,11 +1098,11 @@ class _VizManager:
         template_names = list(data_templates.keys())
         template_names.extend(list(fig_templates.keys()))
         self.templates_dropdown = Dropdown(
-            description="Layout template:",
+            description="Figure Template:",
             options=template_names,
             value=template_names[0],
-            style={"description_width": "initial"},
-            layout=Layout(width="98%"),
+            style={"description_width": "28%"},
+            layout=Layout(width="70%"),
         )
         self.templates_dropdown.observe(self._layout_template_change, "value")
 
@@ -1109,21 +1111,34 @@ class _VizManager:
             button_style="primary",
             style={"button_color": self.viz_layout["theme_color"]},
             layout=self.viz_layout["btn"],
-        )
+        ).add_class("make-fig-btn")
         self.make_fig_button.on_click(self.add_figure)
 
         self.datasets_dropdown = Dropdown(
-            description="Dataset:",
+            description="Simulation:",
             options=[],
             value=None,
-            style={"description_width": "initial"},
-            layout=Layout(width="98%"),
+            style={"description_width": "28%"},
+            layout=Layout(width="70%"),
         )
 
         # data
         self.fig_idx = {"idx": 1}
         self.figs = {}
         self.gui_data = gui_data
+
+        # custom CSS injection
+        self.custom_css = HTML(
+            value="""
+                <style>
+                .make-fig-btn {
+                    flex: 1 1 auto !important;
+                    width: auto !important;
+                    margin: 2px 0px 2px 15px !important;
+                }
+            </style>
+            """
+        )
 
     @property
     def widgets(self):
@@ -1173,17 +1188,29 @@ class _VizManager:
         with self.figs_output:
             display(Label(_fig_placeholder))
 
+        display(self.custom_css)
+
         fig_output_container = VBox(
-            [self.figs_output], layout=self.viz_layout["visualization_window"]
+            [self.figs_output],
+            layout=self.viz_layout["visualization_window"],
+        )
+
+        config_sub_panel = HBox(
+            [
+                self.templates_dropdown,
+                self.make_fig_button,
+            ],
+            layout=Layout(
+                width="100%",
+            )
         )
 
         config_panel = VBox(
             [
-                Box(
+                VBox(
                     [
-                        self.templates_dropdown,
+                        config_sub_panel,
                         self.datasets_dropdown,
-                        self.make_fig_button,
                     ],
                     layout=Layout(
                         display="flex",
@@ -1191,7 +1218,6 @@ class _VizManager:
                         align_items="stretch",
                     ),
                 ),
-                Label("Figure config:"),
                 self.axes_config_output,
             ]
         )
@@ -1214,9 +1240,9 @@ class _VizManager:
             self.datasets_dropdown.value = sim_names[0]
             # show list of simulated to gui dropdown
             self.datasets_dropdown.layout.visibility = "visible"
-        else:
-            # hide sim-data dropdown
-            self.datasets_dropdown.layout.visibility = "hidden"
+        # else:
+        #     # hide sim-data dropdown
+        #     self.datasets_dropdown.layout.visibility = "hidden"
 
     @unlink_relink(attribute="figs_config_tab_link")
     def add_figure(self, b=None):
