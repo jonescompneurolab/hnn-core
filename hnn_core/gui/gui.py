@@ -1320,8 +1320,12 @@ class HNNGUI:
                     border: none !important;
                 }
 
-                /* ensure the log output doesn't overlap the button */
+                /*
+                    ensure the log output handles scrolling,
+                    and that the output content doesn't overlap the button
+                */
                 .log-out > .widget-output {
+                    overflow-y: auto !important;
                     padding-left: 30px !important;
                     padding-right: 10px !important;
                 }
