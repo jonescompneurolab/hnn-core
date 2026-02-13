@@ -30,6 +30,8 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### People who contributed to this release:
 
+- [Tushar Jamdade][]
+- [Karthikeya Kodlai][]
 - [Maira Usman][]
 
 ### Changelog
@@ -41,6 +43,14 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
   `examples/howto/plot_dual_network_simulation.py`. This work was done as part of Google
   Summer of Code 2025, organized through the International Neuroinformatics Coordinating Facility.
   By [Maira Usman][] in {gh}`1096`.
+- Add support for printing a welcome message that asks the user to fill out the HNN
+  survey, which is printed to the standard output after (and only after) the first time
+  the `hnn_core` module is imported. Whether or not the message is displayed is
+  determined by the presence of a new file created in the module after first run.
+  by [Karthikeya Kodlai][] in {gh}`1158`. This was their first PR, thanks Karthikeya!
+  
+- Add progressive minimal install and test to Github Actions,
+  by [Tushar Jamdade][] in {gh}`1214`. This was their first PR, thanks Tushar!
 
 ## 0.5.0 Release Notes
 
@@ -1259,3 +1269,5 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Maira Usman]: https://github.com/Myrausman
 [Chetan Kandpal]: https://github.com/Chetank99
 [NEURON]: https://nrn.readthedocs.io
+[Karthikeya Kodlai]: https://github.com/sketch123456
+[Tushar Jamdade]: https://github.com/Tusharjamdade
