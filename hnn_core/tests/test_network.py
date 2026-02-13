@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import hnn_core
 from hnn_core import (
     CellResponse,
+    MPIBackend,
     Network,
     calcium_model,
     jones_2009_model,
@@ -29,6 +30,11 @@ from hnn_core.network import (
 )
 from hnn_core.network_builder import NetworkBuilder
 from hnn_core.network_models import add_erp_drives_to_jones_model
+from hnn_core.parallel_backends import (
+    requires_mpi4py,
+    requires_psutil,
+    _determine_cores_hwthreading,
+)
 from hnn_core.viz import plot_dipole
 
 hnn_core_root = op.dirname(hnn_core.__file__)
@@ -2143,7 +2149,7 @@ def test_shift_gid_ranges_simple(base_network):
     _ = simulate_dipole(net_shifted, tstop=20.0, n_trials=1)
 
 
-def test_shift_gid_ranges_consecutive(base_network):
+def test_shift_gid_ranges_multiple(base_network):
     """Test that `Network._shift_gid_ranges` works with multiple shifts."""
     # "Base" has many connections and drives, but for now we're only interested in the
     # non-drive params config
@@ -2161,7 +2167,17 @@ def test_shift_gid_ranges_consecutive(base_network):
 
 
 @pytest.mark.parametrize("probability", [1.0, 0.67])  # SIX SEVEN /dance
-def test_shift_gid_ranges_sub1prob_drives(base_network, probability):
+@pytest.mark.parametrize("inter_network_spacing", [0, 76])  # used for gaps bw net gids
+@pytest.mark.parametrize("use_mpi", [False, True])  # used for gaps bw net gids
+@requires_mpi4py
+@requires_psutil
+@pytest.mark.uses_mpi
+def test_shift_gid_ranges_sub1prob_drives(
+    base_network,
+    probability,
+    inter_network_spacing,
+    use_mpi,
+):
     """Test that GID-shifting works with drives."""
     # "Base" has many connections and drives, but for now we're only interested in the
     # non-drive params config
@@ -2198,8 +2214,10 @@ def test_shift_gid_ranges_sub1prob_drives(base_network, probability):
     # Now, let's make a new network, but add drives with NOT all-to-all connectivity
     # after the GID shift:
     net_shifted = jones_2009_model(params, add_drives_from_params=False)
-    net_shifted._shift_gid_ranges(gid_start=gid_offset)
-    assert net_shifted._get_next_available_gid() == (270 + gid_offset)
+    net_shifted._shift_gid_ranges(gid_start=(inter_network_spacing + gid_offset))
+    assert net_shifted._get_next_available_gid() == (
+        270 + inter_network_spacing + gid_offset
+    )
     drive_new_gid = net_shifted._get_next_available_gid()
     net_shifted.add_evoked_drive(
         "evdist1",
@@ -2212,7 +2230,9 @@ def test_shift_gid_ranges_sub1prob_drives(base_network, probability):
         probability=probability,
         conn_seed=conn_seed,
     )
-    assert net_shifted._get_next_available_gid() == (270 + gid_offset + 200)
+    assert net_shifted._get_next_available_gid() == (
+        270 + inter_network_spacing + gid_offset + 200
+    )
     drive_new_gid = net_shifted._get_next_available_gid()
     net_shifted.add_evoked_drive(
         "evdist2",
@@ -2225,7 +2245,9 @@ def test_shift_gid_ranges_sub1prob_drives(base_network, probability):
         probability=probability,
         conn_seed=conn_seed,
     )
-    assert net_shifted._get_next_available_gid() == (270 + gid_offset + 200 + 200)
+    assert net_shifted._get_next_available_gid() == (
+        270 + inter_network_spacing + gid_offset + 200 + 200
+    )
 
     assert (
         len(net_base.connectivity[-1]["gid_pairs"])
@@ -2235,7 +2257,9 @@ def test_shift_gid_ranges_sub1prob_drives(base_network, probability):
 
     for gids_type in ["src_gids", "target_gids"]:
         for base_gid in net_base.connectivity[-1][gids_type]:
-            assert (base_gid + gid_offset) in net_shifted.connectivity[-1][gids_type]
+            assert (
+                base_gid + inter_network_spacing + gid_offset
+            ) in net_shifted.connectivity[-1][gids_type]
 
     shifted_pairs = net_shifted.connectivity[-1]["gid_pairs"]
     for base_key, base_val in net_base.connectivity[-1]["gid_pairs"].items():
@@ -2244,7 +2268,23 @@ def test_shift_gid_ranges_sub1prob_drives(base_network, probability):
         # `net_shifted`, which is only true if their `conn_seed` is identical.
         #
         # Have to unpack then re-cast the value to list:
-        assert shifted_pairs[base_key + gid_offset] == [base_val[0] + gid_offset]
+        assert shifted_pairs[base_key + inter_network_spacing + gid_offset] == [
+            base_val[0] + inter_network_spacing + gid_offset
+        ]
 
     # Finally, let's test that our GID-shifted network and drives can still simulate:
-    _ = simulate_dipole(net_shifted, tstop=20.0, n_trials=1)
+    if use_mpi:
+        [detected_cores, _] = _determine_cores_hwthreading(
+            use_hwthreading_if_found=False
+        )
+        with MPIBackend(n_procs=detected_cores):
+            _ = simulate_dipole(net_base, tstop=20.0, n_trials=1)
+            _ = simulate_dipole(net_shifted, tstop=20.0, n_trials=1)
+    else:
+        _ = simulate_dipole(net_base, tstop=20.0, n_trials=1)
+        _ = simulate_dipole(net_shifted, tstop=20.0, n_trials=1)
+
+    assert np.allclose(
+        net_base.cell_response.spike_times,
+        net_shifted.cell_response.spike_times,
+    )
