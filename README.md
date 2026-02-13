@@ -113,6 +113,14 @@ JOSS](https://doi.org/10.21105/joss.05848):
 > circuit-level interpretation of human MEG/EEG. *Journal of Open Source
 > Software*, 8(92), 5848, <https://doi.org/10.21105/joss.05848>
 
+# Funding
+
+HNN-core development has been funded in part by the following United States of America federal government grants:
+- NIH R01EB022889 Human Neocortical Neurosolver
+- NIH 1U24NS129945 Dissemination of the Human Neocortical Neurosolver (HNN) software for circuit level interpretation of human MEG/EEG
+- NSF IIS 2424101 Collaborative Research: CRCNS Research Proposal: Uncovering the mechanisms and meaning of brain rhythm frequency shifts during decision making
+
 [Contributing Guide]: https://jonescompneurolab.github.io/hnn-core/stable/contributing.html
 [HNN Textbook website]: https://jonescompneurolab.github.io/textbook/content/preface.html
 [Installation Guide]: https://jonescompneurolab.github.io/textbook/content/01_getting_started/installation.html
+

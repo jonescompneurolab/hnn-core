@@ -28,7 +28,7 @@ jobs:
               command: |
                   export PATH=~/miniconda/bin:$PATH
                   conda update --yes --quiet conda
-                  conda create -n testenv --yes pip python=3.13
+                  conda create -n testenv --yes pip python=3.11
                   source activate testenv
                   # necessary due to https://github.com/mpi4py/mpi4py/issues/335#issuecomment-1486366039
                   rm $CONDA_PREFIX/compiler_compat/ld

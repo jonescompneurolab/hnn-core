@@ -2915,7 +2915,7 @@ def _update_L5_biophysics_cell_params(net, cell_param_key, param_list):
     mechs_params["cat"] = {"gbar_cat": param_list[18].value}
     mechs_params["ar"] = {
         "gbar_ar": partial(
-            _exp_g_at_dist, zero_val=param_list[19].value, exp_term=3e-3, offset=0.0
+            _exp_g_at_dist, gbar_at_zero=param_list[19].value, exp_term=3e-3, offset=0.0
         )
     }
 

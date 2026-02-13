@@ -3,7 +3,7 @@ import pytest
 from neuron import h
 import numpy as np
 
-from hnn_core.cells_default import pyramidal, basket
+from hnn_core.cells_default import pyramidal, basket, _exp_g_at_dist, _linear_g_at_dist
 from hnn_core.network_builder import load_custom_mechanisms
 
 
@@ -84,3 +84,157 @@ def test_cells_default():
 
     with pytest.raises(ValueError, match="Unknown basket cell type"):
         basket(cell_name="blah")
+
+
+def test_exp_g_at_dist():
+    """Test exponential distance-dependent conductance function."""
+    # Test at x=0 with default slope
+    gbar = _exp_g_at_dist(x=0, gbar_at_zero=1e-6, exp_term=3e-3, offset=0.0)
+    expected = 1e-6 * (1 * np.exp(0) + 0.0)  # 1e-6 * 1 = 1e-6
+    assert np.isclose(gbar, expected)
+
+    # Test at x=0 with non-default slope and offset
+    gbar = _exp_g_at_dist(x=0, gbar_at_zero=2e-6, exp_term=3e-3, offset=0.5, slope=2)
+    expected = 2e-6 * (2 * np.exp(0) + 0.5)  # 2e-6 * 2.5 = 5e-6
+    assert np.isclose(gbar, expected)
+
+    # Test at positive distance
+    x = 100
+    gbar = _exp_g_at_dist(x=x, gbar_at_zero=1e-6, exp_term=3e-3, offset=0.0)
+    expected = 1e-6 * (1 * np.exp(3e-3 * x) + 0.0)
+    assert np.isclose(gbar, expected)
+
+    # Test with negative exp_term (decay)
+    x = 100
+    gbar = _exp_g_at_dist(x=x, gbar_at_zero=0.06, exp_term=-0.006, offset=1e-4, slope=1)
+    expected = 0.06 * (1 * np.exp(-0.006 * x) + 1e-4)
+    assert np.isclose(gbar, expected)
+
+    # Test with array input
+    x_array = np.array([0, 50, 100, 200])
+    gbar_array = _exp_g_at_dist(
+        x=x_array, gbar_at_zero=1e-6, exp_term=3e-3, offset=0.0, slope=1
+    )
+    expected_array = 1e-6 * (np.exp(3e-3 * x_array) + 0.0)
+    assert np.allclose(gbar_array, expected_array)
+
+    # Test that function is monotonically increasing with positive exp_term
+    x_values = np.linspace(0, 100, 10)
+    gbar_values = _exp_g_at_dist(
+        x=x_values, gbar_at_zero=1e-6, exp_term=3e-3, offset=0.0, slope=1
+    )
+    assert np.all(np.diff(gbar_values) > 0)
+
+    # Test that function is monotonically decreasing with negative exp_term
+    x_values = np.linspace(0, 100, 10)
+    gbar_values = _exp_g_at_dist(
+        x=x_values, gbar_at_zero=1.0, exp_term=-0.01, offset=0.0, slope=1
+    )
+    assert np.all(np.diff(gbar_values) < 0)
+
+
+def test_linear_g_at_dist():
+    """Test linear distance-dependent conductance function."""
+    # Test at x=0 (should return gsoma)
+    gbar = _linear_g_at_dist(x=0, gsoma=10.0, gdend=40.0, xkink=1501)
+    assert np.isclose(gbar, 10.0)
+
+    # Test at x < xkink (linear interpolation)
+    x = 750  # halfway to xkink
+    gbar = _linear_g_at_dist(x=x, gsoma=10.0, gdend=40.0, xkink=1501)
+    expected = 10.0 + 750 * (40.0 - 10.0) / 1501
+    assert np.isclose(gbar, expected)
+
+    # Test at x = xkink (should return gdend)
+    gbar = _linear_g_at_dist(x=1501, gsoma=10.0, gdend=40.0, xkink=1501)
+    assert np.isclose(gbar, 40.0)
+
+    # Test at x > xkink (should still return gdend)
+    gbar = _linear_g_at_dist(x=2000, gsoma=10.0, gdend=40.0, xkink=1501)
+    assert np.isclose(gbar, 40.0)
+
+    # Test with hotzone (x inside hotzone boundaries)
+    x = 500
+    gbar = _linear_g_at_dist(
+        x=x,
+        gsoma=10.0,
+        gdend=40.0,
+        xkink=1501,
+        hotzone_factor=2.0,
+        hotzone_boundaries=[400, 600],
+    )
+    expected_base = 10.0 + 500 * (40.0 - 10.0) / 1501
+    expected = expected_base * 2.0
+    assert np.isclose(gbar, expected)
+
+    # Test outside hotzone (x before hotzone)
+    x = 300
+    gbar = _linear_g_at_dist(
+        x=x,
+        gsoma=10.0,
+        gdend=40.0,
+        xkink=1501,
+        hotzone_factor=2.0,
+        hotzone_boundaries=[400, 600],
+    )
+    expected = 10.0 + 300 * (40.0 - 10.0) / 1501
+    assert np.isclose(gbar, expected)
+
+    # Test outside hotzone (x after hotzone)
+    x = 700
+    gbar = _linear_g_at_dist(
+        x=x,
+        gsoma=10.0,
+        gdend=40.0,
+        xkink=1501,
+        hotzone_factor=2.0,
+        hotzone_boundaries=[400, 600],
+    )
+    expected = 10.0 + 700 * (40.0 - 10.0) / 1501
+    assert np.isclose(gbar, expected)
+
+    # Test at hotzone boundary (exactly at start, should not apply factor)
+    x = 400
+    gbar = _linear_g_at_dist(
+        x=x,
+        gsoma=10.0,
+        gdend=40.0,
+        xkink=1501,
+        hotzone_factor=2.0,
+        hotzone_boundaries=[400, 600],
+    )
+    expected = 10.0 + 400 * (40.0 - 10.0) / 1501
+    assert np.isclose(gbar, expected)
+
+    # Test at hotzone boundary (exactly at end, should not apply factor)
+    x = 600
+    gbar = _linear_g_at_dist(
+        x=x,
+        gsoma=10.0,
+        gdend=40.0,
+        xkink=1501,
+        hotzone_factor=2.0,
+        hotzone_boundaries=[400, 600],
+    )
+    expected = 10.0 + 600 * (40.0 - 10.0) / 1501
+    assert np.isclose(gbar, expected)
+
+    # Test with hotzone_factor = 1 (no effect)
+    x = 500
+    gbar = _linear_g_at_dist(
+        x=x,
+        gsoma=10.0,
+        gdend=40.0,
+        xkink=1501,
+        hotzone_factor=1.0,
+        hotzone_boundaries=[400, 600],
+    )
+    expected = 10.0 + 500 * (40.0 - 10.0) / 1501
+    assert np.isclose(gbar, expected)
+
+    # Test decreasing conductance (gdend < gsoma)
+    x = 500
+    gbar = _linear_g_at_dist(x=x, gsoma=40.0, gdend=10.0, xkink=1000)
+    expected = 40.0 + 500 * (10.0 - 40.0) / 1000
+    assert np.isclose(gbar, expected)
+    assert gbar < 40.0  # Should be less than gsoma

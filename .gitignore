@@ -1,5 +1,4 @@
 # HNN-core build
-dpl.txt
 hnn_core/mod/x86_64/
 hnn_core/mod/arm64/
 
@@ -17,6 +16,7 @@ env/
 venv/
 ENV/
 VENV/
+uv.lock
 
 # Sphinx documentation
 doc/_build/**
@@ -25,17 +25,28 @@ pip-log.txt
 tags
 cover
 
-# Pycharm
+# IDE programs
+.cursor
 .idea/
-
-*.pyc
-
-.cache
-.pytest_cache
-.ipynb_checkpoints
-.DS_Store
 .vscode/
 
+# AI and LLMs
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+
+# Testing
+dpl.txt
+dpl2.txt
+.pytest_cache
+
+# Caches, compilations, and other
+*.pyc
 __pycache__
+.cache
+
+.ipynb_checkpoints
 
 *.log
+
+.DS_Store
