@@ -1197,13 +1197,39 @@ class HNNGUI:
         param_tabs_styling = HTML(
             value="""
             <style>
+                /*
+                    ensure the border around the container that holds the tabs
+                    themselves takes up no space, i.e. 0px
+                */
                 .param-tabs-widget-container .widget-tab-bar {
                     border: 0px solid lightgrey;
                 }
+
+                /* set the border color for the individual tabs */
+                .param-tabs-widget-container .lm-TabBar-tab {
+                    border-color: lightgrey !important;
+                }
+
+                /*
+                    this adjusts the content container's border, not the borders
+                    on the tabs themselves. Though it does effectively set the
+                    bottom border around the inactive tabs (with the active tab
+                    not having a bottom border)
+                */
                 .param-tabs-widget-container .widget-tab-contents {
-                    border-left: 1px solid lightgrey !important;
-                    border-right: 1px solid lightgrey !important;
-                    border-bottom: 1px solid lightgrey !important;
+                    border: 1px solid lightgrey !important;
+                }
+
+                /*
+                    allow TabBar to grow to fill the available space; this fixes
+                    and issue where the last tab was slightly offset (by around
+                    1px) from the right border. Not that we only target tabs that
+                    are the first child of .lm-TabBar-content to ensure none of
+                    the nested tabs grow
+                */
+                .param-tabs-widget-container > .widget-tab-bar >
+                .lm-TabBar-content > .lm-TabBar-tab {
+                    flex-grow: 1 !important;
                 }
             </style>
             """,
