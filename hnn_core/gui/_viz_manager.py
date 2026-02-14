@@ -969,7 +969,7 @@ def _add_axes_controls(widgets, data, fig_default_params, fig, axd):
         button_style="danger",
         icon="close",
         layout=Layout(width="98%"),
-    )
+    ).add_class("red-button")
     close_fig_button.on_click(
         partial(_close_figure, widgets=widgets, data=data, fig_idx=fig_idx)
     )

@@ -805,16 +805,81 @@ class HNNGUI:
         #     layout=self.layout["operation_box"],
         # )
         # title
+        sun_icon = (
+            "M361.5 1.2c5 2.1 8.6 6.6 9.6 11.9L391 121l107.9 19.8c5.3 1 9.8 4.6 11.9 "
+            "9.6s1.5 10.7-1.6 15.2L446.9 256l62.3 90.3c3.1 4.5 3.7 10.2 1.6 15.2s-6.6 "
+            "8.6-11.9 9.6L391 391 371.1 498.9c-1 5.3-4.6 9.8-9.6 11.9s-10.7 1.5-15.2-"
+            "1.6L256 446.9l-90.3 62.3c-4.5 3.1-10.2 3.7-15.2 1.6s-8.6-6.6-9.6-11.9L121 "
+            "391 13.1 371.1c-5.3-1-9.8-4.6-11.9-9.6s-1.5-10.7 1.6-15.2L65.1 256 2.8 "
+            "165.7c-3.1-4.5-3.7-10.2-1.6-15.2s6.6-8.6 11.9-9.6L121 121 140.9 13.1c1-"
+            "5.3 4.6-9.8 9.6-11.9s10.7-1.5 15.2 1.6L256 65.1 346.3 2.8c4.5-3.1 10.2-"
+            "3.7 15.2-1.6zM160 256a96 96 0 1 1 192 0 96 96 0 1 1 -192 0zm224 0a128 128 "
+            "0 1 0 -256 0 128 128 0 1 0 256 0z"
+        )
+
+        moon_icon = (
+            "M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-"
+            "63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c"
+            "-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 "
+            "7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"
+        )
+
+        toggle_script = (
+            "const c = document.querySelector('.jupyter-widgets-view') || "
+            "document.body; if (c) { c.classList.toggle('dark-mode'); "
+            "const isD = c.classList.contains('dark-mode'); "
+            "const s = document.getElementById('sun-svg'); "
+            "const m = document.getElementById('moon-svg'); "
+            "s.style.display = isD ? 'none' : 'block'; "
+            "m.style.display = isD ? 'block' : 'none'; }"
+        )
+
         self._header = HTML(
             value=f"""
-                <div style='
+                <div class="title-bar" style='
                     background:{self.layout["theme_color"]};
                     text-align:center;
                     color:white;
+                    position:relative;
+                    height: 28px;
+                    line-height: 28px;
+                    margin: 0;
+                    padding: 0;
+                    overflow: hidden;
                 '>
                     HUMAN NEOCORTICAL NEUROSOLVER
+                    <div id="theme-toggle-container" style="
+                        position: absolute;
+                        left: 8px;
+                        top: 0;
+                        padding: 4px 0 4px 0px;
+                        height: 20px;
+                        display: flex;
+                        align-items: center;
+                        cursor: pointer;
+                    ">
+                        <div style="width: 20px; height: 20px; display: flex;"
+                            onclick="(function() {{ {toggle_script} }})()">
+                            <svg id="sun-svg" viewBox="0 0 512 512" style="
+                                fill: white;
+                                display: block;
+                                width: 100%;
+                                height: 100%;
+                            ">
+                                <path d="{sun_icon}"></path>
+                            </svg>
+                            <svg id="moon-svg" viewBox="0 0 384 512" style="
+                                fill: white;
+                                display: none;
+                                width: 100%;
+                                height: 100%;
+                            ">
+                                <path d="{moon_icon}"></path>
+                            </svg>
+                        </div>
+                    </div>
                 </div>
-            """
+            """,
         )
 
     @property
@@ -1517,6 +1582,144 @@ class HNNGUI:
         )
         display(adjust_viz_window_spacing)
 
+        dark_theme = HTML(
+            value="""
+            <style>
+                /* basic dark-mode colors */
+                .dark-mode {
+                    --dm-bg-primary: #14181e;
+                    --dm-bg-secondary: #313438;
+                    --dm-text-main: #d4d4d4;
+                    --dm-border-color: #3e3e42;
+                    --dm-theme: #ba83be;  /* note: same as textbook-light-purple */
+                }
+
+                /* force background color for major containers */
+                .dark-mode,
+                .dark-mode .jp-Notebook,
+                .dark-mode .lm-Widget,
+                .dark-mode .lm-Panel,
+                .dark-mode .jupyter-widgets:not(.jupyter-button) {
+                    background-color: var(--dm-bg-primary) !important;
+                    border-color: var(--dm-border-color) !important;
+                }
+
+                /*
+                    flip text and border colors globally. we'll have to "overwrite"
+                    some of these changes, but this is the best way to ensure
+                    everything gets updated without manually needing to specify
+                    every single child element that needs to change
+                */
+                .dark-mode * {
+                    color: var(--dm-text-main) !important;
+                    border-color: var(--dm-border-color) !important;
+                }
+
+                /* ------------------------------------------- */
+                /* --- add exceptions to dark mode changes --- */
+                /* ------------------------------------------- */
+
+                /* set title bar to dark mode theme */
+                .dark-mode .title-bar .widget-html-content div {
+                    background-color: var(--dm-theme) !important;
+                    /* color: var(--dm-bg-primary) !important; */
+                    color: #fff !important;
+                }
+
+                /* restore transparent border when fig-tabs is not empty */
+                .visualization-window:has(.fig-tabs:not(:empty)) {
+                    border-color: transparent !important;
+                }
+
+                /* adjust style of tabbar and child tabs */
+                .dark-mode .lm-TabBar-tab {
+                    background-color: var(--dm-bg-secondary) !important;
+                    color: var(--dm-text-main) !important;
+                    border-color: var(--dm-border-color) !important;
+                }
+
+                /* adjust the accent line above the selected tab */
+                .lm-TabBar-tab.lm-mod-current::before {
+                    background-color: var(--dm-theme) !important;
+                }
+
+                /* adjust active tabbar to blend with primary background */
+                .dark-mode .lm-TabBar-tab.lm-mod-current {
+                    background-color: var(--dm-bg-primary) !important;
+                }
+
+                /* adjust background color for input areas */
+                .dark-mode input,
+                .dark-mode select,
+                .dark-mode textarea {
+                    background-color: var(--dm-bg-secondary) !important;
+                }
+
+                /* restore border color when focusing on input areas */
+                .dark-mode input:focus,
+                .dark-mode select:focus,
+                .dark-mode textarea:focus {
+                    border-color: var(--dm-theme) !important;
+                }
+
+                /* adjust button colors */
+                .dark-mode button:not(.log-toggle-icon),
+                .dark-mode .jupyter-button:not(.log-toggle-icon),
+                .dark-mode .widget-button:not(.log-toggle-icon) {
+                    background-color: var(--dm-theme) !important;
+                    color: var(--dm-bg-primary) !important;
+                }
+
+                /* adjust button icon color */
+                .dark-mode button:not(.log-toggle-icon) i,
+                .dark-mode .jupyter-button:not(.log-toggle-icon) i,
+                .dark-mode .widget-button:not(.log-toggle-icon) i {
+                    color: var(--dm-bg-primary) !important;
+                }
+
+                /* restore toggle icon for the log */
+                .dark-mode .log-toggle-icon,
+                .dark-mode .log-toggle-icon i {
+                    color: var(--dm-theme) !important;
+                }
+
+                /* adjust scrollbars for dark mode */
+                .dark-mode ::-webkit-scrollbar {
+                    width: 10px !important;
+                    height: 10px !important;
+                }
+                .dark-mode ::-webkit-scrollbar-track {
+                    background: var(--dm-bg-primary) !important;
+                }
+                .dark-mode ::-webkit-scrollbar-thumb {
+                    background: var(--dm-bg-secondary) !important;
+                    border: 2px solid var(--dm-bg-primary) !important;
+                    border-radius: 5px !important;
+                }
+                .dark-mode ::-webkit-scrollbar-thumb:hover {
+                    background: var(--dm-theme) !important;
+                }
+
+                /* dim hard-white backgrounds in visualizations */
+                .dark-mode .visualization-window .widget-tab-contents img,
+                .dark-mode .visualization-window .widget-tab-contents canvas,
+                .dark-mode .visualization-window .widget-tab-contents .js-plotly-plot
+                .main-svg,
+                .dark-mode .visualization-window .widget-tab-contents .bk-root {
+                    filter: brightness(0.8) contrast(1.2) !important;
+                }
+
+                /* last item to restore: close fig and delete drive buttons to red */
+                .dark-mode .widget-button.red-button {
+                    background-color: var(--gentle-red) !important;
+                }
+
+            </style>
+            """,
+        )
+        display(dark_theme)
+
+
         self._link_callbacks()
 
         # initialize drive and connectivity ipywidgets
@@ -1750,7 +1953,7 @@ class HNNGUI:
             button_style="danger",
             icon="close",
             layout=self.layout["del_fig_btn"],
-        )
+        ).add_class("red-button")
         delete_button.on_click(self._delete_single_drive)
         drive_box.children += (
             HTML(value="<p> </p>"),  # Adds blank space
