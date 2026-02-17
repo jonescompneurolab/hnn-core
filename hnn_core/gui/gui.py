@@ -1727,6 +1727,14 @@ class HNNGUI:
         )
         display(dark_theme)
 
+        # DSD TODO
+        # check if middle scroll can be disabled for parameter inputs
+
+        # DSD TODO
+        # try to fix text shift on input when browser zoom != 100%
+
+        # DSD TODO
+        # add scientific units everywhere
 
         self._link_callbacks()
 
