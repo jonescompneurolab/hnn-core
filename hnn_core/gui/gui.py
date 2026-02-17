@@ -1685,16 +1685,16 @@ class HNNGUI:
 
                 /* adjust scrollbars for dark mode */
                 .dark-mode ::-webkit-scrollbar {
-                    width: 10px !important;
-                    height: 10px !important;
+                    width: 17px !important;
+                    height: 17px !important;
                 }
                 .dark-mode ::-webkit-scrollbar-track {
                     background: var(--dm-bg-primary) !important;
                 }
                 .dark-mode ::-webkit-scrollbar-thumb {
                     background: var(--dm-bg-secondary) !important;
-                    border: 2px solid var(--dm-bg-primary) !important;
-                    border-radius: 5px !important;
+                    border: 4px solid var(--dm-bg-primary) !important;
+                    border-radius: 20px !important;
                 }
                 .dark-mode ::-webkit-scrollbar-thumb:hover {
                     background: var(--dm-theme) !important;
