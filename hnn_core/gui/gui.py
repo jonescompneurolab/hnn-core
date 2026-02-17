@@ -1423,6 +1423,7 @@ class HNNGUI:
                     check if its 3rd tab (external drives) is active
                     selectively style the contents container for that tab
                 */
+                .param-tabs-widget-container >
                 .widget-tab-bar:has(.lm-TabBar-tab:nth-child(3).lm-mod-current) +
                 .widget-tab-contents {
                     scrollbar-gutter: stable !important;
@@ -1431,8 +1432,15 @@ class HNNGUI:
                 }
 
                 /* same for 4th tab (visualization) */
+                .param-tabs-widget-container >
                 .widget-tab-bar:has(.lm-TabBar-tab:nth-child(4).lm-mod-current) +
                 .widget-tab-contents {
+                    scrollbar-gutter: stable !important;
+                    overflow-y: auto !important;
+                    padding-right: 10px !important;
+                }
+
+                .network-container > .widget-tab-contents {
                     scrollbar-gutter: stable !important;
                     overflow-y: auto !important;
                     padding-right: 10px !important;
