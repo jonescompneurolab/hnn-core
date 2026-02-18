@@ -1298,6 +1298,7 @@ class HNNGUI:
                 }
             </style>
             """,
+            layout=Layout(display="none"),
         )
         display(param_tabs_styling)
 
@@ -1311,6 +1312,7 @@ class HNNGUI:
                 }
             </style>
             """,
+            layout=Layout(display="none"),
         )
         display(make_subtabs_sticky)
 
@@ -1367,7 +1369,8 @@ class HNNGUI:
                     }
 
                 </style>
-            """
+            """,
+            layout=Layout(display="none"),
         )
         display(adjust_accent_colors)
 
@@ -1411,6 +1414,7 @@ class HNNGUI:
                 }
             </style>
             """,
+            layout=Layout(display="none"),
         )
         display(log_toggle)
 
@@ -1447,6 +1451,7 @@ class HNNGUI:
                 }
             </style>
             """,
+            layout=Layout(display="none"),
         )
         display(tabs_add_scrollbar_gutter)
 
@@ -1473,6 +1478,7 @@ class HNNGUI:
                 }
             </style>
             """,
+            layout=Layout(display="none"),
         )
         display(stabilize_tabs_height)
 
@@ -1586,7 +1592,8 @@ class HNNGUI:
                         overflow: visible !important;
                     }
                 </style>
-            """
+            """,
+            layout=Layout(display="none"),
         )
         display(adjust_viz_window_spacing)
 
@@ -1949,6 +1956,7 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
 
             </style>
             """,
+            layout=Layout(display="none"),
         )
         display(dark_theme)
 
@@ -3294,14 +3302,16 @@ def add_network_connectivity_tab(
 
     # Style the <div> automatically created around connectivity boxes
     connectivity_out_style = HTML("""
-    <style>
-        /* CSS to style elements inside the Accordion */
-        .connectivity-section .jupyter-widget-Collapse-contents {
-            padding: 0px 0px 10px 0px !important;
-            margin: 0 !important;
-        }
-    </style>
-    """)
+        <style>
+            /* CSS to style elements inside the Accordion */
+            .connectivity-section .jupyter-widget-Collapse-contents {
+                padding: 0px 0px 10px 0px !important;
+                margin: 0 !important;
+            }
+        </style>
+        """,
+        layout=Layout(display="none"),
+    )
 
     # Display the Accordion with styling
     with connectivity_out:
