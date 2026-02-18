@@ -1590,1002 +1590,6 @@ class HNNGUI:
         )
         display(adjust_viz_window_spacing)
 
-        # ----------------------------------------------------------------------------
-        # DON'T REVIEW!!!
-        # this is just my keepign my checkpoints.
-        # see the next commit with the actual implementation.
-        # ----------------------------------------------------------------------------
-
-        # adjust_tab_overflow = HTML(
-        #     value="""
-        #     <style>
-        #         /* Target only the tab-strip area */
-        #         .visualization-window .lm-TabBar-content {
-        #             max-width: 100% !important;
-        #             overflow-x: auto !important;
-        #         }
-
-        #         .visualization-window .lm-TabBar-tab {
-        #             flex-shrink: 0 !important;
-        #         }
-        #     </style>
-        #     """,
-        # )
-        # display(adjust_tab_overflow)
-
-        # checkpoint
-        # adjust_tab_overflow = HTML(
-        #     value="""
-        #     <style>
-        #     .visualization-window .lm-TabBar {
-        #         position: relative !important;
-        #         /* add the border to TabBar instead of the content panel */
-        #         border-bottom: 1px solid lightgrey !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-content {
-        #         max-width: 100% !important;
-        #         overflow-x: auto !important;
-        #         scrollbar-width: none !important;
-        #         display: flex !important;
-        #         -ms-overflow-style: none !important;
-
-        #         /* shift content down so that tabs overlap the bottom-border */
-        #         margin-bottom: -1px !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-content::-webkit-scrollbar {
-        #         display: none !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-tab {
-        #         flex-shrink: 0 !important;
-        #     }
-
-        #     /* The active tab now overlaps the border we just added to the parent */
-        #     .visualization-window .lm-TabBar-tab.lm-mod-current {
-        #         border-bottom: 1px solid white !important;
-        #         transform: translateY(1px);
-        #         z-index: 3;
-        #     }
-
-        #     /* Remove the original border that was found in the console diagnostic */
-        #     .visualization-window .widget-tab-contents {
-        #         border-top: none !important;
-        #     }
-
-        #     .tab-caret {
-        #         position: absolute;
-        #         top: 0;
-        #         height: 100%;
-        #         width: 30px;
-        #         background: #1e1e1e;
-        #         color: #ffffff;
-        #         display: flex;
-        #         align-items: center;
-        #         justify-content: center;
-        #         z-index: 1000;
-        #         cursor: pointer;
-        #         visibility: hidden;
-        #         pointer-events: none;
-        #         border: none;
-        #     }
-        #     .tab-caret.is-visible {
-        #         visibility: visible;
-        #         pointer-events: auto;
-        #     }
-        #     .caret-left { left: 0; border-right: 1px solid #444 !important; }
-        #     .caret-right { right: 0; border-left: 1px solid #444 !important; }
-        #     </style>
-
-        #     <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" 
-        #          onload='
-        #         (function() {
-        #             const setup = () => {
-        #                 const parent = document.querySelector(".visualization-window .lm-TabBar");
-        #                 const bar = document.querySelector(".visualization-window .lm-TabBar-content");
-        #                 if (!parent || !bar || parent.querySelector(".caret-left")) return;
-
-        #                 const l = document.createElement("div");
-        #                 l.className = "tab-caret caret-left";
-        #                 l.innerHTML = "&#10094;";
-        #                 const r = document.createElement("div");
-        #                 r.className = "tab-caret caret-right";
-        #                 r.innerHTML = "&#10095;";
-
-        #                 parent.appendChild(l);
-        #                 parent.appendChild(r);
-
-        #                 const toggle = () => {
-        #                     const canLeft = bar.scrollLeft > 5;
-        #                     const canRight = bar.scrollLeft + bar.clientWidth < bar.scrollWidth - 5;
-        #                     l.classList.toggle("is-visible", canLeft);
-        #                     r.classList.toggle("is-visible", canRight);
-        #                 };
-
-        #                 l.onclick = () => bar.scrollBy({ left: -150, behavior: "smooth" });
-        #                 r.onclick = () => bar.scrollBy({ left: 150, behavior: "smooth" });
-        #                 bar.addEventListener("scroll", toggle);
-                        
-        #                 new MutationObserver(toggle).observe(bar, { childList: true });
-        #                 setTimeout(toggle, 100);
-        #             };
-
-        #             const poller = setInterval(() => {
-        #                 if (document.querySelector(".visualization-window .lm-TabBar-content")) {
-        #                     setup();
-        #                     clearInterval(poller);
-        #                 }
-        #             }, 500);
-        #         })();
-        #     '>
-        #     """,
-        #     layout=Layout(display="none")
-        # )
-        # display(adjust_tab_overflow)
-
-        # checkpoint
-        # adjust_tab_overflow = HTML(
-        #     value="""
-        #     <style>
-        #     .visualization-window .lm-TabBar {
-        #         position: relative !important;
-        #         border-bottom: none !important;
-        #     }
-            
-        #     .visualization-window .lm-TabBar-content {
-        #         max-width: 100% !important;
-        #         overflow-x: auto !important;
-        #         scrollbar-width: none !important;
-        #         display: flex !important;
-        #         -ms-overflow-style: none !important;
-        #         border-bottom: none !important;
-        #         /* Ensure the container doesn't clip the top border */
-        #         padding-top: 1px !important;
-        #     }
-            
-        #     .visualization-window .lm-TabBar-content::-webkit-scrollbar { display: none !important; }
-            
-        #     .visualization-window .lm-TabBar-tab { 
-        #         flex-shrink: 0 !important;
-        #         /* This puts the line back on inactive tabs */
-        #         border-bottom: 1px solid lightgrey !important;
-        #         /* Shift the tab content down 1px to make room for the top border */
-        #         margin-top: 1px !important;
-        #         transform: none !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-tab.lm-mod-current {
-        #         /* Active tab bottom border is white to 'open' the tab */
-        #         border-bottom: 1px solid white !important;
-        #         background-color: white !important;
-        #         z-index: 3;
-        #         /* Maintain the same top margin as inactive tabs so they stay aligned */
-        #         margin-top: 0px !important;
-        #     }
-
-        #     /* Fill the empty space to the right of the tabs with a bottom border */
-        #     .visualization-window .lm-TabBar-content::after {
-        #         content: '';
-        #         flex-grow: 1;
-        #         border-bottom: 1px solid lightgrey !important;
-        #         /* Align this line with the bottom of the tabs */
-        #         margin-bottom: 0px;
-        #     }
-
-        #     .visualization-window .widget-tab-contents {
-        #         border-top: none !important;
-        #     }
-
-        #     .tab-caret {
-        #         position: absolute;
-        #         top: 0;
-        #         height: 100%;
-        #         width: 30px;
-        #         background: #1e1e1e;
-        #         color: #ffffff;
-        #         display: flex;
-        #         align-items: center;
-        #         justify-content: center;
-        #         z-index: 1000;
-        #         cursor: pointer;
-        #         visibility: hidden;
-        #         pointer-events: none;
-        #         border: none;
-        #     }
-        #     .tab-caret.is-visible {
-        #         visibility: visible;
-        #         pointer-events: auto;
-        #     }
-        #     .caret-left { left: 0; border-right: 1px solid #444 !important; }
-        #     .caret-right { right: 0; border-left: 1px solid #444 !important; }
-        #     </style>
-
-        #     <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" 
-        #          onload='
-        #         (function() {
-        #             const setup = () => {
-        #                 const parent = document.querySelector(".visualization-window .lm-TabBar");
-        #                 const bar = document.querySelector(".visualization-window .lm-TabBar-content");
-        #                 if (!parent || !bar || parent.querySelector(".caret-left")) return;
-
-        #                 const l = document.createElement("div");
-        #                 l.className = "tab-caret caret-left";
-        #                 l.innerHTML = "&#10094;";
-        #                 const r = document.createElement("div");
-        #                 r.className = "tab-caret caret-right";
-        #                 r.innerHTML = "&#10095;";
-
-        #                 parent.appendChild(l);
-        #                 parent.appendChild(r);
-
-        #                 const toggle = () => {
-        #                     const canLeft = bar.scrollLeft > 5;
-        #                     const canRight = bar.scrollLeft + bar.clientWidth < bar.scrollWidth - 5;
-        #                     l.classList.toggle("is-visible", canLeft);
-        #                     r.classList.toggle("is-visible", canRight);
-        #                 };
-
-        #                 l.onclick = () => bar.scrollBy({ left: -150, behavior: "smooth" });
-        #                 r.onclick = () => bar.scrollBy({ left: 150, behavior: "smooth" });
-        #                 bar.addEventListener("scroll", toggle);
-                        
-        #                 new MutationObserver(toggle).observe(bar, { childList: true });
-        #                 setTimeout(toggle, 100);
-        #             };
-
-        #             const poller = setInterval(() => {
-        #                 if (document.querySelector(".visualization-window .lm-TabBar-content")) {
-        #                     setup();
-        #                     clearInterval(poller);
-        #                 }
-        #             }, 500);
-        #         })();
-        #     '>
-        #     """,
-        #     layout=Layout(display="none")
-        # )
-        # display(adjust_tab_overflow)
-
-        # checkpoint
-        # this code works perfectly unless the right/left most tab is the active tab
-        # adjust_tab_overflow = HTML(
-        #     value="""
-        #     <style>
-        #     .visualization-window .lm-TabBar {
-        #         position: relative !important;
-        #         border-bottom: none !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-content {
-        #         max-width: 100% !important;
-        #         overflow-x: auto !important;
-        #         scrollbar-width: none !important;
-        #         display: flex !important;
-        #         -ms-overflow-style: none !important;
-        #         border-bottom: none !important;
-        #         padding-top: 1px !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-content::-webkit-scrollbar {
-        #         display: none !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-tab {
-        #         flex-shrink: 0 !important;
-        #         border-bottom: 1px solid lightgrey !important;
-        #         margin-top: 1px !important;
-        #         transform: none !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-tab.lm-mod-current {
-        #         border-bottom: 1px solid white !important;
-        #         background-color: white !important;
-        #         margin-top: 0px !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-content::after {
-        #         content: '';
-        #         flex-grow: 1;
-        #         border-bottom: 1px solid lightgrey !important;
-        #         margin-bottom: 0px;
-        #     }
-
-        #     .visualization-window .widget-tab-contents {
-        #         border-top: none !important;
-        #     }
-
-        #     .tab-caret {
-        #         position: absolute;
-        #         top: 1px;
-        #         bottom: 0;
-        #         margin: auto 0;
-        #         height: 70%;
-        #         width: 20px;
-        #         border-radius: 20px;
-        #         background: #ffffffcc;
-        #         color: var(--textbook-light-purple);
-        #         display: flex;
-        #         align-items: center;
-        #         justify-content: center;
-        #         z-index: 10 !important;
-        #         cursor: pointer !important;
-        #         visibility: hidden;
-        #         border: none;
-        #         user-select: none;
-        #         pointer-events: auto !important;
-        #     }
-        #     .tab-caret.is-visible {
-        #         visibility: visible;
-        #     }
-        #     .caret-left { left: 0; }
-        #     .caret-right { right: 0; }
-        #     </style>
-
-        #     <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-        #         onload='
-        #         (function() {
-        #             const setup = () => {
-        #                 const parent = document.querySelector(
-        #                     ".visualization-window .lm-TabBar"
-        #                 );
-        #                 const bar = document.querySelector(
-        #                     ".visualization-window .lm-TabBar-content"
-        #                 );
-        #                 if (!parent || !bar || parent.querySelector(".caret-left")) {
-        #                     return;
-        #                 }
-
-        #                 const l = document.createElement("div");
-        #                 l.className = "tab-caret caret-left";
-        #                 l.innerHTML = "&#10094;";
-        #                 const r = document.createElement("div");
-        #                 r.className = "tab-caret caret-right";
-        #                 r.innerHTML = "&#10095;";
-
-        #                 parent.appendChild(l);
-        #                 parent.appendChild(r);
-
-        #                 const toggle = () => {
-        #                     const canLeft = bar.scrollLeft > 5;
-        #                     const canRight = bar.scrollLeft + bar.clientWidth < (
-        #                         bar.scrollWidth - 5
-        #                     );
-        #                     l.classList.toggle("is-visible", canLeft);
-        #                     r.classList.toggle("is-visible", canRight);
-        #                 };
-
-        #                 const doScroll = (e, amt) => {
-        #                     e.stopImmediatePropagation();
-        #                     e.stopPropagation();
-        #                     e.preventDefault();
-        #                     bar.scrollBy({ left: amt, behavior: "smooth" });
-        #                     return false;
-        #                 };
-
-        #                 const events = ["pointerdown", "mousedown", "click"];
-        #                 events.forEach(evtName => {
-        #                     l.addEventListener(
-        #                         evtName, (e) => doScroll(e, -150), true
-        #                     );
-        #                     r.addEventListener(
-        #                         evtName, (e) => doScroll(e, 150), true
-        #                     );
-        #                 });
-
-        #                 bar.addEventListener("scroll", toggle);
-        #                 new MutationObserver(toggle).observe(
-        #                     bar, { childList: true }
-        #                 );
-        #                 setTimeout(toggle, 100);
-        #             };
-
-        #             const poller = setInterval(() => {
-        #                 const target = ".visualization-window .lm-TabBar-content";
-        #                 if (document.querySelector(target)) {
-        #                     setup();
-        #                     clearInterval(poller);
-        #                 }
-        #             }, 500);
-        #         })();
-        #     '>
-        #     """,
-        #     layout=Layout(display="none")
-        # )
-        # display(adjust_tab_overflow)
-
-        # checkpoint
-        # adjust_tab_overflow = HTML(
-        #     value="""
-        #     <style>
-        #     .visualization-window .lm-TabBar {
-        #         position: relative !important;
-        #         border-bottom: none !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-content {
-        #         max-width: 100% !important;
-        #         overflow-x: hidden !important;
-        #         scrollbar-width: none !important;
-        #         display: flex !important;
-        #         /* -ms-overflow-style: none !important; */
-        #         border-bottom: none !important;
-        #         padding-top: 1px !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-content::-webkit-scrollbar {
-        #         display: none !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-tab {
-        #         width: 130px !important;
-        #         flex-shrink: 0 !important;
-        #         border-bottom: 1px solid lightgrey !important;
-        #         margin-top: 1px !important;
-        #         transform: none !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-tab.lm-mod-current {
-        #         border-bottom: 1px solid white !important;
-        #         background-color: white !important;
-        #         /* margin-top: 0px !important; */
-        #     }
-
-        #     /* draw a new bottom border */
-        #     .visualization-window .lm-TabBar-content::after {
-        #         content: '';
-        #         flex-grow: 1;
-        #         border-bottom: 1px solid lightgrey !important;
-        #         margin-bottom: 0px;
-        #     }
-
-        #     .visualization-window .widget-tab-contents {
-        #         border-top: none !important;
-        #     }
-
-        #     .tab-caret {
-        #         position: absolute;
-        #         top: 1px;
-        #         bottom: 0;
-        #         margin: auto 0;
-        #         height: 70%;
-        #         width: 20px;
-        #         border-radius: 20px;
-        #         background: #ffffffcc;
-        #         color: var(--textbook-light-purple);
-        #         display: flex;
-        #         align-items: center;
-        #         justify-content: center;
-        #         z-index: 10 !important;
-        #         cursor: pointer !important;
-        #         visibility: hidden;
-        #         border: none;
-        #         user-select: none;
-        #         pointer-events: auto !important;
-        #     }
-
-        #     .tab-caret.is-visible {
-        #         visibility: visible;
-        #     }
-
-        #     .caret-left { left: 2px; }
-        #     .caret-right { right: 2px; }
-        #     </style>
-
-        #     <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-        #         onload='
-        #         (function() {
-        #             const setup = () => {
-        #                 const parent = document.querySelector(
-        #                     ".visualization-window .lm-TabBar"
-        #                 );
-        #                 const bar = document.querySelector(
-        #                     ".visualization-window .lm-TabBar-content"
-        #                 );
-        #                 if (!parent || !bar || parent.querySelector(".caret-left")) {
-        #                     return;
-        #                 }
-
-        #                 const l = document.createElement("div");
-        #                 l.className = "tab-caret caret-left";
-        #                 l.innerHTML = "&#10094;";
-        #                 const r = document.createElement("div");
-        #                 r.className = "tab-caret caret-right";
-        #                 r.innerHTML = "&#10095;";
-
-        #                 parent.appendChild(l);
-        #                 parent.appendChild(r);
-
-        #                 const toggle = () => {
-        #                     const canLeft = bar.scrollLeft > 5;
-        #                     const canRight = bar.scrollLeft + bar.clientWidth < (
-        #                         bar.scrollWidth - 5
-        #                     );
-        #                     l.classList.toggle("is-visible", canLeft);
-        #                     r.classList.toggle("is-visible", canRight);
-        #                 };
-
-        #                 const doScroll = (e, amt) => {
-        #                     e.stopImmediatePropagation();
-        #                     e.stopPropagation();
-        #                     e.preventDefault();
-        #                     bar.scrollBy({ left: amt, behavior: "smooth" });
-        #                     return false;
-        #                 };
-
-        #                 const events = ["pointerdown", "mousedown", "click"];
-        #                 events.forEach(evtName => {
-        #                     l.addEventListener(
-        #                         evtName, (e) => doScroll(e, -150), true
-        #                     );
-        #                     r.addEventListener(
-        #                         evtName, (e) => doScroll(e, 150), true
-        #                     );
-        #                 });
-
-        #                 bar.addEventListener("scroll", toggle);
-        #                 new MutationObserver(toggle).observe(
-        #                     bar, { childList: true }
-        #                 );
-        #                 setTimeout(toggle, 100);
-        #             };
-
-        #             const poller = setInterval(() => {
-        #                 const target = ".visualization-window .lm-TabBar-content";
-        #                 if (document.querySelector(target)) {
-        #                     setup();
-        #                     clearInterval(poller);
-        #                 }
-        #             }, 500);
-        #         })();
-        #     '>
-        #     """,
-        #     layout=Layout(display="none")
-        # )
-        # display(adjust_tab_overflow)
-
-        # # checkpoint
-        # adjust_tab_overflow = HTML(
-        #     value="""
-        #     <style>
-        #     .visualization-window .lm-TabBar {
-        #         position: relative !important;
-        #         border-bottom: none !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-content {
-        #         max-width: 100% !important;
-        #         display: flex !important;
-        #         border-bottom: none !important;
-        #         padding: 1px 0 0 0 !important;
-        #         /* overflow: hidden ensures the container doesn't create
-        #            a sub-pixel scroll area that clips the final border */
-        #         overflow: hidden !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-content::-webkit-scrollbar {
-        #         display: none !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-tab {
-        #         /* Distribute 5 tabs perfectly across 100% */
-        #         flex: 0 0 20% !important;
-        #         width: 20% !important;
-        #         max-width: 20% !important;
-
-        #         /* Include the border in the width calculation */
-        #         box-sizing: border-box !important;
-        #         border-bottom: 1px solid lightgrey !important;
-
-        #         /* Remove border-right; use border-left for dividers instead */
-        #         border-right: none !important;
-
-        #         margin: 1px 0 0 0 !important;
-        #         transform: none !important;
-        #         min-width: 0 !important;
-        #     }
-
-        #     /* Add the divider only between tabs */
-        #     .visualization-window .lm-TabBar-tab:not(:first-child) {
-        #         border-left: 1px solid lightgrey !important;
-        #     }
-
-        #     /* Add the right border back to the last tab only */
-        #     .visualization-window .lm-TabBar-tab:last-child {
-        #         border-right: 1px solid lightgrey !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-tab.lm-mod-current {
-        #         border-bottom: 1px solid white !important;
-        #         background-color: white !important;
-        #         /* margin-top: 0px !important; */
-        #     }
-
-        #     /* draw a new bottom border */
-        #     .visualization-window .lm-TabBar-content::after {
-        #         content: '';
-        #         flex-grow: 1;
-        #         border-bottom: 1px solid lightgrey !important;
-        #         margin-bottom: 0px;
-        #     }
-
-        #     .visualization-window .widget-tab-contents {
-        #         border-top: none !important;
-        #     }
-
-        #     .tab-caret {
-        #         position: absolute;
-        #         top: 1px;
-        #         bottom: 0;
-        #         margin: auto 0;
-        #         height: 70%;
-        #         width: 20px;
-        #         border-radius: 20px;
-        #         background: #ffffffcc;
-        #         color: var(--textbook-light-purple);
-        #         display: flex;
-        #         align-items: center;
-        #         justify-content: center;
-        #         z-index: 10 !important;
-        #         cursor: pointer !important;
-        #         visibility: hidden;
-        #         border: none;
-        #         user-select: none;
-        #         pointer-events: auto !important;
-        #     }
-
-        #     .tab-caret.is-visible {
-        #         visibility: visible;
-        #     }
-
-        #     .caret-left { left: 2px; }
-        #     .caret-right { right: 2px; }
-        #     </style>
-
-        #     <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-        #         onload='
-        #         (function() {
-        #             const setup = () => {
-        #                 const parent = document.querySelector(
-        #                     ".visualization-window .lm-TabBar"
-        #                 );
-        #                 const bar = document.querySelector(
-        #                     ".visualization-window .lm-TabBar-content"
-        #                 );
-        #                 if (!parent || !bar || parent.querySelector(".caret-left")) {
-        #                     return;
-        #                 }
-
-        #                 const l = document.createElement("div");
-        #                 l.className = "tab-caret caret-left";
-        #                 l.innerHTML = "&#10094;";
-        #                 const r = document.createElement("div");
-        #                 r.className = "tab-caret caret-right";
-        #                 r.innerHTML = "&#10095;";
-
-        #                 parent.appendChild(l);
-        #                 parent.appendChild(r);
-
-        #                 const toggle = () => {
-        #                     const canLeft = bar.scrollLeft > 5;
-        #                     const canRight = bar.scrollLeft + bar.clientWidth < (
-        #                         bar.scrollWidth - 5
-        #                     );
-        #                     l.classList.toggle("is-visible", canLeft);
-        #                     r.classList.toggle("is-visible", canRight);
-        #                 };
-
-        #                 const doScroll = (e, amt) => {
-        #                     e.stopImmediatePropagation();
-        #                     e.stopPropagation();
-        #                     e.preventDefault();
-        #                     bar.scrollBy({ left: amt, behavior: "smooth" });
-        #                     return false;
-        #                 };
-
-        #                 const events = ["pointerdown", "mousedown", "click"];
-        #                 events.forEach(evtName => {
-        #                     l.addEventListener(
-        #                         evtName, (e) => doScroll(e, -150), true
-        #                     );
-        #                     r.addEventListener(
-        #                         evtName, (e) => doScroll(e, 150), true
-        #                     );
-        #                 });
-
-        #                 bar.addEventListener("scroll", toggle);
-        #                 new MutationObserver(toggle).observe(
-        #                     bar, { childList: true }
-        #                 );
-        #                 setTimeout(toggle, 100);
-        #             };
-
-        #             const poller = setInterval(() => {
-        #                 const target = ".visualization-window .lm-TabBar-content";
-        #                 if (document.querySelector(target)) {
-        #                     setup();
-        #                     clearInterval(poller);
-        #                 }
-        #             }, 500);
-        #         })();
-        #     '>
-        #     """,
-        #     layout=Layout(display="none")
-        # )
-        # display(adjust_tab_overflow)
-
-        # checkpoint
-        # minimal solution with minimal formatting
-        # adjust_tab_overflow = HTML(
-        #     value="""
-        #     <style>
-        #     .visualization-window .lm-TabBar {
-        #         position: relative !important;
-        #         /* Ensure absolute carets aren't clipped by the main bar container */
-        #         overflow: visible !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-content {
-        #         display: flex !important;
-        #         /* Required for the JS scroll logic to function */
-        #         overflow: hidden !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-content::-webkit-scrollbar {
-        #         display: none !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-tab {
-        #         /* Required: prevents tabs from squishing to fit the bar.
-        #            If tabs shrink to fit, no scroll is needed and carets won't show. */
-        #         flex-shrink: 0 !important;
-        #     }
-
-        #     .tab-caret {
-        #         position: absolute;
-        #         top: 50%;
-        #         transform: translateY(-50%);
-        #         height: 24px;
-        #         width: 24px;
-        #         border-radius: 50%;
-        #         background: #ffffffcc;
-        #         color: var(--textbook-light-purple);
-        #         display: flex;
-        #         align-items: center;
-        #         justify-content: center;
-        #         z-index: 100 !important;
-        #         cursor: pointer !important;
-        #         visibility: hidden;
-        #         border: none;
-        #         user-select: none;
-        #         box-shadow: 0 0 4px rgba(0,0,0,0.1);
-        #     }
-
-        #     .tab-caret.is-visible {
-        #         visibility: visible;
-        #     }
-
-        #     .caret-left { left: 4px; }
-        #     .caret-right { right: 4px; }
-        #     </style>
-
-        #     <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-        #         onload='
-        #         (function() {
-        #             const setup = () => {
-        #                 const parent = document.querySelector(".visualization-window .lm-TabBar");
-        #                 const bar = document.querySelector(".visualization-window .lm-TabBar-content");
-                        
-        #                 if (!parent || !bar || parent.querySelector(".caret-left")) return;
-
-        #                 const l = document.createElement("div");
-        #                 l.className = "tab-caret caret-left";
-        #                 l.innerHTML = "&#10094;";
-        #                 const r = document.createElement("div");
-        #                 r.className = "tab-caret caret-right";
-        #                 r.innerHTML = "&#10095;";
-
-        #                 parent.appendChild(l);
-        #                 parent.appendChild(r);
-
-        #                 const toggle = () => {
-        #                     const canLeft = bar.scrollLeft > 5;
-        #                     const canRight = bar.scrollLeft + bar.clientWidth < (bar.scrollWidth - 5);
-        #                     l.classList.toggle("is-visible", canLeft);
-        #                     r.classList.toggle("is-visible", canRight);
-        #                 };
-
-        #                 const doScroll = (e, direction) => {
-        #                     e.stopImmediatePropagation();
-        #                     e.stopPropagation();
-        #                     e.preventDefault();
-                            
-        #                     // Move by the width of the first tab found
-        #                     const tab = bar.querySelector(".lm-TabBar-tab");
-        #                     const amt = tab ? tab.offsetWidth : 150;
-                            
-        #                     bar.scrollBy({ left: direction * amt, behavior: "smooth" });
-        #                     return false;
-        #                 };
-
-        #                 const events = ["pointerdown", "mousedown", "click"];
-        #                 events.forEach(evtName => {
-        #                     l.addEventListener(evtName, (e) => doScroll(e, -1), true);
-        #                     r.addEventListener(evtName, (e) => doScroll(e, 1), true);
-        #                 });
-
-        #                 bar.addEventListener("scroll", toggle);
-        #                 new MutationObserver(toggle).observe(bar, { childList: true });
-        #                 setTimeout(toggle, 100);
-        #             };
-
-        #             const poller = setInterval(() => {
-        #                 if (document.querySelector(".visualization-window .lm-TabBar-content")) {
-        #                     setup();
-        #                     clearInterval(poller);
-        #                 }
-        #             }, 500);
-        #         })();
-        #     '>
-        #     """,
-        #     layout=Layout(display="none")
-        # )
-        # display(adjust_tab_overflow)
-
-        # checkpoint
-        # fixed!!!
-        # adjust_tab_overflow = HTML(
-        #     value="""
-        #     <style>
-        #     .visualization-window .lm-TabBar {
-        #         position: relative !important;
-        #         border-bottom: none !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-content {
-        #         max-width: 100% !important;
-        #         overflow-x: auto !important;
-        #         scrollbar-width: none !important;
-        #         display: flex !important;
-        #         -ms-overflow-style: none !important;
-        #         border-bottom: none !important;
-        #         padding-top: 1px !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-content::-webkit-scrollbar {
-        #         display: none !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-tab {
-        #         flex-shrink: 0 !important;
-        #         border-bottom: 1px solid lightgrey !important;
-        #         border-right: 1px solid lightgrey !important;
-        #         margin-top: 1px !important;
-        #         transform: none !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-tab:first-child {
-        #         border-left: 1px solid lightgrey !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-tab.lm-mod-current {
-        #         border-bottom: 1px solid white !important;
-        #         background-color: white !important;
-        #         margin-top: 0px !important;
-        #     }
-
-        #     .visualization-window .lm-TabBar-content::after {
-        #         content: '';
-        #         flex-grow: 1;
-        #         border-bottom: 1px solid lightgrey !important;
-        #         margin-bottom: 0px;
-        #     }
-
-        #     .visualization-window .widget-tab-contents {
-        #         border-top: none !important;
-        #     }
-
-        #     .tab-caret {
-        #         position: absolute;
-        #         top: 1px;
-        #         bottom: 0;
-        #         margin: auto 0;
-        #         height: 70%;
-        #         width: 20px;
-        #         border-radius: 20px;
-        #         background: #ffffffcc;
-        #         color: var(--textbook-light-purple) !important;
-        #         display: flex;
-        #         align-items: center;
-        #         justify-content: center;
-        #         z-index: 30 !important; /* Above walls */
-        #         cursor: pointer !important;
-        #         visibility: hidden;
-        #         border: none;
-        #         user-select: none;
-        #         pointer-events: auto !important;
-        #     }
-
-        #     .tab-caret.is-visible {
-        #         visibility: visible;
-        #     }
-
-        #     .caret-left { left: 4px; }
-        #     .caret-right { right: 4px; }
-        #     </style>
-
-        #     <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-        #         onload='
-        #         (function() {
-        #             const setup = () => {
-        #                 const parent = document.querySelector(".visualization-window .lm-TabBar");
-        #                 const bar = document.querySelector(".visualization-window .lm-TabBar-content");
-        #                 if (!parent || !bar || parent.querySelector(".caret-left")) return;
-
-        #                 // Create Carets
-        #                 const lCaret = document.createElement("div");
-        #                 lCaret.className = "tab-caret caret-left";
-        #                 lCaret.innerHTML = "&#10094;";
-        #                 const rCaret = document.createElement("div");
-        #                 rCaret.className = "tab-caret caret-right";
-        #                 rCaret.innerHTML = "&#10095;";
-
-        #                 // Create Boundary Walls (Persistent vertical borders)
-        #                 const leftWall = document.createElement("div");
-        #                 const rightWall = document.createElement("div");
-
-        #                 const wallStyle = "position: absolute; top: 2px; bottom: 0; width: 1px; background-color: lightgrey; z-index: 20; pointer-events: none; display: none;";
-        #                 leftWall.style.cssText = wallStyle + "left: 0;";
-        #                 rightWall.style.cssText = wallStyle + "right: 0;";
-
-        #                 parent.appendChild(lCaret);
-        #                 parent.appendChild(rCaret);
-        #                 parent.appendChild(leftWall);
-        #                 parent.appendChild(rightWall);
-
-        #                 const update = () => {
-        #                     const canLeft = bar.scrollLeft > 1;
-        #                     const isAtEnd = bar.scrollLeft + bar.clientWidth >= (bar.scrollWidth - 1);
-                            
-        #                     lCaret.classList.toggle("is-visible", canLeft);
-        #                     rCaret.classList.toggle("is-visible", !isAtEnd);
-                            
-        #                     leftWall.style.display = canLeft ? "block" : "none";
-        #                     rightWall.style.display = !isAtEnd ? "block" : "none";
-        #                 };
-
-        #                 const doScroll = (e, amt) => {
-        #                     e.stopImmediatePropagation();
-        #                     e.stopPropagation();
-        #                     e.preventDefault();
-        #                     bar.scrollBy({ left: amt, behavior: "smooth" });
-        #                     return false;
-        #                 };
-
-        #                 const events = ["pointerdown", "mousedown", "click"];
-        #                 events.forEach(evtName => {
-        #                     lCaret.addEventListener(evtName, (e) => doScroll(e, -150), true);
-        #                     rCaret.addEventListener(evtName, (e) => doScroll(e, 150), true);
-        #                 });
-
-        #                 bar.addEventListener("scroll", update);
-        #                 new MutationObserver(update).observe(bar, { childList: true, subtree: true });
-        #                 setTimeout(update, 100);
-        #             };
-
-        #             const poller = setInterval(() => {
-        #                 if (document.querySelector(".visualization-window .lm-TabBar-content")) {
-        #                     setup();
-        #                     clearInterval(poller);
-        #                 }
-        #             }, 500);
-        #         })();
-        #     '>
-        #     """,
-        #     layout=Layout(display="none"),
-        # )
-        # display(adjust_tab_overflow)
-
         dark_theme = HTML(
             value="""
             <style>
@@ -2722,6 +1726,226 @@ class HNNGUI:
             """,
         )
         display(dark_theme)
+
+        adjust_tab_overflow = HTML(
+            value="""
+            <style>
+
+            :root {
+                --tab-color: white;
+                --tab-border: lightgrey;
+            }
+
+            .dark-mode {
+                --tab-color: var(--dm-bg-primary);
+                --tab-border: var(--dm-border-color);
+            }
+
+            /*
+                target the TabBar in visualization-window (right panel)
+                target the *first* TabBar instance in visualization-tab (left panel)
+            */
+            .visualization-window .lm-TabBar,
+            .visualization-tab .lm-TabBar:first-of-type {
+                position: relative !important;
+                border-bottom: none !important;
+            }
+
+            /*
+                for both visualization-window and visualization-tab:
+                    - set TabBar container properties
+                    - remove the bottom border, as we'll be managing it via the
+                      individual tabs instead
+                    - allow content to overflow horizontal axis
+            */
+            .visualization-window .lm-TabBar-content,
+            .visualization-tab .lm-TabBar:first-of-type .lm-TabBar-content {
+                max-width: 100% !important;
+                overflow-x: auto !important;
+                scrollbar-width: none !important;
+                display: flex !important;
+                -ms-overflow-style: none !important; /* old browser compatibility */
+                border-bottom: none !important;
+                padding-top: 1px !important;
+            }
+
+            /*
+                hide the scrollabr for both visualization-window and visualization-tab
+            */
+            .visualization-window .lm-TabBar-content::-webkit-scrollbar,
+            .visualization-tab .lm-TabBar:first-of-type
+            .lm-TabBar-content::-webkit-scrollbar {
+                display: none !important;
+            }
+
+            /*
+                for both visualization-window and visualization-tab:
+                    - style the individual tabs
+                    - prevent the individual tabs from shrinking
+            */
+            .visualization-window .lm-TabBar-tab,
+            .visualization-tab .lm-TabBar:first-of-type .lm-TabBar-tab {
+                flex-shrink: 0 !important;
+                border-bottom: 1px solid var(--tab-border) !important;
+                margin-top: 1px !important;
+                transform: none !important;
+
+                /* uncomment the code below if manual override is needed */
+                /* border-right: 1px solid var(--tab-border) !important; */
+            }
+
+            /*
+                targets first tab left border
+                uncomment code below if manual border color override is needed
+            */
+            /*  start code -----
+            .visualization-window .lm-TabBar-tab:first-child,
+            .visualization-tab .lm-TabBar:first-of-type .lm-TabBar-tab:first-child {
+                border-left: 1px solid var(--tab-border) !important;
+            }
+            ----- end code  */
+
+            .visualization-window .lm-TabBar-tab.lm-mod-current,
+            .visualization-tab .lm-TabBar:first-of-type .lm-TabBar-tab.lm-mod-current {
+                border-bottom: 1px solid var(--tab-color) !important;
+                /*
+                    background-color does not strictly need to be specified here, but
+                    keeping it as a fail safe
+                */
+                background-color: var(--tab-color) !important;
+                margin-top: 0px !important;
+            }
+
+            .visualization-window .lm-TabBar-content::after,
+            .visualization-tab .lm-TabBar:first-of-type .lm-TabBar-content::after {
+                content: '';
+                flex-grow: 1;
+                border-bottom: 1px solid var(--tab-border) !important;
+                margin-bottom: 0px;
+            }
+
+            .visualization-window .widget-tab-contents,
+            .visualization-tab .widget-tab-contents {
+                border-top: none !important;
+            }
+
+            /* ----- caret styling and placement ------ */
+            /* ---------------------------------------- */
+            .tab-caret {
+                position: absolute;
+                top: 1px;
+                bottom: 0;
+                margin: auto 0;
+                height: 70%;
+                width: 20px;
+                border-radius: 20px;
+                background: #ffffffcc;
+                color: var(--textbook-light-purple) !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 30 !important;
+                cursor: pointer !important;
+                visibility: hidden;
+                border: none;
+                user-select: none;
+                pointer-events: auto !important;
+            }
+
+            .tab-caret.is-visible { visibility: visible; }
+            .caret-left { left: 4px; }
+            .caret-right { right: 4px; }
+
+            </style>
+
+            /* ----------------------------------------------------------------------
+                this method of running the script below seems a bit "hacky", but it is
+                apparently a commonly used trick. We use a 1x1 transparent GIF to
+                trigger the "onload" event that follows it. this is apparently the
+                smallest footprint option for a valid asset load, meaning the browser
+                won't treat it as an error. this method ensure the script runs every
+                time a tab is rendered.
+               ----------------------------------------------------------------------
+            */
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///
+yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+                onload='
+                (function() {
+                    const setup = (selector) => {
+                        const parent = document.querySelector(selector);
+                        if (!parent) return;
+
+                        const bar = parent.querySelector(".lm-TabBar-content");
+                        if (!bar || parent.querySelector(".caret-left")) return;
+
+                        const lCaret = document.createElement("div");
+                        lCaret.className = "tab-caret caret-left";
+                        lCaret.innerHTML = "&#10094;";
+                        const rCaret = document.createElement("div");
+                        rCaret.className = "tab-caret caret-right";
+                        rCaret.innerHTML = "&#10095;";
+
+                        const leftWall = document.createElement("div");
+                        const rightWall = document.createElement("div");
+
+                        let wallStyle = "position: absolute; top: 2px; ";
+                        wallStyle += "bottom: 0; width: 1px; ";
+                        wallStyle += "background-color: var(--tab-border); ";
+                        wallStyle += "z-index: 20; ";
+                        wallStyle += "pointer-events: none; display: none;";
+
+                        leftWall.style.cssText = wallStyle + "left: 0;";
+                        rightWall.style.cssText = wallStyle + "right: 0;";
+
+                        parent.appendChild(lCaret);
+                        parent.appendChild(rCaret);
+                        parent.appendChild(leftWall);
+                        parent.appendChild(rightWall);
+
+                        const update = () => {
+                            const canLeft = bar.scrollLeft > 1;
+                            const isAtEnd = bar.scrollLeft +
+                                bar.clientWidth >= (bar.scrollWidth - 1);
+
+                            lCaret.classList.toggle("is-visible", canLeft);
+                            rCaret.classList.toggle("is-visible", !isAtEnd);
+
+                            leftWall.style.display = canLeft ? "block" : "none";
+                            rightWall.style.display = !isAtEnd ? "block" : "none";
+                        };
+
+                        const doScroll = (e, amt) => {
+                            e.stopImmediatePropagation();
+                            e.stopPropagation();
+                            e.preventDefault();
+                            bar.scrollBy({ left: amt, behavior: "smooth" });
+                            return false;
+                        };
+
+                        const events = ["pointerdown", "mousedown", "click"];
+                        events.forEach(evtName => {
+                            lCaret.addEventListener(evtName, (e) =>
+                                doScroll(e, -150), true);
+                            rCaret.addEventListener(evtName, (e) =>
+                                doScroll(e, 150), true);
+                        });
+
+                        bar.addEventListener("scroll", update);
+                        const obs = new MutationObserver(update);
+                        obs.observe(bar, { childList: true, subtree: true });
+                        setTimeout(update, 100);
+                    };
+
+                    const poller = setInterval(() => {
+                        setup(".visualization-window .lm-TabBar");
+                        setup(".visualization-tab .lm-TabBar:first-of-type");
+                    }, 500);
+                })();
+            '>
+            """,
+            layout=Layout(display="none"),
+        )
+        display(adjust_tab_overflow)
 
         # DSD TODO
         # check if middle scroll can be disabled for parameter inputs
