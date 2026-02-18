@@ -1220,7 +1220,7 @@ class _VizManager:
                 ),
                 self.axes_config_output,
             ]
-        )
+        ).add_class("visualization-tab")
         return config_panel, fig_output_container
 
     def _layout_template_change(self, template_type):
