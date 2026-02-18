@@ -1628,6 +1628,47 @@ class HNNGUI:
         )
         display(adjust_viz_window_spacing)
 
+        adjust_viz_param_tab = HTML(
+            value="""
+            <style>
+                /*
+                    remove the rectangle in the vizualization-tab when there is
+                    not actually any figure present
+                */
+
+                /*
+                    remove the "top" edge of the rectangle by setting border to none if
+                    the "lm-TabBar-tab" child class is not present
+
+                    this element needs to be targeted with "::after", as that element
+                    is used to form the border that spans from the end of the tab to
+                    the end of the container that holds the figure
+                */
+                .visualization-tab
+                .lm-TabBar-content:not(:has(.lm-TabBar-tab))::after {
+                    content: none !important;
+                    border: none !important;
+                    display: none !important;
+                }
+
+                /*
+                    remove the "U" edges of the rectangle by setting border to none if
+                    the "widget-container" child is not present
+                */
+                .visualization-tab
+                .widget-tab-contents:not(:has(.widget-container)) {
+                    border: none !important;
+                    box-shadow: none !important;
+                    outline: none !important;
+                }
+
+            </style>
+            """,
+            layout=Layout(display="none"),
+        )
+        display(adjust_viz_param_tab)
+
+
         adjust_tab_overflow = HTML(
             value="""
             <style>
