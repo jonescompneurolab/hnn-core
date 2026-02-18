@@ -19,7 +19,7 @@ from functools import partial
 from pathlib import Path
 
 import numpy as np
-from IPython.display import IFrame, display
+from IPython.display import IFrame, display, Javascript
 from ipywidgets import (
     HTML,
     Accordion,
@@ -1315,6 +1315,37 @@ class HNNGUI:
             layout=Layout(display="none"),
         )
         display(make_subtabs_sticky)
+
+        # disable dropdown menu displaying when no actual items are present
+        # note: i've *only* noticed this on Firefox, but it creates an empty
+        #       oval on screen that looks like an erroroneous box... this requires
+        #       js as you can't target those popup boxes with CSS, unforuntately
+
+        js_code = """
+            (function() {
+                        const blockEmpty = (e) => {
+                            const t = e.target;
+                            const isDrop = t.closest('.widget-dropdown');
+                            if (t.tagName === 'SELECT' && isDrop) {
+                                if (t.childElementCount === 0) {
+                                    e.preventDefault();
+                                    t.focus();
+                                }
+                            }
+                        };
+
+                        document.addEventListener('mousedown', blockEmpty, true);
+
+                        const obs = new MutationObserver(() => {
+                            document.removeEventListener('mousedown', blockEmpty, true);
+                            document.addEventListener('mousedown', blockEmpty, true);
+                        });
+
+                        obs.observe(document.body, {childList: true, subtree: true});
+            })();
+            """
+
+        display(Javascript(js_code))
 
         # adjust colors and accents
         adjust_accent_colors = HTML(
