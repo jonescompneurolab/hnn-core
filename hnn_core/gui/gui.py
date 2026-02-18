@@ -2032,14 +2032,27 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
         )
         display(dark_theme)
 
-        # DSD TODO
+        # DSD TODO [DONE]
         # check if middle scroll can be disabled for parameter inputs
+        # note: some change I made to how scroll functions generally seems to have
+        #       removed the "middle scroll" behavior for input boxes. Tested on both
+        #       Chrome and Firefox
 
         # DSD TODO
         # try to fix text shift on input when browser zoom != 100%
+        # this is a stretch goal and not strictly necessary, but altenative zoom levels
+        # can shift pixels around ever so slightly. elements are currently optimized
+        # for 100% zoom. I'm not sure fixing this is worth the effort, as it would
+        # likely require manually specifying all pixels, which is 1) extremely
+        # difficult to do when the app is created / updated in real time by
+        # ipywidgets, and 2) maintenance would be a nightmare. That being said, there
+        # may be alternative ways to fix *some* specfic cases of pixel shifting that
+        # we want to avoid by, e.g., using a javascript function to watch for
+        # pixel discrepancies
 
         # DSD TODO
         # add scientific units everywhere
+        # after further thought, i think this should be a separate PR
 
         self._link_callbacks()
 
