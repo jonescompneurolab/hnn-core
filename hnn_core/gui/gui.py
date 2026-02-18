@@ -1628,7 +1628,7 @@ class HNNGUI:
             }
 
             /*
-                hide the scrollabr for both visualization-window and visualization-tab
+                hide the scrollabr for both visualization containers
             */
             .visualization-window .lm-TabBar-content::-webkit-scrollbar,
             .visualization-tab .lm-TabBar:first-of-type
@@ -1647,22 +1647,13 @@ class HNNGUI:
                 border-bottom: 1px solid var(--tab-border) !important;
                 margin-top: 1px !important;
                 transform: none !important;
-
-                /* uncomment the code below if manual override is needed */
-                /* border-right: 1px solid var(--tab-border) !important; */
             }
 
             /*
-                targets first tab left border
-                uncomment code below if manual border color override is needed
+                for both visualization-window and visualization-tab, we set the
+                bottom border of the currently-selected tab to equal the background
+                color of the tab
             */
-            /*  start code -----
-            .visualization-window .lm-TabBar-tab:first-child,
-            .visualization-tab .lm-TabBar:first-of-type .lm-TabBar-tab:first-child {
-                border-left: 1px solid var(--tab-border) !important;
-            }
-            ----- end code  */
-
             .visualization-window .lm-TabBar-tab.lm-mod-current,
             .visualization-tab .lm-TabBar:first-of-type .lm-TabBar-tab.lm-mod-current {
                 border-bottom: 1px solid var(--tab-color) !important;
@@ -1674,6 +1665,13 @@ class HNNGUI:
                 margin-top: 0px !important;
             }
 
+            /*
+                for both visualization-window and visualization-tab, we need to
+                set the bottom border in areas where there is *not* a tab (i.e.,
+                there are too few tabs to fill up the entire horizontal width). The
+                border needs to grow to fill the available space between the tabs
+                and the end of the container.
+            */
             .visualization-window .lm-TabBar-content::after,
             .visualization-tab .lm-TabBar:first-of-type .lm-TabBar-content::after {
                 content: '';
@@ -1682,6 +1680,7 @@ class HNNGUI:
                 margin-bottom: 0px;
             }
 
+            /* top borders are managed by the tabs for both visualization containers */
             .visualization-window .widget-tab-contents,
             .visualization-tab .widget-tab-contents {
                 border-top: none !important;
