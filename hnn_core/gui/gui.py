@@ -1590,143 +1590,6 @@ class HNNGUI:
         )
         display(adjust_viz_window_spacing)
 
-        dark_theme = HTML(
-            value="""
-            <style>
-                /* basic dark-mode colors */
-                .dark-mode {
-                    --dm-bg-primary: #14181e;
-                    --dm-bg-secondary: #313438;
-                    --dm-text-main: #d4d4d4;
-                    --dm-border-color: #3e3e42;
-                    --dm-theme: #ba83be;  /* note: same as textbook-light-purple */
-                }
-
-                /* force background color for major containers */
-                .dark-mode,
-                .dark-mode .jp-Notebook,
-                .dark-mode .lm-Widget,
-                .dark-mode .lm-Panel,
-                .dark-mode .jupyter-widgets:not(.jupyter-button) {
-                    background-color: var(--dm-bg-primary) !important;
-                    border-color: var(--dm-border-color) !important;
-                }
-
-                /*
-                    flip text and border colors globally. we'll have to "overwrite"
-                    some of these changes, but this is the best way to ensure
-                    everything gets updated without manually needing to specify
-                    every single child element that needs to change
-                */
-                .dark-mode * {
-                    color: var(--dm-text-main) !important;
-                    border-color: var(--dm-border-color) !important;
-                }
-
-                /* ------------------------------------------- */
-                /* --- add exceptions to dark mode changes --- */
-                /* ------------------------------------------- */
-
-                /* set title bar to dark mode theme */
-                .dark-mode .title-bar .widget-html-content div {
-                    background-color: var(--dm-theme) !important;
-                    /* color: var(--dm-bg-primary) !important; */
-                    color: #fff !important;
-                }
-
-                /* restore transparent border when fig-tabs is not empty */
-                .visualization-window:has(.fig-tabs:not(:empty)) {
-                    border-color: transparent !important;
-                }
-
-                /* adjust style of tabbar and child tabs */
-                .dark-mode .lm-TabBar-tab {
-                    background-color: var(--dm-bg-secondary) !important;
-                    color: var(--dm-text-main) !important;
-                    border-color: var(--dm-border-color) !important;
-                }
-
-                /* adjust the accent line above the selected tab */
-                .lm-TabBar-tab.lm-mod-current::before {
-                    background-color: var(--dm-theme) !important;
-                }
-
-                /* adjust active tabbar to blend with primary background */
-                .dark-mode .lm-TabBar-tab.lm-mod-current {
-                    background-color: var(--dm-bg-primary) !important;
-                }
-
-                /* adjust background color for input areas */
-                .dark-mode input,
-                .dark-mode select,
-                .dark-mode textarea {
-                    background-color: var(--dm-bg-secondary) !important;
-                }
-
-                /* restore border color when focusing on input areas */
-                .dark-mode input:focus,
-                .dark-mode select:focus,
-                .dark-mode textarea:focus {
-                    border-color: var(--dm-theme) !important;
-                }
-
-                /* adjust button colors */
-                .dark-mode button:not(.log-toggle-icon),
-                .dark-mode .jupyter-button:not(.log-toggle-icon),
-                .dark-mode .widget-button:not(.log-toggle-icon) {
-                    background-color: var(--dm-theme) !important;
-                    color: var(--dm-bg-primary) !important;
-                }
-
-                /* adjust button icon color */
-                .dark-mode button:not(.log-toggle-icon) i,
-                .dark-mode .jupyter-button:not(.log-toggle-icon) i,
-                .dark-mode .widget-button:not(.log-toggle-icon) i {
-                    color: var(--dm-bg-primary) !important;
-                }
-
-                /* restore toggle icon for the log */
-                .dark-mode .log-toggle-icon,
-                .dark-mode .log-toggle-icon i {
-                    color: var(--dm-theme) !important;
-                }
-
-                /* adjust scrollbars for dark mode */
-                .dark-mode ::-webkit-scrollbar {
-                    width: 17px !important;
-                    height: 17px !important;
-                }
-                .dark-mode ::-webkit-scrollbar-track {
-                    background: var(--dm-bg-primary) !important;
-                }
-                .dark-mode ::-webkit-scrollbar-thumb {
-                    background: var(--dm-bg-secondary) !important;
-                    border: 4px solid var(--dm-bg-primary) !important;
-                    border-radius: 20px !important;
-                }
-                .dark-mode ::-webkit-scrollbar-thumb:hover {
-                    background: var(--dm-theme) !important;
-                }
-
-                /* dim hard-white backgrounds in visualizations */
-                .dark-mode .visualization-window .widget-tab-contents img,
-                .dark-mode .visualization-window .widget-tab-contents canvas,
-                .dark-mode .visualization-window .widget-tab-contents .js-plotly-plot
-                .main-svg,
-                .dark-mode .visualization-window .widget-tab-contents .bk-root {
-                    filter: brightness(0.8) contrast(1.2) !important;
-                }
-
-                /* last item to restore: close fig and delete drive buttons to red */
-                .dark-mode .widget-button.red-button {
-                    background-color: var(--gentle-red) !important;
-                }
-
-            </style>
-            """,
-        )
-        display(dark_theme)
-
         adjust_tab_overflow = HTML(
             value="""
             <style>
@@ -1734,11 +1597,6 @@ class HNNGUI:
             :root {
                 --tab-color: white;
                 --tab-border: lightgrey;
-            }
-
-            .dark-mode {
-                --tab-color: var(--dm-bg-primary);
-                --tab-border: var(--dm-border-color);
             }
 
             /*
@@ -1946,6 +1804,154 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
             layout=Layout(display="none"),
         )
         display(adjust_tab_overflow)
+
+        dark_theme = HTML(
+            value="""
+            <style>
+                /* basic dark-mode colors */
+                .dark-mode {
+                    --dm-bg-primary: #14181e;
+                    --dm-bg-secondary: #313438;
+                    --dm-text-main: #d4d4d4;
+                    --dm-border-color: #3e3e42;
+                    --dm-theme: #ba83be;  /* note: same as textbook-light-purple */
+                }
+
+                /* overwrite light-mode variables for dark-mode */
+                .dark-mode {
+                    --tab-color: var(--dm-bg-primary);
+                    --tab-border: var(--dm-border-color);
+                }
+
+                /* force background color for major containers */
+                .dark-mode,
+                .dark-mode .jp-Notebook,
+                .dark-mode .lm-Widget,
+                .dark-mode .lm-Panel,
+                .dark-mode .jupyter-widgets:not(.jupyter-button) {
+                    background-color: var(--dm-bg-primary) !important;
+                    border-color: var(--dm-border-color) !important;
+                }
+
+                /*
+                    flip text and border colors globally. we'll have to "overwrite"
+                    some of these changes, but this is the best way to ensure
+                    everything gets updated without manually needing to specify
+                    every single child element that needs to change
+                */
+                .dark-mode * {
+                    color: var(--dm-text-main) !important;
+                    border-color: var(--dm-border-color) !important;
+                }
+
+                /* ------------------------------------------- */
+                /* --- add exceptions to dark mode changes --- */
+                /* ------------------------------------------- */
+
+                /* set title bar to dark mode theme */
+                .dark-mode .title-bar .widget-html-content div {
+                    background-color: var(--dm-theme) !important;
+                    /* color: var(--dm-bg-primary) !important; */
+                    color: #fff !important;
+                }
+
+                /* restore transparent border when fig-tabs is not empty */
+                .visualization-window:has(.fig-tabs:not(:empty)) {
+                    border-color: transparent !important;
+                }
+
+                /* adjust style of tabbar and child tabs */
+                .dark-mode .lm-TabBar-tab {
+                    background-color: var(--dm-bg-secondary) !important;
+                    color: var(--dm-text-main) !important;
+                    border-color: var(--dm-border-color) !important;
+                }
+
+                /* adjust the accent line above the selected tab */
+                .lm-TabBar-tab.lm-mod-current::before {
+                    background-color: var(--dm-theme) !important;
+                }
+
+                /* adjust active tabbar to blend with primary background */
+                .dark-mode .lm-TabBar-tab.lm-mod-current {
+                    background-color: var(--dm-bg-primary) !important;
+                }
+
+                /* adjust tab caret that controls scrolling */
+                .tab-caret {
+                    color: var(--textbook-light-purple) !important;
+                }
+
+                /* adjust background color for input areas */
+                .dark-mode input,
+                .dark-mode select,
+                .dark-mode textarea {
+                    background-color: var(--dm-bg-secondary) !important;
+                }
+
+                /* restore border color when focusing on input areas */
+                .dark-mode input:focus,
+                .dark-mode select:focus,
+                .dark-mode textarea:focus {
+                    border-color: var(--dm-theme) !important;
+                }
+
+                /* adjust button colors */
+                .dark-mode button:not(.log-toggle-icon),
+                .dark-mode .jupyter-button:not(.log-toggle-icon),
+                .dark-mode .widget-button:not(.log-toggle-icon) {
+                    background-color: var(--dm-theme) !important;
+                    color: var(--dm-bg-primary) !important;
+                }
+
+                /* adjust button icon color */
+                .dark-mode button:not(.log-toggle-icon) i,
+                .dark-mode .jupyter-button:not(.log-toggle-icon) i,
+                .dark-mode .widget-button:not(.log-toggle-icon) i {
+                    color: var(--dm-bg-primary) !important;
+                }
+
+                /* restore toggle icon for the log */
+                .dark-mode .log-toggle-icon,
+                .dark-mode .log-toggle-icon i {
+                    color: var(--dm-theme) !important;
+                }
+
+                /* adjust scrollbars for dark mode */
+                .dark-mode ::-webkit-scrollbar {
+                    width: 17px !important;
+                    height: 17px !important;
+                }
+                .dark-mode ::-webkit-scrollbar-track {
+                    background: var(--dm-bg-primary) !important;
+                }
+                .dark-mode ::-webkit-scrollbar-thumb {
+                    background: var(--dm-bg-secondary) !important;
+                    border: 4px solid var(--dm-bg-primary) !important;
+                    border-radius: 20px !important;
+                }
+                .dark-mode ::-webkit-scrollbar-thumb:hover {
+                    background: var(--dm-theme) !important;
+                }
+
+                /* dim hard-white backgrounds in visualizations */
+                .dark-mode .visualization-window .widget-tab-contents img,
+                .dark-mode .visualization-window .widget-tab-contents canvas,
+                .dark-mode .visualization-window .widget-tab-contents .js-plotly-plot
+                .main-svg,
+                .dark-mode .visualization-window .widget-tab-contents .bk-root {
+                    filter: brightness(0.8) contrast(1.2) !important;
+                }
+
+                /* last item to restore: close fig and delete drive buttons to red */
+                .dark-mode .widget-button.red-button {
+                    background-color: var(--gentle-red) !important;
+                }
+
+            </style>
+            """,
+        )
+        display(dark_theme)
 
         # DSD TODO
         # check if middle scroll can be disabled for parameter inputs
