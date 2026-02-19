@@ -1724,7 +1724,7 @@ class HNNGUI:
             .visualization-tab .lm-TabBar:first-of-type .lm-TabBar-tab {
                 flex-shrink: 0 !important;
                 border-bottom: 1px solid var(--tab-border) !important;
-                margin-top: 1px !important;
+                margin-top: 0px !important;
                 transform: none !important;
             }
 
@@ -1933,7 +1933,7 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                     color: #fff !important;
                 }
 
-                /* restore transparent border when fig-tabs is not empty */
+                /* restore transparent outer border when fig-tabs is not empty */
                 .visualization-window:has(.fig-tabs:not(:empty)) {
                     border-color: transparent !important;
                 }
@@ -2021,10 +2021,132 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                     filter: brightness(0.8) contrast(1.2) !important;
                 }
 
-                /* last item to restore: close fig and delete drive buttons to red */
+                /* restore red coloring for close fig and delete drive buttons */
                 .dark-mode .widget-button.red-button {
                     background-color: var(--gentle-red) !important;
                 }
+
+                /* adjust param container border colors to match theme */
+                /* --------------------------------------------------- */
+                /*
+                    Note: here I am adding accent borders to the "outer"
+                    containers in dark-mode. It requires some style overwriting.
+                    I think these accents make it easier to discern the "outer"-
+                    most parent container from the nested inner containers. But this
+                    whole section can be removed without interferring with any
+                    functionality if we decide we would prefer to not have the
+                    accent borders. There are three sub sections here handle:
+                        - param-tabs-widget-container
+                        - log-out
+                        - visualization-window
+                */
+
+                /* set border for the tab contents */
+                /* ------------------------------ */
+
+                .dark-mode div.param-tabs-widget-container.param-tabs-widget-container
+                > .widget-tab-contents {
+                    position: relative;
+                    border: 2px solid var(--dm-theme) !important;
+                }
+
+                /*
+                    allow the TabBar to overflow, this will allow us to cover the
+                    border created for the tab contents for the active tab
+                */
+                .dark-mode div.param-tabs-widget-container.param-tabs-widget-container
+                > .lm-TabBar {
+                    position: relative;
+                    overflow: visible !important;
+                }
+
+                /* set position and borders for active tab */
+                .dark-mode div.param-tabs-widget-container.param-tabs-widget-container
+                > .lm-TabBar:first-of-type .lm-TabBar-tab.lm-mod-current {
+                    position: relative;
+                    background-color: var(--tab-color) !important;
+                    border-right: 2px solid var(--dm-theme) !important;
+                    border-left: 2px solid var(--dm-theme) !important;
+
+                    /*
+                        note: removing border-bottom allows the mask we create below
+                        to work without creating the "triangle" shaped overlap at the
+                        edges where the borders meet
+                    */
+                    border-bottom: none !important;
+                }
+
+                /*
+                    add the "mask" that covers the bottom border on the widget-contents
+                    for the active tab
+                */
+                .dark-mode div.param-tabs-widget-container.param-tabs-widget-container
+                .lm-TabBar-tab.lm-mod-current::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -2px;
+                    left: 0px;
+                    right: 0px;
+                    height: 2px;
+                    background-color: var(--tab-color) !important;
+                    z-index: 4;
+                }
+
+                /* set border for the log window */
+                /* ------------------------------ */
+
+                .dark-mode div.log-out.log-out {
+                    border: 2px solid var(--dm-theme) !important;
+                }
+
+                /* set borders for visualization window */
+                /* ------------------------------ */
+
+                /* remove top border on contents as we'll manage it with tabs */
+                .dark-mode .visualization-window .widget-tab-contents {
+                    border: 2px solid var(--dm-theme) !important;
+                    border-top: none !important;
+                }
+
+                /* keep the 2px border-bottom for inactive tabs */
+                .dark-mode .visualization-window .lm-TabBar-tab {
+                    margin-top: 0px !important;
+                    box-sizing: border-box !important;
+                    border-bottom: 2px solid var(--dm-theme) !important;
+                }
+
+                /* style the active tab */
+                .dark-mode .visualization-window .lm-TabBar-tab.lm-mod-current {
+                    background-color: var(--tab-color) !important;
+                    border-left: 2px solid var(--dm-theme) !important;
+                    border-right: 2px solid var(--dm-theme) !important;
+
+                    /*
+                        using a box shadow "mask" instead of border-bottom fixes the
+                        overlapping triangles at border edges
+                    */
+                    /* remove border bottom */
+                    border-bottom: none !important;
+
+                    /* add 2px padding to replace the 2px border */
+                    padding-bottom: 2px !important;
+
+                    /* draw the mask using the inset shadow */
+                    box-shadow: inset 0 -2px 0 var(--tab-color) !important;
+                }
+
+                /*
+                    this isn't really necessary since we've shifted the border to the
+                    tabs themselves, but keeping it in as a failsafe
+                */
+                .dark-mode .visualization-window .lm-TabBar-content::after {
+                    border-bottom: 2px solid var(--dm-theme) !important;
+                }
+
+                /* ------------------- end section ------------------- */
+                /* --------------------------------------------------- */
+
+
 
             </style>
             """,
@@ -2053,6 +2175,19 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
         # DSD TODO
         # add scientific units everywhere
         # after further thought, i think this should be a separate PR
+
+        # DSD TODO
+        # fix the "run" box, adding a label to the input field
+
+        # DSD TODO
+        # adjust dark-mode border around log, params, and viz window to be light
+        # purple. also adjust symbol color in input fields, and symbol shifting
+
+        # DSD TODO
+        # highlight log [ERROR] outputs in red
+
+        # DSD TODO
+        # remove topbar margin
 
         self._link_callbacks()
 
