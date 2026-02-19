@@ -1883,6 +1883,17 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
         )
         display(adjust_tab_overflow)
 
+        adjust_topbar_margin = HTML(
+            value="""
+            <style>
+                .title-bar {
+                    margin: 0px !important;
+                }
+            </style>
+            """
+        )
+        display(adjust_topbar_margin)
+
         dark_theme = HTML(
             value="""
             <style>
@@ -2160,7 +2171,7 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
         #       removed the "middle scroll" behavior for input boxes. Tested on both
         #       Chrome and Firefox
 
-        # DSD TODO
+        # DSD TODO [POSSIBLE PR]
         # try to fix text shift on input when browser zoom != 100%
         # this is a stretch goal and not strictly necessary, but altenative zoom levels
         # can shift pixels around ever so slightly. elements are currently optimized
@@ -2172,21 +2183,23 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
         # we want to avoid by, e.g., using a javascript function to watch for
         # pixel discrepancies
 
-        # DSD TODO
+        # DSD TODO [NEW PR]
         # add scientific units everywhere
         # after further thought, i think this should be a separate PR
 
         # DSD TODO
         # fix the "run" box, adding a label to the input field
 
-        # DSD TODO
+        # DSD TODO [DONE]
         # adjust dark-mode border around log, params, and viz window to be light
         # purple. also adjust symbol color in input fields, and symbol shifting
+        # note: adjusting the symbol isn't easy, as it's a "ghost" element, so
+        #       not going to worry about it for now
 
         # DSD TODO
         # highlight log [ERROR] outputs in red
 
-        # DSD TODO
+        # DSD TODO [DONE]
         # remove topbar margin
 
         self._link_callbacks()
