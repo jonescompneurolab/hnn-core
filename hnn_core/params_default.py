@@ -227,15 +227,17 @@ def get_L2Pyr_params_default():
         "L2Pyr_ampa_e": 0.0,
         "L2Pyr_ampa_tau1": 0.5,
         "L2Pyr_ampa_tau2": 5.0,
+        "L2Pyr_ampa_type": "Exp2Syn",
         "L2Pyr_nmda_e": 0.0,
         "L2Pyr_nmda_tau1": 1.0,
-        "L2Pyr_nmda_tau2": 20.0,
+        "L2Pyr_nmda_tau2": 20.0,  # Intentionally not adding type here for testing backwards compat
         "L2Pyr_gabaa_e": -80.0,
         "L2Pyr_gabaa_tau1": 0.5,
         "L2Pyr_gabaa_tau2": 5.0,
         "L2Pyr_gabab_e": -80.0,
         "L2Pyr_gabab_tau1": 1.0,
         "L2Pyr_gabab_tau2": 20.0,
+        "L2Pyr_gabab_type": "Exp2Syn",
         # Biophysics soma
         "L2Pyr_soma_gkbar_hh2": 0.01,
         "L2Pyr_soma_gnabar_hh2": 0.18,

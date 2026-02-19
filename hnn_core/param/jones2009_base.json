@@ -46,17 +46,20 @@
                     "ampa": {
                         "e": 0,
                         "tau1": 0.5,
-                        "tau2": 5.0
+                        "tau2": 5.0,
+                        "type": "Exp2Syn"
                     },
                     "gabaa": {
                         "e": -80,
                         "tau1": 0.5,
-                        "tau2": 5.0
+                        "tau2": 5.0,
+                        "type": "Exp2Syn"
                     },
                     "nmda": {
                         "e": 0,
                         "tau1": 1.0,
-                        "tau2": 20.0
+                        "tau2": 20.0,
+                        "type": "Exp2Syn"
                     }
                 },
                 "cell_tree": null,
@@ -383,22 +386,26 @@
                     "ampa": {
                         "e": 0.0,
                         "tau1": 0.5,
-                        "tau2": 5.0
+                        "tau2": 5.0,
+                        "type": "Exp2Syn"
                     },
                     "nmda": {
                         "e": 0.0,
                         "tau1": 1.0,
-                        "tau2": 20.0
+                        "tau2": 20.0,
+                        "type": "Exp2Syn"
                     },
                     "gabaa": {
                         "e": -80.0,
                         "tau1": 0.5,
-                        "tau2": 5.0
+                        "tau2": 5.0,
+                        "type": "Exp2Syn"
                     },
                     "gabab": {
                         "e": -80.0,
                         "tau1": 1.0,
-                        "tau2": 20.0
+                        "tau2": 20.0,
+                        "type": "Exp2Syn"
                     }
                 },
                 "cell_tree": {
@@ -508,17 +515,20 @@
                     "ampa": {
                         "e": 0,
                         "tau1": 0.5,
-                        "tau2": 5.0
+                        "tau2": 5.0,
+                        "type": "Exp2Syn"
                     },
                     "gabaa": {
                         "e": -80,
                         "tau1": 0.5,
-                        "tau2": 5.0
+                        "tau2": 5.0,
+                        "type": "Exp2Syn"
                     },
                     "nmda": {
                         "e": 0,
                         "tau1": 1.0,
-                        "tau2": 20.0
+                        "tau2": 20.0,
+                        "type": "Exp2Syn"
                     }
                 },
                 "cell_tree": null,
@@ -1162,22 +1172,26 @@
                     "ampa": {
                         "e": 0.0,
                         "tau1": 0.5,
-                        "tau2": 5.0
+                        "tau2": 5.0,
+                        "type": "Exp2Syn"
                     },
                     "nmda": {
                         "e": 0.0,
                         "tau1": 1.0,
-                        "tau2": 20.0
+                        "tau2": 20.0,
+                        "type": "Exp2Syn"
                     },
                     "gabaa": {
                         "e": -80.0,
                         "tau1": 0.5,
-                        "tau2": 5.0
+                        "tau2": 5.0,
+                        "type": "Exp2Syn"
                     },
                     "gabab": {
                         "e": -80.0,
                         "tau1": 1.0,
-                        "tau2": 20.0
+                        "tau2": 20.0,
+                        "type": "Exp2Syn"
                     }
                 },
                 "cell_tree": {
