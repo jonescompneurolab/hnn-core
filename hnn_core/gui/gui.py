@@ -19,7 +19,7 @@ from functools import partial
 from pathlib import Path
 
 import numpy as np
-from IPython.display import IFrame, display, Javascript
+from IPython.display import IFrame, Javascript, display
 from ipywidgets import (
     HTML,
     Accordion,
