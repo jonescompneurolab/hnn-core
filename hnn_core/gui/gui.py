@@ -782,11 +782,11 @@ class HNNGUI:
 
         # function to toggle log window height
         def toggle_logs(_):
-            if self._log_window.layout.height == "3em":
+            if self._log_window.layout.height == "3.5em":
                 self._log_window.layout.height = self._log_expanded_height
                 self._log_toggle_btn.icon = "chevron-down"
             else:
-                self._log_window.layout.height = "3em"
+                self._log_window.layout.height = "3.5em"
                 self._log_toggle_btn.icon = "chevron-up"
 
         # apply function when button is clicked
