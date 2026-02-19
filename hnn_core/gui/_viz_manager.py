@@ -12,10 +12,9 @@ import numpy as np
 from IPython.display import display
 from ipywidgets import (
     HTML,
-    Box,
+    BoundedFloatText,
     Button,
     Dropdown,
-    BoundedFloatText,
     FloatText,
     HBox,
     Label,
@@ -24,10 +23,9 @@ from ipywidgets import (
     Tab,
     VBox,
     link,
-    HTML,
 )
 
-from hnn_core.dipole import average_dipoles, _rmse
+from hnn_core.dipole import _rmse, average_dipoles
 from hnn_core.gui._logging import logger
 from hnn_core.viz import plot_dipole
 
@@ -1134,7 +1132,7 @@ class _VizManager:
                 .make-fig-btn {
                     flex: 1 1 auto !important;
                     width: auto !important;
-                    margin: 2px 0px 2px 15px !important;
+                    margin: 2px 2px 2px 10px !important;
                 }
             </style>
             """
