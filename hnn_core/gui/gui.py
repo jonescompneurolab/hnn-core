@@ -1955,6 +1955,23 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
         )
         display(adjust_topbar_margin)
 
+        # the current "existing plots" logic is deeply tied to viz manager, but the
+        # information is actually duplicative with what's already in the figure
+        # legend, and the display logic massively clutters the axes subplots without
+        # adding any value. So I propose we simply hide it from view as done below,
+        # as trying to remove the box from viz manager yields errors
+        hide_existing_plots = HTML(
+            value="""
+            <style>
+                /* hide the existing-plots container */
+                .jupyter-widgets.widget-vbox.existing-plots {
+                    display: none !important;
+                }
+            </style>
+            """
+        )
+        display(hide_existing_plots)
+
         dark_theme = HTML(
             value="""
             <style>

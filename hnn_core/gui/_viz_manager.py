@@ -826,7 +826,7 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
         style=analysis_style,
     )
 
-    existing_plots = VBox([])
+    existing_plots = VBox([]).add_class("existing-plots")
 
     plot_button = Button(description="Add plot")
     clear_button = Button(description="Clear axis")
