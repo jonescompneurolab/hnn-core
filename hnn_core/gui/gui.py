@@ -355,7 +355,7 @@ class HNNGUI:
             # button styling
             # --------------------------------------------------
             "btn": Layout(height=f"{button_height}px", width="auto"),
-            "run_btn": Layout(height=f"{button_height}px", width="10%"),
+            "run_btn": Layout(height=f"{button_height}px", width="130px"),
             "btn_full_w": Layout(height=f"{button_height}px", width="100%"),
             "del_fig_btn": Layout(height=f"{button_height}px", width="auto"),
 
@@ -585,7 +585,7 @@ class HNNGUI:
             accept=".txt,.csv",
             multiple=False,
             style={"button_color": self.layout["theme_color"]},
-            layout=self.layout["btn"],
+            layout=self.layout["run_btn"],
             description="Load data",
             button_style="success",
         )
@@ -599,8 +599,8 @@ class HNNGUI:
         )
 
         self.simulation_list_widget = Dropdown(
-            options=[], value=None, description="", layout={"width": "15%"}
-        )
+            options=[], value=None, description="", layout={"width": "50%"}
+        ).add_class("simulation-list-widget")
         # Drive selection
         self.widget_drive_type_selection = Dropdown(
             options=["Evoked", "Poisson", "Rhythmic", "Tonic"],
@@ -627,7 +627,7 @@ class HNNGUI:
 
         # Dashboard level buttons
         self.run_button = create_expanded_button(
-            "Run",
+            "Run Simulation",
             "success",
             layout=self.layout["run_btn"],
             button_color=self.layout["theme_color"],
@@ -712,9 +712,12 @@ class HNNGUI:
         self.html_download_button = """
         <a download="{filename}" href="data:{mimetype};base64,{payload}"
           download>
-        <button style="background:{color_theme}; height:{btn_height}"
-        class=" jupyter-button
-           mod-warning" {is_disabled} >{title}</button>
+        <button
+            style="background:{color_theme}; height:{btn_height}; width:{btn_width}"
+            class="jupyter-button mod-warning" {is_disabled}
+        >
+            {title}
+        </button>
         </a>
         """
         # Create widget wrapper
@@ -724,6 +727,7 @@ class HNNGUI:
                 filename={""},
                 is_disabled="disabled",
                 btn_height=self.layout["run_btn"].height,
+                btn_width=self.layout["run_btn"].width,
                 color_theme=self.layout["theme_color"],
                 title=title,
                 mimetype=mimetype,
@@ -1111,23 +1115,80 @@ class HNNGUI:
                         self.widget_max_frequency,
                     ]
                 ),
+                Box(layout=Layout(height="20px")),
+                # the VBox below contains the run, save, and load buttons, as well as
+                # the dropdown widget for selecting networks/simulations to save
                 VBox(
                     [
                         HBox(
                             [
                                 self.run_button,
                                 self.load_data_button,
+                                HTML(
+                                    value="""
+                                    <style>
+                                        .sim-tab-spacer {
+                                            display: inline-block !important;
+                                            width: 8px !important;
+                                        }
+                                    </style>
+                                    <span class="sim-tab-spacer" />
+                                    """
+                                ),
+                                HTML(
+                                    value="""
+                                    <style>
+                                        .save-sim-section-container {
+                                            display: flex !important;
+                                            flex-direction: column !important;
+                                            height: 100% !important;
+                                        }
+                                        /* push the text to the bottom of the box */
+                                        .save-sim-section-text {
+                                            margin-top: auto !important;
+                                            line-height: 1 !important;
+                                            padding-bottom: 2px !important;
+                                        }
+                                    </style>
+                                    <div class="save-sim-section-container">
+                                        <span class="save-sim-section-text">
+                                            Simulation or Network to Save
+                                        </span>
+                                    </div>
+                                    """,
+                                    layout=Layout(margin="0px")
+                                )
+                            ]
+                        ),
+                        HBox(
+                            [
                                 self.save_config_button,
                                 self.save_simulation_button,
+                                HTML(
+                                    value="""
+                                    <style>
+                                    /*
+                                        add spacer to the left and margin to the top
+                                        of the dropdown widget
+                                    */
+                                        .simulation-list-widget {
+                                            margin-top: 4px !important;
+                                        }
+                                    </style>
+                                    <span class="sim-tab-spacer" />
+                                    """
+                                ),
                                 self.simulation_list_widget,
                             ]
                         )
                     ],
                     layout=Layout(
                         flex="1",
-                        justify_content="flex-end",
+                        # uncomment the line below to make the "sim-tab-buttons"
+                        # container "stick" to the bottom of the sim tab
+                        # justify_content="flex-end",
                     ),
-                ),
+                ).add_class("sim-tab-buttons"),
             ],
             layout=self.layout["sim_container"],
         ).add_class("simulation-container")
