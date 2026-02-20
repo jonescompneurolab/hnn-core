@@ -306,8 +306,6 @@ class HNNGUI:
         header_height=50,
         status_height=30,
         button_height=30,
-        # operation_box_height=60,  # TODO remove
-        # drive_widget_width=200,  # TODO remove
         param_window_width_prct=0.45,
         log_window_height_prct=0.25,
         dpi=96,
@@ -331,22 +329,10 @@ class HNNGUI:
         # specify gap between vertical AppLayout panels
         footer_gap = 10
 
-        # TODO remove unused variables
-        # - move towards using % for nested containers
-        # log_window_height = int(total_height * log_window_prct)
-        # sim_container_height = (
-        #     total_height
-        #     - status_height
-        #     - log_window_height
-        # )
-
         # ----------------------------------------------------------------------
         # Set the layout properties for various GUI components
         # ----------------------------------------------------------------------
         self.layout = {
-            # TODO aggregate and remove unused code
-            # "viz_config": Layout(width="99%"),
-            # "simulations_list": Layout(width=f"{parameters_window_width - 50}px")
             "dpi": dpi,
             "theme_color": theme_color,
             # button styling
@@ -556,13 +542,10 @@ class HNNGUI:
             description="MPI cmd:",
             disabled=False,
         )
-        # TODO [REVERT]
-        # manually overwriting for now
         self.widget_n_jobs = BoundedIntText(
-            value=8,
+            value=1,
             min=1,
-            # max=self.n_cores,
-            max=8,
+            max=self.n_cores,
             description="Cores:",
             disabled=False,
         )
@@ -781,18 +764,6 @@ class HNNGUI:
         # apply function when button is clicked
         self._log_toggle_btn.on_click(toggle_logs)
 
-        # TODO [DEPRECATE]
-        # "_operation_buttons" will no longer be separated from the simulation tab
-        # self._operation_buttons = HBox(
-        #     [
-        #         self.run_button,
-        #         self.load_data_button,
-        #         self.save_config_button,
-        #         self.save_simulation_button,
-        #         self.simulation_list_widget,
-        #     ],
-        #     layout=self.layout["operation_box"],
-        # )
         # title
         sun_icon = (
             "M361.5 1.2c5 2.1 8.6 6.6 9.6 11.9L391 121l107.9 19.8c5.3 1 9.8 4.6 11.9 "
