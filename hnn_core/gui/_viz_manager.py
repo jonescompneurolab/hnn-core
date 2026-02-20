@@ -989,8 +989,8 @@ def _add_figure(
     viz_window_height = int(data["visualization_window"].height[:-2])
     viz_out_width_prct = int(data["visualization_output"].width[:-1])
     viz_out_height_prct = int(data["visualization_output"].height[:-1])
-    viz_out_width = int(viz_window_width*viz_out_width_prct/100)
-    viz_out_height = int(viz_window_height*viz_out_height_prct/100)
+    viz_out_width = int(viz_window_width * viz_out_width_prct / 100)
+    viz_out_height = int(viz_window_height * viz_out_height_prct / 100)
 
     fig_outputs = Output()
     n_tabs = len(widgets["figs_tabs"].children)
@@ -1004,7 +1004,6 @@ def _add_figure(
         fig_outputs
     ]
     widgets["figs_tabs"].set_title(n_tabs, _idx2figname(fig_idx))
-
 
     with fig_outputs:
         figsize = (
@@ -1200,7 +1199,7 @@ class _VizManager:
             ],
             layout=Layout(
                 width="100%",
-            )
+            ),
         )
 
         config_panel = VBox(

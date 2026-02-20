@@ -344,35 +344,28 @@ class HNNGUI:
         # Set the layout properties for various GUI components
         # ----------------------------------------------------------------------
         self.layout = {
-
             # TODO aggregate and remove unused code
             # "viz_config": Layout(width="99%"),
             # "simulations_list": Layout(width=f"{parameters_window_width - 50}px")
-
             "dpi": dpi,
             "theme_color": theme_color,
-
             # button styling
             # --------------------------------------------------
             "btn": Layout(height=f"{button_height}px", width="auto"),
             "run_btn": Layout(height=f"{button_height}px", width="130px"),
             "btn_full_w": Layout(height=f"{button_height}px", width="100%"),
             "del_fig_btn": Layout(height=f"{button_height}px", width="auto"),
-
             # "Outer" container styling
             # --------------------------------------------------
             # Define layout properties for the outer-most containers of AppLayout
             # Note that we do not (currently) utilize the "center" container,
             # which is set to 0px in our AppLayout instantiation
-
             # For reference, AppLayout uses the following structure:
             # | -------------- header --------------- |
             # | left-sidebar | center | right-sidebar |
             # | -------------- footer --------------- |
-
             # html class: "title-bar"
             "header_height": f"{header_height}px",
-
             # Container for parameter specification and the logger output that
             # fills the "left_sidebar" parameter in AppLayout
             # html class: "parameters-window"
@@ -381,18 +374,16 @@ class HNNGUI:
                 height=f"{main_content_height}px",
                 # border="2px solid yellow",  # debug
             ),
-
             # Container for simulation output and visualizations that fills
             # the "right_sidebar" parameter in AppLayout
             # html class: "visualization-window"
             "visualization_window": Layout(
                 width=f"{figures_window_width}px",
-                height=f"{main_content_height-footer_gap}px",
+                height=f"{main_content_height - footer_gap}px",
                 # border="1px solid lightgrey",
                 border="1px solid lightgrey",
                 # overflow="scroll",
             ),
-
             # Container for simulation status that fills the "footer" parameter
             # in AppLayout
             # html class: "status-bar"
@@ -407,7 +398,6 @@ class HNNGUI:
                 background:var(--gentle-green);
                 padding-left:10px;
             """,
-
             # "Inner" container styling
             # --------------------------------------------------
             # child of parameters_window
@@ -418,7 +408,6 @@ class HNNGUI:
                 margin=f"0px 0px {footer_gap}px 0px",
                 overflow="auto",
             ),
-
             # child of visualization_window
             # downstream, this determines the dimensions of:
             #   a. the static figure image: <img src="data:img/png;base64,...>", OR
@@ -431,7 +420,6 @@ class HNNGUI:
                 border="1px solid lightgray",
                 # overflow="scroll",
             ),
-
             # child of parameters_window
             # html class: "param-tabs-outer-container"
             "param_tabs_outer_container": Layout(
@@ -439,7 +427,6 @@ class HNNGUI:
                 height="100%",
                 # border="2px solid blue",  # debug
             ),
-
             # child of param_tabs_outer_container
             # html class: "patam-tabs-widget-container"
             "param_tabs_widget_container": Layout(
@@ -449,7 +436,6 @@ class HNNGUI:
                 # border="1px solid lightgrey",
                 # border="1px solid yellow",  # debug
             ),
-
             # The container below is specific to the Simulation tab and
             # sets the boundary for the parameters therein
             # child of "param_tabs_outer_container"
@@ -459,7 +445,6 @@ class HNNGUI:
                 height="100%",
                 # border="2px solid red"  # debug
             ),
-
             "drive_widget": Layout(width="auto"),
             "drive_textbox": Layout(width="270px", height="auto"),
         }
@@ -772,13 +757,13 @@ class HNNGUI:
         self._log_toggle_btn = Button(
             icon="chevron-down",
             layout=Layout(width="30px", height="30px"),
-            tooltip="Toggle Log View"
+            tooltip="Toggle Log View",
         ).add_class("log-toggle-icon")
 
         # log window
         self._log_window = HBox(
             [self._log_out, self._log_toggle_btn],
-            layout=self.layout["log_out"]
+            layout=self.layout["log_out"],
         ).add_class("log-out")
 
         # store the expanded height *directly* for use in toggle_logs() below
@@ -1156,8 +1141,8 @@ class HNNGUI:
                                         </span>
                                     </div>
                                     """,
-                                    layout=Layout(margin="0px")
-                                )
+                                    layout=Layout(margin="0px"),
+                                ),
                             ]
                         ),
                         HBox(
@@ -1180,7 +1165,7 @@ class HNNGUI:
                                 ),
                                 self.simulation_list_widget,
                             ]
-                        )
+                        ),
                     ],
                     layout=Layout(
                         flex="1",
@@ -1282,7 +1267,7 @@ class HNNGUI:
             "Simulation",
             "Network",
             "External drives",
-            "Visualization"
+            "Visualization",
         )
         for idx, title in enumerate(titles):
             left_tab.set_title(idx, title)
@@ -1510,7 +1495,6 @@ class HNNGUI:
         )
         display(log_toggle)
 
-
         tabs_add_scrollbar_gutter = HTML(
             value="""
             <style>
@@ -1728,7 +1712,6 @@ class HNNGUI:
             layout=Layout(display="none"),
         )
         display(adjust_viz_param_tab)
-
 
         adjust_tab_overflow = HTML(
             value="""
@@ -3612,7 +3595,8 @@ def add_network_connectivity_tab(
         cell_connectivity.set_title(idx, connectivity_name)
 
     # Style the <div> automatically created around connectivity boxes
-    connectivity_out_style = HTML("""
+    connectivity_out_style = HTML(
+        """
         <style>
             /* CSS to style elements inside the Accordion */
             .connectivity-section .jupyter-widget-Collapse-contents {
