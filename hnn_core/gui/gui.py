@@ -2105,7 +2105,7 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                     containers in dark-mode. It requires some style overwriting.
                     I think these accents make it easier to discern the "outer"-
                     most parent container from the nested inner containers. But this
-                    whole section can be removed without interferring with any
+                    whole section can be removed without interfering with any
                     functionality if we decide we would prefer to not have the
                     accent borders. There are three sub sections here handle:
                         - param-tabs-widget-container
@@ -2234,13 +2234,13 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
 
         # DSD TODO [POSSIBLE PR]
         # try to fix text shift on input when browser zoom != 100%
-        # this is a stretch goal and not strictly necessary, but altenative zoom levels
+        # this is a stretch goal and not strictly necessary, but alternative zoom levels
         # can shift pixels around ever so slightly. elements are currently optimized
         # for 100% zoom. I'm not sure fixing this is worth the effort, as it would
         # likely require manually specifying all pixels, which is 1) extremely
         # difficult to do when the app is created / updated in real time by
         # ipywidgets, and 2) maintenance would be a nightmare. That being said, there
-        # may be alternative ways to fix *some* specfic cases of pixel shifting that
+        # may be alternative ways to fix *some* specific cases of pixel shifting that
         # we want to avoid by, e.g., using a javascript function to watch for
         # pixel discrepancies
 
