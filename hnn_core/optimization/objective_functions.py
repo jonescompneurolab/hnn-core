@@ -52,7 +52,10 @@ def _rmse_evoked(
     new_net = initial_net.copy()
     set_params(new_net, params)
 
-    dpls = simulate_dipole(new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"])
+    if 'bsl_cor' in obj_fun_kwargs:
+        dpls = simulate_dipole(new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"], bsl_cor=obj_fun_kwargs['bsl_cor'])
+    else:
+        dpls = simulate_dipole(new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"])
 
     # smooth & scale
     if "scale_factor" in obj_fun_kwargs:
