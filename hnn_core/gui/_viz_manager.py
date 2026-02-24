@@ -1149,7 +1149,7 @@ class _VizManager:
                 # Update the options for the data to compare dropdown
                 simulation_to_compare = ax_control.children[4]
                 prev_target = simulation_to_compare.value
-                simulation_to_compare.options = simulation_names + ("None",)
+                simulation_to_compare.options = list(simulation_names) + ["None"]
                 if prev_target in simulation_names:
                     simulation_to_compare.value = prev_target
                 else:
