@@ -2112,7 +2112,7 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
         # Now, create the similar final Weight text output
         final_weight_indicator_output = HTML(
             value=f"""
-            <b>Final Weight={
+            <b>Final Weight (µS)={
                 (
                     weight_text_input.value
                     * (
@@ -2129,7 +2129,7 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
         ):
             def update_weight_indicator(change):
                 weight_output.value = f"""
-                <b>Final Weight={
+                <b>Final Weight (µS)={
                     (
                         weight_input.value
                         * (
@@ -2260,11 +2260,11 @@ def _get_drive_weight_widgets(layout, style, location, data=None):
         "delays": delays,
     }
     widgets_list = (
-        [HTML(value="<b>AMPA weights</b>")]
+        [HTML(value="<b>AMPA weights (µS)</b>")]
         + list(weights_ampa.values())
-        + [HTML(value="<b>NMDA weights</b>")]
+        + [HTML(value="<b>NMDA weights (µS)</b>")]
         + list(weights_nmda.values())
-        + [HTML(value="<b>Synaptic delays</b>")]
+        + [HTML(value="<b>Synaptic delays (ms)</b>")]
         + list(delays.values())
     )
     return widgets_list, widgets_dict
@@ -2545,7 +2545,7 @@ def _get_evoked_widget(
     kwargs = dict(layout=layout, style=style)
     mu = BoundedFloatText(
         value=default_data["mu"],
-        description="Mean time:",
+        description="Mean time (ms):",
         min=0,
         max=1e6,
         step=0.01,
@@ -2553,7 +2553,7 @@ def _get_evoked_widget(
     )
     sigma = BoundedFloatText(
         value=default_data["sigma"],
-        description="Std dev time:",
+        description="Std dev time (ms):",
         min=0,
         max=1e6,
         step=0.01,
