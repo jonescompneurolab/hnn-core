@@ -553,7 +553,7 @@ class HNNGUI:
             "Delete all drives",
             "success",
             layout=self.layout["btn"],
-            button_color=self.layout["theme_color"],
+            button_color="#D32F2F",
         )
 
         self.cell_type_radio_buttons = RadioButtons(
