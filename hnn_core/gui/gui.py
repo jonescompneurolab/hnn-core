@@ -339,6 +339,7 @@ class HNNGUI:
             # --------------------------------------------------
             "btn": Layout(height=f"{button_height}px", width="auto"),
             "run_btn": Layout(height=f"{button_height}px", width="130px"),
+            "save_btn": Layout(height=f"{button_height}px", width="264px"),
             "btn_full_w": Layout(height=f"{button_height}px", width="100%"),
             "del_fig_btn": Layout(height=f"{button_height}px", width="auto"),
             # "Outer" container styling
@@ -560,14 +561,21 @@ class HNNGUI:
 
         # Create save simulation widget wrapper
         self.save_simulation_button = self._init_html_download_button(
-            title="Save Simulation", mimetype="text/csv"
+            title="Save Simulation Output",
+            mimetype="text/csv",
+            btn_width=self.layout["save_btn"].width,
         )
         self.save_config_button = self._init_html_download_button(
-            title="Save Network", mimetype="application/json"
+            title="Save Current Network and Drives",
+            mimetype="application/json",
+            btn_width=self.layout["save_btn"].width,
         )
 
         self.simulation_list_widget = Dropdown(
-            options=[], value=None, description="", layout={"width": "50%"}
+            options=["Simulation Output to Save"],
+            value="Simulation Output to Save",
+            disabled=True,
+            layout={"width": "50%"},
         ).add_class("simulation-list-widget")
         # Drive selection
         self.widget_drive_type_selection = Dropdown(
@@ -673,7 +681,12 @@ class HNNGUI:
         This is for testing purposes"""
         return cell_parameters_dict
 
-    def _init_html_download_button(self, title, mimetype):
+    def _init_html_download_button(
+        self,
+        title,
+        mimetype,
+        btn_width,
+    ):
         b64 = base64.b64encode("".encode())
         payload = b64.decode()
         # Initialliting HTML code for download button
@@ -695,7 +708,7 @@ class HNNGUI:
                 filename={""},
                 is_disabled="disabled",
                 btn_height=self.layout["run_btn"].height,
-                btn_width=self.layout["run_btn"].width,
+                btn_width=btn_width,
                 color_theme=self.layout["theme_color"],
                 title=title,
                 mimetype=mimetype,
@@ -942,6 +955,8 @@ class HNNGUI:
                 self._log_out, self.data, self.simulation_list_widget
             )
 
+            self.simulation_list_widget.disabled = False
+
             result_file = f"{value.new}{file_extension}"
             if file_extension == ".csv":
                 b64 = base64.b64encode(_simulation_data.encode())
@@ -949,14 +964,17 @@ class HNNGUI:
                 b64 = base64.b64encode(_simulation_data)
 
             payload = b64.decode()
+
+            # redraw button in the same way after simulation change, but mapped to
+            # the result_file filename
             self.save_simulation_button.value = self.html_download_button.format(
                 payload=payload,
                 filename=result_file,
                 is_disabled="",
-                btn_height=self.layout["run_btn"].height,
-                btn_width=self.layout["run_btn"].width,
+                btn_height=self.layout["save_btn"].height,
+                btn_width=self.layout["save_btn"].width,
                 color_theme=self.layout["theme_color"],
-                title="Save Simulation",
+                title="Save Simulation Output",
                 mimetype="text/csv",
             )
 
@@ -965,14 +983,17 @@ class HNNGUI:
                 self._log_out, self.data, self.simulation_list_widget
             )
             b64_net = base64.b64encode(network_config.encode())
+
+            # redraw button in the same way after simulation change, but mapped to
+            # the value.new filename
             self.save_config_button.value = self.html_download_button.format(
                 payload=b64_net.decode(),
                 filename=f"{value.new}.json",
                 is_disabled="",
-                btn_height=self.layout["run_btn"].height,
-                btn_width=self.layout["run_btn"].width,
+                btn_height=self.layout["save_btn"].height,
+                btn_width=self.layout["save_btn"].width,
                 color_theme=self.layout["theme_color"],
-                title="Save Network",
+                title="Save Current Network and Drives",
                 mimetype="application/json",
             )
 
@@ -1061,7 +1082,7 @@ class HNNGUI:
                         self._backend_config_out,
                     ]
                 ),
-                Box(layout=Layout(height="20px")),
+                Box(layout=Layout(height="18px")),
                 HTML(
                     f"<div {box_style}'>Default Visualization Parameters</div>",
                 ),
@@ -1073,7 +1094,7 @@ class HNNGUI:
                         self.widget_max_frequency,
                     ]
                 ),
-                Box(layout=Layout(height="20px")),
+                Box(layout=Layout(height="18px")),
                 # the VBox below contains the run, save, and load buttons, as well as
                 # the dropdown widget for selecting networks/simulations to save
                 VBox(
@@ -1082,45 +1103,15 @@ class HNNGUI:
                             [
                                 self.run_button,
                                 self.load_data_button,
-                                HTML(
-                                    value="""
-                                    <style>
-                                        .sim-tab-spacer {
-                                            display: inline-block !important;
-                                            width: 8px !important;
-                                        }
-                                    </style>
-                                    <span class="sim-tab-spacer" />
-                                    """
-                                ),
-                                HTML(
-                                    value="""
-                                    <style>
-                                        .save-sim-section-container {
-                                            display: flex !important;
-                                            flex-direction: column !important;
-                                            height: 100% !important;
-                                        }
-                                        /* push the text to the bottom of the box */
-                                        .save-sim-section-text {
-                                            margin-top: auto !important;
-                                            line-height: 1 !important;
-                                            padding-bottom: 2px !important;
-                                        }
-                                    </style>
-                                    <div class="save-sim-section-container">
-                                        <span class="save-sim-section-text">
-                                            Simulation or Network to Save
-                                        </span>
-                                    </div>
-                                    """,
-                                    layout=Layout(margin="0px"),
-                                ),
                             ]
                         ),
                         HBox(
                             [
                                 self.save_config_button,
+                            ]
+                        ),
+                        HBox(
+                            [
                                 self.save_simulation_button,
                                 HTML(
                                     value="""
