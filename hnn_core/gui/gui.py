@@ -359,7 +359,6 @@ class HNNGUI:
             "parameters_window": Layout(
                 width=f"{parameters_window_width}px",
                 height=f"{main_content_height}px",
-                # border="2px solid yellow",  # debug
             ),
             # Container for simulation output and visualizations that fills
             # the "right_sidebar" parameter in AppLayout
@@ -418,7 +417,6 @@ class HNNGUI:
             "param_tabs_outer_container": Layout(
                 width="100%",
                 height="100%",
-                # border="2px solid blue",  # debug
             ),
             # child of param_tabs_outer_container
             # html class: "patam-tabs-widget-container"
@@ -426,8 +424,6 @@ class HNNGUI:
                 width="98%",
                 height="98%",
                 margin="0px 0px 0px 0px",
-                # border="1px solid lightgrey",
-                # border="1px solid yellow",  # debug
             ),
             # The container below is specific to the Simulation tab and
             # sets the boundary for the parameters therein
@@ -436,7 +432,6 @@ class HNNGUI:
             "sim_container": Layout(
                 width="100%",
                 height="100%",
-                # border="2px solid red"  # debug
             ),
             "drive_widget": Layout(width="auto"),
             "drive_textbox": Layout(width="270px", height="auto"),
