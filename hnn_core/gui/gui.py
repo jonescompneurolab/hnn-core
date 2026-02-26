@@ -375,8 +375,14 @@ class HNNGUI:
             # in AppLayout
             # html class: "status-bar"
             "simulation_status_height": f"{status_height}px",
-            "simulation_status_common": "background:gray;padding-left:10px",
-            "simulation_status_running": "background:orange;padding-left:10px",
+            "simulation_status_common": """
+                background:gray;
+                padding-left:10px;
+            """,
+            "simulation_status_running": """
+                background:var(--statusbar-running);
+                padding-left:10px;
+            """,
             "simulation_status_failed": """
                 background:var(--gentle-red);
                 padding-left:10px;
@@ -437,14 +443,38 @@ class HNNGUI:
         }
 
         self._simulation_status_contents = {
-            "not_running": f"""<div style='{self.layout["simulation_status_common"]};
-            color:white;'>Not running</div>""",
-            "running": f"""<div style='{self.layout["simulation_status_running"]};
-            color:white;'>Running...</div>""",
-            "finished": f"""<div style='{self.layout["simulation_status_finished"]};
-            color:white;'>Simulation finished</div>""",
-            "failed": f"""<div style='{self.layout["simulation_status_failed"]};
-            color:white;'>Simulation failed</div>""",
+            "not_running": f"""
+                <div
+                class='sim-status-box'
+                style='{self.layout["simulation_status_common"]};
+                color:white;'>
+                    Not running
+                </div>
+            """,
+            "running": f"""
+                <div
+                class='sim-status-box status-running'
+                style='{self.layout["simulation_status_running"]};
+                color:white;'>
+                    Running...
+                </div>
+            """,
+            "finished": f"""
+                <div
+                class='sim-status-box'
+                style='{self.layout["simulation_status_finished"]};
+                color:white;'>
+                    Simulation finished
+                </div>
+            """,
+            "failed": f"""
+                <div
+                class='sim-status-box'
+                style='{self.layout["simulation_status_failed"]};
+                color:white;'>
+                    Simulation failed
+                </div>
+            """,
         }
 
         # ----------------------------------------------------------------------
@@ -1374,6 +1404,7 @@ class HNNGUI:
                         --default-blue-accent: #64b5f6;
                         --gentle-red: #ed665e;
                         --gentle-green: #77aa77;
+                        --statusbar-running: orange;
 
                         /* adjust border colors around input fields */
                         # --jp-widgets-input-focus-border-color: var(
@@ -2000,6 +2031,7 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                     --dm-text-main: #d4d4d4;
                     --dm-border-color: #3e3e42;
                     --dm-theme: #ba83be;  /* note: same as textbook-light-purple */
+                    --statusbar-running: #C88809;
                 }
 
                 /* overwrite light-mode variables for dark-mode */
