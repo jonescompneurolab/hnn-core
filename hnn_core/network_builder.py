@@ -371,8 +371,6 @@ class NetworkBuilder(object):
             record_ca=record_ca,
         )
 
-        self.state_init()
-
         # set to record spikes, somatic voltages, and extracellular potentials
         self._spike_times = h.Vector()
         self._spike_gids = h.Vector()
@@ -648,37 +646,6 @@ class NetworkBuilder(object):
                 self._ca.update(ca)
 
         _PC.barrier()  # get all nodes to this place before continuing
-
-    def state_init(self):
-        """Initializes the state closer to baseline."""
-
-        for cell in self._cells:
-            seclist = h.SectionList()
-            seclist.wholetree(sec=cell._nrn_sections["soma"])
-            src_type = self.net.gid_to_type(cell.gid)
-            cell_metadata = self.net.cell_types[src_type]["cell_metadata"]
-            # initializing segment voltages from cell_metadata
-            for sect in seclist:
-                for seg in sect:
-                    if (
-                        cell_metadata.get("morpho_type") == "pyramidal"
-                        and cell_metadata.get("layer") == "2"
-                    ):
-                        seg.v = -71.46
-                    elif (
-                        cell_metadata.get("morpho_type") == "pyramidal"
-                        and cell_metadata.get("layer") == "5"
-                    ):
-                        if sect.name() == f"{_short_name(src_type)}_apical_1":
-                            seg.v = -71.32
-                        elif sect.name() == f"{_short_name(src_type)}_apical_2":
-                            seg.v = -69.08
-                        elif sect.name() == f"{_short_name(src_type)}_apical_tuft":
-                            seg.v = -67.30
-                        else:
-                            seg.v = -72.0
-                    elif cell_metadata.get("morpho_type") == "basket":
-                        seg.v = -64.9737
 
     def _clear_neuron_objects(self):
         """Clear up NEURON internal gid and reference information.
