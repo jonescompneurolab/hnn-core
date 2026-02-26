@@ -575,7 +575,11 @@ class HNNGUI:
             options=["Simulation Output to Save"],
             value="Simulation Output to Save",
             disabled=True,
-            layout={"width": "50%"},
+            layout=Layout(
+                width="50%",
+                flex="0 1 50%",  # prevents growth beyond container limit
+                min_width="0",  # forces text to truncate
+            ),
         ).add_class("simulation-list-widget")
         # Drive selection
         self.widget_drive_type_selection = Dropdown(
@@ -1919,6 +1923,73 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
         )
         display(hide_existing_plots)
 
+        # adjust carets on dropdown input fields
+        adjust_dropdown_carets = HTML(
+            value=(
+                """
+                <style>
+                /*
+                    remove the default jupyter caret from the dropdown field,
+                    and style the input field for longer strings
+                */
+                .widget-dropdown select,
+                .widget-dropdown select:focus {
+                    background-image: none !important;
+                    appearance: none;
+                    -webkit-appearance: none;
+                    padding-right: 32px !important;
+                    text-overflow: ellipsis !important;
+                    white-space: nowrap !important;
+                    overflow: hidden !important;
+                }
+
+                /* custom caret */
+                .widget-dropdown::after {
+                    content: "";
+                    position: absolute;
+                    right: 10px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    width: 20px;
+                    height: 20px;
+                    pointer-events: none;
+                    background-color: var(--jp-widgets-input-color) !important;
+
+                    /* spliting long strings for ruff */
+                    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg """
+                """xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">"""
+                """<path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/>"""
+                """</svg>');
+                        mask-image: url('data:image/svg+xml;utf8,<svg """
+                """xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">"""
+                """<path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/>"""
+                """</svg>');
+
+                    -webkit-mask-repeat: no-repeat;
+                    mask-repeat: no-repeat;
+                    -webkit-mask-size: contain;
+                    mask-size: contain;
+                }
+
+                /* recolor caret on hover/focus */
+                .widget-dropdown:hover::after {
+                    background-color: #ba83be !important;
+                }
+                .widget-dropdown:focus-within::after {
+                    background-color: #ba83be !important;
+                }
+
+                /* recolor hover/focus differently when input is disabled */
+                .widget-dropdown:has(select[disabled])::after {
+                    background-color: grey !important;
+                }
+                </style>
+                """
+            ),
+            layout=Layout(display="none"),
+        )
+        display(adjust_dropdown_carets)
+
         dark_theme = HTML(
             value="""
             <style>
@@ -1994,6 +2065,17 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                 /* adjust tab caret that controls scrolling */
                 .tab-caret {
                     color: var(--textbook-light-purple) !important;
+                }
+
+                /* adjust the caret for dropdown input fields */
+                .dark-mode .widget-dropdown::after {
+                    background-color: var(--dm-text-main) !important;
+                }
+                .dark-mode .widget-dropdown:hover::after {
+                    background-color: #ba83be !important;
+                }
+                .dark-mode .widget-dropdown:focus-within::after {
+                    background-color: #ba83be !important;
                 }
 
                 /* adjust background color for input areas */
