@@ -574,7 +574,7 @@ list of nodes (children nodes) connected to the parent node.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.distance_section" title="hnn_core.Cell.distance_section"><code class="xref py py-obj docutils literal notranslate"><span class="pre">distance_section</span></code></a>(target_sec_name, curr_node)</p></td>
 <td><p>Find distance between the current node and the target section.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.modify_section" title="hnn_core.Cell.modify_section"><code class="xref py py-obj docutils literal notranslate"><span class="pre">modify_section</span></code></a>(sec_name[, L, diam, cm, Ra])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#hnn_core.Cell.modify_section" title="hnn_core.Cell.modify_section"><code class="xref py py-obj docutils literal notranslate"><span class="pre">modify_section</span></code></a>(sec_name[, L, diam, cm, Ra, v0])</p></td>
 <td><p>Change attributes of section specified by <em class="xref py py-obj">sec_name</em></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#hnn_core.Cell.parconnect_from_src" title="hnn_core.Cell.parconnect_from_src"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parconnect_from_src</span></code></a>(gid_presyn, nc_dict, ...)</p></td>
@@ -700,7 +700,7 @@ It is of the the form (sec_name, end_pt).</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="hnn_core.Cell.modify_section">
-<span class="sig-name descname"><span class="pre">modify_section</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sec_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ra</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.modify_section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.modify_section" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">modify_section</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sec_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ra</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hnn_core/cell.html#Cell.modify_section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hnn_core.Cell.modify_section" title="Link to this definition">#</a></dt>
 <dd><p>Change attributes of section specified by <em class="xref py py-obj">sec_name</em></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -714,6 +714,8 @@ It is of the the form (sec_name, end_pt).</p>
 <dt><strong>cm</strong><span class="classifier">float | int | None</span></dt><dd><p>membrane capacitance in micro-Farads.</p>
 </dd>
 <dt><strong>Ra</strong><span class="classifier">float | int | None</span></dt><dd><p>axial resistivity in ohm-cm.</p>
+</dd>
+<dt><strong>v0</strong><span class="classifier">float | int | None</span></dt><dd><p>start value for membrane potential in millivolts.</p>
 </dd>
 </dl>
 </dd>
