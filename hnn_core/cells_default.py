@@ -384,7 +384,7 @@ def _cell_L5Pyr(override_params, pos=(0.0, 0.0, 0), gid=0):
     sections["soma"] = _get_pyr_soma(
         p_all,
         "L5Pyr",
-        v_init=-72,
+        v_init=v_init["soma"],
     )
 
     end_pts = {

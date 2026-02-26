@@ -245,7 +245,7 @@ def test_basket_voltage_init():
     # Current section initial voltage, for soma (only section) of both basket types. The
     # original location of this value can be found at
     # https://github.com/jonescompneurolab/hnn-core/blob/8a0fffef8d8803e2404d7237f9adeabecd1285ed/hnn_core/network_builder.py#L681
-    expected_basket_v0 = -64.9737
+    expected_basket_v0 = {"soma": -64.9737}
 
     # Initial setup
     load_custom_mechanisms()
@@ -256,10 +256,13 @@ def test_basket_voltage_init():
 
     # Test initial voltages (v0) for basket cells after HNN-Core Cell class creation,
     # but before NEURON cell building
-    for cell_name, cell in cells.items():
-        assert np.isclose(cell.sections["soma"].v0, expected_basket_v0), (
-            f"{cell_name} soma v0={cell.sections['soma'].v0}, expected {expected_basket_v0}"
-        )
+    for _, cell in cells.items():
+        for sec_name, sec in cell.sections.items():
+            v0 = sec.v0
+            expected_v0 = expected_basket_v0[sec_name]
+            assert np.isclose(v0, expected_v0), (
+                f"HNN-Core Basket cell {sec_name} v0={v0}, expected {expected_v0}"
+            )
 
     # Build NEURON cells and sections, then initialize
     for cell in cells.values():
@@ -268,11 +271,13 @@ def test_basket_voltage_init():
 
     # Test that the initial voltages of the built NEURON sections (at the midpoint)
     # still match our expected values
-    for cell_name, cell in cells.items():
-        soma_v = cell._nrn_sections["soma"](0.5).v
-        assert np.isclose(soma_v, expected_basket_v0, atol=0.1), (
-            f"{cell_name} soma initial voltage is {soma_v}, expected {expected_basket_v0}"
-        )
+    for _, cell in cells.items():
+        for sec_name in cell._nrn_sections:
+            v = cell._nrn_sections[sec_name](0.5).v
+            expected_v = expected_basket_v0[sec_name]
+            assert np.isclose(v, expected_v, atol=0.1), (
+                f"NEURON-built Basket cell {sec_name} initial voltage is {v}, expected {expected_v}"
+            )
 
 
 def test_l2pyr_voltage_init():
@@ -290,7 +295,7 @@ def test_l2pyr_voltage_init():
     # but before NEURON cell building
     for sec_name, sec in l2pyr.sections.items():
         assert np.isclose(sec.v0, expected_l2pyr_v0), (
-            f"L2Pyr {sec_name} v0={sec.v0}, expected {expected_l2pyr_v0}"
+            f"HNN-Core L2Pyr {sec_name} v0={sec.v0}, expected {expected_l2pyr_v0}"
         )
 
     # Build NEURON cells and sections, then initialize
@@ -302,7 +307,7 @@ def test_l2pyr_voltage_init():
     for sec_name in l2pyr._nrn_sections:
         v = l2pyr._nrn_sections[sec_name](0.5).v
         assert np.isclose(v, expected_l2pyr_v0, atol=0.1), (
-            f"L2Pyr {sec_name} initial voltage is {v}, expected {expected_l2pyr_v0}"
+            f"NEURON-built L2Pyr {sec_name} initial voltage is {v}, expected {expected_l2pyr_v0}"
         )
 
 
@@ -330,9 +335,10 @@ def test_l5pyr_voltage_init():
     # Test initial voltages (v0) for L5Pyr cells after HNN-Core Cell class creation,
     # but before NEURON cell building
     for sec_name, sec in l5pyr.sections.items():
+        v0 = sec.v0
         expected_v0 = expected_l5pyr_v0[sec_name]
-        assert np.isclose(sec.v0, expected_v0), (
-            f"L5Pyr {sec_name} v0={sec.v0}, expected {expected_v0}"
+        assert np.isclose(v0, expected_v0), (
+            f"HNN-Core L5Pyr {sec_name} v0={v0}, expected {expected_v0}"
         )
 
     # Build NEURON cells and sections, then initialize
@@ -343,6 +349,7 @@ def test_l5pyr_voltage_init():
     # still match our expected values
     for sec_name in l5pyr._nrn_sections:
         v = l5pyr._nrn_sections[sec_name](0.5).v
-        assert np.isclose(v, expected_l5pyr_v0[sec_name], atol=0.1), (
-            f"L5Pyr {sec_name} initial voltage is {v}, expected {expected_l5pyr_v0[sec_name]}"
+        expected_v = expected_l5pyr_v0[sec_name]
+        assert np.isclose(v, expected_v, atol=0.1), (
+            f"NEURON-built L5Pyr {sec_name} initial voltage is {v}, expected {expected_v}"
         )
