@@ -1926,7 +1926,8 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                     margin: 0px !important;
                 }
             </style>
-            """
+            """,
+            layout=Layout(display="none")
         )
         display(adjust_topbar_margin)
 
@@ -1943,7 +1944,8 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                     display: none !important;
                 }
             </style>
-            """
+            """,
+            layout=Layout(display="none"),
         )
         display(hide_existing_plots)
 
@@ -2024,7 +2026,8 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                     box-sizing: border-box !important;
                 }
             <style>
-            """
+            """,
+            layout=Layout(display="none")
         )
         display(sim_tab_buttons)
 
