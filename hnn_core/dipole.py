@@ -267,8 +267,8 @@ def average_dipoles(dpls):
     return avg_dpl
 
 
-def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
-    """Calculates RMSE between data in dpl and exp_dpl
+def _resample_dpl(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
+    """Resamples a simulated and experimental dpl
     Parameters
     ----------
     dpl : instance of Dipole
@@ -287,8 +287,12 @@ def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
 
     Returns
     -------
-    err : float
-        Weighted RMSE between data in dpl and exp_dpl
+    dpl_data : array
+        Reampled array of dpl
+    exp_dpl_data : array
+        Reampled array of exp_dpl
+    weights : array
+        Reampled array of weights
     """
     from scipy import signal
 
@@ -318,20 +322,80 @@ def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
         weights = np.ones(len(sim_times[0:sim_end_index]))
     weights = weights[sim_start_index:sim_end_index]
 
-    dpl1 = dpl.data["agg"][sim_start_index:sim_end_index]
-    dpl2 = exp_dpl.data["agg"][exp_start_index:exp_end_index]
+    dpl_data = dpl.data["agg"][sim_start_index:sim_end_index]
+    exp_dpl_data = exp_dpl.data["agg"][exp_start_index:exp_end_index]
 
     if sim_length > exp_length:
         # downsample simulation timeseries to match exp data
-        dpl1 = signal.resample(dpl1, exp_length)
+        dpl_data = signal.resample(dpl_data, exp_length)
         weights = signal.resample(weights, exp_length)
         indices = np.where(weights < 1e-4)
         weights[indices] = 0
     elif sim_length < exp_length:
         # downsample exp timeseries to match simulation data
-        dpl2 = signal.resample(dpl2, sim_length)
+        exp_dpl_data = signal.resample(exp_dpl_data, sim_length)
+
+    return dpl_data, exp_dpl_data, weights
+
+
+def _rmse(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
+    """Calculates RMSE between data in dpl and exp_dpl
+    Parameters
+    ----------
+    dpl : instance of Dipole
+        A dipole object with simulated data
+    exp_dpl : instance of Dipole
+        A dipole object with experimental data
+    tstart : None | float
+        Time at beginning of range over which to calculate RMSE
+    tstop : None | float
+        Time at end of range over which to calculate RMSE
+    weights : None | array
+        An array of weights to be applied to each point in
+        simulated dpl. Must have length >= dpl.data
+        If None, weights will be replaced with 1's for typical RMSE
+        calculation.
+
+    Returns
+    -------
+    err : float
+        Weighted RMSE between data in dpl and exp_dpl
+    """
+    dpl1, dpl2, weights = _resample_dpl(
+        dpl, exp_dpl, tstart=tstart, tstop=tstop, weights=weights
+    )
 
     return np.sqrt((weights * ((dpl1 - dpl2) ** 2)).sum() / weights.sum())
+
+
+def _corr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
+    """Calculates correlation between data in dpl and exp_dpl
+    Parameters
+    ----------
+    dpl : instance of Dipole
+        A dipole object with simulated data
+    exp_dpl : instance of Dipole
+        A dipole object with experimental data
+    tstart : None | float
+        Time at beginning of range over which to calculate RMSE
+    tstop : None | float
+        Time at end of range over which to calculate RMSE
+    weights : None | array
+        An array of weights to be applied to each point in
+        simulated dpl. Must have length >= dpl.data
+        If None, weights will be replaced with 1's for typical RMSE
+        calculation.
+
+    Returns
+    -------
+    err : float
+        Correlation coefficient r
+    """
+    dpl1, dpl2, weights = _resample_dpl(
+        dpl, exp_dpl, tstart=tstart, tstop=tstop, weights=weights
+    )
+
+    return np.corrcoef(dpl1 * weights, dpl2 * weights)[0, 1]
 
 
 class Dipole(object):
