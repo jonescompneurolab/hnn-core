@@ -1243,9 +1243,6 @@ class HNNGUI:
         # Tabs for left pane
         left_tab = Tab()
 
-        # left_tab.layout.height = "98%"
-        # left_tab.layout.width = "98%"
-
         left_tab.layout = self.layout["param_tabs_widget_container"]
 
         left_tab.children = [
