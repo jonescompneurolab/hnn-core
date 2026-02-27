@@ -1145,19 +1145,17 @@ class HNNGUI:
                                 HTML(
                                     value="""
                                     <style>
-                                    /*
-                                        add spacer to the left and margin to the top
-                                        of the dropdown widget
-                                    */
+                                    /* add left margin to the dropdown widget */
                                         .simulation-list-widget {
-                                            margin-top: 4px !important;
+                                            margin-left: 6px !important;
                                         }
                                     </style>
-                                    <span class="sim-tab-spacer" />
-                                    """
+                                    """,
+                                    layout=Layout(display="none")
                                 ),
                                 self.simulation_list_widget,
-                            ]
+                            ],
+                            layout=Layout(align_items="center")
                         ),
                     ],
                     layout=Layout(
@@ -2015,6 +2013,20 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
             layout=Layout(display="none"),
         )
         display(adjust_dropdown_carets)
+
+        sim_tab_buttons = HTML(
+            value="""
+            <style>
+                .simulation-container,
+                .simulation-container .widget-hbox,
+                .simulation-container .widget-vbox {
+                    overflow: hidden !important;
+                    box-sizing: border-box !important;
+                }
+            <style>
+            """
+        )
+        display(sim_tab_buttons)
 
         dark_theme = HTML(
             value="""
