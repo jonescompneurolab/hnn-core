@@ -307,7 +307,7 @@ class HNNGUI:
         status_height=30,
         button_height=30,
         param_window_width_prct=0.45,
-        log_window_height_prct=0.25,
+        log_window_height_prct=0.22,
         dpi=96,
         network_configuration=default_network_configuration,
     ):
@@ -1111,7 +1111,7 @@ class HNNGUI:
                         self._backend_config_out,
                     ]
                 ),
-                Box(layout=Layout(height="18px")),
+                Box().add_class("dynamic-spacer"),
                 HTML(
                     f"<div {box_style}'>Default Visualization Parameters</div>",
                 ),
@@ -1123,7 +1123,7 @@ class HNNGUI:
                         self.widget_max_frequency,
                     ]
                 ),
-                Box(layout=Layout(height="18px")),
+                Box().add_class("dynamic-spacer"),
                 # the VBox below contains the run, save, and load buttons, as well as
                 # the dropdown widget for selecting networks/simulations to save
                 VBox(
@@ -1159,10 +1159,8 @@ class HNNGUI:
                         ),
                     ],
                     layout=Layout(
-                        flex="1",
-                        # uncomment the line below to make the "sim-tab-buttons"
-                        # container "stick" to the bottom of the sim tab
-                        # justify_content="flex-end",
+                        # don't grow, *do* shrink, use auto height
+                        flex="0 1 auto",
                     ),
                 ).add_class("sim-tab-buttons"),
             ],
@@ -1330,6 +1328,21 @@ class HNNGUI:
                 .lm-TabBar-content > .lm-TabBar-tab {
                     flex-grow: 1 !important;
                 }
+
+            /*
+                adjust bottom-padding around widget-tab-contents
+
+                bonus: optionally target a single tab (e.g., the first tab) with...
+                .param-tabs-widget-container >
+                .widget-tab-bar:has(.lm-TabBar-tab:nth-child(1).lm-mod-current) +
+                .widget-tab-contents
+            */
+            .param-tabs-widget-container >
+            .widget-tab-contents {
+                padding-bottom: 10px !important;
+            }
+
+
             </style>
             """,
             layout=Layout(display="none"),
@@ -2022,11 +2035,27 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                     overflow: hidden !important;
                     box-sizing: border-box !important;
                 }
-            <style>
+            </style>
             """,
             layout=Layout(display="none"),
         )
         display(sim_tab_buttons)
+
+        dynamic_spacer = HTML(
+            value="""
+            <style>
+
+            .dynamic-spacer {
+                flex: 1 1 auto !important;
+                min-height: 4px !important;
+                max-height: 15px !important;
+            }
+
+            </style>
+            """,
+            layout=Layout(display="none"),
+        )
+        display(dynamic_spacer)
 
         dark_theme = HTML(
             value="""
