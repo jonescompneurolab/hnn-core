@@ -395,7 +395,7 @@ class HNNGUI:
             # child of parameters_window
             "log_out": Layout(
                 border="1px solid lightgray",
-                height="25%",  # TODO get this from log_window_prct
+                height=f"{int(log_window_height_prct*100)}%",
                 width="98%",
                 margin=f"0px 0px {footer_gap}px 0px",
                 overflow="auto",
