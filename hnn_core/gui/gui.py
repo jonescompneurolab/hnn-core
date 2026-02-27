@@ -1151,11 +1151,11 @@ class HNNGUI:
                                         }
                                     </style>
                                     """,
-                                    layout=Layout(display="none")
+                                    layout=Layout(display="none"),
                                 ),
                                 self.simulation_list_widget,
                             ],
-                            layout=Layout(align_items="center")
+                            layout=Layout(align_items="center"),
                         ),
                     ],
                     layout=Layout(
@@ -1927,7 +1927,7 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                 }
             </style>
             """,
-            layout=Layout(display="none")
+            layout=Layout(display="none"),
         )
         display(adjust_topbar_margin)
 
@@ -2027,7 +2027,7 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                 }
             <style>
             """,
-            layout=Layout(display="none")
+            layout=Layout(display="none"),
         )
         display(sim_tab_buttons)
 
