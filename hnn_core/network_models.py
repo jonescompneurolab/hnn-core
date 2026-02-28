@@ -391,7 +391,7 @@ def calcium_model(
     # Replace L5 pyramidal cell template with updated calcium
     cell_name = 'L5_pyramidal'
     pos = net.cell_types[cell_name].pos
-    net.cell_types[cell_name] = pyramidal_ca(
+    net.cell_types[cell_name] = pyramidal_ca( 
         cell_name=_short_name(cell_name), pos=pos)
 
     return net
@@ -590,10 +590,10 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
     loc = 'soma'
     receptor = 'gabaa'
     net.add_connection(
-        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha, allow_autapses=False)
     receptor = 'gabab'
     net.add_connection(
-        src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha, allow_autapses=False)
     
     # xx -> layer5 Basket
     src_cell = 'L5_basket'
