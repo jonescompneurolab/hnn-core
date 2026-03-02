@@ -196,7 +196,7 @@ class _OutputWidgetHandler(logging.Handler):
             "output_type": "stream",
             "text": formatted_record + "\n",
         }
-        self.out.outputs = (new_output,) + self.out.outputs
+        self.out.outputs = self.out.outputs + (new_output,)
 
 
 class _GUI_PrintToLogger:
