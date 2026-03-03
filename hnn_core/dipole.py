@@ -406,7 +406,9 @@ def _corr(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
         # downsample exp timeseries to match simulation data
         dpl2 = signal.resample(dpl2, sim_length)
 
-    obj = (-1 * np.corrcoef(dpl1 * weights, dpl2 * weights)[0, 1]) + 1 # transform so that 0 is a perfect fit
+    obj = (
+        -1 * np.corrcoef(dpl1 * weights, dpl2 * weights)[0, 1]
+    ) + 1  # transform so that 0 is a perfect fit
     return obj
 
 

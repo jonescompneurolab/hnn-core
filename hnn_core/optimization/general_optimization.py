@@ -481,6 +481,7 @@ def _run_opt_cma(
     """
 
     import cma
+
     obj_values = list()
 
     def _obj_func(predicted_params):
@@ -500,12 +501,18 @@ def _run_opt_cma(
     # _b_obj_func = cma.BoundDomainTransform(_obj_func, constraints)  # evaluates fun only in the bounded domain
 
     sigma = 1 / (np.array(constraints[1]) - np.array(constraints[0]))
-    es = cma.CMAEvolutionStrategy(list(initial_params.values()), 1, {'bounds': constraints,
-                                                                     'tolfun': obj_fun_kwargs.get('tolfun', 0.01),
-                                                                     'maxiter': max_iter,
-                                                                     'popsize': obj_fun_kwargs.get('popsize', 100),
-                                                                     'CMA_stds': obj_fun_kwargs.get('sigma', sigma),
-                                                                     'verbose': 0})
+    es = cma.CMAEvolutionStrategy(
+        list(initial_params.values()),
+        1,
+        {
+            "bounds": constraints,
+            "tolfun": obj_fun_kwargs.get("tolfun", 0.01),
+            "maxiter": max_iter,
+            "popsize": obj_fun_kwargs.get("popsize", 100),
+            "CMA_stds": obj_fun_kwargs.get("sigma", sigma),
+            "verbose": 0,
+        },
+    )
     while not es.stop():
         solutions = es.ask()
         es.tell(solutions, _obj_func(solutions))
@@ -609,72 +616,95 @@ def _run_opt_cobyla(
 
 
 def add_opt_drives(net, tstop=200, n_prox=2, n_dist=1):
-    prox_cell_type = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
-    dist_cell_type = ['L5_pyramidal', 'L2_pyramidal', 'L2_basket']
-    default_range = {'mu': (0, tstop), 'sigma': (0, 20), 'numspikes':(0,1), 'ampa': (-5, 1), 'nmda': (-5, 1)}
+    prox_cell_type = ["L5_pyramidal", "L5_basket", "L2_pyramidal", "L2_basket"]
+    dist_cell_type = ["L5_pyramidal", "L2_pyramidal", "L2_basket"]
+    default_range = {
+        "mu": (0, tstop),
+        "sigma": (0, 20),
+        "numspikes": (0, 1),
+        "ampa": (-5, 1),
+        "nmda": (-5, 1),
+    }
 
-    prox_weights  = {cell_type: 0.0 for cell_type in prox_cell_type}
-    dist_weights  = {cell_type: 0.0 for cell_type in dist_cell_type}
+    prox_weights = {cell_type: 0.0 for cell_type in prox_cell_type}
+    dist_weights = {cell_type: 0.0 for cell_type in dist_cell_type}
 
-    prox_delays = {"L2_basket": 0.1, "L2_pyramidal": 0.1, "L5_basket": 1.0, "L5_pyramidal": 1.0,}
+    prox_delays = {
+        "L2_basket": 0.1,
+        "L2_pyramidal": 0.1,
+        "L5_basket": 1.0,
+        "L5_pyramidal": 1.0,
+    }
     dist_delays = {"L2_basket": 0.1, "L2_pyramidal": 0.1, "L5_pyramidal": 0.1}
 
     constraints, initial_params = dict(), dict()
     # Add proximal drives
     for idx in range(n_prox):
-        name = f'evprox{idx+1}'
-        constraints[f'{name}_mu'] = default_range['mu']
-        initial_params[f'{name}_mu'] = np.random.uniform(*default_range['mu'])
+        name = f"evprox{idx + 1}"
+        constraints[f"{name}_mu"] = default_range["mu"]
+        initial_params[f"{name}_mu"] = np.random.uniform(*default_range["mu"])
 
-        constraints[f'{name}_sigma'] = default_range['sigma']
-        initial_params[f'{name}_sigma'] = np.random.uniform(*default_range['sigma'])
+        constraints[f"{name}_sigma"] = default_range["sigma"]
+        initial_params[f"{name}_sigma"] = np.random.uniform(*default_range["sigma"])
 
-        constraints[f'{name}_numspikes'] = default_range['numspikes']
-        initial_params[f'{name}_numspikes'] = 1
+        constraints[f"{name}_numspikes"] = default_range["numspikes"]
+        initial_params[f"{name}_numspikes"] = 1
 
         for cell_type in prox_cell_type:
-            constraints[f'{name}_{cell_type}_ampa'] = default_range['ampa']
-            initial_params[f'{name}_{cell_type}_ampa'] = np.random.uniform(*default_range['ampa'])
+            constraints[f"{name}_{cell_type}_ampa"] = default_range["ampa"]
+            initial_params[f"{name}_{cell_type}_ampa"] = np.random.uniform(
+                *default_range["ampa"]
+            )
 
-            constraints[f'{name}_{cell_type}_nmda'] = default_range['nmda']
-            initial_params[f'{name}_{cell_type}_nmda'] = np.random.uniform(*default_range['nmda'])
+            constraints[f"{name}_{cell_type}_nmda"] = default_range["nmda"]
+            initial_params[f"{name}_{cell_type}_nmda"] = np.random.uniform(
+                *default_range["nmda"]
+            )
 
-        net.add_evoked_drive(name,
-                             mu=0.0,
-                             sigma=1.0,
-                             numspikes=1,
-                             location='proximal',
-                             weights_ampa=prox_weights,
-                             weights_nmda=prox_weights,
-                             synaptic_delays=prox_delays)
+        net.add_evoked_drive(
+            name,
+            mu=0.0,
+            sigma=1.0,
+            numspikes=1,
+            location="proximal",
+            weights_ampa=prox_weights,
+            weights_nmda=prox_weights,
+            synaptic_delays=prox_delays,
+        )
 
     # Add distal drives
     for idx in range(n_dist):
-        name = f'evdist{idx+1}'
-        constraints[f'{name}_mu'] = default_range['mu']
-        initial_params[f'{name}_mu'] = np.random.uniform(*default_range['mu'])
+        name = f"evdist{idx + 1}"
+        constraints[f"{name}_mu"] = default_range["mu"]
+        initial_params[f"{name}_mu"] = np.random.uniform(*default_range["mu"])
 
-        constraints[f'{name}_sigma'] = default_range['sigma']
-        initial_params[f'{name}_sigma'] = np.random.uniform(*default_range['sigma'])
+        constraints[f"{name}_sigma"] = default_range["sigma"]
+        initial_params[f"{name}_sigma"] = np.random.uniform(*default_range["sigma"])
 
-        constraints[f'{name}_numspikes'] = default_range['numspikes']
-        initial_params[f'{name}_numspikes'] = 1
+        constraints[f"{name}_numspikes"] = default_range["numspikes"]
+        initial_params[f"{name}_numspikes"] = 1
 
         for cell_type in prox_cell_type:
-            constraints[f'{name}_{cell_type}_ampa'] = default_range['ampa']
-            initial_params[f'{name}_{cell_type}_ampa'] = np.random.uniform(*default_range['ampa'])
+            constraints[f"{name}_{cell_type}_ampa"] = default_range["ampa"]
+            initial_params[f"{name}_{cell_type}_ampa"] = np.random.uniform(
+                *default_range["ampa"]
+            )
 
-            constraints[f'{name}_{cell_type}_nmda'] = default_range['nmda']
-            initial_params[f'{name}_{cell_type}_nmda'] = np.random.uniform(*default_range['nmda'])
+            constraints[f"{name}_{cell_type}_nmda"] = default_range["nmda"]
+            initial_params[f"{name}_{cell_type}_nmda"] = np.random.uniform(
+                *default_range["nmda"]
+            )
 
-        net.add_evoked_drive(name,
-                             mu=0.0,
-                             sigma=1.0,
-                             numspikes=1,
-                             location='distal',
-                             weights_ampa=dist_weights,
-                             weights_nmda=dist_weights,
-                             synaptic_delays=dist_delays)
+        net.add_evoked_drive(
+            name,
+            mu=0.0,
+            sigma=1.0,
+            numspikes=1,
+            location="distal",
+            weights_ampa=dist_weights,
+            weights_nmda=dist_weights,
+            synaptic_delays=dist_delays,
+        )
 
     return constraints, initial_params
 
@@ -682,25 +712,32 @@ def add_opt_drives(net, tstop=200, n_prox=2, n_dist=1):
 def set_params_opt_drives(net, param_values):
     drive_names = list(net.external_drives.keys())
     for name in drive_names:
-        target_cell_types = net.external_drives[name]['target_types']
+        target_cell_types = net.external_drives[name]["target_types"]
 
-        net.external_drives[name]['dynamics']['mu'] = param_values[f'{name}_mu']
-        net.external_drives[name]['dynamics']['sigma'] = param_values[f'{name}_sigma']
-        net.external_drives[name]['dynamics']['numspikes'] = max(1, int(np.round(param_values[f'{name}_numspikes'])))
+        net.external_drives[name]["dynamics"]["mu"] = param_values[f"{name}_mu"]
+        net.external_drives[name]["dynamics"]["sigma"] = param_values[f"{name}_sigma"]
+        net.external_drives[name]["dynamics"]["numspikes"] = max(
+            1, int(np.round(param_values[f"{name}_numspikes"]))
+        )
 
         # reinstate external drives to be able to fill in below
-        for receptor in ['ampa', 'nmda']:
-                        net.external_drives[name][f'weights_{receptor}'] = {
-                        ct: 0.0 for ct in target_cell_types
-                    }
+        for receptor in ["ampa", "nmda"]:
+            net.external_drives[name][f"weights_{receptor}"] = {
+                ct: 0.0 for ct in target_cell_types
+            }
 
         for cell_type in target_cell_types:
-            for receptor in ['ampa', 'nmda']:
-
-                conn_idx = pick_connection(net, src_gids=name, target_gids=cell_type, receptor=receptor)
+            for receptor in ["ampa", "nmda"]:
+                conn_idx = pick_connection(
+                    net, src_gids=name, target_gids=cell_type, receptor=receptor
+                )
                 assert len(conn_idx) == 1
 
-                # KD: I still think this isn't the user-friendliest way as this is pretty hidden. 
+                # KD: I still think this isn't the user-friendliest way as this is pretty hidden.
                 # Will fix.
-                net.connectivity[conn_idx[0]]['nc_dict']['A_weight'] = 10 ** param_values[f'{name}_{cell_type}_{receptor}']
-                net.external_drives[name][f'weights_{receptor}'][cell_type] = 10 ** param_values[f'{name}_{cell_type}_{receptor}']
+                net.connectivity[conn_idx[0]]["nc_dict"]["A_weight"] = (
+                    10 ** param_values[f"{name}_{cell_type}_{receptor}"]
+                )
+                net.external_drives[name][f"weights_{receptor}"][cell_type] = (
+                    10 ** param_values[f"{name}_{cell_type}_{receptor}"]
+                )

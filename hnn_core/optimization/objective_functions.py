@@ -10,6 +10,7 @@ from hnn_core import simulate_dipole
 from ..dipole import _rmse, _corr, average_dipoles
 from ..batch_simulate import BatchSimulate
 
+
 def _rmse_evoked(
     initial_net,
     initial_params,
@@ -160,6 +161,7 @@ def _maximize_psd(
 
     return obj
 
+
 def _corr_evoked(
     initial_net,
     initial_params,
@@ -200,45 +202,57 @@ def _corr_evoked(
     # params = update_params(initial_params, predicted_params)
     predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
     print(predicted_params.shape)
-    params_batch = {name: predicted_params[:, idx] for idx, name in enumerate(initial_params.keys())}
+    params_batch = {
+        name: predicted_params[:, idx] for idx, name in enumerate(initial_params.keys())
+    }
 
     # simulate dpl with predicted params
     new_net = initial_net.copy()
 
-    set_params_batch = lambda a,b: set_params(b, a) # need to fix this
-    
-    batch_simulation = BatchSimulate(net=new_net,
-                                    set_params=set_params_batch,
-                                    save_outputs=False,
-                                    save_dpl=True,
-                                    dt=obj_fun_kwargs.get('dt', 0.025),
-                                    n_trials=obj_fun_kwargs.get('n_trials', 1),
-                                    tstop=tstop,
-                                    overwrite=False,
-                                    clear_cache=False,
-                                    verbose=0)
+    set_params_batch = lambda a, b: set_params(b, a)  # need to fix this
 
-    res = batch_simulation.run(params_batch,
-                            n_jobs=obj_fun_kwargs.get('n_jobs', 50),
-                            combinations=False,
-                            backend='loky',
-                            verbose=0)
- 
+    batch_simulation = BatchSimulate(
+        net=new_net,
+        set_params=set_params_batch,
+        save_outputs=False,
+        save_dpl=True,
+        dt=obj_fun_kwargs.get("dt", 0.025),
+        n_trials=obj_fun_kwargs.get("n_trials", 1),
+        tstop=tstop,
+        overwrite=False,
+        clear_cache=False,
+        verbose=0,
+    )
+
+    res = batch_simulation.run(
+        params_batch,
+        n_jobs=obj_fun_kwargs.get("n_jobs", 50),
+        combinations=False,
+        backend="loky",
+        verbose=0,
+    )
+
     dpls = list()
-    for batch_res in res['simulated_data']:
+    for batch_res in res["simulated_data"]:
         for data in batch_res:
             # smooth & scale all dipoles in this population (defined by n_trials)
             if "scale_factor" in obj_fun_kwargs:
-                [trl_dpl.scale(obj_fun_kwargs["scale_factor"]) for trl_dpl in data['dpl']]
+                [
+                    trl_dpl.scale(obj_fun_kwargs["scale_factor"])
+                    for trl_dpl in data["dpl"]
+                ]
             if "smooth_window_len" in obj_fun_kwargs:
-                [trl_dpl.smooth(obj_fun_kwargs["smooth_window_len"]) for trl_dpl in data['dpl']]
-            
+                [
+                    trl_dpl.smooth(obj_fun_kwargs["smooth_window_len"])
+                    for trl_dpl in data["dpl"]
+                ]
+
             # average dipoles per population
-            dpls.append(average_dipoles(data['dpl']))
+            dpls.append(average_dipoles(data["dpl"]))
 
     obj = [_corr(dpl, obj_fun_kwargs["target"], tstop=tstop) for dpl in dpls]
     obj_values.append(obj)
 
-    print(f'Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}')
+    print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
 
     return obj
