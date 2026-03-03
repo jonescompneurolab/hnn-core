@@ -410,37 +410,129 @@ class HNNGUI:
         # specify gap between vertical AppLayout panels
         footer_gap = 10
 
-        # defauilt (shared) height for buttons
-        button_height=30
+        # default (shared) height for buttons
+        button_height = 30
 
         self.layout = {
+            # dpi is technically used in only one place (the _add_figure function in
+            # _viz_manager.py), but it is defined here so that it can be specified
+            # when calling ``HNNGUI.__init__`` and be passed to the viz_layout
+            # argument via "self.viz_manager = _VizManager(...)" below
+            # [REF]: [DSD] this parameter should ideally be separated from self.layout
             "dpi": dpi,
+            #
+            # ==================================================
+            # Repeated elements that are not containers
+            # ==================================================
+            # [REF]: [DSD] imho these elements below, which describe buttons, should
+            # ideally be separated from self.layout, which should only define
+            # the layour properties of containers
             "theme_color": "#802989",
+            "btn": Layout(
+                height=f"{button_height}px",
+                width="auto",
+            ),
+            "run_btn": Layout(
+                height=f"{button_height}px",
+                width="130px",
+            ),
+            "save_btn": Layout(
+                height=f"{button_height}px",
+                width="264px",
+            ),
+            "btn_full_w": Layout(
+                height=f"{button_height}px",
+                width="100%",
+            ),
+            "del_fig_btn": Layout(
+                height=f"{button_height}px",
+                width="auto",
+            ),
             #
-            # Button styling
-            # --------------------------------------------------
-            "btn": Layout(height=f"{button_height}px", width="auto"),
-            "run_btn": Layout(height=f"{button_height}px", width="130px"),
-            "save_btn": Layout(height=f"{button_height}px", width="264px"),
-            "btn_full_w": Layout(height=f"{button_height}px", width="100%"),
-            "del_fig_btn": Layout(height=f"{button_height}px", width="auto"),
-            #
-            # "Outer" container styling
-            # --------------------------------------------------
-            # Define layout properties for the outer-most containers of AppLayout
-            #   - html class: "title-bar"
+            # ==================================================
+            # Styling for the header and footer containers
+            # ==================================================
+            # style for the "header" section of AppLayout that display the GUI
+            # title and contains the light-dark toggle button
+            #   - associated html class: "title-bar"
             "header_height": f"{header_height}px",
-            # Container for parameter specification and the logger output that
-            # fills the "left_sidebar" parameter in AppLayout
-            #   - html class: "parameters-window"
+            #
+            # style for the "footer" section of AppLayout that shows the simulation
+            # status
+            #   - associated html class: "status-bar"
+            "simulation_status_height": f"{status_height}px",
+            #
+            # ==================================================
+            # Styling for "parameters-window" and its children
+            # ==================================================
+            # container for parameter specification and simulation output
+            # that occupies the "left_sidebar" section in AppLayout
+            #   - associated html class: "parameters-window"
             "parameters_window": Layout(
                 width=f"{parameters_window_width}px",
                 height=f"{main_content_height}px",
             ),
             #
-            # Container for simulation output and visualizations that fills
-            # the "right_sidebar" parameter in AppLayout
-            #   - html class: "visualization-window"
+            # this "intermediate" container holds the parameter tabs container
+            # as well as the log container
+            #   - child of "parameters-window"
+            #   - associated html class: "param-tabs-outer-container"
+            "param_tabs_outer_container": Layout(
+                width="100%",
+                height="100%",
+            ),
+            #
+            # this container holds the parameters-window tab bar *and* the associated
+            # contents for each tab, which are separate <div> trees under
+            # param-tabs-outer-container
+            #   - child of "parameters-window" > "param_tabs_outer_container"
+            #   - associated html class: "param-tabs-widget-container"
+            "param_tabs_widget_container": Layout(
+                width="98%",
+                height="98%",
+                margin="0px 0px 0px 0px",
+            ),
+            #
+            # this container is specific to the *contents* of the parameters tabs
+            # widget, and does not include the tab bar. It sets the boundary
+            # *exclusively* for the contents of the Simulation tab
+            #   - child of "parameters-window" > "param_tabs_outer_container" >
+            #     "param-tabs-widget-container" > "widget-tab-contents"
+            #   - associated html class: "simulation-container"
+            # note that "widget-tab-contents" is an auto-generated container that
+            # we do not specifically tag, but it is often used in conjunction with
+            # the parent or child container for targeted CSS styling
+            "sim_container": Layout(
+                width="100%",
+                height="100%",
+            ),
+            #
+            # styles the text boxes within the collapsible widgets that contain the
+            # instantiated drives in the External Drives tab
+            #   - child of "parameters-window" > ... > "drive-container" >
+            #     "widget-output" > ... > "widget-vbox"
+            "drive_textbox": Layout(
+                width="270px",
+                height="auto",
+            ),
+            #
+            # container for the log window
+            #   - child of "parameters-window"
+            #   - associated html class: "log-window"
+            "log_window": Layout(
+                border="1px solid lightgray",
+                height=f"{int(log_window_height_prop * 100)}%",
+                width="98%",
+                margin=f"0px 0px {footer_gap}px 0px",
+                overflow="auto",
+            ),
+            #
+            # ==================================================
+            # Styling for "visualization-window" and its children
+            # ==================================================
+            # Container for simulation output and visualizations that occupies
+            # the "right_sidebar" section in AppLayout
+            #   - associated html class: "visualization-window"
             "visualization_window": Layout(
                 width=f"{figures_window_width}px",
                 height=f"{main_content_height - footer_gap}px",
@@ -448,103 +540,65 @@ class HNNGUI:
                 border="1px solid lightgrey",
                 # overflow="scroll",
             ),
-            # Container for simulation status that fills the "footer" parameter
-            # in AppLayout
-            # html class: "status-bar"
-            "simulation_status_height": f"{status_height}px",
-            "simulation_status_common": """
-                background:gray;
-                padding-left:10px;
-            """,
-            "simulation_status_running": """
-                background:var(--statusbar-running);
-                padding-left:10px;
-            """,
-            "simulation_status_failed": """
-                background:var(--gentle-red);
-                padding-left:10px;
-            """,
-            "simulation_status_finished": """
-                background:var(--gentle-green);
-                padding-left:10px;
-            """,
-            # "Inner" container styling
-            # --------------------------------------------------
-            # child of parameters_window
-            "log_window": Layout(
-                border="1px solid lightgray",
-                height=f"{int(log_window_height_prop*100)}%",
-                width="98%",
-                margin=f"0px 0px {footer_gap}px 0px",
-                overflow="auto",
-            ),
-            # child of visualization_window
+            # child of visualization-window
             # downstream, this determines the dimensions of:
             #   a. the static figure image: <img src="data:img/png;base64,...>", OR
             #   b. the dynamic figure: <div class="jupyter-matplotlib-figure">
             # Note: figure sizes are set in _add_figure in _viz_manager, where
             # percents are converted to pixels
+            #   - associated html class: ""
             "visualization_output": Layout(
                 width="100%",
                 height="95%",
                 border="1px solid lightgray",
                 # overflow="scroll",
             ),
-            # child of parameters_window
-            # html class: "param-tabs-outer-container"
-            "param_tabs_outer_container": Layout(
-                width="100%",
-                height="100%",
-            ),
-            # child of param_tabs_outer_container
-            # html class: "patam-tabs-widget-container"
-            "param_tabs_widget_container": Layout(
-                width="98%",
-                height="98%",
-                margin="0px 0px 0px 0px",
-            ),
-            # The container below is specific to the Simulation tab and
-            # sets the boundary for the parameters therein
-            # child of "param_tabs_outer_container"
-            # html class: simulation-container
-            "sim_container": Layout(
-                width="100%",
-                height="100%",
-            ),
-            "drive_widget": Layout(width="auto"),
-            "drive_textbox": Layout(width="270px", height="auto"),
         }
 
+        # direct HTML specification for the "status-bar"
+        # used in _init_ui_components and run_button_clicked
         self._simulation_status_contents = {
-            "not_running": f"""
+            "not_running": """
                 <div
                 class='sim-status-box'
-                style='{self.layout["simulation_status_common"]};
-                color:white;'>
+                style='
+                    background:gray;
+                    padding-left:10px;
+                    color:white;
+                '>
                     Not running
                 </div>
             """,
-            "running": f"""
+            "running": """
                 <div
                 class='sim-status-box status-running'
-                style='{self.layout["simulation_status_running"]};
-                color:white;'>
+                style='
+                    background:var(--statusbar-running);
+                    padding-left:10px;
+                    color:white;
+                '>
                     Running...
                 </div>
             """,
-            "finished": f"""
+            "finished": """
                 <div
                 class='sim-status-box'
-                style='{self.layout["simulation_status_finished"]};
-                color:white;'>
+                style='
+                    background:var(--gentle-green);
+                    padding-left:10px;
+                    color:white;
+                '>
                     Simulation finished
                 </div>
             """,
-            "failed": f"""
+            "failed": """
                 <div
                 class='sim-status-box'
-                style='{self.layout["simulation_status_failed"]};
-                color:white;'>
+                style='
+                    background:var(--gentle-red);
+                    padding-left:10px;
+                    color:white;
+                '>
                     Simulation failed
                 </div>
             """,
@@ -690,17 +744,17 @@ class HNNGUI:
             value="Evoked",
             description="Drive type:",
             disabled=False,
-            layout=self.layout["drive_widget"],
+            layout=Layout(width="auto"),
             style={"description_width": "100px"},
-        )
+        ).add_class("drive-selection")
         self.widget_location_selection = Dropdown(
             options=["Proximal", "Distal"],
             value="Proximal",
             description="Drive location:",
             disabled=False,
-            layout=self.layout["drive_widget"],
+            layout=Layout(width="auto"),
             style={"description_width": "100px"},
-        )
+        ).add_class("drive-location")
         self.add_drive_button = create_expanded_button(
             "Add drive",
             "primary",
@@ -1371,7 +1425,6 @@ class HNNGUI:
         self.app_layout.right_sidebar.add_class("visualization-window")
         self.app_layout.header.add_class("title-bar")
         self.app_layout.footer.add_class("status-bar")
-
 
         self._link_callbacks()
 
