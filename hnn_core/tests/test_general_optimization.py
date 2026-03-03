@@ -9,7 +9,8 @@ from hnn_core import jones_2009_model, simulate_dipole
 from hnn_core.optimization import Optimizer
 
 
-@pytest.mark.parametrize("solver", ["bayesian", "cobyla"])
+@pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
+@pytest.mark.parametrize("obj_fun", ["dipole_rmse", "dipole_corr"])
 def test_optimize_evoked(solver):
     """Test optimization routines for evoked drives in a reduced network."""
 
@@ -98,7 +99,7 @@ def test_optimize_evoked(solver):
             constraints=constraints,
             set_params=set_params,
             solver=solver,
-            obj_fun="dipole_rmse",
+            obj_fun=obj_fun,
             max_iter=max_iter,
         )
 
@@ -125,7 +126,7 @@ def test_optimize_evoked(solver):
     assert all(vals >= 0 for vals in obj), "rmse values should be positive"
 
 
-@pytest.mark.parametrize("solver", ["bayesian", "cobyla"])
+@pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
 def test_rhythmic(solver):
     """Test optimization routines for rhythmic drives in a reduced network."""
 
@@ -242,7 +243,7 @@ def test_rhythmic(solver):
     assert len(obj) <= max_iter, "Number of rmse values should be the same as max_iter"
 
 
-@pytest.mark.parametrize("solver", ["bayesian", "cobyla"])
+@pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
 def test_user_obj_fun(solver):
     """Test optimization routines with a user-defined optimization function."""
 

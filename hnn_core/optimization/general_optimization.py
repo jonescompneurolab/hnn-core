@@ -46,10 +46,10 @@ class Optimizer:
             names, values are initial parameters. The default is None.
             If None, the parameters will be set to the midpoints of parameter ranges.
         solver : str
-            The optimizer, 'bayesian' or 'cobyla'.
+            The optimizer, 'bayesian', 'cobyla', or 'cma'.
         obj_fun : str | func
             The objective function to be minimized. Can be 'dipole_rmse',
-            'maximize_psd', or a user-defined function. The default is
+            'maximize_psd', "dipole_corr", or a user-defined function. The default is
             'dipole_rmse'.
         max_iter : int, optional
             The max number of calls to the objective function. The default is
@@ -612,7 +612,6 @@ def add_opt_drives(net, tstop=200, n_prox=2, n_dist=1):
     prox_cell_type = ['L5_pyramidal', 'L5_basket', 'L2_pyramidal', 'L2_basket']
     dist_cell_type = ['L5_pyramidal', 'L2_pyramidal', 'L2_basket']
     default_range = {'mu': (0, tstop), 'sigma': (0, 20), 'numspikes':(0,1), 'ampa': (-5, 1), 'nmda': (-5, 1)}
-    #default_values = {'mu': tstop // 2, 'sigma': 2, 'numspikes':1, 'ampa': -3, 'nmda': -3}
 
     prox_weights  = {cell_type: 0.0 for cell_type in prox_cell_type}
     dist_weights  = {cell_type: 0.0 for cell_type in dist_cell_type}
