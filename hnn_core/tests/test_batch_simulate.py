@@ -7,7 +7,7 @@ from pathlib import Path
 import time
 import pytest
 import numpy as np
-import os
+from pathlib import Path
 
 from hnn_core.batch_simulate import BatchSimulate
 from hnn_core import jones_2009_model
@@ -210,8 +210,8 @@ def test_save_load_and_overwrite(batch_simulate_instance, param_grid, tmp_path):
 
     batch_simulate_instance._save(results, start_idx, end_idx)
 
-    file_name = os.path.join(tmp_path, f"sim_run_{start_idx}-{end_idx}.npz")
-    assert os.path.exists(file_name)
+    file_name = tmp_path / f"sim_run_{start_idx}-{end_idx}.npz"
+    assert file_name.exists()
 
     loaded_data = np.load(file_name, allow_pickle=True)
     loaded_results = {key: loaded_data[key].tolist() for key in loaded_data.files}
@@ -261,8 +261,8 @@ def test_load_results(batch_simulate_instance, param_grid, tmp_path):
     end_idx = len(results)
     batch_simulate_instance._save(results, start_idx, end_idx)
 
-    file_name = os.path.join(tmp_path, f"sim_run_{start_idx}-{end_idx}.npz")
-    assert os.path.exists(file_name)
+    file_name = tmp_path / f"sim_run_{start_idx}-{end_idx}.npz"
+    assert file_name.exists()
 
     # single result file
     loaded_results = batch_simulate_instance.load_results(file_name)

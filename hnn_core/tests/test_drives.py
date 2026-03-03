@@ -2,7 +2,7 @@
 #          Christopher Bailey <bailey.cj@gmail.com>
 
 import pytest
-import os.path as op
+from pathlib import Path
 
 import numpy as np
 
@@ -18,13 +18,13 @@ from hnn_core.network import pick_connection
 from hnn_core.network_models import jones_2009_model
 from hnn_core import simulate_dipole
 
-hnn_core_root = op.dirname(hnn_core.__file__)
+hnn_core_root = Path(hnn_core.__file__).parent
 
 
 @pytest.fixture
 def setup_net():
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root/ "param"/ "default.json"
     params = read_params(params_fname)
     net = jones_2009_model(params, mesh_shape=(3, 3))
 
@@ -219,8 +219,8 @@ def test_clear_drives(setup_net):
 
 def test_add_drives():
     """Test methods for adding drives to a Network."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    hnn_core_root =Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root/ "param"/ "default.json"
     params = read_params(params_fname)
     net = Network(params, legacy_mode=False)
 

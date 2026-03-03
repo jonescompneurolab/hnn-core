@@ -2,7 +2,7 @@
 
 from contextlib import redirect_stdout
 import io
-import os.path as op
+from pathlib import Path
 import tempfile
 
 import numpy as np
@@ -31,14 +31,14 @@ from hnn_core.network_builder import NetworkBuilder
 from hnn_core.network_models import add_erp_drives_to_jones_model
 from hnn_core.viz import plot_dipole
 
-hnn_core_root = op.dirname(hnn_core.__file__)
-params_fname = op.join(hnn_core_root, "param", "default.json")
+hnn_core_root = Path(hnn_core.__file__).parent
+params_fname = hnn_core_root/ "param" /"default.json"
 
 
 @pytest.fixture(scope="class")
 def base_network():
     """Base Network with connections and drives"""
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    params_fname =hnn_core_root/ "param"/"default.json"
     params = read_params(params_fname)
     net = Network(params, legacy_mode=False)
     # add some basic local network connectivity
@@ -1094,10 +1094,10 @@ def test_add_cell_type():
 
 def test_tonic_biases():
     """Test tonic biases."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
+    hnn_core_root = Path(hnn_core.__file__).parent
 
     # default params
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    params_fname =hnn_core_root/ "param"/ "default.json"
     params = read_params(params_fname)
 
     net = Network(params)
@@ -1234,10 +1234,10 @@ def test_tonic_biases():
 
 def test_network_mesh():
     """Test mesh for defining cell positions biases."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
+    hnn_core_root = Path(hnn_core.__file__).parent
 
     # default params
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    params_fname = hnn_core_root/ "param"/ "default.json"
     params = read_params(params_fname)
 
     # Test custom mesh_shape
@@ -1655,7 +1655,7 @@ def test_rename_cell_types(base_network):
 
     # Test the other main network we use for testing
     net4 = hnn_core.hnn_io.read_network_configuration(
-        op.join(hnn_core_root, "tests", "assets", "jones2009_3x3_drives.json")
+        hnn_core_root / "tests" / "assets" / "jones2009_3x3_drives.json"
     )
     net4._rename_cell_types(cell_type_rename_mapping)
     dpls4 = simulate_dipole(net4, tstop=10.0, n_trials=1)
@@ -1674,6 +1674,7 @@ def test_spike_train_drive_formats_and_simulation():
 
     # File format will be tested in a temporary directory
     with tempfile.TemporaryDirectory() as tmp_dir:
+        tmp_dir = Path(tmp_dir)
         # Create dictionary format (Format 1)
         dict_format = {
             "L2_pyramidal": [10.0, 20.0, 30.0],
@@ -1714,9 +1715,9 @@ def test_spike_train_drive_formats_and_simulation():
         )
 
         # Write spike data to file
-        spike_file_pattern = op.join(tmp_dir, "spk_%d.txt")
+        spike_file_pattern = tmp_dir / "spk_%d.txt"
         cell_response.write(spike_file_pattern)
-        file_format = op.join(tmp_dir, "spk_*.txt")
+        file_format = str(tmp_dir / "spk_*.txt")
 
         # Add drives to networks with different formats
         net_dict.add_spike_train_drive(

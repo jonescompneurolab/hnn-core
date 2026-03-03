@@ -1,4 +1,4 @@
-import os.path as op
+from pathlib import Path
 from os import environ
 import io
 import itertools
@@ -169,8 +169,8 @@ class TestParallelBackends:
     @requires_psutil
     def test_terminate_mpibackend(self, run_hnn_core_fixture):
         """Test terminating MPIBackend from thread"""
-        hnn_core_root = op.dirname(hnn_core.__file__)
-        params_fname = op.join(hnn_core_root, "param", "default.json")
+        hnn_core_root = Path(hnn_core.__file__).parent
+        params_fname = hnn_core_root/ "param"/ "default.json"
         params = read_params(params_fname)
         params.update(
             {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
@@ -203,8 +203,8 @@ class TestParallelBackends:
     @pytest.mark.parametrize("use_hwthreading_if_found", [True, False])
     def test_run_mpibackend_oversubscribed(self, use_hwthreading_if_found):
         """Test running MPIBackend with oversubscribed number of procs"""
-        hnn_core_root = op.dirname(hnn_core.__file__)
-        params_fname = op.join(hnn_core_root, "param", "default.json")
+        hnn_core_root = Path(hnn_core.__file__).parent
+        params_fname = hnn_core_root/ "param"/ "default.json"
         params = read_params(params_fname)
         params.update(
             {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
@@ -303,8 +303,8 @@ class TestParallelBackends:
         override_oversubscribe_option,
     ):
         """Test running MPIBackend with oversubscribed number of procs"""
-        hnn_core_root = op.dirname(hnn_core.__file__)
-        params_fname = op.join(hnn_core_root, "param", "default.json")
+        hnn_core_root = Path(hnn_core.__file__).parent
+        params_fname = hnn_core_root/"param"/"default.json"
         params = read_params(params_fname)
         params.update(
             {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
@@ -377,7 +377,7 @@ class TestParallelBackends:
             "https://raw.githubusercontent.com/jonescompneurolab/"
             "hnn-core/test_data/dpl.txt"
         )
-        if not op.exists("dpl.txt"):
+        if not Path("dpl.txt").exists():
             urlretrieve(data_url, "dpl.txt")
         dpl_master = loadtxt("dpl.txt")
 

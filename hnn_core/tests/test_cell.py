@@ -3,6 +3,7 @@ import pickle
 import numpy as np
 
 import matplotlib
+from pathlib import Path
 
 from hnn_core.network_builder import load_custom_mechanisms
 from hnn_core.cell import _ArtificialCell, Cell, Section
