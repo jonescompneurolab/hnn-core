@@ -225,28 +225,28 @@ class HNNGUI:
 
     Parameters
     ----------
-    theme_color : str
-        The theme color of the whole dashboard.
     total_height : int
-        The height of the GUI (in pixel, same for all following parameters).
+        The height of the GUI in pixels. For an explanation of the various layout
+        windows and how they relate, see the comments in ``HNNGUI.__init__``.
     total_width : int
-        The width of the GUI.
+        The width of the GUI in pixels
     header_height : int
-        The height of the header.
-    button_height : int
-        The height of buttons.
-    operation_box_height : int
-        The operation_box_height of operations box.
-    drive_widget_width : int
-        The width of GUI drive box.
-    parameters_window_width : int
-        The width of left sidebad.
-    log_window_height : int
-        The height of logging window.
+        The height of the header in pixels
     status_height : int
-        The height of status bar.
+        The height of status bar in pixels
+    param_window_width_prop : float
+        The proportion of the width reserved for the "parameters-window" container;
+        the proportion reserved for the visualization-window is then defined as
+        (1 - param_window_width_prop)
+    log_window_height_prop : float
+        The proportion of the height reserved for the "log-window" container. The
+        height of the parameters-window grows to fill the remaining space and is thus
+        not specified directly
     dpi : int
-        The screen dpi.
+        The pixel density specified in dots per inch
+    network configuration : str
+        The relative path to the hierarchical json file defining the network and
+        drives to be used, typically "jones2009_base.json"
 
     Attributes
     ----------
@@ -300,17 +300,20 @@ class HNNGUI:
 
     def __init__(
         self,
-        theme_color="#802989",
         total_height=800,
         total_width=1300,
         header_height=50,
         status_height=30,
-        button_height=30,
         param_window_width_prop=0.45,
         log_window_height_prop=0.22,
         dpi=96,
         network_configuration=default_network_configuration,
     ):
+
+        # ----------------------------------------------------------------------
+        # Set the layout properties for various GUI components
+        # ----------------------------------------------------------------------
+
         # Set up container height / width parameters
         # ----------------------------------------------------------------------
         # Containers properties are computed relative to total height/width,
@@ -329,12 +332,12 @@ class HNNGUI:
         # specify gap between vertical AppLayout panels
         footer_gap = 10
 
-        # ----------------------------------------------------------------------
-        # Set the layout properties for various GUI components
-        # ----------------------------------------------------------------------
+        # defauilt (shared) height for buttons
+        button_height=30
+
         self.layout = {
             "dpi": dpi,
-            "theme_color": theme_color,
+            "theme_color": "#802989",
             # button styling
             # --------------------------------------------------
             "btn": Layout(height=f"{button_height}px", width="auto"),
@@ -393,7 +396,7 @@ class HNNGUI:
             # "Inner" container styling
             # --------------------------------------------------
             # child of parameters_window
-            "log_out": Layout(
+            "log_window": Layout(
                 border="1px solid lightgray",
                 height=f"{int(log_window_height_prop*100)}%",
                 width="98%",
@@ -788,11 +791,11 @@ class HNNGUI:
         # log window
         self._log_window = HBox(
             [self._log_out, self._log_toggle_btn],
-            layout=self.layout["log_out"],
-        ).add_class("log-out")
+            layout=self.layout["log_window"],
+        ).add_class("log-window")
 
         # store the expanded height *directly* for use in toggle_logs() below
-        self._log_expanded_height = self.layout["log_out"].height
+        self._log_expanded_height = self.layout["log_window"].height
 
         # function to toggle log window height
         def toggle_logs(_):
@@ -1487,7 +1490,7 @@ class HNNGUI:
                     ensure the log output handles scrolling,
                     and that the output content doesn't overlap the button
                 */
-                .log-out > .widget-output {
+                .log-window > .widget-output {
                     overflow-y: auto !important;
                     padding-left: 30px !important;
                     padding-right: 10px !important;
@@ -2239,7 +2242,7 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                     functionality if we decide we would prefer to not have the
                     accent borders. There are three sub sections here handle:
                         - param-tabs-widget-container
-                        - log-out
+                        - log-window
                         - visualization-window
                 */
 
@@ -2297,7 +2300,7 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                 /* set border for the log window */
                 /* ------------------------------ */
 
-                .dark-mode div.log-out.log-out {
+                .dark-mode div.log-window.log-window {
                     border: 2px solid var(--dm-theme) !important;
                 }
 
