@@ -1259,6 +1259,10 @@ class HNNGUI:
             left_tab.set_title(idx, title)
             left_tab.add_class("param-tabs-widget-container")
 
+        # add custom CSS and JS to the DOM before AppLayout is called so that
+        # the style is applied before the widget is rendered
+        self.custom_css_styling()
+
         self.app_layout = AppLayout(
             header=self._header,
             left_sidebar=VBox(
@@ -1290,6 +1294,18 @@ class HNNGUI:
         self.app_layout.header.add_class("title-bar")
         self.app_layout.footer.add_class("status-bar")
 
+
+        self._link_callbacks()
+
+        # initialize drive and connectivity ipywidgets
+        self.load_drive_and_connectivity()
+
+        if not return_layout:
+            return
+        else:
+            return self.app_layout
+
+    def custom_css_styling(self):
         # add styling to children of param-tabs-widget-container
         param_tabs_styling = HTML(
             value="""
@@ -2339,16 +2355,6 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
             layout=Layout(display="none"),
         )
         display(dark_theme)
-
-        self._link_callbacks()
-
-        # initialize drive and connectivity ipywidgets
-        self.load_drive_and_connectivity()
-
-        if not return_layout:
-            return
-        else:
-            return self.app_layout
 
     def show(self):
         display(self.app_layout)
