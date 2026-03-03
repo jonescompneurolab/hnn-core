@@ -306,8 +306,8 @@ class HNNGUI:
         header_height=50,
         status_height=30,
         button_height=30,
-        param_window_width_prct=0.45,
-        log_window_height_prct=0.22,
+        param_window_width_prop=0.45,
+        log_window_height_prop=0.22,
         dpi=96,
         network_configuration=default_network_configuration,
     ):
@@ -322,7 +322,7 @@ class HNNGUI:
         # We'll compute pixels for the "fixed" outer containers (per AppLayout), but
         # we'll be able to use percentages for most of the "inner" containers
         # Note that we must use int() as we cannot have fractional pixel values
-        parameters_window_width = int(total_width * param_window_width_prct)
+        parameters_window_width = int(total_width * param_window_width_prop)
         figures_window_width = int(total_width - parameters_window_width)
         main_content_height = total_height - status_height
 
@@ -395,7 +395,7 @@ class HNNGUI:
             # child of parameters_window
             "log_out": Layout(
                 border="1px solid lightgray",
-                height=f"{int(log_window_height_prct*100)}%",
+                height=f"{int(log_window_height_prop*100)}%",
                 width="98%",
                 margin=f"0px 0px {footer_gap}px 0px",
                 overflow="auto",
