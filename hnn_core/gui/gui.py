@@ -311,6 +311,84 @@ class HNNGUI:
     ):
 
         # ----------------------------------------------------------------------
+        # Structural overview of the GUI
+        # ----------------------------------------------------------------------
+        # The HNN GUI is composed using ipywidget's AppLayout, which uses the
+        # following structure:
+        #   | -------------- header --------------- |
+        #   | left-sidebar | center | right-sidebar |
+        #   | -------------- footer --------------- |
+        #
+        # Throughout the following code, we add HTML classes to the key "containers"
+        # that hold all of our widgets, and to several of the widgets themselves.
+        # These HTML classes are sometimes used to apply custom styling to certain
+        # elements.
+        #
+        # Even when not used for styling, these HTML classes are extremely
+        # valuable for debugging at the browser level when you need to inspect page
+        # elements directly (via inspect) or programatically (via the console).
+        # This is largely due to the fact that ipywidgets and AppLayout necessarily
+        # add numerous layers of nested <div> elements (i.e., "tags") to the HTML tree
+        # when instantiating widgets, which would make it extremely difficult to
+        # ascertain which <div> elements our CSS style blocks are being applied to if
+        # we did not include custom HTML classes
+        #
+        # Using our custom class names in place of the AppLayout parameter names, the
+        # structure of the GUI can be written as follows:
+        #   | ----------------- title-bar ----------------- |
+        #   |   parameters-window  | | visualization-window |
+        #   | --------------- sim-status-box -------------- |
+        #
+        # Note that we do not (currently) utilize the "center" AppLayout container,
+        # which is set to 0px in our AppLayout instantiation below
+        #
+        # The title-bar and sim-status-box do not have "child" containers that hold
+        # widgets, but parameters-window and visualization-window do. Thus, we
+        # outline the structure of these "outer"-most containers below.
+        #
+        # The general structure of parameters-window is as follows:
+        #   =================== parameters-window ===================
+        #   ||                                                     ||
+        #   ||   ========== param-tabs-outer-container =========   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ||  ======== param-widget-container =======  ||   ||
+        #   ||   ||  ||                                   ||  ||   ||
+        #   ||   ||  ||         ~ contents here ~         ||  ||   ||
+        #   ||   ||  ||                                   ||  ||   ||
+        #   ||   ||  =======================================  ||   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ===============================================   ||
+        #   ||                                                     ||
+        #   ||   ================== log-window =================   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ||             ~ contents here ~             ||   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ===============================================   ||
+        #   ||                                                     ||
+        #   =========================================================
+        #
+        # The general structure of visualization-window is as follows:
+        #   ================== visualization-window =================
+        #   ||                                                     ||
+        #   ||   ====== [[ nested, auto-generated tags ]] ======   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ||  ============== fig-tabs ===============  ||   ||
+        #   ||   ||  ||                                   ||  ||   ||
+        #   ||   ||  ||         ~ contents here ~         ||  ||   ||
+        #   ||   ||  ||                                   ||  ||   ||
+        #   ||   ||  =======================================  ||   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ===============================================   ||
+        #   ||                                                     ||
+        #   =========================================================
+        # Note: the "fig-tabs" HTML class is applied when the Tab() container
+        # is initialized in _viz_manager.py, and not in gui.py
+        #
+        # Keep in mind that there are many more HTML tags used that listed in the
+        # diagrams above; these are merely the tags that are used to specify the
+        # primary "outer" containers that house the actual GUI contents
+
+        # ----------------------------------------------------------------------
         # Set the layout properties for various GUI components
         # ----------------------------------------------------------------------
 
@@ -338,34 +416,31 @@ class HNNGUI:
         self.layout = {
             "dpi": dpi,
             "theme_color": "#802989",
-            # button styling
+            #
+            # Button styling
             # --------------------------------------------------
             "btn": Layout(height=f"{button_height}px", width="auto"),
             "run_btn": Layout(height=f"{button_height}px", width="130px"),
             "save_btn": Layout(height=f"{button_height}px", width="264px"),
             "btn_full_w": Layout(height=f"{button_height}px", width="100%"),
             "del_fig_btn": Layout(height=f"{button_height}px", width="auto"),
+            #
             # "Outer" container styling
             # --------------------------------------------------
             # Define layout properties for the outer-most containers of AppLayout
-            # Note that we do not (currently) utilize the "center" container,
-            # which is set to 0px in our AppLayout instantiation
-            # For reference, AppLayout uses the following structure:
-            # | -------------- header --------------- |
-            # | left-sidebar | center | right-sidebar |
-            # | -------------- footer --------------- |
-            # html class: "title-bar"
+            #   - html class: "title-bar"
             "header_height": f"{header_height}px",
             # Container for parameter specification and the logger output that
             # fills the "left_sidebar" parameter in AppLayout
-            # html class: "parameters-window"
+            #   - html class: "parameters-window"
             "parameters_window": Layout(
                 width=f"{parameters_window_width}px",
                 height=f"{main_content_height}px",
             ),
+            #
             # Container for simulation output and visualizations that fills
             # the "right_sidebar" parameter in AppLayout
-            # html class: "visualization-window"
+            #   - html class: "visualization-window"
             "visualization_window": Layout(
                 width=f"{figures_window_width}px",
                 height=f"{main_content_height - footer_gap}px",
