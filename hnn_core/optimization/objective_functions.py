@@ -209,7 +209,8 @@ def _corr_evoked(
     # simulate dpl with predicted params
     new_net = initial_net.copy()
 
-    set_params_batch = lambda a, b: set_params(b, a)  # need to fix this
+    def set_params_batch(a, b):
+        set_params(b, a)  # need to fix this
 
     batch_simulation = BatchSimulate(
         net=new_net,
