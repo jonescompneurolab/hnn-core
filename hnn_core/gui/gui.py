@@ -415,7 +415,6 @@ class HNNGUI:
         button_height = 30
 
         self.layout = {
-
             # ==================================================
             # Elements that are not containers
             # ==================================================
@@ -634,8 +633,13 @@ class HNNGUI:
         self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
 
         # Default visualization params for figures
-        analysis_style = {"description_width": "200px"}
-        layout = Layout(width="300px")
+        # --------------------------------------------------
+        default_param_properties = {
+            # container_width includes the space allocated for both the text and
+            # the input field
+            "container_width": Layout(width="300px"),
+            "text_width": {"description_width": "200px"},
+        }
 
         self.widget_default_smoothing = BoundedFloatText(
             value=30.0,
@@ -644,8 +648,8 @@ class HNNGUI:
             max=100.0,
             step=1.0,
             disabled=False,
-            layout=layout,
-            style=analysis_style,
+            layout=default_param_properties["container_width"],
+            style=default_param_properties["text_width"],
         )
 
         self.widget_default_scaling = FloatText(
@@ -653,8 +657,8 @@ class HNNGUI:
             description="Dipole Scaling:",
             step=100.0,
             disabled=False,
-            layout=layout,
-            style=analysis_style,
+            layout=default_param_properties["container_width"],
+            style=default_param_properties["text_width"],
         )
 
         self.widget_min_frequency = BoundedFloatText(
@@ -663,8 +667,8 @@ class HNNGUI:
             max=1000,
             description="Min Spectral Frequency (Hz):",
             disabled=False,
-            layout=layout,
-            style=analysis_style,
+            layout=default_param_properties["container_width"],
+            style=default_param_properties["text_width"],
         )
 
         self.widget_max_frequency = BoundedFloatText(
@@ -673,8 +677,8 @@ class HNNGUI:
             max=1000,
             description="Max Spectral Frequency (Hz):",
             disabled=False,
-            layout=layout,
-            style=analysis_style,
+            layout=default_param_properties["container_width"],
+            style=default_param_properties["text_width"],
         )
 
         self.fig_default_params = {
