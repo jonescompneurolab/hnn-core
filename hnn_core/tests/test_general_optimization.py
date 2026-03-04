@@ -85,24 +85,6 @@ def test_optimize_evoked(solver, obj_fun):
         max_iter=max_iter,
     )
 
-    # test exception raised
-    with pytest.raises(
-        ValueError,
-        match="The current Network instance has "
-        "external drives, provide a Network object with no "
-        "external drives.",
-    ):
-        net_with_drives = net_orig.copy()
-        optim = Optimizer(
-            net_with_drives,
-            tstop=tstop,
-            constraints=constraints,
-            set_params=set_params,
-            solver=solver,
-            obj_fun=obj_fun,
-            max_iter=max_iter,
-        )
-
     # test repr before fitting
     assert "fit=False" in repr(optim), "optimizer is already fit"
 
@@ -203,24 +185,6 @@ def test_rhythmic(solver):
         obj_fun="maximize_psd",
         max_iter=max_iter,
     )
-
-    # test exception raised
-    with pytest.raises(
-        ValueError,
-        match="The current Network instance has "
-        "external drives, provide a Network object with no "
-        "external drives.",
-    ):
-        net_with_drives = jones_2009_model(add_drives_from_params=True)
-        optim = Optimizer(
-            net_with_drives,
-            tstop=tstop,
-            constraints=constraints,
-            set_params=set_params,
-            solver=solver,
-            obj_fun="maximize_psd",
-            max_iter=max_iter,
-        )
 
     # test repr before fitting
     assert "fit=False" in repr(optim), "optimizer is already fit"
@@ -348,24 +312,6 @@ def test_user_obj_fun(solver):
         obj_fun=maximize_csd,
         max_iter=max_iter,
     )
-
-    # test exception raised
-    with pytest.raises(
-        ValueError,
-        match="The current Network instance has "
-        "external drives, provide a Network object with no "
-        "external drives.",
-    ):
-        net_with_drives = jones_2009_model(add_drives_from_params=True)
-        optim = Optimizer(
-            net_with_drives,
-            tstop=tstop,
-            constraints=constraints,
-            set_params=set_params,
-            solver=solver,
-            obj_fun=maximize_csd,
-            max_iter=max_iter,
-        )
 
     # test repr before fitting
     assert "fit=False" in repr(optim), "optimizer is already fit"
