@@ -407,26 +407,32 @@ class HNNGUI:
         figures_window_width = int(total_width - parameters_window_width)
         main_content_height = total_height - status_height
 
-        # specify gap between vertical AppLayout panels
+        # specify the gap between the footer ("sim-status-box") and the containers
+        # above it
         footer_gap = 10
 
         # default (shared) height for buttons
         button_height = 30
 
         self.layout = {
+
+            # ==================================================
+            # Elements that are not containers
+            # ==================================================
             # dpi is technically used in only one place (the _add_figure function in
             # _viz_manager.py), but it is defined here so that it can be specified
             # when calling ``HNNGUI.__init__`` and be passed to the viz_layout
             # argument via "self.viz_manager = _VizManager(...)" below
-            # [REF]: [DSD] this parameter should ideally be separated from self.layout
+            # [REF]: [DSD] this parameter should ideally be separated from self.layout,
+            # which should only define the layout properties of containers.
             "dpi": dpi,
             #
-            # ==================================================
-            # Repeated elements that are not containers
-            # ==================================================
             # [REF]: [DSD] imho these elements below, which describe buttons, should
-            # ideally be separated from self.layout, which should only define
-            # the layour properties of containers
+            # also be separated from self.layout. Similar to dpi, "theme_color" and
+            # "btn" are passed to viz_layout, albeit they are only used in one
+            # place in _viz_manager, when self.make_fig_button is called. This button
+            # already has make-fig-btn HTML class, so adding the styling directly via
+            # CSS to the different buttons may be the better approach
             "theme_color": "#802989",
             "btn": Layout(
                 height=f"{button_height}px",
