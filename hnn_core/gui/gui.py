@@ -304,7 +304,7 @@ class HNNGUI:
         self,
         total_height=800,
         total_width=1300,
-        header_height=50,
+        header_height=42,
         status_height=30,
         param_window_width_prop=0.45,
         log_window_height_prop=0.22,
@@ -2153,17 +2153,23 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
         )
         display(adjust_tab_overflow)
 
-        adjust_topbar_margin = HTML(
+        adjust_header_footer_margins = HTML(
             value="""
             <style>
+                .title-bar {
+                    margin: 2px 0px 2px 0px !important;
+                }
                 .title-bar-contents {
                     margin: 0px !important;
+                }
+                .status-bar {
+                    margin: 2px 0px 2px 0px !important;
                 }
             </style>
             """,
             layout=Layout(display="none"),
         )
-        display(adjust_topbar_margin)
+        display(adjust_header_footer_margins)
 
         # viz_manager relies on the presence of the "existing-plots" HTML container
         # in various parts of the code; however, the display for existing-plots
