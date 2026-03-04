@@ -548,7 +548,7 @@ def _plot_on_axes(
         A dict that contains all the widgets.
     data : dict
         A dict that contains all the simulation data. Can be accessed by names
-        specified in widgets_simulation and target_simulations weidgets.
+        specified in widgets_simulation and target_simulations widgets.
     fig_idx : int
         The index of the figure we want to plot on.
     fig : matplotlib.figure.Figure
@@ -1223,7 +1223,7 @@ class _VizManager:
     def _layout_template_change(self, template_type):
         # check if plot set type requires loaded sim-data
         if _check_template_type_is_data_dependant(template_type.new):
-            # Add only simualated data
+            # Add only simulated data
             sim_names = [
                 simulations
                 for simulations, sim_name in self.data["simulations"].items()

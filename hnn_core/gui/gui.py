@@ -1512,8 +1512,8 @@ class HNNGUI:
 
         # disable dropdown menu displaying when no actual items are present
         # note: i've *only* noticed this on Firefox, but it creates an empty
-        #       oval on screen that looks like an erroroneous box... this requires
-        #       js as you can't target those popup boxes with CSS, unforuntately
+        #       oval on screen that looks like an erroneous box... this requires
+        #       js as you can't target those popup boxes with CSS, unfortunately
 
         js_code = """
             (function() {
@@ -1826,7 +1826,7 @@ class HNNGUI:
             value="""
             <style>
                 /*
-                    remove the rectangle in the vizualization-tab when there is
+                    remove the rectangle in the visualization-tab when there is
                     not actually any figure present
                 */
 
