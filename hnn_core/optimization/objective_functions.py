@@ -52,13 +52,16 @@ def _rmse_evoked(
     elif len(np.array(predicted_params).shape) == 2:
         is_batch = True
     else:
-        raise ValueError(f"Incorrect shape for predicted params. Got {np.array(predicted_params).shape}")
+        raise ValueError(
+            f"Incorrect shape for predicted params. Got {np.array(predicted_params).shape}"
+        )
 
     if is_batch:
         predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
         print(predicted_params.shape)
         params_batch = {
-            name: predicted_params[:, idx] for idx, name in enumerate(initial_params.keys())
+            name: predicted_params[:, idx]
+            for idx, name in enumerate(initial_params.keys())
         }
 
         # simulate dpl with predicted params
@@ -115,7 +118,9 @@ def _rmse_evoked(
         new_net = initial_net.copy()
         set_params(new_net, params)
 
-        dpls = simulate_dipole(new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"])
+        dpls = simulate_dipole(
+            new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"]
+        )
 
         # smooth & scale
         if "scale_factor" in obj_fun_kwargs:
@@ -186,13 +191,16 @@ def _maximize_psd(
     elif len(np.array(predicted_params).shape) == 2:
         is_batch = True
     else:
-        raise ValueError(f"Incorrect shape for predicted params. Got {np.array(predicted_params).shape}")
+        raise ValueError(
+            f"Incorrect shape for predicted params. Got {np.array(predicted_params).shape}"
+        )
 
     if is_batch:
         predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
         print(predicted_params.shape)
         params_batch = {
-            name: predicted_params[:, idx] for idx, name in enumerate(initial_params.keys())
+            name: predicted_params[:, idx]
+            for idx, name in enumerate(initial_params.keys())
         }
 
         # simulate dpl with predicted params
@@ -251,15 +259,23 @@ def _maximize_psd(
 
                 # Handle float and list inputs for relative_bandpower
                 if isinstance(relative_bandpower, float):
-                    relative_bandpower = [relative_bandpower] * len(obj_fun_kwargs["f_bands"])
+                    relative_bandpower = [relative_bandpower] * len(
+                        obj_fun_kwargs["f_bands"]
+                    )
                 elif len(relative_bandpower) != len(obj_fun_kwargs["f_bands"]):
-                    raise ValueError("Length of relative_bandpower must match length of f_bands.")
+                    raise ValueError(
+                        "Length of relative_bandpower must match length of f_bands."
+                    )
 
                 for idx, f_band in enumerate(obj_fun_kwargs["f_bands"]):
                     f_band_idx = np.where(
-                        np.logical_and(freqs_simulated >= f_band[0], freqs_simulated <= f_band[1])
+                        np.logical_and(
+                            freqs_simulated >= f_band[0], freqs_simulated <= f_band[1]
+                        )
                     )[0]
-                    f_bands_psds.append(relative_bandpower[idx] * sum(psd_simulated[f_band_idx]))
+                    f_bands_psds.append(
+                        relative_bandpower[idx] * sum(psd_simulated[f_band_idx])
+                    )
 
                 # The optimizer is designed to minimize the objective function.
                 # Maximizing the relative band power is equivalent to minimizing its negative.
@@ -293,13 +309,19 @@ def _maximize_psd(
         if isinstance(relative_bandpower, float):
             relative_bandpower = [relative_bandpower] * len(obj_fun_kwargs["f_bands"])
         elif len(relative_bandpower) != len(obj_fun_kwargs["f_bands"]):
-            raise ValueError("Length of relative_bandpower must match length of f_bands.")
+            raise ValueError(
+                "Length of relative_bandpower must match length of f_bands."
+            )
 
         for idx, f_band in enumerate(obj_fun_kwargs["f_bands"]):
             f_band_idx = np.where(
-                np.logical_and(freqs_simulated >= f_band[0], freqs_simulated <= f_band[1])
+                np.logical_and(
+                    freqs_simulated >= f_band[0], freqs_simulated <= f_band[1]
+                )
             )[0]
-            f_bands_psds.append(relative_bandpower[idx] * sum(psd_simulated[f_band_idx]))
+            f_bands_psds.append(
+                relative_bandpower[idx] * sum(psd_simulated[f_band_idx])
+            )
 
         # The optimizer is designed to minimize the objective function.
         # Maximizing the relative band power is equivalent to minimizing its negative.
@@ -352,14 +374,17 @@ def _corr_evoked(
     elif len(np.array(predicted_params).shape) == 2:
         is_batch = True
     else:
-        raise ValueError(f"Incorrect shape for predicted params. Got {np.array(predicted_params).shape}")
+        raise ValueError(
+            f"Incorrect shape for predicted params. Got {np.array(predicted_params).shape}"
+        )
 
     if is_batch:
         # params = update_params(initial_params, predicted_params)
         predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
         print(predicted_params.shape)
         params_batch = {
-            name: predicted_params[:, idx] for idx, name in enumerate(initial_params.keys())
+            name: predicted_params[:, idx]
+            for idx, name in enumerate(initial_params.keys())
         }
 
         # simulate dpl with predicted params
@@ -408,7 +433,7 @@ def _corr_evoked(
                 dpls.append(average_dipoles(data["dpl"]))
 
         obj = [_corr(dpl, obj_fun_kwargs["target"], tstop=tstop) for dpl in dpls]
-    
+
     else:
         params = update_params(initial_params, predicted_params)
 
@@ -416,7 +441,9 @@ def _corr_evoked(
         new_net = initial_net.copy()
         set_params(new_net, params)
 
-        dpls = simulate_dipole(new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"])
+        dpls = simulate_dipole(
+            new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"]
+        )
 
         # smooth & scale
         if "scale_factor" in obj_fun_kwargs:
@@ -426,7 +453,7 @@ def _corr_evoked(
 
         dpl = average_dipoles(dpls)
         obj = _corr(dpl, obj_fun_kwargs["target"], tstop=tstop)
-    
+
     print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
     obj_values.append(obj)
 
