@@ -47,25 +47,87 @@ def _rmse_evoked(
     obj : float
         Normalized RMSE between recorded and simulated dipole.
     """
+    if len(np.array(predicted_params).shape) == 1:
+        is_batch = False
+    elif len(np.array(predicted_params).shape) == 2:
+        is_batch = True
+    else:
+        raise ValueError(f"Incorrect shape for predicted params. Got {np.array(predicted_params).shape}")
 
-    params = update_params(initial_params, predicted_params)
+    if is_batch:
+        predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
+        print(predicted_params.shape)
+        params_batch = {
+            name: predicted_params[:, idx] for idx, name in enumerate(initial_params.keys())
+        }
 
-    # simulate dpl with predicted params
-    new_net = initial_net.copy()
-    set_params(new_net, params)
+        # simulate dpl with predicted params
+        new_net = initial_net.copy()
 
-    dpls = simulate_dipole(new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"])
+        def set_params_batch(a, b):
+            set_params(b, a)  # need to fix this
 
-    # smooth & scale
-    if "scale_factor" in obj_fun_kwargs:
-        [dpl.scale(obj_fun_kwargs["scale_factor"]) for dpl in dpls]
-    if "smooth_window_len" in obj_fun_kwargs:
-        [dpl.smooth(obj_fun_kwargs["smooth_window_len"]) for dpl in dpls]
+        batch_simulation = BatchSimulate(
+            net=new_net,
+            set_params=set_params_batch,
+            save_outputs=False,
+            save_dpl=True,
+            dt=obj_fun_kwargs.get("dt", 0.025),
+            n_trials=obj_fun_kwargs.get("n_trials", 1),
+            tstop=tstop,
+            overwrite=False,
+            clear_cache=False,
+            verbose=0,
+        )
 
-    dpl = average_dipoles(dpls)
-    obj = _rmse(dpl, obj_fun_kwargs["target"], tstop=tstop)
+        res = batch_simulation.run(
+            params_batch,
+            n_jobs=obj_fun_kwargs.get("n_jobs", 50),
+            combinations=False,
+            backend="loky",
+            verbose=0,
+        )
+
+        dpls = list()
+        for batch_res in res["simulated_data"]:
+            for data in batch_res:
+                # smooth & scale all dipoles in this population (defined by n_trials)
+                if "scale_factor" in obj_fun_kwargs:
+                    [
+                        trl_dpl.scale(obj_fun_kwargs["scale_factor"])
+                        for trl_dpl in data["dpl"]
+                    ]
+                if "smooth_window_len" in obj_fun_kwargs:
+                    [
+                        trl_dpl.smooth(obj_fun_kwargs["smooth_window_len"])
+                        for trl_dpl in data["dpl"]
+                    ]
+
+                # average dipoles per population
+                dpls.append(average_dipoles(data["dpl"]))
+
+        obj = [_rmse(dpl, obj_fun_kwargs["target"], tstop=tstop) for dpl in dpls]
+
+    else:
+        params = update_params(initial_params, predicted_params)
+
+        # simulate dpl with predicted params
+        new_net = initial_net.copy()
+        set_params(new_net, params)
+
+        dpls = simulate_dipole(new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"])
+
+        # smooth & scale
+        if "scale_factor" in obj_fun_kwargs:
+            [dpl.scale(obj_fun_kwargs["scale_factor"]) for dpl in dpls]
+        if "smooth_window_len" in obj_fun_kwargs:
+            [dpl.smooth(obj_fun_kwargs["smooth_window_len"]) for dpl in dpls]
+
+        dpl = average_dipoles(dpls)
+        obj = _rmse(dpl, obj_fun_kwargs["target"], tstop=tstop)
+
     obj_values.append(obj)
-
+    print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
     return obj
 
 
@@ -119,43 +181,129 @@ def _maximize_psd(
 
     from scipy.signal import periodogram
 
-    params = update_params(initial_params, predicted_params)
+    if len(np.array(predicted_params).shape) == 1:
+        is_batch = False
+    elif len(np.array(predicted_params).shape) == 2:
+        is_batch = True
+    else:
+        raise ValueError(f"Incorrect shape for predicted params. Got {np.array(predicted_params).shape}")
 
-    # simulate dpl with predicted params
-    new_net = initial_net.copy()
-    set_params(new_net, params)
-    dpl = simulate_dipole(new_net, tstop=tstop, n_trials=1)[0]
+    if is_batch:
+        predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
+        print(predicted_params.shape)
+        params_batch = {
+            name: predicted_params[:, idx] for idx, name in enumerate(initial_params.keys())
+        }
 
-    # smooth & scale
-    if "scale_factor" in obj_fun_kwargs:
-        dpl.scale(obj_fun_kwargs["scale_factor"])
-    if "smooth_window_len" in obj_fun_kwargs:
-        dpl.smooth(obj_fun_kwargs["smooth_window_len"])
+        # simulate dpl with predicted params
+        new_net = initial_net.copy()
 
-    # get psd of simulated dpl
-    freqs_simulated, psd_simulated = periodogram(
-        dpl.data["agg"], dpl.sfreq, window="hamming"
-    )
+        def set_params_batch(a, b):
+            set_params(b, a)  # need to fix this
 
-    # for each f band
-    f_bands_psds = list()
-    relative_bandpower = obj_fun_kwargs["relative_bandpower"]
+        batch_simulation = BatchSimulate(
+            net=new_net,
+            set_params=set_params_batch,
+            save_outputs=False,
+            save_dpl=True,
+            dt=obj_fun_kwargs.get("dt", 0.025),
+            n_trials=1,
+            tstop=tstop,
+            overwrite=False,
+            clear_cache=False,
+            verbose=0,
+        )
 
-    # Handle float and list inputs for relative_bandpower
-    if isinstance(relative_bandpower, float):
-        relative_bandpower = [relative_bandpower] * len(obj_fun_kwargs["f_bands"])
-    elif len(relative_bandpower) != len(obj_fun_kwargs["f_bands"]):
-        raise ValueError("Length of relative_bandpower must match length of f_bands.")
+        res = batch_simulation.run(
+            params_batch,
+            n_jobs=obj_fun_kwargs.get("n_jobs", 50),
+            combinations=False,
+            backend="loky",
+            verbose=0,
+        )
 
-    for idx, f_band in enumerate(obj_fun_kwargs["f_bands"]):
-        f_band_idx = np.where(
-            np.logical_and(freqs_simulated >= f_band[0], freqs_simulated <= f_band[1])
-        )[0]
-        f_bands_psds.append(relative_bandpower[idx] * sum(psd_simulated[f_band_idx]))
+        obj = list()
+        for batch_res in res["simulated_data"]:
+            for data in batch_res:
+                # smooth & scale all dipoles in this population (defined by n_trials)
+                if "scale_factor" in obj_fun_kwargs:
+                    [
+                        trl_dpl.scale(obj_fun_kwargs["scale_factor"])
+                        for trl_dpl in data["dpl"]
+                    ]
+                if "smooth_window_len" in obj_fun_kwargs:
+                    [
+                        trl_dpl.smooth(obj_fun_kwargs["smooth_window_len"])
+                        for trl_dpl in data["dpl"]
+                    ]
 
-    # The optimizer is designed to minimize the objective function.
-    # Maximizing the relative band power is equivalent to minimizing its negative.
-    obj = -sum(f_bands_psds) / sum(psd_simulated)
+                # average dipoles per population
+                dpl = data["dpl"][0]
+
+                # get psd of simulated dpl
+                freqs_simulated, psd_simulated = periodogram(
+                    dpl.data["agg"], dpl.sfreq, window="hamming"
+                )
+
+                # for each f band
+                f_bands_psds = list()
+                relative_bandpower = obj_fun_kwargs["relative_bandpower"]
+
+                # Handle float and list inputs for relative_bandpower
+                if isinstance(relative_bandpower, float):
+                    relative_bandpower = [relative_bandpower] * len(obj_fun_kwargs["f_bands"])
+                elif len(relative_bandpower) != len(obj_fun_kwargs["f_bands"]):
+                    raise ValueError("Length of relative_bandpower must match length of f_bands.")
+
+                for idx, f_band in enumerate(obj_fun_kwargs["f_bands"]):
+                    f_band_idx = np.where(
+                        np.logical_and(freqs_simulated >= f_band[0], freqs_simulated <= f_band[1])
+                    )[0]
+                    f_bands_psds.append(relative_bandpower[idx] * sum(psd_simulated[f_band_idx]))
+
+                # The optimizer is designed to minimize the objective function.
+                # Maximizing the relative band power is equivalent to minimizing its negative.
+                relative_power = -sum(f_bands_psds) / sum(psd_simulated)
+                obj.append(relative_power)
+
+    else:
+        params = update_params(initial_params, predicted_params)
+
+        # simulate dpl with predicted params
+        new_net = initial_net.copy()
+        set_params(new_net, params)
+        dpl = simulate_dipole(new_net, tstop=tstop, n_trials=1)[0]
+
+        # smooth & scale
+        if "scale_factor" in obj_fun_kwargs:
+            dpl.scale(obj_fun_kwargs["scale_factor"])
+        if "smooth_window_len" in obj_fun_kwargs:
+            dpl.smooth(obj_fun_kwargs["smooth_window_len"])
+
+        # get psd of simulated dpl
+        freqs_simulated, psd_simulated = periodogram(
+            dpl.data["agg"], dpl.sfreq, window="hamming"
+        )
+
+        # for each f band
+        f_bands_psds = list()
+        relative_bandpower = obj_fun_kwargs["relative_bandpower"]
+
+        # Handle float and list inputs for relative_bandpower
+        if isinstance(relative_bandpower, float):
+            relative_bandpower = [relative_bandpower] * len(obj_fun_kwargs["f_bands"])
+        elif len(relative_bandpower) != len(obj_fun_kwargs["f_bands"]):
+            raise ValueError("Length of relative_bandpower must match length of f_bands.")
+
+        for idx, f_band in enumerate(obj_fun_kwargs["f_bands"]):
+            f_band_idx = np.where(
+                np.logical_and(freqs_simulated >= f_band[0], freqs_simulated <= f_band[1])
+            )[0]
+            f_bands_psds.append(relative_bandpower[idx] * sum(psd_simulated[f_band_idx]))
+
+        # The optimizer is designed to minimize the objective function.
+        # Maximizing the relative band power is equivalent to minimizing its negative.
+        obj = -sum(f_bands_psds) / sum(psd_simulated)
 
     obj_values.append(obj)
 
@@ -171,6 +319,7 @@ def _corr_evoked(
     obj_values,
     tstop,
     obj_fun_kwargs,
+    is_batch=False,
 ):
     """The objective function for evoked responses.
 
@@ -198,62 +347,87 @@ def _corr_evoked(
     obj : float
         Normalized RMSE between recorded and simulated dipole.
     """
+    if len(np.array(predicted_params).shape) == 1:
+        is_batch = False
+    elif len(np.array(predicted_params).shape) == 2:
+        is_batch = True
+    else:
+        raise ValueError(f"Incorrect shape for predicted params. Got {np.array(predicted_params).shape}")
 
-    # params = update_params(initial_params, predicted_params)
-    predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
-    print(predicted_params.shape)
-    params_batch = {
-        name: predicted_params[:, idx] for idx, name in enumerate(initial_params.keys())
-    }
+    if is_batch:
+        # params = update_params(initial_params, predicted_params)
+        predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
+        print(predicted_params.shape)
+        params_batch = {
+            name: predicted_params[:, idx] for idx, name in enumerate(initial_params.keys())
+        }
 
-    # simulate dpl with predicted params
-    new_net = initial_net.copy()
+        # simulate dpl with predicted params
+        new_net = initial_net.copy()
 
-    def set_params_batch(a, b):
-        set_params(b, a)  # need to fix this
+        def set_params_batch(a, b):
+            set_params(b, a)  # need to fix this
 
-    batch_simulation = BatchSimulate(
-        net=new_net,
-        set_params=set_params_batch,
-        save_outputs=False,
-        save_dpl=True,
-        dt=obj_fun_kwargs.get("dt", 0.025),
-        n_trials=obj_fun_kwargs.get("n_trials", 1),
-        tstop=tstop,
-        overwrite=False,
-        clear_cache=False,
-        verbose=0,
-    )
+        batch_simulation = BatchSimulate(
+            net=new_net,
+            set_params=set_params_batch,
+            save_outputs=False,
+            save_dpl=True,
+            dt=obj_fun_kwargs.get("dt", 0.025),
+            n_trials=obj_fun_kwargs.get("n_trials", 1),
+            tstop=tstop,
+            overwrite=False,
+            clear_cache=False,
+            verbose=0,
+        )
 
-    res = batch_simulation.run(
-        params_batch,
-        n_jobs=obj_fun_kwargs.get("n_jobs", 50),
-        combinations=False,
-        backend="loky",
-        verbose=0,
-    )
+        res = batch_simulation.run(
+            params_batch,
+            n_jobs=obj_fun_kwargs.get("n_jobs", 50),
+            combinations=False,
+            backend="loky",
+            verbose=0,
+        )
 
-    dpls = list()
-    for batch_res in res["simulated_data"]:
-        for data in batch_res:
-            # smooth & scale all dipoles in this population (defined by n_trials)
-            if "scale_factor" in obj_fun_kwargs:
-                [
-                    trl_dpl.scale(obj_fun_kwargs["scale_factor"])
-                    for trl_dpl in data["dpl"]
-                ]
-            if "smooth_window_len" in obj_fun_kwargs:
-                [
-                    trl_dpl.smooth(obj_fun_kwargs["smooth_window_len"])
-                    for trl_dpl in data["dpl"]
-                ]
+        dpls = list()
+        for batch_res in res["simulated_data"]:
+            for data in batch_res:
+                # smooth & scale all dipoles in this population (defined by n_trials)
+                if "scale_factor" in obj_fun_kwargs:
+                    [
+                        trl_dpl.scale(obj_fun_kwargs["scale_factor"])
+                        for trl_dpl in data["dpl"]
+                    ]
+                if "smooth_window_len" in obj_fun_kwargs:
+                    [
+                        trl_dpl.smooth(obj_fun_kwargs["smooth_window_len"])
+                        for trl_dpl in data["dpl"]
+                    ]
 
-            # average dipoles per population
-            dpls.append(average_dipoles(data["dpl"]))
+                # average dipoles per population
+                dpls.append(average_dipoles(data["dpl"]))
 
-    obj = [_corr(dpl, obj_fun_kwargs["target"], tstop=tstop) for dpl in dpls]
-    obj_values.append(obj)
+        obj = [_corr(dpl, obj_fun_kwargs["target"], tstop=tstop) for dpl in dpls]
+    
+    else:
+        params = update_params(initial_params, predicted_params)
 
+        # simulate dpl with predicted params
+        new_net = initial_net.copy()
+        set_params(new_net, params)
+
+        dpls = simulate_dipole(new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"])
+
+        # smooth & scale
+        if "scale_factor" in obj_fun_kwargs:
+            [dpl.scale(obj_fun_kwargs["scale_factor"]) for dpl in dpls]
+        if "smooth_window_len" in obj_fun_kwargs:
+            [dpl.smooth(obj_fun_kwargs["smooth_window_len"]) for dpl in dpls]
+
+        dpl = average_dipoles(dpls)
+        obj = _corr(dpl, obj_fun_kwargs["target"], tstop=tstop)
+    
     print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
+    obj_values.append(obj)
 
     return obj

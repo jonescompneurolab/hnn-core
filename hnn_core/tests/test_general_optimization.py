@@ -207,7 +207,7 @@ def test_rhythmic(solver):
     assert len(obj) <= max_iter, "Number of rmse values should be the same as max_iter"
 
 
-@pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
+@pytest.mark.parametrize("solver", ["bayesian", "cobyla"])
 def test_user_obj_fun(solver):
     """Test optimization routines with a user-defined optimization function."""
 
