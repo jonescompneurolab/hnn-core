@@ -58,6 +58,8 @@ from hnn_core.parallel_backends import (
 )
 from hnn_core.params_default import get_L2Pyr_params_default, get_L5Pyr_params_default
 
+from ..externals.mne import _validate_type
+
 hnn_core_root = Path(hnn_core.__file__).parent
 default_network_configuration = hnn_core_root / "param" / "jones2009_base.json"
 
@@ -309,6 +311,21 @@ class HNNGUI:
         dpi=96,
         network_configuration=default_network_configuration,
     ):
+        _validate_type(total_height, types="int", item_name="total_height")
+        _validate_type(total_width, types="int", item_name="total_width")
+        _validate_type(header_height, types="int", item_name="header_height")
+        _validate_type(status_height, types="int", item_name="status_height")
+        _validate_type(
+            param_window_width_prop,
+            types="numeric",
+            item_name="param_window_width_prop",
+        )
+        _validate_type(
+            log_window_height_prop,
+            types="numeric",
+            item_name="log_window_height_prop",
+        )
+        _validate_type(dpi, types="int", item_name="dpi")
 
         # ----------------------------------------------------------------------
         # Structural overview of the GUI
@@ -1450,9 +1467,7 @@ class HNNGUI:
                 self.layout["parameters_window"].height,
                 self.layout["simulation_status_height"],
             ],
-            layout=Layout(
-                justify_content="center"
-            )
+            layout=Layout(justify_content="center"),
         )
 
         # add classes to "outer" containers
