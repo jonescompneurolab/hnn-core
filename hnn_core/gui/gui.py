@@ -1495,8 +1495,7 @@ class HNNGUI:
                 self.layout["parameters_window"].height,
                 self.layout["simulation_status_height"],
             ],
-            layout=Layout(justify_content="center"),
-        )
+        ).add_class("hnn-gui")
 
         # add classes to "outer" containers
         self.app_layout.left_sidebar.add_class("parameters-window")
@@ -1515,6 +1514,25 @@ class HNNGUI:
             return self.app_layout
 
     def custom_css_styling(self):
+        # style the AppLayout container
+        style_gui_container = HTML(
+            value="""
+            <style>
+                .hnn-gui {
+                    /*
+                        center the Applayout grid on the webpage. The addition of the
+                        "safe" parameter prevents the app from being cut off when the
+                        window size is smaller than the gui itself
+                    */
+                    justify-content: safe center !important;
+                }
+            </style>
+            """,
+            layout=Layout(display="none"),
+        )
+        display(style_gui_container)
+
+
         # add styling to children of param-tabs-widget-container
         param_tabs_styling = HTML(
             value="""
