@@ -1450,6 +1450,9 @@ class HNNGUI:
                 self.layout["parameters_window"].height,
                 self.layout["simulation_status_height"],
             ],
+            layout=Layout(
+                justify_content="center"
+            )
         )
 
         # add classes to "outer" containers
