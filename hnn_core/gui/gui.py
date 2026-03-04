@@ -525,6 +525,11 @@ class HNNGUI:
             # container for the log window
             #   - child of "parameters-window"
             #   - associated html class: "log-window"
+            # note: we use a margin on log-window to set the footer-gap here, as the
+            # gap is inserted between the inner container "log-window" and its parent
+            # container "parameters-window."" Adding the gap as a margin directly to
+            # parameters-window would also require recalculating the height of the
+            # container to accommodate the extra margin, since its height is fixed
             "log_window": Layout(
                 border="1px solid lightgray",
                 height=f"{int(log_window_height_prop * 100)}%",
@@ -539,12 +544,15 @@ class HNNGUI:
             # Container for simulation output and visualizations that occupies
             # the "right_sidebar" section in AppLayout
             #   - associated html class: "visualization-window"
+            # note: we set the footer-gap here by recalculating the height of
+            # visualization-window. Adding footer_gap as a margin, as done above for
+            # log-window above, would not shift the content up, as the container height
+            # is still specified in pixels. Rather, the margin on visualization-window
+            # would simply overflow into the footer
             "visualization_window": Layout(
                 width=f"{figures_window_width}px",
                 height=f"{main_content_height - footer_gap}px",
-                # border="1px solid lightgrey",
                 border="1px solid lightgrey",
-                # overflow="scroll",
             ),
             # child of visualization-window
             # downstream, this determines the dimensions of:
