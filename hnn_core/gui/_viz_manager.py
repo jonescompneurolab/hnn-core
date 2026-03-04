@@ -983,16 +983,15 @@ def _add_figure(
     b, widgets, data, fig_default_params, template_type, scale=0.95, dpi=96
 ):
     fig_idx = data["fig_idx"]["idx"]
-    # viz_output_layout = data["visualization_output"]  # TODO remove
 
     viz_window_width = int(data["visualization_window"].width[:-2])
     viz_window_height = int(data["visualization_window"].height[:-2])
-    viz_out_width_prct = int(data["visualization_output"].width[:-1])
-    viz_out_height_prct = int(data["visualization_output"].height[:-1])
+    viz_out_width_prct = int(data["viz_out_figsize"].width[:-1])
+    viz_out_height_prct = int(data["viz_out_figsize"].height[:-1])
     viz_out_width = int(viz_window_width * viz_out_width_prct / 100)
     viz_out_height = int(viz_window_height * viz_out_height_prct / 100)
 
-    fig_outputs = Output()
+    fig_outputs = Output().add_class("visualization-output")
     n_tabs = len(widgets["figs_tabs"].children)
 
     if n_tabs == 0:
@@ -1155,7 +1154,7 @@ class _VizManager:
             "simulations": self.gui_data["simulation_data"],
             "fig_idx": self.fig_idx,
             "visualization_window": self.viz_layout["visualization_window"],
-            "visualization_output": self.viz_layout["visualization_output"],
+            "viz_out_figsize": self.viz_layout["visualization_output_figsize"],
             "figs": self.figs,
         }
 

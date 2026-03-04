@@ -336,34 +336,46 @@ class HNNGUI:
         #   | left-sidebar | center | right-sidebar |
         #   | -------------- footer --------------- |
         #
-        # Throughout the following code, we add HTML classes to the key "containers"
-        # that hold all of our widgets, and to several of the widgets themselves.
-        # These HTML classes are sometimes used to apply custom styling to certain
-        # elements.
+        # Throughout the following code, we add HTML classes (i.e., "tags") to the key
+        # "containers" that hold all of our widgets, and to several of the widgets
+        # themselves. These HTML classes are sometimes used to apply custom styling to
+        # certain elements.
         #
         # Even when not used for styling, these HTML classes are extremely
         # valuable for debugging at the browser level when you need to inspect page
         # elements directly (via inspect) or programatically (via the console).
-        # This is largely due to the fact that ipywidgets and AppLayout necessarily
-        # add numerous layers of nested <div> elements (i.e., "tags") to the HTML tree
-        # when instantiating widgets, which would make it extremely difficult to
-        # ascertain which <div> elements our CSS style blocks are being applied to if
-        # we did not include custom HTML classes
+        #
+        #     > Note: the value of including custom HTML tags comes from the fact that
+        #       ipywidgets and AppLayout necessarily add numerous layers of nested
+        #       <div> elements (i.e.,"blocks") to the HTML tree when instantiating
+        #       widgets, which would make it extremely difficult to ascertain which
+        #       <div> elements we need to target with CSS without the use of HTML
+        #       tags to identify the relevant containers
         #
         # Using our custom class names in place of the AppLayout parameter names, the
-        # structure of the GUI can be written as follows:
+        # structure of the GUI can similarly be written as follows:
         #   | ----------------- title-bar ----------------- |
         #   |   parameters-window  | | visualization-window |
-        #   | --------------- sim-status-box -------------- |
+        #   | ----------------- status-bar ---------------- |
         #
-        # Note that we do not (currently) utilize the "center" AppLayout container,
-        # which is set to 0px in our AppLayout instantiation below
+        #     > Note that we do not (currently) utilize the "center" AppLayout
+        #       container, which is set to 0px in our AppLayout instantiation below
         #
-        # The title-bar and sim-status-box do not have "child" containers that hold
-        # widgets, but parameters-window and visualization-window do. Thus, we
-        # outline the structure of these "outer"-most containers below.
+        # The diagrams below outline the structure of these automatically-generated
+        # "outer" parent containers, with our included HTML tags
         #
-        # The general structure of parameters-window is as follows:
+        # The AppLayout header (title-bar)
+        #   ======================= title-bar =======================
+        #   ||                                                     ||
+        #   ||   ============== title-bar-contents =============   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ||             ~ contents here ~             ||   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ===============================================   ||
+        #   ||                                                     ||
+        #   =========================================================
+        #
+        # The AppLayout left-sidebar (parameters-window)
         #   =================== parameters-window ===================
         #   ||                                                     ||
         #   ||   ========== param-tabs-outer-container =========   ||
@@ -384,7 +396,7 @@ class HNNGUI:
         #   ||                                                     ||
         #   =========================================================
         #
-        # The general structure of visualization-window is as follows:
+        # The AppLayout right-sidebar (visualization-window)
         #   ================== visualization-window =================
         #   ||                                                     ||
         #   ||   ====== [[ nested, auto-generated tags ]] ======   ||
@@ -398,8 +410,19 @@ class HNNGUI:
         #   ||   ===============================================   ||
         #   ||                                                     ||
         #   =========================================================
-        # Note: the "fig-tabs" HTML class is applied when the Tab() container
-        # is initialized in _viz_manager.py, and not in gui.py
+        #     > Note: the "fig-tabs" HTML class is applied when the Tab() container
+        #       is initialized in _viz_manager.py, and not in gui.py
+        #
+        # The AppLayout footer (status-bar)
+        #   ====================== status-bar =======================
+        #   ||                                                     ||
+        #   ||   =============== sim-status-box ================   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ||             ~ contents here ~             ||   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ===============================================   ||
+        #   ||                                                     ||
+        #   =========================================================
         #
         # Keep in mind that there are many more HTML tags used that listed in the
         # diagrams above; these are merely the tags that are used to specify the
@@ -424,7 +447,7 @@ class HNNGUI:
         figures_window_width = int(total_width - parameters_window_width)
         main_content_height = total_height - status_height
 
-        # specify the gap between the footer ("sim-status-box") and the containers
+        # specify the gap between the footer ("status-bar") and the containers
         # above it
         footer_gap = 10
 
@@ -557,9 +580,10 @@ class HNNGUI:
             # ==================================================
             # Styling for "visualization-window" and its children
             # ==================================================
-            # Container for simulation output and visualizations that occupies
+            # container for simulation output and visualizations that occupies
             # the "right_sidebar" section in AppLayout
             #   - associated html class: "visualization-window"
+            #
             # note: we set the footer-gap here by recalculating the height of
             # visualization-window. Adding footer_gap as a margin, as done above for
             # log-window above, would not shift the content up, as the container height
@@ -570,25 +594,29 @@ class HNNGUI:
                 height=f"{main_content_height - footer_gap}px",
                 border="1px solid lightgrey",
             ),
-            # child of visualization-window
-            # downstream, this determines the dimensions of:
-            #   a. the static figure image: <img src="data:img/png;base64,...>", OR
-            #   b. the dynamic figure: <div class="jupyter-matplotlib-figure">
-            # Note: figure sizes are set in _add_figure in _viz_manager, where
-            # percents are converted to pixels
-            #   - associated html class: ""
-            "visualization_output": Layout(
+            #
+            # directly set figsize for the matplotlib figure in the Output()
+            # blocks of visualization-window
+            #   - child of visualization-window > visualization-output > ... >
+            #     ( <img src=...> | <div class="jupyter-matplotlib-figure"...>)
+            #   - associated html class: NA
+            #
+            # note: figure sizes are set in _add_figure in _viz_manager, where
+            # percents are converted to pixels. This CSS block sets the dimensions
+            # for both static figure outputs (<img src="data:img/png;base64,...>")
+            # AND for dynamic figure outputs (<div class="jupyter-matplotlib-figure">)
+            "visualization_output_figsize": Layout(
                 width="100%",
                 height="95%",
-                border="1px solid lightgray",
-                # overflow="scroll",
             ),
         }
 
         # Set up for the simulation status bar
         # ----------------------------------------------------------------------
-        # we directly set up the html for "status-bar" below
+        # we directly set up the html for the status bar below
         # this dict is referenced in _init_ui_components and run_button_clicked
+        #   - child of status-bar
+        #   - associated html class: sim-status-box
         self._simulation_status_contents = {
             "not_running": """
                 <div
@@ -1019,7 +1047,7 @@ class HNNGUI:
 
         self._header = HTML(
             value=f"""
-                <div class="title-bar" style='
+                <div class="title-bar-contents" style='
                     background:{self.layout["theme_color"]};
                     text-align:center;
                     color:white;
@@ -1069,7 +1097,7 @@ class HNNGUI:
     def analysis_config(self):
         """Provides everything viz window needs except for the data."""
         return {
-            "viz_style": self.layout["visualization_output"],
+            "viz_style": self.layout["visualization_output_figsize"],
             # widgets
             "plot_outputs": self.plot_outputs_dict,
             "plot_dropdowns": self.plot_dropdown_types_dict,
@@ -2128,7 +2156,7 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
         adjust_topbar_margin = HTML(
             value="""
             <style>
-                .title-bar {
+                .title-bar-contents {
                     margin: 0px !important;
                 }
             </style>
@@ -2298,7 +2326,7 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                 /* ------------------------------------------- */
 
                 /* set title bar to dark mode theme */
-                .dark-mode .title-bar .widget-html-content div {
+                .dark-mode .title-bar-contents {
                     background-color: var(--dm-theme) !important;
                     /* color: var(--dm-bg-primary) !important; */
                     color: #fff !important;
