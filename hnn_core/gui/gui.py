@@ -568,8 +568,10 @@ class HNNGUI:
             ),
         }
 
-        # direct HTML specification for the "status-bar"
-        # used in _init_ui_components and run_button_clicked
+        # Set up for the simulation status bar
+        # ----------------------------------------------------------------------
+        # we directly set up the html for "status-bar" below
+        # this dict is referenced in _init_ui_components and run_button_clicked
         self._simulation_status_contents = {
             "not_running": """
                 <div
@@ -618,7 +620,7 @@ class HNNGUI:
         }
 
         # ----------------------------------------------------------------------
-        # Parameters
+        # Set up the GUI widgets and their contents
         # ----------------------------------------------------------------------
         # load default parameters
         self.params = self.load_parameters(network_configuration)
@@ -632,63 +634,18 @@ class HNNGUI:
         # In-memory storage of all simulation and visualization related data
         self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
 
-        # Default visualization params for figures
+        # ==================================================
+        # Simulation tab
+        # ==================================================
+
+        # input fields for simulation parameters
         # --------------------------------------------------
-        default_param_properties = {
-            # container_width includes the space allocated for both the text and
-            # the input field
-            "container_width": Layout(width="300px"),
-            "text_width": {"description_width": "200px"},
-        }
-
-        self.widget_default_smoothing = BoundedFloatText(
-            value=30.0,
-            description="Dipole Smoothing:",
-            min=0.0,
-            max=100.0,
-            step=1.0,
+        self.widget_simulation_name = Text(
+            value="default",
+            placeholder="ID of your simulation",
+            description="Name:",
             disabled=False,
-            layout=default_param_properties["container_width"],
-            style=default_param_properties["text_width"],
         )
-
-        self.widget_default_scaling = FloatText(
-            value=3000.0,
-            description="Dipole Scaling:",
-            step=100.0,
-            disabled=False,
-            layout=default_param_properties["container_width"],
-            style=default_param_properties["text_width"],
-        )
-
-        self.widget_min_frequency = BoundedFloatText(
-            value=10,
-            min=0.1,
-            max=1000,
-            description="Min Spectral Frequency (Hz):",
-            disabled=False,
-            layout=default_param_properties["container_width"],
-            style=default_param_properties["text_width"],
-        )
-
-        self.widget_max_frequency = BoundedFloatText(
-            value=100,
-            min=0.1,
-            max=1000,
-            description="Max Spectral Frequency (Hz):",
-            disabled=False,
-            layout=default_param_properties["container_width"],
-            style=default_param_properties["text_width"],
-        )
-
-        self.fig_default_params = {
-            "default_smoothing": self.widget_default_smoothing.value,
-            "default_scaling": self.widget_default_scaling.value,
-            "default_min_frequency": self.widget_min_frequency.value,
-            "default_max_frequency": self.widget_max_frequency.value,
-        }
-
-        # Simulation parameters
         self.widget_tstop = BoundedFloatText(
             value=170, description="tstop (ms):", min=0, max=1e6, step=1, disabled=False
         )
@@ -701,22 +658,10 @@ class HNNGUI:
             disabled=False,
         )
         self.widget_ntrials = IntText(value=1, description="Trials:", disabled=False)
-        self.widget_simulation_name = Text(
-            value="default",
-            placeholder="ID of your simulation",
-            description="Name:",
-            disabled=False,
-        )
         self.widget_backend_selection = Dropdown(
             options=[("Joblib", "Joblib"), ("MPI", "MPI")],
             value=self._check_backend(),
             description="Backend:",
-        )
-        self.widget_mpi_cmd = Text(
-            value="mpiexec",
-            placeholder="Fill if applies",
-            description="MPI cmd:",
-            disabled=False,
         )
         self.widget_n_jobs = BoundedIntText(
             value=1,
@@ -725,6 +670,66 @@ class HNNGUI:
             description="Cores:",
             disabled=False,
         )
+        self.widget_mpi_cmd = Text(
+            value="mpiexec",
+            placeholder="Fill if applies",
+            description="MPI cmd:",
+            disabled=False,
+        )
+
+        # input fields for default visualization parameters
+        # --------------------------------------------------
+        default_param_properties = {
+            # container_width includes the space allocated for both the text and
+            # the input field
+            "container_width": Layout(width="300px"),
+            "text_width": {"description_width": "200px"},
+        }
+        self.widget_default_smoothing = BoundedFloatText(
+            value=30.0,
+            description="Dipole Smoothing:",
+            min=0.0,
+            max=100.0,
+            step=1.0,
+            disabled=False,
+            layout=default_param_properties["container_width"],
+            style=default_param_properties["text_width"],
+        )
+        self.widget_default_scaling = FloatText(
+            value=3000.0,
+            description="Dipole Scaling:",
+            step=100.0,
+            disabled=False,
+            layout=default_param_properties["container_width"],
+            style=default_param_properties["text_width"],
+        )
+        self.widget_min_frequency = BoundedFloatText(
+            value=10,
+            min=0.1,
+            max=1000,
+            description="Min Spectral Frequency (Hz):",
+            disabled=False,
+            layout=default_param_properties["container_width"],
+            style=default_param_properties["text_width"],
+        )
+        self.widget_max_frequency = BoundedFloatText(
+            value=100,
+            min=0.1,
+            max=1000,
+            description="Max Spectral Frequency (Hz):",
+            disabled=False,
+            layout=default_param_properties["container_width"],
+            style=default_param_properties["text_width"],
+        )
+        self.fig_default_params = {
+            "default_smoothing": self.widget_default_smoothing.value,
+            "default_scaling": self.widget_default_scaling.value,
+            "default_min_frequency": self.widget_min_frequency.value,
+            "default_max_frequency": self.widget_max_frequency.value,
+        }
+
+        # simulation tab buttons
+        # --------------------------------------------------
         self.load_data_button = FileUpload(
             accept=".txt,.csv",
             multiple=False,
@@ -733,19 +738,23 @@ class HNNGUI:
             description="Load data",
             button_style="success",
         )
-
-        # Create save simulation widget wrapper
-        self.save_simulation_button = self._init_html_download_button(
-            title="Save Simulation Output",
-            mimetype="text/csv",
-            btn_width=self.layout["save_btn"].width,
+        self.run_button = create_expanded_button(
+            "Run Simulation",
+            "success",
+            layout=self.layout["run_btn"],
+            button_color=self.layout["theme_color"],
         )
         self.save_config_button = self._init_html_download_button(
             title="Save Current Network and Drives",
             mimetype="application/json",
             btn_width=self.layout["save_btn"].width,
         )
-
+        self.save_simulation_button = self._init_html_download_button(
+            title="Save Simulation Output",
+            mimetype="text/csv",
+            btn_width=self.layout["save_btn"].width,
+        )
+        # the list that corresponds to save_simulation_button
         self.simulation_list_widget = Dropdown(
             options=["Simulation Output to Save"],
             value="Simulation Output to Save",
@@ -756,7 +765,65 @@ class HNNGUI:
                 min_width="0",  # forces text to truncate
             ),
         ).add_class("simulation-list-widget")
-        # Drive selection
+
+        # ==================================================
+        # Network tab
+        # ==================================================
+
+        self.load_connectivity_button = FileUpload(
+            accept=".json",
+            multiple=False,
+            style={"button_color": self.layout["theme_color"]},
+            description="Load local network connectivity",
+            layout=self.layout["btn_full_w"],
+            button_style="success",
+        )
+        self.cell_type_radio_buttons = RadioButtons(
+            options=["L2/3 Pyramidal", "L5 Pyramidal"], description="Cell type:"
+        )
+        self.cell_layer_radio_buttons = RadioButtons(
+            options=["Geometry", "Synapses", "Biophysics"],
+            description="Cell Properties:",
+        )
+
+        # instantiate empty list/dicts for storing network-related data
+        # --------------------------------------------------
+        # Connectivity tab
+        self.global_gain_widgets = dict()
+        self.connectivity_widgets = list()
+
+        # Cell parameters tab
+        self.cell_parameters_widgets = dict()
+
+        # ==================================================
+        # External drives tab
+        # ==================================================
+
+        # primary ("fixed") external drives tab buttons
+        # --------------------------------------------------
+        self.load_drives_button = FileUpload(
+            accept=".json",
+            multiple=False,
+            style={"button_color": self.layout["theme_color"]},
+            description="Load external drives",
+            layout=self.layout["btn"],
+            button_style="success",
+        )
+        self.add_drive_button = create_expanded_button(
+            "Add drive",
+            "primary",
+            layout=self.layout["btn"],
+            button_color=self.layout["theme_color"],
+        )
+        self.delete_drive_button = create_expanded_button(
+            "Delete all drives",
+            "success",
+            layout=self.layout["btn"],
+            button_color=self.layout["theme_color"],
+        )
+
+        # drive selection dropdown fields
+        # --------------------------------------------------
         self.widget_drive_type_selection = Dropdown(
             options=["Evoked", "Poisson", "Rhythmic", "Tonic"],
             value="Evoked",
@@ -773,76 +840,26 @@ class HNNGUI:
             layout=Layout(width="auto"),
             style={"description_width": "100px"},
         ).add_class("drive-location")
-        self.add_drive_button = create_expanded_button(
-            "Add drive",
-            "primary",
-            layout=self.layout["btn"],
-            button_color=self.layout["theme_color"],
-        )
 
-        # Dashboard level buttons
-        self.run_button = create_expanded_button(
-            "Run Simulation",
-            "success",
-            layout=self.layout["run_btn"],
-            button_color=self.layout["theme_color"],
-        )
-
-        self.load_connectivity_button = FileUpload(
-            accept=".json",
-            multiple=False,
-            style={"button_color": self.layout["theme_color"]},
-            description="Load local network connectivity",
-            layout=self.layout["btn_full_w"],
-            button_style="success",
-        )
-        self.load_drives_button = FileUpload(
-            accept=".json",
-            multiple=False,
-            style={"button_color": self.layout["theme_color"]},
-            description="Load external drives",
-            layout=self.layout["btn"],
-            button_style="success",
-        )
-
-        self.delete_drive_button = create_expanded_button(
-            "Delete all drives",
-            "success",
-            layout=self.layout["btn"],
-            button_color=self.layout["theme_color"],
-        )
-
-        self.cell_type_radio_buttons = RadioButtons(
-            options=["L2/3 Pyramidal", "L5 Pyramidal"], description="Cell type:"
-        )
-
-        self.cell_layer_radio_buttons = RadioButtons(
-            options=["Geometry", "Synapses", "Biophysics"],
-            description="Cell Properties:",
-        )
-
-        # Plotting window
+        # instantiate empty lists/widgets for storing drive-related data
         # --------------------------------------------------
-
-        # Visualization figure related dicts
-        self.plot_outputs_dict = dict()
-        self.plot_dropdown_types_dict = dict()
-        self.plot_sim_selections_dict = dict()
-
-        # Add drive section
         self.drive_widgets = list()
         self.drive_boxes = list()
         self.drive_accordion = Accordion()
 
-        # Connectivity list
-        self.connectivity_widgets = list()
+        # ==================================================
+        # Visualization tab
+        # ==================================================
 
-        # Cell parameter dict
-        self.cell_parameters_widgets = dict()
+        # instantiate empty dictionaries for storing visualization-related data
+        # --------------------------------------------------
+        self.plot_outputs_dict = dict()
+        self.plot_dropdown_types_dict = dict()
+        self.plot_sim_selections_dict = dict()
 
-        # Synaptic Gains dict
-        self.global_gain_widgets = dict()
-
+        # ----------------------------------------------------------------------
+        # Run initialization functions
+        # ----------------------------------------------------------------------
         self._init_ui_components()
         self.add_logging_window_logger()
 
