@@ -1809,7 +1809,6 @@ class HNNGUI:
 
                     /* style the tab container that holds the output */
                     .visualization-window .widget-tab-contents {
-                        /* border: 1px solid red !important; */  /* debug */
                         border: 1px solid lightgrey !important;
                         box-sizing: border-box !important;
                         margin: 0px !important;
