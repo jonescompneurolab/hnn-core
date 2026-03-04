@@ -747,12 +747,10 @@ class HNNGUI:
         self.save_config_button = self._init_html_download_button(
             title="Save Current Network and Drives",
             mimetype="application/json",
-            btn_width=self.layout["save_btn"].width,
         )
         self.save_simulation_button = self._init_html_download_button(
             title="Save Simulation Output",
             mimetype="text/csv",
-            btn_width=self.layout["save_btn"].width,
         )
         # the list that corresponds to save_simulation_button
         self.simulation_list_widget = Dropdown(
@@ -881,7 +879,6 @@ class HNNGUI:
         self,
         title,
         mimetype,
-        btn_width,
     ):
         b64 = base64.b64encode("".encode())
         payload = b64.decode()
@@ -904,7 +901,7 @@ class HNNGUI:
                 filename={""},
                 is_disabled="disabled",
                 btn_height=self.layout["run_btn"].height,
-                btn_width=btn_width,
+                btn_width=self.layout["save_btn"].width,
                 color_theme=self.layout["theme_color"],
                 title=title,
                 mimetype=mimetype,
