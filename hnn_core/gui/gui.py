@@ -2122,11 +2122,11 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
         )
         display(adjust_topbar_margin)
 
-        # the current "existing plots" logic is deeply tied to viz manager, but the
-        # information is actually duplicative with what's already in the figure
-        # legend, and the display logic massively clutters the axes subplots without
-        # adding any value. So I propose we simply hide it from view as done below,
-        # as trying to remove the box from viz manager yields errors
+        # viz_manager relies on the presence of the "existing-plots" HTML container
+        # in various parts of the code; however, the display for existing-plots
+        # is redundant and adds clutter to visualization window. Since its not
+        # obvious how to untangle viz_manager's dependence on this element (though
+        # we should do so in a new PR...), we can simply hide the widget from the user.
         hide_existing_plots = HTML(
             value="""
             <style>
