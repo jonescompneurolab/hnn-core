@@ -328,7 +328,7 @@ def test_rmse():
     )
 
     hnn_core_root = Path(hnn_core.__file__).resolve().parent
-    params_fname = hnn_core_root/ "param"/ "default.json"
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
 
     expected_rmse = 0.1

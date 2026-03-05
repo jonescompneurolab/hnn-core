@@ -32,13 +32,13 @@ from hnn_core.network_models import add_erp_drives_to_jones_model
 from hnn_core.viz import plot_dipole
 
 hnn_core_root = Path(hnn_core.__file__).parent
-params_fname = hnn_core_root/ "param" /"default.json"
+params_fname = hnn_core_root / "param" / "default.json"
 
 
 @pytest.fixture(scope="class")
 def base_network():
     """Base Network with connections and drives"""
-    params_fname =hnn_core_root/ "param"/"default.json"
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     net = Network(params, legacy_mode=False)
     # add some basic local network connectivity
@@ -1097,7 +1097,7 @@ def test_tonic_biases():
     hnn_core_root = Path(hnn_core.__file__).parent
 
     # default params
-    params_fname =hnn_core_root/ "param"/ "default.json"
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
 
     net = Network(params)
@@ -1237,7 +1237,7 @@ def test_network_mesh():
     hnn_core_root = Path(hnn_core.__file__).parent
 
     # default params
-    params_fname = hnn_core_root/ "param"/ "default.json"
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
 
     # Test custom mesh_shape

@@ -383,7 +383,7 @@ def test_read_run_tutorial_json():
         "hnn-data/refs/heads/main/"
         "network-configurations/ERPYes100Trials.json"
     )
-    net_fname = hnn_core_root/ "param"/ "ERPYes100Trials.json"
+    net_fname = hnn_core_root / "param" / "ERPYes100Trials.json"
     if not Path(net_fname).exists():
         urlretrieve(net_url, net_fname)
 

@@ -170,7 +170,7 @@ class TestParallelBackends:
     def test_terminate_mpibackend(self, run_hnn_core_fixture):
         """Test terminating MPIBackend from thread"""
         hnn_core_root = Path(hnn_core.__file__).parent
-        params_fname = hnn_core_root/ "param"/ "default.json"
+        params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
         params.update(
             {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
@@ -204,7 +204,7 @@ class TestParallelBackends:
     def test_run_mpibackend_oversubscribed(self, use_hwthreading_if_found):
         """Test running MPIBackend with oversubscribed number of procs"""
         hnn_core_root = Path(hnn_core.__file__).parent
-        params_fname = hnn_core_root/ "param"/ "default.json"
+        params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
         params.update(
             {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
@@ -304,7 +304,7 @@ class TestParallelBackends:
     ):
         """Test running MPIBackend with oversubscribed number of procs"""
         hnn_core_root = Path(hnn_core.__file__).parent
-        params_fname = hnn_core_root/"param"/"default.json"
+        params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
         params.update(
             {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}

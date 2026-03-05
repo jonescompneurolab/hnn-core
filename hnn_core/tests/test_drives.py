@@ -24,7 +24,7 @@ hnn_core_root = Path(hnn_core.__file__).parent
 @pytest.fixture
 def setup_net():
     hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root/ "param"/ "default.json"
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     net = jones_2009_model(params, mesh_shape=(3, 3))
 
@@ -219,8 +219,8 @@ def test_clear_drives(setup_net):
 
 def test_add_drives():
     """Test methods for adding drives to a Network."""
-    hnn_core_root =Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root/ "param"/ "default.json"
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     net = Network(params, legacy_mode=False)
 

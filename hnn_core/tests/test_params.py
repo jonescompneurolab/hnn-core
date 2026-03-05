@@ -18,7 +18,7 @@ hnn_core_root = Path(__file__).parents[1]
 
 def test_read_params():
     """Test reading of params object."""
-    params_fname = hnn_core_root/ "param"/ "default.json"
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     # Smoke test that network loads params
     _ = jones_2009_model(params, add_drives_from_params=True, legacy_mode=False)
@@ -29,7 +29,7 @@ def test_read_params():
     # unsupported extension
     pytest.raises(ValueError, read_params, "params.txt")
     # empty file
-    empty_fname = hnn_core_root/ "param"/ "empty.json"
+    empty_fname = hnn_core_root / "param" / "empty.json"
     with open(empty_fname, "w") as json_data:
         json.dump({}, json_data)
     pytest.raises(ValueError, read_params, empty_fname)
@@ -43,11 +43,11 @@ def test_read_legacy_params():
     param_url = (
         "https://raw.githubusercontent.com/hnnsolver/hnn-core/test_data/default.param"
     )
-    params_legacy_fname = hnn_core_root/ "param"/ "default.param"
+    params_legacy_fname = hnn_core_root / "param" / "default.param"
     if not Path(params_legacy_fname).exists():
         urlretrieve(param_url, params_legacy_fname)
 
-    params_new_fname = hnn_core_root/ "param"/ "default.json"
+    params_new_fname = hnn_core_root / "param" / "default.json"
     params_legacy = read_params(params_legacy_fname)
     params_new = read_params(params_new_fname)
 
@@ -70,7 +70,7 @@ def test_base_params():
         "https://raw.githubusercontent.com/jonescompneurolab/"
         "hnn-core/test_data/base.json"
     )
-    params_base_fname = hnn_core_root/ "param"/ "base.json"
+    params_base_fname = hnn_core_root / "param" / "base.json"
     if not Path(params_base_fname).exists():
         urlretrieve(param_url, params_base_fname)
 

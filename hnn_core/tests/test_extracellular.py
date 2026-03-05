@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 
 
 hnn_core_root = Path(hnn_core.__file__).parent
-params_fname = hnn_core_root/ "param"/ "default.json"
+params_fname = hnn_core_root / "param" / "default.json"
 params = read_params(params_fname)
 
 
@@ -267,7 +267,7 @@ def test_extracellular_backends(run_hnn_core_fixture):
 def test_rec_array_calculation():
     """Test LFP/CSD calculation."""
     hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname =hnn_core_root/ "param"/ "default.json"
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     params.update({"t_evprox_1": 7, "t_evdist_1": 17})
     net = jones_2009_model(params, mesh_shape=(3, 3), add_drives_from_params=True)
@@ -324,7 +324,7 @@ def test_rec_array_calculation():
 def test_extracellular_viz():
     """Test if deprecation warning is raised in plot_laminar_lfp."""
     hnn_core_root = Path(hnn_core.__file__).parent
-    params_fname = hnn_core_root/ "param"/"default.json"
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     params.update({"t_evprox_1": 7, "t_evdist_1": 17})
     net = jones_2009_model(params, mesh_shape=(3, 3), add_drives_from_params=True)
