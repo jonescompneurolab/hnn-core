@@ -500,7 +500,7 @@ def _run_opt_cma(
     # I think that's also why you had to add the max(0.01, ...) for sigma in set_params_opt_drives
     # _b_obj_func = cma.BoundDomainTransform(_obj_func, constraints)  # evaluates fun only in the bounded domain
 
-    sigma = 1 / (np.array(constraints[1]) - np.array(constraints[0]))
+    sigma = 0.25 * (np.array(constraints[1]) - np.array(constraints[0]))
     es = cma.CMAEvolutionStrategy(
         list(initial_params.values()),
         1,
