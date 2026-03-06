@@ -343,7 +343,7 @@ class HNNGUI:
         #
         # Even when not used for styling, these HTML classes are extremely
         # valuable for debugging at the browser level when you need to inspect page
-        # elements directly (via inspect) or programatically (via the console).
+        # elements directly (via inspect) or programmatically (via the console).
         #
         #     > Note: the value of including custom HTML tags comes from the fact that
         #       ipywidgets and AppLayout necessarily add numerous layers of nested
