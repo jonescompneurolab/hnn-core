@@ -366,37 +366,37 @@ def get_L2Pyrhuman_params():
         "L2Pyr_gabab_type": "gabab",
         # Biophysics soma
         "L2Pyr_soma_gbar_NaTs2_t_32d": 20_400e-4 * 1.2,
-        "L2Pyr_soma_gbar_SKv3_1": 6_930e-4,
+        "L2Pyr_soma_gbar_SKv3_1": 6_930e-4*1.5,
         "L2Pyr_soma_gbar_Nap_Et2": 1e-4 / 2 * 0,
         "L2Pyr_soma_gbar_SK_E2": 3.0e-05,
         "L2Pyr_soma_gbar_Ca_HVA": 9.92e-04,
         "L2Pyr_soma_gbar_Ca_LVAst": 34.3e-4,
-        "L2Pyr_soma_gbar_Ih": 0.000080 / 2,
+        "L2Pyr_soma_gbar_Ih": 0.000080*2,
         "L2Pyr_soma_gbar_Im": 8e-3 * 0.05,
-        "L2Pyr_soma_g_pas": 1.0 / 15000,
+        "L2Pyr_soma_g_pas": 1.0 / 37000,
         "L2Pyr_soma_e_pas": -75,
         "L2Pyr_soma_decay_CaDynamics_E2": 90,
         "L2Pyr_soma_gamma_CaDynamics_E2": 0.000533,
         # Biophysics basal
         "L2Pyr_basal_gbar_NaTs2_t_32d": 0.008009,
         "L2Pyr_basal_gbar_SKv3_1": 0.000513,
-        "L2Pyr_basal_gbar_Ih": 0.00008 / 2,
-        "L2Pyr_basal_g_pas": 1.0 / 13000.0,  # default read out from neuron
+        "L2Pyr_basal_gbar_Ih": 0.00008*2,
+        "L2Pyr_basal_g_pas": 1.0 / 37000,  # default read out from neuron
         "L2Pyr_basal_e_pas": -75,
         "L2Pyr_basal_decay_CaDynamics_E2": 70,
         "L2Pyr_basal_gamma_CaDynamics_E2": 0.000533 * 2.5,
         # Biophysics dends
-        "L2Pyr_dend_gbar_NaTa_t_32d": 0.008 * 0.0001,
-        "L2Pyr_dend_gbar_SKv3_1": 0.003 * 3,
+        "L2Pyr_dend_gbar_NaTa_t_32d": 0.008 * 0.01,
+        "L2Pyr_dend_gbar_SKv3_1": 0.003 * 4,
         "L2Pyr_dend_gbar_Ca_HVA": 0.00001,
         "L2Pyr_dend_gbar_Ca_LVAst": 0.0000001,
-        "L2Pyr_dend_gbar_Ih": 0.000080,
+        "L2Pyr_dend_gbar_Ih": 0.00008,
         "L2Pyr_dend_gbar_Im": 0.0009 * 0.0001,
         "L2Pyr_dend_gbar_SK_E2": 3.0e-06,
-        "L2Pyr_dend_g_pas": 1.0 / 9000,
+        "L2Pyr_dend_g_pas": 1.0 / 37000,
         "L2Pyr_dend_e_pas": -75,
-        "L2Pyr_dend_decay_CaDynamics_E2": 50,
-        "L2Pyr_dend_gamma_CaDynamics_E2": 0.0005096,
+        "L2Pyr_dend_decay_CaDynamics_E2": 70,
+        "L2Pyr_dend_gamma_CaDynamics_E2":  0.00053300*2.5
     }
 
 

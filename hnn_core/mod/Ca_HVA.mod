@@ -1,6 +1,7 @@
 :Comment :
 :Reference : :		Reuveni, Friedman, Amitai, and Gutnick, J.Neurosci. 1993
 
+
 NEURON	{
 	SUFFIX Ca_HVA
 	USEION ca READ eca WRITE ica
