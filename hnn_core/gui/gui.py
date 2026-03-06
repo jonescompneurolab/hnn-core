@@ -531,8 +531,8 @@ class HNNGUI:
             # contents for each tab, which are separate <div> trees under
             # param-tabs-outer-container
             #   - child of "parameters-window" > "param_tabs_outer_container"
-            #   - associated html class: "param-tabs-widget-container"
-            "param_tabs_widget_container": Layout(
+            #   - associated html class: "param-window-tabs-widget"
+            "param_window_tabs_widget": Layout(
                 width="98%",
                 height="98%",
                 margin="0px 0px 0px 0px",
@@ -542,19 +542,19 @@ class HNNGUI:
             # widget, and does not include the tab bar. It sets the boundary
             # *exclusively* for the contents of the Simulation tab
             #   - child of "parameters-window" > "param_tabs_outer_container" >
-            #     "param-tabs-widget-container" > "widget-tab-contents"
-            #   - associated html class: "simulation-container"
+            #     "param-window-tabs-widget" > "widget-tab-contents"
+            #   - associated html class: "simulation-tab-contents"
             # note that "widget-tab-contents" is an auto-generated container that
             # we do not specifically tag, but it is often used in conjunction with
             # the parent or child container for targeted CSS styling
-            "sim_container": Layout(
+            "simulation_tab_contents": Layout(
                 width="100%",
                 height="100%",
             ),
             #
             # styles the text boxes within the collapsible widgets that contain the
             # instantiated drives in the External Drives tab
-            #   - child of "parameters-window" > ... > "drive-container" >
+            #   - child of "parameters-window" > ... > "drive-tab-contents" >
             #     "widget-output" > ... > "widget-vbox"
             "drive_textbox": Layout(
                 width="270px",
@@ -967,10 +967,10 @@ class HNNGUI:
         part.
         """
         # dynamic larger components
-        self._drives_out = Output()  # tab to add new drives
-        self._connectivity_out = Output()  # tab to tune connectivity.
-        self._cell_params_out = Output()
-        self._global_gain_out = Output()
+        self._drives_out = Output().add_class("external-drives-widgets")
+        self._connectivity_out = Output().add_class("connectivity-weights-widgets")
+        self._cell_params_out = Output().add_class("cell-parameters-widgets")
+        self._global_gain_out = Output().add_class("connectivity-gains-widgets")
 
         self._log_out = Output()
 
@@ -1288,28 +1288,12 @@ class HNNGUI:
         with self._drives_out:
             display(self.drive_accordion)
 
-    def compose(self, return_layout=True):
-        """Compose widgets.
+    def build_sim_tab_contents(self):
+        """Build the Simulation tab contents"""
 
-        Parameters
-        ----------
-        return_layout : bool
-            If the method returns the layout object which can be rendered by
-            IPython.display.display() method.
-        """
-        box_style = """
-            style="
-                background: gray;
-                color: white;
-                # font-weight: bold;
-                width: 290px;
-                padding: 0px 5px;
-                margin-bottom: 2px;
-            "
-        """
         simulation_box = VBox(
             [
-                HTML(f"<div {box_style}>Simulation Parameters</div>"),
+                HTML("Simulation Parameters").add_class("sim-tab-titles"),
                 VBox(
                     [
                         self.widget_simulation_name,
@@ -1320,10 +1304,11 @@ class HNNGUI:
                         self._backend_config_out,
                     ]
                 ),
+                # the dynamic-spacer can shrink/grow based on available space to
+                # help prevent any "smushing" or overlap that may appear on some
+                # OS/browser combinations but not others
                 Box().add_class("dynamic-spacer"),
-                HTML(
-                    f"<div {box_style}'>Default Visualization Parameters</div>",
-                ),
+                HTML("Default Visualization Parameters").add_class("sim-tab-titles"),
                 VBox(
                     [
                         self.widget_default_smoothing,
@@ -1351,41 +1336,28 @@ class HNNGUI:
                         HBox(
                             [
                                 self.save_simulation_button,
-                                HTML(
-                                    value="""
-                                    <style>
-                                    /* add left margin to the dropdown widget */
-                                        .simulation-list-widget {
-                                            margin-left: 6px !important;
-                                        }
-                                    </style>
-                                    """,
-                                    layout=Layout(display="none"),
-                                ),
                                 self.simulation_list_widget,
                             ],
                             layout=Layout(align_items="center"),
                         ),
                     ],
                     layout=Layout(
-                        # don't grow, *do* shrink, use auto height
+                        # don't grow, *do* allow shrink, use auto height
                         flex="0 1 auto",
                     ),
                 ).add_class("sim-tab-buttons"),
             ],
-            layout=self.layout["sim_container"],
-        ).add_class("simulation-container")
+            layout=self.layout["simulation_tab_contents"],
+        ).add_class("simulation-tab-contents")
 
-        # Displays the default backend options
-        handle_backend_change(
-            self.widget_backend_selection.value,
-            self._backend_config_out,
-            self.widget_mpi_cmd,
-            self.widget_n_jobs,
-        )
+        return simulation_box
 
-        connectivity_configuration = Tab().add_class("network-container")
+    def build_network_tab_contents(self):
+        """build the Network tab contents"""
 
+        network_tab_contents = Tab().add_class("network-tab-contents")
+
+        # build Connectivity tab contents
         connectivity_box = VBox(
             [
                 HBox(
@@ -1398,27 +1370,44 @@ class HNNGUI:
                         self._global_gain_out,
                     ]
                 ),
+                # the toggle widgets for the weights for each connection
                 self._connectivity_out,
             ]
         ).add_class("connectivity-params")
 
-        cell_parameters = VBox(
+        # build Cell parameters tab contents
+        cell_parameters_box = VBox(
             [
                 HBox([self.cell_type_radio_buttons, self.cell_layer_radio_buttons]),
                 self._cell_params_out,
             ]
         ).add_class("cell-params")
 
-        connectivity_configuration.children = [
+        # build the Network tab from its constituent components
+        network_tab_contents.children = [
             connectivity_box,
-            cell_parameters,
+            cell_parameters_box,
         ]
-        connectivity_configuration.titles = [
+        # label the sub tabs
+        network_tab_contents.titles = [
             "Connectivity",
             "Cell parameters",
         ]
 
-        drive_selections = VBox(
+        return network_tab_contents
+
+    def build_drive_tab_contents(self):
+        """build the External Drives tab contents"""
+
+        drive_load_delete_container = VBox(
+            [
+                self.load_drives_button,
+                self.delete_drive_button,
+            ],
+            layout=Layout(flex="1"),
+        )
+
+        drive_add_container = VBox(
             [
                 self.add_drive_button,
                 self.widget_drive_type_selection,
@@ -1427,37 +1416,49 @@ class HNNGUI:
             layout=Layout(flex="1"),
         )
 
-        drives_options = VBox(
+        # container to hold all contents of the External Drives tab
+        drive_tab_contents = VBox(
             [
+                # buttons / input fields for managing drives
                 HBox(
                     [
-                        VBox(
-                            [
-                                self.load_drives_button,
-                                self.delete_drive_button,
-                            ],
-                            layout=Layout(flex="1"),
-                        ),
-                        drive_selections,
+                        drive_load_delete_container,
+                        drive_add_container,
                     ]
                 ),
+                # the toggle widgets for each of the individual drives
                 self._drives_out,
             ]
-        ).add_class("drive-container")
+        ).add_class("drive-tab-contents")
 
-        config_panel, figs_output = self.viz_manager.compose()
+        return drive_tab_contents
 
-        # Tabs for left pane
-        left_tab = Tab()
+    def build_parameters_window(self):
+        """
+        build parameters-window (to occupy AppLayout's left_sidebar)
+        """
 
-        left_tab.layout = self.layout["param_tabs_widget_container"]
+        # initialize the Vbox objects that contain the contents of the primary GUI
+        # tabs: Simulation, Network, External Drives, and Visualization
+        simulation_tab_contents = self.build_sim_tab_contents()
+        network_tab_contents = self.build_network_tab_contents()
+        drive_tab_contents = self.build_drive_tab_contents()
+        visualization_tab_contents = self.viz_manager.build_viz_tab_contents()
 
-        left_tab.children = [
-            simulation_box,
-            connectivity_configuration,
-            drives_options,
-            config_panel,
+        # build the param_window_tabs_widget Tab() object, which holds both the
+        # tab bar *and* the associated contents for each tab
+        param_window_tabs_widget = Tab().add_class("param-window-tabs-widget")
+        param_window_tabs_widget.layout = self.layout["param_window_tabs_widget"]
+
+        # assign tab contents
+        param_window_tabs_widget.children = [
+            simulation_tab_contents,
+            network_tab_contents,
+            drive_tab_contents,
+            visualization_tab_contents,
         ]
+
+        # loop through tabs and set the title
         titles = (
             "Simulation",
             "Network",
@@ -1465,25 +1466,60 @@ class HNNGUI:
             "Visualization",
         )
         for idx, title in enumerate(titles):
-            left_tab.set_title(idx, title)
-            left_tab.add_class("param-tabs-widget-container")
+            param_window_tabs_widget.set_title(idx, title)
+
+        # build parameters window from constituent components
+        parameters_window = VBox(
+            [
+                VBox(
+                    [param_window_tabs_widget],
+                    layout=self.layout["param_tabs_outer_container"],
+                ).add_class("param-tabs-outer-container"),
+                self._log_window,
+            ],
+            layout=self.layout["parameters_window"],
+        )
+
+        return parameters_window
+
+    def compose(self, return_layout=True):
+        """Build the GUI and its widgets
+
+        Parameters
+        ----------
+        return_layout : bool
+            If the method returns the layout object which can be rendered by
+            IPython.display.display() method.
+        """
+
+        # setup
+        # --------------------------------------------------
 
         # add custom CSS and JS to the DOM before AppLayout is called so that
         # the style is applied before the widget is rendered
         self.custom_css_styling()
 
+        # handle display of backend options and associated input boxes
+        #   - an additional input field "MPI cmd" appears when the MPI backend is
+        #     selected and disappears when "Joblib" is selected
+        handle_backend_change(
+            self.widget_backend_selection.value,
+            self._backend_config_out,
+            self.widget_mpi_cmd,
+            self.widget_n_jobs,
+        )
+
+        # build parameters-window and visualization-window
+        parameters_window = self.build_parameters_window()
+        visualization_window = self.viz_manager.build_visualization_window()
+
+        # build the GUI from its constituent components
+        # --------------------------------------------------
+
         self.app_layout = AppLayout(
             header=self._header,
-            left_sidebar=VBox(
-                [
-                    VBox(
-                        [left_tab], layout=self.layout["param_tabs_outer_container"]
-                    ).add_class("param-tabs-outer-container"),
-                    self._log_window,
-                ],
-                layout=self.layout["parameters_window"],
-            ),
-            right_sidebar=figs_output,
+            left_sidebar=parameters_window,
+            right_sidebar=visualization_window,
             footer=self._simulation_status_bar,
             pane_widths=[
                 self.layout["parameters_window"].width,
@@ -1497,12 +1533,13 @@ class HNNGUI:
             ],
         ).add_class("hnn-gui")
 
-        # add classes to "outer" containers
+        # add classes to the "outer-most" containers / AppLayout gridboxes
         self.app_layout.left_sidebar.add_class("parameters-window")
         self.app_layout.right_sidebar.add_class("visualization-window")
         self.app_layout.header.add_class("title-bar")
         self.app_layout.footer.add_class("status-bar")
 
+        # initialize link callbacks to UI components
         self._link_callbacks()
 
         # initialize drive and connectivity ipywidgets
@@ -1532,8 +1569,7 @@ class HNNGUI:
         )
         display(style_gui_container)
 
-
-        # add styling to children of param-tabs-widget-container
+        # add styling to children of param-window-tabs-widget
         param_tabs_styling = HTML(
             value="""
             <style>
@@ -1541,12 +1577,12 @@ class HNNGUI:
                     ensure the border around the container that holds the tabs
                     themselves takes up no space, i.e. 0px
                 */
-                .param-tabs-widget-container .widget-tab-bar {
+                .param-window-tabs-widget .widget-tab-bar {
                     border: 0px solid lightgrey;
                 }
 
                 /* set the border color for the individual tabs */
-                .param-tabs-widget-container .lm-TabBar-tab {
+                .param-window-tabs-widget .lm-TabBar-tab {
                     border-color: lightgrey !important;
                 }
 
@@ -1556,7 +1592,7 @@ class HNNGUI:
                     bottom border around the inactive tabs (with the active tab
                     not having a bottom border)
                 */
-                .param-tabs-widget-container .widget-tab-contents {
+                .param-window-tabs-widget .widget-tab-contents {
                     border: 1px solid lightgrey !important;
                 }
 
@@ -1567,7 +1603,7 @@ class HNNGUI:
                     are the first child of .lm-TabBar-content to ensure none of
                     the nested tabs grow
                 */
-                .param-tabs-widget-container > .widget-tab-bar >
+                .param-window-tabs-widget > .widget-tab-bar >
                 .lm-TabBar-content > .lm-TabBar-tab {
                     flex-grow: 1 !important;
                 }
@@ -1576,11 +1612,11 @@ class HNNGUI:
                 adjust bottom-padding around widget-tab-contents
 
                 bonus: optionally target a single tab (e.g., the first tab) with...
-                .param-tabs-widget-container >
+                .param-window-tabs-widget >
                 .widget-tab-bar:has(.lm-TabBar-tab:nth-child(1).lm-mod-current) +
                 .widget-tab-contents
             */
-            .param-tabs-widget-container >
+            .param-window-tabs-widget >
             .widget-tab-contents {
                 padding-bottom: 10px !important;
             }
@@ -1596,7 +1632,7 @@ class HNNGUI:
         make_subtabs_sticky = HTML(
             value="""
             <style>
-                .network-container {
+                .network-tab-contents {
                     height: 99% !important;
                     flex: none !important;
                 }
@@ -1748,7 +1784,7 @@ class HNNGUI:
                     check if its 3rd tab (external drives) is active
                     selectively style the contents container for that tab
                 */
-                .param-tabs-widget-container >
+                .param-window-tabs-widget >
                 .widget-tab-bar:has(.lm-TabBar-tab:nth-child(3).lm-mod-current) +
                 .widget-tab-contents {
                     scrollbar-gutter: stable !important;
@@ -1757,7 +1793,7 @@ class HNNGUI:
                 }
 
                 /* same for 4th tab (visualization) */
-                .param-tabs-widget-container >
+                .param-window-tabs-widget >
                 .widget-tab-bar:has(.lm-TabBar-tab:nth-child(4).lm-mod-current) +
                 .widget-tab-contents {
                     scrollbar-gutter: stable !important;
@@ -1765,7 +1801,7 @@ class HNNGUI:
                     padding-right: 10px !important;
                 }
 
-                .network-container > .widget-tab-contents {
+                .network-tab-contents > .widget-tab-contents {
                     scrollbar-gutter: stable !important;
                     overflow-y: auto !important;
                     padding-right: 10px !important;
@@ -2274,12 +2310,42 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
         )
         display(adjust_dropdown_carets)
 
-        sim_tab_buttons = HTML(
+        sim_tab_adjustments = HTML(
             value="""
             <style>
-                .simulation-container,
-                .simulation-container .widget-hbox,
-                .simulation-container .widget-vbox {
+                /*
+                    style the text titles differentiating run parameters from
+                    default visualization parameters
+                */
+
+                .sim-tab-titles {
+                    background: gray;
+                    color: white;
+                    width: 300px;
+                    padding: 0px 5px;
+                    margin-bottom: 2px;
+                }
+
+                /*
+                    allow the space between sections to dynamically shrink/grow
+                    based on available space so elements don't overlap
+                */
+
+                .dynamic-spacer {
+                    flex: 1 1 auto !important;
+                    min-height: 4px !important;
+                    max-height: 15px !important;
+                }
+
+                /* add left margin to the dropdown widget for saving outputs */
+                .simulation-list-widget {
+                    margin-left: 6px !important;
+                }
+
+                /* adjust sim tab button properties to avoid overlap or overflow */
+                .simulation-tab-contents,
+                .simulation-tab-contents .widget-hbox,
+                .simulation-tab-contents .widget-vbox {
                     overflow: hidden !important;
                     box-sizing: border-box !important;
                 }
@@ -2287,23 +2353,21 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
             """,
             layout=Layout(display="none"),
         )
-        display(sim_tab_buttons)
+        display(sim_tab_adjustments)
 
-        dynamic_spacer = HTML(
+        make_fig_button = HTML(
             value="""
             <style>
-
-            .dynamic-spacer {
-                flex: 1 1 auto !important;
-                min-height: 4px !important;
-                max-height: 15px !important;
-            }
-
+                .make-fig-btn {
+                    flex: 1 1 auto !important;
+                    width: auto !important;
+                    margin: 2px 2px 2px 10px !important;
+                }
             </style>
             """,
             layout=Layout(display="none"),
         )
-        display(dynamic_spacer)
+        display(make_fig_button)
 
         dark_theme = HTML(
             value="""
@@ -2312,7 +2376,7 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                 .dark-mode {
                     --dm-bg-primary: #14181e;
                     --dm-bg-secondary: #313438;
-                    --dm-text-main: #d4d4d4;
+                    --dm-text-main: #dfdfdf;
                     --dm-border-color: #3e3e42;
                     --dm-theme: #ba83be;  /* note: same as textbook-light-purple */
                     --statusbar-running: #C88809;
@@ -2470,7 +2534,7 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                     whole section can be removed without interfering with any
                     functionality if we decide we would prefer to not have the
                     accent borders. There are three sub sections here handle:
-                        - param-tabs-widget-container
+                        - param-window-tabs-widget
                         - log-window
                         - visualization-window
                 */
@@ -2478,7 +2542,7 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                 /* set border for the tab contents */
                 /* ------------------------------ */
 
-                .dark-mode div.param-tabs-widget-container.param-tabs-widget-container
+                .dark-mode div.param-window-tabs-widget.param-window-tabs-widget
                 > .widget-tab-contents {
                     position: relative;
                     border: 2px solid var(--dm-theme) !important;
@@ -2488,14 +2552,14 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                     allow the TabBar to overflow, this will allow us to cover the
                     border created for the tab contents for the active tab
                 */
-                .dark-mode div.param-tabs-widget-container.param-tabs-widget-container
+                .dark-mode div.param-window-tabs-widget.param-window-tabs-widget
                 > .lm-TabBar {
                     position: relative;
                     overflow: visible !important;
                 }
 
                 /* set position and borders for active tab */
-                .dark-mode div.param-tabs-widget-container.param-tabs-widget-container
+                .dark-mode div.param-window-tabs-widget.param-window-tabs-widget
                 > .lm-TabBar:first-of-type .lm-TabBar-tab.lm-mod-current {
                     position: relative;
                     background-color: var(--tab-color) !important;
@@ -2514,7 +2578,7 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                     add the "mask" that covers the bottom border on the widget-contents
                     for the active tab
                 */
-                .dark-mode div.param-tabs-widget-container.param-tabs-widget-container
+                .dark-mode div.param-window-tabs-widget.param-window-tabs-widget
                 .lm-TabBar-tab.lm-mod-current::after {
                     content: '';
                     position: absolute;
@@ -2524,6 +2588,13 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                     height: 2px;
                     background-color: var(--tab-color) !important;
                     z-index: 4;
+                }
+
+                /* restore colors for the simulation tab titles */
+                .dark-mode .widget-html.sim-tab-titles {
+                    background-color: gray !important;
+                    color: white !important;
+
                 }
 
                 /* set border for the log window */

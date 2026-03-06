@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from IPython.display import display
 from ipywidgets import (
-    HTML,
     BoundedFloatText,
     Button,
     Dropdown,
@@ -1123,19 +1122,6 @@ class _VizManager:
         self.figs = {}
         self.gui_data = gui_data
 
-        # custom CSS injection
-        self.custom_css = HTML(
-            value="""
-                <style>
-                .make-fig-btn {
-                    flex: 1 1 auto !important;
-                    width: auto !important;
-                    margin: 2px 2px 2px 10px !important;
-                }
-            </style>
-            """
-        )
-
     @property
     def widgets(self):
         return {
@@ -1177,19 +1163,21 @@ class _VizManager:
             template_name = list(fig_templates.keys())[0]
         self._simulate_switch_fig_template(template_name)
 
-    def compose(self):
-        """Compose widgets."""
+    def build_visualization_window(self):
+        """build visualization-window (to occupy AppLayout's right_sidebar)"""
         with self.axes_config_output:
             display(self.axes_config_tabs)
         with self.figs_output:
             display(Label(_fig_placeholder))
 
-        display(self.custom_css)
-
-        fig_output_container = VBox(
+        visualization_window = VBox(
             [self.figs_output],
             layout=self.viz_layout["visualization_window"],
         )
+        return visualization_window
+
+    def build_viz_tab_contents(self):
+        """Compose Visualization tab and widgets"""
 
         config_sub_panel = HBox(
             [
@@ -1201,7 +1189,7 @@ class _VizManager:
             ),
         )
 
-        config_panel = VBox(
+        visualization_tab = VBox(
             [
                 VBox(
                     [
@@ -1217,7 +1205,8 @@ class _VizManager:
                 self.axes_config_output,
             ]
         ).add_class("visualization-tab")
-        return config_panel, fig_output_container
+
+        return visualization_tab
 
     def _layout_template_change(self, template_type):
         # check if plot set type requires loaded sim-data
