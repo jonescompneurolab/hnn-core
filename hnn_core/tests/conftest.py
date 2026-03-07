@@ -76,6 +76,8 @@ def run_hnn_core_fixture():
         n_procs=None,
         n_jobs=1,
         reduced=False,
+        mesh_shape=None,
+        add_drives=True,
         record_vsec=False,
         record_isec=False,
         record_ca=False,
@@ -91,18 +93,18 @@ def run_hnn_core_fixture():
         tstop = 170.0
         legacy_mode = True
         if reduced:
-            mesh_shape = (3, 3)
             params.update(
                 {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
             )
             tstop = 40.0
             legacy_mode = False
-        else:
-            mesh_shape = (10, 10)
+        if mesh_shape is None:
+            mesh_shape = (3, 3) if reduced else (10, 10)
+
         # Legacy mode necessary for exact dipole comparison test
         net = jones_2009_model(
             params,
-            add_drives_from_params=True,
+            add_drives_from_params=add_drives,
             legacy_mode=legacy_mode,
             mesh_shape=mesh_shape,
         )
@@ -144,9 +146,36 @@ def run_hnn_core_fixture():
         pickle.dumps(net)
 
         # number of trials simulated
-        for drive in net.external_drives.values():
-            assert len(drive["events"]) == params["N_trials"]
+        if net.external_drives:
+            for drive in net.external_drives.values():
+                assert len(drive["events"]) == params["N_trials"]
 
         return dpls, net
 
     return _run_hnn_core_fixture
+
+@pytest.fixture
+def network_fixture():
+    def _network_fixture(
+        reduced=False,
+        mesh_shape=None,
+        add_drives=False,
+    ):
+        hnn_core_root = op.dirname(hnn_core.__file__)
+        params_fname = op.join(hnn_core_root, "param", "default.json")
+        params = read_params(params_fname)
+        if reduced:
+            params.update(
+                {"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20, "N_trials": 2}
+            )
+        if mesh_shape is None:
+            mesh_shape = (3, 3) if reduced else (10, 10)
+
+        net = jones_2009_model(
+            params,
+            add_drives_from_params=add_drives,
+            mesh_shape=mesh_shape,
+        )
+        return net
+    return _network_fixture
+        
