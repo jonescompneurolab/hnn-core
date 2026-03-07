@@ -154,6 +154,7 @@ def run_hnn_core_fixture():
 
     return _run_hnn_core_fixture
 
+
 @pytest.fixture
 def network_fixture():
     def _network_fixture(
@@ -177,5 +178,5 @@ def network_fixture():
             mesh_shape=mesh_shape,
         )
         return net
+
     return _network_fixture
-        
