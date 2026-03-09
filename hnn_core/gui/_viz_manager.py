@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from IPython.display import display
 from ipywidgets import (
+    HTML,
     BoundedFloatText,
     Button,
     Dropdown,
@@ -28,7 +29,13 @@ from hnn_core.dipole import _rmse, average_dipoles
 from hnn_core.gui._logging import logger
 from hnn_core.viz import plot_dipole
 
-_fig_placeholder = "Run simulation to add figures here."
+#
+_fig_placeholder = HTML(
+    value="""
+        Visualizations will become available in this window after a simulation has been
+        run or data have been loaded
+    """
+).add_class("fig-placeholder")
 
 _plot_types = [
     "current dipole",
@@ -944,7 +951,7 @@ def _close_figure(b, widgets, data, fig_idx):
             if n_tabs == 0:
                 widgets["figs_output"].clear_output()
                 with widgets["figs_output"]:
-                    display(Label(_fig_placeholder))
+                    display(_fig_placeholder)
 
 
 def _add_axes_controls(widgets, data, fig_default_params, fig, axd):
@@ -1168,7 +1175,7 @@ class _VizManager:
         with self.axes_config_output:
             display(self.axes_config_tabs)
         with self.figs_output:
-            display(Label(_fig_placeholder))
+            display(_fig_placeholder)
 
         visualization_window = VBox(
             [self.figs_output],

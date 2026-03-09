@@ -1953,6 +1953,20 @@ class HNNGUI:
         )
         display(adjust_viz_window_spacing)
 
+        adjust_fig_placeholer = HTML(
+            value="""
+            <style>
+                .fig-placeholder .widget-html-content {
+                    color: #969696;
+                    font-size: 13px;
+                    margin-top: 6px;
+                    text-align: center;
+                }
+            </style>
+            """
+        )
+        display(adjust_fig_placeholer)
+
         adjust_viz_param_tab = HTML(
             value="""
             <style>
@@ -2428,6 +2442,11 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                     background-color: var(--dm-theme) !important;
                     /* color: var(--dm-bg-primary) !important; */
                     color: #fff !important;
+                }
+
+                /* adjust visualization window placeholder text */
+                .dark-mode .fig-placeholder .widget-html-content {
+                    color: #848484 !important;
                 }
 
                 /* restore transparent outer border when fig-tabs is not empty */
