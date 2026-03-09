@@ -1482,6 +1482,54 @@ class HNNGUI:
 
         return parameters_window
 
+    def custom_gui_styling(self):
+        """
+        Load custom CSS and JS for styling the GUI
+        """
+        gui_directory = Path(__file__).parent
+        css_path = gui_directory / "gui_styles.css"
+        js_path = gui_directory / "gui_scripts.js"
+
+        with open(css_path, "r") as f:
+            gui_styles = f.read()
+        with open(js_path, "r") as f:
+            gui_scripts = f.read()
+
+        # ----------------------------------------------------------------------
+        # JavaScript tags injected via HTML() (which is how IPywidgets updates
+        # the DOM) are not executed by browsers for security reasons. To get
+        # around this constraint, we use a 1x1 transparent GIF to trigger the "onload"
+        # event that follows it. this method may seem a bit "hacky", but it is
+        # actually a very commonly used trick for injecting scripts into IPywidgets.
+        # because "onload" is a "lifecycle event" of a valid asset (basically, a
+        # high-priority attribute that must be processed when rendering the web page),
+        # the browser is forced to execute the included JavaScript as soon as the
+        # widget is rendered. this gives us a reliable execution hook that
+        # is responsive to changes to the GUI (such as tabs being added or closed)
+        # ----------------------------------------------------------------------
+
+        # "escape" any double quotes in our JS code, which is needed since we insert
+        # our script file as a string via the HTML attribute onload="{gui_scripts}"
+        gui_scripts = gui_scripts.replace('"', "&quot;")
+
+        minimal_img_src = (
+            "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP"
+            + "///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+        )
+
+        custom_assets = f"""
+            <style>
+                {gui_styles}
+            </style>
+            <img
+                src="{minimal_img_src}"
+                onload="{gui_scripts}"
+                style="display:none;"
+            >
+        """
+
+        return custom_assets
+
     def compose(self, return_layout=True):
         """Build the GUI and its widgets
 
@@ -1497,7 +1545,9 @@ class HNNGUI:
 
         # add custom CSS and JS to the DOM before AppLayout is called so that
         # the style is applied before the widget is rendered
-        self.custom_css_styling()
+        # self.custom_css_styling()
+        custom_gui_styling = self.custom_gui_styling()
+        self._header.value = custom_gui_styling + self._header.value
 
         # handle display of backend options and associated input boxes
         #   - an additional input field "MPI cmd" appears when the MPI backend is
