@@ -977,7 +977,7 @@ class HNNGUI:
         self.viz_manager = _VizManager(self.data, self.layout, self.fig_default_params)
 
         # detailed configuration of backends
-        self._backend_config_out = Output()
+        self._backend_config_out = Output().add_class("backend-config-out")
 
         # static parts
         # Running status
@@ -2348,6 +2348,16 @@ yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
                 .simulation-tab-contents .widget-vbox {
                     overflow: hidden !important;
                     box-sizing: border-box !important;
+                }
+
+                /*
+                    there is an additional Output() box around "Core" and "MPI cmd"
+                    since the "MPI cmd" is dynamically inserted when the MPI backend
+                    is selected. We need to remove the margin around that extra box
+                    so that the input fields line up properly
+                */
+                .backend-config-out {
+                    margin: 0px !important;
                 }
             </style>
             """,
