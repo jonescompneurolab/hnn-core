@@ -1562,6 +1562,7 @@ class Network:
         amplitude,
         t0=0,
         tstop=None,
+        gid=None
     ):
         """Attaches parameters of tonic bias input for given cell types
 
@@ -1590,6 +1591,10 @@ class Network:
             The end time of tonic input (in ms). Default: end of simulation.
             This value will be applied to all the  tonic biases if
             multiple are specified with the `amplitude` keyword.
+        gid : int | list | None
+            Optionally specify gid(s) to which the tonic bias should be applied. 
+            If None (default), the bias will be applied to all cells of the specified cell type(s). 
+
         """
 
         # old functionality single cell type - amplitude
@@ -1612,6 +1617,7 @@ class Network:
                 amplitude=float(amplitude),
                 t_0=t0,
                 t_stop=tstop,
+                gid=gid
             )
         else:
             _validate_type(amplitude, dict, "amplitude")
@@ -1632,6 +1638,7 @@ class Network:
                     amplitude=_amplitude,
                     t_0=t0,
                     t_stop=tstop,
+                    gid=gid
                 )
 
     def _add_cell_type(self, cell_name, pos, cell_template=None):
@@ -2414,6 +2421,7 @@ def _add_cell_type_bias(
     bias_name="tonic",
     t_0=0,
     t_stop=None,
+    gid=None
 ):
     """Add a tonic bias to a specific cell type in the network.
 
@@ -2457,6 +2465,7 @@ def _add_cell_type_bias(
         "t0": t_0,
         "tstop": t_stop,
         "section": section,
+        "gid": gid
     }
 
     sections = list(network.cell_types[cell_type]["cell_object"].sections.keys())

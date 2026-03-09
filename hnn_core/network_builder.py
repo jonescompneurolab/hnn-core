@@ -477,9 +477,24 @@ class NetworkBuilder(object):
                 # add tonic biases
                 for bias in self.net.external_biases:
                     if src_type in self.net.external_biases[bias]:
-                        cell.create_tonic_bias(
-                            **self.net.external_biases[bias][src_type]
-                        )
+                        # if no specific GID specified for this bias, apply to all cells of the type
+                        if self.net.external_biases[bias][src_type]["gid"] is None:
+                            cell.create_tonic_bias(
+                                **self.net.external_biases[bias][src_type]
+                            )
+                        # if specific GIDs specified, check if this cell's GID is in the list and apply bias if so
+                        elif type(self.net.external_biases[bias][src_type]["gid"]) is list:
+                            if gid in self.net.external_biases[bias][src_type]["gid"]:
+                                cell.create_tonic_bias(
+                                    **self.net.external_biases[bias][src_type]
+                                )
+                        # if specific GID specified as int, apply bias if this cell's GID matches
+                        elif gid == self.net.external_biases[bias][src_type]["gid"]:
+                            cell.create_tonic_bias(
+                                **self.net.external_biases[bias][src_type]
+                            )
+
+                        # KD: need to come up with a test to make sure that there is an error if users define gids that are not in cell type range.
                 cell.record(record_vsec, record_isec, record_ca)
 
                 # this call could belong in init of a _Cell (with threshold)?
