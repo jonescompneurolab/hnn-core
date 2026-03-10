@@ -85,7 +85,7 @@ def _rmse_evoked(
 
         res = batch_simulation.run(
             params_batch,
-            n_jobs=obj_fun_kwargs.get("n_jobs", 50),
+            n_jobs=obj_fun_kwargs.get("n_jobs", 1),
             combinations=False,
             backend="loky",
             verbose=0,
@@ -224,7 +224,7 @@ def _maximize_psd(
 
         res = batch_simulation.run(
             params_batch,
-            n_jobs=obj_fun_kwargs.get("n_jobs", 50),
+            n_jobs=obj_fun_kwargs.get("n_jobs", 1),
             combinations=False,
             backend="loky",
             verbose=0,
@@ -408,7 +408,7 @@ def _corr_evoked(
 
         res = batch_simulation.run(
             params_batch,
-            n_jobs=obj_fun_kwargs.get("n_jobs", 50),
+            n_jobs=obj_fun_kwargs.get("n_jobs", 1),
             combinations=False,
             backend="loky",
             verbose=0,
