@@ -516,7 +516,7 @@ def _run_opt_cma(
     while not es.stop():
         solutions = es.ask()
         es.tell(solutions, _obj_func(solutions))
-        es.disp()
+        print
     es.result_pretty()
 
     # get best params

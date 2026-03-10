@@ -71,7 +71,7 @@ def _simulate_single_trial(net, tstop, dt, trial_idx):
         if net._verbose:
             print(f"Trial {trial_idx + 1}: {round(h.t, 2)} ms...")
 
-    if rank == 0 and net._verbose:
+    if rank == 0:
         for tt in range(0, int(h.tstop), 10):
             _CVODE.event(tt, simulation_time)
 
@@ -352,9 +352,9 @@ class NetworkBuilder(object):
         self._rank = _get_rank()
 
         # load mechanisms needs ParallelContext for get_rank
-        load_custom_mechanisms(self.net._verbose)
+        load_custom_mechanisms()
 
-        if self._rank == 0 and self.net._verbose:
+        if self._rank == 0:
             print("Building the NEURON model")
 
         self._clear_last_network_objects()
@@ -389,7 +389,7 @@ class NetworkBuilder(object):
         if len(self.net.rec_arrays) > 0:
             self._record_extracellular()
 
-        if self._rank == 0 and self.net._verbose:
+        if self._rank == 0:
             print("[Done]")
 
     def _gid_assign(self, rank=None, n_hosts=None):
