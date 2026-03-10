@@ -18,7 +18,6 @@ def jones_2009_model(
     add_drives_from_params=False,
     legacy_mode=False,
     mesh_shape=(10, 10),
-    verbose=False,
 ):
     """Instantiate the network model described in Jones et al. 2009
 
@@ -37,10 +36,6 @@ def jones_2009_model(
         are added suitably. Will be deprecated in a future release.
     mesh_shape : tuple of int (default: (10, 10))
         Defines the (n_x, n_y) shape of the grid of pyramidal cells.
-
-    verbose : bool
-        If True, set the hidden attribute ``net._verbose`` to True so
-        downstream builders print verbose output. Default: False
 
     Returns
 
@@ -149,12 +144,7 @@ def jones_2009_model(
         mesh_shape=mesh_shape,
         pos_dict=pos_dict,
         cell_types=cell_types,
-        verbose=verbose,
     )
-
-    # Hidden flag used by downstream builders to control verbose output.
-    # Set from the `verbose` argument so callers can control verbosity.
-    # net._verbose = bool(verbose)
 
     delay = net.delay
 
@@ -280,7 +270,6 @@ def law_2021_model(
     add_drives_from_params=False,
     legacy_mode=False,
     mesh_shape=(10, 10),
-    verbose=False,
 ):
     """Instantiate the expansion of Jones 2009 model to study beta
     modulated ERPs as described in
@@ -320,7 +309,6 @@ def law_2021_model(
         add_drives_from_params,
         legacy_mode,
         mesh_shape=mesh_shape,
-        verbose=False,
     )
 
     # Update biophysics (increase gabab duration of inhibition)
@@ -374,7 +362,6 @@ def calcium_model(
     add_drives_from_params=False,
     legacy_mode=False,
     mesh_shape=(10, 10),
-    verbose=False,
 ):
     """Instantiate the Jones 2009 model with improved calcium dynamics in
     L5 pyramidal neurons. For more details on changes to calcium dynamics
@@ -414,7 +401,6 @@ def calcium_model(
         add_drives_from_params,
         legacy_mode,
         mesh_shape=mesh_shape,
-        verbose=verbose,
     )
 
     # Replace L5 pyramidal cell template with updated calcium

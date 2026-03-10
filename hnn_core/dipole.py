@@ -24,6 +24,7 @@ def simulate_dipole(
     record_isec=False,
     record_ca=False,
     postproc=False,
+    verbose=True,
 ):
     """Simulate a dipole given the experiment parameters.
 
@@ -56,6 +57,9 @@ def simulate_dipole(
         extracellular recordings etc. The preferred way is to use the
         :meth:`~hnn_core.dipole.Dipole.smooth` and
         :meth:`~hnn_core.dipole.Dipole.scale` methods instead. Default: False.
+    verbose : bool
+        If True, set the hidden attribute ``net._verbose`` to True so
+        downstream builders print verbose output. Default: True.
 
     Returns
     -------
@@ -127,6 +131,9 @@ def simulate_dipole(
             "smoothing and scaling explicitly using Dipole methods.",
             DeprecationWarning,
         )
+
+    net._verbose = verbose
+
     dpls = _BACKEND.simulate(net, tstop, dt, n_trials, postproc)
 
     return dpls

@@ -124,7 +124,7 @@ def test_child_run():
     params_reduced.update({"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20})
     tstop, n_trials = 25, 2
     net_reduced = jones_2009_model(
-        params_reduced, add_drives_from_params=True, mesh_shape=(3, 3), verbose=True
+        params_reduced, add_drives_from_params=True, mesh_shape=(3, 3)
     )
     net_reduced._instantiate_drives(tstop=tstop, n_trials=n_trials)
 

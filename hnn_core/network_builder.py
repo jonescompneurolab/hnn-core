@@ -178,7 +178,7 @@ def _is_loaded_mechanisms():
         return True
 
 
-def load_custom_mechanisms(net_verbose=False):
+def load_custom_mechanisms(net_verbose=True):
     if _is_loaded_mechanisms():
         return
 
