@@ -1,33 +1,25 @@
 /* ----------------------------------------------------------------------
-   disable dropdown menu displaying when no actual items are present
-
-   note: i've *only* noticed this on Firefox, but it creates an empty
-         oval on screen that looks like an erroneous box... this requires
-         js as you can't target those popup boxes with CSS, unfortunately.
-         We may deprecate this function later in the event that we figure
-         out why this occurs under certain browser-OS combinations
-   ---------------------------------------------------------------------- */
+    Manage the toggle button for switching between light/dark themes 
+    ---------------------------------------------------------------------- */
 
 (function() {
-    const blockEmpty = (e) => {
-        const t = e.target;
-        const isDrop = t.closest(".widget-dropdown");
-        if (t.tagName === "SELECT" && isDrop) {
-            if (t.childElementCount === 0) {
-                e.preventDefault();
-                t.focus();
+    // Attach the toggle logic to the window "hnnToggleTheme" so we can 
+    // pass it to the "on click" HTML attribute when instantiating the
+    // contents of title-bar (which fills the "header" gridbox in AppLayout) 
+    window.hnnToggleTheme = function() {
+        const c = document.querySelector('.jupyter-widgets-view') || document.body;
+        if (c) {
+            c.classList.toggle('dark-mode');
+            const isD = c.classList.contains('dark-mode');
+            const s = document.getElementById('sun-svg');
+            const m = document.getElementById('moon-svg');
+            
+            if (s && m) {
+                s.style.display = isD ? 'none' : 'block';
+                m.style.display = isD ? 'block' : 'none';
             }
         }
     };
-
-    document.addEventListener("mousedown", blockEmpty, true);
-
-    const obs = new MutationObserver(() => {
-        document.removeEventListener("mousedown", blockEmpty, true);
-        document.addEventListener("mousedown", blockEmpty, true);
-    });
-
-    obs.observe(document.body, {childList: true, subtree: true});
 })();
 
 
@@ -107,4 +99,36 @@
         setup(".visualization-window .lm-TabBar");
         setup(".visualization-tab .lm-TabBar:first-of-type");
     }, 500);
+})();
+
+/* ----------------------------------------------------------------------
+   disable dropdown menu displaying when no actual items are present
+
+   note: i've *only* noticed this on Firefox, but it creates an empty
+         oval on screen that looks like an erroneous box... this requires
+         js as you can't target those popup boxes with CSS, unfortunately.
+         We may deprecate this function later in the event that we figure
+         out why this occurs under certain browser-OS combinations
+   ---------------------------------------------------------------------- */
+
+(function() {
+    const blockEmpty = (e) => {
+        const t = e.target;
+        const isDrop = t.closest(".widget-dropdown");
+        if (t.tagName === "SELECT" && isDrop) {
+            if (t.childElementCount === 0) {
+                e.preventDefault();
+                t.focus();
+            }
+        }
+    };
+
+    document.addEventListener("mousedown", blockEmpty, true);
+
+    const obs = new MutationObserver(() => {
+        document.removeEventListener("mousedown", blockEmpty, true);
+        document.addEventListener("mousedown", blockEmpty, true);
+    });
+
+    obs.observe(document.body, {childList: true, subtree: true});
 })();
