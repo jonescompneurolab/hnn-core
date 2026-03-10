@@ -25,7 +25,7 @@
 
 /* ----------------------------------------------------------------------
     Add the "caret" buttons for scrolling in the visualization-window tabbar
-    and in the figures tabbar in parameters-window > visualization-tab  
+    and in the figures tabbar in parameters-window > visualization-tab-contents  
     ---------------------------------------------------------------------- */
 
 (function() {
@@ -97,7 +97,7 @@
 
     const poller = setInterval(() => {
         setup(".visualization-window .lm-TabBar");
-        setup(".visualization-tab .lm-TabBar:first-of-type");
+        setup(".visualization-tab-contents .lm-TabBar:first-of-type");
     }, 500);
 })();
 

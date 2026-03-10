@@ -1211,7 +1211,7 @@ class _VizManager:
                 ),
                 self.axes_config_output,
             ]
-        ).add_class("visualization-tab")
+        ).add_class("visualization-tab-contents")
 
         return visualization_tab
 
