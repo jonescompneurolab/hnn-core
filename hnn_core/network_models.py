@@ -38,7 +38,6 @@ def jones_2009_model(
         Defines the (n_x, n_y) shape of the grid of pyramidal cells.
 
     Returns
-
     -------
     net : Instance of Network object
         Network object used to store

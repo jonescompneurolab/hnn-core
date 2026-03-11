@@ -58,8 +58,7 @@ def simulate_dipole(
         :meth:`~hnn_core.dipole.Dipole.smooth` and
         :meth:`~hnn_core.dipole.Dipole.scale` methods instead. Default: False.
     verbose : bool
-        If True, set the hidden attribute ``net._verbose`` to True so
-        downstream builders print verbose output. Default: True.
+        If True, print build steps and simulation progress to console. Default: True.
 
     Returns
     -------

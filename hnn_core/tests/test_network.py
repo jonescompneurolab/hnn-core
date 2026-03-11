@@ -2073,3 +2073,19 @@ def test_check_global_synaptic_gains_uniformity():
     assert result is False
     assert "WARNING" in stdout
     assert "custom synaptic gain values" in stdout
+
+def test_verbose():
+    """Test that verbose flag controls print statements."""
+
+    net = jones_2009_model(mesh_shape=(3, 3))
+
+    with io.StringIO() as buf, redirect_stdout(buf):
+        simulate_dipole(net, dt=0.5, tstop=20.0, verbose=True)
+        stdout_verbose_true = buf.getvalue()
+
+    with io.StringIO() as buf, redirect_stdout(buf):
+        simulate_dipole(net, dt=0.5, tstop=20.0, verbose=False)
+        stdout_verbose_false = buf.getvalue()
+
+    assert stdout_verbose_true != ""
+    assert stdout_verbose_false == ""
