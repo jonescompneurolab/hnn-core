@@ -1,0 +1,919 @@
+/* ================================================== */
+/* basic styling */
+/* ================================================== */
+
+/*  set color schema for default (light) mode  */
+:root {
+    --theme-color: #802989;
+    --textbook-light-purple: #ba83be;
+    --textbook-sidebar-purple: #88548c;
+    --default-blue-accent: #64b5f6;
+    --gentle-red: #ed665e;
+    --gentle-green: #77aa77;
+    --statusbar-running: orange;
+    --jp-widgets-input-focus-border-color: var(--textbook-light-purple) !important;
+    --jp-error-color1: var(--gentle-red) !important;
+    --tab-color: white;
+    --tab-border: lightgrey;
+}
+
+/*  center the entire AppLayout container
+
+        note: the "safe" parameter prevents the app from being cut
+        off when the window size is smaller than the gui itself
+*/
+.hnn-gui {
+    justify-content: safe center !important;
+}
+
+/*  adjust header and footer margins  */
+.title-bar {
+    margin: 2px 0px 2px 0px !important;
+}
+.title-bar-contents {
+    margin: 0px !important;
+}
+.status-bar {
+    margin: 2px 0px 2px 0px !important;
+}
+
+/*  adjust the accent line above the selected tab  */
+.lm-TabBar-tab.lm-mod-current::before {
+    background-color: var(--theme-color) !important;
+}
+
+/*  adjust border width on focus for input fields
+
+        note: we change the border-width property directly to force
+        it to update on focus. we also adjust the text padding to
+        account for the increase in border thickness 
+*/
+.jupyter-widgets input:focus,
+.jupyter-widgets select:focus,
+.jupyter-widgets textarea:focus {
+    --jp-widgets-input-border-width: 2px !important;
+    border-width: var(--jp-widgets-input-border-width) !important;
+    padding:
+        var(--jp-widgets-input-padding)
+        0
+        var(--jp-widgets-input-padding)
+        calc(var(--jp-widgets-input-padding) * 2 - 1px) 
+        !important;
+}
+
+/*  prevent small pixel shifts when switching between tabs
+
+        note: a fixed "flex-basis" ensures sizes are calculated
+        based on the *parent's* dimensions rather than the child's
+        contents. this prevents height recalculation when the layout
+        changes, which can cause visible pixel jumps 
+        "border-box" ensures borders and padding are contained within
+        the height, similarly preventign shifts with layout changes
+*/
+.jupyter-widget-TabPanel > .widget-tab-contents {
+    flex-basis: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* ---------------------------------------- */
+/*  adjust carets on dropdown input fields  */
+/* ---------------------------------------- */
+
+/*
+    remove the default jupyter caret from the dropdown field,
+    and style the input field for longer strings
+*/
+.widget-dropdown select,
+.widget-dropdown select:focus {
+    background-image: none !important;
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 32px !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+}
+
+/* custom caret */
+.widget-dropdown::after {
+    content: "";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+    background-color: var(--jp-widgets-input-color) !important;
+
+
+    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>');
+    mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"/></svg>');
+
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+/* recolor caret on hover/focus */
+.widget-dropdown:hover::after {
+    background-color: var(--textbook-light-purple) !important;
+}
+.widget-dropdown:focus-within::after {
+    background-color: var(--textbook-light-purple) !important;
+}
+
+/* recolor hover/focus differently when input is disabled */
+.widget-dropdown:has(select[disabled])::after {
+    background-color: lightgrey !important;
+}
+
+/* ================================================== */
+/* adjust style of parameters-window & children */
+/* ================================================== */
+
+/* ---------------------------------------- */
+/* -- general parameters-window styling --- */
+/* ---------------------------------------- */ 
+
+/*  ensure TabBar fills the available space
+
+        note: this fixes an issue where the last tab was slightly offset
+        (by around 1px) from the right border. we only target tabs that
+        are the first child of .lm-TabBar-content to ensure none of the
+        nested tabs grow
+*/
+.param-window-tabs-widget > .widget-tab-bar >
+.lm-TabBar-content > .lm-TabBar-tab {
+    flex-grow: 1 !important;
+}
+
+/*  adjust bottom-padding around widget-tab-contents
+
+        note: we can target a specific, active tab with...
+        .param-window-tabs-widget >
+        .widget-tab-bar:has(.lm-TabBar-tab:nth-child(1).lm-mod-current) +
+        .widget-tab-contents
+*/
+.param-window-tabs-widget >
+.widget-tab-contents {
+padding-bottom: 10px !important;
+}
+
+/*  make subtabs of the Network tab "sticky"  */
+.network-tab-contents {
+    height: 99% !important;
+    flex: none !important;
+}
+
+/* 
+    hide the existing-plots container in Visualization tab
+
+        note: viz_manager relies on the presence of the "existing-plots"
+        HTML container in various parts of the code; however, the display
+        for existing-plots is adds clutter to the visualization tab. Since
+        its not obvious how to untangle viz_manager's dependence on this
+        element, we can simply hide the display from the user
+*/
+.jupyter-widgets.widget-vbox.existing-plots {
+    display: none !important;
+}
+
+/* ---------------------------------------- */
+/* ---- adjust tab and content borders ---- */
+/* ---------------------------------------- */
+/*
+    the blocks below ensure that the border around the container
+    that holds the tabs themselves takes up no space
+*/
+
+.param-window-tabs-widget .widget-tab-bar {
+    border: 0px solid lightgrey;
+}
+
+/*  set the border color for the individual tabs  */
+.param-window-tabs-widget .lm-TabBar-tab {
+    border-color: lightgrey !important;
+}
+
+/*
+    this adjusts the content container's border, not the borders
+    on the tabs themselves. Though it does effectively set the
+    bottom border around the inactive tabs (with the active tab
+    not having a bottom border)
+*/
+.param-window-tabs-widget .widget-tab-contents {
+    border: 1px solid lightgrey !important;
+}
+
+/* ---------------------------------------- */
+/* ---- adjust simulation-tab-contents ---- */
+/* ---------------------------------------- */
+
+/*
+    style the text titles differentiating run parameters from
+    default visualization parameters
+*/
+.sim-tab-titles {
+    background: gray;
+    color: white;
+    width: 300px;
+    padding: 0px 5px;
+    margin-bottom: 2px;
+}
+
+/*
+    allow the space between sections to dynamically shrink/grow
+    based on available space so elements don't overlap
+*/
+
+.dynamic-spacer {
+    flex: 1 1 auto !important;
+    min-height: 4px !important;
+    max-height: 15px !important;
+}
+
+/* add left margin to the dropdown widget for saving outputs */
+.simulation-list-widget {
+    margin-left: 6px !important;
+}
+
+/* adjust sim tab button properties to avoid overlap or overflow */
+.simulation-tab-contents,
+.simulation-tab-contents .widget-hbox,
+.simulation-tab-contents .widget-vbox {
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+}
+
+/*
+    there is an additional Output() box around "Core" and "MPI cmd"
+    since the "MPI cmd" is dynamically inserted when the MPI backend
+    is selected. We need to remove the margin around that extra box
+    so that the input fields line up properly
+*/
+.backend-config-out {
+    margin: 0px !important;
+}
+
+/* ---------------------------------------- */
+/* -- adjust visualization-tab-contents --- */
+/* ---------------------------------------- */
+/*
+    the blocks below remove the border in visualization-tab-contents
+    when there is no figure present
+*/
+
+/*
+    remove the "top" edge of the border by setting border to "none"
+    if the "lm-TabBar-tab" child class is not present
+
+        note: this element needs to be targeted with "::after", as that
+        element is used to form the border that spans from the end of 
+        the tab to the end of the container that holds the figure
+*/
+.visualization-tab-contents
+.lm-TabBar-content:not(:has(.lm-TabBar-tab))::after {
+    content: none !important;
+    border: none !important;
+    display: none !important;
+}
+
+/*
+    remove the "U" edges of the border by setting border to none if
+    the "widget-container" child is not present
+*/
+.visualization-tab-contents
+.widget-tab-contents:not(:has(.widget-container)) {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/*  adjust make figure button  */
+.make-fig-btn {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    margin: 2px 2px 2px 10px !important;
+}
+
+/* ---------------------------------------- */
+/* ----- add scrollbar gutter to tabs ----- */
+/* ---------------------------------------- */
+
+/* 
+    style the gutter for the *child* containers within the
+    network-tab-contents. This adds the gutter *inside* the
+    Connectivity and Cell Parameter widgets
+*/
+.network-tab-contents > .widget-tab-contents {
+    scrollbar-gutter: stable !important;
+    overflow-y: auto !important;
+    padding-right: 10px !important;
+}
+
+/*
+    style the gutter for the *parent* container of drive-tab-contents.
+    This adds the gutter *outside* of the widgets 
+
+        note: to do this, we check if the 3rd tab (External Drives) is 
+        active, and we selectively style the contents container for that
+        tab only, since we do not want the gutter present on all tabs
+*/
+.param-window-tabs-widget >
+.widget-tab-bar:has(.lm-TabBar-tab:nth-child(3).lm-mod-current) +
+.widget-tab-contents {
+    scrollbar-gutter: stable !important;
+    overflow-y: auto !important;
+    padding-right: 10px !important;
+}
+
+/* 
+    similarly style the gutter for the *parent* container of 
+    visualization-tab-contents, which adds the gutter *outside*
+    of the widgets
+*/
+.param-window-tabs-widget >
+.widget-tab-bar:has(.lm-TabBar-tab:nth-child(4).lm-mod-current) +
+.widget-tab-contents {
+    scrollbar-gutter: stable !important;
+    overflow-y: auto !important;
+    padding-right: 10px !important;
+}
+
+/* ---------------------------------------- */
+/* --------- style the log window --------- */
+/* ---------------------------------------- */
+
+.log-toggle-icon {
+    overflow: visible !important;
+    position: absolute !important;
+    top: 0px !important;
+    left: 0px !important;
+    z-index: 10;
+    color: var(--textbook-light-purple);
+    background: transparent !important;
+    border: none !important;
+}
+
+/*  remove focus effects on the icon  */
+.log-toggle-icon:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    --jp-widgets-input-focus-border-color: transparent !important;
+    --jp-widgets-input-focus-shadow: none !important;
+}
+
+/*  remove hover effects on the icon  */
+.log-toggle-icon:hover {
+    color: var(--theme-color);
+    box-shadow: none !important;
+}
+
+/*
+    ensure the log output handles scrolling, and that the
+    output's contents don't overlap the toggle button
+*/
+.log-window > .widget-output {
+    overflow-y: auto !important;
+    padding-left: 30px !important;
+    padding-right: 10px !important;
+}
+
+/* ================================================== */
+/* adjust style of visualization-window & children */
+/* ================================================== */
+
+/*  adjust the tab border color to match the container  */
+.visualization-window .lm-TabBar-tab {
+    border-color: lightgrey !important;
+}
+
+/*  remove the automatically-added margins  */
+.visualization-window > .widget-output,
+.visualization-window .fig-tabs {
+    margin: 0px 0px 0px 0px !important;
+}
+
+/*
+    make the visualization-window border transparent if
+    fig-tabs is *not* empty
+*/
+.visualization-window:has(.fig-tabs:not(:empty)) {
+    border-color: transparent !important;
+}
+
+/*
+    align TabBar to the *top* rather than the bottom, and shift
+    the top margin to reduce excess space
+*/
+.visualization-window .lm-TabBar {
+    align-items: flex-start !important;
+    margin-top: -1px !important;
+}
+
+.visualization-window .lm-TabBar-content {
+    margin-top: 0 !important;
+}
+
+/*
+    set "display: flex" on visualization-window to enable its
+    children to grow to fill available space
+*/
+.visualization-window {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/*
+    target child elements inside visualization window to allow
+    them to grow to fill the available space. 
+
+        note: this looks more complicated than it actually is, we just
+        need to target all of the children manually, which necessitates
+        understanding the hierarchy of automatically-generated containers
+*/
+.visualization-window > .widget-output,
+.visualization-window > .widget-output > .jp-OutputArea,
+.visualization-window .jp-OutputArea > .jp-OutputArea-child,
+.visualization-window .jp-OutputArea-child > .jp-OutputArea-output,
+.visualization-window .jp-OutputArea-output > .fig-tabs,
+.visualization-window .widget-tab-contents {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 0% !important;
+    height: auto !important;
+    min-height: 0 !important;
+}
+
+/*  style the tab container that holds the output  */
+.visualization-window .widget-tab-contents {
+    border: 1px solid lightgrey !important;
+    box-sizing: border-box !important;
+    margin: 0px !important;
+    width: 100% !important;
+}
+
+/*  style figure placeholder text  */
+.fig-placeholder .widget-html-content {
+    color: #969696;
+    font-size: 13px;
+    margin-top: 6px;
+    text-align: center;
+}
+
+/* ---------------------------------------- */
+/* -- fix interactive plot sizing issues -- */
+/* ---------------------------------------- */
+/*
+    collapse the actual height and force the container to
+    have height via padding
+
+        note: this change is necessary to force the interactive
+        plots to respect the parent container's constraints
+*/
+.visualization-window .jupyter-matplotlib-canvas-div {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 0 !important;
+    padding-bottom: 100% !important;
+    position: relative !important;
+    display: block !important;
+}
+
+/*  scale the canvas to fit the padded container  */
+.visualization-window .jupyter-matplotlib-canvas-div canvas {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+}
+
+/*  manually set figure dimensions so the canvas renders  */
+.visualization-window .jupyter-matplotlib,
+.visualization-window .jupyter-matplotlib-figure,
+.visualization-window .jupyter-matplotlib-canvas-container {
+    width: 650px !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+}
+
+/* ================================================== */
+/* adjust overflow & scroll for the dynamic tab bars  */
+/* ================================================== */
+/*
+    note: in the interest of maintenance and keeping the
+    styling *exactly* the same, the code blocks below handle
+    the styling for the dynamic tab bars in visualization-window
+    *and* in visualization-tab-contents, rather than duplicating
+    the styling in their respective sections above
+*/
+
+/*
+    target the TabBar in visualization-window, and target the
+    *first* TabBar instance *only* in visualization-tab-contents
+*/
+.visualization-window .lm-TabBar,
+.visualization-tab-contents .lm-TabBar:first-of-type {
+    position: relative !important;
+    border-bottom: none !important;
+}
+
+/*
+    for both visualization-window and visualization-tab-contents:
+        - set TabBar container properties
+        - remove the bottom border, as we'll be managing it via the
+          individual tabs instead
+        - allow content to overflow horizontal axis
+*/
+.visualization-window .lm-TabBar-content,
+.visualization-tab-contents .lm-TabBar:first-of-type .lm-TabBar-content {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    display: flex !important;
+    -ms-overflow-style: none !important; /* old browser compatibility */
+    border-bottom: none !important;
+    padding-top: 1px !important;
+}
+
+/*  hide the scrollabr for both visualization containers  */
+.visualization-window .lm-TabBar-content::-webkit-scrollbar,
+.visualization-tab-contents .lm-TabBar:first-of-type
+.lm-TabBar-content::-webkit-scrollbar {
+    display: none !important;
+}
+
+/*
+    for both visualization-window and visualization-tab-contents:
+        - style the individual tabs
+        - prevent the individual tabs from shrinking
+*/
+.visualization-window .lm-TabBar-tab,
+.visualization-tab-contents .lm-TabBar:first-of-type .lm-TabBar-tab {
+    flex-shrink: 0 !important;
+    border-bottom: 1px solid var(--tab-border) !important;
+    margin-top: 0px !important;
+    transform: none !important;
+}
+
+/*
+    for both visualization-window and visualization-tab-contents,
+    we set the bottom border of the currently-selected tab to match
+    the background color of the tab
+
+        note: background-color does not strictly need to be
+        specified in this block, but keeping it as a fail safe
+*/
+.visualization-window .lm-TabBar-tab.lm-mod-current,
+.visualization-tab-contents .lm-TabBar:first-of-type .lm-TabBar-tab.lm-mod-current {
+    border-bottom: 1px solid var(--tab-color) !important;
+    background-color: var(--tab-color) !important;
+    margin-top: 0px !important;
+}
+
+/*
+    for both visualization-window and visualization-tab-contents, we
+    need to set the bottom border in areas where there is *not* a tab
+    (i.e., there are too few tabs to fill up the entire horizontal
+    width). The border needs to grow to fill the available space between
+     the tabs and the end of the container.
+*/
+.visualization-window .lm-TabBar-content::after,
+.visualization-tab-contents .lm-TabBar:first-of-type .lm-TabBar-content::after {
+    content: '';
+    flex-grow: 1;
+    border-bottom: 1px solid var(--tab-border) !important;
+    margin-bottom: 0px;
+}
+
+/*  top borders are managed by the tabs for both visualization containers  */
+.visualization-window .widget-tab-contents,
+.visualization-tab-contents .widget-tab-contents {
+    border-top: none !important;
+}
+
+/* ---------------------------------------- */
+/* ----- caret styling and placement ------ */
+/* ---------------------------------------- */
+
+.tab-caret {
+    position: absolute;
+    top: 1px;
+    bottom: 0;
+    margin: auto 0;
+    height: 70%;
+    width: 20px;
+    border-radius: 20px;
+    background: #ffffffcc;
+    color: var(--textbook-light-purple) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 30 !important;
+    cursor: pointer !important;
+    visibility: hidden;
+    border: none;
+    user-select: none;
+    pointer-events: auto !important;
+}
+
+.tab-caret.is-visible { visibility: visible; }
+.caret-left { left: 4px; }
+.caret-right { right: 4px; }
+
+/* ================================================== */
+/* Set style for the "dark-mode" theme */
+/* ================================================== */
+
+/*  basic dark-mode colors  */
+.dark-mode {
+    --dm-bg-primary: #14181e;
+    --dm-bg-secondary: #313438;
+    --dm-text-main: #dfdfdf;
+    --dm-border-color: #3e3e42;
+    --dm-theme: #ba83be;
+    --statusbar-running: #C88809;
+}
+
+/*  overwrite default (root) colors for dark-mode  */
+.dark-mode {
+    --tab-color: var(--dm-bg-primary);
+    --tab-border: var(--dm-border-color);
+}
+
+/*  force background and border color for widget containers  */
+.dark-mode,
+.dark-mode .jp-Notebook,
+.dark-mode .lm-Widget,
+.dark-mode .lm-Panel,
+.dark-mode .jupyter-widgets:not(.jupyter-button) {
+    background-color: var(--dm-bg-primary) !important;
+    border-color: var(--dm-border-color) !important;
+}
+
+/*
+    flip text and border colors globally. we'll have to "overwrite"
+    some of these changes, but this is the best way to ensure
+    everything gets updated without manually needing to specify
+    every single child element that should change
+*/
+.dark-mode * {
+    color: var(--dm-text-main) !important;
+    border-color: var(--dm-border-color) !important;
+}
+
+/* ------------------------------------------- */
+/* - exceptions to global dark mode changes -  */
+/* ------------------------------------------- */
+
+/*  adjust title-bar-contents  */
+.dark-mode .title-bar-contents {
+    background-color: var(--dm-theme) !important;
+    color: #fff !important;
+}
+
+/*  adjust visualization-window placeholder text  */
+.dark-mode .fig-placeholder .widget-html-content {
+    color: grey !important;
+}
+
+/*
+    restore transparent border for visualization-window
+    when fig-tabs is not empty
+*/
+.visualization-window:has(.fig-tabs:not(:empty)) {
+    border-color: transparent !important;
+}
+
+/*  adjust the style for all TabBar tabs  */
+.dark-mode .lm-TabBar-tab {
+    background-color: var(--dm-bg-secondary) !important;
+    color: var(--dm-text-main) !important;
+    border-color: var(--dm-border-color) !important;
+}
+
+/*  adjust the accent line above the selected tab  */
+.lm-TabBar-tab.lm-mod-current::before {
+    background-color: var(--dm-theme) !important;
+}
+
+/*  adjust the active tab to blend with primary background  */
+.dark-mode .lm-TabBar-tab.lm-mod-current {
+    background-color: var(--dm-bg-primary) !important;
+}
+
+/*  adjust the caret that controls scrolling for the dynamic TabBars  */
+.tab-caret {
+    color: var(--textbook-light-purple) !important;
+}
+
+/*  adjust the caret for dropdown input fields  */
+.dark-mode .widget-dropdown::after {
+    background-color: var(--dm-text-main) !important;
+}
+
+/*  adjust the input field caret during hover and focus  */
+.dark-mode .widget-dropdown:hover::after,
+.dark-mode .widget-dropdown:focus-within::after {
+    background-color: var(--dm-theme) !important;
+}
+
+/*  adjust the input field hover/focus when the input is disabled  */
+.dark-mode .widget-dropdown:has(select[disabled])::after {
+    background-color: grey !important;
+}
+
+/*  adjust background color for input areas  */
+.dark-mode input,
+.dark-mode select,
+.dark-mode textarea {
+    background-color: var(--dm-bg-secondary) !important;
+}
+
+/*  restore border color when focusing on input areas  */
+.dark-mode input:focus,
+.dark-mode select:focus,
+.dark-mode textarea:focus {
+    border-color: var(--dm-theme) !important;
+}
+
+/*  adjust button colors  */
+.dark-mode button:not(.log-toggle-icon),
+.dark-mode .jupyter-button:not(.log-toggle-icon),
+.dark-mode .widget-button:not(.log-toggle-icon) {
+    background-color: var(--dm-theme) !important;
+    color: var(--dm-bg-primary) !important;
+}
+
+/*  adjust button icon color  */
+.dark-mode button:not(.log-toggle-icon) i,
+.dark-mode .jupyter-button:not(.log-toggle-icon) i,
+.dark-mode .widget-button:not(.log-toggle-icon) i {
+    color: var(--dm-bg-primary) !important;
+}
+
+/*  restore toggle icon for the log  */
+.dark-mode .log-toggle-icon,
+.dark-mode .log-toggle-icon i {
+    color: var(--dm-theme) !important;
+}
+
+/*  restore red coloring for close fig and delete drive buttons  */
+.dark-mode .widget-button.red-button {
+    background-color: var(--gentle-red) !important;
+}
+
+/*  dim figures to reduce high contrast from the white backgrounds  */
+.dark-mode .visualization-window .widget-tab-contents img,
+.dark-mode .visualization-window .widget-tab-contents canvas,
+.dark-mode .visualization-window .widget-tab-contents .js-plotly-plot
+.main-svg,
+.dark-mode .visualization-window .widget-tab-contents .bk-root {
+    filter: brightness(0.8) contrast(1.2) !important;
+}
+
+
+/* ------------------------------------------- */
+/* --- add custom scrollbars for dark mode --- */
+/* ------------------------------------------- */
+
+.dark-mode ::-webkit-scrollbar {
+    width: 17px !important;
+    height: 17px !important;
+}
+.dark-mode ::-webkit-scrollbar-track {
+    background: var(--dm-bg-primary) !important;
+}
+.dark-mode ::-webkit-scrollbar-thumb {
+    background: var(--dm-bg-secondary) !important;
+    border: 4px solid var(--dm-bg-primary) !important;
+    border-radius: 20px !important;
+}
+.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: var(--dm-theme) !important;
+}
+
+/* ------------------------------------------- */
+/*   adjust param-window-tabs-widget borders   */
+/* ------------------------------------------- */
+/*
+    note: the blocks below add accent borders to the "outer"
+    containers in dark-mode. It requires some style overwriting.
+    I [DSD] think these accents make it easier to discern the
+    "outer-most" parent container from the nested inner containers.
+    But, if we decide we would prefer to not have the accent borders, 
+    this whole section can be removed without interfering with any
+    functionality
+*/
+
+/*     style borders for parameters-window     */
+/* ------------------------------------------- */
+
+/*  set the border for widget-tab-contents  */
+.dark-mode div.param-window-tabs-widget.param-window-tabs-widget
+> .widget-tab-contents {
+    position: relative;
+    border: 2px solid var(--dm-theme) !important;
+}
+
+/*
+    allow TabBar to overflow, which will let the active tab 
+    overlap the top border of widget-tab-contents
+*/
+.dark-mode div.param-window-tabs-widget.param-window-tabs-widget
+> .lm-TabBar {
+    position: relative;
+    overflow: visible !important;
+}
+
+/*  set the position and borders for the active tab
+
+        note: removing "border-bottom" allows the mask we create
+        below to work without causing overlap at the edges where
+        the borders meet
+*/
+.dark-mode div.param-window-tabs-widget.param-window-tabs-widget
+> .lm-TabBar:first-of-type .lm-TabBar-tab.lm-mod-current {
+    position: relative;
+    background-color: var(--tab-color) !important;
+    border-right: 2px solid var(--dm-theme) !important;
+    border-left: 2px solid var(--dm-theme) !important;
+    border-bottom: none !important;
+}
+
+/*
+    add the "mask" that covers the bottom border on the widget-contents
+    for the active tab
+*/
+.dark-mode div.param-window-tabs-widget.param-window-tabs-widget
+.lm-TabBar-tab.lm-mod-current::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0px;
+    right: 0px;
+    height: 2px;
+    background-color: var(--tab-color) !important;
+    z-index: 4;
+}
+
+/*  restore background color for the simulation tab titles  */
+.dark-mode .widget-html.sim-tab-titles {
+    background-color: gray !important;
+
+}
+
+/*  set border for the log window  */
+
+.dark-mode div.log-window.log-window {
+    border: 2px solid var(--dm-theme) !important;
+}
+
+/*    style borders for visualization window   */
+/* ------------------------------------------- */
+
+/* remove top border on contents as we'll manage it with tabs */
+.dark-mode .visualization-window .widget-tab-contents {
+    border: 2px solid var(--dm-theme) !important;
+    border-top: none !important;
+}
+
+/* keep the 2px border-bottom for inactive tabs */
+.dark-mode .visualization-window .lm-TabBar-tab {
+    margin-top: 0px !important;
+    box-sizing: border-box !important;
+    border-bottom: 2px solid var(--dm-theme) !important;
+}
+
+/* style the active tab */
+.dark-mode .visualization-window .lm-TabBar-tab.lm-mod-current {
+    background-color: var(--tab-color) !important;
+    border-left: 2px solid var(--dm-theme) !important;
+    border-right: 2px solid var(--dm-theme) !important;
+
+    /*
+        using a box shadow "mask" instead of border-bottom fixes the
+        overlapping triangles at border edges
+    */
+    /* remove border bottom */
+    border-bottom: none !important;
+
+    /* add 2px padding to replace the 2px border */
+    padding-bottom: 2px !important;
+
+    /* draw the mask using the inset shadow */
+    box-shadow: inset 0 -2px 0 var(--tab-color) !important;
+}
+
+/*
+    this isn't really necessary since we've shifted the border to the
+    tabs themselves, but keeping it in as a failsafe
+*/
+.dark-mode .visualization-window .lm-TabBar-content::after {
+    border-bottom: 2px solid var(--dm-theme) !important;
+}

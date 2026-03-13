@@ -11,10 +11,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from IPython.display import display
 from ipywidgets import (
-    Box,
+    HTML,
+    BoundedFloatText,
     Button,
     Dropdown,
-    BoundedFloatText,
     FloatText,
     HBox,
     Label,
@@ -25,11 +25,17 @@ from ipywidgets import (
     link,
 )
 
-from hnn_core.dipole import average_dipoles, _rmse
+from hnn_core.dipole import _rmse, average_dipoles
 from hnn_core.gui._logging import logger
 from hnn_core.viz import plot_dipole
 
-_fig_placeholder = "Run simulation to add figures here."
+#
+_fig_placeholder = HTML(
+    value="""
+        Visualizations will become available in this window after a simulation has been
+        run or data have been loaded
+    """
+).add_class("fig-placeholder")
 
 _plot_types = [
     "current dipole",
@@ -548,7 +554,7 @@ def _plot_on_axes(
         A dict that contains all the widgets.
     data : dict
         A dict that contains all the simulation data. Can be accessed by names
-        specified in widgets_simulation and target_simulations weidgets.
+        specified in widgets_simulation and target_simulations widgets.
     fig_idx : int
         The index of the figure we want to plot on.
     fig : matplotlib.figure.Figure
@@ -826,7 +832,7 @@ def _get_ax_control(widgets, data, fig_default_params, fig_idx, fig, ax):
         style=analysis_style,
     )
 
-    existing_plots = VBox([])
+    existing_plots = VBox([]).add_class("existing-plots")
 
     plot_button = Button(description="Add plot")
     clear_button = Button(description="Clear axis")
@@ -945,7 +951,7 @@ def _close_figure(b, widgets, data, fig_idx):
             if n_tabs == 0:
                 widgets["figs_output"].clear_output()
                 with widgets["figs_output"]:
-                    display(Label(_fig_placeholder))
+                    display(_fig_placeholder)
 
 
 def _add_axes_controls(widgets, data, fig_default_params, fig, axd):
@@ -967,7 +973,7 @@ def _add_axes_controls(widgets, data, fig_default_params, fig, axd):
         button_style="danger",
         icon="close",
         layout=Layout(width="98%"),
-    )
+    ).add_class("red-button")
     close_fig_button.on_click(
         partial(_close_figure, widgets=widgets, data=data, fig_idx=fig_idx)
     )
@@ -983,8 +989,15 @@ def _add_figure(
     b, widgets, data, fig_default_params, template_type, scale=0.95, dpi=96
 ):
     fig_idx = data["fig_idx"]["idx"]
-    viz_output_layout = data["visualization_output"]
-    fig_outputs = Output()
+
+    viz_window_width = int(data["visualization_window"].width[:-2])
+    viz_window_height = int(data["visualization_window"].height[:-2])
+    viz_out_width_prct = int(data["viz_out_figsize"].width[:-1])
+    viz_out_height_prct = int(data["viz_out_figsize"].height[:-1])
+    viz_out_width = int(viz_window_width * viz_out_width_prct / 100)
+    viz_out_height = int(viz_window_height * viz_out_height_prct / 100)
+
+    fig_outputs = Output().add_class("visualization-output")
     n_tabs = len(widgets["figs_tabs"].children)
 
     if n_tabs == 0:
@@ -999,8 +1012,8 @@ def _add_figure(
 
     with fig_outputs:
         figsize = (
-            scale * ((int(viz_output_layout.width[:-2]) - 10) / dpi),
-            scale * ((int(viz_output_layout.height[:-2]) - 10) / dpi),
+            scale * (viz_out_width / dpi),
+            scale * (viz_out_height / dpi),
         )
         mosaic = template_type["mosaic"]
         kwargs = template_type["kwargs"]
@@ -1076,7 +1089,7 @@ class _VizManager:
 
         # widgets
         self.axes_config_tabs = Tab()
-        self.figs_tabs = Tab()
+        self.figs_tabs = Tab().add_class("fig-tabs")
         self.axes_config_tabs.selected_index = None
         self.figs_tabs.selected_index = None
         self.figs_config_tab_link = link(
@@ -1087,11 +1100,11 @@ class _VizManager:
         template_names = list(data_templates.keys())
         template_names.extend(list(fig_templates.keys()))
         self.templates_dropdown = Dropdown(
-            description="Layout template:",
+            description="Figure Template:",
             options=template_names,
             value=template_names[0],
-            style={"description_width": "initial"},
-            layout=Layout(width="98%"),
+            style={"description_width": "28%"},
+            layout=Layout(width="70%"),
         )
         self.templates_dropdown.observe(self._layout_template_change, "value")
 
@@ -1100,15 +1113,15 @@ class _VizManager:
             button_style="primary",
             style={"button_color": self.viz_layout["theme_color"]},
             layout=self.viz_layout["btn"],
-        )
+        ).add_class("make-fig-btn")
         self.make_fig_button.on_click(self.add_figure)
 
         self.datasets_dropdown = Dropdown(
-            description="Dataset:",
+            description="Simulation:",
             options=[],
             value=None,
-            style={"description_width": "initial"},
-            layout=Layout(width="98%"),
+            style={"description_width": "28%"},
+            layout=Layout(width="70%"),
         )
 
         # data
@@ -1133,7 +1146,8 @@ class _VizManager:
             "use_ipympl": self.use_ipympl,
             "simulations": self.gui_data["simulation_data"],
             "fig_idx": self.fig_idx,
-            "visualization_output": self.viz_layout["visualization_output"],
+            "visualization_window": self.viz_layout["visualization_window"],
+            "viz_out_figsize": self.viz_layout["visualization_output_figsize"],
             "figs": self.figs,
         }
 
@@ -1156,24 +1170,38 @@ class _VizManager:
             template_name = list(fig_templates.keys())[0]
         self._simulate_switch_fig_template(template_name)
 
-    def compose(self):
-        """Compose widgets."""
+    def build_visualization_window(self):
+        """build visualization-window (to occupy AppLayout's right_sidebar)"""
         with self.axes_config_output:
             display(self.axes_config_tabs)
         with self.figs_output:
-            display(Label(_fig_placeholder))
+            display(_fig_placeholder)
 
-        fig_output_container = VBox(
-            [self.figs_output], layout=self.viz_layout["visualization_window"]
+        visualization_window = VBox(
+            [self.figs_output],
+            layout=self.viz_layout["visualization_window"],
+        )
+        return visualization_window
+
+    def build_viz_tab_contents(self):
+        """Compose Visualization tab and widgets"""
+
+        config_sub_panel = HBox(
+            [
+                self.templates_dropdown,
+                self.make_fig_button,
+            ],
+            layout=Layout(
+                width="100%",
+            ),
         )
 
-        config_panel = VBox(
+        visualization_tab = VBox(
             [
-                Box(
+                VBox(
                     [
-                        self.templates_dropdown,
+                        config_sub_panel,
                         self.datasets_dropdown,
-                        self.make_fig_button,
                     ],
                     layout=Layout(
                         display="flex",
@@ -1181,16 +1209,16 @@ class _VizManager:
                         align_items="stretch",
                     ),
                 ),
-                Label("Figure config:"),
                 self.axes_config_output,
             ]
-        )
-        return config_panel, fig_output_container
+        ).add_class("visualization-tab-contents")
+
+        return visualization_tab
 
     def _layout_template_change(self, template_type):
         # check if plot set type requires loaded sim-data
         if _check_template_type_is_data_dependant(template_type.new):
-            # Add only simualated data
+            # Add only simulated data
             sim_names = [
                 simulations
                 for simulations, sim_name in self.data["simulations"].items()
@@ -1204,9 +1232,9 @@ class _VizManager:
             self.datasets_dropdown.value = sim_names[0]
             # show list of simulated to gui dropdown
             self.datasets_dropdown.layout.visibility = "visible"
-        else:
-            # hide sim-data dropdown
-            self.datasets_dropdown.layout.visibility = "hidden"
+        # else:
+        #     # hide sim-data dropdown
+        #     self.datasets_dropdown.layout.visibility = "hidden"
 
     @unlink_relink(attribute="figs_config_tab_link")
     def add_figure(self, b=None):
