@@ -502,6 +502,7 @@
     <span class="n">record_isec</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">record_ca</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">postproc</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulate a dipole given the experiment parameters.</span>
 
@@ -534,6 +535,8 @@
 <span class="sd">        extracellular recordings etc. The preferred way is to use the</span>
 <span class="sd">        :meth:`~hnn_core.dipole.Dipole.smooth` and</span>
 <span class="sd">        :meth:`~hnn_core.dipole.Dipole.scale` methods instead. Default: False.</span>
+<span class="sd">    verbose : bool</span>
+<span class="sd">        If True, print build steps and simulation progress to console. Default: True.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -605,6 +608,9 @@
             <span class="s2">&quot;smoothing and scaling explicitly using Dipole methods.&quot;</span><span class="p">,</span>
             <span class="ne">DeprecationWarning</span><span class="p">,</span>
         <span class="p">)</span>
+
+    <span class="n">net</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
     <span class="n">dpls</span> <span class="o">=</span> <span class="n">_BACKEND</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">postproc</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">dpls</span></div>

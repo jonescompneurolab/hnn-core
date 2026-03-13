@@ -1039,11 +1039,11 @@
 <span class="sd">        dpl: list of Dipole</span>
 <span class="sd">            The Dipole results from each simulation trial</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="nb">print</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Joblib will run </span><span class="si">{</span><span class="n">n_trials</span><span class="si">}</span><span class="s2"> trial(s) in parallel by &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;distributing trials over </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="si">}</span><span class="s2"> jobs.&quot;</span>
-        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">net</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Joblib will run </span><span class="si">{</span><span class="n">n_trials</span><span class="si">}</span><span class="s2"> trial(s) in parallel by &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;distributing trials over </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">n_jobs</span><span class="si">}</span><span class="s2"> jobs.&quot;</span>
+            <span class="p">)</span>
         <span class="n">parallel</span><span class="p">,</span> <span class="n">myfunc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parallel_func</span><span class="p">(</span><span class="n">_simulate_single_trial</span><span class="p">)</span>
         <span class="n">sim_data</span> <span class="o">=</span> <span class="n">parallel</span><span class="p">(</span>
             <span class="n">myfunc</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">tstop</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">trial_idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">trial_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_trials</span><span class="p">)</span>

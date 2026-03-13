@@ -746,7 +746,10 @@
 <div class="viewcode-block" id="law_2021_model">
 <a class="viewcode-back" href="../../generated/hnn_core.law_2021_model.html#hnn_core.law_2021_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">law_2021_model</span><span class="p">(</span>
-    <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the expansion of Jones 2009 model to study beta</span>
 <span class="sd">    modulated ERPs as described in</span>
@@ -782,7 +785,10 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span>
-        <span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="p">,</span> <span class="n">legacy_mode</span><span class="p">,</span> <span class="n">mesh_shape</span><span class="o">=</span><span class="n">mesh_shape</span>
+        <span class="n">params</span><span class="p">,</span>
+        <span class="n">add_drives_from_params</span><span class="p">,</span>
+        <span class="n">legacy_mode</span><span class="p">,</span>
+        <span class="n">mesh_shape</span><span class="o">=</span><span class="n">mesh_shape</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="c1"># Update biophysics (increase gabab duration of inhibition)</span>
@@ -835,7 +841,10 @@
 <div class="viewcode-block" id="calcium_model">
 <a class="viewcode-back" href="../../generated/hnn_core.calcium_model.html#hnn_core.calcium_model">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">calcium_model</span><span class="p">(</span>
-    <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">add_drives_from_params</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">legacy_mode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">mesh_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Instantiate the Jones 2009 model with improved calcium dynamics in</span>
 <span class="sd">    L5 pyramidal neurons. For more details on changes to calcium dynamics</span>
@@ -871,7 +880,10 @@
         <span class="n">params</span> <span class="o">=</span> <span class="n">read_params</span><span class="p">(</span><span class="n">params_fname</span><span class="p">)</span>
 
     <span class="n">net</span> <span class="o">=</span> <span class="n">jones_2009_model</span><span class="p">(</span>
-        <span class="n">params</span><span class="p">,</span> <span class="n">add_drives_from_params</span><span class="p">,</span> <span class="n">legacy_mode</span><span class="p">,</span> <span class="n">mesh_shape</span><span class="o">=</span><span class="n">mesh_shape</span>
+        <span class="n">params</span><span class="p">,</span>
+        <span class="n">add_drives_from_params</span><span class="p">,</span>
+        <span class="n">legacy_mode</span><span class="p">,</span>
+        <span class="n">mesh_shape</span><span class="o">=</span><span class="n">mesh_shape</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="c1"># Replace L5 pyramidal cell template with updated calcium</span>
