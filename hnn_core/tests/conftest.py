@@ -7,7 +7,7 @@ from typing import Dict, Tuple
 import pytest
 import pickle
 
-import os.path as op
+from pathlib import Path
 import hnn_core
 from hnn_core import read_params, jones_2009_model, simulate_dipole
 from hnn_core import MPIBackend, JoblibBackend
@@ -82,10 +82,10 @@ def run_hnn_core_fixture():
         postproc=False,
         electrode_array=None,
     ):
-        hnn_core_root = op.dirname(hnn_core.__file__)
+        hnn_core_root = Path(hnn_core.__file__).parent
 
         # default params
-        params_fname = op.join(hnn_core_root, "param", "default.json")
+        params_fname = hnn_core_root / "param" / "default.json"
         params = read_params(params_fname)
 
         tstop = 170.0

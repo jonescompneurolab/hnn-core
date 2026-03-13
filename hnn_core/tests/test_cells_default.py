@@ -2,6 +2,7 @@ import pytest
 
 from neuron import h
 import numpy as np
+from pathlib import Path
 
 from hnn_core.cells_default import pyramidal, basket, _exp_g_at_dist, _linear_g_at_dist
 from hnn_core.network_builder import load_custom_mechanisms
