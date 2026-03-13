@@ -265,7 +265,10 @@ def jones_2009_model(
 
 
 def law_2021_model(
-    params=None, add_drives_from_params=False, legacy_mode=False, mesh_shape=(10, 10)
+    params=None,
+    add_drives_from_params=False,
+    legacy_mode=False,
+    mesh_shape=(10, 10),
 ):
     """Instantiate the expansion of Jones 2009 model to study beta
     modulated ERPs as described in
@@ -301,7 +304,10 @@ def law_2021_model(
     """
 
     net = jones_2009_model(
-        params, add_drives_from_params, legacy_mode, mesh_shape=mesh_shape
+        params,
+        add_drives_from_params,
+        legacy_mode,
+        mesh_shape=mesh_shape,
     )
 
     # Update biophysics (increase gabab duration of inhibition)
@@ -351,7 +357,10 @@ def law_2021_model(
 # Remove params argument after updating examples
 # (only relevant for Jones 2009 model)
 def calcium_model(
-    params=None, add_drives_from_params=False, legacy_mode=False, mesh_shape=(10, 10)
+    params=None,
+    add_drives_from_params=False,
+    legacy_mode=False,
+    mesh_shape=(10, 10),
 ):
     """Instantiate the Jones 2009 model with improved calcium dynamics in
     L5 pyramidal neurons. For more details on changes to calcium dynamics
@@ -387,7 +396,10 @@ def calcium_model(
         params = read_params(params_fname)
 
     net = jones_2009_model(
-        params, add_drives_from_params, legacy_mode, mesh_shape=mesh_shape
+        params,
+        add_drives_from_params,
+        legacy_mode,
+        mesh_shape=mesh_shape,
     )
 
     # Replace L5 pyramidal cell template with updated calcium
