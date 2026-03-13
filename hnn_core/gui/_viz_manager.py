@@ -366,33 +366,39 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
         if len(dpls_copied) > 0:
             min_f = plot_config["min_spectral_frequency"]
             max_f = plot_config["max_spectral_frequency"]
-            step_f = 1.0
-            if min_f > max_f:
-                step_f = -1
+            step_f = 1.0 if min_f < max_f else -1
             freqs = np.arange(min_f, max_f, step_f)
             n_cycles = freqs / 2.0
 
+            tfrs = []
+            times = None
+
             try:
-                dpls_copied[0].plot_tfr_morlet(
-                    freqs,
-                    n_cycles=n_cycles,
-                    colormap=plot_config["spectrogram_cm"],
-                    ax=ax,
-                    colorbar_inside=True,
-                    show=False,
+                for dpl in dpls_copied:
+                    tfr, _times, _freqs = dpl.plot_tfr_morlet(
+                        freqs,
+                        n_cycles=n_cycles,
+                        return_data=True,
+                        show=False,
+                    )
+                    tfrs.append(tfr)
+                    if times is None:
+                        times = _times
+                tfr_avg = np.mean(tfrs, axis=0)
+                ax.imshow(
+                    tfr_avg,
+                    aspect="auto",
+                    origin="lower",
+                    extent=[times[0], times[-1], freqs[0], freqs[-1]],
+                    cmap=plot_config["spectrogram_cm"],
                 )
 
             except ValueError as ex:
-                if str(ex) == (
-                    "At least one of the wavelets is longer than "
-                    "the signal. Use a longer signal or shorter "
-                    "wavelets."
-                ):
+                if "wavelets is longer than the signal" in str(ex):
                     logger.error(
-                        "At least one of the wavelets is "
-                        "longer than the signal. Use a longer signal "
-                        "or shorter wavelets. No spectrogram will be "
-                        "plotted."
+                        "Wavelet longer than signal. "
+                        "Use longer signal or shorter wavelets. "
+                        "No spectrogram plotted."
                     )
 
     elif "dipole" in plot_type:
