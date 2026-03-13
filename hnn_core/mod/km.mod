@@ -19,7 +19,7 @@ INDEPENDENT {t FROM 0 TO 1 WITH 1 (ms)}
 NEURON {
     SUFFIX km
     USEION k READ ek WRITE ik
-    RANGE n, gk, gbar
+    RANGE n, gk, gbar, ik
     RANGE ninf, ntau
     GLOBAL Ra, Rb
     GLOBAL q10, temp, tadj, vmin, vmax, tshift
