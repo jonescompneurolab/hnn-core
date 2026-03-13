@@ -9,6 +9,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 import matplotlib.pyplot as plt
+from pathlib import Path
 
 import hnn_core
 from hnn_core import (
@@ -1654,14 +1655,15 @@ def test_rename_cell_types(base_network):
     net3.cell_response.plot_spikes_hist(show=False)
 
     # Test the other main network we use for testing
-    net4 = hnn_core.hnn_io.read_network_configuration(
-        op.join(hnn_core_root, "tests", "assets", "jones2009_3x3_drives.json")
-    )
+    asset_path = Path(__file__).parent / "assets" / "jones2009_3x3_drives.json"
+
+    net4 = hnn_core.hnn_io.read_network_configuration(asset_path)
+
     net4._rename_cell_types(cell_type_rename_mapping)
     dpls4 = simulate_dipole(net4, tstop=10.0, n_trials=1)
     plot_dipole(dpls4, show=False)
     net4.cell_response.plot_spikes_raster(
-        show=False, cell_types=list(cell_type_rename_mapping.values())
+    show=False, cell_types=list(cell_type_rename_mapping.values())
     )
     net4.cell_response.plot_spikes_hist(show=False)
 

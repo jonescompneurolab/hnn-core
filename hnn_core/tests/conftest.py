@@ -150,3 +150,42 @@ def run_hnn_core_fixture():
         return dpls, net
 
     return _run_hnn_core_fixture
+
+@pytest.fixture
+def default_params():
+    """Load default parameters for the Jones 2009 model."""
+    hnn_core_root = op.dirname(hnn_core.__file__)
+    params_fname = op.join(hnn_core_root, "param", "default.json")
+    return read_params(params_fname)
+
+
+@pytest.fixture
+def network_default(default_params):
+    """Default Jones 2009 network with drives."""
+    return jones_2009_model(default_params, add_drives_from_params=True)
+
+
+@pytest.fixture
+def network_no_drives(default_params):
+    """Jones 2009 network without external drives."""
+    return jones_2009_model(default_params, add_drives_from_params=False)
+
+
+@pytest.fixture
+def network_small(default_params):
+    """Small network (1x1 mesh) for faster tests."""
+    return jones_2009_model(
+        default_params,
+        add_drives_from_params=True,
+        mesh_shape=(1, 1),
+    )
+
+
+@pytest.fixture
+def network_3x3(default_params):
+    """3x3 mesh network used for testing larger network configurations."""
+    return jones_2009_model(
+        default_params,
+        add_drives_from_params=True,
+        mesh_shape=(3, 3),
+    )
