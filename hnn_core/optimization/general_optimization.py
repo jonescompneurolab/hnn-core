@@ -7,8 +7,9 @@
 
 import numpy as np
 
-from .objective_functions import _rmse_evoked, _maximize_psd
+from .objective_functions import _rmse_evoked, _corr_evoked, _maximize_psd
 from ..externals.mne import _validate_type
+from ..network import pick_connection
 
 
 class Optimizer:
@@ -45,10 +46,10 @@ class Optimizer:
             names, values are initial parameters. The default is None.
             If None, the parameters will be set to the midpoints of parameter ranges.
         solver : str
-            The optimizer, 'bayesian' or 'cobyla'.
+            The optimizer, 'bayesian', 'cobyla', or 'cma'.
         obj_fun : str | func
             The objective function to be minimized. Can be 'dipole_rmse',
-            'maximize_psd', or a user-defined function. The default is
+            'maximize_psd', "dipole_corr", or a user-defined function. The default is
             'dipole_rmse'.
         max_iter : int, optional
             The max number of calls to the objective function. The default is
@@ -77,13 +78,13 @@ class Optimizer:
         opt_params_ : list
             The list of optimized parameter values.
         """
-
-        if initial_net.external_drives:
-            raise ValueError(
-                "The current Network instance has external "
-                + "drives, provide a Network object with no "
-                + "external drives."
-            )
+        # Nick: I don't think this should be a hard requirement
+        # if initial_net.external_drives:
+        #     raise ValueError(
+        #         "The current Network instance has external "
+        #         + "drives, provide a Network object with no "
+        #         + "external drives."
+        #     )
         self._initial_net = initial_net
         self.constraints = constraints
         self._set_params = set_params
@@ -97,6 +98,10 @@ class Optimizer:
             self.solver = "cobyla"
             self._assemble_constraints = _assemble_constraints_cobyla
             self._run_opt = _run_opt_cobyla
+        elif solver == "cma":
+            self.solver = "cma"
+            self._assemble_constraints = _assemble_constraints_cma
+            self._run_opt = _run_opt_cma
         else:
             raise ValueError("solver must be 'bayesian' or 'cobyla'")
         # Response to be optimized
@@ -106,6 +111,9 @@ class Optimizer:
         elif obj_fun == "maximize_psd":
             self.obj_fun = _maximize_psd
             self.obj_fun_name = "maximize_psd"
+        elif obj_fun == "dipole_corr":
+            self.obj_fun = _corr_evoked
+            self.obj_fun_name = "dipole_corr"
         else:
             self.obj_fun = obj_fun  # user-defined function
             self.obj_fun_name = None
@@ -306,6 +314,27 @@ def _assemble_constraints_cobyla(constraints):
     return cons_cobyla
 
 
+def _assemble_constraints_cma(constraints):
+    """Assembles constraints in format required by cma.
+
+    Parameters
+    ----------
+    constraints : dict
+        The user-defined constraints.
+
+    Returns
+    -------
+    cons_cma : list of lists
+        Lower and higher limit for each parameter.
+    """
+
+    # assemble constraints in solver-specific format
+    lower_bounds = [bound[0] for bound in constraints.values()]
+    upper_bounds = [bound[1] for bound in constraints.values()]
+    cons_cma = [lower_bounds, upper_bounds]
+    return cons_cma
+
+
 def _update_params(initial_params, predicted_params):
     """Update params with predicted parameters.
 
@@ -409,6 +438,101 @@ def _run_opt_bayesian(
     return opt_params, obj, net_
 
 
+def _run_opt_cma(
+    initial_net,
+    tstop,
+    constraints,
+    set_params,
+    initial_params,
+    obj_fun,
+    max_iter,
+    obj_fun_kwargs,
+):
+    """Runs optimization routine with CMA-ES
+
+    Parameters
+    ----------
+    initial_net : instance of Network
+        The network object.
+    tstop : float
+        The simulated dipole's duration.
+    constraints : list of tuples
+        Parameter constraints in solver-specific format.
+    set_params : func
+        User-defined function that sets parameters in network drives.
+    initial_params : dict
+        Keys are parameter names, values are initial parameters.
+    obj_fun : func
+        The objective function.
+    max_iter : int
+        Number of calls the optimizer makes.
+    obj_fun_kwargs : dict
+        Additional arguments along with their respective values to be passed
+        to the objective function.
+
+    Returns
+    -------
+    opt_params : list
+        Optimized parameters.
+    obj : list
+        Objective values.
+    net_ : instance of Network
+        Optimized network object.
+    """
+
+    import cma
+
+    obj_values = list()
+
+    def _obj_func(predicted_params):
+        return obj_fun(
+            initial_net=initial_net,
+            initial_params=initial_params,
+            set_params=set_params,
+            predicted_params=predicted_params,
+            update_params=_update_params,
+            obj_values=obj_values,
+            tstop=tstop,
+            obj_fun_kwargs=obj_fun_kwargs,
+        )
+
+    # KD: this does not seem to be working because I was getting a lot of solutions outside the bounds
+    # I think that's also why you had to add the max(0.01, ...) for sigma in set_params_opt_drives
+    # _b_obj_func = cma.BoundDomainTransform(_obj_func, constraints)  # evaluates fun only in the bounded domain
+
+    sigma = 0.25 * (np.array(constraints[1]) - np.array(constraints[0]))
+    es = cma.CMAEvolutionStrategy(
+        list(initial_params.values()),
+        1,
+        {
+            "bounds": constraints,
+            "tolfun": obj_fun_kwargs.get("tolfun", 0.01),
+            "maxiter": max_iter,
+            "popsize": obj_fun_kwargs.get("popsize", 100),
+            "CMA_stds": obj_fun_kwargs.get("sigma", sigma),
+            "verbose": 0,
+        },
+    )
+    while not es.stop():
+        solutions = es.ask()
+        es.tell(solutions, _obj_func(solutions))
+        print
+    es.result_pretty()
+
+    # get best params
+    best_params = es.result.xbest
+
+    # get objective values
+    obj = [np.min(obj_values[:idx]) for idx in range(1, max_iter + 1)]
+
+    # get optimized net
+    params = _update_params(initial_params, best_params)
+    net_ = initial_net.copy()
+    set_params(net_, params)
+
+    return best_params, obj, net_
+
+
 def _run_opt_cobyla(
     initial_net,
     tstop,
@@ -489,3 +613,131 @@ def _run_opt_cobyla(
     set_params(net_, params)
 
     return opt_params, obj, net_
+
+
+def add_opt_drives(net, tstop=200, n_prox=2, n_dist=1):
+    prox_cell_type = ["L5_pyramidal", "L5_basket", "L2_pyramidal", "L2_basket"]
+    dist_cell_type = ["L5_pyramidal", "L2_pyramidal", "L2_basket"]
+    default_range = {
+        "mu": (0, tstop),
+        "sigma": (0, 20),
+        "numspikes": (0, 1),
+        "ampa": (-5, 1),
+        "nmda": (-5, 1),
+    }
+
+    prox_weights = {cell_type: 0.0 for cell_type in prox_cell_type}
+    dist_weights = {cell_type: 0.0 for cell_type in dist_cell_type}
+
+    prox_delays = {
+        "L2_basket": 0.1,
+        "L2_pyramidal": 0.1,
+        "L5_basket": 1.0,
+        "L5_pyramidal": 1.0,
+    }
+    dist_delays = {"L2_basket": 0.1, "L2_pyramidal": 0.1, "L5_pyramidal": 0.1}
+
+    constraints, initial_params = dict(), dict()
+    # Add proximal drives
+    for idx in range(n_prox):
+        name = f"evprox{idx + 1}"
+        constraints[f"{name}_mu"] = default_range["mu"]
+        initial_params[f"{name}_mu"] = np.random.uniform(*default_range["mu"])
+
+        constraints[f"{name}_sigma"] = default_range["sigma"]
+        initial_params[f"{name}_sigma"] = np.random.uniform(*default_range["sigma"])
+
+        constraints[f"{name}_numspikes"] = default_range["numspikes"]
+        initial_params[f"{name}_numspikes"] = 1
+
+        for cell_type in prox_cell_type:
+            constraints[f"{name}_{cell_type}_ampa"] = default_range["ampa"]
+            initial_params[f"{name}_{cell_type}_ampa"] = np.random.uniform(
+                *default_range["ampa"]
+            )
+
+            constraints[f"{name}_{cell_type}_nmda"] = default_range["nmda"]
+            initial_params[f"{name}_{cell_type}_nmda"] = np.random.uniform(
+                *default_range["nmda"]
+            )
+
+        net.add_evoked_drive(
+            name,
+            mu=0.0,
+            sigma=1.0,
+            numspikes=1,
+            location="proximal",
+            weights_ampa=prox_weights,
+            weights_nmda=prox_weights,
+            synaptic_delays=prox_delays,
+        )
+
+    # Add distal drives
+    for idx in range(n_dist):
+        name = f"evdist{idx + 1}"
+        constraints[f"{name}_mu"] = default_range["mu"]
+        initial_params[f"{name}_mu"] = np.random.uniform(*default_range["mu"])
+
+        constraints[f"{name}_sigma"] = default_range["sigma"]
+        initial_params[f"{name}_sigma"] = np.random.uniform(*default_range["sigma"])
+
+        constraints[f"{name}_numspikes"] = default_range["numspikes"]
+        initial_params[f"{name}_numspikes"] = 1
+
+        for cell_type in prox_cell_type:
+            constraints[f"{name}_{cell_type}_ampa"] = default_range["ampa"]
+            initial_params[f"{name}_{cell_type}_ampa"] = np.random.uniform(
+                *default_range["ampa"]
+            )
+
+            constraints[f"{name}_{cell_type}_nmda"] = default_range["nmda"]
+            initial_params[f"{name}_{cell_type}_nmda"] = np.random.uniform(
+                *default_range["nmda"]
+            )
+
+        net.add_evoked_drive(
+            name,
+            mu=0.0,
+            sigma=1.0,
+            numspikes=1,
+            location="distal",
+            weights_ampa=dist_weights,
+            weights_nmda=dist_weights,
+            synaptic_delays=dist_delays,
+        )
+
+    return constraints, initial_params
+
+
+def set_params_opt_drives(net, param_values):
+    drive_names = list(net.external_drives.keys())
+    for name in drive_names:
+        target_cell_types = net.external_drives[name]["target_types"]
+
+        net.external_drives[name]["dynamics"]["mu"] = param_values[f"{name}_mu"]
+        net.external_drives[name]["dynamics"]["sigma"] = param_values[f"{name}_sigma"]
+        net.external_drives[name]["dynamics"]["numspikes"] = max(
+            1, int(np.round(param_values[f"{name}_numspikes"]))
+        )
+
+        # reinstate external drives to be able to fill in below
+        for receptor in ["ampa", "nmda"]:
+            net.external_drives[name][f"weights_{receptor}"] = {
+                ct: 0.0 for ct in target_cell_types
+            }
+
+        for cell_type in target_cell_types:
+            for receptor in ["ampa", "nmda"]:
+                conn_idx = pick_connection(
+                    net, src_gids=name, target_gids=cell_type, receptor=receptor
+                )
+                assert len(conn_idx) == 1
+
+                # KD: I still think this isn't the user-friendliest way as this is pretty hidden.
+                # Will fix.
+                net.connectivity[conn_idx[0]]["nc_dict"]["A_weight"] = (
+                    10 ** param_values[f"{name}_{cell_type}_{receptor}"]
+                )
+                net.external_drives[name][f"weights_{receptor}"][cell_type] = (
+                    10 ** param_values[f"{name}_{cell_type}_{receptor}"]
+                )
