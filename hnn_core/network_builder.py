@@ -352,9 +352,9 @@ class NetworkBuilder(object):
         self._rank = _get_rank()
 
         # load mechanisms needs ParallelContext for get_rank
-        load_custom_mechanisms()
+        load_custom_mechanisms(self.net._verbose)
 
-        if self._rank == 0:
+        if self._rank == 0 and self.net._verbose:
             print("Building the NEURON model")
 
         self._clear_last_network_objects()
@@ -389,7 +389,7 @@ class NetworkBuilder(object):
         if len(self.net.rec_arrays) > 0:
             self._record_extracellular()
 
-        if self._rank == 0:
+        if self._rank == 0 and self.net._verbose:
             print("[Done]")
 
     def _gid_assign(self, rank=None, n_hosts=None):
