@@ -71,8 +71,6 @@ def simulate_dipole(
     if _BACKEND is None:
         _BACKEND = JoblibBackend(n_jobs=1)
 
-    net._verbose = verbose
-
     if n_trials is None:
         n_trials = net._params.get("N_trials", 1)
         net._params["N_trials"] = n_trials

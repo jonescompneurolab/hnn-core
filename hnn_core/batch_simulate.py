@@ -91,7 +91,7 @@ class BatchSimulate(object):
         A function to calculate summary statistics from the simulation
         results. Default is None.
     verbose : bool
-        If True, print simulation time outputs. Default: True.
+        If True, print build steps and simulation progress to console. Default: True.
 
     Notes
     -----
