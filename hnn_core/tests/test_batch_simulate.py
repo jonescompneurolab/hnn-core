@@ -5,7 +5,6 @@
 
 from pathlib import Path
 from contextlib import redirect_stdout
-import io
 import time
 import pytest
 import numpy as np
