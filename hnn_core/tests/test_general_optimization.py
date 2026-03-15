@@ -484,3 +484,24 @@ def test_initial_params_validation(solver, initial_params, error_type):
             max_iter=2,
             initial_params=initial_params,
         )
+
+
+def cma_warning():
+    tstop = 10.0
+    net = jones_2009_model(mesh_shape=(3, 3))
+    constraints = dict()
+
+    def set_params():
+        pass
+
+    with pytest.warns(UserWarning, "The cma solver"):
+        Optimizer(
+            net_offset,
+            tstop=tstop,
+            constraints=constraints,
+            set_params=set_params,
+            solver="cma",
+            obj_fun="dipole_rmse",
+            max_iter=2,
+            initial_params=initial_params,
+        )
