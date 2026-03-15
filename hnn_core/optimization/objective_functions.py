@@ -32,6 +32,36 @@ def _preprocess_dipole(dpls, obj_fun_kwargs):
         [dpl.smooth(obj_fun_kwargs["smooth_window_len"]) for dpl in dpls]
 
 
+def _get_relative_power(dpl, obj_fun_kwargs):
+    from scipy.signal import periodogram
+
+    # get psd of simulated dpl
+    freqs_simulated, psd_simulated = periodogram(
+        dpl.data["agg"], dpl.sfreq, window="hamming"
+    )
+
+    # for each f band
+    f_bands_psds = list()
+    relative_bandpower = obj_fun_kwargs["relative_bandpower"]
+
+    # Handle float and list inputs for relative_bandpower
+    if isinstance(relative_bandpower, float):
+        relative_bandpower = [relative_bandpower] * len(obj_fun_kwargs["f_bands"])
+    elif len(relative_bandpower) != len(obj_fun_kwargs["f_bands"]):
+        raise ValueError("Length of relative_bandpower must match length of f_bands.")
+
+    for idx, f_band in enumerate(obj_fun_kwargs["f_bands"]):
+        f_band_idx = np.where(
+            np.logical_and(freqs_simulated >= f_band[0], freqs_simulated <= f_band[1])
+        )[0]
+        f_bands_psds.append(relative_bandpower[idx] * sum(psd_simulated[f_band_idx]))
+
+    # The optimizer is designed to minimize the objective function.
+    # Maximizing the relative band power is equivalent to minimizing its negative.
+    obj = -sum(f_bands_psds) / sum(psd_simulated)
+    return obj
+
+
 def _rmse_evoked(
     initial_net,
     initial_params,
@@ -109,20 +139,8 @@ def _rmse_evoked(
         dpls = list()
         for batch_res in res["simulated_data"]:
             for data in batch_res:
-                # # smooth & scale all dipoles in this population (defined by n_trials)
-                # if "scale_factor" in obj_fun_kwargs:
-                #     [
-                #         trl_dpl.scale(obj_fun_kwargs["scale_factor"])
-                #         for trl_dpl in data["dpl"]
-                #     ]
-                # if "smooth_window_len" in obj_fun_kwargs:
-                #     [
-                #         trl_dpl.smooth(obj_fun_kwargs["smooth_window_len"])
-                #         for trl_dpl in data["dpl"]
-                #     ]
-
+                # smooth & scale all dipoles
                 _preprocess_dipole(data["dpl"], obj_fun_kwargs)
-
                 # average dipoles per population
                 dpls.append(average_dipoles(data["dpl"]))
 
@@ -139,7 +157,7 @@ def _rmse_evoked(
             new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"]
         )
 
-        # smooth & scale
+        # smooth & scale all dipoles
         _preprocess_dipole(dpls, obj_fun_kwargs)
 
         dpl = average_dipoles(dpls)
@@ -200,8 +218,6 @@ def _maximize_psd(
 
     import numpy as np
 
-    from scipy.signal import periodogram
-
     is_batch = _check_is_batch(predicted_params)
 
     if is_batch:
@@ -241,45 +257,10 @@ def _maximize_psd(
         obj = list()
         for batch_res in res["simulated_data"]:
             for data in batch_res:
-                # smooth & scale all dipoles in this population (defined by n_trials)
+                # smooth & scale all dipoles
                 _preprocess_dipole(data["dpl"], obj_fun_kwargs)
-
-                # average dipoles per population
-                dpl = data["dpl"][0]
-
-                # get psd of simulated dpl
-                freqs_simulated, psd_simulated = periodogram(
-                    dpl.data["agg"], dpl.sfreq, window="hamming"
-                )
-
-                # for each f band
-                f_bands_psds = list()
-                relative_bandpower = obj_fun_kwargs["relative_bandpower"]
-
-                # Handle float and list inputs for relative_bandpower
-                if isinstance(relative_bandpower, float):
-                    relative_bandpower = [relative_bandpower] * len(
-                        obj_fun_kwargs["f_bands"]
-                    )
-                elif len(relative_bandpower) != len(obj_fun_kwargs["f_bands"]):
-                    raise ValueError(
-                        "Length of relative_bandpower must match length of f_bands."
-                    )
-
-                for idx, f_band in enumerate(obj_fun_kwargs["f_bands"]):
-                    f_band_idx = np.where(
-                        np.logical_and(
-                            freqs_simulated >= f_band[0], freqs_simulated <= f_band[1]
-                        )
-                    )[0]
-                    f_bands_psds.append(
-                        relative_bandpower[idx] * sum(psd_simulated[f_band_idx])
-                    )
-
-                # The optimizer is designed to minimize the objective function.
-                # Maximizing the relative band power is equivalent to minimizing its negative.
-                relative_power = -sum(f_bands_psds) / sum(psd_simulated)
-                obj.append(relative_power)
+                dpl = data["dpl"][0]  # only one trial to analyze
+                obj.append(_get_relative_power(dpl, obj_fun_kwargs))
 
     else:
         params = update_params(initial_params, predicted_params)
@@ -289,42 +270,10 @@ def _maximize_psd(
         set_params(new_net, params)
         dpls = simulate_dipole(new_net, tstop=tstop, n_trials=1)
 
-        # smooth & scale
+        # smooth & scale all dipoles
         _preprocess_dipole(dpls, obj_fun_kwargs)
-
-        # Only 1 trial to analyze
-        dpl = dpls[0]
-
-        # get psd of simulated dpl
-        freqs_simulated, psd_simulated = periodogram(
-            dpl.data["agg"], dpl.sfreq, window="hamming"
-        )
-
-        # for each f band
-        f_bands_psds = list()
-        relative_bandpower = obj_fun_kwargs["relative_bandpower"]
-
-        # Handle float and list inputs for relative_bandpower
-        if isinstance(relative_bandpower, float):
-            relative_bandpower = [relative_bandpower] * len(obj_fun_kwargs["f_bands"])
-        elif len(relative_bandpower) != len(obj_fun_kwargs["f_bands"]):
-            raise ValueError(
-                "Length of relative_bandpower must match length of f_bands."
-            )
-
-        for idx, f_band in enumerate(obj_fun_kwargs["f_bands"]):
-            f_band_idx = np.where(
-                np.logical_and(
-                    freqs_simulated >= f_band[0], freqs_simulated <= f_band[1]
-                )
-            )[0]
-            f_bands_psds.append(
-                relative_bandpower[idx] * sum(psd_simulated[f_band_idx])
-            )
-
-        # The optimizer is designed to minimize the objective function.
-        # Maximizing the relative band power is equivalent to minimizing its negative.
-        obj = -sum(f_bands_psds) / sum(psd_simulated)
+        dpl = dpls[0]  # only one trial to analyze
+        obj = _get_relative_power(dpl, obj_fun_kwargs)
 
     obj_values.append(obj)
 
@@ -409,7 +358,7 @@ def _corr_evoked(
         dpls = list()
         for batch_res in res["simulated_data"]:
             for data in batch_res:
-                # smooth & scale all dipoles in this population (defined by n_trials)
+                # smooth & scale all dipoles
                 _preprocess_dipole(data["dpl"], obj_fun_kwargs)
 
                 # average dipoles per population
@@ -428,12 +377,8 @@ def _corr_evoked(
             new_net, tstop=tstop, n_trials=obj_fun_kwargs["n_trials"]
         )
 
-        # smooth & scale
-        if "scale_factor" in obj_fun_kwargs:
-            [dpl.scale(obj_fun_kwargs["scale_factor"]) for dpl in dpls]
-        if "smooth_window_len" in obj_fun_kwargs:
-            [dpl.smooth(obj_fun_kwargs["smooth_window_len"]) for dpl in dpls]
-
+        # smooth & scale all dipoles
+        _preprocess_dipole(dpls, obj_fun_kwargs)
         dpl = average_dipoles(dpls)
         obj = _corr(dpl, obj_fun_kwargs["target"], tstop=tstop)
 

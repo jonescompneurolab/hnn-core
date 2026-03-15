@@ -315,6 +315,7 @@ def test_parallel_execution(batch_simulate_instance, param_grid):
         "Parallel execution is not faster than serial execution!"
     )
 
+
 # This test is currently not working, buffer is returning empty string
 # def test_verbose(batch_simulate_instance, param_grid):
 #     """Test that verbose flag controls print statements."""
