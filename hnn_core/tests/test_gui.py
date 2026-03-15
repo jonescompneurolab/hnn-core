@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 import traitlets
-import os
 
 from pathlib import Path
 from hnn_core import Dipole, Network, simulate_dipole
@@ -959,7 +958,7 @@ def test_gui_upload_csv_simulation(setup_gui):
     # Formulate path to the file
     file_path = assets_path / "test_default.csv"
     absolute_path = str(file_path.resolve())
-    if os.name == "nt":  # Windows
+    if Path().anchor == "\\":  # Windows
         # Convert backslashes to forward slashes and
         # ensure we have three slashes after 'file:'
         file_url = "file:///" + absolute_path.replace("\\", "/")

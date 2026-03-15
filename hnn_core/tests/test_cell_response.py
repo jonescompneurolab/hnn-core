@@ -5,6 +5,7 @@ from glob import glob
 import matplotlib.pyplot as plt
 import pytest
 import numpy as np
+from pathlib import Path
 
 from hnn_core import CellResponse, read_spikes
 

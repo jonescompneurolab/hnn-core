@@ -1,4 +1,4 @@
-import os.path as op
+from pathlib import Path
 import io
 from contextlib import redirect_stdout, redirect_stderr
 from queue import Queue
@@ -78,10 +78,10 @@ def test_extract_data_length():
 def test_str_to_net():
     """Test reading the network via a string"""
 
-    hnn_core_root = op.dirname(hnn_core.__file__)
+    hnn_core_root = Path(hnn_core.__file__).parent
 
     # prepare network
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     net = jones_2009_model(params, add_drives_from_params=True)
 
@@ -115,10 +115,10 @@ def test_str_to_net():
 def test_child_run():
     """Test running the child process without MPI"""
 
-    hnn_core_root = op.dirname(hnn_core.__file__)
+    hnn_core_root = Path(hnn_core.__file__).parent
 
     # prepare params
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     params_reduced = params.copy()
     params_reduced.update({"t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20})

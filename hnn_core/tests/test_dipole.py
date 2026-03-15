@@ -1,4 +1,3 @@
-import os.path as op
 from urllib.request import urlretrieve
 from pathlib import Path
 
@@ -21,8 +20,8 @@ matplotlib.use("agg")
 
 def test_dipole(tmp_path, run_hnn_core_fixture):
     """Test dipole object."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root / "param" / "default.json"
     dpl_out_fname = tmp_path / "dpl1.txt"
     dpl_out_hdf5_fname = tmp_path / "dpl.hdf5"
     params = read_params(params_fname)
@@ -187,8 +186,8 @@ def test_dipole(tmp_path, run_hnn_core_fixture):
 
 def test_dipole_simulation():
     """Test data produced from simulate_dipole() call."""
-    hnn_core_root = op.dirname(hnn_core.__file__)
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    hnn_core_root = Path(hnn_core.__file__).parent
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
     params.update(
         {"dipole_smooth_win": 5, "t_evprox_1": 5, "t_evdist_1": 10, "t_evprox_2": 20}
@@ -320,7 +319,7 @@ def test_rmse():
         "https://raw.githubusercontent.com/jonescompneurolab/hnn/"
         "master/data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt"
     )
-    if not op.exists("yes_trial_S1_ERP_all_avg.txt"):
+    if not Path("yes_trial_S1_ERP_all_avg.txt").exists():
         urlretrieve(data_url, "yes_trial_S1_ERP_all_avg.txt")
     extdata = np.loadtxt("yes_trial_S1_ERP_all_avg.txt")
 
@@ -328,8 +327,8 @@ def test_rmse():
         times=extdata[:, 0], data=np.c_[extdata[:, 1], extdata[:, 1], extdata[:, 1]]
     )
 
-    hnn_core_root = op.join(op.dirname(hnn_core.__file__))
-    params_fname = op.join(hnn_core_root, "param", "default.json")
+    hnn_core_root = Path(hnn_core.__file__).resolve().parent
+    params_fname = hnn_core_root / "param" / "default.json"
     params = read_params(params_fname)
 
     expected_rmse = 0.1

@@ -7,6 +7,7 @@ import pytest
 
 from hnn_core import jones_2009_model, simulate_dipole
 from hnn_core.optimization import Optimizer
+from pathlib import Path
 
 
 @pytest.mark.parametrize("solver", ["bayesian", "cobyla"])
