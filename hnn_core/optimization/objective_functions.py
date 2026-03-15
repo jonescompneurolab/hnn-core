@@ -24,6 +24,14 @@ def _check_is_batch(predicted_params):
     return is_batch
 
 
+def _preprocess_dipole(dpls, obj_fun_kwargs):
+    """Apply smooth and scale preprocessing"""
+    if "scale_factor" in obj_fun_kwargs:
+        [dpl.scale(obj_fun_kwargs["scale_factor"]) for dpl in dpls]
+    if "smooth_window_len" in obj_fun_kwargs:
+        [dpl.smooth(obj_fun_kwargs["smooth_window_len"]) for dpl in dpls]
+
+
 def _rmse_evoked(
     initial_net,
     initial_params,
@@ -54,6 +62,8 @@ def _rmse_evoked(
         A dipole object with experimental data.
     n_trials : int
         Number of trials to simulate and average.
+    verbose : bool
+        If True, print build steps and simulation progress to console. Default: True.
 
     Returns
     -------
@@ -86,7 +96,6 @@ def _rmse_evoked(
             tstop=tstop,
             overwrite=False,
             clear_cache=False,
-            verbose=0,
         )
 
         res = batch_simulation.run(
@@ -94,23 +103,25 @@ def _rmse_evoked(
             n_jobs=obj_fun_kwargs.get("n_jobs", 1),
             combinations=False,
             backend="loky",
-            verbose=0,
+            verbose=obj_fun_kwargs.get("verbose", True),
         )
 
         dpls = list()
         for batch_res in res["simulated_data"]:
             for data in batch_res:
-                # smooth & scale all dipoles in this population (defined by n_trials)
-                if "scale_factor" in obj_fun_kwargs:
-                    [
-                        trl_dpl.scale(obj_fun_kwargs["scale_factor"])
-                        for trl_dpl in data["dpl"]
-                    ]
-                if "smooth_window_len" in obj_fun_kwargs:
-                    [
-                        trl_dpl.smooth(obj_fun_kwargs["smooth_window_len"])
-                        for trl_dpl in data["dpl"]
-                    ]
+                # # smooth & scale all dipoles in this population (defined by n_trials)
+                # if "scale_factor" in obj_fun_kwargs:
+                #     [
+                #         trl_dpl.scale(obj_fun_kwargs["scale_factor"])
+                #         for trl_dpl in data["dpl"]
+                #     ]
+                # if "smooth_window_len" in obj_fun_kwargs:
+                #     [
+                #         trl_dpl.smooth(obj_fun_kwargs["smooth_window_len"])
+                #         for trl_dpl in data["dpl"]
+                #     ]
+
+                _preprocess_dipole(data["dpl"], obj_fun_kwargs)
 
                 # average dipoles per population
                 dpls.append(average_dipoles(data["dpl"]))
@@ -129,10 +140,7 @@ def _rmse_evoked(
         )
 
         # smooth & scale
-        if "scale_factor" in obj_fun_kwargs:
-            [dpl.scale(obj_fun_kwargs["scale_factor"]) for dpl in dpls]
-        if "smooth_window_len" in obj_fun_kwargs:
-            [dpl.smooth(obj_fun_kwargs["smooth_window_len"]) for dpl in dpls]
+        _preprocess_dipole(dpls, obj_fun_kwargs)
 
         dpl = average_dipoles(dpls)
         obj = _rmse(dpl, obj_fun_kwargs["target"], tstop=tstop)
@@ -173,6 +181,8 @@ def _maximize_psd(
     relative_bandpower : list of float | float
         Weight for each frequency band in f_bands. If a single float is provided,
         the same weight is applied to all frequency bands.
+    verbose : bool
+        If True, print build steps and simulation progress to console. Default: True.
 
     Returns
     -------
@@ -218,7 +228,6 @@ def _maximize_psd(
             tstop=tstop,
             overwrite=False,
             clear_cache=False,
-            verbose=0,
         )
 
         res = batch_simulation.run(
@@ -226,23 +235,14 @@ def _maximize_psd(
             n_jobs=obj_fun_kwargs.get("n_jobs", 1),
             combinations=False,
             backend="loky",
-            verbose=0,
+            verbose=obj_fun_kwargs.get("verbose", True),
         )
 
         obj = list()
         for batch_res in res["simulated_data"]:
             for data in batch_res:
                 # smooth & scale all dipoles in this population (defined by n_trials)
-                if "scale_factor" in obj_fun_kwargs:
-                    [
-                        trl_dpl.scale(obj_fun_kwargs["scale_factor"])
-                        for trl_dpl in data["dpl"]
-                    ]
-                if "smooth_window_len" in obj_fun_kwargs:
-                    [
-                        trl_dpl.smooth(obj_fun_kwargs["smooth_window_len"])
-                        for trl_dpl in data["dpl"]
-                    ]
+                _preprocess_dipole(data["dpl"], obj_fun_kwargs)
 
                 # average dipoles per population
                 dpl = data["dpl"][0]
@@ -287,13 +287,13 @@ def _maximize_psd(
         # simulate dpl with predicted params
         new_net = initial_net.copy()
         set_params(new_net, params)
-        dpl = simulate_dipole(new_net, tstop=tstop, n_trials=1)[0]
+        dpls = simulate_dipole(new_net, tstop=tstop, n_trials=1)
 
         # smooth & scale
-        if "scale_factor" in obj_fun_kwargs:
-            dpl.scale(obj_fun_kwargs["scale_factor"])
-        if "smooth_window_len" in obj_fun_kwargs:
-            dpl.smooth(obj_fun_kwargs["smooth_window_len"])
+        _preprocess_dipole(dpls, obj_fun_kwargs)
+
+        # Only 1 trial to analyze
+        dpl = dpls[0]
 
         # get psd of simulated dpl
         freqs_simulated, psd_simulated = periodogram(
@@ -340,7 +340,6 @@ def _corr_evoked(
     obj_values,
     tstop,
     obj_fun_kwargs,
-    is_batch=False,
 ):
     """The objective function for evoked responses.
 
@@ -362,6 +361,8 @@ def _corr_evoked(
         A dipole object with experimental data.
     n_trials : int
         Number of trials to simulate and average.
+    verbose : bool
+        If True, print build steps and simulation progress to console. Default: True.
 
     Returns
     -------
@@ -395,7 +396,6 @@ def _corr_evoked(
             tstop=tstop,
             overwrite=False,
             clear_cache=False,
-            verbose=0,
         )
 
         res = batch_simulation.run(
@@ -403,23 +403,14 @@ def _corr_evoked(
             n_jobs=obj_fun_kwargs.get("n_jobs", 1),
             combinations=False,
             backend="loky",
-            verbose=0,
+            verbose=obj_fun_kwargs.get("verbose", True),
         )
 
         dpls = list()
         for batch_res in res["simulated_data"]:
             for data in batch_res:
                 # smooth & scale all dipoles in this population (defined by n_trials)
-                if "scale_factor" in obj_fun_kwargs:
-                    [
-                        trl_dpl.scale(obj_fun_kwargs["scale_factor"])
-                        for trl_dpl in data["dpl"]
-                    ]
-                if "smooth_window_len" in obj_fun_kwargs:
-                    [
-                        trl_dpl.smooth(obj_fun_kwargs["smooth_window_len"])
-                        for trl_dpl in data["dpl"]
-                    ]
+                _preprocess_dipole(data["dpl"], obj_fun_kwargs)
 
                 # average dipoles per population
                 dpls.append(average_dipoles(data["dpl"]))

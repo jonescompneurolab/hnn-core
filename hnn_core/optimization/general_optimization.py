@@ -170,8 +170,10 @@ class Optimizer:
             The dipole scale factor.
         smooth_window_len : float, optional
             The smooth window length.
+        verbose : bool
+            If True, print build steps and simulation progress to console. Default: True.
         """
-        if self.obj_fun_name == "dipole_rmse":
+        if self.obj_fun_name == "dipole_rmse" or self.obj_fun_name == "dipole_corr":
             if "target" not in obj_fun_kwargs:
                 raise Exception("target must be specified")
             elif "n_trials" not in obj_fun_kwargs:
