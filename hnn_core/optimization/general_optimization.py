@@ -78,13 +78,6 @@ class Optimizer:
         opt_params_ : list
             The list of optimized parameter values.
         """
-        # Nick: I don't think this should be a hard requirement
-        # if initial_net.external_drives:
-        #     raise ValueError(
-        #         "The current Network instance has external "
-        #         + "drives, provide a Network object with no "
-        #         + "external drives."
-        #     )
         self._initial_net = initial_net
         self.constraints = constraints
         self._set_params = set_params
@@ -495,10 +488,6 @@ def _run_opt_cma(
             tstop=tstop,
             obj_fun_kwargs=obj_fun_kwargs,
         )
-
-    # KD: this does not seem to be working because I was getting a lot of solutions outside the bounds
-    # I think that's also why you had to add the max(0.01, ...) for sigma in set_params_opt_drives
-    # _b_obj_func = cma.BoundDomainTransform(_obj_func, constraints)  # evaluates fun only in the bounded domain
 
     sigma = 0.25 * (np.array(constraints[1]) - np.array(constraints[0]))
     es = cma.CMAEvolutionStrategy(

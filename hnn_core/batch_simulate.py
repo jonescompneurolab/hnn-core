@@ -144,6 +144,7 @@ class BatchSimulate(object):
         _check_option("record_vsec", record_vsec, ["all", "soma", False])
         _check_option("record_isec", record_isec, ["all", "soma", False])
         _validate_type(clear_cache, types=(bool,), item_name="clear_cache")
+        _validate_type(verbose, types=(bool,), item_name="verbose")
 
         if set_params is not None and not callable(set_params):
             raise TypeError("set_params must be a callable function")

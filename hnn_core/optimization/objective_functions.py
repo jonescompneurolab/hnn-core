@@ -11,6 +11,19 @@ from ..dipole import _rmse, _corr, average_dipoles
 from ..batch_simulate import BatchSimulate
 
 
+def _check_is_batch(predicted_params):
+    """Check predicted params dimensionality, dim=2 indicates batch simulation"""
+    if len(np.array(predicted_params).shape) == 1:
+        is_batch = False
+    elif len(np.array(predicted_params).shape) == 2:
+        is_batch = True
+    else:
+        raise ValueError(
+            f"Incorrect shape for predicted params. Got {np.array(predicted_params).shape}"
+        )
+    return is_batch
+
+
 def _rmse_evoked(
     initial_net,
     initial_params,
@@ -47,14 +60,7 @@ def _rmse_evoked(
     obj : float
         Normalized RMSE between recorded and simulated dipole.
     """
-    if len(np.array(predicted_params).shape) == 1:
-        is_batch = False
-    elif len(np.array(predicted_params).shape) == 2:
-        is_batch = True
-    else:
-        raise ValueError(
-            f"Incorrect shape for predicted params. Got {np.array(predicted_params).shape}"
-        )
+    is_batch = _check_is_batch(predicted_params)
 
     if is_batch:
         predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
@@ -186,14 +192,7 @@ def _maximize_psd(
 
     from scipy.signal import periodogram
 
-    if len(np.array(predicted_params).shape) == 1:
-        is_batch = False
-    elif len(np.array(predicted_params).shape) == 2:
-        is_batch = True
-    else:
-        raise ValueError(
-            f"Incorrect shape for predicted params. Got {np.array(predicted_params).shape}"
-        )
+    is_batch = _check_is_batch(predicted_params)
 
     if is_batch:
         predicted_params = np.array(predicted_params).reshape(-1, len(initial_params))
@@ -369,14 +368,7 @@ def _corr_evoked(
     obj : float
         Normalized RMSE between recorded and simulated dipole.
     """
-    if len(np.array(predicted_params).shape) == 1:
-        is_batch = False
-    elif len(np.array(predicted_params).shape) == 2:
-        is_batch = True
-    else:
-        raise ValueError(
-            f"Incorrect shape for predicted params. Got {np.array(predicted_params).shape}"
-        )
+    is_batch = _check_is_batch(predicted_params)
 
     if is_batch:
         # params = update_params(initial_params, predicted_params)
