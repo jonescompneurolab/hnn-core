@@ -1232,9 +1232,10 @@ class _VizManager:
             self.datasets_dropdown.value = sim_names[0]
             # show list of simulated to gui dropdown
             self.datasets_dropdown.layout.visibility = "visible"
-        # else:
-        #     # hide sim-data dropdown
-        #     self.datasets_dropdown.layout.visibility = "hidden"
+        else:
+            # hide sim-data dropdown if not using a pre-programmed Figure Template (this
+            # currently only applies to the "[Blank] Xrow x Ycol" Figure Templates)
+            self.datasets_dropdown.layout.visibility = "hidden"
 
     @unlink_relink(attribute="figs_config_tab_link")
     def add_figure(self, b=None):
