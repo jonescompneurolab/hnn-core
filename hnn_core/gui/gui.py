@@ -332,6 +332,7 @@ class HNNGUI:
         # ----------------------------------------------------------------------
         # The HNN GUI is composed using ipywidget's AppLayout, which uses the
         # following structure:
+        #
         #   | -------------- header --------------- |
         #   | left-sidebar | center | right-sidebar |
         #   | -------------- footer --------------- |
@@ -350,21 +351,23 @@ class HNNGUI:
         #       <div> elements (i.e.,"blocks") to the HTML tree when instantiating
         #       widgets, which would make it extremely difficult to ascertain which
         #       <div> elements we need to target with CSS without the use of HTML
-        #       tags to identify the relevant containers
+        #       tags to identify the relevant containers.
         #
         # Using our custom class names in place of the AppLayout parameter names, the
         # structure of the GUI can similarly be written as follows:
+        #
         #   | ----------------- title-bar ----------------- |
         #   |   parameters-window  | | visualization-window |
         #   | ----------------- status-bar ---------------- |
         #
         #     > Note that we do not (currently) utilize the "center" AppLayout
-        #       container, which is set to 0px in our AppLayout instantiation below
+        #       container, which is set to 0px in our AppLayout instantiation below.
         #
         # The diagrams below outline the structure of these automatically-generated
-        # "outer" parent containers, with our included HTML tags
+        # "outer" parent containers, with our included HTML tags:
         #
-        # The AppLayout header (title-bar)
+        # The AppLayout header (title-bar):
+        #
         #   ======================= title-bar =======================
         #   ||                                                     ||
         #   ||   ============== title-bar-contents =============   ||
@@ -375,7 +378,8 @@ class HNNGUI:
         #   ||                                                     ||
         #   =========================================================
         #
-        # The AppLayout left-sidebar (parameters-window)
+        # The AppLayout left-sidebar (parameters-window):
+        #
         #   =================== parameters-window ===================
         #   ||                                                     ||
         #   ||   ========== param-tabs-outer-container =========   ||
@@ -396,7 +400,8 @@ class HNNGUI:
         #   ||                                                     ||
         #   =========================================================
         #
-        # The AppLayout right-sidebar (visualization-window)
+        # The AppLayout right-sidebar (visualization-window):
+        #
         #   ================== visualization-window =================
         #   ||                                                     ||
         #   ||   ====== [[ nested, auto-generated tags ]] ======   ||
@@ -411,9 +416,10 @@ class HNNGUI:
         #   ||                                                     ||
         #   =========================================================
         #     > Note: the "fig-tabs" HTML class is applied when the Tab() container
-        #       is initialized in _viz_manager.py, and not in gui.py
+        #       is initialized in _viz_manager.py, and not in gui.py .
         #
-        # The AppLayout footer (status-bar)
+        # The AppLayout footer (status-bar):
+        #
         #   ====================== status-bar =======================
         #   ||                                                     ||
         #   ||   =============== sim-status-box ================   ||
@@ -426,7 +432,7 @@ class HNNGUI:
         #
         # Keep in mind that there are many more HTML tags used that listed in the
         # diagrams above; these are merely the tags that are used to specify the
-        # primary "outer" containers that house the actual GUI contents
+        # primary "outer" containers that house the actual GUI contents.
 
         # ----------------------------------------------------------------------
         # Set the layout properties for various GUI components
@@ -434,21 +440,20 @@ class HNNGUI:
 
         # Set up container height / width parameters
         # ----------------------------------------------------------------------
-        # Containers properties are computed relative to total height/width,
+        # Containers' properties are computed relative to total height/width,
         # allowing us to scale the GUI size without needed to figure out what the
-        # exact pixel values need to be for each element
+        # exact pixel values need to be for each element:
         self.total_height = total_height
         self.total_width = total_width
 
         # We'll compute pixels for the "fixed" outer containers (per AppLayout), but
-        # we'll be able to use percentages for most of the "inner" containers
-        # Note that we must use int() as we cannot have fractional pixel values
+        # we'll be able to use percentages for most of the "inner" containers.
+        # Note that we must use int() as we cannot have fractional pixel values.
         parameters_window_width = int(total_width * param_window_width_prop)
         figures_window_width = int(total_width - parameters_window_width)
         main_content_height = total_height - status_height
 
-        # specify the gap between the footer ("status-bar") and the containers
-        # above it
+        # Specify the gap between the footer ("status-bar") and the containers above it
         footer_gap = 10
 
         # default (shared) height for buttons
@@ -461,17 +466,17 @@ class HNNGUI:
             # dpi is technically used in only one place (the _add_figure function in
             # _viz_manager.py), but it is defined here so that it can be specified
             # when calling ``HNNGUI.__init__`` and be passed to the viz_layout
-            # argument via "self.viz_manager = _VizManager(...)" below
-            # [REF]: [DSD] this parameter should ideally be separated from self.layout,
+            # argument via "self.viz_manager = _VizManager(...)" below.
+            # TODO: [DSD] this parameter should ideally be separated from self.layout,
             # which should only define the layout properties of containers.
             "dpi": dpi,
             #
-            # [REF]: [DSD] imho these elements below, which describe buttons, should
+            # TODO: [DSD] IMHO these elements below, which describe buttons, should
             # also be separated from self.layout. Similar to dpi, "theme_color" and
             # "btn" are passed to viz_layout, albeit they are only used in one
             # place in _viz_manager, when self.make_fig_button is called. This button
             # already has make-fig-btn HTML class, so adding the styling directly via
-            # CSS to the different buttons may be the better approach
+            # CSS to the different buttons may be the better approach.
             "theme_color": "#802989",
             "btn": Layout(
                 height=f"{button_height}px",
@@ -544,9 +549,10 @@ class HNNGUI:
             #   - child of "parameters-window" > "param_tabs_outer_container" >
             #     "param-window-tabs-widget" > "widget-tab-contents"
             #   - associated html class: "simulation-tab-contents"
-            # note that "widget-tab-contents" is an auto-generated container that
+            #
+            # Note that "widget-tab-contents" is an auto-generated container that
             # we do not specifically tag, but it is often used in conjunction with
-            # the parent or child container for targeted CSS styling
+            # the parent or child container for targeted CSS styling.
             "simulation_tab_contents": Layout(
                 width="100%",
                 height="100%",
@@ -564,11 +570,12 @@ class HNNGUI:
             # container for the log window
             #   - child of "parameters-window"
             #   - associated html class: "log-window"
-            # note: we use a margin on log-window to set the footer-gap here, as the
+            #
+            # Note: we use a margin on log-window to set the footer-gap here, as the
             # gap is inserted between the inner container "log-window" and its parent
             # container "parameters-window."" Adding the gap as a margin directly to
             # parameters-window would also require recalculating the height of the
-            # container to accommodate the extra margin, since its height is fixed
+            # container to accommodate the extra margin, since its height is fixed.
             "log_window": Layout(
                 border="1px solid lightgray",
                 height=f"{int(log_window_height_prop * 100)}%",
@@ -584,11 +591,11 @@ class HNNGUI:
             # the "right_sidebar" section in AppLayout
             #   - associated html class: "visualization-window"
             #
-            # note: we set the footer-gap here by recalculating the height of
+            # Note: we set the footer-gap here by recalculating the height of
             # visualization-window. Adding footer_gap as a margin, as done above for
             # log-window above, would not shift the content up, as the container height
             # is still specified in pixels. Rather, the margin on visualization-window
-            # would simply overflow into the footer
+            # would simply overflow into the footer.
             "visualization_window": Layout(
                 width=f"{figures_window_width}px",
                 height=f"{main_content_height - footer_gap}px",
@@ -601,10 +608,10 @@ class HNNGUI:
             #     ( <img src=...> | <div class="jupyter-matplotlib-figure"...>)
             #   - associated html class: NA
             #
-            # note: figure sizes are set in _add_figure in _viz_manager, where
+            # Note: figure sizes are set in _add_figure in _viz_manager, where
             # percents are converted to pixels. This CSS block sets the dimensions
             # for both static figure outputs (<img src="data:img/png;base64,...>")
-            # AND for dynamic figure outputs (<div class="jupyter-matplotlib-figure">)
+            # AND for dynamic figure outputs (<div class="jupyter-matplotlib-figure">).
             "visualization_output_figsize": Layout(
                 width="100%",
                 height="95%",
@@ -613,10 +620,10 @@ class HNNGUI:
 
         # Set up for the simulation status bar
         # ----------------------------------------------------------------------
-        # we directly set up the html for the status bar below
-        # this dict is referenced in _init_ui_components and run_button_clicked
+        # We directly set up the html for the status bar below.
         #   - child of status-bar
         #   - associated html class: sim-status-box
+        # Note: This dict is referenced in _init_ui_components and run_button_clicked:
         self._simulation_status_contents = {
             "not_running": """
                 <div
@@ -682,6 +689,7 @@ class HNNGUI:
         # ==================================================
         # Simulation tab
         # ==================================================
+        # This is where we first start instantiating actual widgets.
 
         # input fields for simulation parameters
         # --------------------------------------------------
@@ -1017,9 +1025,9 @@ class HNNGUI:
 
         # generate the HTML contents for the title-bar
         # --------------------------------------------------
-        # the sun and moon icons for the theme toggle button are kept here so that
+        # The sun and moon icons for the theme toggle button are kept here so that
         # they load immediately with the GUI. we *could* move these to the .js, but
-        # then there would be a delay before the buttons appears
+        # then there would be a delay before the buttons appears.
         sun_icon = (
             "M361.5 1.2c5 2.1 8.6 6.6 9.6 11.9L391 121l107.9 19.8c5.3 1 9.8 4.6 11.9 "
             "9.6s1.5 10.7-1.6 15.2L446.9 256l62.3 90.3c3.1 4.5 3.7 10.2 1.6 15.2s-6.6 "
@@ -1298,9 +1306,9 @@ class HNNGUI:
                         self._backend_config_out,
                     ]
                 ),
-                # the dynamic-spacer can shrink/grow based on available space to
+                # The dynamic-spacer can shrink/grow based on available space to
                 # help prevent any "smushing" or overlap that may appear on some
-                # OS/browser combinations but not others
+                # OS/browser combinations but not others:
                 Box().add_class("dynamic-spacer"),
                 HTML("Default Visualization Parameters").add_class("sim-tab-titles"),
                 VBox(
@@ -1312,8 +1320,8 @@ class HNNGUI:
                     ]
                 ),
                 Box().add_class("dynamic-spacer"),
-                # the VBox below contains the run, save, and load buttons, as well as
-                # the dropdown widget for selecting networks/simulations to save
+                # The VBox below contains the run, save, and load buttons, as well as
+                # the dropdown widget for selecting networks/simulations to save:
                 VBox(
                     [
                         HBox(
@@ -1364,7 +1372,8 @@ class HNNGUI:
                         self._global_gain_out,
                     ]
                 ),
-                # the toggle widgets for the weights for each connection
+                # The connectivity weights/gains accordion, already built from
+                # _init_ui_components
                 self._connectivity_out,
             ]
         ).add_class("connectivity-params")
@@ -1420,7 +1429,7 @@ class HNNGUI:
                         drive_add_container,
                     ]
                 ),
-                # the toggle widgets for each of the individual drives
+                # the external drives accordion, already built from _init_ui_components
                 self._drives_out,
             ]
         ).add_class("drive-tab-contents")
@@ -1431,7 +1440,6 @@ class HNNGUI:
         """
         build parameters-window (to occupy AppLayout's left_sidebar)
         """
-
         # initialize the Vbox objects that contain the contents of the primary GUI
         # tabs: Simulation, Network, External Drives, and Visualization
         simulation_tab_contents = self.build_sim_tab_contents()
@@ -1452,7 +1460,7 @@ class HNNGUI:
             visualization_tab_contents,
         ]
 
-        # loop through tabs and set the title
+        # set each tab's title
         titles = (
             "Simulation",
             "Network",
@@ -1493,13 +1501,13 @@ class HNNGUI:
         # JavaScript tags injected via HTML() (which is how IPywidgets updates
         # the DOM) are not executed by browsers for security reasons. To get
         # around this constraint, we use a 1x1 transparent GIF to trigger the "onload"
-        # event that follows it. this method may seem a bit "hacky", but it is
+        # event that follows it. This method may seem a bit "hacky", but it is
         # actually a very commonly used trick for injecting scripts into IPywidgets.
-        # because "onload" is a "lifecycle event" of a valid asset (basically, a
+        # Because "onload" is a "lifecycle event" of a valid asset (basically, a
         # high-priority attribute that must be processed when rendering the web page),
         # the browser is forced to execute the included JavaScript as soon as the
-        # widget is rendered. this gives us a reliable execution hook that
-        # is responsive to changes to the GUI (such as tabs being added or closed)
+        # widget is rendered. This gives us a reliable execution hook that
+        # is responsive to changes to the GUI (such as tabs being added or closed).
         # ----------------------------------------------------------------------
 
         # "escape" any double quotes in our JS code, which is needed since we insert
@@ -1536,7 +1544,6 @@ class HNNGUI:
 
         # setup
         # --------------------------------------------------
-
         # add custom CSS and JS to the DOM before AppLayout is called so that
         # the style is applied before the widget is rendered
         custom_gui_styling = self.custom_gui_styling()
@@ -1558,7 +1565,8 @@ class HNNGUI:
 
         # build the GUI from its constituent components
         # --------------------------------------------------
-
+        # Note: see __init__() for diagrams and explanations of the overall structure,
+        # including nesting and HTML tag usage.
         self.app_layout = AppLayout(
             header=self._header,
             left_sidebar=parameters_window,

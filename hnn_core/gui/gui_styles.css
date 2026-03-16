@@ -19,8 +19,8 @@
 
 /*  center the entire AppLayout container
 
-        note: the "safe" parameter prevents the app from being cut
-        off when the window size is smaller than the gui itself
+        Note: the "safe" parameter prevents the app from being cut off when the window
+        size is smaller than the gui itself
 */
 .hnn-gui {
     justify-content: safe center !important;
@@ -44,9 +44,9 @@
 
 /*  adjust border width on focus for input fields
 
-        note: we change the border-width property directly to force
-        it to update on focus. we also adjust the text padding to
-        account for the increase in border thickness 
+        Note: We change the border-width property directly to force it to update on
+        focus. We also adjust the text padding to account for the increase in border
+        thickness.
 */
 .jupyter-widgets input:focus,
 .jupyter-widgets select:focus,
@@ -57,18 +57,17 @@
         var(--jp-widgets-input-padding)
         0
         var(--jp-widgets-input-padding)
-        calc(var(--jp-widgets-input-padding) * 2 - 1px) 
+        calc(var(--jp-widgets-input-padding) * 2 - 1px)
         !important;
 }
 
 /*  prevent small pixel shifts when switching between tabs
 
-        note: a fixed "flex-basis" ensures sizes are calculated
-        based on the *parent's* dimensions rather than the child's
-        contents. this prevents height recalculation when the layout
-        changes, which can cause visible pixel jumps 
-        "border-box" ensures borders and padding are contained within
-        the height, similarly preventign shifts with layout changes
+        Note: A fixed "flex-basis" ensures sizes are calculated based on the *parent's*
+        dimensions rather than the child's contents. This prevents height recalculation
+        when the layout changes, which can cause visible pixel jumps "border-box"
+        ensures borders and padding are contained within the height, similarly
+        preventing shifts with layout changes.
 */
 .jupyter-widget-TabPanel > .widget-tab-contents {
     flex-basis: 100% !important;
@@ -135,14 +134,13 @@
 
 /* ---------------------------------------- */
 /* -- general parameters-window styling --- */
-/* ---------------------------------------- */ 
+/* ---------------------------------------- */
 
 /*  ensure TabBar fills the available space
 
-        note: this fixes an issue where the last tab was slightly offset
-        (by around 1px) from the right border. we only target tabs that
-        are the first child of .lm-TabBar-content to ensure none of the
-        nested tabs grow
+        Note: This fixes an issue where the last tab was slightly offset (by around 1px)
+        from the right border. We only target tabs that are the first child of
+        .lm-TabBar-content to ensure none of the nested tabs grow.
 */
 .param-window-tabs-widget > .widget-tab-bar >
 .lm-TabBar-content > .lm-TabBar-tab {
@@ -167,14 +165,14 @@ padding-bottom: 10px !important;
     flex: none !important;
 }
 
-/* 
+/*
     hide the existing-plots container in Visualization tab
 
-        note: viz_manager relies on the presence of the "existing-plots"
+        Note: viz_manager relies on the presence of the "existing-plots"
         HTML container in various parts of the code; however, the display
         for existing-plots is adds clutter to the visualization tab. Since
         its not obvious how to untangle viz_manager's dependence on this
-        element, we can simply hide the display from the user
+        element, we can simply hide the display from the user.
 */
 .jupyter-widgets.widget-vbox.existing-plots {
     display: none !important;
@@ -198,10 +196,10 @@ padding-bottom: 10px !important;
 }
 
 /*
-    this adjusts the content container's border, not the borders
+    This adjusts the content container's border, not the borders
     on the tabs themselves. Though it does effectively set the
     bottom border around the inactive tabs (with the active tab
-    not having a bottom border)
+    not having a bottom border).
 */
 .param-window-tabs-widget .widget-tab-contents {
     border: 1px solid lightgrey !important;
@@ -248,10 +246,10 @@ padding-bottom: 10px !important;
 }
 
 /*
-    there is an additional Output() box around "Core" and "MPI cmd"
+    There is an additional Output() box around "Core" and "MPI cmd"
     since the "MPI cmd" is dynamically inserted when the MPI backend
     is selected. We need to remove the margin around that extra box
-    so that the input fields line up properly
+    so that the input fields line up properly.
 */
 .backend-config-out {
     margin: 0px !important;
@@ -269,9 +267,9 @@ padding-bottom: 10px !important;
     remove the "top" edge of the border by setting border to "none"
     if the "lm-TabBar-tab" child class is not present
 
-        note: this element needs to be targeted with "::after", as that
-        element is used to form the border that spans from the end of 
-        the tab to the end of the container that holds the figure
+        Note: This element needs to be targeted with "::after", as that
+        element is used to form the border that spans from the end of
+        the tab to the end of the container that holds the figure.
 */
 .visualization-tab-contents
 .lm-TabBar-content:not(:has(.lm-TabBar-tab))::after {
@@ -302,10 +300,9 @@ padding-bottom: 10px !important;
 /* ----- add scrollbar gutter to tabs ----- */
 /* ---------------------------------------- */
 
-/* 
-    style the gutter for the *child* containers within the
-    network-tab-contents. This adds the gutter *inside* the
-    Connectivity and Cell Parameter widgets
+/*
+    Style the gutter for the *child* containers within the network-tab-contents. This
+    adds the gutter *inside* the Connectivity and Cell Parameter widgets.
 */
 .network-tab-contents > .widget-tab-contents {
     scrollbar-gutter: stable !important;
@@ -314,12 +311,12 @@ padding-bottom: 10px !important;
 }
 
 /*
-    style the gutter for the *parent* container of drive-tab-contents.
-    This adds the gutter *outside* of the widgets 
+    Style the gutter for the *parent* container of drive-tab-contents. This adds the
+    gutter *outside* of the widgets.
 
-        note: to do this, we check if the 3rd tab (External Drives) is 
+        Note: To do this, we check if the 3rd tab (External Drives) is
         active, and we selectively style the contents container for that
-        tab only, since we do not want the gutter present on all tabs
+        tab only, since we do not want the gutter present on all tabs.
 */
 .param-window-tabs-widget >
 .widget-tab-bar:has(.lm-TabBar-tab:nth-child(3).lm-mod-current) +
@@ -329,8 +326,8 @@ padding-bottom: 10px !important;
     padding-right: 10px !important;
 }
 
-/* 
-    similarly style the gutter for the *parent* container of 
+/*
+    similarly style the gutter for the *parent* container of
     visualization-tab-contents, which adds the gutter *outside*
     of the widgets
 */
@@ -428,12 +425,12 @@ padding-bottom: 10px !important;
 }
 
 /*
-    target child elements inside visualization window to allow
-    them to grow to fill the available space. 
+    target child elements inside visualization window to allow them to grow to fill the
+    available space
 
-        note: this looks more complicated than it actually is, we just
+        Note: This looks more complicated than it actually is, we just
         need to target all of the children manually, which necessitates
-        understanding the hierarchy of automatically-generated containers
+        understanding the hierarchy of automatically-generated containers.
 */
 .visualization-window > .widget-output,
 .visualization-window > .widget-output > .jp-OutputArea,
@@ -577,7 +574,7 @@ padding-bottom: 10px !important;
 }
 
 /*
-    for both visualization-window and visualization-tab-contents, we
+    For both visualization-window and visualization-tab-contents, we
     need to set the bottom border in areas where there is *not* a tab
     (i.e., there are too few tabs to fill up the entire horizontal
     width). The border needs to grow to fill the available space between
@@ -657,10 +654,10 @@ padding-bottom: 10px !important;
 }
 
 /*
-    flip text and border colors globally. we'll have to "overwrite"
+    Flip text and border colors globally. We'll have to "overwrite"
     some of these changes, but this is the best way to ensure
     everything gets updated without manually needing to specify
-    every single child element that should change
+    every single child element that should change.
 */
 .dark-mode * {
     color: var(--dm-text-main) !important;
@@ -802,13 +799,13 @@ padding-bottom: 10px !important;
 /*   adjust param-window-tabs-widget borders   */
 /* ------------------------------------------- */
 /*
-    note: the blocks below add accent borders to the "outer"
+    Note: The blocks below add accent borders to the "outer"
     containers in dark-mode. It requires some style overwriting.
     I [DSD] think these accents make it easier to discern the
     "outer-most" parent container from the nested inner containers.
-    But, if we decide we would prefer to not have the accent borders, 
+    But, if we decide we would prefer to not have the accent borders,
     this whole section can be removed without interfering with any
-    functionality
+    functionality.
 */
 
 /*     style borders for parameters-window     */
@@ -822,7 +819,7 @@ padding-bottom: 10px !important;
 }
 
 /*
-    allow TabBar to overflow, which will let the active tab 
+    allow TabBar to overflow, which will let the active tab
     overlap the top border of widget-tab-contents
 */
 .dark-mode div.param-window-tabs-widget.param-window-tabs-widget

@@ -1,11 +1,11 @@
 /* ----------------------------------------------------------------------
-    Manage the toggle button for switching between light/dark themes 
+    Manage the toggle button for switching between light/dark themes
     ---------------------------------------------------------------------- */
 
 (function() {
-    // Attach the toggle logic to the window "hnnToggleTheme" so we can 
+    // Attach the toggle logic to the window "hnnToggleTheme" so we can
     // pass it to the "on click" HTML attribute when instantiating the
-    // contents of title-bar (which fills the "header" gridbox in AppLayout) 
+    // contents of title-bar (which fills the "header" gridbox in AppLayout)
     window.hnnToggleTheme = function() {
         const c = document.querySelector('.jupyter-widgets-view') || document.body;
         if (c) {
@@ -13,7 +13,7 @@
             const isD = c.classList.contains('dark-mode');
             const s = document.getElementById('sun-svg');
             const m = document.getElementById('moon-svg');
-            
+
             if (s && m) {
                 s.style.display = isD ? 'none' : 'block';
                 m.style.display = isD ? 'block' : 'none';
@@ -25,7 +25,7 @@
 
 /* ----------------------------------------------------------------------
     Add the "caret" buttons for scrolling in the visualization-window tabbar
-    and in the figures tabbar in parameters-window > visualization-tab-contents  
+    and in the figures tabbar in parameters-window > visualization-tab-contents
     ---------------------------------------------------------------------- */
 
 (function() {
