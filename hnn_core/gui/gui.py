@@ -5,31 +5,33 @@
 import base64
 import codecs
 import io
+import json
 import logging
 import mimetypes
-import numpy as np
 import sys
-import json
 import urllib.parse
 import urllib.request
 import zipfile
 from collections import defaultdict
 from copy import deepcopy
-from pathlib import Path
 from datetime import datetime
 from functools import partial
+from pathlib import Path
+
+import numpy as np
 from IPython.display import IFrame, display
 from ipywidgets import (
     HTML,
     Accordion,
     AppLayout,
-    FloatText,
     BoundedFloatText,
     BoundedIntText,
+    Box,
     Button,
+    Checkbox,
     Dropdown,
     FileUpload,
-    VBox,
+    FloatText,
     HBox,
     IntText,
     Layout,
@@ -37,24 +39,26 @@ from ipywidgets import (
     RadioButtons,
     Tab,
     Text,
-    Checkbox,
-    Box,
+    VBox,
 )
 from ipywidgets.embed import embed_minimal_html
+
 import hnn_core
 from hnn_core import JoblibBackend, MPIBackend, simulate_dipole
-from hnn_core.gui._logging import logger
-from hnn_core.gui._viz_manager import _VizManager, _idx2figname
-from hnn_core.network import pick_connection
-from hnn_core.dipole import _read_dipole_txt
-from hnn_core.params_default import get_L2Pyr_params_default, get_L5Pyr_params_default
-from hnn_core.hnn_io import dict_to_network, write_network_configuration
 from hnn_core.cells_default import _exp_g_at_dist
+from hnn_core.dipole import _read_dipole_txt
+from hnn_core.gui._logging import logger
+from hnn_core.gui._viz_manager import _idx2figname, _VizManager
+from hnn_core.hnn_io import dict_to_network, write_network_configuration
+from hnn_core.network import pick_connection
 from hnn_core.parallel_backends import (
     _determine_cores_hwthreading,
     _has_mpi4py,
     _has_psutil,
 )
+from hnn_core.params_default import get_L2Pyr_params_default, get_L5Pyr_params_default
+
+from ..externals.mne import _validate_type
 
 hnn_core_root = Path(hnn_core.__file__).parent
 default_network_configuration = hnn_core_root / "param" / "jones2009_base.json"
@@ -189,7 +193,7 @@ class _OutputWidgetHandler(logging.Handler):
         try:
             formatted_record = formatted_record.replace("  - ", "\n")
             formatted_record = "[TIME] " + formatted_record + "\n"
-        except:
+        except Exception:
             pass
         new_output = {
             "name": "stdout",
@@ -223,28 +227,28 @@ class HNNGUI:
 
     Parameters
     ----------
-    theme_color : str
-        The theme color of the whole dashboard.
     total_height : int
-        The height of the GUI (in pixel, same for all following parameters).
+        The height of the GUI in pixels. For an explanation of the various layout
+        windows and how they relate, see the comments in ``HNNGUI.__init__``.
     total_width : int
-        The width of the GUI.
+        The width of the GUI in pixels
     header_height : int
-        The height of the header.
-    button_height : int
-        The height of buttons.
-    operation_box_height : int
-        The operation_box_height of operations box.
-    drive_widget_width : int
-        The width of GUI drive box.
-    left_sidebar_width : int
-        The width of left sidebad.
-    log_window_height : int
-        The height of logging window.
+        The height of the header in pixels
     status_height : int
-        The height of status bar.
+        The height of status bar in pixels
+    param_window_width_prop : float
+        The proportion of the width reserved for the "parameters-window" container;
+        the proportion reserved for the visualization-window is then defined as
+        (1 - param_window_width_prop)
+    log_window_height_prop : float
+        The proportion of the height reserved for the "log-window" container. The
+        height of the parameters-window grows to fill the remaining space and is thus
+        not specified directly
     dpi : int
-        The screen dpi.
+        The pixel density specified in dots per inch
+    network configuration : str
+        The relative path to the hierarchical json file defining the network and
+        drives to be used, typically "jones2009_base.json"
 
     Attributes
     ----------
@@ -298,92 +302,378 @@ class HNNGUI:
 
     def __init__(
         self,
-        theme_color="#802989",
         total_height=800,
         total_width=1300,
-        header_height=50,
-        button_height=30,
-        operation_box_height=60,
-        drive_widget_width=200,
-        left_sidebar_width=576,
-        log_window_height=150,
+        header_height=42,
         status_height=30,
+        param_window_width_prop=0.45,
+        log_window_height_prop=0.22,
         dpi=96,
         network_configuration=default_network_configuration,
     ):
-        # set up styling.
+        _validate_type(total_height, types="int", item_name="total_height")
+        _validate_type(total_width, types="int", item_name="total_width")
+        _validate_type(header_height, types="int", item_name="header_height")
+        _validate_type(status_height, types="int", item_name="status_height")
+        _validate_type(
+            param_window_width_prop,
+            types="numeric",
+            item_name="param_window_width_prop",
+        )
+        _validate_type(
+            log_window_height_prop,
+            types="numeric",
+            item_name="log_window_height_prop",
+        )
+        _validate_type(dpi, types="int", item_name="dpi")
+
+        # ----------------------------------------------------------------------
+        # Structural overview of the GUI
+        # ----------------------------------------------------------------------
+        # The HNN GUI is composed using ipywidget's AppLayout, which uses the
+        # following structure:
+        #
+        #   | -------------- header --------------- |
+        #   | left-sidebar | center | right-sidebar |
+        #   | -------------- footer --------------- |
+        #
+        # Throughout the following code, we add HTML classes (i.e., "tags") to the key
+        # "containers" that hold all of our widgets, and to several of the widgets
+        # themselves. These HTML classes are sometimes used to apply custom styling to
+        # certain elements.
+        #
+        # Even when not used for styling, these HTML classes are extremely
+        # valuable for debugging at the browser level when you need to inspect page
+        # elements directly (via inspect) or programmatically (via the console).
+        #
+        #     > Note: the value of including custom HTML tags comes from the fact that
+        #       ipywidgets and AppLayout necessarily add numerous layers of nested
+        #       <div> elements (i.e.,"blocks") to the HTML tree when instantiating
+        #       widgets, which would make it extremely difficult to ascertain which
+        #       <div> elements we need to target with CSS without the use of HTML
+        #       tags to identify the relevant containers.
+        #
+        # Using our custom class names in place of the AppLayout parameter names, the
+        # structure of the GUI can similarly be written as follows:
+        #
+        #   | ----------------- title-bar ----------------- |
+        #   |   parameters-window  | | visualization-window |
+        #   | ----------------- status-bar ---------------- |
+        #
+        #     > Note that we do not (currently) utilize the "center" AppLayout
+        #       container, which is set to 0px in our AppLayout instantiation below.
+        #
+        # The diagrams below outline the structure of these automatically-generated
+        # "outer" parent containers, with our included HTML tags:
+        #
+        # The AppLayout header (title-bar):
+        #
+        #   ======================= title-bar =======================
+        #   ||                                                     ||
+        #   ||   ============== title-bar-contents =============   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ||             ~ contents here ~             ||   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ===============================================   ||
+        #   ||                                                     ||
+        #   =========================================================
+        #
+        # The AppLayout left-sidebar (parameters-window):
+        #
+        #   =================== parameters-window ===================
+        #   ||                                                     ||
+        #   ||   ========== param-tabs-outer-container =========   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ||  ======== param-widget-container =======  ||   ||
+        #   ||   ||  ||                                   ||  ||   ||
+        #   ||   ||  ||         ~ contents here ~         ||  ||   ||
+        #   ||   ||  ||                                   ||  ||   ||
+        #   ||   ||  =======================================  ||   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ===============================================   ||
+        #   ||                                                     ||
+        #   ||   ================== log-window =================   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ||             ~ contents here ~             ||   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ===============================================   ||
+        #   ||                                                     ||
+        #   =========================================================
+        #
+        # The AppLayout right-sidebar (visualization-window):
+        #
+        #   ================== visualization-window =================
+        #   ||                                                     ||
+        #   ||   ====== [[ nested, auto-generated tags ]] ======   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ||  ============== fig-tabs ===============  ||   ||
+        #   ||   ||  ||                                   ||  ||   ||
+        #   ||   ||  ||         ~ contents here ~         ||  ||   ||
+        #   ||   ||  ||                                   ||  ||   ||
+        #   ||   ||  =======================================  ||   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ===============================================   ||
+        #   ||                                                     ||
+        #   =========================================================
+        #     > Note: the "fig-tabs" HTML class is applied when the Tab() container
+        #       is initialized in _viz_manager.py, and not in gui.py .
+        #
+        # The AppLayout footer (status-bar):
+        #
+        #   ====================== status-bar =======================
+        #   ||                                                     ||
+        #   ||   =============== sim-status-box ================   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ||             ~ contents here ~             ||   ||
+        #   ||   ||                                           ||   ||
+        #   ||   ===============================================   ||
+        #   ||                                                     ||
+        #   =========================================================
+        #
+        # Keep in mind that there are many more HTML tags used that listed in the
+        # diagrams above; these are merely the tags that are used to specify the
+        # primary "outer" containers that house the actual GUI contents.
+
+        # ----------------------------------------------------------------------
+        # Set the layout properties for various GUI components
+        # ----------------------------------------------------------------------
+
+        # Set up container height / width parameters
+        # ----------------------------------------------------------------------
+        # Containers' properties are computed relative to total height/width,
+        # allowing us to scale the GUI size without needed to figure out what the
+        # exact pixel values need to be for each element:
         self.total_height = total_height
         self.total_width = total_width
 
-        viz_win_width = self.total_width - left_sidebar_width
-        main_content_height = self.total_height - status_height
+        # We'll compute pixels for the "fixed" outer containers (per AppLayout), but
+        # we'll be able to use percentages for most of the "inner" containers.
+        # Note that we must use int() as we cannot have fractional pixel values.
+        parameters_window_width = int(total_width * param_window_width_prop)
+        figures_window_width = int(total_width - parameters_window_width)
+        main_content_height = total_height - status_height
 
-        config_box_height = main_content_height - (
-            log_window_height + operation_box_height
-        )
+        # Specify the gap between the footer ("status-bar") and the containers above it
+        footer_gap = 10
+
+        # default (shared) height for buttons
+        button_height = 30
+
         self.layout = {
+            # ==================================================
+            # Elements that are not containers
+            # ==================================================
+            # dpi is technically used in only one place (the _add_figure function in
+            # _viz_manager.py), but it is defined here so that it can be specified
+            # when calling ``HNNGUI.__init__`` and be passed to the viz_layout
+            # argument via "self.viz_manager = _VizManager(...)" below.
+            # TODO: [DSD] this parameter should ideally be separated from self.layout,
+            # which should only define the layout properties of containers.
             "dpi": dpi,
+            #
+            # TODO: [DSD] IMHO these elements below, which describe buttons, should
+            # also be separated from self.layout. Similar to dpi, "theme_color" and
+            # "btn" are passed to viz_layout, albeit they are only used in one
+            # place in _viz_manager, when self.make_fig_button is called. This button
+            # already has make-fig-btn HTML class, so adding the styling directly via
+            # CSS to the different buttons may be the better approach.
+            "theme_color": "#802989",
+            "btn": Layout(
+                height=f"{button_height}px",
+                width="auto",
+            ),
+            "run_btn": Layout(
+                height=f"{button_height}px",
+                width="130px",
+            ),
+            "save_btn": Layout(
+                height=f"{button_height}px",
+                width="264px",
+            ),
+            "btn_full_w": Layout(
+                height=f"{button_height}px",
+                width="100%",
+            ),
+            "del_fig_btn": Layout(
+                height=f"{button_height}px",
+                width="auto",
+            ),
+            #
+            # ==================================================
+            # Styling for the header and footer containers
+            # ==================================================
+            # style for the "header" section of AppLayout that display the GUI
+            # title and contains the light-dark toggle button
+            #   - associated html class: "title-bar"
             "header_height": f"{header_height}px",
-            "theme_color": theme_color,
-            "btn": Layout(height=f"{button_height}px", width="auto"),
-            "run_btn": Layout(height=f"{button_height}px", width="10%"),
-            "btn_full_w": Layout(height=f"{button_height}px", width="100%"),
-            "del_fig_btn": Layout(height=f"{button_height}px", width="auto"),
-            "log_out": Layout(
-                border="1px solid gray",
-                height=f"{log_window_height - 10}px",
+            #
+            # style for the "footer" section of AppLayout that shows the simulation
+            # status
+            #   - associated html class: "status-bar"
+            "simulation_status_height": f"{status_height}px",
+            #
+            # ==================================================
+            # Styling for "parameters-window" and its children
+            # ==================================================
+            # container for parameter specification and simulation output
+            # that occupies the "left_sidebar" section in AppLayout
+            #   - associated html class: "parameters-window"
+            "parameters_window": Layout(
+                width=f"{parameters_window_width}px",
+                height=f"{main_content_height}px",
+            ),
+            #
+            # this "intermediate" container holds the parameter tabs container
+            # as well as the log container
+            #   - child of "parameters-window"
+            #   - associated html class: "param-tabs-outer-container"
+            "param_tabs_outer_container": Layout(
+                width="100%",
+                height="100%",
+            ),
+            #
+            # this container holds the parameters-window tab bar *and* the associated
+            # contents for each tab, which are separate <div> trees under
+            # param-tabs-outer-container
+            #   - child of "parameters-window" > "param_tabs_outer_container"
+            #   - associated html class: "param-window-tabs-widget"
+            "param_window_tabs_widget": Layout(
+                width="98%",
+                height="98%",
+                margin="0px 0px 0px 0px",
+            ),
+            #
+            # this container is specific to the *contents* of the parameters tabs
+            # widget, and does not include the tab bar. It sets the boundary
+            # *exclusively* for the contents of the Simulation tab
+            #   - child of "parameters-window" > "param_tabs_outer_container" >
+            #     "param-window-tabs-widget" > "widget-tab-contents"
+            #   - associated html class: "simulation-tab-contents"
+            #
+            # Note that "widget-tab-contents" is an auto-generated container that
+            # we do not specifically tag, but it is often used in conjunction with
+            # the parent or child container for targeted CSS styling.
+            "simulation_tab_contents": Layout(
+                width="100%",
+                height="100%",
+            ),
+            #
+            # styles the text boxes within the collapsible widgets that contain the
+            # instantiated drives in the External Drives tab
+            #   - child of "parameters-window" > ... > "drive-tab-contents" >
+            #     "widget-output" > ... > "widget-vbox"
+            "drive_textbox": Layout(
+                width="270px",
+                height="auto",
+            ),
+            #
+            # container for the log window
+            #   - child of "parameters-window"
+            #   - associated html class: "log-window"
+            #
+            # Note: we use a margin on log-window to set the footer-gap here, as the
+            # gap is inserted between the inner container "log-window" and its parent
+            # container "parameters-window."" Adding the gap as a margin directly to
+            # parameters-window would also require recalculating the height of the
+            # container to accommodate the extra margin, since its height is fixed.
+            "log_window": Layout(
+                border="1px solid lightgray",
+                height=f"{int(log_window_height_prop * 100)}%",
+                width="98%",
+                margin=f"0px 0px {footer_gap}px 0px",
                 overflow="auto",
             ),
-            "viz_config": Layout(width="99%"),
-            "simulations_list": Layout(width=f"{left_sidebar_width - 50}px"),
+            #
+            # ==================================================
+            # Styling for "visualization-window" and its children
+            # ==================================================
+            # container for simulation output and visualizations that occupies
+            # the "right_sidebar" section in AppLayout
+            #   - associated html class: "visualization-window"
+            #
+            # Note: we set the footer-gap here by recalculating the height of
+            # visualization-window. Adding footer_gap as a margin, as done above for
+            # log-window above, would not shift the content up, as the container height
+            # is still specified in pixels. Rather, the margin on visualization-window
+            # would simply overflow into the footer.
             "visualization_window": Layout(
-                width=f"{viz_win_width - 10}px",
-                height=f"{main_content_height - 10}px",
-                border="1px solid gray",
-                overflow="scroll",
+                width=f"{figures_window_width}px",
+                height=f"{main_content_height - footer_gap}px",
+                border="1px solid lightgrey",
             ),
-            "visualization_output": Layout(
-                width=f"{viz_win_width - 50}px",
-                height=f"{main_content_height - 100}px",
-                border="1px solid gray",
-                overflow="scroll",
+            #
+            # directly set figsize for the matplotlib figure in the Output()
+            # blocks of visualization-window
+            #   - child of visualization-window > visualization-output > ... >
+            #     ( <img src=...> | <div class="jupyter-matplotlib-figure"...>)
+            #   - associated html class: NA
+            #
+            # Note: figure sizes are set in _add_figure in _viz_manager, where
+            # percents are converted to pixels. This CSS block sets the dimensions
+            # for both static figure outputs (<img src="data:img/png;base64,...>")
+            # AND for dynamic figure outputs (<div class="jupyter-matplotlib-figure">).
+            "visualization_output_figsize": Layout(
+                width="100%",
+                height="95%",
             ),
-            "left_sidebar": Layout(
-                width=f"{left_sidebar_width}px", height=f"{main_content_height}px"
-            ),
-            "left_tab": Layout(
-                width=f"{left_sidebar_width}px", height=f"{config_box_height}px"
-            ),
-            "operation_box": Layout(
-                width=f"{left_sidebar_width}px",
-                height=f"{operation_box_height}px",
-                flex_wrap="wrap",
-            ),
-            "config_box": Layout(
-                width=f"{left_sidebar_width - 40}px",
-                height=f"{config_box_height - 100}px",
-            ),
-            "drive_widget": Layout(width="auto"),
-            "drive_textbox": Layout(width="270px", height="auto"),
-            # simulation status related
-            "simulation_status_height": f"{status_height}px",
-            "simulation_status_common": "background:gray;padding-left:10px",
-            "simulation_status_running": "background:orange;padding-left:10px",
-            "simulation_status_failed": "background:red;padding-left:10px",
-            "simulation_status_finished": "background:green;padding-left:10px",
         }
 
+        # Set up for the simulation status bar
+        # ----------------------------------------------------------------------
+        # We directly set up the html for the status bar below.
+        #   - child of status-bar
+        #   - associated html class: sim-status-box
+        # Note: This dict is referenced in _init_ui_components and run_button_clicked:
         self._simulation_status_contents = {
-            "not_running": f"""<div style='{self.layout["simulation_status_common"]};
-            color:white;'>Not running</div>""",
-            "running": f"""<div style='{self.layout["simulation_status_running"]};
-            color:white;'>Running...</div>""",
-            "finished": f"""<div style='{self.layout["simulation_status_finished"]};
-            color:white;'>Simulation finished</div>""",
-            "failed": f"""<div style='{self.layout["simulation_status_failed"]};
-            color:white;'>Simulation failed</div>""",
+            "not_running": """
+                <div
+                class='sim-status-box'
+                style='
+                    background:gray;
+                    padding-left:10px;
+                    color:white;
+                '>
+                    Not running
+                </div>
+            """,
+            "running": """
+                <div
+                class='sim-status-box status-running'
+                style='
+                    background:var(--statusbar-running);
+                    padding-left:10px;
+                    color:white;
+                '>
+                    Running...
+                </div>
+            """,
+            "finished": """
+                <div
+                class='sim-status-box'
+                style='
+                    background:var(--gentle-green);
+                    padding-left:10px;
+                    color:white;
+                '>
+                    Simulation finished
+                </div>
+            """,
+            "failed": """
+                <div
+                class='sim-status-box'
+                style='
+                    background:var(--gentle-red);
+                    padding-left:10px;
+                    color:white;
+                '>
+                    Simulation failed
+                </div>
+            """,
         }
 
+        # ----------------------------------------------------------------------
+        # Set up the GUI widgets and their contents
+        # ----------------------------------------------------------------------
         # load default parameters
         self.params = self.load_parameters(network_configuration)
 
@@ -396,58 +686,19 @@ class HNNGUI:
         # In-memory storage of all simulation and visualization related data
         self.simulation_data = defaultdict(lambda: dict(net=None, dpls=list()))
 
-        # Default visualization params for figures
-        analysis_style = {"description_width": "200px"}
-        layout = Layout(width="300px")
+        # ==================================================
+        # Simulation tab
+        # ==================================================
+        # This is where we first start instantiating actual widgets.
 
-        self.widget_default_smoothing = BoundedFloatText(
-            value=30.0,
-            description="Dipole Smoothing:",
-            min=0.0,
-            max=100.0,
-            step=1.0,
+        # input fields for simulation parameters
+        # --------------------------------------------------
+        self.widget_simulation_name = Text(
+            value="default",
+            placeholder="ID of your simulation",
+            description="Name:",
             disabled=False,
-            layout=layout,
-            style=analysis_style,
         )
-
-        self.widget_default_scaling = FloatText(
-            value=3000.0,
-            description="Dipole Scaling:",
-            step=100.0,
-            disabled=False,
-            layout=layout,
-            style=analysis_style,
-        )
-
-        self.widget_min_frequency = BoundedFloatText(
-            value=10,
-            min=0.1,
-            max=1000,
-            description="Min Spectral Frequency (Hz):",
-            disabled=False,
-            layout=layout,
-            style=analysis_style,
-        )
-
-        self.widget_max_frequency = BoundedFloatText(
-            value=100,
-            min=0.1,
-            max=1000,
-            description="Max Spectral Frequency (Hz):",
-            disabled=False,
-            layout=layout,
-            style=analysis_style,
-        )
-
-        self.fig_default_params = {
-            "default_smoothing": self.widget_default_smoothing.value,
-            "default_scaling": self.widget_default_scaling.value,
-            "default_min_frequency": self.widget_min_frequency.value,
-            "default_max_frequency": self.widget_max_frequency.value,
-        }
-
-        # Simulation parameters
         self.widget_tstop = BoundedFloatText(
             value=170, description="tstop (ms):", min=0, max=1e6, step=1, disabled=False
         )
@@ -460,16 +711,17 @@ class HNNGUI:
             disabled=False,
         )
         self.widget_ntrials = IntText(value=1, description="Trials:", disabled=False)
-        self.widget_simulation_name = Text(
-            value="default",
-            placeholder="ID of your simulation",
-            description="Name:",
-            disabled=False,
-        )
         self.widget_backend_selection = Dropdown(
             options=[("Joblib", "Joblib"), ("MPI", "MPI")],
             value=self._check_backend(),
             description="Backend:",
+        )
+        self.widget_n_jobs = BoundedIntText(
+            value=1,
+            min=1,
+            max=self.n_cores,
+            description="Cores:",
+            disabled=False,
         )
         self.widget_mpi_cmd = Text(
             value="mpiexec",
@@ -477,60 +729,97 @@ class HNNGUI:
             description="MPI cmd:",
             disabled=False,
         )
-        self.widget_n_jobs = BoundedIntText(
-            value=1, min=1, max=self.n_cores, description="Cores:", disabled=False
+
+        # input fields for default visualization parameters
+        # --------------------------------------------------
+        default_param_properties = {
+            # container_width includes the space allocated for both the text and
+            # the input field
+            "container_width": Layout(width="300px"),
+            "text_width": {"description_width": "200px"},
+        }
+        self.widget_default_smoothing = BoundedFloatText(
+            value=30.0,
+            description="Dipole Smoothing:",
+            min=0.0,
+            max=100.0,
+            step=1.0,
+            disabled=False,
+            layout=default_param_properties["container_width"],
+            style=default_param_properties["text_width"],
         )
+        self.widget_default_scaling = FloatText(
+            value=3000.0,
+            description="Dipole Scaling:",
+            step=100.0,
+            disabled=False,
+            layout=default_param_properties["container_width"],
+            style=default_param_properties["text_width"],
+        )
+        self.widget_min_frequency = BoundedFloatText(
+            value=10,
+            min=0.1,
+            max=1000,
+            description="Min Spectral Frequency (Hz):",
+            disabled=False,
+            layout=default_param_properties["container_width"],
+            style=default_param_properties["text_width"],
+        )
+        self.widget_max_frequency = BoundedFloatText(
+            value=100,
+            min=0.1,
+            max=1000,
+            description="Max Spectral Frequency (Hz):",
+            disabled=False,
+            layout=default_param_properties["container_width"],
+            style=default_param_properties["text_width"],
+        )
+        self.fig_default_params = {
+            "default_smoothing": self.widget_default_smoothing.value,
+            "default_scaling": self.widget_default_scaling.value,
+            "default_min_frequency": self.widget_min_frequency.value,
+            "default_max_frequency": self.widget_max_frequency.value,
+        }
+
+        # simulation tab buttons
+        # --------------------------------------------------
         self.load_data_button = FileUpload(
             accept=".txt,.csv",
             multiple=False,
             style={"button_color": self.layout["theme_color"]},
-            layout=self.layout["btn"],
+            layout=self.layout["run_btn"],
             description="Load data",
             button_style="success",
         )
-
-        # Create save simulation widget wrapper
-        self.save_simuation_button = self._init_html_download_button(
-            title="Save Simulation", mimetype="text/csv"
-        )
-        self.save_config_button = self._init_html_download_button(
-            title="Save Network", mimetype="application/json"
-        )
-
-        self.simulation_list_widget = Dropdown(
-            options=[], value=None, description="", layout={"width": "15%"}
-        )
-        # Drive selection
-        self.widget_drive_type_selection = Dropdown(
-            options=["Evoked", "Poisson", "Rhythmic", "Tonic"],
-            value="Evoked",
-            description="Drive type:",
-            disabled=False,
-            layout=self.layout["drive_widget"],
-            style={"description_width": "100px"},
-        )
-        self.widget_location_selection = Dropdown(
-            options=["Proximal", "Distal"],
-            value="Proximal",
-            description="Drive location:",
-            disabled=False,
-            layout=self.layout["drive_widget"],
-            style={"description_width": "100px"},
-        )
-        self.add_drive_button = create_expanded_button(
-            "Add drive",
-            "primary",
-            layout=self.layout["btn"],
-            button_color=self.layout["theme_color"],
-        )
-
-        # Dashboard level buttons
         self.run_button = create_expanded_button(
-            "Run",
+            "Run Simulation",
             "success",
             layout=self.layout["run_btn"],
             button_color=self.layout["theme_color"],
         )
+        self.save_config_button = self._init_html_download_button(
+            title="Save Current Network and Drives",
+            mimetype="application/json",
+        )
+        self.save_simulation_button = self._init_html_download_button(
+            title="Save Simulation Output",
+            mimetype="text/csv",
+        )
+        # the list that corresponds to save_simulation_button
+        self.simulation_list_widget = Dropdown(
+            options=["Simulation Output to Save"],
+            value="Simulation Output to Save",
+            disabled=True,
+            layout=Layout(
+                width="50%",
+                flex="0 1 50%",  # prevents growth beyond container limit
+                min_width="0",  # forces text to truncate
+            ),
+        ).add_class("simulation-list-widget")
+
+        # ==================================================
+        # Network tab
+        # ==================================================
 
         self.load_connectivity_button = FileUpload(
             accept=".json",
@@ -540,6 +829,29 @@ class HNNGUI:
             layout=self.layout["btn_full_w"],
             button_style="success",
         )
+        self.cell_type_radio_buttons = RadioButtons(
+            options=["L2/3 Pyramidal", "L5 Pyramidal"], description="Cell type:"
+        )
+        self.cell_layer_radio_buttons = RadioButtons(
+            options=["Geometry", "Synapses", "Biophysics"],
+            description="Cell Properties:",
+        )
+
+        # instantiate empty list/dicts for storing network-related data
+        # --------------------------------------------------
+        # Connectivity tab
+        self.global_gain_widgets = dict()
+        self.connectivity_widgets = list()
+
+        # Cell parameters tab
+        self.cell_parameters_widgets = dict()
+
+        # ==================================================
+        # External drives tab
+        # ==================================================
+
+        # primary ("fixed") external drives tab buttons
+        # --------------------------------------------------
         self.load_drives_button = FileUpload(
             accept=".json",
             multiple=False,
@@ -548,7 +860,12 @@ class HNNGUI:
             layout=self.layout["btn"],
             button_style="success",
         )
-
+        self.add_drive_button = create_expanded_button(
+            "Add drive",
+            "primary",
+            layout=self.layout["btn"],
+            button_color=self.layout["theme_color"],
+        )
         self.delete_drive_button = create_expanded_button(
             "Delete all drives",
             "success",
@@ -556,36 +873,44 @@ class HNNGUI:
             button_color=self.layout["theme_color"],
         )
 
-        self.cell_type_radio_buttons = RadioButtons(
-            options=["L2/3 Pyramidal", "L5 Pyramidal"], description="Cell type:"
-        )
+        # drive selection dropdown fields
+        # --------------------------------------------------
+        self.widget_drive_type_selection = Dropdown(
+            options=["Evoked", "Poisson", "Rhythmic", "Tonic"],
+            value="Evoked",
+            description="Drive type:",
+            disabled=False,
+            layout=Layout(width="auto"),
+            style={"description_width": "100px"},
+        ).add_class("drive-selection")
+        self.widget_location_selection = Dropdown(
+            options=["Proximal", "Distal"],
+            value="Proximal",
+            description="Drive location:",
+            disabled=False,
+            layout=Layout(width="auto"),
+            style={"description_width": "100px"},
+        ).add_class("drive-location")
 
-        self.cell_layer_radio_buttons = RadioButtons(
-            options=["Geometry", "Synapses", "Biophysics"],
-            description="Cell Properties:",
-        )
-
-        # Plotting window
-
-        # Visualization figure related dicts
-        self.plot_outputs_dict = dict()
-        self.plot_dropdown_types_dict = dict()
-        self.plot_sim_selections_dict = dict()
-
-        # Add drive section
+        # instantiate empty lists/widgets for storing drive-related data
+        # --------------------------------------------------
         self.drive_widgets = list()
         self.drive_boxes = list()
         self.drive_accordion = Accordion()
 
-        # Connectivity list
-        self.connectivity_widgets = list()
+        # ==================================================
+        # Visualization tab
+        # ==================================================
 
-        # Cell parameter dict
-        self.cell_parameters_widgets = dict()
+        # instantiate empty dictionaries for storing visualization-related data
+        # --------------------------------------------------
+        self.plot_outputs_dict = dict()
+        self.plot_dropdown_types_dict = dict()
+        self.plot_sim_selections_dict = dict()
 
-        # Synaptic Gains dict
-        self.global_gain_widgets = dict()
-
+        # ----------------------------------------------------------------------
+        # Run initialization functions
+        # ----------------------------------------------------------------------
         self._init_ui_components()
         self.add_logging_window_logger()
 
@@ -603,16 +928,23 @@ class HNNGUI:
         This is for testing purposes"""
         return cell_parameters_dict
 
-    def _init_html_download_button(self, title, mimetype):
+    def _init_html_download_button(
+        self,
+        title,
+        mimetype,
+    ):
         b64 = base64.b64encode("".encode())
         payload = b64.decode()
         # Initialliting HTML code for download button
         self.html_download_button = """
         <a download="{filename}" href="data:{mimetype};base64,{payload}"
           download>
-        <button style="background:{color_theme}; height:{btn_height}"
-        class=" jupyter-button
-           mod-warning" {is_disabled} >{title}</button>
+        <button
+            style="background:{color_theme}; height:{btn_height}; width:{btn_width}"
+            class="jupyter-button mod-warning" {is_disabled}
+        >
+            {title}
+        </button>
         </a>
         """
         # Create widget wrapper
@@ -622,6 +954,7 @@ class HNNGUI:
                 filename={""},
                 is_disabled="disabled",
                 btn_height=self.layout["run_btn"].height,
+                btn_width=self.layout["save_btn"].width,
                 color_theme=self.layout["theme_color"],
                 title=title,
                 mimetype=mimetype,
@@ -642,17 +975,17 @@ class HNNGUI:
         part.
         """
         # dynamic larger components
-        self._drives_out = Output()  # tab to add new drives
-        self._connectivity_out = Output()  # tab to tune connectivity.
-        self._cell_params_out = Output()
-        self._global_gain_out = Output()
+        self._drives_out = Output().add_class("external-drives-accordion-widgets")
+        self._connectivity_out = Output().add_class("connectivity-accordion-widgets")
+        self._cell_params_out = Output().add_class("cell-parameters-widgets")
+        self._global_gain_out = Output().add_class("connectivity-gains-widgets")
 
         self._log_out = Output()
 
         self.viz_manager = _VizManager(self.data, self.layout, self.fig_default_params)
 
         # detailed configuration of backends
-        self._backend_config_out = Output()
+        self._backend_config_out = Output().add_class("backend-config-out")
 
         # static parts
         # Running status
@@ -660,30 +993,113 @@ class HNNGUI:
             value=self._simulation_status_contents["not_running"]
         )
 
-        self._log_window = HBox([self._log_out], layout=self.layout["log_out"])
-        self._operation_buttons = HBox(
-            [
-                self.run_button,
-                self.load_data_button,
-                self.save_config_button,
-                self.save_simuation_button,
-                self.simulation_list_widget,
-            ],
-            layout=self.layout["operation_box"],
+        # log window with toggle
+        # --------------------------------------------------
+        # toggle button
+        self._log_toggle_btn = Button(
+            icon="chevron-down",
+            layout=Layout(width="30px", height="30px"),
+            tooltip="Toggle Log View",
+        ).add_class("log-toggle-icon")
+
+        # log window
+        self._log_window = HBox(
+            [self._log_out, self._log_toggle_btn],
+            layout=self.layout["log_window"],
+        ).add_class("log-window")
+
+        # store the expanded height *directly* for use in toggle_logs() below
+        self._log_expanded_height = self.layout["log_window"].height
+
+        # function to toggle log window height
+        def toggle_logs(_):
+            if self._log_window.layout.height == "3.5em":
+                self._log_window.layout.height = self._log_expanded_height
+                self._log_toggle_btn.icon = "chevron-down"
+            else:
+                self._log_window.layout.height = "3.5em"
+                self._log_toggle_btn.icon = "chevron-up"
+
+        # apply function when button is clicked
+        self._log_toggle_btn.on_click(toggle_logs)
+
+        # generate the HTML contents for the title-bar
+        # --------------------------------------------------
+        # The sun and moon icons for the theme toggle button are kept here so that
+        # they load immediately with the GUI. we *could* move these to the .js, but
+        # then there would be a delay before the buttons appears.
+        sun_icon = (
+            "M361.5 1.2c5 2.1 8.6 6.6 9.6 11.9L391 121l107.9 19.8c5.3 1 9.8 4.6 11.9 "
+            "9.6s1.5 10.7-1.6 15.2L446.9 256l62.3 90.3c3.1 4.5 3.7 10.2 1.6 15.2s-6.6 "
+            "8.6-11.9 9.6L391 391 371.1 498.9c-1 5.3-4.6 9.8-9.6 11.9s-10.7 1.5-15.2-"
+            "1.6L256 446.9l-90.3 62.3c-4.5 3.1-10.2 3.7-15.2 1.6s-8.6-6.6-9.6-11.9L121 "
+            "391 13.1 371.1c-5.3-1-9.8-4.6-11.9-9.6s-1.5-10.7 1.6-15.2L65.1 256 2.8 "
+            "165.7c-3.1-4.5-3.7-10.2-1.6-15.2s6.6-8.6 11.9-9.6L121 121 140.9 13.1c1-"
+            "5.3 4.6-9.8 9.6-11.9s10.7-1.5 15.2 1.6L256 65.1 346.3 2.8c4.5-3.1 10.2-"
+            "3.7 15.2-1.6zM160 256a96 96 0 1 1 192 0 96 96 0 1 1 -192 0zm224 0a128 128 "
+            "0 1 0 -256 0 128 128 0 1 0 256 0z"
         )
-        # title
+
+        moon_icon = (
+            "M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-"
+            "63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c"
+            "-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 "
+            "7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"
+        )
+
         self._header = HTML(
-            value=f"""<div
-            style='background:{self.layout["theme_color"]};
-            text-align:center;color:white;'>
-            HUMAN NEOCORTICAL NEUROSOLVER</div>"""
+            value=f"""
+                <div class="title-bar-contents" style='
+                    background:{self.layout["theme_color"]};
+                    text-align:center;
+                    color:white;
+                    position:relative;
+                    height: 28px;
+                    line-height: 28px;
+                    margin: 0;
+                    padding: 0;
+                    overflow: hidden;
+                '>
+                    HUMAN NEOCORTICAL NEUROSOLVER
+                    <div id="theme-toggle-container" style="
+                        position: absolute;
+                        left: 8px;
+                        top: 0;
+                        padding: 4px 0 4px 0px;
+                        height: 20px;
+                        display: flex;
+                        align-items: center;
+                        cursor: pointer;
+                    ">
+                        <div style="width: 20px; height: 20px; display: flex;"
+                            onclick="hnnToggleTheme()">
+                            <svg id="sun-svg" viewBox="0 0 512 512" style="
+                                fill: white;
+                                display: block;
+                                width: 100%;
+                                height: 100%;
+                            ">
+                                <path d="{sun_icon}"></path>
+                            </svg>
+                            <svg id="moon-svg" viewBox="0 0 384 512" style="
+                                fill: white;
+                                display: none;
+                                width: 100%;
+                                height: 100%;
+                            ">
+                                <path d="{moon_icon}"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            """,
         )
 
     @property
     def analysis_config(self):
         """Provides everything viz window needs except for the data."""
         return {
-            "viz_style": self.layout["visualization_output"],
+            "viz_style": self.layout["visualization_output_figsize"],
             # widgets
             "plot_outputs": self.plot_outputs_dict,
             "plot_dropdowns": self.plot_dropdown_types_dict,
@@ -779,6 +1195,8 @@ class HNNGUI:
                 self._log_out, self.data, self.simulation_list_widget
             )
 
+            self.simulation_list_widget.disabled = False
+
             result_file = f"{value.new}{file_extension}"
             if file_extension == ".csv":
                 b64 = base64.b64encode(_simulation_data.encode())
@@ -786,13 +1204,17 @@ class HNNGUI:
                 b64 = base64.b64encode(_simulation_data)
 
             payload = b64.decode()
-            self.save_simuation_button.value = self.html_download_button.format(
+
+            # redraw button in the same way after simulation change, but mapped to
+            # the result_file filename
+            self.save_simulation_button.value = self.html_download_button.format(
                 payload=payload,
                 filename=result_file,
                 is_disabled="",
-                btn_height=self.layout["run_btn"].height,
+                btn_height=self.layout["save_btn"].height,
+                btn_width=self.layout["save_btn"].width,
                 color_theme=self.layout["theme_color"],
-                title="Save Simulation",
+                title="Save Simulation Output",
                 mimetype="text/csv",
             )
 
@@ -801,13 +1223,17 @@ class HNNGUI:
                 self._log_out, self.data, self.simulation_list_widget
             )
             b64_net = base64.b64encode(network_config.encode())
+
+            # redraw button in the same way after simulation change, but mapped to
+            # the value.new filename
             self.save_config_button.value = self.html_download_button.format(
                 payload=b64_net.decode(),
                 filename=f"{value.new}.json",
                 is_disabled="",
-                btn_height=self.layout["run_btn"].height,
+                btn_height=self.layout["save_btn"].height,
+                btn_width=self.layout["save_btn"].width,
                 color_theme=self.layout["theme_color"],
-                title="Save Network",
+                title="Save Current Network and Drives",
                 mimetype="application/json",
             )
 
@@ -864,28 +1290,12 @@ class HNNGUI:
         with self._drives_out:
             display(self.drive_accordion)
 
-    def compose(self, return_layout=True):
-        """Compose widgets.
+    def build_sim_tab_contents(self):
+        """Build the Simulation tab contents"""
 
-        Parameters
-        ----------
-        return_layout : bool
-            If the method returns the layout object which can be rendered by
-            IPython.display.display() method.
-        """
-        box_style = """
-            style="
-                background: gray;
-                color: white;
-                # font-weight: bold;
-                width: 290px;
-                padding: 0px 5px;
-                margin-bottom: 2px;
-            "
-        """
         simulation_box = VBox(
             [
-                HTML(f"<div {box_style}>Simulation Parameters</div>"),
+                HTML("Simulation Parameters").add_class("sim-tab-titles"),
                 VBox(
                     [
                         self.widget_simulation_name,
@@ -896,10 +1306,11 @@ class HNNGUI:
                         self._backend_config_out,
                     ]
                 ),
-                Box(layout=Layout(height="20px")),
-                HTML(
-                    f"<div {box_style}'>Default Visualization Parameters</div>",
-                ),
+                # The dynamic-spacer can shrink/grow based on available space to
+                # help prevent any "smushing" or overlap that may appear on some
+                # OS/browser combinations but not others:
+                Box().add_class("dynamic-spacer"),
+                HTML("Default Visualization Parameters").add_class("sim-tab-titles"),
                 VBox(
                     [
                         self.widget_default_smoothing,
@@ -908,19 +1319,47 @@ class HNNGUI:
                         self.widget_max_frequency,
                     ]
                 ),
+                Box().add_class("dynamic-spacer"),
+                # The VBox below contains the run, save, and load buttons, as well as
+                # the dropdown widget for selecting networks/simulations to save:
+                VBox(
+                    [
+                        HBox(
+                            [
+                                self.run_button,
+                                self.load_data_button,
+                            ]
+                        ),
+                        HBox(
+                            [
+                                self.save_config_button,
+                            ]
+                        ),
+                        HBox(
+                            [
+                                self.save_simulation_button,
+                                self.simulation_list_widget,
+                            ],
+                            layout=Layout(align_items="center"),
+                        ),
+                    ],
+                    layout=Layout(
+                        # don't grow, *do* allow shrink, use auto height
+                        flex="0 1 auto",
+                    ),
+                ).add_class("sim-tab-buttons"),
             ],
-            layout=self.layout["config_box"],
-        )
-        # Displays the default backend options
-        handle_backend_change(
-            self.widget_backend_selection.value,
-            self._backend_config_out,
-            self.widget_mpi_cmd,
-            self.widget_n_jobs,
-        )
+            layout=self.layout["simulation_tab_contents"],
+        ).add_class("simulation-tab-contents")
 
-        connectivity_configuration = Tab()
+        return simulation_box
 
+    def build_network_tab_contents(self):
+        """build the Network tab contents"""
+
+        network_tab_contents = Tab().add_class("network-tab-contents")
+
+        # build Connectivity tab contents
         connectivity_box = VBox(
             [
                 HBox(
@@ -933,27 +1372,45 @@ class HNNGUI:
                         self._global_gain_out,
                     ]
                 ),
+                # The connectivity weights/gains accordion, already built from
+                # _init_ui_components
                 self._connectivity_out,
             ]
-        )
+        ).add_class("connectivity-params")
 
-        cell_parameters = VBox(
+        # build Cell parameters tab contents
+        cell_parameters_box = VBox(
             [
                 HBox([self.cell_type_radio_buttons, self.cell_layer_radio_buttons]),
                 self._cell_params_out,
             ]
-        )
+        ).add_class("cell-params")
 
-        connectivity_configuration.children = [
+        # build the Network tab from its constituent components
+        network_tab_contents.children = [
             connectivity_box,
-            cell_parameters,
+            cell_parameters_box,
         ]
-        connectivity_configuration.titles = [
+        # label the sub tabs
+        network_tab_contents.titles = [
             "Connectivity",
             "Cell parameters",
         ]
 
-        drive_selections = VBox(
+        return network_tab_contents
+
+    def build_drive_tab_contents(self):
+        """build the External Drives tab contents"""
+
+        drive_load_delete_container = VBox(
+            [
+                self.load_drives_button,
+                self.delete_drive_button,
+            ],
+            layout=Layout(flex="1"),
+        )
+
+        drive_add_container = VBox(
             [
                 self.add_drive_button,
                 self.widget_drive_type_selection,
@@ -962,59 +1419,178 @@ class HNNGUI:
             layout=Layout(flex="1"),
         )
 
-        drives_options = VBox(
+        # container to hold all contents of the External Drives tab
+        drive_tab_contents = VBox(
             [
+                # buttons / input fields for managing drives
                 HBox(
                     [
-                        VBox(
-                            [self.load_drives_button, self.delete_drive_button],
-                            layout=Layout(flex="1"),
-                        ),
-                        drive_selections,
+                        drive_load_delete_container,
+                        drive_add_container,
                     ]
                 ),
+                # the external drives accordion, already built from _init_ui_components
                 self._drives_out,
             ]
+        ).add_class("drive-tab-contents")
+
+        return drive_tab_contents
+
+    def build_parameters_window(self):
+        """
+        build parameters-window (to occupy AppLayout's left_sidebar)
+        """
+        # initialize the Vbox objects that contain the contents of the primary GUI
+        # tabs: Simulation, Network, External Drives, and Visualization
+        simulation_tab_contents = self.build_sim_tab_contents()
+        network_tab_contents = self.build_network_tab_contents()
+        drive_tab_contents = self.build_drive_tab_contents()
+        visualization_tab_contents = self.viz_manager.build_viz_tab_contents()
+
+        # build the param_window_tabs_widget Tab() object, which holds both the
+        # tab bar *and* the associated contents for each tab
+        param_window_tabs_widget = Tab().add_class("param-window-tabs-widget")
+        param_window_tabs_widget.layout = self.layout["param_window_tabs_widget"]
+
+        # assign tab contents
+        param_window_tabs_widget.children = [
+            simulation_tab_contents,
+            network_tab_contents,
+            drive_tab_contents,
+            visualization_tab_contents,
+        ]
+
+        # set each tab's title
+        titles = (
+            "Simulation",
+            "Network",
+            "External drives",
+            "Visualization",
+        )
+        for idx, title in enumerate(titles):
+            param_window_tabs_widget.set_title(idx, title)
+
+        # build parameters window from constituent components
+        parameters_window = VBox(
+            [
+                VBox(
+                    [param_window_tabs_widget],
+                    layout=self.layout["param_tabs_outer_container"],
+                ).add_class("param-tabs-outer-container"),
+                self._log_window,
+            ],
+            layout=self.layout["parameters_window"],
         )
 
-        config_panel, figs_output = self.viz_manager.compose()
+        return parameters_window
 
-        # Tabs for left pane
-        left_tab = Tab()
-        left_tab.children = [
-            simulation_box,
-            connectivity_configuration,
-            drives_options,
-            config_panel,
-        ]
-        titles = ("Simulation", "Network", "External drives", "Visualization")
-        for idx, title in enumerate(titles):
-            left_tab.set_title(idx, title)
+    def load_custom_gui_styling(self):
+        """
+        Load custom CSS and JS for styling the GUI
+        """
+        gui_directory = Path(__file__).parent
+        css_path = gui_directory / "gui_styles.css"
+        js_path = gui_directory / "gui_scripts.js"
 
+        with open(css_path, "r") as f:
+            gui_styles = f.read()
+        with open(js_path, "r") as f:
+            gui_scripts = f.read()
+
+        # ----------------------------------------------------------------------
+        # JavaScript tags injected via HTML() (which is how IPywidgets updates
+        # the DOM) are not executed by browsers for security reasons. To get
+        # around this constraint, we use a 1x1 transparent GIF to trigger the "onload"
+        # event that follows it. This method may seem a bit "hacky", but it is
+        # actually a very commonly used trick for injecting scripts into IPywidgets.
+        # Because "onload" is a "lifecycle event" of a valid asset (basically, a
+        # high-priority attribute that must be processed when rendering the web page),
+        # the browser is forced to execute the included JavaScript as soon as the
+        # widget is rendered. This gives us a reliable execution hook that
+        # is responsive to changes to the GUI (such as tabs being added or closed).
+        # ----------------------------------------------------------------------
+
+        # "escape" any double quotes in our JS code, which is needed since we insert
+        # our script file as a string via the HTML attribute onload="{gui_scripts}"
+        gui_scripts = gui_scripts.replace('"', "&quot;")
+
+        minimal_img_src = (
+            "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP"
+            + "///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+        )
+
+        custom_assets = f"""
+            <style>
+                {gui_styles}
+            </style>
+            <img
+                src="{minimal_img_src}"
+                onload="{gui_scripts}"
+                style="display:none;"
+            >
+        """
+
+        return custom_assets
+
+    def compose(self, return_layout=True):
+        """Build the GUI and its widgets
+
+        Parameters
+        ----------
+        return_layout : bool
+            If the method returns the layout object which can be rendered by
+            IPython.display.display() method.
+        """
+
+        # setup
+        # --------------------------------------------------
+        # add custom CSS and JS to the DOM before AppLayout is called so that
+        # the style is applied before the widget is rendered
+        custom_gui_styling = self.load_custom_gui_styling()
+        self._header.value = custom_gui_styling + self._header.value
+
+        # handle display of backend options and associated input boxes
+        #   - an additional input field "MPI cmd" appears when the MPI backend is
+        #     selected and disappears when "Joblib" is selected
+        handle_backend_change(
+            self.widget_backend_selection.value,
+            self._backend_config_out,
+            self.widget_mpi_cmd,
+            self.widget_n_jobs,
+        )
+
+        # build parameters-window and visualization-window
+        parameters_window = self.build_parameters_window()
+        visualization_window = self.viz_manager.build_visualization_window()
+
+        # build the GUI from its constituent components
+        # --------------------------------------------------
+        # Note: see __init__() for diagrams and explanations of the overall structure,
+        # including nesting and HTML tag usage.
         self.app_layout = AppLayout(
             header=self._header,
-            left_sidebar=VBox(
-                [
-                    VBox([left_tab], layout=self.layout["left_tab"]),
-                    self._operation_buttons,
-                    self._log_window,
-                ],
-                layout=self.layout["left_sidebar"],
-            ),
-            right_sidebar=figs_output,
+            left_sidebar=parameters_window,
+            right_sidebar=visualization_window,
             footer=self._simulation_status_bar,
             pane_widths=[
-                self.layout["left_sidebar"].width,
-                "0px",
+                self.layout["parameters_window"].width,
+                "0px",  # center container width, currently unused
                 self.layout["visualization_window"].width,
             ],
             pane_heights=[
                 self.layout["header_height"],
-                self.layout["visualization_window"].height,
+                self.layout["parameters_window"].height,
                 self.layout["simulation_status_height"],
             ],
-        )
+        ).add_class("hnn-gui")
 
+        # add classes to the "outer-most" containers / AppLayout gridboxes
+        self.app_layout.left_sidebar.add_class("parameters-window")
+        self.app_layout.right_sidebar.add_class("visualization-window")
+        self.app_layout.header.add_class("title-bar")
+        self.app_layout.footer.add_class("status-bar")
+
+        # initialize link callbacks to UI components
         self._link_callbacks()
 
         # initialize drive and connectivity ipywidgets
@@ -1248,7 +1824,7 @@ class HNNGUI:
             button_style="danger",
             icon="close",
             layout=self.layout["del_fig_btn"],
-        )
+        ).add_class("red-button")
         delete_button.on_click(self._delete_single_drive)
         drive_box.children += (
             HTML(value="<p> </p>"),  # Adds blank space
@@ -2347,15 +2923,18 @@ def add_network_connectivity_tab(
         cell_connectivity.set_title(idx, connectivity_name)
 
     # Style the <div> automatically created around connectivity boxes
-    connectivity_out_style = HTML("""
-    <style>
-        /* CSS to style elements inside the Accordion */
-        .connectivity-section .jupyter-widget-Collapse-contents {
-            padding: 0px 0px 10px 0px !important;
-            margin: 0 !important;
-        }
-    </style>
-    """)
+    connectivity_out_style = HTML(
+        """
+        <style>
+            /* CSS to style elements inside the Accordion */
+            .connectivity-section .jupyter-widget-Collapse-contents {
+                padding: 0px 0px 10px 0px !important;
+                margin: 0 !important;
+            }
+        </style>
+        """,
+        layout=Layout(display="none"),
+    )
 
     # Display the Accordion with styling
     with connectivity_out:
@@ -2533,7 +3112,8 @@ def _init_network_from_widgets(
                     "A_weight"
                 ] = vbox_key.children[1].children[0].value
 
-                # 1. identify which case of global_gain_textfield applies to this src/target
+                # 1. identify which case of global_gain_textfield applies to this
+                #    src/target
                 global_gain_type = global_gain_type_lookup_dict[
                     (
                         vbox_key._belongsto["src_gids"],
