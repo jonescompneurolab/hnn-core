@@ -90,7 +90,19 @@
         });
 
         bar.addEventListener("scroll", update);
-        const obs = new MutationObserver(update);
+        const obs = new MutationObserver(
+            (mutations) => {
+                const isFigBar =
+                    parent.matches(".visualization-tab-contents .lm-TabBar:first-of-type")
+                    || parent.matches(".visualization-window .lm-TabBar:first-of-type");
+                const hadNewTab = mutations.some(
+                    m => m.type === "childList" && m.addedNodes.length > 0
+                );
+                if (isFigBar && hadNewTab) {
+                    bar.scrollTo({ left: bar.scrollWidth, behavior: "smooth" });
+                }
+                update();
+        });
         obs.observe(bar, { childList: true, subtree: true });
         setTimeout(update, 100);
     };
