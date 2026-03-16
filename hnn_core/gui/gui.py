@@ -975,8 +975,8 @@ class HNNGUI:
         part.
         """
         # dynamic larger components
-        self._drives_out = Output().add_class("external-drives-widgets")
-        self._connectivity_out = Output().add_class("connectivity-weights-widgets")
+        self._drives_out = Output().add_class("external-drives-accordion-widgets")
+        self._connectivity_out = Output().add_class("connectivity-accordion-widgets")
         self._cell_params_out = Output().add_class("cell-parameters-widgets")
         self._global_gain_out = Output().add_class("connectivity-gains-widgets")
 
@@ -1484,7 +1484,7 @@ class HNNGUI:
 
         return parameters_window
 
-    def custom_gui_styling(self):
+    def load_custom_gui_styling(self):
         """
         Load custom CSS and JS for styling the GUI
         """
@@ -1546,7 +1546,7 @@ class HNNGUI:
         # --------------------------------------------------
         # add custom CSS and JS to the DOM before AppLayout is called so that
         # the style is applied before the widget is rendered
-        custom_gui_styling = self.custom_gui_styling()
+        custom_gui_styling = self.load_custom_gui_styling()
         self._header.value = custom_gui_styling + self._header.value
 
         # handle display of backend options and associated input boxes
