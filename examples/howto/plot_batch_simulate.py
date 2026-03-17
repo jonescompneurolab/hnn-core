@@ -58,30 +58,39 @@ def set_params(param_values, net=None):
     net : instance of Network, optional
         If None, a new network is created using the specified model type.
     """
-    weights_ampa = {'L2_basket': param_values['weight_basket'],
-                    'L2_pyramidal': param_values['weight_pyr'],
-                    'L5_basket': param_values['weight_basket'],
-                    'L5_pyramidal': param_values['weight_pyr']}
+    weights_ampa = {
+        "L2_basket": param_values["weight_basket"],
+        "L2_pyramidal": param_values["weight_pyr"],
+        "L5_basket": param_values["weight_basket"],
+        "L5_pyramidal": param_values["weight_pyr"],
+    }
 
-    synaptic_delays = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                       'L5_basket': 1., 'L5_pyramidal': 1.}
+    synaptic_delays = {
+        "L2_basket": 0.1,
+        "L2_pyramidal": 0.1,
+        "L5_basket": 1.0,
+        "L5_pyramidal": 1.0,
+    }
 
     # Add an evoked drive to the network.
-    net.add_evoked_drive('evprox',
-                         mu=40,
-                         sigma=5,
-                         numspikes=1,
-                         location='proximal',
-                         weights_ampa=weights_ampa,
-                         synaptic_delays=synaptic_delays)
+    net.add_evoked_drive(
+        "evprox",
+        mu=40,
+        sigma=5,
+        numspikes=1,
+        location="proximal",
+        weights_ampa=weights_ampa,
+        synaptic_delays=synaptic_delays,
+    )
+
 
 ###############################################################################
 # Next, we define a parameter grid for the batch simulation.
 
 
 param_grid = {
-    'weight_basket': np.logspace(-4, -1, 20),
-    'weight_pyr': np.logspace(-4, -1, 20)
+    "weight_basket": np.logspace(-4, -1, 20),
+    "weight_pyr": np.logspace(-4, -1, 20),
 }
 
 ###############################################################################
@@ -104,12 +113,13 @@ def summary_func(results):
     """
     summary_stats = []
     for result in results:
-        dpl_smooth = result['dpl'][0].copy().smooth(window_len=30)
-        dpl_data = dpl_smooth.data['agg']
+        dpl_smooth = result["dpl"][0].copy().smooth(window_len=30)
+        dpl_data = dpl_smooth.data["agg"]
         min_peak = np.min(dpl_data)
         max_peak = np.max(dpl_data)
-        summary_stats.append({'min_peak': min_peak, 'max_peak': max_peak})
+        summary_stats.append({"min_peak": min_peak, "max_peak": max_peak})
     return summary_stats
+
 
 ###############################################################################
 # Run the batch simulation and collect the results.
@@ -117,15 +127,38 @@ def summary_func(results):
 
 # Initialize the network model and run the batch simulation.
 net = jones_2009_model(mesh_shape=(3, 3))
-batch_simulation = BatchSimulate(net=net,
-                                 set_params=set_params,
-                                 summary_func=summary_func)
-simulation_results = batch_simulation.run(param_grid,
-                                          n_jobs=n_jobs,
-                                          combinations=False,
-                                          backend='loky')
+batch_simulation = BatchSimulate(
+    net=net, set_params=set_params, summary_func=summary_func
+)
+simulation_results = batch_simulation.run(
+    param_grid, n_jobs=1, combinations=False, backend="loky"
+)
 
 print("Simulation results:", simulation_results)
+
+###############################################################################
+# Using Dask backend for distributed computing
+# --------------------------------------------
+# Dask can also be used as a backend for distributed computing.
+# For local use, ``LocalCluster`` can be used as shown below.
+# Note that ``threads_per_worker=1`` is required to avoid NEURON conflicts.
+# To run on a remote cluster instead, replace ``LocalCluster`` with a
+# ``Client`` connected to your cluster scheduler address e.g.
+# ``Client('mycluster.university.edu:8786')``.
+
+try:
+    if __name__ == "__main__":
+        from dask.distributed import Client, LocalCluster
+
+        cluster = LocalCluster(processes=True, n_workers=4, threads_per_worker=1)
+        client = Client(cluster)
+        dask_results = batch_simulation.run(
+            param_grid, n_jobs=4, combinations=False, backend="dask"
+        )
+        client.close()
+except ImportError:
+    pass
+
 ###############################################################################
 # This plot shows an overlay of all smoothed dipole waveforms from the
 # batch simulation. Each line represents a different set of synaptic strength
@@ -148,23 +181,23 @@ print("Simulation results:", simulation_results)
 # amplitude responses and more pronounced features throughout the simulation.
 
 dpl_waveforms, param_values = [], []
-for data_list in simulation_results['simulated_data']:
+for data_list in simulation_results["simulated_data"]:
     for data in data_list:
-        dpl_smooth = data['dpl'][0].copy().smooth(window_len=30)
-        dpl_waveforms.append(dpl_smooth.data['agg'])
-        param_values.append(data['param_values']['weight_basket'])
+        dpl_smooth = data["dpl"][0].copy().smooth(window_len=30)
+        dpl_waveforms.append(dpl_smooth.data["agg"])
+        param_values.append(data["param_values"]["weight_basket"])
 
 plt.figure(figsize=(10, 6))
-cmap = plt.get_cmap('viridis')
+cmap = plt.get_cmap("viridis")
 log_param_values = np.log10(param_values)
 norm = plt.Normalize(log_param_values.min(), log_param_values.max())
 
 for waveform, log_param in zip(dpl_waveforms, log_param_values):
     color = cmap(norm(log_param))
     plt.plot(waveform, color=color, alpha=0.7, linewidth=2)
-plt.title('Overlay of Dipole Waveforms')
-plt.xlabel('Time (ms)')
-plt.ylabel('Dipole Amplitude (nAm)')
+plt.title("Overlay of Dipole Waveforms")
+plt.xlabel("Time (ms)")
+plt.ylabel("Dipole Amplitude (nAm)")
 plt.grid(True)
 plt.tight_layout()
 plt.show()
@@ -174,53 +207,23 @@ plt.show()
 # dipole activity changes as we vary the synaptic strength parameter.
 
 min_peaks, max_peaks, param_values = [], [], []
-for summary_list, data_list in zip(simulation_results['summary_statistics'],
-                                   simulation_results['simulated_data']):
+for summary_list, data_list in zip(
+    simulation_results["summary_statistics"], simulation_results["simulated_data"]
+):
     for summary, data in zip(summary_list, data_list):
-        min_peaks.append(summary['min_peak'])
-        max_peaks.append(summary['max_peak'])
-        param_values.append(data['param_values']['weight_basket'])
+        min_peaks.append(summary["min_peak"])
+        max_peaks.append(summary["max_peak"])
+        param_values.append(data["param_values"]["weight_basket"])
 
 # Plotting
 plt.figure(figsize=(10, 6))
-plt.plot(param_values, min_peaks, label='Min Dipole Peak')
-plt.plot(param_values, max_peaks, label='Max Dipole Peak')
-plt.xlabel('Synaptic Strength (nS)')
-plt.ylabel('Dipole Peak Magnitude')
-plt.title('Min and Max Dipole Peaks across Simulations')
+plt.plot(param_values, min_peaks, label="Min Dipole Peak")
+plt.plot(param_values, max_peaks, label="Max Dipole Peak")
+plt.xlabel("Synaptic Strength (nS)")
+plt.ylabel("Dipole Peak Magnitude")
+plt.title("Min and Max Dipole Peaks across Simulations")
 plt.legend()
 plt.grid(True)
-plt.xscale('log')
+plt.xscale("log")
 plt.tight_layout()
 plt.show()
-
-###############################################################################
-# Using Dask backend for distributed computing
-# --------------------------------------------
-# For large parameter sweeps like CMA-ES that require many cores across
-# multiple machines, Dask can be used as a backend.
-#
-# First ensure ``dask[distributed]`` is installed (included in
-# ``pip install "hnn_core[parallel]"``).
-#
-# Start a scheduler and workers with ``--nthreads=1`` to avoid NEURON
-# conflicts between threads::
-#
-#     dask scheduler
-#     dask worker tcp://scheduler-address:8786 --nthreads=1 --nworkers=4
-#
-# Then connect and run::
-#
-#     from dask.distributed import Client
-#     # Replace with your cluster's scheduler address
-#     # e.g. 'mycluster.university.edu:8786' or '192.168.1.100:8786'
-#     client = Client('scheduler-address:8786')
-#     simulation_results = batch_simulation.run(param_grid,
-#                                               n_jobs=4,
-#                                               combinations=False,
-#                                               backend='dask')
-#     client.close()
-#
-# Note: ``--nthreads=1`` per worker is required as NEURON does not support
-# multiple threads running simultaneously within the same process.
-# For single machine use, ``loky`` backend is simpler and recommended.
