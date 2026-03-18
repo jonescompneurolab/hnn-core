@@ -498,8 +498,7 @@ def test_simulation_auto_rename_duplicate(setup_gui):
     assert isinstance(gui.simulation_data[sim_name]["net"], Network)
     assert isinstance(gui.simulation_data[sim_name]["dpls"], list)
     assert (
-        gui._simulation_status_bar.value
-        == gui._simulation_status_contents["finished"]
+        gui._simulation_status_bar.value == gui._simulation_status_contents["finished"]
     )
 
     # Second run with the same name — should auto-rename to "{sim_name}-2"
@@ -512,8 +511,7 @@ def test_simulation_auto_rename_duplicate(setup_gui):
     assert isinstance(gui.simulation_data[expected_new_name]["net"], Network)
     assert isinstance(gui.simulation_data[expected_new_name]["dpls"], list)
     assert (
-        gui._simulation_status_bar.value
-        == gui._simulation_status_contents["finished"]
+        gui._simulation_status_bar.value == gui._simulation_status_contents["finished"]
     )
     assert gui.widget_simulation_name.value == expected_new_name
 
