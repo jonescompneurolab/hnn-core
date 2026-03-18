@@ -487,24 +487,36 @@ def test_gui_run_simulations(setup_gui):
     assert len(list(gui.simulation_data)) == sim_count
 
 
-def test_non_unique_name_error(setup_gui):
-    """Checks that simulation fails if new name is not supplied."""
+def test_simulation_auto_rename_duplicate(setup_gui):
+    """Checks that simulation auto-renames if the name is already taken."""
     gui = setup_gui
 
     sim_name = gui.widget_simulation_name.value
 
+    # First run
     gui.run_button.click()
-    dpls = gui.simulation_data[sim_name]["dpls"]
     assert isinstance(gui.simulation_data[sim_name]["net"], Network)
-    assert isinstance(dpls, list)
+    assert isinstance(gui.simulation_data[sim_name]["dpls"], list)
     assert (
-        gui._simulation_status_bar.value == gui._simulation_status_contents["finished"]
+        gui._simulation_status_bar.value
+        == gui._simulation_status_contents["finished"]
     )
 
+    # Second run with the same name — should auto-rename to "{sim_name}-2"
     gui.widget_simulation_name.value = sim_name
     gui.run_button.click()
-    assert len(gui.simulation_data) == 1
-    assert gui._simulation_status_bar.value == gui._simulation_status_contents["failed"]
+
+    expected_new_name = f"{sim_name}-2"
+    assert len(gui.simulation_data) == 2
+    assert expected_new_name in gui.simulation_data
+    assert isinstance(gui.simulation_data[expected_new_name]["net"], Network)
+    assert isinstance(gui.simulation_data[expected_new_name]["dpls"], list)
+    assert (
+        gui._simulation_status_bar.value
+        == gui._simulation_status_contents["finished"]
+    )
+    assert gui.widget_simulation_name.value == expected_new_name
+
     plt.close("all")
 
 
