@@ -78,6 +78,9 @@ def neymotin_2020_model(
 
     # Define cell types for Jones 2009 model
     # data is here in metaData format
+    '''
+    wip: will tell the user to refer to default_cell_metadata in network.py for reference
+    '''
     cell_types = {
         "L2_basket": {
             "cell_object": basket(cell_name="L2_basket"),
