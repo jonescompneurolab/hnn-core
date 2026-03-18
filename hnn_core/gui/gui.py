@@ -3263,12 +3263,27 @@ def run_button_clicked(
         for _name in tuple(simulation_data.keys()):
             if len(simulation_data[_name]["dpls"]) == 0:
                 del simulation_data[_name]
+                
+                
+        def _generate_unique_sim_name(name, simulation_data):
+    if name not in simulation_data:
+        return name
 
+    i = 2
+    while True:
+        new_name = f"{name}-{i:03d}"
+        if new_name not in simulation_data:
+            return new_name
+        i += 1 
+              
         _sim_name = widget_simulation_name.value
-        if simulation_data[_sim_name]["net"] is not None:
-            print("Simulation with the same name exists!")
-            simulation_status_bar.value = simulation_status_contents["failed"]
-            return
+
+# auto rename if simulation exists
+if _sim_name in simulation_data and simulation_data[_sim_name]["net"] is not None:
+    new_name = _generate_unique_sim_name(_sim_name, simulation_data)
+    print(f"Simulation name exists. Renaming to {new_name}")
+    widget_simulation_name.value = new_name
+    _sim_name = new_name
 
         _init_network_from_widgets(
             params,
