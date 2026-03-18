@@ -3308,7 +3308,6 @@ def run_button_clicked(
                 )
 
                 simulation_status_bar.value = simulation_status_contents["finished"]
-                a = fig_default_params["asdf"]
                 sim_names = [
                     sim_name
                     for sim_name in simulation_data
