@@ -377,6 +377,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                     n_cycles=n_cycles,
                     ax=ax,
                     colormap=plot_config["spectrogram_cm"],
+                    colorbar_inside=True,
                     show=False,
                 )
 
