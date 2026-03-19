@@ -791,12 +791,12 @@ class HNNGUI:
             description="Load data",
             button_style="success",
         )
-        self.run_button = create_expanded_button(
-            "Run Simulation",
-            "success",
+        self.run_button = Button(
+            description="Run Simulation",
+            button_style="success",
             layout=self.layout["run_btn"],
-            button_color=self.layout["theme_color"],
         )
+        self.run_button.style.button_color = self.layout["theme_color"]
         self.save_config_button = self._init_html_download_button(
             title="Save Current Network and Drives",
             mimetype="application/json",
@@ -860,12 +860,12 @@ class HNNGUI:
             layout=self.layout["btn"],
             button_style="success",
         )
-        self.add_drive_button = create_expanded_button(
-            "Add drive",
-            "primary",
+        self.add_drive_button = Button(
+            description="Add drive",
+            button_style="primary",
             layout=self.layout["btn"],
-            button_color=self.layout["theme_color"],
         )
+        self.add_drive_button.style.button_color = self.layout["theme_color"]
         self.delete_drive_button = Button(
             description="Delete all drives",
             button_style="danger",
@@ -2025,18 +2025,6 @@ def _update_nested_dict(original, new, skip_none=True):
             pass
 
     return updated
-
-
-def create_expanded_button(
-    description, button_style, layout, disabled=False, button_color="#8A2BE2"
-):
-    return Button(
-        description=description,
-        button_style=button_style,
-        layout=layout,
-        style={"button_color": button_color},
-        disabled=disabled,
-    )
 
 
 def _get_connectivity_widgets(conn_data, global_gain_textfields):
