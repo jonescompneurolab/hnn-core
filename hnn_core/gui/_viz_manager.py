@@ -382,11 +382,16 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
                 )
 
             except ValueError as ex:
-                if "wavelets is longer than the signal" in str(ex):
+                if str(ex) == (
+                    "At least one of the wavelets is longer than "
+                    "the signal. Use a longer signal or shorter "
+                    "wavelets."
+                ):
                     logger.error(
-                        "Wavelet longer than signal. "
-                        "Use longer signal or shorter wavelets. "
-                        "No spectrogram plotted."
+                        "At least one of the wavelets is "
+                        "longer than the signal. Use a longer signal "
+                        "or shorter wavelets. No spectrogram will be "
+                        "plotted."
                     )
 
     elif "dipole" in plot_type:
