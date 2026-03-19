@@ -370,9 +370,6 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
 
     elif plot_type == "spectrogram":
         if len(dpls_copied) > 0:
-            dpl = _avg_dipole_check(dpls_copied)
-            if dpl is None:
-                return
             min_f = plot_config["min_spectral_frequency"]
             max_f = plot_config["max_spectral_frequency"]
             step_f = 1.0
@@ -382,7 +379,7 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
             n_cycles = freqs / 2.0
 
             try:
-                dpl.plot_tfr_morlet(
+                dpls_copied.plot_tfr_morlet(
                     freqs,
                     n_cycles=n_cycles,
                     colormap=plot_config["spectrogram_cm"],
