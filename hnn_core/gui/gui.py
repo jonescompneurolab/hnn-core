@@ -866,12 +866,12 @@ class HNNGUI:
             layout=self.layout["btn"],
             button_color=self.layout["theme_color"],
         )
-        self.delete_drive_button = create_expanded_button(
-            "Delete all drives",
-            "success",
+        self.delete_drive_button = Button(
+            description="Delete all drives",
+            button_style="danger",
+            icon="trash",
             layout=self.layout["btn"],
-            button_color="#D32F2F",
-        )
+        ).add_class("red-button")
 
         # drive selection dropdown fields
         # --------------------------------------------------
