@@ -517,19 +517,19 @@ def pyramidal_l5ET(cell_name,pos=(0,0,0), gid=None):
     # override params according to function
     gbar_Ca_HVA = partial(_linear_g_at_dist, gsoma=2.78e-5/2*1., gdend=2.78e-5/2*12.0, xkink=1500, hotzone_factor=4.5, hotzone_boundaries=[1500, 1700])
     gbar_Ca_LVA = partial(_linear_g_at_dist, gsoma=93.5e-6/2, gdend=93.5e-6/2*2.25, xkink=1500, hotzone_factor=2.25, hotzone_boundaries=[1500, 1700])
-    gbar_Ih = partial(_exp_g_at_dist, gbar_at_zero=p_all['L5Pyr_dend_gbar_Ih'], exp_term = 1./323, offset=-.8696, slope=2.087)
+    gbar_Ih = partial(_exp_g_at_dist, gbar_at_zero=p_all['L5ET_dend_gbar_Ih'], exp_term = 1./323, offset=-.8696, slope=2.087)
 
     # basal dendrites
-    gbar_NaTs2_t = partial(_linear_g_at_dist, gsoma=p_all['L5Pyr_basal_gbar_NaTs2_t'], gdend=0, xkink=255)
-    gbar_SKv3_1 = partial(_linear_g_at_dist, gsoma=0, gdend=p_all['L5Pyr_basal_gbar_SKv3_1'], xkink=255)
+    gbar_NaTs2_t = partial(_linear_g_at_dist, gsoma=p_all['L5ET_basal_gbar_NaTs2_t'], gdend=0, xkink=255)
+    gbar_SKv3_1 = partial(_linear_g_at_dist, gsoma=0, gdend=p_all['L5ET_basal_gbar_SKv3_1'], xkink=255)
 
 
     override_params = dict()
-    override_params['L5Pyr_dend_gbar_Ca_HVA'] = gbar_Ca_HVA
-    override_params['L5Pyr_dend_gbar_Ca_LVAst'] = gbar_Ca_LVA
-    override_params['L5Pyr_dend_gbar_Ih'] = gbar_Ih
-    override_params['L5Pyr_basal_gbar_NaTs2_t'] = gbar_NaTs2_t
-    override_params['L5Pyr_basal_gbar_SKv3_1'] = gbar_SKv3_1
+    override_params['L5ET_dend_gbar_Ca_HVA'] = gbar_Ca_HVA
+    override_params['L5ET_dend_gbar_Ca_LVAst'] = gbar_Ca_LVA
+    override_params['L5ET_dend_gbar_Ih'] = gbar_Ih
+    override_params['L5ET_basal_gbar_NaTs2_t'] = gbar_NaTs2_t
+    override_params['L5ET_basal_gbar_SKv3_1'] = gbar_SKv3_1
 
     p_all = compare_dictionaries(p_all, override_params)
 
@@ -577,12 +577,12 @@ def pyramidal_l5ET(cell_name,pos=(0,0,0), gid=None):
             'apical_2': -66.1535511211922,
             'apical_tuft': -61.47225400606895}
 
-    sections_apcl = _get_dends(p_all, 'L5Pyr', section_names=['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft'], v_init=v_init)
-    sections_basal = _get_basal(p_all, 'L5Pyr', section_names=['basal_1', 'basal_2', 'basal_3', 'apical_oblique'], v_init=v_init)
+    sections_apcl = _get_dends(p_all, 'L5ET', section_names=['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft'], v_init=v_init)
+    sections_basal = _get_basal(p_all, 'L5ET', section_names=['basal_1', 'basal_2', 'basal_3', 'apical_oblique'], v_init=v_init)
 
     sections = {**sections_apcl, **sections_basal}
 
-    sections['soma'] = _get_pyr_soma(p_all, 'L5Pyr', v_init=v_init['soma'])
+    sections['soma'] = _get_pyr_soma(p_all, 'L5ET', v_init=v_init['soma'])
 
     # Soma and apical mechanisms
     mechanisms = {'NaTs2_t':['gbar_NaTs2_t'], 
@@ -598,7 +598,7 @@ def pyramidal_l5ET(cell_name,pos=(0,0,0), gid=None):
                     'K_Tst': ['gbar_K_Tst'],
                     'CaDynamics_E2': ['decay_CaDynamics_E2', 'gamma_CaDynamics_E2']}
 
-    p_mech_soma = _get_mechanisms(p_all, 'L5Pyr', ['soma'], mechanisms)
+    p_mech_soma = _get_mechanisms(p_all, 'L5ET', ['soma'], mechanisms)
 
     section_names = ['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft']
 
@@ -614,7 +614,7 @@ def pyramidal_l5ET(cell_name,pos=(0,0,0), gid=None):
                     'K_Tst': ['gbar_K_Tst'],
                     'CaDynamics_E2': ['decay_CaDynamics_E2', 'gamma_CaDynamics_E2']}
     
-    p_mech_apical = _get_mechanisms(p_all, 'L5Pyr', section_names, mechanisms)
+    p_mech_apical = _get_mechanisms(p_all, 'L5ET', section_names, mechanisms)
 
 
     # basal sections - super hacky because I can't mess with _get_mechanisms
@@ -655,7 +655,7 @@ def pyramidal_l5ET(cell_name,pos=(0,0,0), gid=None):
     sect_loc = {'proximal': ['apical_oblique', 'basal_2', 'basal_3'],
                     'distal': ['apical_tuft']}
 
-    synapses = _get_syn_props(p_all, 'L5Pyr', syn_types=["ampa", "nmda", "gabaa", "gabab"])
+    synapses = _get_syn_props(p_all, 'L5ET', syn_types=["ampa", "nmda", "gabaa", "gabab"])
 
     cell = Cell(cell_name, pos,
                     sections=sections,

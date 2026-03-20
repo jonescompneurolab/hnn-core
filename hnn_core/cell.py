@@ -620,7 +620,17 @@ class Cell:
                 syn_key = f"{sec_name}_{receptor}"
                 seg = self._nrn_sections[sec_name](0.5)
 
-                self._nrn_synapses[syn_key] = self.syn_create(
+                # Quick and dirty, will be updated in bigger synapse refactor
+                if self.name == 'L5ET' and sec_name in ['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft'] and receptor == 'gabaa':
+                    update_ampa_syn = deepcopy(synapses)
+                    update_ampa_syn[receptor]['tau1'] = 1.5     # Schulz et al. 2018
+                    update_ampa_syn[receptor]['tau2'] = 20
+
+                    self._nrn_synapses[syn_key] = self.syn_create(
+                    seg, **update_ampa_syn[receptor])
+
+                else: 
+                    self._nrn_synapses[syn_key] = self.syn_create(
                     seg, **synapses[receptor])
 
 

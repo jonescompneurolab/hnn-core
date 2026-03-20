@@ -325,14 +325,22 @@ class Params(dict):
 
         if isinstance(params_input, dict):
             nprox, ndist = _count_evoked_inputs(params_input)
+            
+            # KD: This doesn't allow users to define new cell names, synapse types etc.
             # create default params templated from params_input
-            params_default = get_params_default(nprox, ndist)
+            # params_default = get_params_default(nprox, ndist)
+            # It's a problem for the new model. Changing for now and will have to refactor/adjust with comprehensive synapse update
+            # Also why would you just silently set values that the user hasn't set????
+            # for key in params_default.keys():
+            #     if key in params_input:
+            #         self[key] = params_input[key]
+            #     else:
+            #         self[key] = params_default[key]
 
-            for key in params_default.keys():
-                if key in params_input:
-                    self[key] = params_input[key]
-                else:
-                    self[key] = params_default[key]
+
+            # changing to this now.
+            for key in params_input.keys():
+                self[key] = params_input[key]
         else:
             raise ValueError(
                 "params_input must be dict or None. Got %s" % type(params_input)

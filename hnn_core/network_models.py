@@ -438,8 +438,8 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
                 "reference": "https://doi.org/10.7554/eLife.51214"
             },
         },
-        "L5_pyramidal": {
-            "cell_object": pyramidal_l5ET(cell_name=_short_name("L5_pyramidal")),
+        "L5ET": {
+            "cell_object": pyramidal_l5ET(cell_name="L5ET"),
             "cell_metadata": {
                 "morpho_type": "pyramidal",
                 "electro_type": "excitatory",
@@ -460,7 +460,7 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
 
     # Map cell types to layer positions
     pos_dict = {
-        "L5_pyramidal": layer_dict["L5_bottom"],
+        "L5ET": layer_dict["L5_bottom"],
         "L2_pyramidal": layer_dict["L2_bottom"],
         "L5_basket": layer_dict["L5_mid"],
         "L2_basket": layer_dict["L2_mid"],
@@ -492,10 +492,10 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
             target_cell, target_cell, loc, receptor, weight,
             delay, lamtha, allow_autapses=False)
     # layer5 Pyr -> layer5 Pyr
-    target_cell ='L5_pyramidal'
+    target_cell ='L5ET'
     for receptor in ['nmda', 'ampa']:
-        key = f'gbar_{_short_name(target_cell)}_'\
-                f'{_short_name(target_cell)}_{receptor}'
+        key = f'gbar_{target_cell}_'\
+                f'{target_cell}_{receptor}'
         weight = params[key]
 
         net.add_connection(
@@ -523,18 +523,18 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
         
     # layer5 Basket -> layer5 Pyr
     src_cell = 'L5_basket'
-    target_cell = 'L5_pyramidal'
+    target_cell = 'L5ET'
     lamtha = 6.125#*0.8  # shorter space constant (Campagnola, 2022, mice data)
     loc = 'soma'
     receptor = 'gabaa'
-    key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
+    key = f'gbar_L5Basket_{target_cell}_{receptor}'
     weight = params[key]
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
     
     # this connection is also 0
     receptor = 'gabab'
-    key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
+    key = f'gbar_L5Basket_{target_cell}_{receptor}'
     weight = params[key]
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
@@ -542,17 +542,17 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
     # layer2 Pyr -> layer5 Pyr
     src_cell = 'L2_pyramidal'
     lamtha = 6.125
-    receptor = 'ampa'
-    for loc in ['proximal', 'distal']:
-        key = f'gbar_L2Pyr_{_short_name(target_cell)}'
-        weight = params[key]
-        net.add_connection(
-            src_cell, target_cell, loc, receptor, weight, delay, lamtha)
+    for receptor in ['ampa', 'nmda']:
+        for loc in ['proximal', 'apical_2']:
+            key = f'gbar_L2Pyr_{target_cell}_{receptor}'
+            weight = params[key]
+            net.add_connection(
+                src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
     # layer2 Basket -> layer5 Pyr
     src_cell = 'L2_basket'
     lamtha = 6.125#*0.8  # shorter space constant (Campagnola, 2022, mice data)
-    key = f'gbar_L2Basket_{_short_name(target_cell)}'
+    key = f'gbar_L2Basket_{target_cell}'
     weight = params[key]
    
     # remove this as we're not simulating NGF cells
@@ -612,9 +612,9 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
         allow_autapses=False)
    
 
-    src_cell = 'L5_pyramidal'
+    src_cell = 'L5ET'
     lamtha = 6.125*0.8  # shorter space constant (Campagnola, 2022, mice data)
-    key = f'gbar_L5Pyr_{_short_name(target_cell)}'
+    key = f'gbar_{src_cell}_{_short_name(target_cell)}'
     weight = params[key]
     loc = 'soma'
     receptor = 'ampa'
