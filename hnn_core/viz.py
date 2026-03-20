@@ -705,7 +705,7 @@ def plot_spikes_raster(
                 f"Got {cell_types}"
             )
     else:
-        # Use default cell types
+        # Use all cell types and warn user that they should select cell types
         cell_types = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
 
     # Set default colors

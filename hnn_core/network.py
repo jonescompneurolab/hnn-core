@@ -502,8 +502,6 @@ class Network:
         self._N_pyr_x = mesh_shape[0]
         self._N_pyr_y = mesh_shape[1]
 
-        self._inplane_distance = 1.0  # XXX hard-coded default
-        self._layer_separation = 1307.4  # XXX hard-coded default
 
         # Handle positions and cell types
         if pos_dict is not None and cell_types is not None:
@@ -518,6 +516,26 @@ class Network:
                     self._add_cell_type(
                         cell_name, self.pos_dict[cell_name], cell_template=cell_template
                     )
+
+            # read out inplane_distance
+            if hasattr(self, '_inplane_distance') is False:
+                inlay_dist = []
+                for cell_type in self.cell_types.keys():
+                    current_dist = np.mean(np.concatenate((np.diff(np.unique(np.array(self.pos_dict[cell_type])[:,0])), np.diff(np.unique(np.array(self.pos_dict[cell_type])[:,1])))))
+                    inlay_dist.append(current_dist)
+                self._inplane_distance = np.min(np.array(inlay_dist))
+
+            # read out layer separation
+            if hasattr(self, '_layer_separation') is False:
+                for cell_type in self.cell_types:
+                    if self.cell_types[cell_type]['cell_metadata']['zdist_origin'] == 1:
+                        self._layer_separation = np.mean(np.array(self.pos_dict[cell_type])[:,2])
+
+            # update drives to be positioned at network origin
+            for drive_name, drive in self.external_drives.items():
+                pos = [self.pos_dict["origin"]] * drive["n_drive_cells"]
+                self.pos_dict[drive_name] = pos
+
         else:
             # Default behavior - create standard network
             cell_types_default = {
@@ -562,6 +580,9 @@ class Network:
                     },
                 },
             }
+
+            self._inplane_distance = 1.0  # XXX hard-coded default
+            self._layer_separation = 1307.4  # XXX hard-coded default
 
             self.set_cell_positions(
                 inplane_distance=self._inplane_distance,
@@ -622,7 +643,8 @@ class Network:
 
         return True
 
-    def set_cell_positions(self, *, inplane_distance=None, layer_separation=None):
+    def set_cell_positions(self, *, inplane_distance=None, layer_separation=None,
+                           ):
         """Set relative positions of cells arranged in a square grid
 
         Note that it is possible to change only a subset of the parameters
@@ -653,31 +675,54 @@ class Network:
             raise ValueError(
                 f"Layer separation must be positive, got: {layer_separation}"
             )
+        
+        adjust_inplane = inplane_distance - self._inplane_distance
+        # if there is a pos_dict, adjust cell positions
+        if hasattr(self, "pos_dict"):
+            for cell_type in self.cell_types:
+                for i in range(len(self.pos_dict[cell_type])):
+                    
+                    # first coordinate in layer (only adjust z)
+                    if i == 0:
+                        lay_origin = self.pos_dict[cell_type][i]
+                        zdist = self.cell_types[cell_type]['cell_metadata']['zdist_origin'] * layer_separation
+                        self.pos_dict[cell_type][i] = (lay_origin[0], lay_origin[1], zdist)
 
-        # Get layer positions using layer dict
-        layer_dict = _create_cell_coords(
-            n_pyr_x=self._N_pyr_x,
-            n_pyr_y=self._N_pyr_y,
-            z_coord=layer_separation,
-            inplane_distance=inplane_distance,
-        )
+                    # following coordinates relative to first
+                    else:
+                        # get distance to origin in percent layer separation
+                        prev = self.pos_dict[cell_type][i-1]
+                        zdist = self.cell_types[cell_type]['cell_metadata']['zdist_origin'] * layer_separation
+                        self.pos_dict[cell_type][i] = (prev[0] + adjust_inplane, prev[1] + adjust_inplane, zdist)
+        
+        # If cell positions are set for the first time -> default model with default cell names
+        else:
 
-        # Map layers to cell types, for default mapping
-        self.pos_dict = {
-            "L5_pyramidal": layer_dict["L5_bottom"],
-            "L2_pyramidal": layer_dict["L2_bottom"],
-            "L5_basket": layer_dict["L5_mid"],
-            "L2_basket": layer_dict["L2_mid"],
-            "origin": layer_dict["origin"],
-        }
+            # Get layer positions using layer dict
+            layer_dict = _create_cell_coords(
+                n_pyr_x=self._N_pyr_x,
+                n_pyr_y=self._N_pyr_y,
+                z_coord=layer_separation,
+                inplane_distance=inplane_distance,
+            )
 
-        # update drives to be positioned at network origin
-        for drive_name, drive in self.external_drives.items():
-            pos = [self.pos_dict["origin"]] * drive["n_drive_cells"]
-            self.pos_dict[drive_name] = pos
+            # Map layers to cell types, for default mapping
+            self.pos_dict = {
+                "L5_pyramidal": layer_dict["L5_bottom"],
+                "L2_pyramidal": layer_dict["L2_bottom"],
+                "L5_basket": layer_dict["L5_mid"],
+                "L2_basket": layer_dict["L2_mid"],
+                "origin": layer_dict["origin"],
+            }
 
-        self._inplane_distance = inplane_distance
-        self._layer_separation = layer_separation
+
+            # update drives to be positioned at network origin
+            for drive_name, drive in self.external_drives.items():
+                pos = [self.pos_dict["origin"]] * drive["n_drive_cells"]
+                self.pos_dict[drive_name] = pos
+
+            self._inplane_distance = inplane_distance
+            self._layer_separation = layer_separation
 
     def copy(self):
         """Return a copy of the Network instance
