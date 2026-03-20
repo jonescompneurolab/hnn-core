@@ -697,16 +697,19 @@ def plot_spikes_raster(
 
     # validate cell types
     if cell_types:
+        
         _validate_type(cell_types, list, "cell_types", "list of str")
-        if not set(cell_types).issubset(set(unique_spike_types)):
+        # allowed are spikes that fired (including drives) and generally cells in network
+        allowed_types = np.unique(cell_response.cell_types+cell_response._cell_type_names)
+        if not set(cell_types).issubset(allowed_types):
             raise ValueError(
                 "Invalid cell types provided. "
-                f"Must be of set {unique_spike_types}. "
+                f"Must be of set {allowed_types}. "
                 f"Got {cell_types}"
             )
     else:
         # Use all cell types and warn user that they should select cell types
-        cell_types = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
+        cell_types = cell_response._cell_type_names
 
     # Set default colors
     default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
