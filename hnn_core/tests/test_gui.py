@@ -491,29 +491,94 @@ def test_simulation_auto_rename_duplicate(setup_gui):
     """Checks that simulation auto-renames if the name is already taken."""
     gui = setup_gui
 
-    sim_name = gui.widget_simulation_name.value
+    default_sim_name = gui.widget_simulation_name.value
 
     # First run
+    # ---------
     gui.run_button.click()
-    assert isinstance(gui.simulation_data[sim_name]["net"], Network)
-    assert isinstance(gui.simulation_data[sim_name]["dpls"], list)
-    assert (
-        gui._simulation_status_bar.value == gui._simulation_status_contents["finished"]
-    )
 
     # Second run with the same name — should auto-rename to "{sim_name}-2"
-    gui.widget_simulation_name.value = sim_name
+    # ---------------------------------------------------------------------
+    gui.widget_simulation_name.value = default_sim_name
     gui.run_button.click()
 
-    expected_new_name = f"{sim_name}-2"
+    # convenience function for all upcoming runs
+    def _check_new_name(expected_new_name):
+        assert expected_new_name in gui.simulation_data
+        assert isinstance(gui.simulation_data[expected_new_name]["net"], Network)
+        assert isinstance(gui.simulation_data[expected_new_name]["dpls"], list)
+        assert (
+            gui._simulation_status_bar.value
+            == gui._simulation_status_contents["finished"]
+        )
+        assert gui.widget_simulation_name.value == expected_new_name
+
+    expected_new_name = f"{default_sim_name}-2"
+    _check_new_name(expected_new_name)
     assert len(gui.simulation_data) == 2
-    assert expected_new_name in gui.simulation_data
-    assert isinstance(gui.simulation_data[expected_new_name]["net"], Network)
-    assert isinstance(gui.simulation_data[expected_new_name]["dpls"], list)
-    assert (
-        gui._simulation_status_bar.value == gui._simulation_status_contents["finished"]
-    )
-    assert gui.widget_simulation_name.value == expected_new_name
+
+    # Third run with the same name — should auto-rename to "{sim_name}-3"
+    # --------------------------------------------------------------------
+    gui.run_button.click()
+    expected_new_name = f"{default_sim_name}-3"
+    _check_new_name(expected_new_name)
+    assert len(gui.simulation_data) == 3
+
+    # Fourth run with a fresh, non-default name containing hyphens
+    # ------------------------------------------------------------
+    custom_sim_name_1 = "asdf-67-qwerty"
+    gui.widget_simulation_name.value = custom_sim_name_1
+    gui.run_button.click()
+
+    expected_new_name = custom_sim_name_1
+    _check_new_name(expected_new_name)
+    assert len(gui.simulation_data) == 4
+
+    # Fifth run with an auto-appended fresh, non-default name
+    # --------------------------------------------------------
+    # TODO Tushar: In this case, we want to retain the hyphens and numbers in the "base"
+    # name, but append "-{number}" like you did for default names.
+    gui.run_button.click()
+
+    expected_new_name = f"{custom_sim_name_1}-2"
+    _check_new_name(expected_new_name)
+    assert len(gui.simulation_data) == 5
+
+    # Sixth run with an incremented auto-appended fresh, non-default name
+    # -------------------------------------------------------------------
+    gui.run_button.click()
+
+    expected_new_name = f"{custom_sim_name_1}-3"
+    _check_new_name(expected_new_name)
+    assert len(gui.simulation_data) == 6
+
+    # Seventh run with a fresh, non-default name ending in "-{number}"
+    # ----------------------------------------------------------------
+    # TODO Tushar: In this case, we want to retain the hyphens and numbers in the "base"
+    # name, but increment the *preexisting* final "-{number}"
+    custom_sim_name_2 = "hjkl-67-qwerty-23"
+    gui.widget_simulation_name.value = custom_sim_name_2
+    gui.run_button.click()
+
+    expected_new_name = custom_sim_name_2
+    _check_new_name(expected_new_name)
+    assert len(gui.simulation_data) == 7
+
+    # Eigth run with a fresh, non-default name ending in "-{number+1}"
+    # ----------------------------------------------------------------
+    gui.run_button.click()
+
+    expected_new_name = "hjkl-67-qwerty-24"
+    _check_new_name(expected_new_name)
+    assert len(gui.simulation_data) == 8
+
+    # Ninth run with a fresh, non-default name ending in "-{number+2}"
+    # ----------------------------------------------------------------
+    gui.run_button.click()
+
+    expected_new_name = "hjkl-67-qwerty-25"
+    _check_new_name(expected_new_name)
+    assert len(gui.simulation_data) == 9
 
     plt.close("all")
 
