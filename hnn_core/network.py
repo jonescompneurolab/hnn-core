@@ -2149,7 +2149,7 @@ class Network:
 
         return values
 
-    def plot_cells(self, ax=None, show=True):
+    def plot_cells(self, ax=None, show=True, colors=None, markers=None):
         """Plot the cells using Network.pos_dict.
 
         Parameters
@@ -2159,13 +2159,19 @@ class Network:
             a new figure is created.
         show : bool
             If True, show the figure.
+        colors : dict | None
+            Dictionary mapping cell type names to colors. If None,
+            colors are assigned automatically from the default color cycle.
+        markers : dict | None
+            Dictionary mapping cell type names to markers. If None,
+            markers are assigned based on ``morpho_type`` in cell metadata.
 
         Returns
         -------
         fig : instance of matplotlib Figure
             The matplotlib figure handle.
         """
-        return plot_cells(net=self, ax=ax, show=show)
+        return plot_cells(net=self, ax=ax, show=show, colors=colors, markers=markers)
 
     def to_dict(self, write_output=False):
         return network_to_dict(self, write_output=write_output)

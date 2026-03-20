@@ -887,7 +887,7 @@ def plot_spikes_raster(
     return ax.get_figure()
 
 
-def plot_cells(net, ax=None, show=True):
+def plot_cells(net, ax=None, show=True, colors=None, markers=None):
     """Plot the cells using Network.pos_dict.
 
     Parameters
@@ -899,6 +899,15 @@ def plot_cells(net, ax=None, show=True):
         a new figure is created.
     show : bool
         If True, show the figure.
+    colors : dict | None
+        Dictionary mapping cell type names to colors. If None,
+        colors are assigned automatically from the default color cycle.
+    markers : dict | None
+        Dictionary mapping cell type names to markers. If None,
+        markers are assigned based on ``morpho_type`` in cell metadata:
+        ``'pyramidal'`` -> ``'^'``, ``'basket'`` -> ``'x'``,
+        ``'interneuron'`` -> ``'o'``. Unknown morpho types get the first
+        unused marker from the pool.
 
     Returns
     -------
@@ -917,27 +926,38 @@ def plot_cells(net, ax=None, show=True):
             f"Expected 'ax' to be an instance of Axes3D, but got {type(ax).__name__}"
         )
 
-    colors = {
-        "L5_pyramidal": "b",
-        "L2_pyramidal": "c",
-        "L5_basket": "r",
-        "L2_basket": "m",
-    }
-    markers = {
-        "L5_pyramidal": "^",
-        "L2_pyramidal": "^",
-        "L5_basket": "x",
-        "L2_basket": "x",
-    }
+    if colors is None:
+        color_cycle = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+        colors = {
+            cell_type: color_cycle[i % len(color_cycle)]
+            for i, cell_type in enumerate(net.cell_types)
+        }
+
+    if markers is None:
+        morpho_marker_map = {"pyramidal": "^", "basket": "x", "interneuron": "o"}
+        all_markers = ["^", "x", "o", "s", "D", "P", "*", "v", "<", ">"]
+        used_markers = set(morpho_marker_map.values())
+        markers = {}
+        for cell_type in net.cell_types:
+            morpho_type = net.cell_types[cell_type]["cell_metadata"].get(
+                "morpho_type", ""
+            )
+            if morpho_type in morpho_marker_map:
+                markers[cell_type] = morpho_marker_map[morpho_type]
+            else:
+                for m in all_markers:
+                    if m not in used_markers:
+                        markers[cell_type] = m
+                        used_markers.add(m)
+                        break
 
     for cell_type in net.cell_types:
         x = [pos[0] for pos in net.pos_dict[cell_type]]
         y = [pos[1] for pos in net.pos_dict[cell_type]]
         z = [pos[2] for pos in net.pos_dict[cell_type]]
-        if cell_type in colors:
-            color = colors[cell_type]
-            marker = markers[cell_type]
-            ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
+        color = colors.get(cell_type, "k")
+        marker = markers.get(cell_type, "o")
+        ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
 
     if net.rec_arrays:
         cols = plt.get_cmap("inferno", len(net.rec_arrays) + 2)
