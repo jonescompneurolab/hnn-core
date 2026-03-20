@@ -81,6 +81,7 @@ def jones_2009_model(
                 "morpho_type": "basket",
                 "electro_type": "inhibitory",
                 "layer": "2",
+                "zdist_origin": 0.8,                    # distance to origin in percent of layer_separation
                 "measure_dipole": False,
                 "reference": "https://doi.org/10.7554/eLife.51214"
             },
@@ -91,6 +92,7 @@ def jones_2009_model(
                 "morpho_type": "pyramidal",
                 "electro_type": "excitatory",
                 "layer": "2",
+                "zdist_origin": 1,
                 "measure_dipole": True,
                 "reference": "https://doi.org/10.7554/eLife.51214"
             },
@@ -101,6 +103,7 @@ def jones_2009_model(
                 "morpho_type": "basket",
                 "electro_type": "inhibitory",
                 "layer": "5",
+                "zdist_origin": 0.2,
                 "measure_dipole": False,
                 "reference": "https://doi.org/10.7554/eLife.51214"
             },
@@ -111,6 +114,7 @@ def jones_2009_model(
                 "morpho_type": "pyramidal",
                 "electro_type": "excitatory",
                 "layer": "5",
+                "zdist_origin": 0,
                 "measure_dipole": True,
                 "reference": "https://doi.org/10.7554/eLife.51214"
             },

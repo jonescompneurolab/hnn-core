@@ -676,24 +676,22 @@ class Network:
                 f"Layer separation must be positive, got: {layer_separation}"
             )
         
-        adjust_inplane = inplane_distance - self._inplane_distance
         # if there is a pos_dict, adjust cell positions
         if hasattr(self, "pos_dict"):
+            scale = inplane_distance / self._inplane_distance
             for cell_type in self.cell_types:
-                for i in range(len(self.pos_dict[cell_type])):
-                    
-                    # first coordinate in layer (only adjust z)
-                    if i == 0:
-                        lay_origin = self.pos_dict[cell_type][i]
-                        zdist = self.cell_types[cell_type]['cell_metadata']['zdist_origin'] * layer_separation
-                        self.pos_dict[cell_type][i] = (lay_origin[0], lay_origin[1], zdist)
-
-                    # following coordinates relative to first
-                    else:
-                        # get distance to origin in percent layer separation
-                        prev = self.pos_dict[cell_type][i-1]
-                        zdist = self.cell_types[cell_type]['cell_metadata']['zdist_origin'] * layer_separation
-                        self.pos_dict[cell_type][i] = (prev[0] + adjust_inplane, prev[1] + adjust_inplane, zdist)
+                zdist = self.cell_types[cell_type]['cell_metadata']['zdist_origin'] * layer_separation
+                self.pos_dict[cell_type] = [
+                    (pos[0] * scale, pos[1] * scale, zdist)
+                    for pos in self.pos_dict[cell_type]
+                ]
+            # scale origin and update drive positions
+            origin = self.pos_dict['origin']
+            self.pos_dict['origin'] = (origin[0] * scale, origin[1] * scale, origin[2])
+            for drive_name in self.external_drives:
+                self.pos_dict[drive_name] = [self.pos_dict['origin']] * len(self.pos_dict[drive_name])
+            self._inplane_distance = inplane_distance
+            self._layer_separation = layer_separation
         
         # If cell positions are set for the first time -> default model with default cell names
         else:
