@@ -102,10 +102,10 @@ def test_optimize_evoked(solver, obj_fun):
         ), "Optimized parameter is not in user-defined range"
 
     obj = optim.obj_
-    # the number of returned rmse values should be the same as max_iter
-    assert len(obj) <= max_iter, "Number of rmse values should be the same as max_iter"
-    # the returned rmse values should be positive
-    assert all(vals >= 0 for vals in obj), "rmse values should be positive"
+    # the number of returned loss values should be the same as max_iter
+    assert len(obj) <= max_iter, "Number of loss values should be the same as max_iter"
+    # the returned loss values should be positive
+    assert all(vals >= 0 for vals in obj), "loss values should be positive"
 
 
 @pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
