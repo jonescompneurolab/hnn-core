@@ -2,11 +2,23 @@ import pytest
 import numpy as np
 from hnn_core.utils import smooth_waveform, _hammfilt, _savgol_filter
 
-
 def test_hamming_smoothing():
     """Test hamming window convolution smoothing"""
     # length of data must be > window size (in samples)
-    pytest.raises(AssertionError, _hammfilt, np.arange(10), 11)
+    with pytest.raises(ValueError, match="winsz must be smaller than input length"):
+        _hammfilt(np.arange(10), 11)
+
+    # invalid x type
+    with pytest.raises(TypeError):
+        _hammfilt("not_array", 5)
+
+    # invalid winsz type
+    with pytest.raises(TypeError):
+        _hammfilt(np.arange(10), "five")
+
+    # negative winsz
+    with pytest.raises(ValueError):
+        _hammfilt(np.arange(10), -1)
 
     window_len, sfreq = 1, 1
     # data must be 1D
@@ -42,3 +54,27 @@ def test_savgol_filter():
         pytest.raises(
             (TypeError, AssertionError, ValueError), _savgol_filter, data, h_freq, sfreq
         )
+
+def test_hammfilt_basic():
+    x = np.array([1, 2, 3, 4, 5])
+    result = _hammfilt(x, 3)
+    assert len(result) == len(x)
+
+def test_hammfilt_invalid_winsz():
+    x = np.array([1, 2, 3])
+    with pytest.raises(ValueError):
+        _hammfilt(x, 5)
+
+def test_hammfilt_invalid_type():
+    with pytest.raises(TypeError):
+        _hammfilt("abc", 3)
+
+def test_hammfilt_zero_window():
+    x = np.array([1, 2, 3])
+    with pytest.raises(ValueError):
+        _hammfilt(x, 0)
+
+def test_hammfilt_float_winsz():
+    x = np.array([1, 2, 3, 4])
+    result = _hammfilt(x, 2.5)
+    assert len(result) == len(x)
