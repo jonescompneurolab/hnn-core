@@ -7,7 +7,6 @@
 import numpy as np
 from .externals.mne import _validate_type
 
-
 def _hammfilt(x, winsz):
     """Convolve with a hamming window."""
     if not isinstance(x, (list, np.ndarray)):
@@ -27,7 +26,6 @@ def _hammfilt(x, winsz):
     win = np.hamming(winsz)
     win /= sum(win)
     return np.convolve(x, win, "same")
-
 
 def _replace_dict_identifier(input_dict, old_identifier, new_identifier):
     """Recursively replace keys and values in a dict that match an identifier.
