@@ -12,10 +12,8 @@ This example demonstrates how to animate HNN simulations
 ###############################################################################
 # First, we'll import the necessary modules for instantiating a network and
 # running a simulation that we would like to animate.
-import os.path as op
 
-import hnn_core
-from hnn_core import jones_2009_model, simulate_dipole, read_params
+from hnn_core import jones_2009_model, simulate_dipole
 from hnn_core.network_models import add_erp_drives_to_jones_model
 
 ###############################################################################
@@ -51,7 +49,7 @@ net_plot.fig
 # network, we need use `simulate_dipole(..., record_vsec='all')` which turns
 # on the recording of voltages in all sections of all cells in the network.
 add_erp_drives_to_jones_model(net)
-dpl = simulate_dipole(net, tstop=170, record_vsec='all')
+dpl = simulate_dipole(net, tstop=170, record_vsec="all")
 net_plot = NetworkPlotter(net)  # Reinitialize plotter with simulated network
 
 ###############################################################################
@@ -61,4 +59,4 @@ net_plot.xlim = (400, 1600)
 net_plot.ylim = (400, 1600)
 net_plot.zlim = (-500, 1600)
 net_plot.azim = 225
-net_plot.export_movie('animation_demo.gif', dpi=100, fps=30, interval=100)
+net_plot.export_movie("animation_demo.gif", dpi=100, fps=30, interval=100)

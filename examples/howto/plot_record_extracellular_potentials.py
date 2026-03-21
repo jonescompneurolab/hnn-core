@@ -36,7 +36,7 @@ from hnn_core.network_models import add_erp_drives_to_jones_model
 net = jones_2009_model()
 add_erp_drives_to_jones_model(net)
 
-net.set_cell_positions(inplane_distance=30.)
+net.set_cell_positions(inplane_distance=30.0)
 
 ###############################################################################
 # Extracellular recordings require specifying the electrode positions. It can be
@@ -59,7 +59,7 @@ net.plot_cells()
 
 depths = list(range(-325, 2150, 100))
 electrode_pos = [(135, 135, dep) for dep in depths]
-net.add_electrode_array('shank1', electrode_pos)
+net.add_electrode_array("shank1", electrode_pos)
 
 ###############################################################################
 # The electrode arrays are stored under ``Network.rec_arrays`` as a dictionary
@@ -82,24 +82,28 @@ dpl = simulate_dipole(net, tstop=170)
 trial_idx = 0
 window_len = 10  # ms
 decimate = [5, 4]  # from 40k to 8k to 2k
-fig, axs = plt.subplots(4, 1, sharex=True, figsize=(6, 8),
-                        gridspec_kw={'height_ratios': [1, 3, 3, 3]})
+fig, axs = plt.subplots(
+    4, 1, sharex=True, figsize=(6, 8), gridspec_kw={"height_ratios": [1, 3, 3, 3]}
+)
 
 # Then plot the aggregate dipole time series on its own axis
 dpl[trial_idx].smooth(window_len=window_len)
 dpl[trial_idx].plot(ax=axs[0], decim=decimate, show=False)
 
 # use the same smoothing window on the LFP traces to allow comparison to dipole
-net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot_lfp(
-    ax=axs[1], decim=decimate, show=False)
+net.rec_arrays["shank1"][trial_idx].smooth(window_len=window_len).plot_lfp(
+    ax=axs[1], decim=decimate, show=False
+)
 
-axs[1].grid(True, which='major', axis='x')
-axs[1].set_xlabel('')
+axs[1].grid(True, which="major", axis="x")
+axs[1].set_xlabel("")
 # Add spike raster to subplot
 net.cell_response.plot_spikes_raster(ax=axs[2], show=False)
 
 # Finally, add the CSD to the bottom subplot
-net.rec_arrays['shank1'][trial_idx].smooth(window_len=window_len).plot_csd(ax=axs[3], show=False)
+net.rec_arrays["shank1"][trial_idx].smooth(window_len=window_len).plot_csd(
+    ax=axs[3], show=False
+)
 plt.tight_layout()
 plt.show()
 

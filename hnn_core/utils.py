@@ -149,4 +149,3 @@ def smooth_waveform(data, window_len, sfreq):
         )
 
     return _hammfilt(data, winsz)
-

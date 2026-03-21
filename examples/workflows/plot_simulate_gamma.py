@@ -35,9 +35,9 @@ hnn_core_root = op.dirname(hnn_core.__file__)
 # Read the parameter file and print the between-cell connectivity parameters.
 # Note that these are different compared with the 'default' parameter set used
 # in, e.g., :ref:`sphx_glr_auto_examples_workflows_plot_simulate_alpha.py`.
-params_fname = op.join(hnn_core_root, 'param', 'gamma_L5weak_L2weak.json')
+params_fname = op.join(hnn_core_root, "param", "gamma_L5weak_L2weak.json")
 params = read_params(params_fname)
-print(params['gbar_L*'])
+print(params["gbar_L*"])
 
 ###############################################################################
 # We'll add a tonic Poisson-distributed excitation to pyramidal cells and
@@ -46,16 +46,20 @@ print(params['gbar_L*'])
 
 net = jones_2009_model(params)
 
-weights_ampa = {'L2_pyramidal': 0.0008, 'L5_pyramidal': 0.0075}
-synaptic_delays = {'L2_pyramidal': 0.1, 'L5_pyramidal': 1.0}
-rate_constant = {'L2_pyramidal': 140.0, 'L5_pyramidal': 40.0}
+weights_ampa = {"L2_pyramidal": 0.0008, "L5_pyramidal": 0.0075}
+synaptic_delays = {"L2_pyramidal": 0.1, "L5_pyramidal": 1.0}
+rate_constant = {"L2_pyramidal": 140.0, "L5_pyramidal": 40.0}
 net.add_poisson_drive(
-    'poisson', rate_constant=rate_constant, weights_ampa=weights_ampa,
-    location='proximal', synaptic_delays=synaptic_delays,
-    event_seed=1349)
+    "poisson",
+    rate_constant=rate_constant,
+    weights_ampa=weights_ampa,
+    location="proximal",
+    synaptic_delays=synaptic_delays,
+    event_seed=1349,
+)
 
 ###############################################################################
-dpls = simulate_dipole(net, tstop=250.)
+dpls = simulate_dipole(net, tstop=250.0)
 scaling_factor = 30000
 dpls = [dpl.scale(scaling_factor) for dpl in dpls]  # scale in place
 
@@ -79,13 +83,12 @@ trial_idx = 0  # pick first trial
 import numpy as np
 import matplotlib.pyplot as plt
 
-fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6),
-                         constrained_layout=True)
+fig, axes = plt.subplots(2, 1, sharex=True, figsize=(6, 6), constrained_layout=True)
 
 dpls[trial_idx].plot(tmin=tmin, ax=axes[0], show=False)
 
 # Create an fixed-step tiling of frequencies from 20 to 100 Hz in steps of 1 Hz
-freqs = np.arange(20., 100., 1.)
+freqs = np.arange(20.0, 100.0, 1.0)
 dpls[trial_idx].plot_tfr_morlet(freqs, n_cycles=7, tmin=tmin, ax=axes[1])
 
 ###############################################################################
@@ -94,8 +97,8 @@ dpls[trial_idx].plot_tfr_morlet(freqs, n_cycles=7, tmin=tmin, ax=axes[1])
 # more regular, with less noise due to the fact that the tonic depolarization
 # dominates over the influence of the Poisson drive. By default, a tonic bias
 # is applied to the entire duration of the simulation.
-net.add_tonic_bias(cell_type='L5_pyramidal', amplitude=6.)
-dpls = simulate_dipole(net, tstop=250., n_trials=1)
+net.add_tonic_bias(cell_type="L5_pyramidal", amplitude=6.0)
+dpls = simulate_dipole(net, tstop=250.0, n_trials=1)
 dpls = [dpl.scale(scaling_factor) for dpl in dpls]  # scale in place
 
 dpls[trial_idx].plot()
@@ -114,7 +117,8 @@ net.cell_response.plot_spikes_raster()
 # Although the simulated dipole signal demonstrates clear periodicity, its
 # frequency is lower compared with the "weak" PING simulation above.
 from hnn_core.viz import plot_psd
-plot_psd(dpls[trial_idx], fmin=20., fmax=100., tmin=tmin)
+
+plot_psd(dpls[trial_idx], fmin=20.0, fmax=100.0, tmin=tmin)
 
 ###############################################################################
 # Finally, we demonstrate the mechanistic link between PING and the GABAA decay
@@ -122,12 +126,11 @@ plot_psd(dpls[trial_idx], fmin=20., fmax=100., tmin=tmin)
 # we decrease `tau2` from 5 to 2 ms. This will shorten the effective
 # refactory period between L5 pyramidal cell spikes and increase the PING
 # frequency from ~50 to ~65 Hz.
-net.cell_types['L5_pyramidal']["cell_object"].synapses['gabaa']['tau2'] = 2
-dpls = simulate_dipole(net, tstop=250., n_trials=1)
+net.cell_types["L5_pyramidal"]["cell_object"].synapses["gabaa"]["tau2"] = 2
+dpls = simulate_dipole(net, tstop=250.0, n_trials=1)
 dpls = [dpl.scale(scaling_factor) for dpl in dpls]  # scale in place
 
-fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 6),
-                         constrained_layout=True)
+fig, axes = plt.subplots(3, 1, sharex=True, figsize=(6, 6), constrained_layout=True)
 dpls[trial_idx].plot(ax=axes[0], show=False)
 net.cell_response.plot_spikes_raster(ax=axes[1], show=False)
 dpls[trial_idx].plot_tfr_morlet(freqs, n_cycles=7, tmin=tmin, ax=axes[2])

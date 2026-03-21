@@ -32,34 +32,38 @@ net = law_2021_model()
 # contains information on the biophysics and geometry of each cell.
 net_jones = jones_2009_model()
 
-jones_rise = net_jones.cell_types['L5_pyramidal']['cell_object'].synapses['gabab']['tau1']
-law_rise = net.cell_types['L5_pyramidal']['cell_object'].synapses['gabab']['tau1']
-print(f'GABAb Rise (ms): {jones_rise} -> {law_rise}')
+jones_rise = net_jones.cell_types["L5_pyramidal"]["cell_object"].synapses["gabab"][
+    "tau1"
+]
+law_rise = net.cell_types["L5_pyramidal"]["cell_object"].synapses["gabab"]["tau1"]
+print(f"GABAb Rise (ms): {jones_rise} -> {law_rise}")
 
-jones_fall = net_jones.cell_types['L5_pyramidal']['cell_object'].synapses['gabab']['tau2']
-law_fall = net.cell_types['L5_pyramidal']['cell_object'].synapses['gabab']['tau2']
-print(f'GABAb Fall (ms): {jones_fall} -> {law_fall}\n')
+jones_fall = net_jones.cell_types["L5_pyramidal"]["cell_object"].synapses["gabab"][
+    "tau2"
+]
+law_fall = net.cell_types["L5_pyramidal"]["cell_object"].synapses["gabab"]["tau2"]
+print(f"GABAb Fall (ms): {jones_fall} -> {law_fall}\n")
 
-print('Apical Dendrite Channels:')
-print(net.cell_types['L5_pyramidal']['cell_object'].sections['apical_1'].mechs.keys())
+print("Apical Dendrite Channels:")
+print(net.cell_types["L5_pyramidal"]["cell_object"].sections["apical_1"].mechs.keys())
 print("\nBasal Dendrite Channels ('ca' missing):")
-print(net.cell_types['L5_pyramidal']['cell_object'].sections['basal_1'].mechs.keys())
+print(net.cell_types["L5_pyramidal"]["cell_object"].sections["basal_1"].mechs.keys())
 
 ###############################################################################
 # A major change to the Jones 2009 model is the addition of a
 # Martinotti-like recurrent tuft connection [3]_. This new connection
 # originates from L5 basket cells, and provides GABAa inhibition on
 # the distal dendrites of L5 pyramidal cells.
-print('Recurrent Tuft Connection')
+print("Recurrent Tuft Connection")
 print(net.connectivity[16])
 
 ###############################################################################
 # The remaining changes to the connectivity was the removal of an
 # L2_basket -> L5_pyramidal GABAa connection, and replacing it with GABAb.
-print('New GABAb connection')
+print("New GABAb connection")
 print(net.connectivity[15])
 
-print('\nConnection Removed from Law Model')
+print("\nConnection Removed from Law Model")
 print(net_jones.connectivity[10])
 
 
@@ -79,37 +83,74 @@ print(net_jones.connectivity[10])
 # above.
 def add_erp_drives(net, stimulus_start):
     # Distal evoked drive
-    weights_ampa_d1 = {'L2_basket': 0.0005, 'L2_pyramidal': 0.004,
-                       'L5_pyramidal': 0.0005}
-    weights_nmda_d1 = {'L2_basket': 0.0005, 'L2_pyramidal': 0.004,
-                       'L5_pyramidal': 0.0005}
-    syn_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                     'L5_pyramidal': 0.1}
+    weights_ampa_d1 = {
+        "L2_basket": 0.0005,
+        "L2_pyramidal": 0.004,
+        "L5_pyramidal": 0.0005,
+    }
+    weights_nmda_d1 = {
+        "L2_basket": 0.0005,
+        "L2_pyramidal": 0.004,
+        "L5_pyramidal": 0.0005,
+    }
+    syn_delays_d1 = {"L2_basket": 0.1, "L2_pyramidal": 0.1, "L5_pyramidal": 0.1}
     net.add_evoked_drive(
-        'evdist1', mu=70.0 + stimulus_start, sigma=0.0, numspikes=1,
-        weights_ampa=weights_ampa_d1, weights_nmda=weights_nmda_d1,
-        location='distal', synaptic_delays=syn_delays_d1, event_seed=274)
+        "evdist1",
+        mu=70.0 + stimulus_start,
+        sigma=0.0,
+        numspikes=1,
+        weights_ampa=weights_ampa_d1,
+        weights_nmda=weights_nmda_d1,
+        location="distal",
+        synaptic_delays=syn_delays_d1,
+        event_seed=274,
+    )
 
     # Two proximal drives
-    weights_ampa_p1 = {'L2_basket': 0.002, 'L2_pyramidal': 0.0011,
-                       'L5_basket': 0.001, 'L5_pyramidal': 0.001}
-    syn_delays_prox = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                       'L5_basket': 1., 'L5_pyramidal': 1.}
+    weights_ampa_p1 = {
+        "L2_basket": 0.002,
+        "L2_pyramidal": 0.0011,
+        "L5_basket": 0.001,
+        "L5_pyramidal": 0.001,
+    }
+    syn_delays_prox = {
+        "L2_basket": 0.1,
+        "L2_pyramidal": 0.1,
+        "L5_basket": 1.0,
+        "L5_pyramidal": 1.0,
+    }
 
     # all NMDA weights are zero; pass None explicitly
     net.add_evoked_drive(
-        'evprox1', mu=25.0 + stimulus_start, sigma=0.0, numspikes=1,
-        weights_ampa=weights_ampa_p1, weights_nmda=None,
-        location='proximal', synaptic_delays=syn_delays_prox, event_seed=544)
+        "evprox1",
+        mu=25.0 + stimulus_start,
+        sigma=0.0,
+        numspikes=1,
+        weights_ampa=weights_ampa_p1,
+        weights_nmda=None,
+        location="proximal",
+        synaptic_delays=syn_delays_prox,
+        event_seed=544,
+    )
 
     # Second proximal evoked drive. NB: only AMPA weights differ from first
-    weights_ampa_p2 = {'L2_basket': 0.005, 'L2_pyramidal': 0.005,
-                       'L5_basket': 0.01, 'L5_pyramidal': 0.01}
+    weights_ampa_p2 = {
+        "L2_basket": 0.005,
+        "L2_pyramidal": 0.005,
+        "L5_basket": 0.01,
+        "L5_pyramidal": 0.01,
+    }
     # all NMDA weights are zero; omit weights_nmda (defaults to None)
     net.add_evoked_drive(
-        'evprox2', mu=135.0 + stimulus_start, sigma=0.0, numspikes=1,
-        weights_ampa=weights_ampa_p2, location='proximal',
-        synaptic_delays=syn_delays_prox, event_seed=814)
+        "evprox2",
+        mu=135.0 + stimulus_start,
+        sigma=0.0,
+        numspikes=1,
+        weights_ampa=weights_ampa_p2,
+        location="proximal",
+        synaptic_delays=syn_delays_prox,
+        event_seed=814,
+    )
 
     return net
 
@@ -121,27 +162,57 @@ def add_erp_drives(net, stimulus_start):
 # of the network, and ultimately suppressed sensory detection.
 def add_beta_drives(net, beta_start):
     # Distal Drive
-    weights_ampa_d1 = {'L2_basket': 0.00032, 'L2_pyramidal': 0.00008,
-                       'L5_pyramidal': 0.00004}
-    syn_delays_d1 = {'L2_basket': 0.5, 'L2_pyramidal': 0.5,
-                     'L5_pyramidal': 0.5}
+    weights_ampa_d1 = {
+        "L2_basket": 0.00032,
+        "L2_pyramidal": 0.00008,
+        "L5_pyramidal": 0.00004,
+    }
+    syn_delays_d1 = {"L2_basket": 0.5, "L2_pyramidal": 0.5, "L5_pyramidal": 0.5}
     net.add_bursty_drive(
-        'beta_dist', tstart=beta_start, tstart_std=0., tstop=beta_start + 50.,
-        burst_rate=1., burst_std=10., numspikes=2, spike_isi=10,
-        n_drive_cells=10, location='distal', weights_ampa=weights_ampa_d1,
-        synaptic_delays=syn_delays_d1, event_seed=290)
+        "beta_dist",
+        tstart=beta_start,
+        tstart_std=0.0,
+        tstop=beta_start + 50.0,
+        burst_rate=1.0,
+        burst_std=10.0,
+        numspikes=2,
+        spike_isi=10,
+        n_drive_cells=10,
+        location="distal",
+        weights_ampa=weights_ampa_d1,
+        synaptic_delays=syn_delays_d1,
+        event_seed=290,
+    )
 
     # Proximal Drive
-    weights_ampa_p1 = {'L2_basket': 0.00004, 'L2_pyramidal': 0.00002,
-                       'L5_basket': 0.00002, 'L5_pyramidal': 0.00002}
-    syn_delays_p1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                     'L5_basket': 1.0, 'L5_pyramidal': 1.0}
+    weights_ampa_p1 = {
+        "L2_basket": 0.00004,
+        "L2_pyramidal": 0.00002,
+        "L5_basket": 0.00002,
+        "L5_pyramidal": 0.00002,
+    }
+    syn_delays_p1 = {
+        "L2_basket": 0.1,
+        "L2_pyramidal": 0.1,
+        "L5_basket": 1.0,
+        "L5_pyramidal": 1.0,
+    }
 
     net.add_bursty_drive(
-        'beta_prox', tstart=beta_start, tstart_std=0., tstop=beta_start + 50.,
-        burst_rate=1., burst_std=20., numspikes=2, spike_isi=10,
-        n_drive_cells=10, location='proximal', weights_ampa=weights_ampa_p1,
-        synaptic_delays=syn_delays_p1, event_seed=300)
+        "beta_prox",
+        tstart=beta_start,
+        tstart_std=0.0,
+        tstop=beta_start + 50.0,
+        burst_rate=1.0,
+        burst_std=20.0,
+        numspikes=2,
+        spike_isi=10,
+        n_drive_cells=10,
+        location="proximal",
+        weights_ampa=weights_ampa_p1,
+        synaptic_delays=syn_delays_p1,
+        event_seed=300,
+    )
     return net
 
 
@@ -174,16 +245,16 @@ dpls_beta_erp = simulate_dipole(net_beta_erp, tstop=400)
 # is an asymmetric beta event with a long positive tail.
 import matplotlib.pyplot as plt
 import numpy as np
-fig, axes = plt.subplots(4, 1, sharex=True, figsize=(7, 7),
-                         constrained_layout=True)
+
+fig, axes = plt.subplots(4, 1, sharex=True, figsize=(7, 7), constrained_layout=True)
 net_beta.cell_response.plot_spikes_hist(ax=axes[0], show=False)
-axes[0].set_title('Beta Event Generation')
-plot_dipole(dpls_beta, ax=axes[1], layer='agg', tmin=1.0, color='b', show=False)
+axes[0].set_title("Beta Event Generation")
+plot_dipole(dpls_beta, ax=axes[1], layer="agg", tmin=1.0, color="b", show=False)
 net_beta.cell_response.plot_spikes_raster(ax=axes[2], show=False)
-axes[2].set_title('Spike Raster')
+axes[2].set_title("Spike Raster")
 
 # Create a fixed-step tiling of frequencies from 1 to 40 Hz in steps of 1 Hz
-freqs = np.arange(10., 60., 1.)
+freqs = np.arange(10.0, 60.0, 1.0)
 dpls_beta[0].plot_tfr_morlet(freqs, n_cycles=7, ax=axes[3])
 
 ###############################################################################
@@ -192,15 +263,13 @@ dpls_beta[0].plot_tfr_morlet(freqs, n_cycles=7, ax=axes[3])
 # hand to arrive at the cortex is roughly 25 ms, which means the first proximal
 # input to the cortical column occurs ~100 ms after the beta event.
 dpls_beta_erp[0].smooth(45)
-fig, axes = plt.subplots(3, 1, sharex=True, figsize=(7, 7),
-                         constrained_layout=True)
-plot_dipole(dpls_beta_erp, ax=axes[0], layer='agg', tmin=1.0, color='r',
-            show=False)
-axes[0].set_title('Beta Event + ERP')
+fig, axes = plt.subplots(3, 1, sharex=True, figsize=(7, 7), constrained_layout=True)
+plot_dipole(dpls_beta_erp, ax=axes[0], layer="agg", tmin=1.0, color="r", show=False)
+axes[0].set_title("Beta Event + ERP")
 net_beta_erp.cell_response.plot_spikes_hist(ax=axes[1], show=False)
-axes[1].set_title('Input Drives Histogram')
+axes[1].set_title("Input Drives Histogram")
 net_beta_erp.cell_response.plot_spikes_raster(ax=axes[2], show=False)
-axes[2].set_title('Spike Raster')
+axes[2].set_title("Spike Raster")
 
 ###############################################################################
 # To help understand the effect of beta mediated inhibition on the response to
@@ -209,17 +278,15 @@ axes[2].set_title('Spike Raster')
 # The sustained inhibition of the network ultimately depresses
 # the sensory response which is associated with a reduced ERP amplitude
 dpls_erp[0].smooth(45)
-fig, axes = plt.subplots(3, 1, sharex=True, figsize=(7, 7),
-                         constrained_layout=True)
-plot_dipole(dpls_beta_erp, ax=axes[0], layer='agg', tmin=1.0, color='r',
-            show=False)
-plot_dipole(dpls_erp, ax=axes[0], layer='agg', tmin=1.0, color='b', show=False)
-axes[0].set_title('Beta ERP Comparison')
-axes[0].legend(['ERP + Beta', 'ERP'])
+fig, axes = plt.subplots(3, 1, sharex=True, figsize=(7, 7), constrained_layout=True)
+plot_dipole(dpls_beta_erp, ax=axes[0], layer="agg", tmin=1.0, color="r", show=False)
+plot_dipole(dpls_erp, ax=axes[0], layer="agg", tmin=1.0, color="b", show=False)
+axes[0].set_title("Beta ERP Comparison")
+axes[0].legend(["ERP + Beta", "ERP"])
 net_beta_erp.cell_response.plot_spikes_raster(ax=axes[1], show=False)
-axes[1].set_title('Beta + ERP Spike Raster')
+axes[1].set_title("Beta + ERP Spike Raster")
 net_erp.cell_response.plot_spikes_raster(ax=axes[2], show=False)
-axes[2].set_title('ERP Spike Raster')
+axes[2].set_title("ERP Spike Raster")
 plt.show()
 
 ###############################################################################

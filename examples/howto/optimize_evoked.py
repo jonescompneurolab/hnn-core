@@ -27,8 +27,7 @@ from matplotlib.lines import Line2D
 # required for this tutorial.
 
 import hnn_core
-from hnn_core import (MPIBackend, jones_2009_model, simulate_dipole,
-                      read_dipole)
+from hnn_core import MPIBackend, jones_2009_model, simulate_dipole, read_dipole
 from hnn_core.viz import plot_dipole
 
 hnn_core_root = op.join(op.dirname(hnn_core.__file__))
@@ -47,16 +46,17 @@ n_procs = 10
 # the finger. This data will serve as our *target dipole* for the optimization
 # process.
 
-data_url = ('https://raw.githubusercontent.com/jonescompneurolab/hnn/master/'
-            'data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt')
-urlretrieve(data_url, 'yes_trial_S1_ERP_all_avg.txt')
-dipole_experimental = read_dipole('yes_trial_S1_ERP_all_avg.txt')
+data_url = (
+    "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/"
+    "data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt"
+)
+urlretrieve(data_url, "yes_trial_S1_ERP_all_avg.txt")
+dipole_experimental = read_dipole("yes_trial_S1_ERP_all_avg.txt")
 
 # Plot
 fig, ax = plt.subplots(figsize=(6, 6))
-dipole_experimental.plot(ax=ax, layer='agg', show=False,
-                         color='tab:blue')
-ax.legend(['experimental'])
+dipole_experimental.plot(ax=ax, layer="agg", show=False, color="tab:blue")
+ax.legend(["experimental"])
 
 ###############################################################################
 # 3. Simulate initial dipole
@@ -72,57 +72,79 @@ n_drive_cells = 1
 cell_specific = False
 
 # Proximal 1
-weights_ampa_p1 = {'L2_basket': 0.08831, 'L2_pyramidal': 0.01525,
-                   'L5_basket': 0.19934, 'L5_pyramidal': 0.00865}
-synaptic_delays_p = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                     'L5_basket': 1., 'L5_pyramidal': 1.}
-net_initial.add_evoked_drive('evprox1',
-                             mu=26.61,
-                             sigma=2.47,
-                             numspikes=1,
-                             location='proximal',
-                             weights_ampa=weights_ampa_p1,
-                             synaptic_delays=synaptic_delays_p,
-                             n_drive_cells=n_drive_cells,
-                             cell_specific=cell_specific)
+weights_ampa_p1 = {
+    "L2_basket": 0.08831,
+    "L2_pyramidal": 0.01525,
+    "L5_basket": 0.19934,
+    "L5_pyramidal": 0.00865,
+}
+synaptic_delays_p = {
+    "L2_basket": 0.1,
+    "L2_pyramidal": 0.1,
+    "L5_basket": 1.0,
+    "L5_pyramidal": 1.0,
+}
+net_initial.add_evoked_drive(
+    "evprox1",
+    mu=26.61,
+    sigma=2.47,
+    numspikes=1,
+    location="proximal",
+    weights_ampa=weights_ampa_p1,
+    synaptic_delays=synaptic_delays_p,
+    n_drive_cells=n_drive_cells,
+    cell_specific=cell_specific,
+)
 
 # Distal
-weights_ampa_d1 = {'L2_basket': 0.006562, 'L2_pyramidal': .000007,
-                   'L5_pyramidal': 0.142300}
-weights_nmda_d1 = {'L2_basket': 0.019482, 'L2_pyramidal': 0.004317,
-                   'L5_pyramidal': 0.080074}
-synaptic_delays_d1 = {'L2_basket': 0.1, 'L2_pyramidal': 0.1,
-                      'L5_pyramidal': 0.1}
-net_initial.add_evoked_drive('evdist1',
-                             mu=63.53,
-                             sigma=3.85,
-                             numspikes=1,
-                             location='distal',
-                             weights_ampa=weights_ampa_d1,
-                             weights_nmda=weights_nmda_d1,
-                             synaptic_delays=synaptic_delays_d1,
-                             n_drive_cells=n_drive_cells,
-                             cell_specific=cell_specific)
+weights_ampa_d1 = {
+    "L2_basket": 0.006562,
+    "L2_pyramidal": 0.000007,
+    "L5_pyramidal": 0.142300,
+}
+weights_nmda_d1 = {
+    "L2_basket": 0.019482,
+    "L2_pyramidal": 0.004317,
+    "L5_pyramidal": 0.080074,
+}
+synaptic_delays_d1 = {"L2_basket": 0.1, "L2_pyramidal": 0.1, "L5_pyramidal": 0.1}
+net_initial.add_evoked_drive(
+    "evdist1",
+    mu=63.53,
+    sigma=3.85,
+    numspikes=1,
+    location="distal",
+    weights_ampa=weights_ampa_d1,
+    weights_nmda=weights_nmda_d1,
+    synaptic_delays=synaptic_delays_d1,
+    n_drive_cells=n_drive_cells,
+    cell_specific=cell_specific,
+)
 
 # Proximal 2
-weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
-                   'L5_basket': 0.008958, 'L5_pyramidal': 0.1}
-net_initial.add_evoked_drive('evprox2',
-                             mu=120.,
-                             sigma=1.,
-                             numspikes=1,
-                             location='proximal',
-                             weights_ampa=weights_ampa_p2,
-                             synaptic_delays=synaptic_delays_p,
-                             n_drive_cells=n_drive_cells,
-                             cell_specific=cell_specific)
+weights_ampa_p2 = {
+    "L2_basket": 0.000003,
+    "L2_pyramidal": 1.438840,
+    "L5_basket": 0.008958,
+    "L5_pyramidal": 0.1,
+}
+net_initial.add_evoked_drive(
+    "evprox2",
+    mu=120.0,
+    sigma=1.0,
+    numspikes=1,
+    location="proximal",
+    weights_ampa=weights_ampa_p2,
+    synaptic_delays=synaptic_delays_p,
+    n_drive_cells=n_drive_cells,
+    cell_specific=cell_specific,
+)
 
 # Simulate initial dipole
 n_trials = 3
 tstop = dipole_experimental.times[-1]
-with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
-    dipoles_initial = simulate_dipole(
-        net_initial, tstop=tstop, n_trials=n_trials)
+with MPIBackend(n_procs=n_procs, mpi_cmd="mpiexec"):
+    dipoles_initial = simulate_dipole(net_initial, tstop=tstop, n_trials=n_trials)
 
 # Smooth and scale
 window_length = 30
@@ -132,15 +154,22 @@ for dipole in dipoles_initial:
 
 # Plot
 fig, ax = plt.subplots(figsize=(6, 6))
-dipole_experimental.plot(ax=ax, layer='agg', show=False,
-                         color='tab:blue')
-plot_dipole(dipoles_initial.copy(), ax=ax, layer='agg', show=False,
-            color='tab:orange', average=True)
+dipole_experimental.plot(ax=ax, layer="agg", show=False, color="tab:blue")
+plot_dipole(
+    dipoles_initial.copy(),
+    ax=ax,
+    layer="agg",
+    show=False,
+    color="tab:orange",
+    average=True,
+)
 
 # Legend
-legend_handles = [Line2D([0], [0], color='tab:blue', lw=1.0),
-                  Line2D([0], [0], color='tab:orange', lw=1.0)]
-ax.legend(legend_handles, ['experimental', 'initial'])
+legend_handles = [
+    Line2D([0], [0], color="tab:blue", lw=1.0),
+    Line2D([0], [0], color="tab:orange", lw=1.0),
+]
+ax.legend(legend_handles, ["experimental", "initial"])
 
 ###############################################################################
 # 4. Define the ``set_params`` function
@@ -162,40 +191,51 @@ ax.legend(legend_handles, ['experimental', 'initial'])
 def set_params(net, params):
 
     # Proximal 1
-    net.add_evoked_drive('evprox1',
-                         mu=26.61,
-                         sigma=2.47,
-                         numspikes=1,
-                         location='proximal',
-                         weights_ampa=weights_ampa_p1,
-                         synaptic_delays=synaptic_delays_p,
-                         n_drive_cells=n_drive_cells,
-                         cell_specific=cell_specific)
+    net.add_evoked_drive(
+        "evprox1",
+        mu=26.61,
+        sigma=2.47,
+        numspikes=1,
+        location="proximal",
+        weights_ampa=weights_ampa_p1,
+        synaptic_delays=synaptic_delays_p,
+        n_drive_cells=n_drive_cells,
+        cell_specific=cell_specific,
+    )
 
     # Distal
-    net.add_evoked_drive('evdist1',
-                         mu=63.53,
-                         sigma=3.85,
-                         numspikes=1,
-                         location='distal',
-                         weights_ampa=weights_ampa_d1,
-                         weights_nmda=weights_nmda_d1,
-                         synaptic_delays=synaptic_delays_d1,
-                         n_drive_cells=n_drive_cells,
-                         cell_specific=cell_specific)
+    net.add_evoked_drive(
+        "evdist1",
+        mu=63.53,
+        sigma=3.85,
+        numspikes=1,
+        location="distal",
+        weights_ampa=weights_ampa_d1,
+        weights_nmda=weights_nmda_d1,
+        synaptic_delays=synaptic_delays_d1,
+        n_drive_cells=n_drive_cells,
+        cell_specific=cell_specific,
+    )
 
     # Proximal 2
-    weights_ampa_p2 = {'L2_basket': 0.000003, 'L2_pyramidal': 1.438840,
-                       'L5_basket': 0.008958, 'L5_pyramidal': params['evprox2_ampa_L5_pyramidal']}
-    net.add_evoked_drive('evprox2',
-                         mu=params['evprox2_mu'],
-                         sigma=params['evprox2_sigma'],
-                         numspikes=1,
-                         location='proximal',
-                         weights_ampa=weights_ampa_p2,
-                         synaptic_delays=synaptic_delays_p,
-                         n_drive_cells=n_drive_cells,
-                         cell_specific=cell_specific)
+    weights_ampa_p2 = {
+        "L2_basket": 0.000003,
+        "L2_pyramidal": 1.438840,
+        "L5_basket": 0.008958,
+        "L5_pyramidal": params["evprox2_ampa_L5_pyramidal"],
+    }
+    net.add_evoked_drive(
+        "evprox2",
+        mu=params["evprox2_mu"],
+        sigma=params["evprox2_sigma"],
+        numspikes=1,
+        location="proximal",
+        weights_ampa=weights_ampa_p2,
+        synaptic_delays=synaptic_delays_p,
+        n_drive_cells=n_drive_cells,
+        cell_specific=cell_specific,
+    )
+
 
 ###############################################################################
 # 5. Define optimization constraints
@@ -208,9 +248,13 @@ def set_params(net, params):
 # realistic model behavior, rather than solely relying on existing literature values.
 
 
-constraints = dict({'evprox2_ampa_L5_pyramidal': (0.01, 1.0),
-                    'evprox2_mu': (100., 150.),
-                    'evprox2_sigma': (1., 20.)})
+constraints = dict(
+    {
+        "evprox2_ampa_L5_pyramidal": (0.01, 1.0),
+        "evprox2_mu": (100.0, 150.0),
+        "evprox2_sigma": (1.0, 20.0),
+    }
+)
 
 ###############################################################################
 # 6. Define the initial parameters
@@ -222,9 +266,9 @@ constraints = dict({'evprox2_ampa_L5_pyramidal': (0.01, 1.0),
 # If ``initial_params`` is not set, the optimizer will use the midpoint of the
 # constraints as the initial parameters.
 
-initial_params = dict({'evprox2_ampa_L5_pyramidal': 0.1,
-                       'evprox2_mu': 120.,
-                       'evprox2_sigma': 1.})
+initial_params = dict(
+    {"evprox2_ampa_L5_pyramidal": 0.1, "evprox2_mu": 120.0, "evprox2_sigma": 1.0}
+)
 
 ###############################################################################
 # 7. Initialize and run the optimizer
@@ -247,11 +291,21 @@ initial_params = dict({'evprox2_ampa_L5_pyramidal': 0.1,
 # .. note:: A custom objective function can also be supplied.
 
 net = jones_2009_model()
-optim = Optimizer(net, tstop=tstop, constraints=constraints,
-                  set_params=set_params, initial_params=initial_params, max_iter=50)
-with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
-    optim.fit(target=dipole_experimental, n_trials=n_trials, scale_factor=scaling_factor,
-              smooth_window_len=window_length)
+optim = Optimizer(
+    net,
+    tstop=tstop,
+    constraints=constraints,
+    set_params=set_params,
+    initial_params=initial_params,
+    max_iter=50,
+)
+with MPIBackend(n_procs=n_procs, mpi_cmd="mpiexec"):
+    optim.fit(
+        target=dipole_experimental,
+        n_trials=n_trials,
+        scale_factor=scaling_factor,
+        smooth_window_len=window_length,
+    )
 
 ###############################################################################
 # 8. Simulate the optimized dipole
@@ -260,9 +314,8 @@ with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
 # Now, we can simulate the dipole using the newly found optimized parameters
 # to see how well they match the experimental data.
 
-with MPIBackend(n_procs=n_procs, mpi_cmd='mpiexec'):
-    dipoles_optimized = simulate_dipole(
-        optim.net_, tstop=tstop, n_trials=n_trials)
+with MPIBackend(n_procs=n_procs, mpi_cmd="mpiexec"):
+    dipoles_optimized = simulate_dipole(optim.net_, tstop=tstop, n_trials=n_trials)
 
 # Smooth and scale
 for dipole in dipoles_optimized:
@@ -277,18 +330,31 @@ for dipole in dipoles_optimized:
 # We can also plot the convergence.
 
 fig, ax = plt.subplots(sharex=True, figsize=(6, 6))
-dipole_experimental.plot(ax=ax, layer='agg', show=False,
-                         color='tab:blue')
-plot_dipole(dipoles_initial.copy(), ax=ax, layer='agg', show=False,
-            color='tab:orange', average=True)
-plot_dipole(dipoles_optimized.copy(), ax=ax, layer='agg',
-            show=False, color='tab:green', average=True)
+dipole_experimental.plot(ax=ax, layer="agg", show=False, color="tab:blue")
+plot_dipole(
+    dipoles_initial.copy(),
+    ax=ax,
+    layer="agg",
+    show=False,
+    color="tab:orange",
+    average=True,
+)
+plot_dipole(
+    dipoles_optimized.copy(),
+    ax=ax,
+    layer="agg",
+    show=False,
+    color="tab:green",
+    average=True,
+)
 
 # Legend
-legend_handles = [Line2D([0], [0], color='tab:blue', lw=1.0),
-                  Line2D([0], [0], color='tab:orange', lw=1.0),
-                  Line2D([0], [0], color='tab:green', lw=1.0)]
-ax.legend(legend_handles, ['experimental', 'initial', 'optimized'])
+legend_handles = [
+    Line2D([0], [0], color="tab:blue", lw=1.0),
+    Line2D([0], [0], color="tab:orange", lw=1.0),
+    Line2D([0], [0], color="tab:green", lw=1.0),
+]
+ax.legend(legend_handles, ["experimental", "initial", "optimized"])
 
 # Convergence plot
 optim.plot_convergence()
