@@ -3319,7 +3319,8 @@ def run_button_clicked(
         except Exception:
             simulation_status_bar.value = simulation_status_contents["failed"]
             full_error = traceback.format_exc()
-            print(f"[ERROR]{full_error}")
+            print(f'[ERROR]{full_error}')
+            return
     viz_manager.reset_fig_config_tabs()
 
     # update default visualization params in gui based on widget

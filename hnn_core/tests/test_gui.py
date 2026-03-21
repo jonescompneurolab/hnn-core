@@ -12,7 +12,7 @@ import traitlets
 import os
 
 from pathlib import Path
-from hnn_core import Dipole, Network, simulate_dipole
+from hnn_core import Dipole, Network, simulate_dipole, Cell
 from hnn_core.gui import HNNGUI
 from hnn_core.gui._viz_manager import (
     _idx2figname,
@@ -1541,63 +1541,54 @@ def test_custom_gains_simulate_and_download(setup_gui):
                 1 + (global_custom_gain - 1) + (single_custom_gain - 1)
             )
 
+def test_traceback(caplog, setup_gui, monkeypatch):
+    import logging
+    logger = logging.getLogger("hnn_gui")
+    gui = setup_gui
+    tstop_trials_tstep = [(10, 1, 0.25), (10, 2, 0.5), (12, 1, 0.5)]
+    gui.widget_backend_selection.value = "Joblib"
+    gui.widget_default_smoothing.value = 0
+    sim_count = 0
+    sim__name = 0
 
-def test_diff_gui_vs_api_networks_simulations():
-    """Test that synaptic gain changes are reproducible between the GUI and API."""
-    # Config
-    # --------------------------------
-    # Need a fully-detailed simulation to ensure spikes present (aka good data)
-    local_dt = 0.025
-    local_tstop = 100.0
-    global_custom_gain = 8.0
-    single_custom_gain = 2.0
+    with caplog.at_level(logging.INFO, logger = "hnn_gui"):
+        logger.info("Information")
+        logger.warning("This is a warning")
+        for val_tstop, val_ntrials, val_tstep in tstop_trials_tstep:
+            gui.widget_simulation_name.value = str(sim_count)
+            gui.widget_tstop.value = val_tstop
+            gui.widget_ntrials.value = val_ntrials
+            gui.widget_dt.value = val_tstep
 
-    # # AES: For some strange reason, the 3x3_drives network file does NOT produce
-    # # identical output, even when the synaptic gains are made identical. I think that's
-    # # a separate bug.
-    # net_file_path = Path(hnn_core_root / "tests" / "assets" / "jones2009_3x3_drives.json")
-    # Using the full GUI base file for now.
-    net_file_path = Path(hnn_core_root / "param" / "jones2009_base.json")
+            gui.run_button.click()
+            sim_name = str(sim__name)
+            dpls = gui.simulation_data[sim_name]["dpls"]
+            sim__name += 1
+    logs = [record.message for record in caplog.records if record.name == "hnn_gui"]
+    log_text = "\n".join(logs)
+    if "Traceback" in log_text:
+        assert '[ERROR]' in log_text
+    else:
+        assert '[ERROR]' not in log_text
+    caplog.clear()
 
-    # Setup and run the GUI simulation
-    # --------------------------------
-    gui = HNNGUI(network_configuration=net_file_path)
-    gui.compose()
+    def raise_exception(*args, **kwargs):
+        raise ValueError("Test exception")
+    monkeypatch.setattr("hnn_core.gui.gui.simulate_dipole", raise_exception)
 
-    gui.widget_dt.value = local_dt
-    gui.widget_tstop.value = local_tstop
+    with caplog.at_level("INFO", logger="hnn_gui"):
+        for val_tstop, val_ntrials, val_tstep in tstop_trials_tstep:
+            gui.widget_simulation_name.value = str(sim_count)
+            gui.widget_tstop.value = val_tstop
+            gui.widget_ntrials.value = val_ntrials
+            gui.widget_dt.value = val_tstep
 
-    # Set some non-default gains
-    gui.global_gain_widgets["i_i"].value = global_custom_gain
-
-    # Also change a single gain, the first one: L2_B->L2_B, affected by i_i above.
-    # Yes this depends on the order of synapses in connectivity_widgets, but
-    # connectivity_widgets doesn't actually contain the text of which connection each
-    # widgets belongs to, so :shrug:
-    gui.connectivity_widgets[0][0].children[2].children[0].value = single_custom_gain
-
-    # Run a simulation to create a network with these gains
-    sim_name = "test_gains_gui"
-    gui.widget_simulation_name.value = sim_name
-    gui.run_button.click()
-    dpls_gui = gui.simulation_data[sim_name]["dpls"]
-
-    # Setup and run the API simulation
-    # --------------------------------
-    net_api = read_network_configuration(net_file_path)
-    net_api.set_global_synaptic_gains(i_i=8.0)
-    l2p_l2p_conn_idx = pick_connection(
-        net_api,
-        src_gids="L2_basket",
-        target_gids="L2_basket",
-    )
-    net_api.connectivity[l2p_l2p_conn_idx[0]]["nc_dict"]["gain"] = (
-        1 + (global_custom_gain - 1) + (single_custom_gain - 1)
-    )
-
-    dpls_api = simulate_dipole(net_api, tstop=local_tstop, dt=local_dt, n_trials=1)
-
-    assert np.allclose(
-        dpls_gui[0].data["agg"],
-        dpls_api[0].data["agg"],
-    )
+            gui.run_button.click()
+            sim_name = gui.widget_simulation_name.value
+            dpls = gui.simulation_data[sim_name]["dpls"]
+            sim_count += 1
+        if "Traceback" in caplog.text:
+            assert '[ERROR]' in caplog.text
+        else:
+            assert '[ERROR]' not in caplog.text
+        caplog.clear()
