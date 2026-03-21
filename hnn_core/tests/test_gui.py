@@ -12,7 +12,7 @@ import traitlets
 import os
 
 from pathlib import Path
-from hnn_core import Dipole, Network, simulate_dipole, Cell
+from hnn_core import Dipole, Network, simulate_dipole
 from hnn_core.gui import HNNGUI
 from hnn_core.gui._viz_manager import (
     _idx2figname,
@@ -1585,7 +1585,6 @@ def test_traceback(caplog, setup_gui, monkeypatch):
 
             gui.run_button.click()
             sim_name = gui.widget_simulation_name.value
-            dpls = gui.simulation_data[sim_name]["dpls"]
             sim_count += 1
         if "Traceback" in caplog.text:
             assert '[ERROR]' in caplog.text
