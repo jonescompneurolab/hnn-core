@@ -10,9 +10,21 @@ from .externals.mne import _validate_type
 
 def _hammfilt(x, winsz):
     """Convolve with a hamming window."""
-    assert len(x) > winsz
+    if not isinstance(x, (list, np.ndarray)):
+        raise TypeError("x must be a list or numpy array")
+
+    if not isinstance(winsz, (int, float)):
+        raise TypeError("winsz must be a number")
+
+    winsz = int(winsz)
+
+    if winsz <= 0:
+        raise ValueError("winsz must be positive")
+
+    if len(x) < winsz:
+        raise ValueError("winsz must be smaller than input length")
     win = np.hamming(winsz)
-    win /= sum(win)
+    win /= np.sum(win)
     return np.convolve(x, win, "same")
 
 
