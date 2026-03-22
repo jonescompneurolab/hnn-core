@@ -9,7 +9,6 @@ import numpy as np
 
 from .objective_functions import _rmse_evoked, _corr_evoked, _maximize_psd
 from ..externals.mne import _validate_type
-from ..network import pick_connection
 from warnings import warn
 
 
