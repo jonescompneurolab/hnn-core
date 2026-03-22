@@ -78,6 +78,11 @@ class Optimizer:
             The objective function values.
         opt_params_ : list
             The list of optimized parameter values.
+
+        Note
+        ----
+        When `solver='cma'`, the `initial_params` argument is not used. Support
+        for `initial_params` with the CMA algorithm is still under development.
         """
         self._initial_net = initial_net
         self.constraints = constraints
@@ -481,6 +486,12 @@ def _run_opt_cma(
         Objective values.
     net_ : instance of Network
         Optimized network object.
+
+    Note
+    ----
+    The `initial_params` argument is not used but is kept here to maintain a
+    consistent API for all solver classes. Support for `initial_params`
+    with the CMA algorithm is still under development.
     """
 
     import cma
