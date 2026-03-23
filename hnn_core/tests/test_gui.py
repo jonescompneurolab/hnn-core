@@ -536,8 +536,6 @@ def test_simulation_auto_rename_duplicate(setup_gui):
 
     # Fifth run with an auto-appended fresh, non-default name
     # --------------------------------------------------------
-    # TODO Tushar: In this case, we want to retain the hyphens and numbers in the "base"
-    # name, but append "-{number}" like you did for default names.
     gui.run_button.click()
 
     expected_new_name = f"{custom_sim_name_1}-2"
@@ -554,8 +552,6 @@ def test_simulation_auto_rename_duplicate(setup_gui):
 
     # Seventh run with a fresh, non-default name ending in "-{number}"
     # ----------------------------------------------------------------
-    # TODO Tushar: In this case, we want to retain the hyphens and numbers in the "base"
-    # name, but increment the *preexisting* final "-{number}"
     custom_sim_name_2 = "hjkl-67-qwerty-23"
     gui.widget_simulation_name.value = custom_sim_name_2
     gui.run_button.click()

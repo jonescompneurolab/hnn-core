@@ -3266,8 +3266,15 @@ def run_button_clicked(
 
         _sim_name = widget_simulation_name.value
         if simulation_data[_sim_name]["net"] is not None:
-            base = _sim_name.split("-")[0]
-            idx = 2
+            parts = _sim_name.rsplit("-", 1)
+
+            if len(parts) == 2 and parts[1].isdigit():
+                base = parts[0]
+                idx = int(parts[1]) + 1
+            else:
+                base = _sim_name
+                idx = 2
+
             while f"{base}-{idx}" in simulation_data:
                 idx += 1
 
