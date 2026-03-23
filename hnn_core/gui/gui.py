@@ -3265,7 +3265,10 @@ def run_button_clicked(
                 del simulation_data[_name]
 
         _sim_name = widget_simulation_name.value
-        if simulation_data[_sim_name]["net"] is not None:
+        if (
+            _sim_name in simulation_data
+            and simulation_data[_sim_name]["net"] is not None
+        ):
             parts = _sim_name.rsplit("-", 1)
 
             if len(parts) == 2 and parts[1].isdigit():
