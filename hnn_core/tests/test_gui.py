@@ -560,7 +560,7 @@ def test_simulation_auto_rename_duplicate(setup_gui):
     _check_new_name(expected_new_name)
     assert len(gui.simulation_data) == 7
 
-    # Eigth run with a fresh, non-default name ending in "-{number+1}"
+    # Eighth run with a fresh, non-default name ending in "-{number+1}"
     # ----------------------------------------------------------------
     gui.run_button.click()
 
