@@ -1265,6 +1265,7 @@ def test_network_mesh():
     with pytest.raises(TypeError, match="mesh_shape must be"):
         net = Network(params, mesh_shape="abc")  # noqa: F841
 
+
 @pytest.mark.parametrize(
     "network_model",
     [jones_2009_model, law_2021_model, calcium_model],
@@ -1281,6 +1282,7 @@ def test_network_models_mesh(network_model):
     assert len(net.pos_dict["L2_pyramidal"]) == mesh_shape[0] * mesh_shape[1]
     assert len(net.pos_dict["L5_pyramidal"]) == mesh_shape[0] * mesh_shape[1]
     del net, dp
+
 
 def test_set_global_synaptic_gains():
     """Test synaptic gains setter"""
