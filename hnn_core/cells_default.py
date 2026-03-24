@@ -567,15 +567,15 @@ def pyramidal_l5ET(cell_name,pos=(0,0,0), gid=None):
     section_names = list(end_pts.keys())
 
     # initialize section voltage
-    v_init = {'soma': -71.56521022702259,
-            'basal_1': -71.65128168943417,
-            'basal_2': -71.77924562640379,
-            'basal_3': -71.77924562640379,
-            'apical_oblique': -71.53636973768913,
-            'apical_trunk': -71.50652549683365,
-            'apical_1': -70.3781183764456,
-            'apical_2': -66.1535511211922,
-            'apical_tuft': -61.47225400606895}
+    v_init = {'soma': np.float64(-71), 
+              'basal_1': np.float64(-71), 
+              'basal_2': np.float64(-71), 
+              'basal_3': np.float64(-71), 
+              'apical_oblique': np.float64(-71), 
+              'apical_trunk': np.float64(-71), 
+              'apical_1': np.float64(-71), 
+              'apical_2': np.float64(-66.1144274029203), 
+              'apical_tuft': np.float64(-59.84726333175576)}
 
     sections_apcl = _get_dends(p_all, 'L5ET', section_names=['apical_trunk', 'apical_1', 'apical_2', 'apical_tuft'], v_init=v_init)
     sections_basal = _get_basal(p_all, 'L5ET', section_names=['basal_1', 'basal_2', 'basal_3', 'apical_oblique'], v_init=v_init)
@@ -716,14 +716,14 @@ def pyramidal_l23(cell_name,pos=(0,0,0), gid=None):
     # build sections
     section_names = list(end_pts.keys())
 
-    v_init = {'soma': -73.91534035708573,
-            'basal_1': -73.93352687563383,
-            'basal_2': -73.98646383934111,
-            'basal_3': -73.98646383934111,
-            'apical_oblique': -73.91421209292815,
-            'apical_trunk': -73.88877758950657,
-            'apical_1': -73.64560269252748,
-            'apical_tuft': -73.27793049058045}
+    v_init = {'soma': np.float64(-71.78874217085284), 
+              'basal_1': np.float64(-71.78937996213429), 
+              'basal_2': np.float64(-71.79124296245172), 
+              'basal_3': np.float64(-71.79124296245172), 
+              'apical_oblique': np.float64(-71.72499593245432), 
+              'apical_trunk': np.float64(-71.75508099484644), 
+              'apical_1': np.float64(-71.52576752573326), 
+              'apical_tuft': np.float64(-71.20459607525555)}
     
     sections = _get_dends(p_all, 'L2Pyr', section_names, v_init=v_init)
     sections['soma'] = _get_pyr_soma(p_all, 'L2Pyr', v_init=v_init['soma'])
@@ -807,7 +807,7 @@ def interneuron(cell_name,pos=(0,0,0), layer=2, gid=None):
 
     p_all = get_Int_params()
     sections = dict()
-    sections['soma'] = _get_interneuron_soma(cell_name, v_init=-65)
+    sections['soma'] = _get_interneuron_soma(cell_name, v_init=-68.98)
     synapses = _get_syn_props(p_all, 'Int', syn_types=["ampa", "nmda", "gabaa", "gabab"])
     sections['soma'].syns = list(synapses.keys())
 
