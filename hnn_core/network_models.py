@@ -586,7 +586,7 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
-    # try this for long inhibition
+    weight = params[key]*0.18           # see Koh 1995; Kriener 2022
     receptor = 'nmda'
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
@@ -597,9 +597,6 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
     weight = params[key]
     loc = 'soma'
     receptor = 'gabaa'
-    net.add_connection(
-        src_cell, target_cell, loc, receptor, weight, delay, lamtha, allow_autapses=False)
-    receptor = 'gabab'
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha, allow_autapses=False)
     
@@ -614,11 +611,6 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha,
         allow_autapses=False)
-    receptor = 'gabab'
-    net.add_connection(
-        src_cell, target_cell, loc, receptor, weight, delay, lamtha,
-        allow_autapses=False)
-   
 
     src_cell = 'L5ET'
     lamtha = 6.125*0.8  # shorter space constant (Campagnola, 2022, mice data)
@@ -629,7 +621,7 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
 
-    # try this for long inhibition
+    weight = params[key]*0.2           # see Koh 1995; Kriener 2022
     receptor = 'nmda'
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha)
