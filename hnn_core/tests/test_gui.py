@@ -566,7 +566,8 @@ def test_gui_add_figure(setup_gui):
     assert remaining_titles1 == remaining_titles2 == correct_remaining_titles
     plt.close("all")
 
-def test_avg_spectrogram_data(setup_gui):
+
+def test_gui_spectrogram_trial_averaging(setup_gui):
     """Test whether the spectrogram plot data is consistent across simulations on various trials"""
     gui = setup_gui
     gui.widget_tstop.value = 500
@@ -588,7 +589,6 @@ def test_avg_spectrogram_data(setup_gui):
     spectrograms = {}
 
     for sim_name, _ in simulations:
-
         # clear axis first and then plot the spectrogram
         gui._simulate_viz_action(
             "edit_figure", figname, axname, sim_name, "spectrogram", {}, "clear"
