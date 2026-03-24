@@ -782,6 +782,72 @@ def test_gui_visualization(setup_gui):
     plt.close("all")
 
 
+def test_spectrogram_trial_consistency(setup_gui):
+    """Test spectrogram plot data consistency across simulations.
+
+    1. Two single-trial simulations should produce the same spectrogram data.
+    2. A single-trial and multi-trial simulation should produce different
+       spectrogram data.
+    """
+    gui = setup_gui
+    gui.widget_tstop.value = 500
+
+    # --- Run sim1: single trial ---
+    gui.widget_simulation_name.value = "sim1"
+    gui.widget_ntrials.value = 1
+    gui.run_button.click()
+
+    # --- Run sim2: single trial (identical settings) ---
+    gui.widget_simulation_name.value = "sim2"
+    gui.widget_ntrials.value = 1
+    gui.run_button.click()
+
+    # --- Run sim3: multiple trials ---
+    gui.widget_simulation_name.value = "sim3"
+    gui.widget_ntrials.value = 3
+    gui.run_button.click()
+
+    gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
+    gui._simulate_viz_action("add_fig")
+    figid = gui.viz_manager.fig_idx["idx"] - 1
+    figname = f"Figure {figid}"
+    axname = "ax0"
+
+    def get_spectrogram_data(sim_name):
+        """Helper: plot a spectrogram for sim_name and return the axis image data."""
+        gui._simulate_viz_action(
+            "edit_figure", figname, axname, sim_name, "spectrogram", {}, "clear"
+        )
+        gui._simulate_viz_action(
+            "edit_figure", figname, axname, sim_name, "spectrogram", {}, "plot"
+        )
+
+        fig = gui.viz_manager.figs[figid]
+        assert fig.axes[0].has_data(), f"No spectrogram data for {sim_name}"
+
+        images = fig.axes[0].get_images()
+        assert len(images) > 0, f"No images found in spectrogram axes for {sim_name}"
+        return images[0].get_array()
+
+    data_sim1 = get_spectrogram_data("sim1")
+    data_sim2 = get_spectrogram_data("sim2")
+    data_sim3 = get_spectrogram_data("sim3")
+
+    # 1. Two identical single-trial simulations should yield the same spectrogram
+    assert np.allclose(data_sim1, data_sim2), (
+        "Spectrogram data should be identical for two single-trial simulations "
+        "with the same parameters."
+    )
+
+    # 2. Single-trial vs multi-trial simulation should yield different spectrograms
+    assert not np.allclose(data_sim1, data_sim3), (
+        "Spectrogram data should differ between a single-trial and a "
+        "multi-trial simulation."
+    )
+
+    plt.close("all")
+
+
 def test_dipole_data_overlay(setup_gui):
     """Tests dipole plot with a simulation and data overlay."""
     gui = setup_gui
