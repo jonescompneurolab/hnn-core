@@ -823,11 +823,11 @@ def test_spectrogram_trial_consistency(setup_gui):
         )
 
         fig = gui.viz_manager.figs[figid]
-        assert fig.axes[0].has_data(), f"No spectrogram data for {sim_name}"
+        for ax in fig.axes:
+            if len(ax.collections) > 0:
+                return ax.collections[0].get_array()
 
-        images = fig.axes[0].get_images()
-        assert len(images) > 0, f"No images found in spectrogram axes for {sim_name}"
-        return images[0].get_array()
+        raise AssertionError(f"No spectrogram data found for '{sim_name}'")
 
     data_sim1 = get_spectrogram_data("sim1")
     data_sim2 = get_spectrogram_data("sim2")
