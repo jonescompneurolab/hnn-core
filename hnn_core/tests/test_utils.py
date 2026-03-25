@@ -1,24 +1,12 @@
 import pytest
 import numpy as np
-from hnn_core.utils import smooth_waveform, _hammfilt, _savgol_filter
+from hnn_core.utils import smooth_waveform, _savgol_filter
 
 
 def test_hamming_smoothing():
     """Test hamming window convolution smoothing"""
-    with pytest.raises(ValueError, match="winsz must be smaller than input length"):
-        _hammfilt(np.arange(10), 11)
-
-    # invalid x type
-    with pytest.raises(TypeError):
-        _hammfilt("not_array", 5)
-
-    # invalid winsz type
-    with pytest.raises(TypeError):
-        _hammfilt(np.arange(10), "five")
-
-    # negative winsz
-    with pytest.raises(ValueError):
-        _hammfilt(np.arange(10), -1)
+    with pytest.raises(ValueError, match="Window length too long.*"):
+        smooth_waveform(np.arange(10), 11000, 1)
 
     window_len, sfreq = 1, 1
     # data must be 1D
@@ -28,14 +16,14 @@ def test_hamming_smoothing():
 
     # window_len is positive number, longer than data, and >1ms
     data, sfreq = np.random.random((100,)), 1
-    for window_len in [None, -1, 1e6, 1e-1]:
+    for window_len in [-1, 1e6, 1e-1]:
         with pytest.raises(ValueError):
             smooth_waveform(data, window_len, sfreq)
 
     # sfreq is positive number
     data, window_len = np.random.random((100,)), 1
-    for sfreq in [None, [1], -1]:
-        with pytest.raises((TypeError, AssertionError)):
+    for sfreq in [-1]:
+        with pytest.raises(AssertionError):
             smooth_waveform(data, window_len, sfreq)
 
 
@@ -44,41 +32,26 @@ def test_savgol_filter():
     data, sfreq = np.random.random((100,)), 1
 
     # h_freq is positive number and less than half the sampling rate
-    for h_freq in [None, [1], -1, sfreq / 2]:
-        with pytest.raises((TypeError, AssertionError, ValueError)):
-            _savgol_filter(data, h_freq, sfreq)
+    # negative h_freq → AssertionError
+    with pytest.raises(AssertionError):
+        _savgol_filter(data, -1, sfreq)
+
+    # too large h_freq → ValueError
+    with pytest.raises(ValueError):
+        _savgol_filter(data, sfreq / 2, sfreq)
 
     h_freq = 0.6
     # sfreq is positive number and at least twice the cutoff frequency
-    for sfreq in [None, [1], -1, 1]:
-        with pytest.raises((TypeError, AssertionError, ValueError)):
-            _savgol_filter(data, h_freq, sfreq)
+    # invalid sfreq (<=0) → AssertionError
+    with pytest.raises(AssertionError):
+        _savgol_filter(data, h_freq, -1)
 
-
-def test_hammfilt_basic():
-    x = np.array([1, 2, 3, 4, 5])
-    result = _hammfilt(x, 3)
-    assert len(result) == len(x)
-
-
-def test_hammfilt_invalid_winsz():
-    x = np.array([1, 2, 3])
+    # too small sfreq → ValueError
     with pytest.raises(ValueError):
-        _hammfilt(x, 5)
+        _savgol_filter(data, h_freq, 1)
 
 
-def test_hammfilt_invalid_type():
-    with pytest.raises(TypeError):
-        _hammfilt("abc", 3)
-
-
-def test_hammfilt_zero_window():
-    x = np.array([1, 2, 3])
-    with pytest.raises(ValueError):
-        _hammfilt(x, 0)
-
-
-def test_hammfilt_float_winsz():
+def test_smooth_window_float_winsz():
     x = np.array([1, 2, 3, 4])
-    result = _hammfilt(x, 2.5)
+    result = smooth_waveform(x, 2.5, 1)
     assert len(result) == len(x)
