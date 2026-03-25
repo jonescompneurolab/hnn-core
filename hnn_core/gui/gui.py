@@ -3265,10 +3265,24 @@ def run_button_clicked(
                 del simulation_data[_name]
 
         _sim_name = widget_simulation_name.value
-        if simulation_data[_sim_name]["net"] is not None:
-            print("Simulation with the same name exists!")
-            simulation_status_bar.value = simulation_status_contents["failed"]
-            return
+        if (
+            _sim_name in simulation_data
+            and simulation_data[_sim_name]["net"] is not None
+        ):
+            parts = _sim_name.rsplit("-", 1)
+
+            if len(parts) == 2 and parts[1].isdigit():
+                base = parts[0]
+                idx = int(parts[1]) + 1
+            else:
+                base = _sim_name
+                idx = 2
+
+            while f"{base}-{idx}" in simulation_data:
+                idx += 1
+
+            _sim_name = f"{base}-{idx}"
+            widget_simulation_name.value = _sim_name
 
         _init_network_from_widgets(
             params,
