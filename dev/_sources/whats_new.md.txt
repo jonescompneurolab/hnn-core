@@ -35,6 +35,13 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### Changelog
 
+- In the GUI, add auto-renaming of new simulations. This fixes an annoying issue with
+  the GUI where every time a user wanted to run a new simulation, they had to go back to
+  the Simulation tab and manually change the simulation name. Now, whenever they run a
+  new simulation without changing the name manually, the new simulation will use the old
+  name, but with a reasonable number appended.
+  By [Tushar Jamdade][] in {gh}`1213`.
+
 - Add support for printing a welcome message that asks the user to fill out the HNN
   survey, which is printed to the standard output after (and only after) the first time
   the `hnn_core` module is imported. Whether or not the message is displayed is
