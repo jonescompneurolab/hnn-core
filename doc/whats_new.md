@@ -30,10 +30,14 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### People who contributed to this release:
 
+- [Muhammad Ahmad Amin][]
 - [Tushar Jamdade][]
 - [Karthikeya Kodlai][]
 
 ### Changelog
+
+- Improve UX of GUI's "Delete all drives" button and small refactors of GUI codebase.
+  By [Muhammad Ahmad Amin][] in {gh}`1245`. This was their first PR, thanks Muhammad!
 
 - In the GUI, add auto-renaming of new simulations. This fixes an annoying issue with
   the GUI where every time a user wanted to run a new simulation, they had to go back to
@@ -1270,3 +1274,4 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [NEURON]: https://nrn.readthedocs.io
 [Karthikeya Kodlai]: https://github.com/sketch123456
 [Tushar Jamdade]: https://github.com/Tusharjamdade
+[Muhammad Ahmad Amin]: https://github.com/m-ahmad-amin
