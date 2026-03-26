@@ -10,10 +10,6 @@ from .externals.mne import _validate_type
 
 def _hammfilt(x, winsz):
     """Convolve with a hamming window."""
-    winsz = int(winsz)
-
-    if winsz <= 0:
-        return x
 
     win = np.hamming(winsz)
     win /= np.sum(win)
@@ -132,7 +128,9 @@ def smooth_waveform(data, window_len, sfreq):
     _validate_type(sfreq, (float, int), "sfreq")
     assert sfreq > 0.0
     # convolutional filter length is given in samples
-    winsz = np.round(1e-3 * window_len * sfreq)
+    winsz = int(np.round(1e-3 * window_len * sfreq))
+    if winsz < 1:
+        raise ValueError("Window length too small")
     if winsz > len(data):
         raise ValueError(
             f"Window length too long: {winsz} samples; data length is "
