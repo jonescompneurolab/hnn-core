@@ -795,8 +795,8 @@ class HNNGUI:
             description="Run Simulation",
             button_style="success",
             layout=self.layout["run_btn"],
+            style={"button_color": self.layout["theme_color"]},
         )
-        self.run_button.style.button_color = self.layout["theme_color"]
         self.save_config_button = self._init_html_download_button(
             title="Save Current Network and Drives",
             mimetype="application/json",
@@ -864,12 +864,12 @@ class HNNGUI:
             description="Add drive",
             button_style="primary",
             layout=self.layout["btn"],
+            style={"button_color": self.layout["theme_color"]},
         )
-        self.add_drive_button.style.button_color = self.layout["theme_color"]
         self.delete_drive_button = Button(
             description="Delete all drives",
             button_style="danger",
-            icon="trash",
+            icon="close",
             layout=self.layout["btn"],
         ).add_class("red-button")
 
