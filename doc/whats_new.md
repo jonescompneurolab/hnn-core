@@ -36,7 +36,7 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### Changelog
 
-- Improve UX of GUI's "Delete all drives" button and small refactors of GUI codebase.
+- Improve UX of GUI's "Delete all drives" button and small refactors of GUI codebase. 
   By [Muhammad Ahmad Amin][] in {gh}`1245`. This was their first PR, thanks Muhammad!
 
 - In the GUI, add auto-renaming of new simulations. This fixes an annoying issue with
