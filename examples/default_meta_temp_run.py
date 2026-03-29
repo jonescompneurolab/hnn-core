@@ -1,5 +1,5 @@
 # direct import and usage
-from hnn_core.network import default_cell_metadata
+from hnn_core.network_models import default_cell_metadata
 
 print("default_cell_metadata, no network needed:")
 for cell_name, meta in default_cell_metadata.items():

@@ -6,10 +6,45 @@ import os.path as op
 from copy import deepcopy
 import hnn_core
 from hnn_core import read_params
-from .network import Network, _create_cell_coords, default_cell_metadata
+from .network import Network, _create_cell_coords
 from .params import _short_name
 from .cells_default import pyramidal_ca, pyramidal, basket
 from .externals.mne import _validate_type
+
+# Default cell metadata for the standard Jones 2009 network cell types.
+# Defined here at module level so that other code (e.g. JSON
+# serialisation / deserialisation) can import it without instantiating
+# a full Network object.
+default_cell_metadata = {
+    "L2_basket": {
+        "morpho_type": "basket",
+        "electro_type": "inhibitory",
+        "layer": "2",
+        "measure_dipole": False,
+        "reference": "https://doi.org/10.7554/eLife.51214",
+    },
+    "L2_pyramidal": {
+        "morpho_type": "pyramidal",
+        "electro_type": "excitatory",
+        "layer": "2",
+        "measure_dipole": True,
+        "reference": "https://doi.org/10.7554/eLife.51214",
+    },
+    "L5_basket": {
+        "morpho_type": "basket",
+        "electro_type": "inhibitory",
+        "layer": "5",
+        "measure_dipole": False,
+        "reference": "https://doi.org/10.7554/eLife.51214",
+    },
+    "L5_pyramidal": {
+        "morpho_type": "pyramidal",
+        "electro_type": "excitatory",
+        "layer": "5",
+        "measure_dipole": True,
+        "reference": "https://doi.org/10.7554/eLife.51214",
+    },
+}
 
 # ToDO -> direct _cell_L2Pyr calling
 
@@ -76,29 +111,22 @@ def jones_2009_model(
 
     # Define cell types for Jones 2009 model
     # data is here in metaData format
-    '''
-    wip: will tell the user to refer to default_cell_metadata in network.py for reference
-    '''
     cell_types = {
         "L2_basket": {
             "cell_object": basket(cell_name="L2_basket"),
-            "cell_metadata": deepcopy(
-                default_cell_metadata["L2_basket"]),
+            "cell_metadata": deepcopy(default_cell_metadata["L2_basket"]),
         },
         "L2_pyramidal": {
             "cell_object": pyramidal(cell_name="L2_pyramidal"),
-            "cell_metadata": deepcopy(
-                default_cell_metadata["L2_pyramidal"]),
+            "cell_metadata": deepcopy(default_cell_metadata["L2_pyramidal"]),
         },
         "L5_basket": {
             "cell_object": basket(cell_name="L5_basket"),
-            "cell_metadata": deepcopy(
-                default_cell_metadata["L5_basket"]),
+            "cell_metadata": deepcopy(default_cell_metadata["L5_basket"]),
         },
         "L5_pyramidal": {
             "cell_object": pyramidal(cell_name="L5_pyramidal"),
-            "cell_metadata": deepcopy(
-                default_cell_metadata["L5_pyramidal"]),
+            "cell_metadata": deepcopy(default_cell_metadata["L5_pyramidal"]),
         },
     }
 
