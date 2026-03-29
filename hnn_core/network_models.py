@@ -17,6 +17,8 @@ from .externals.mne import _validate_type
 # Defined here at module level so that other code (e.g. JSON
 # serialisation / deserialisation) can import it without instantiating
 # a full Network object.
+
+# colors are a wip placeholder that will change post dev meet discussion
 default_cell_metadata = {
     "L2_basket": {
         "morpho_type": "basket",
@@ -24,6 +26,8 @@ default_cell_metadata = {
         "layer": "2",
         "measure_dipole": False,
         "reference": "https://doi.org/10.7554/eLife.51214",
+        "color": "m",
+        "marker": "x", #shape from prev viz.py line:926
     },
     "L2_pyramidal": {
         "morpho_type": "pyramidal",
@@ -31,6 +35,8 @@ default_cell_metadata = {
         "layer": "2",
         "measure_dipole": True,
         "reference": "https://doi.org/10.7554/eLife.51214",
+        "color": "c",
+        "marker": "^",
     },
     "L5_basket": {
         "morpho_type": "basket",
@@ -38,6 +44,8 @@ default_cell_metadata = {
         "layer": "5",
         "measure_dipole": False,
         "reference": "https://doi.org/10.7554/eLife.51214",
+        "color": "r",
+        "marker": "x",
     },
     "L5_pyramidal": {
         "morpho_type": "pyramidal",
@@ -45,7 +53,16 @@ default_cell_metadata = {
         "layer": "5",
         "measure_dipole": True,
         "reference": "https://doi.org/10.7554/eLife.51214",
+        "color": "b",
+        "marker": "^",
     },
+}
+
+# same, placeholder, wip
+default_drive_colors = {
+    "proximal": "r",
+    "distal": "g",
+    "default": "#8B4513",
 }
 
 # ToDO -> direct _cell_L2Pyr calling
