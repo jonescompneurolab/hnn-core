@@ -158,3 +158,60 @@ def _maximize_psd(
     obj_values.append(obj)
 
     return obj
+
+
+def _custom_objective_function(
+    initial_net,
+    initial_params,
+    set_params,
+    predicted_params,
+    update_params,
+    obj_values,
+    tstop,
+    obj_fun_kwargs,
+):
+    """The generic objective function for user-defined loss functions.
+
+    Parameters
+    ----------
+    initial_net : instance of Network
+        The network object.
+    initial_params : dict
+        Keys are parameter names, values are initial parameters.
+    set_params : func
+        User-defined function that sets network drives and parameters.
+    predicted_params : list
+        Parameters selected by the optimizer.
+    update_params : func
+        Function to update params.
+    tstop : float
+        The simulated dipole's duration.
+    obj_fun_kwargs : dict
+        Additional arguments to pass to the objective function, must contain
+        'loss_fun', a callable.
+        
+    Returns
+    -------
+    obj : float
+        The loss value returned by the user-defined loss function.
+    """
+
+    params = update_params(initial_params, predicted_params)
+
+    # simulate dpl with predicted params
+    new_net = initial_net.copy()
+    set_params(new_net, params)
+
+    dpls = simulate_dipole(new_net, tstop=tstop, n_trials=obj_fun_kwargs.get("n_trials", 1))
+
+    # smooth & scale
+    if "scale_factor" in obj_fun_kwargs:
+        [dpl.scale(obj_fun_kwargs["scale_factor"]) for dpl in dpls]
+    if "smooth_window_len" in obj_fun_kwargs:
+        [dpl.smooth(obj_fun_kwargs["smooth_window_len"]) for dpl in dpls]
+
+    loss_fun = obj_fun_kwargs["loss_fun"]
+    obj = loss_fun(dpls, obj_fun_kwargs)
+    obj_values.append(obj)
+
+    return obj
