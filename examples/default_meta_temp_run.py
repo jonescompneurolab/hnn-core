@@ -17,7 +17,7 @@ filled = {**default_cell_metadata["L5_pyramidal"], **partial}
 print(f"\nPartial metadata   : {partial}")
 print(f"Filled from defaults: {filled}")
 
-# verifing the consistency
+# consistency check
 from hnn_core import jones_2009_model
 
 net = jones_2009_model()
