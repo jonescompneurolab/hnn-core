@@ -399,13 +399,16 @@ class TestCellResponsePlotters:
             labels = [text.get_text() for text in fig.axes[0].legend_.get_texts()]
             return colors, labels
 
-        # Default colors should be the default color cycle
+        # Default colors should come from cell metadata
         fig = net.cell_response.plot_spikes_raster(trial_idx=0, show=False)
-        colors, _ = _get_line_hex_colors(fig)
-        default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
-            0 : len(colors)
+        colors, labels = _get_line_hex_colors(fig)
+        from hnn_core.network_models import default_cell_metadata
+        expected_cell_types = sorted(default_cell_metadata.keys())
+        expected_colors = [
+            matplotlib.colors.to_hex(default_cell_metadata[ct]["color"])
+            for ct in expected_cell_types
         ]
-        assert colors == default_colors
+        assert colors == expected_colors
 
         # Custom hex colors as list
         custom_colors = ["#daf7a6", "#ffc300", "#ff5733", "#c70039"]
