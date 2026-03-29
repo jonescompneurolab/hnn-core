@@ -504,10 +504,9 @@ def plot_spikes_hist(
     }
     # fetching the cell types
     from .network_models import default_cell_metadata
+
     known_cell_types = set(default_cell_metadata.keys())
-    cell_types = sorted(
-        [ct for ct in unique_types if ct in known_cell_types]
-    )
+    cell_types = sorted([ct for ct in unique_types if ct in known_cell_types])
     input_types = np.setdiff1d(unique_types, cell_types)
 
     if isinstance(spike_types, str):
@@ -732,19 +731,16 @@ def plot_spikes_raster(
             )
     else:
         from .network_models import default_cell_metadata
+
         known_cell_types = set(default_cell_metadata.keys())
-        cell_types = sorted(
-            [ct for ct in unique_spike_types if ct in known_cell_types]
-        )
+        cell_types = sorted([ct for ct in unique_spike_types if ct in known_cell_types])
         if not cell_types:
             cell_types = sorted(list(known_cell_types))
 
     # default colors from cell metadata
     from .network_models import default_cell_metadata as _meta
-    cell_colors = {
-        cell: _meta.get(cell, {}).get("color", "k")
-        for cell in cell_types
-    }
+
+    cell_colors = {cell: _meta.get(cell, {}).get("color", "k") for cell in cell_types}
 
     # validate colors argument
     _validate_type(colors, (list, dict, None), "color", "list of str, or dict")
@@ -960,8 +956,8 @@ def plot_cells(net, ax=None, show=True):
         x = [pos[0] for pos in net.pos_dict[cell_type]]
         y = [pos[1] for pos in net.pos_dict[cell_type]]
         z = [pos[2] for pos in net.pos_dict[cell_type]]
-        color = colors.get(cell_type, 'k')
-        marker = markers.get(cell_type, 'o')
+        color = colors.get(cell_type, "k")
+        marker = markers.get(cell_type, "o")
         ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
 
     if net.rec_arrays:

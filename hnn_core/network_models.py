@@ -25,7 +25,7 @@ default_cell_metadata = {
         "measure_dipole": False,
         "reference": "https://doi.org/10.7554/eLife.51214",
         "color": "m",
-        "marker": "x", #shape from prev viz.py line:926
+        "marker": "x",  # shape from prev viz.py line:926
     },
     "L2_pyramidal": {
         "morpho_type": "pyramidal",
