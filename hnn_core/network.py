@@ -529,6 +529,7 @@ class Network:
             """
             # wip: getting it from network_models this time
             from .network_models import default_cell_metadata
+
             cell_types_default = {
                 "L2_basket": {
                     "cell_object": basket(cell_name="L2_basket"),
