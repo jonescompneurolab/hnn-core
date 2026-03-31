@@ -593,10 +593,17 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
     
     src_cell = 'L2_basket'
     lamtha = 6.125
-    key = f'gbar_L2Basket_{_short_name(target_cell)}'
+    receptor = 'gabaa'
+    key = f'gbar_L2Basket_{_short_name(target_cell)}_{receptor}'
     weight = params[key]
     loc = 'soma'
-    receptor = 'gabaa'
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha, allow_autapses=False)
+    
+    receptor = 'gabab'
+    key = f'gbar_L2Basket_{_short_name(target_cell)}_{receptor}'
+    weight = params[key]
+    loc = 'soma'
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha, allow_autapses=False)
     
@@ -606,7 +613,14 @@ def duecker_ET_model(params=None, add_drives_from_params=False,
     lamtha = 6.125
     loc = 'soma'
     receptor = 'gabaa'
-    key = f'gbar_L5Basket_{_short_name(target_cell)}'
+    key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
+    weight = params[key]
+    net.add_connection(
+        src_cell, target_cell, loc, receptor, weight, delay, lamtha,
+        allow_autapses=False)
+    
+    receptor = 'gabab'
+    key = f'gbar_L5Basket_{_short_name(target_cell)}_{receptor}'
     weight = params[key]
     net.add_connection(
         src_cell, target_cell, loc, receptor, weight, delay, lamtha,
