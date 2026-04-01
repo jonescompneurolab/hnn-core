@@ -179,7 +179,7 @@
     "gbar_L2Pyr_L2Basket": 8e-4,
     "gbar_L2Basket_L2Basket_gabaa": 0.03,
     "gbar_L2Basket_L2Basket_gabab": 0.03,
-    "gbar_L2Pyr_L5Basket": 8e-4,
+    "gbar_L2Pyr_L5Basket": 5e-5,
     "gbar_L5ET_L5Basket": 8e-4,
     "gbar_L5Basket_L5Basket_gabaa": 0.03,
     "gbar_L5Basket_L5Basket_gabab": 0.0,
