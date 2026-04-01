@@ -598,12 +598,10 @@ def test_gui_spectrogram_trial_averaging(setup_gui):
         )
 
         fig = gui.viz_manager.figs[figid]
-        found = False
         ax = fig.axes[0]
-        if len(ax.collections) > 0:
-            spectrograms[sim_name] = ax.collections[0].get_array().copy()
-            found = True
-        assert found
+
+        spectrograms[sim_name] = ax.collections[0].get_array().copy()
+        assert spectrograms[sim_name].any()
 
     # equality for single-trial simulations
     assert np.allclose(spectrograms["sim1"], spectrograms["sim2"])
