@@ -32,8 +32,14 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 - [Tushar Jamdade][]
 - [Karthikeya Kodlai][]
+- [M Yaswanth Reddy][]
 
 ### Changelog
+
+- In the GUI, when simulating multiple trials and plotting the spectrogram, use the
+  averaged Time-Frequency-Representation of the dipoles for spectrogram calculation
+  instead of only the first dipole,
+  by [M Yaswanth Reddy][] in {gh}`1223`. This was their first PR, thanks Yaswanth!
 
 - In the GUI, add auto-renaming of new simulations. This fixes an annoying issue with
   the GUI where every time a user wanted to run a new simulation, they had to go back to
@@ -1270,3 +1276,4 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [NEURON]: https://nrn.readthedocs.io
 [Karthikeya Kodlai]: https://github.com/sketch123456
 [Tushar Jamdade]: https://github.com/Tusharjamdade
+[M Yaswanth Reddy]: https://github.com/Yaswanth8390

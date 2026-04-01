@@ -638,6 +638,50 @@ def test_gui_add_figure(setup_gui):
     plt.close("all")
 
 
+def test_gui_spectrogram_trial_averaging(setup_gui):
+    """Test whether the spectrogram plot data is consistent across simulations on various trials"""
+    gui = setup_gui
+    gui.widget_tstop.value = 500
+    simulations = [("sim1", 1), ("sim2", 1), ("sim3", 2)]
+
+    # run simulations for single and multi trials
+    for sim_name, trials in simulations:
+        gui.widget_simulation_name.value = sim_name
+        gui.widget_ntrials.value = trials
+        gui.run_button.click()
+
+    gui._simulate_viz_action("switch_fig_template", "[Blank] single figure")
+    gui._simulate_viz_action("add_fig")
+
+    figid = gui.viz_manager.fig_idx["idx"] - 1
+    figname = f"Figure {figid}"
+    axname = "ax0"
+
+    spectrograms = {}
+
+    for sim_name, _ in simulations:
+        # clear axis first and then plot the spectrogram
+        gui._simulate_viz_action(
+            "edit_figure", figname, axname, sim_name, "spectrogram", {}, "clear"
+        )
+        gui._simulate_viz_action(
+            "edit_figure", figname, axname, sim_name, "spectrogram", {}, "plot"
+        )
+
+        fig = gui.viz_manager.figs[figid]
+        ax = fig.axes[0]
+
+        spectrograms[sim_name] = ax.collections[0].get_array().copy()
+        assert spectrograms[sim_name].any()
+
+    # equality for single-trial simulations
+    assert np.allclose(spectrograms["sim1"], spectrograms["sim2"])
+    # equality for multi-trial simulations
+    assert not np.allclose(spectrograms["sim1"], spectrograms["sim3"])
+
+    plt.close("all")
+
+
 def test_gui_add_data_dependent_figure(setup_gui):
     """Test if the GUI adds/deletes figs data dependent properly."""
     gui = setup_gui

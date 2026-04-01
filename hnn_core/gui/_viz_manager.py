@@ -27,7 +27,7 @@ from ipywidgets import (
 
 from hnn_core.dipole import _rmse, average_dipoles
 from hnn_core.gui._logging import logger
-from hnn_core.viz import plot_dipole
+from hnn_core.viz import plot_dipole, plot_tfr_morlet
 
 #
 _fig_placeholder = HTML(
@@ -379,7 +379,8 @@ def _update_ax(fig, ax, single_simulation, sim_name, plot_type, plot_config):
             n_cycles = freqs / 2.0
 
             try:
-                dpls_copied[0].plot_tfr_morlet(
+                plot_tfr_morlet(
+                    dpls_copied,
                     freqs,
                     n_cycles=n_cycles,
                     colormap=plot_config["spectrogram_cm"],
