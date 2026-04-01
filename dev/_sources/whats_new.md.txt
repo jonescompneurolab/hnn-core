@@ -30,11 +30,15 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### People who contributed to this release:
 
+- [Muhammad Ahmad Amin][]
 - [Tushar Jamdade][]
 - [Karthikeya Kodlai][]
 - [M Yaswanth Reddy][]
 
 ### Changelog
+
+- Improve UX of GUI's "Delete all drives" button and small refactors of GUI codebase. 
+  By [Muhammad Ahmad Amin][] in {gh}`1245`. This was their first PR, thanks Muhammad!
 
 - In the GUI, when simulating multiple trials and plotting the spectrogram, use the
   averaged Time-Frequency-Representation of the dipoles for spectrogram calculation
@@ -1277,3 +1281,4 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Karthikeya Kodlai]: https://github.com/sketch123456
 [Tushar Jamdade]: https://github.com/Tusharjamdade
 [M Yaswanth Reddy]: https://github.com/Yaswanth8390
+[Muhammad Ahmad Amin]: https://github.com/m-ahmad-amin

@@ -1269,11 +1269,11 @@
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Load data&quot;</span><span class="p">,</span>
             <span class="n">button_style</span><span class="o">=</span><span class="s2">&quot;success&quot;</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">run_button</span> <span class="o">=</span> <span class="n">create_expanded_button</span><span class="p">(</span>
-            <span class="s2">&quot;Run Simulation&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;success&quot;</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_button</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Run Simulation&quot;</span><span class="p">,</span>
+            <span class="n">button_style</span><span class="o">=</span><span class="s2">&quot;success&quot;</span><span class="p">,</span>
             <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s2">&quot;run_btn&quot;</span><span class="p">],</span>
-            <span class="n">button_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s2">&quot;theme_color&quot;</span><span class="p">],</span>
+            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;button_color&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s2">&quot;theme_color&quot;</span><span class="p">]},</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save_config_button</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_html_download_button</span><span class="p">(</span>
             <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Save Current Network and Drives&quot;</span><span class="p">,</span>
@@ -1338,18 +1338,18 @@
             <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s2">&quot;btn&quot;</span><span class="p">],</span>
             <span class="n">button_style</span><span class="o">=</span><span class="s2">&quot;success&quot;</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_drive_button</span> <span class="o">=</span> <span class="n">create_expanded_button</span><span class="p">(</span>
-            <span class="s2">&quot;Add drive&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_drive_button</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Add drive&quot;</span><span class="p">,</span>
+            <span class="n">button_style</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span>
             <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s2">&quot;btn&quot;</span><span class="p">],</span>
-            <span class="n">button_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s2">&quot;theme_color&quot;</span><span class="p">],</span>
+            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;button_color&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s2">&quot;theme_color&quot;</span><span class="p">]},</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">delete_drive_button</span> <span class="o">=</span> <span class="n">create_expanded_button</span><span class="p">(</span>
-            <span class="s2">&quot;Delete all drives&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;success&quot;</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete_drive_button</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Delete all drives&quot;</span><span class="p">,</span>
+            <span class="n">button_style</span><span class="o">=</span><span class="s2">&quot;danger&quot;</span><span class="p">,</span>
+            <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;close&quot;</span><span class="p">,</span>
             <span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s2">&quot;btn&quot;</span><span class="p">],</span>
-            <span class="n">button_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">[</span><span class="s2">&quot;theme_color&quot;</span><span class="p">],</span>
-        <span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="s2">&quot;red-button&quot;</span><span class="p">)</span>
 
         <span class="c1"># drive selection dropdown fields</span>
         <span class="c1"># --------------------------------------------------</span>
@@ -2540,18 +2540,6 @@
             <span class="k">pass</span>
 
     <span class="k">return</span> <span class="n">updated</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">create_expanded_button</span><span class="p">(</span>
-    <span class="n">description</span><span class="p">,</span> <span class="n">button_style</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">button_color</span><span class="o">=</span><span class="s2">&quot;#8A2BE2&quot;</span>
-<span class="p">):</span>
-    <span class="k">return</span> <span class="n">Button</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
-        <span class="n">button_style</span><span class="o">=</span><span class="n">button_style</span><span class="p">,</span>
-        <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span>
-        <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;button_color&quot;</span><span class="p">:</span> <span class="n">button_color</span><span class="p">},</span>
-        <span class="n">disabled</span><span class="o">=</span><span class="n">disabled</span><span class="p">,</span>
-    <span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_get_connectivity_widgets</span><span class="p">(</span><span class="n">conn_data</span><span class="p">,</span> <span class="n">global_gain_textfields</span><span class="p">):</span>
