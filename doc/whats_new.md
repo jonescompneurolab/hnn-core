@@ -1272,7 +1272,7 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Carolina Fernandez Pujol]: https://github.com/carolinafernandezp
 [Austin E. Soplata]: https://github.com/asoplata
 [Dikshant Jha]: https://github.com/dikshant182004
-[Dan Toms]: https://github.com/pynmash
+[Dan Toms]: https://github.com/dantoms
 [Shehroz Kashif]: https://github.com/Shehrozkashif
 [Mohamed W. ElSayed]: https://github.com/wagdy88
 [Maira Usman]: https://github.com/Myrausman
