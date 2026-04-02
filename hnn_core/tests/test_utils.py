@@ -7,8 +7,9 @@ def test_hamming_smoothing():
     """Test hamming window convolution smoothing"""
 
     # length of data must be > window size (in samples)
+    # This uses our true default simulation sampling rate of 40 kHz
     with pytest.raises(ValueError):
-        smooth_waveform(np.arange(10), 11, 1000)
+        smooth_waveform(np.arange(10), 11, 40000)
 
     window_len, sfreq = 1, 1
     # data must be 1D

@@ -108,7 +108,7 @@ def smooth_waveform(data, window_len, sfreq):
         The length (in ms) of a `~numpy.hamming` window to convolve the
         data with.
     sfreq : float
-        The data sampling rate.
+        The data sampling rate (in Hz).
 
     Returns
     -------
