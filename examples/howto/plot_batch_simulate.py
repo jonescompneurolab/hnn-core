@@ -114,7 +114,6 @@ def summary_func(results):
 ###############################################################################
 # Run the batch simulation and collect the results.
 
-
 # Initialize the network model and run the batch simulation.
 net = jones_2009_model(mesh_shape=(3, 3))
 batch_simulation = BatchSimulate(net=net,
@@ -129,26 +128,6 @@ def run_loky():
                                             backend='loky')
     print("Simulation results:", simulation_results)
     return simulation_results
-
-###############################################################################
-# Using Dask backend for distributed computing
-# --------------------------------------------
-# Dask can also be used as a backend for distributed computing.
-# For local use, ``LocalCluster`` can be used as shown below.
-# Note that ``threads_per_worker=1`` is required to avoid NEURON conflicts.
-# To run on a remote cluster instead, replace ``LocalCluster`` with a
-# ``Client`` connected to your cluster scheduler address e.g.
-# ``Client('mycluster.university.edu:8786')``.
-def run_dask():
-    from dask.distributed import Client, LocalCluster
-    cluster = LocalCluster(processes=True, n_workers=4, threads_per_worker=1)
-    client = Client(cluster)
-    dask_results = batch_simulation.run(
-        param_grid, n_jobs=n_jobs, combinations=False, backend="dask"
-    )
-    client.close()
-    print("Simulation results:", dask_results)
-    return dask_results
 
 ###############################################################################
 # This plot shows an overlay of all smoothed dipole waveforms from the
@@ -218,15 +197,35 @@ def plot_results(simulation_results):
     plt.xscale('log')
     plt.tight_layout()
     plt.show()
-    
+
+###############################################################################
+# Using Dask backend for distributed computing
+# --------------------------------------------
+# Dask can also be used as a backend for distributed computing.
+# For local use, ``LocalCluster`` can be used as shown below.
+# Note that ``threads_per_worker=1`` is required to avoid NEURON conflicts.
+# To run on a remote cluster instead, replace ``LocalCluster`` with a
+# ``Client`` connected to your cluster scheduler address e.g.
+# ``Client('mycluster.university.edu:8786')``.
+def run_dask():
+    from dask.distributed import Client, LocalCluster
+    cluster = LocalCluster(processes=True, n_workers=4, threads_per_worker=1)
+    client = Client(cluster)
+    dask_results = batch_simulation.run(
+        param_grid, n_jobs=n_jobs, combinations=False, backend="dask"
+    )
+    client.close()
+    print("Simulation results:", dask_results)
+    return dask_results
+
 # Note: on Linux, plotting before running Dask causes tkinter cleanup
 # warnings due to multiprocessing inheriting the GUI state.
 # Simulations are run first, then results are plotted.
-if __name__=='__main__':
-    try:
-        loky_results = run_loky()
-        plot_results(loky_results)
 
+if __name__=='__main__':
+    loky_results = run_loky()
+    plot_results(loky_results)
+    try:
         dask_results = run_dask()
         plot_results(dask_results)
         
