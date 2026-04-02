@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**06:33.546** total execution time for 9 files **from auto_examples/howto**:
+**06:23.062** total execution time for 9 files **from auto_examples/howto**:
 
 .. container::
 
@@ -33,25 +33,25 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_howto_plot_hnn_animation.py` (``plot_hnn_animation.py``)
-     - 01:38.384
+     - 01:32.354
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_plot_connectivity.py` (``plot_connectivity.py``)
-     - 01:29.839
+     - 01:29.126
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_plot_replaying_spike_data_as_input.py` (``plot_replaying_spike_data_as_input.py``)
-     - 01:12.228
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py` (``plot_record_extracellular_potentials.py``)
-     - 00:46.294
+     - 01:09.267
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_plot_simulate_mpi_backend.py` (``plot_simulate_mpi_backend.py``)
-     - 00:40.675
+     - 00:43.291
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_howto_plot_record_extracellular_potentials.py` (``plot_record_extracellular_potentials.py``)
+     - 00:42.816
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_plot_firing_pattern.py` (``plot_firing_pattern.py``)
-     - 00:31.348
+     - 00:31.084
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_plot_batch_simulate.py` (``plot_batch_simulate.py``)
-     - 00:14.778
+     - 00:15.124
      - 0.0
    * - :ref:`sphx_glr_auto_examples_howto_optimize_evoked.py` (``optimize_evoked.py``)
      - 00:00.000
