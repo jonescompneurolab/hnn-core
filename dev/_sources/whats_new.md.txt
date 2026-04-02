@@ -34,8 +34,12 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 - [Tushar Jamdade][]
 - [Karthikeya Kodlai][]
 - [M Yaswanth Reddy][]
+- [Satvik Saluja][]
 
 ### Changelog
+
+- Fix testing of `mesh_shape` to include all available network models,
+  by [Satvik Saluja][] in {gh}`1268`. This was their first PR, thanks Satvik!
 
 - Improve UX of GUI's "Delete all drives" button and small refactors of GUI codebase. 
   By [Muhammad Ahmad Amin][] in {gh}`1245`. This was their first PR, thanks Muhammad!
@@ -1282,3 +1286,4 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [Tushar Jamdade]: https://github.com/Tusharjamdade
 [M Yaswanth Reddy]: https://github.com/Yaswanth8390
 [Muhammad Ahmad Amin]: https://github.com/m-ahmad-amin
+[Satvik Saluja]: https://github.com/SatvikSaluja
