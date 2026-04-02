@@ -30,10 +30,27 @@ merged into `master`! Use `git log` instead and cross-reference instead. -->
 
 ### People who contributed to this release:
 
+- [Muhammad Ahmad Amin][]
 - [Tushar Jamdade][]
 - [Karthikeya Kodlai][]
+- [M Yaswanth Reddy][]
 
 ### Changelog
+
+- Improve UX of GUI's "Delete all drives" button and small refactors of GUI codebase. 
+  By [Muhammad Ahmad Amin][] in {gh}`1245`. This was their first PR, thanks Muhammad!
+
+- In the GUI, when simulating multiple trials and plotting the spectrogram, use the
+  averaged Time-Frequency-Representation of the dipoles for spectrogram calculation
+  instead of only the first dipole,
+  by [M Yaswanth Reddy][] in {gh}`1223`. This was their first PR, thanks Yaswanth!
+
+- In the GUI, add auto-renaming of new simulations. This fixes an annoying issue with
+  the GUI where every time a user wanted to run a new simulation, they had to go back to
+  the Simulation tab and manually change the simulation name. Now, whenever they run a
+  new simulation without changing the name manually, the new simulation will use the old
+  name, but with a reasonable number appended.
+  By [Tushar Jamdade][] in {gh}`1213`.
 
 - Add support for printing a welcome message that asks the user to fill out the HNN
   survey, which is printed to the standard output after (and only after) the first time
@@ -1263,3 +1280,5 @@ v0.4 represents a major milestone in development of `hnn_core` and the HNN ecosy
 [NEURON]: https://nrn.readthedocs.io
 [Karthikeya Kodlai]: https://github.com/sketch123456
 [Tushar Jamdade]: https://github.com/Tusharjamdade
+[M Yaswanth Reddy]: https://github.com/Yaswanth8390
+[Muhammad Ahmad Amin]: https://github.com/m-ahmad-amin
