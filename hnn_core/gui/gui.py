@@ -3155,9 +3155,7 @@ def _create_widgets_for_evoked(
         "seedcore": 14,
     }
     data.update({"n_drive_cells": n_drive_cells, "cell_specific": cell_specific})
-    data = _
-    
-    ed_dict(default_data, data)
+    data = _update_nested_dict(default_data, data)
 
     # Set our layout and styling preferences for the widgets according to which tab
     # we're building for:
