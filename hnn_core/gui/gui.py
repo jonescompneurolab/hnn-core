@@ -570,17 +570,16 @@ class HNNGUI:
                 width="270px",
                 height="auto",
             ),
-            # AES TODO: assign classes later
+            #
             # styles the text boxes within the collapsible widgets that contain the
             # instantiated drives in the Optimization tab
-            #   - child of "parameters-window" > ... > "opt-tab-contents" >
+            #   - child of "parameters-window" > ... > "optimization-tab-contents" >
             #     "widget-output" > ... > "widget-vbox"
             "opt_textbox": Layout(
                 width="250px",
                 height="100%",
             ),
             # styles the dropdown menus within the Optimization tab
-            #   - child of ??? TODO
             "opt_dropdown_style": {"description_width": "120px"},
             #
             # container for the log window
@@ -940,7 +939,7 @@ class HNNGUI:
             disabled=False,
             layout=self.layout["opt_textbox"],
             style=self.layout["opt_dropdown_style"],
-        )
+        ).add_class("opt-objective-function")
         self.widget_opt_solver = Dropdown(
             options=["bayesian", "cobyla"],
             value="bayesian",
@@ -957,7 +956,7 @@ class HNNGUI:
             disabled=False,
             layout=self.layout["opt_textbox"],
             style=self.layout["opt_dropdown_style"],
-        )
+        ).add_class("opt-max-iter")
         self.widget_opt_tstop = BoundedFloatText(
             value=170,
             min=1,
@@ -966,7 +965,7 @@ class HNNGUI:
             disabled=False,
             layout=self.layout["opt_textbox"],
             style=self.layout["opt_dropdown_style"],
-        )
+        ).add_class("opt-tstop")
         self.widget_opt_n_jobs = BoundedIntText(
             value=1,
             min=1,
@@ -975,7 +974,7 @@ class HNNGUI:
             disabled=False,
             layout=self.layout["opt_textbox"],
             style=self.layout["opt_dropdown_style"],
-        )
+        ).add_class("opt-n-jobs")
         self.widget_opt_dt = BoundedFloatText(
             value=0.025,
             description="dt (ms):",
@@ -985,7 +984,7 @@ class HNNGUI:
             disabled=False,
             layout=self.layout["opt_textbox"],
             style=self.layout["opt_dropdown_style"],
-        )
+        ).add_class("opt-dt")
         self.widget_opt_smoothing = BoundedFloatText(
             value=30.0,
             description="Dipole Smoothing:",
@@ -995,7 +994,7 @@ class HNNGUI:
             disabled=False,
             layout=self.layout["opt_textbox"],
             style=self.layout["opt_dropdown_style"],
-        )
+        ).add_class("opt-smoothing")
         self.widget_opt_scaling = FloatText(
             value=3000.0,
             description="Dipole Scaling:",
@@ -1003,7 +1002,7 @@ class HNNGUI:
             disabled=False,
             layout=self.layout["opt_textbox"],
             style=self.layout["opt_dropdown_style"],
-        )
+        ).add_class("opt-scaling")
 
         # optimization buttons
         # --------------------------------------------------
@@ -1015,11 +1014,11 @@ class HNNGUI:
                 height=self.layout["run_btn"].height,
             ),
             style={"button_color": self.layout["theme_color"]},
-        )
+        ).add_class("run-opt-button")
         self.save_opt_history_button = self._init_html_download_button(
             title="Save Optimization History",
             mimetype="text/plain",
-        )
+        ).add_class("save-opt-history-button")
 
         # instantiate empty lists/widgets for storing optimization-related data
         # --------------------------------------------------
@@ -1028,7 +1027,6 @@ class HNNGUI:
         self.opt_target_widgets = {}
         self.opt_drive_accordion = Accordion()
         self.opt_results = list()
-        # end of AES
 
         # ==================================================
         # Visualization tab
@@ -1111,10 +1109,8 @@ class HNNGUI:
         self._connectivity_out = Output().add_class("connectivity-accordion-widgets")
         self._cell_params_out = Output().add_class("cell-parameters-widgets")
         self._global_gain_out = Output().add_class("connectivity-gains-widgets")
-        # AES
-        self._opt_target_out = Output()  # dynamic target params widgets of opt tab
-        self._opt_drives_out = Output()  # drive accordion of optimization tab
-        # end of AES
+        self._opt_target_out = Output().add_class("opt-target-input-widgets")
+        self._opt_drives_out = Output().add_class("opt-drives-accordion-widgets")
 
         self._log_out = Output()
 
@@ -1370,8 +1366,7 @@ class HNNGUI:
                 self.widget_opt_scaling.value,
                 self.opt_target_widgets,
             )
-            # AES "Hack" to re-load our NEW, optimized drive parameters...
-            # ...is it a hack if it works well? ;)
+            # Re-load our NEW, optimized drive parameters after an optimization run:
             if result:
                 output_config, opt_result = result
                 # Rebuild the drives' widgets in the Drives and Optimization tabs from
@@ -1673,26 +1668,18 @@ class HNNGUI:
 
         return drive_tab_contents
 
-    def build_parameters_window(self):
-        """
-        build parameters-window (to occupy AppLayout's left_sidebar)
-        """
-        # initialize the Vbox objects that contain the contents of the primary GUI
-        # tabs: Simulation, Network, External Drives, and Visualization
-        simulation_tab_contents = self.build_sim_tab_contents()
-        network_tab_contents = self.build_network_tab_contents()
-        drive_tab_contents = self.build_drive_tab_contents()
-        visualization_tab_contents = self.viz_manager.build_viz_tab_contents()
+    def build_opt_tab_contents(self):
+        """Build the Optimization tab contents
 
-        # AES
-        # Create optimization tab
-        # -----------------------------------------
-        # The Optimization tab is divided into 4 main sections:
-        # 1. The always-shown top-level optimization parameters
-        # 2. The "target" parameters box (dynamic, depending on your objective function)
-        # 3. The always-shown "Run Optimization" and "Save Optimization History" buttons
-        # 4. The drives accordion (dynamic, depending on existing drives in the Drives tab)
-        opt_box = VBox(
+        The Optimization tab is divided into 4 main sections:
+
+        1. The always-shown top-level optimization parameters
+        2. The "target" parameters box (dynamic, depending on your objective function)
+        3. The always-shown "Run Optimization" and "Save Optimization History" buttons
+        4. The drives accordion (dynamic, depending on existing drives in the Drives
+           tab)
+        """
+        optimization_tab_contents = VBox(
             [
                 # 1. Top-level optimization parameters
                 HBox(
@@ -1728,8 +1715,21 @@ class HNNGUI:
                 # 4. Drives accordion (a dynamic Output widget)
                 self._opt_drives_out,
             ]
-        )
-        # end of AES
+        ).add_class("optimization-tab-contents")
+
+        return optimization_tab_contents
+
+    def build_parameters_window(self):
+        """
+        build parameters-window (to occupy AppLayout's left_sidebar)
+        """
+        # initialize the Vbox objects that contain the contents of the primary GUI
+        # tabs: Simulation, Network, External Drives, and Visualization
+        simulation_tab_contents = self.build_sim_tab_contents()
+        network_tab_contents = self.build_network_tab_contents()
+        drive_tab_contents = self.build_drive_tab_contents()
+        optimization_tab_contents = self.build_opt_tab_contents()
+        visualization_tab_contents = self.viz_manager.build_viz_tab_contents()
 
         # build the param_window_tabs_widget Tab() object, which holds both the
         # tab bar *and* the associated contents for each tab
@@ -1741,7 +1741,7 @@ class HNNGUI:
             simulation_tab_contents,
             network_tab_contents,
             drive_tab_contents,
-            opt_box,  # AES
+            optimization_tab_contents,
             visualization_tab_contents,
         ]
 
