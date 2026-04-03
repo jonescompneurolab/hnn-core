@@ -1183,11 +1183,12 @@ def test_gui_add_tonic_input():
         gui.global_gain_widgets,
     )
 
+    tonic_drive_name = last_drive["name"]
     net = _single_simulation["net"]
-    assert net.external_biases["tonic"] is not None
-    assert net.external_biases["tonic"]["L5_pyramidal"]["t0"] == 0.0
-    assert net.external_biases["tonic"]["L5_pyramidal"]["tstop"] == 15.0
-    assert net.external_biases["tonic"]["L5_pyramidal"]["amplitude"] == 10.0
+    assert net.external_biases[tonic_drive_name] is not None
+    assert net.external_biases[tonic_drive_name]["L5_pyramidal"]["t0"] == 0.0
+    assert net.external_biases[tonic_drive_name]["L5_pyramidal"]["tstop"] == 15.0
+    assert net.external_biases[tonic_drive_name]["L5_pyramidal"]["amplitude"] == 10.0
 
 
 def test_gui_cell_params_widgets(setup_gui):
@@ -1760,6 +1761,7 @@ def test_gui_run_optimization(backend_selection, opt_solver):
         - All of the above works after a second optimization run, including in the case
           that the objective function is different between runs
     """
+    # Not using setup_gui because we want to test the true default network
     gui = HNNGUI()
     _ = gui.compose()
 
@@ -1767,7 +1769,7 @@ def test_gui_run_optimization(backend_selection, opt_solver):
     # AES: For some reason, using the common faster dt of 0.5 fails
     # due to errors related to "usable mindelay is 0", similar to
     # https://github.com/jonescompneurolab/hnn-core/issues/960 .
-    gui.widget_tstop.value = 70
+    gui.widget_tstop.value = 30
     gui.widget_dt.value = 0.025
     gui.widget_backend_selection.value = backend_selection
 
@@ -1894,5 +1896,61 @@ def test_gui_run_optimization(backend_selection, opt_solver):
     assert isinstance(dpls, list)
     assert len(dpls) > 0
     assert all([isinstance(dpl, Dipole) for dpl in dpls])
+
+    plt.close("all")
+
+
+def test_gui_optimization_no_constraints(setup_gui):
+    """Test that optimization fails gracefully when no constraints are selected."""
+    gui = setup_gui
+
+    # Using this objective function because we don't have to load target data and run it
+    # without any additional config
+    gui.widget_opt_obj_fun.value = "maximize_psd"
+
+    # Ensure no constraints are selected (this is the default)
+    for drive_widget in gui.opt_drive_widgets:
+        # Check all checkbox-type widgets
+        for key, val in drive_widget.items():
+            if key.endswith("_opt_checkbox"):
+                assert val.value is False
+
+    # Run optimization - should fail with error message
+    gui.run_opt_button.click()
+
+    # Check that optimization was marked as failed, and the appropriate error message
+    # was logged
+    assert gui._simulation_status_bar.value == gui._simulation_status_contents["failed"]
+    assert any(
+        "You have not selected any parameters to constrain" in entry["text"]
+        for entry in gui._log_out.outputs
+    )
+
+    # Verify that no optimized simulation was created
+    assert "default_optimized" not in gui.simulation_data
+
+    plt.close("all")
+
+
+def test_gui_optimization_no_target_data(setup_gui):
+    """Test that optimization fails when no target data is selected."""
+    gui = setup_gui
+
+    # Select a constraint but don't upload target data
+    gui.opt_drive_widgets[0]["mu_opt_checkbox"].value = True
+
+    # Try to run optimization without target data
+    gui.run_opt_button.click()
+
+    # Check that optimization was marked as failed, and the appropriate error message
+    # was logged
+    assert gui._simulation_status_bar.value == gui._simulation_status_contents["failed"]
+    assert any(
+        "You have not selected a dataset to use as the target" in entry["text"]
+        for entry in gui._log_out.outputs
+    )
+
+    # Verify that no optimized simulation was created
+    assert "default_optimized" not in gui.simulation_data
 
     plt.close("all")
