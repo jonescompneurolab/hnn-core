@@ -168,6 +168,7 @@ class BatchSimulate(object):
         self.postproc = postproc
         self.clear_cache = clear_cache
         self.summary_func = summary_func
+        self._verbose = True
 
     def run(
         self,
@@ -176,7 +177,7 @@ class BatchSimulate(object):
         combinations=True,
         n_jobs=1,
         backend="loky",
-        verbose=50,
+        verbose=True,
     ):
         """Run batch simulations.
 
@@ -197,8 +198,8 @@ class BatchSimulate(object):
             `multiprocessing`, or `dask`. WARNING: currently only `loky` is
             completely operationable; all other backends are in
             development. Default is `loky`.
-        verbose : int, optional
-            The verbosity level for parallel execution. Default is 50.
+        verbose : bool
+            If True, print build steps and simulation progress to console. Default: True.
 
         Returns
         -------
@@ -217,7 +218,8 @@ class BatchSimulate(object):
         _check_option(
             "backend", backend, ["loky", "threading", "multiprocessing", "dask"]
         )
-        _validate_type(verbose, types="int", item_name="verbose")
+        _validate_type(verbose, types=(bool,), item_name="verbose")
+        self._verbose = verbose
 
         param_combinations = self._generate_param_combinations(param_grid, combinations)
         total_sims = len(param_combinations)
@@ -232,7 +234,6 @@ class BatchSimulate(object):
                 param_combinations[start_idx:end_idx],
                 n_jobs=n_jobs,
                 backend=backend,
-                verbose=verbose,
             )
 
             if self.save_outputs:
@@ -261,7 +262,6 @@ class BatchSimulate(object):
         param_combinations,
         n_jobs=1,
         backend="loky",
-        verbose=50,
     ):
         """Simulate a batch of parameter sets in parallel.
 
@@ -276,8 +276,6 @@ class BatchSimulate(object):
             `multiprocessing`, or `dask`. WARNING: currently only `loky` is
             completely operationable; all other backends are in
             development. Default is `loky`.
-        verbose : int, optional
-            The verbosity level for parallel execution. Default is 50.
 
         Returns
         -------
@@ -297,10 +295,9 @@ class BatchSimulate(object):
         _check_option(
             "backend", backend, ["loky", "threading", "multiprocessing", "dask"]
         )
-        _validate_type(verbose, types="int", item_name="verbose")
 
         with parallel_config(backend=backend):
-            res = Parallel(n_jobs=n_jobs, verbose=verbose)(
+            res = Parallel(n_jobs=n_jobs)(
                 delayed(self._run_single_sim)(params) for params in param_combinations
             )
         return res
@@ -337,6 +334,7 @@ class BatchSimulate(object):
                 record_vsec=self.record_vsec,
                 record_isec=self.record_isec,
                 postproc=self.postproc,
+                verbose=self._verbose,
             )
             results["dpl"] = dpl
 
