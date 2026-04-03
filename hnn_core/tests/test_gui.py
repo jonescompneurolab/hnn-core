@@ -1607,14 +1607,18 @@ def test_diff_gui_vs_api_networks_simulations():
 @requires_mpi4py
 @requires_psutil
 @pytest.mark.uses_mpi
-def test_gui_run_optimization():
+@pytest.mark.parametrize("backend_selection", ["MPI", "Joblib"])
+def test_gui_run_optimization(backend_selection):
     """TODO"""
     gui = HNNGUI()
     _ = gui.compose()
 
+    # TODO: test setup_gui as well
+    # TODO: test joblib
+
     gui.widget_tstop.value = 170
     gui.widget_dt.value = 0.025
-    gui.widget_backend_selection.value = "MPI"
+    gui.widget_backend_selection.value = backend_selection
 
     gui.widget_ntrials.value = 2
     gui.widget_opt_max_iter.value = 3
