@@ -1754,6 +1754,9 @@ def test_gui_run_optimization(backend_selection, opt_solver):
         - Enabled constraint checkboxes remain enabled across runs
         - The final resulting simulation after the optimization run is added to the main
           list of simulations, has a new appropriate name, and has existent Dipole data
+        - Selected constraint values after a run are within the initial provided
+          constraint bounds (this not a very good test of this because we are using very
+          few optimization iterations, but whatevs)
         - All of the above works after a second optimization run, including in the case
           that the objective function is different between runs
     """
@@ -1808,6 +1811,12 @@ def test_gui_run_optimization(backend_selection, opt_solver):
     # Give it a non-zero value so it actually affects the simulation
     gui.opt_drive_widgets[9]["amplitude"]["L2_pyramidal"].value = 0.2
 
+    # Record the initial values of these parameters
+    initial_mu = gui.opt_drive_widgets[0]["mu"].value
+    initial_rate_const = gui.opt_drive_widgets[4]["rate_constant"]["L5_pyramidal"].value
+    initial_burst_rate = gui.opt_drive_widgets[8]["burst_rate"].value
+    initial_amplitude = gui.opt_drive_widgets[9]["amplitude"]["L2_pyramidal"].value
+
     # Perform the first run of optimization
     gui.run_opt_button.click()
 
@@ -1816,6 +1825,27 @@ def test_gui_run_optimization(backend_selection, opt_solver):
 
     # Check that our target data and constraint checkboxes have not been reset
     assert gui.opt_target_widgets["rmse_target_data"].value == file_path.stem
+
+    # Check that optimized values are within their original constraint proportions
+    # [initial * opt_min%, initial * opt_max%]. Initial values come from
+    # jones_2009_model (evdist1 mu), gui.py defaults (Poisson rate_constant, Rhythmic
+    # burst_rate), and the explicit assignment above (tonic amplitude).
+    constrained_vars = [
+        (gui.opt_drive_widgets[0], "mu", initial_mu),
+        (
+            gui.opt_drive_widgets[4]["rate_constant"],
+            "L5_pyramidal",
+            initial_rate_const,
+        ),
+        (gui.opt_drive_widgets[8], "burst_rate", initial_burst_rate),
+        (gui.opt_drive_widgets[9]["amplitude"], "L2_pyramidal", initial_amplitude),
+    ]
+    for drive, var, initial in constrained_vars:
+        assert (
+            drive[f"{var}_opt_min"].value / 100 * initial
+            <= drive[var].value
+            <= drive[f"{var}_opt_max"].value / 100 * initial
+        )
 
     assert gui.opt_drive_widgets[0]["mu_opt_checkbox"].value
     assert gui.opt_drive_widgets[4]["rate_constant"]["L5_pyramidal_opt_checkbox"].value
