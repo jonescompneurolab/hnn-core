@@ -570,12 +570,18 @@ class HNNGUI:
                 width="270px",
                 height="auto",
             ),
-            # AES
-            # optimization related
+            # AES TODO: assign classes later
+            # styles the text boxes within the collapsible widgets that contain the
+            # instantiated drives in the Optimization tab
+            #   - child of "parameters-window" > ... > "opt-tab-contents" >
+            #     "widget-output" > ... > "widget-vbox"
             "opt_textbox": Layout(
                 width="250px",
+                height="100%",
             ),
-            # end of AES
+            # styles the dropdown menus within the Optimization tab
+            #   - child of ??? TODO
+            "opt_dropdown_style": {"description_width": "120px"},
             #
             # container for the log window
             #   - child of "parameters-window"
@@ -812,100 +818,6 @@ class HNNGUI:
             button_style="success",
         )
 
-        # AES
-        self.save_opt_history_button = self._init_html_download_button(
-            title="Save Optimization History",
-            mimetype="text/plain",
-        )
-
-        # Optimizer widgets
-        # Just use same styling as top-level drive widgets (not accordion)
-        opt_dropdown_style = {"description_width": "120px"}
-
-        self.widget_opt_obj_fun = Dropdown(
-            options=["dipole_rmse", "maximize_psd"],
-            value="dipole_rmse",
-            description="Objective Function:",
-            disabled=False,
-            layout=self.layout["opt_textbox"],
-            style=opt_dropdown_style,
-        )
-        self.widget_opt_solver = Dropdown(
-            options=["bayesian", "cobyla"],
-            value="bayesian",
-            description="Solver:",
-            disabled=False,
-            layout=self.layout["opt_textbox"],
-            style=opt_dropdown_style,
-        )
-        self.widget_opt_max_iter = BoundedIntText(
-            value=5,
-            min=1,
-            max=10000,
-            description="Max Iterations:",
-            disabled=False,
-            layout=self.layout["opt_textbox"],
-            style=opt_dropdown_style,
-        )
-        self.widget_opt_tstop = BoundedFloatText(
-            value=170,
-            min=1,
-            max=1000.0,
-            description="tstop (ms):",
-            disabled=False,
-            layout=self.layout["opt_textbox"],
-            style=opt_dropdown_style,
-        )
-        self.widget_opt_n_jobs = BoundedIntText(
-            value=1,
-            min=1,
-            max=self.n_cores,
-            description="Cores:",
-            disabled=False,
-            layout=self.layout["opt_textbox"],
-            style=opt_dropdown_style,
-        )
-        self.widget_opt_dt = BoundedFloatText(
-            value=0.025,
-            description="dt (ms):",
-            min=0,
-            max=10,
-            step=0.01,
-            disabled=False,
-            layout=self.layout["opt_textbox"],
-            style=opt_dropdown_style,
-        )
-        self.widget_opt_smoothing = BoundedFloatText(
-            value=30.0,
-            description="Dipole Smoothing:",
-            min=0.0,
-            max=100.0,
-            step=1.0,
-            disabled=False,
-            layout=self.layout["opt_textbox"],
-            style=opt_dropdown_style,
-        )
-        self.widget_opt_scaling = FloatText(
-            value=3000.0,
-            description="Dipole Scaling:",
-            step=100.0,
-            disabled=False,
-            layout=self.layout["opt_textbox"],
-            style=opt_dropdown_style,
-        )
-
-        # AES button width
-        self.run_opt_button = Button(
-            description="Run Optimization",
-            button_style="success",
-            layout=Layout(
-                width="74%",
-                height=self.layout["run_btn"].height,
-            ),
-            style={"button_color": self.layout["theme_color"]},
-        )
-
-        # end of AES
         self.run_button = Button(
             description="Run Simulation",
             button_style="success",
@@ -1013,13 +925,110 @@ class HNNGUI:
         self.drive_boxes = list()
         self.drive_accordion = Accordion()
 
-        # AES
-        # Add optimization section
+        # ==================================================
+        # Optimization tab
+        # ==================================================
+
+        # primary ("fixed") optimization tab buttons
+        # --------------------------------------------------
+        # Note: most of these will be hard-linked with their Simulation tab counterparts
+        # later in `HNNGUI._link_callbacks`.
+        self.widget_opt_obj_fun = Dropdown(
+            options=["dipole_rmse", "maximize_psd"],
+            value="dipole_rmse",
+            description="Objective Function:",
+            disabled=False,
+            layout=self.layout["opt_textbox"],
+            style=self.layout["opt_dropdown_style"],
+        )
+        self.widget_opt_solver = Dropdown(
+            options=["bayesian", "cobyla"],
+            value="bayesian",
+            description="Solver:",
+            disabled=False,
+            layout=self.layout["opt_textbox"],
+            style=self.layout["opt_dropdown_style"],
+        )
+        self.widget_opt_max_iter = BoundedIntText(
+            value=5,
+            min=1,
+            max=10000,
+            description="Max Iterations:",
+            disabled=False,
+            layout=self.layout["opt_textbox"],
+            style=self.layout["opt_dropdown_style"],
+        )
+        self.widget_opt_tstop = BoundedFloatText(
+            value=170,
+            min=1,
+            max=1000.0,
+            description="tstop (ms):",
+            disabled=False,
+            layout=self.layout["opt_textbox"],
+            style=self.layout["opt_dropdown_style"],
+        )
+        self.widget_opt_n_jobs = BoundedIntText(
+            value=1,
+            min=1,
+            max=self.n_cores,
+            description="Cores:",
+            disabled=False,
+            layout=self.layout["opt_textbox"],
+            style=self.layout["opt_dropdown_style"],
+        )
+        self.widget_opt_dt = BoundedFloatText(
+            value=0.025,
+            description="dt (ms):",
+            min=0,
+            max=10,
+            step=0.01,
+            disabled=False,
+            layout=self.layout["opt_textbox"],
+            style=self.layout["opt_dropdown_style"],
+        )
+        self.widget_opt_smoothing = BoundedFloatText(
+            value=30.0,
+            description="Dipole Smoothing:",
+            min=0.0,
+            max=100.0,
+            step=1.0,
+            disabled=False,
+            layout=self.layout["opt_textbox"],
+            style=self.layout["opt_dropdown_style"],
+        )
+        self.widget_opt_scaling = FloatText(
+            value=3000.0,
+            description="Dipole Scaling:",
+            step=100.0,
+            disabled=False,
+            layout=self.layout["opt_textbox"],
+            style=self.layout["opt_dropdown_style"],
+        )
+
+        # optimization buttons
+        # --------------------------------------------------
+        self.run_opt_button = Button(
+            description="Run Optimization",
+            button_style="success",
+            layout=Layout(
+                width="74%",
+                height=self.layout["run_btn"].height,
+            ),
+            style={"button_color": self.layout["theme_color"]},
+        )
+        self.save_opt_history_button = self._init_html_download_button(
+            title="Save Optimization History",
+            mimetype="text/plain",
+        )
+
+        # instantiate empty lists/widgets for storing optimization-related data
+        # --------------------------------------------------
         self.opt_drive_widgets = list()
         self.opt_drive_boxes = list()
         self.opt_target_widgets = {}
         self.opt_drive_accordion = Accordion()
         self.opt_results = list()
+        # end of AES
 
         # ==================================================
         # Visualization tab
@@ -5608,7 +5617,7 @@ def run_opt_button_clicked(
                 # simulation result, or (more likely) forgot to load their experimental
                 # target data first.
                 #
-                # ATTN: How we want to handle this, and what we want to communicate,
+                # TODO: How we want to handle this, and what we want to communicate,
                 # needs some discussion and thinking.
                 logger.error(
                     textwrap.dedent("""
@@ -5822,7 +5831,7 @@ def run_opt_button_clicked(
             # Check if optimization showed ANY difference in the objective function. If
             # it did not, then we made no progress.
             #
-            # ATTN: If we want to include something like the following in our automated
+            # TODO: If we want to include something like the following in our automated
             # testing, then we need to be sure (or at least very confident) that the
             # same inputs will produce the same outputs (i.e. that our optimization is
             # deterministic). Is it?
@@ -5876,7 +5885,7 @@ def run_opt_button_clicked(
             "plot",
         )
 
-        # ATTN: Maybe force a file-save of the final network params automatically at the
+        # TODO: Maybe force a file-save of the final network params automatically at the
         # end? Since the `HNNGUI.save_config_button` is just a huge HTML element itself,
         # I can't get it to artificially ".click()" to actually initiate a download. Is
         # there even a way to do this?
