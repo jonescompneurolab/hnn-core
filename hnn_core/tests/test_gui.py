@@ -1744,8 +1744,8 @@ def test_gui_run_optimization(backend_selection, opt_solver):
         - all current drive and bias types included
         - all solvers
         - all backends
-        - both the `dipole_rmse` (default) and `maximize_psd` objective functions,
-          including with real target data for `dipole_rmse`
+        - the `dipole_rmse` (default), `dipole_corr`, and `maximize_psd` objective
+          functions, including with real target data for `dipole_*` functions
         - n_trials > 1
         - max optimization iterations > 1
         - max "safe" cores (i.e. the max allowed in the GUI)
@@ -1793,11 +1793,11 @@ def test_gui_run_optimization(backend_selection, opt_solver):
         urlretrieve(data_url, file_path)
     gui._simulate_upload_data(file_path)
 
-    # Our first optimization run will use the default objective function of RMSE and the
-    # default Bayesian solver:
+    # Our first optimization run will use the  objective function of `dipole_corr`
     # ----------------------------------------------------------------------------------
+    gui.widget_opt_obj_fun.value = "dipole_corr"
     # Set our target data
-    gui.opt_target_widgets["rmse_target_data"].value = file_path.stem
+    gui.opt_target_widgets["target_dipole_data"].value = file_path.stem
 
     # Enable at least one constraint from each type of drive and bias to ensure they are
     # all included in the optimization
@@ -1826,7 +1826,7 @@ def test_gui_run_optimization(backend_selection, opt_solver):
     time.sleep(2)
 
     # Check that our target data and constraint checkboxes have not been reset
-    assert gui.opt_target_widgets["rmse_target_data"].value == file_path.stem
+    assert gui.opt_target_widgets["target_dipole_data"].value == file_path.stem
 
     # Check that optimized values are within their original constraint proportions
     # [initial * opt_min%, initial * opt_max%]. Initial values come from
@@ -1864,7 +1864,35 @@ def test_gui_run_optimization(backend_selection, opt_solver):
     assert all([isinstance(dpl, Dipole) for dpl in dpls])
 
     # Now, let's prepare to run a second run of optimization, but with a different
-    # objective function and different algorithm:
+    # objective function:
+    # ----------------------------------------------------------------------------------
+    gui.widget_opt_obj_fun.value = "dipole_rmse"
+
+    # Perform the first run of optimization
+    gui.run_opt_button.click()
+
+    # Give the GUI time to regenerate
+    time.sleep(2)
+
+    # Check that our target data and constraint checkboxes have not been reset
+    assert gui.opt_drive_widgets[0]["mu_opt_checkbox"].value
+    assert gui.opt_drive_widgets[4]["rate_constant"]["L5_pyramidal_opt_checkbox"].value
+    assert gui.opt_drive_widgets[8]["burst_rate_opt_checkbox"].value
+    assert gui.opt_drive_widgets[9]["amplitude"]["L2_pyramidal_opt_checkbox"].value
+
+    # Perform some basic checks, like that the optimized sim name has changed, there is
+    # existent Dipole data, etc. This also tests the auto-rename of multiple consecutive
+    # optimization runs.
+    new_sim_name_2 = gui.widget_simulation_name.value + "_optimized" + "_1"
+    assert new_sim_name_2 == "default_optimized_1"
+    dpls = gui.simulation_data[new_sim_name_2]["dpls"]
+    assert isinstance(gui.simulation_data[new_sim_name_2]["net"], Network)
+    assert isinstance(dpls, list)
+    assert len(dpls) > 0
+    assert all([isinstance(dpl, Dipole) for dpl in dpls])
+
+    # Now, let's prepare to run a third run of optimization, but with a different
+    # objective function:
     # ----------------------------------------------------------------------------------
     gui.widget_opt_obj_fun.value = "maximize_psd"
 
@@ -1889,10 +1917,10 @@ def test_gui_run_optimization(backend_selection, opt_solver):
     # Perform some basic checks, like that the optimized sim name has changed, there is
     # existent Dipole data, etc. This also tests the auto-rename of multiple consecutive
     # optimization runs.
-    new_sim_name_2 = gui.widget_simulation_name.value + "_optimized" + "_1"
-    assert new_sim_name_2 == "default_optimized_1"
-    dpls = gui.simulation_data[new_sim_name_2]["dpls"]
-    assert isinstance(gui.simulation_data[new_sim_name_2]["net"], Network)
+    new_sim_name_3 = gui.widget_simulation_name.value + "_optimized" + "_2"
+    assert new_sim_name_3 == "default_optimized_2"
+    dpls = gui.simulation_data[new_sim_name_3]["dpls"]
+    assert isinstance(gui.simulation_data[new_sim_name_3]["net"], Network)
     assert isinstance(dpls, list)
     assert len(dpls) > 0
     assert all([isinstance(dpl, Dipole) for dpl in dpls])

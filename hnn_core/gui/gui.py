@@ -933,7 +933,7 @@ class HNNGUI:
         # Note: most of these will be hard-linked with their Simulation tab counterparts
         # later in `HNNGUI._link_callbacks`.
         self.widget_opt_obj_fun = Dropdown(
-            options=["dipole_rmse", "maximize_psd"],
+            options=["dipole_corr", "dipole_rmse", "maximize_psd"],
             value="dipole_rmse",
             description="Objective Function:",
             disabled=False,
@@ -2233,10 +2233,10 @@ class HNNGUI:
     def _update_opt_target_hbox(self, opt_obj_fun):
         self._opt_target_out.clear_output()
 
-        if opt_obj_fun == "dipole_rmse":
+        if opt_obj_fun in ("dipole_corr", "dipole_rmse"):
             displayed_target_widgets = HBox(
                 [
-                    self.opt_target_widgets["rmse_target_data"],
+                    self.opt_target_widgets["target_dipole_data"],
                     self.opt_target_widgets["n_trials"],
                 ]
             )
@@ -2281,20 +2281,20 @@ class HNNGUI:
                 if hasattr(widget, "value"):
                     prior_target_state[key] = widget.value
 
-        # The obj_fun="dipole_rmse" case is very simple
+        # The obj_fun="dipole_corr" and "dipole_rmse" cases are very simple
         # ------------------------------------------------------------------------------
-        self.opt_target_widgets["rmse_target_data"] = Dropdown(
+        self.opt_target_widgets["target_dipole_data"] = Dropdown(
             options=self.data["simulation_data"].keys(),
-            value=prior_target_state.get("rmse_target_data", None),
+            value=prior_target_state.get("target_dipole_data", None),
             description="Target Data:",
             disabled=False,
             layout=Layout(width="500px"),
             style={"description_width": "80px"},
         )
-        # Set `_external_data_widget` to `opt_target_widgets["rmse_target_data"]` when simulation
+        # Set `_external_data_widget` to `opt_target_widgets["target_dipole_data"]` when simulation
         # data changes
         self.viz_manager._external_data_widget = self.opt_target_widgets[
-            "rmse_target_data"
+            "target_dipole_data"
         ]
 
         self.opt_target_widgets["n_trials"] = IntText(
@@ -5547,7 +5547,8 @@ def run_opt_button_clicked(
 
     1. Some setup based on the existing simulation data and names.
     2. Perform some input validation based on the type of optimization selected
-        (i.e. checks for valid data if the objective function is `dipole_rmse`).
+        (i.e. checks for valid data if the objective function is `dipole_corr` or
+        `dipole_rmse`).
     3. Instantiate the Network object, but NOT including any drives. This creates the
         Network object at `simulation_data[_sim_name]["net"]` specifically.
     4. Dynamically build the `constraints` dict and the function (`set_params_func`)
@@ -5562,9 +5563,9 @@ def run_opt_button_clicked(
         applying "target" widgets options.
     9. Afterwards, create a new `simulation_data` name (depending on existing names) and
         re-execute the final version of optimized Network. (We have to do this since the
-        Optimizer object does not (I think?) give us the final simulation output
-        data). The optimized simulation data gets saved to `<current GUI Simulation Name
-        widget value>_optimized` or something similar.
+        Optimizer object does not (I think?) give us the final simulation output data).
+        The optimized simulation data gets saved to `<current GUI Simulation Name widget
+        value>_optimized` or something similar.
     10. Save the re-executed final optimized Network and simulation data into
         `simulation_data`, so that it can be used and explored in the GUI.
     11. Plot the resulting optimized dipole.
@@ -5594,8 +5595,8 @@ def run_opt_button_clicked(
 
         # RMSE Target data extraction (and related input validation)
         # ------------------------------------------------------------------------------
-        if opt_obj_fun == "dipole_rmse":
-            opt_rmse_target_data_name = opt_target_widgets["rmse_target_data"].value
+        if opt_obj_fun in ("dipole_corr", "dipole_rmse"):
+            opt_rmse_target_data_name = opt_target_widgets["target_dipole_data"].value
             if not opt_rmse_target_data_name:
                 # In this case, they probably have not run any simulations or loaded any
                 # data.
@@ -5721,13 +5722,17 @@ def run_opt_button_clicked(
             psd_relative_bandpower = None
 
             try:
-                if opt_obj_fun == "dipole_rmse":
-                    optim.fit(
+                if opt_obj_fun in ("dipole_corr", "dipole_rmse"):
+                    # AES: Not including the kwarg for "verbose" since the GUI log is
+                    # already pretty "busy"
+                    obj_fun_kwargs = dict(
+                        dt=dt.value,
                         target=target_dipole,
                         n_trials=opt_target_widgets["n_trials"].value,
                         smooth_window_len=opt_smoothing,
                         scale_factor=opt_scaling,
                     )
+                    optim.fit(**obj_fun_kwargs)
                 elif opt_obj_fun == "maximize_psd":
                     if opt_target_widgets["psd_target_band2_checkbox"].value:
                         f_bands = [
@@ -5759,12 +5764,15 @@ def run_opt_button_clicked(
                     psd_f_bands = f_bands
                     psd_relative_bandpower = relative_bandpower
 
-                    optim.fit(
+                    # Note: `maximize_psd` does not currently support multiple trials.
+                    obj_fun_kwargs = dict(
+                        dt=dt.value,
                         f_bands=f_bands,
                         relative_bandpower=relative_bandpower,
                         smooth_window_len=opt_smoothing,
                         scale_factor=opt_scaling,
                     )
+                    optim.fit(**obj_fun_kwargs)
 
             except Exception as e:
                 logger.error(
@@ -5878,8 +5886,8 @@ def run_opt_button_clicked(
             new_name,
             "current dipole",
             {
-                "data_to_compare": opt_target_widgets["rmse_target_data"].value
-                if opt_obj_fun == "dipole_rmse"
+                "data_to_compare": opt_target_widgets["target_dipole_data"].value
+                if opt_obj_fun in ("dipole_corr", "dipole_rmse")
                 else None
             },
             "plot",
@@ -5902,9 +5910,11 @@ def run_opt_button_clicked(
             "max_iter": opt_max_iter,
         }
 
-        # Add target dataset name if using dipole_rmse
-        if opt_obj_fun == "dipole_rmse":
-            opt_result["target_data"] = opt_target_widgets["rmse_target_data"].value
+        # Add target dataset name if using dipole_corr or dipole_rmse
+        if opt_obj_fun in ("dipole_corr", "dipole_rmse"):
+            opt_result["target_dipole_data"] = opt_target_widgets[
+                "target_dipole_data"
+            ].value
             opt_result["n_trials"] = opt_target_widgets["n_trials"].value
         # Add frequency band parameters if using maximize_psd
         elif opt_obj_fun == "maximize_psd":
