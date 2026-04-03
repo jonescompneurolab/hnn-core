@@ -1729,7 +1729,6 @@ def test_gui_run_optimization(backend_selection):
     _ = gui.compose()
 
     # TODO: test setup_gui as well
-    # TODO: test joblib
 
     gui.widget_tstop.value = 170
     gui.widget_dt.value = 0.025
@@ -1738,6 +1737,12 @@ def test_gui_run_optimization(backend_selection):
     gui.widget_ntrials.value = 2
     gui.widget_opt_max_iter.value = 3
     gui.widget_n_jobs.value = 3
+
+    for val_drive_type in ("Poisson", "Evoked", "Rhythmic", "Tonic"):
+        for val_location in ("Distal", "Proximal"):
+            gui.widget_drive_type_selection.value = val_drive_type
+            gui.widget_location_selection.value = val_location
+            gui.add_drive_button.click()
 
     # file2_path = Path(hnn_core_root.parents[0], "default_all.json")
     # gui._simulate_upload_drives(file2_path)
@@ -1758,11 +1763,16 @@ def test_gui_run_optimization(backend_selection):
     # gui.widget_opt_obj_fun.value = "maximize_psd"
 
     # Enable some values that we want to constrain for the optimization
+    # This checks an Evoked drive
     gui.opt_drive_widgets[0]["mu_opt_checkbox"].value = True
-    # gui.opt_drive_widgets[0]["weights_ampa"]["L2_pyramidal_opt_checkbox"].value = True
-    # gui.opt_drive_widgets[-1]["amplitude"]["L2_pyramidal_opt_checkbox"].value = True
-    # gui.opt_drive_widgets[0]["weights_ampa"]["L2_pyramidal_opt_checkbox"].value = True
-    # gui.opt_drive_widgets[3]["tstop_opt_checkbox"].value = True
+    # This checks a Poisson drive
+    gui.opt_drive_widgets[4]["rate_constant"]["L5_pyramidal_opt_checkbox"].value = True
+    # This checks a Rhythmic drive
+    gui.opt_drive_widgets[8]["burst_rate_opt_checkbox"].value = True
+    # This checks a Tonic bias
+    gui.opt_drive_widgets[9]["amplitude"]["L2_pyramidal_opt_checkbox"].value = True
+    # Give it a non-zero value so it actually affects the simulation
+    gui.opt_drive_widgets[9]["amplitude"]["L2_pyramidal"].value = 0.2
 
     gui.run_opt_button.click()
 
