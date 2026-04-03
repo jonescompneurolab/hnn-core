@@ -7,6 +7,7 @@ import pytest
 
 from hnn_core import jones_2009_model, simulate_dipole
 from hnn_core.optimization import Optimizer
+import numpy as np
 
 
 @pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
@@ -207,7 +208,7 @@ def test_rhythmic(solver):
     assert len(obj) <= max_iter, "Number of rmse values should be the same as max_iter"
 
 
-@pytest.mark.parametrize("solver", ["bayesian", "cobyla"])
+@pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
 def test_initial_params(solver):
     """Test optimization routines with user-defined initial parameters."""
 
@@ -295,7 +296,7 @@ def test_initial_params(solver):
     optim.fit(target=dpl_orig, n_trials=3)
 
 
-@pytest.mark.parametrize("solver", ["bayesian", "cobyla"])
+@pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
 @pytest.mark.parametrize(
     "initial_params, error_type",
     [
@@ -355,23 +356,58 @@ def test_initial_params_validation(solver, initial_params, error_type):
         )
 
 
-def cma_warning():
-    tstop = 10.0
+def test_cma_validation():
     net = jones_2009_model(mesh_shape=(3, 3))
-    constraints = dict()
-    initial_params = {"mu": 5, "sigma": 5}
+    tstop = 10.0
+    constraints = {"mu": (1, 10), "sigma": (1, 10)}
+    solver = "cma"
+    obj_fun = "dipole_rmse"
+    max_iter = 2
 
-    def set_params():
+    dpl_target = simulate_dipole(net, tstop=tstop)[0]
+
+    def set_params(a, b):
         pass
 
-    with pytest.warns(UserWarning, "The cma solver"):
-        Optimizer(
-            net,
-            tstop=tstop,
-            constraints=constraints,
-            set_params=set_params,
-            solver="cma",
-            obj_fun="dipole_rmse",
-            max_iter=2,
-            initial_params=initial_params,
-        )
+    optim = Optimizer(
+        net,
+        tstop=tstop,
+        constraints=constraints,
+        set_params=set_params,
+        solver=solver,
+        obj_fun=obj_fun,
+        max_iter=max_iter,
+    )
+
+    with pytest.raises(ValueError, match="sigma0 must be greater than"):
+        optim.fit(target=dpl_target, sigma0=-1)
+
+    with pytest.raises(ValueError, match="it must be shape"):
+        optim.fit(target=dpl_target, sigma0=np.array([[0, 1], [2, 3]]))
+
+    with pytest.raises(ValueError, match="length must be the same as the constraints"):
+        optim.fit(target=dpl_target, sigma0=[1, 2, 3])
+
+    optim.fit(target=dpl_target, sigma0=[1, 2])
+
+
+# def cma_warning():
+#     tstop = 10.0
+#     net = jones_2009_model(mesh_shape=(3, 3))
+#     constraints = dict()
+#     initial_params = {"mu": 5, "sigma": 5}
+
+#     def set_params():
+#         pass
+
+#     with pytest.warns(UserWarning, "The cma solver"):
+#         Optimizer(
+#             net,
+#             tstop=tstop,
+#             constraints=constraints,
+#             set_params=set_params,
+#             solver="cma",
+#             obj_fun="dipole_rmse",
+#             max_iter=2,
+#             initial_params=initial_params,
+#         )
