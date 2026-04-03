@@ -898,7 +898,10 @@ class HNNGUI:
         self.run_opt_button = Button(
             description="Run Optimization",
             button_style="success",
-            layout=self.layout["run_btn"],
+            layout=Layout(
+                width="74%",
+                height=self.layout["run_btn"].height,
+            ),
             style={"button_color": self.layout["theme_color"]},
         )
 
