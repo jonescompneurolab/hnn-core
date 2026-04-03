@@ -96,13 +96,6 @@ class Optimizer:
             self.solver = "cma"
             self._assemble_constraints = _assemble_constraints_cma
             self._run_opt = _run_opt_cma
-
-            if initial_params is not None:
-                warn(
-                    "The cma solver does not use initial_params."
-                    "Values passed will not be used",
-                    UserWarning,
-                )
         else:
             raise ValueError("solver must be 'bayesian' or 'cobyla'")
         # Response to be optimized
