@@ -2473,6 +2473,7 @@ class HNNGUI:
             filename=filename,
             is_disabled="",
             btn_height=self.layout["run_btn"].height,
+            btn_width=self.layout["save_btn"].width,
             color_theme=self.layout["theme_color"],
             title="Save Optimization History",
             mimetype="text/plain",
