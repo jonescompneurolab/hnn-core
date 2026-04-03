@@ -4560,6 +4560,7 @@ def _init_network_from_widgets(
         if drive["type"] in ("Tonic"):
             weights_amplitudes = _drive_widget_to_dict(drive, "amplitude")
             single_simulation_data["net"].add_tonic_bias(
+                bias_name=drive["name"],
                 amplitude=weights_amplitudes,
                 t0=drive["t0"].value,
                 tstop=drive["tstop"].value,
@@ -5420,6 +5421,7 @@ def _generate_constraints_and_func(net, opt_drive_widgets):
                     amplitude=deployed_syn_dicts["amplitude"],
                     t0=_use_nonsyn_params_if_exists("t0", drive, params),
                     tstop=_use_nonsyn_params_if_exists("tstop", drive, params),
+                    bias_name=drive["name"],
                 )
             else:
                 sync_inputs_kwargs = dict(
