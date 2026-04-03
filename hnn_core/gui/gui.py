@@ -2931,7 +2931,7 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
 def _create_synaptic_widgets(
     location,
     choose_tab_drive_or_opt,  # which tab to build for, including which kwargs to use
-    data={},
+    data=None,
     # Drive-tab-specific kwargs
     drive_tab_var_layout=None,
     drive_tab_var_style=None,
@@ -2958,6 +2958,7 @@ def _create_synaptic_widgets(
     This handles the cases for Evoked, Poisson, and Rhythmic drives, but not
     Tonic biases.
     """
+    # Initialize our default parameters:
     default_data = {
         "weights_ampa": {
             "L5_pyramidal": 0.0,
@@ -2989,8 +2990,11 @@ def _create_synaptic_widgets(
                 },
             }
         )
-
-    data = _update_nested_dict(default_data, data)
+    # Apply any missing default parameters if they don't already exist in the input data
+    if isinstance(data, dict):
+        data = _update_nested_dict(default_data, data)
+    else:
+        data = default_data
 
     # Setup our styling
     if choose_tab_drive_or_opt == "opt":
@@ -3117,7 +3121,7 @@ def _create_widgets_for_evoked(
     name,
     location,
     choose_tab_drive_or_opt,  # which tab to build for, including which kwargs to use
-    data={},
+    data=None,
     weights_ampa=None,
     weights_nmda=None,
     delays=None,
@@ -3147,8 +3151,7 @@ def _create_widgets_for_evoked(
     Optimization tab, including constraint widgets and observers that mirror the
     Drives-tab widgets.
     """
-    # Initialize our data dict with default values, then overwrite with any passed
-    # values:
+    # Initialize our default parameters:
     default_data = {
         "mu": 0,
         "sigma": 1,
@@ -3157,8 +3160,12 @@ def _create_widgets_for_evoked(
         "cell_specific": True,
         "seedcore": 14,
     }
-    data.update({"n_drive_cells": n_drive_cells, "cell_specific": cell_specific})
-    data = _update_nested_dict(default_data, data)
+    # Apply any missing default parameters if they don't already exist in the input data
+    if isinstance(data, dict):
+        data.update({"n_drive_cells": n_drive_cells, "cell_specific": cell_specific})
+        data = _update_nested_dict(default_data, data)
+    else:
+        data = default_data
 
     # Set our layout and styling preferences for the widgets according to which tab
     # we're building for:
@@ -3341,7 +3348,7 @@ def _create_widgets_for_poisson(
     tstop_widget,
     location,
     choose_tab_drive_or_opt,  # which tab to build for, including which kwargs to use
-    data={},
+    data=None,
     weights_ampa=None,
     weights_nmda=None,
     delays=None,
@@ -3371,8 +3378,8 @@ def _create_widgets_for_poisson(
     Optimization tab, including constraint widgets and observers that mirror the
     Drives-tab widgets.
     """
-    # Initialize our data dict with default values, then overwrite with any passed
-    # values. The default rate constants are available in `_create_synaptic_widgets`.
+    # Initialize our default parameters. The default rate constants are available in
+    # `_create_synaptic_widgets`.
     default_data = {
         "tstart": 0.0,
         "tstop": tstop_widget.value,
@@ -3380,8 +3387,12 @@ def _create_widgets_for_poisson(
         "cell_specific": True,
         "seedcore": 14,
     }
-    data.update({"n_drive_cells": n_drive_cells, "cell_specific": cell_specific})
-    data = _update_nested_dict(default_data, data)
+    # Apply any missing default parameters if they don't already exist in the input data
+    if isinstance(data, dict):
+        data.update({"n_drive_cells": n_drive_cells, "cell_specific": cell_specific})
+        data = _update_nested_dict(default_data, data)
+    else:
+        data = default_data
 
     # Set our layout and styling preferences for the widgets according to which tab
     # we're building for:
@@ -3530,7 +3541,7 @@ def _create_widgets_for_rhythmic(
     tstop_widget,
     location,
     choose_tab_drive_or_opt,  # which tab to build for, including which kwargs to use
-    data={},
+    data=None,
     weights_ampa=None,
     weights_nmda=None,
     delays=None,
@@ -3560,8 +3571,7 @@ def _create_widgets_for_rhythmic(
     for the Optimization tab, including constraint widgets and observers that mirror the
     Drives-tab widgets.
     """
-    # Initialize our data dict with default values, then overwrite with any passed
-    # values:
+    # Initialize our default parameters:
     default_data = {
         "tstart": 0.0,
         "tstart_std": 0.0,
@@ -3573,8 +3583,12 @@ def _create_widgets_for_rhythmic(
         "cell_specific": False,
         "seedcore": 14,
     }
-    data.update({"n_drive_cells": n_drive_cells, "cell_specific": cell_specific})
-    data = _update_nested_dict(default_data, data)
+    # Apply any missing default parameters if they don't already exist in the input data
+    if isinstance(data, dict):
+        data.update({"n_drive_cells": n_drive_cells, "cell_specific": cell_specific})
+        data = _update_nested_dict(default_data, data)
+    else:
+        data = default_data
 
     # Set our layout and styling preferences for the widgets according to which tab
     # we're building for:
@@ -3850,8 +3864,7 @@ def _create_widgets_for_tonic(
         )
         # No complex widget kwargs needed for non-Optimization widgets
 
-    # Initialize our data dict with default values, then overwrite with any passed
-    # values:
+    # Initialize our data dict with default values:
     if choose_tab_drive_or_opt == "opt":
         # Note that unlike the similar "weights_ampa" etc., the drive_widgets
         # use "amplitude" in the singular, not plural "amplitudes".
@@ -3871,6 +3884,7 @@ def _create_widgets_for_tonic(
         tstop = default_values["tstop"]
         default_data = {cell_type: default_values for cell_type in cell_types}
 
+    # Apply any missing default parameters if they don't already exist in the input data
     if isinstance(data, dict):
         data = _update_nested_dict(default_data, data)
     else:
