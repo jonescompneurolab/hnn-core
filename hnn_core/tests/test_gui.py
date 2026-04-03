@@ -7,11 +7,13 @@ import json
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import pytest
-import traitlets
 import os
-
+import pytest
+import time
+import traitlets
 from pathlib import Path
+from urllib.request import urlretrieve
+
 from hnn_core import Dipole, Network, simulate_dipole
 from hnn_core.gui import HNNGUI
 from hnn_core.gui._viz_manager import (
@@ -1722,47 +1724,79 @@ def test_diff_gui_vs_api_networks_simulations():
 @requires_mpi4py
 @requires_psutil
 @pytest.mark.uses_mpi
-@pytest.mark.parametrize("backend_selection", ["MPI", "Joblib"])
-def test_gui_run_optimization(backend_selection):
-    """TODO"""
+@pytest.mark.parametrize(
+    "backend_selection,opt_solver",
+    [
+        (backend, solver)
+        for backend in ("MPI", "Joblib")
+        for solver in ("bayesian", "cobyla")
+    ],
+)
+def test_gui_run_optimization(backend_selection, opt_solver):
+    """Comprehensively test optimization functionality in the GUI.
+
+    This is a pretty comprehensive test of optimization usage in the GUI (but of course
+    is not completely exhaustive). This includes many tests of existing optimization run
+    (and tab) functionality, including:
+
+    - Tests that optimization runs successfully in the cases of:
+        - all current drive and bias types included
+        - all solvers
+        - all backends
+        - both the `dipole_rmse` (default) and `maximize_psd` objective functions,
+          including with real target data for `dipole_rmse`
+        - n_trials > 1
+        - max optimization iterations > 1
+        - max "safe" cores (i.e. the max allowed in the GUI)
+
+    - Tests that the relevant GUI widgets are properly updated at setup and after
+      consecutive, heterogeneous optimization runs, including that:
+        - Enabled constraint checkboxes remain enabled across runs
+        - The final resulting simulation after the optimization run is added to the main
+          list of simulations, has a new appropriate name, and has existent Dipole data
+        - All of the above works after a second optimization run, including in the case
+          that the objective function is different between runs
+    """
     gui = HNNGUI()
     _ = gui.compose()
 
-    # TODO: test setup_gui as well
-
-    gui.widget_tstop.value = 170
+    # Setup initial params:
+    # AES: For some reason, using the common faster dt of 0.5 fails
+    # due to errors related to "usable mindelay is 0", similar to
+    # https://github.com/jonescompneurolab/hnn-core/issues/960 .
+    gui.widget_tstop.value = 70
     gui.widget_dt.value = 0.025
     gui.widget_backend_selection.value = backend_selection
 
+    assert gui.widget_opt_obj_fun.value == "dipole_rmse"
+    gui.widget_opt_solver.value = opt_solver
     gui.widget_ntrials.value = 2
     gui.widget_opt_max_iter.value = 3
-    gui.widget_n_jobs.value = 3
+    gui.widget_n_jobs.value = gui.n_cores  # use the safe default max of available cores
 
+    # Add at least one of every drive and bias type
     for val_drive_type in ("Poisson", "Evoked", "Rhythmic", "Tonic"):
         for val_location in ("Distal", "Proximal"):
             gui.widget_drive_type_selection.value = val_drive_type
             gui.widget_location_selection.value = val_location
             gui.add_drive_button.click()
 
-    # file2_path = Path(hnn_core_root.parents[0], "default_all.json")
-    # gui._simulate_upload_drives(file2_path)
+    # Load target data (and download if necessary)
+    file_path = Path("S1_SupraT.txt")
+    if not file_path.exists():
+        data_url = f"https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/{file_path}"  # noqa
+        urlretrieve(data_url, file_path)
+    gui._simulate_upload_data(file_path)
 
-    # doesn't work for real files???
-    # file1_path = hnn_core_root / "dpl2.txt"
-    file1_url = "https://raw.githubusercontent.com/jonescompneurolab/hnn/master/data/MEG_detection_data/S1_SupraT.txt"  # noqa
-    gui._simulate_upload_data(file1_url)
+    # Our first optimization run will use the default objective function of RMSE and the
+    # default Bayesian solver:
+    # ----------------------------------------------------------------------------------
+    # Set our target data
+    gui.opt_target_widgets["rmse_target_data"].value = file_path.stem
 
-    # data_url = ('https://raw.githubusercontent.com/jonescompneurolab/hnn/master/'
-    #             'data/MEG_detection_data/yes_trial_S1_ERP_all_avg.txt')
-    # urlretrieve(data_url, 'yes_trial_S1_ERP_all_avg.txt')
-    # from hnn_core import read_dipole
-    # target_dipole = read_dipole('yes_trial_S1_ERP_all_avg.txt')
-
-    # AES not sure that this is all that is required to actually update this widget...
-    gui.opt_target_widgets["rmse_target_data"].value = "S1_SupraT"
-    # gui.widget_opt_obj_fun.value = "maximize_psd"
-
-    # Enable some values that we want to constrain for the optimization
+    # Enable at least one constraint from each type of drive and bias to ensure they are
+    # all included in the optimization
+    # ----------------------------------------------------------------------------------
     # This checks an Evoked drive
     gui.opt_drive_widgets[0]["mu_opt_checkbox"].value = True
     # This checks a Poisson drive
@@ -1774,15 +1808,61 @@ def test_gui_run_optimization(backend_selection):
     # Give it a non-zero value so it actually affects the simulation
     gui.opt_drive_widgets[9]["amplitude"]["L2_pyramidal"].value = 0.2
 
+    # Perform the first run of optimization
     gui.run_opt_button.click()
 
-    gui.opt_target_widgets["rmse_target_data"].value = "S1_SupraT"
-    gui.opt_drive_widgets[0]["mu_opt_checkbox"].value = True
+    # Give the GUI time to regenerate
+    time.sleep(2)
 
-    default_name = gui.widget_simulation_name.value
-    dpls = gui.simulation_data[default_name + "_optimized"]["dpls"]
-    assert isinstance(gui.simulation_data[default_name + "_optimized"]["net"], Network)
+    # Check that our target data and constraint checkboxes have not been reset
+    assert gui.opt_target_widgets["rmse_target_data"].value == file_path.stem
+
+    assert gui.opt_drive_widgets[0]["mu_opt_checkbox"].value
+    assert gui.opt_drive_widgets[4]["rate_constant"]["L5_pyramidal_opt_checkbox"].value
+    assert gui.opt_drive_widgets[8]["burst_rate_opt_checkbox"].value
+    assert gui.opt_drive_widgets[9]["amplitude"]["L2_pyramidal_opt_checkbox"].value
+
+    # Perform some basic checks, like that the optimized sim name has changed, there is
+    # existent Dipole data, etc.
+    new_sim_name_1 = gui.widget_simulation_name.value + "_optimized"
+    dpls = gui.simulation_data[new_sim_name_1]["dpls"]
+    assert isinstance(gui.simulation_data[new_sim_name_1]["net"], Network)
     assert isinstance(dpls, list)
     assert len(dpls) > 0
     assert all([isinstance(dpl, Dipole) for dpl in dpls])
+
+    # Now, let's prepare to run a second run of optimization, but with a different
+    # objective function and different algorithm:
+    # ----------------------------------------------------------------------------------
+    gui.widget_opt_obj_fun.value = "maximize_psd"
+
+    gui.opt_target_widgets["psd_target_band1_min"].value = 15.0
+    gui.opt_target_widgets["psd_target_band1_max"].value = 30.0
+    gui.opt_target_widgets["psd_target_band2_checkbox"].value = True
+    gui.opt_target_widgets["psd_target_band1_proportion"].value = 0.8
+    assert np.isclose(gui.opt_target_widgets["psd_target_band2_proportion"].value, 0.2)
+
+    # Perform the second run of optimization
+    gui.run_opt_button.click()
+
+    # Give the GUI time to regenerate
+    time.sleep(2)
+
+    # Check that our target data and constraint checkboxes have not been reset
+    assert gui.opt_drive_widgets[0]["mu_opt_checkbox"].value
+    assert gui.opt_drive_widgets[4]["rate_constant"]["L5_pyramidal_opt_checkbox"].value
+    assert gui.opt_drive_widgets[8]["burst_rate_opt_checkbox"].value
+    assert gui.opt_drive_widgets[9]["amplitude"]["L2_pyramidal_opt_checkbox"].value
+
+    # Perform some basic checks, like that the optimized sim name has changed, there is
+    # existent Dipole data, etc. This also tests the auto-rename of multiple consecutive
+    # optimization runs.
+    new_sim_name_2 = gui.widget_simulation_name.value + "_optimized" + "_1"
+    assert new_sim_name_2 == "default_optimized_1"
+    dpls = gui.simulation_data[new_sim_name_2]["dpls"]
+    assert isinstance(gui.simulation_data[new_sim_name_2]["net"], Network)
+    assert isinstance(dpls, list)
+    assert len(dpls) > 0
+    assert all([isinstance(dpl, Dipole) for dpl in dpls])
+
     plt.close("all")
