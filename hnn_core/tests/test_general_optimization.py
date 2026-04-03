@@ -389,25 +389,3 @@ def test_cma_validation():
         optim.fit(target=dpl_target, sigma0=[1, 2, 3])
 
     optim.fit(target=dpl_target, sigma0=[1, 2])
-
-
-# def cma_warning():
-#     tstop = 10.0
-#     net = jones_2009_model(mesh_shape=(3, 3))
-#     constraints = dict()
-#     initial_params = {"mu": 5, "sigma": 5}
-
-#     def set_params():
-#         pass
-
-#     with pytest.warns(UserWarning, "The cma solver"):
-#         Optimizer(
-#             net,
-#             tstop=tstop,
-#             constraints=constraints,
-#             set_params=set_params,
-#             solver="cma",
-#             obj_fun="dipole_rmse",
-#             max_iter=2,
-#             initial_params=initial_params,
-#         )
