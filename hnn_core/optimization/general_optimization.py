@@ -201,10 +201,10 @@ class Optimizer:
         -----
         When defining sigma0 for CMA-ES as a float, the sigma0 applied to each parameter
         is calculated as sigma0 * (upper_bound - lower_bound) based on the constraints.
-        It is reccomended to choose a sigma0 such that the optimum is expected to lie within
+        It is recommended to choose a sigma0 such that the optimum is expected to lie within
         about initial_params +- 3*sigma0. A smaller sigma0 searches closer to initial_params.
 
-        When defining popsize for CMA-ES, it is reccomended to increase popsize relative to
+        When defining popsize for CMA-ES, it is recommended to increase popsize relative to
         the number of parameters being optimized (N). 4+3*log(N)
 
         """
