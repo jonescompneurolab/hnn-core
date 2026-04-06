@@ -77,7 +77,7 @@ class build_py_mod(build_py):
 if __name__ == "__main__":
     extras = {
         'opt': ['scikit-learn'],
-        'parallel': ['joblib', 'psutil', 'dask', 'dask[distributed]'],
+        'parallel': ['joblib', 'psutil', 'dask[distributed]'],
         'test': ['codespell', 'pytest', 'pytest-cov', 'pytest-xdist', 'ruff'],
         'docs': ['mne', 'myst-parser', 'nibabel', 'numpydoc', 'pillow',
                  'pooch<1.9.0', 'pydata-sphinx-theme', 'sphinx', 'sphinx-gallery',
