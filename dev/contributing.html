@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -38,10 +38,10 @@
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
 
     <script src="_static/documentation_options.js?v=215e94d7"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
@@ -50,12 +50,13 @@
     <script src="_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'contributing';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_version = '0.17.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="What’s new?" href="whats_new.html" />
@@ -63,6 +64,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.5.1.dev0" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
 <script>
@@ -75,13 +82,11 @@
 
 
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
@@ -113,7 +118,7 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -522,7 +527,7 @@ provide you with the minimum commands necessary to get everything working.</p>
 <p>Fortunately, there is a large amount of helpful guidance online for learning how to use
 <code class="docutils literal notranslate"><span class="pre">git</span></code> and, through it, Github:</p>
 <ul class="simple">
-<li><p><a class="github reference external" href="https://github.com/git-guides">git-guides</a> (recommended for beginners)</p></li>
+<li><p><a class="reference external" href="https://github.com/git-guides">https://github.com/git-guides</a> (recommended for beginners)</p></li>
 <li><p><a class="reference external" href="https://docs.github.com/en/get-started">https://docs.github.com/en/get-started</a> (recommended for beginners)</p></li>
 <li><p><a class="reference external" href="https://swcarpentry.github.io/git-novice/">https://swcarpentry.github.io/git-novice/</a></p></li>
 <li><p><a class="reference external" href="https://git-scm.com/doc/ext">https://git-scm.com/doc/ext</a> (often more technical, but also more informative)</p></li>
@@ -532,8 +537,8 @@ contribution to <code class="docutils literal notranslate"><span class="pre">doc
 <section id="making-your-first-pull-request-including-installing-for-development">
 <h3>Making your first Pull Request, including <em>installing for development</em><a class="headerlink" href="#making-your-first-pull-request-including-installing-for-development" title="Link to this heading">#</a></h3>
 <ol class="arabic">
-<li><p>Go to <a class="github reference external" href="https://github.com">github</a> and create an account. For the sake of an example, let’s
-pretend your new account is <a class="github reference external" href="https://github.com/asoplata">asoplata</a> and your username is
+<li><p>Go to <a class="reference external" href="https://github.com">https://github.com</a> and create an account. For the sake of an example, let’s
+pretend your new account is <a class="reference external" href="https://github.com/asoplata">https://github.com/asoplata</a> and your username is
 <code class="docutils literal notranslate"><span class="pre">asoplata</span></code>. (For all subsequent steps, you should replace where it says <code class="docutils literal notranslate"><span class="pre">asoplata</span></code>
 with your username.)</p></li>
 <li><p>On the Github webpage for the <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core"><code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>
@@ -593,9 +598,9 @@ your code “<code class="docutils literal notranslate"><span class="pre">commit
 the remote you will primarily be using when you want to “<code class="docutils literal notranslate"><span class="pre">fetch</span></code>” (a.k.a. download) new
 commits that other people have made to the “<code class="docutils literal notranslate"><span class="pre">upstream</span></code>” (a.k.a. original) version of the
 code. To be explicit, this is so you can manage changes that other people make to the
-“upstream” code at <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core">jonescompneurolab/hnn-core</a>, including
+“upstream” code at <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core">https://github.com/jonescompneurolab/hnn-core</a>, including
 eventually integrating those changes to both your local git repo and your fork at
-<a class="github reference external" href="https://github.com/asoplata/hnn-core">asoplata/hnn-core</a>. Run the following command:</p>
+<a class="reference external" href="https://github.com/asoplata/hnn-core">https://github.com/asoplata/hnn-core</a>. Run the following command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">remote</span> <span class="n">add</span> <span class="n">upstream</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">jonescompneurolab</span><span class="o">/</span><span class="n">hnn</span><span class="o">-</span><span class="n">core</span>
 </pre></div>
 </div>
@@ -704,11 +709,11 @@ next step.</p>
 </div>
 </li>
 <li><p>Now, if you go to the webpage for your fork
-(e.g. <a class="github reference external" href="https://github.com/asoplata/hnn-core">asoplata/hnn-core</a> ) and click <code class="docutils literal notranslate"><span class="pre">master</span></code> on the left, you
+(e.g. <a class="reference external" href="https://github.com/asoplata/hnn-core">https://github.com/asoplata/hnn-core</a> ) and click <code class="docutils literal notranslate"><span class="pre">master</span></code> on the left, you
 should see that your new branch is now viewable. Github is aware of your branch, but
 there is no Pull Request yet.</p></li>
 <li><p>Let’s finally create the Pull Request: go to
-<a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core/compare">jonescompneurolab/hnn-core</a>, then click “compare across
+<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/compare">https://github.com/jonescompneurolab/hnn-core/compare</a>, then click “compare across
 forks”. Don’t change the <code class="docutils literal notranslate"><span class="pre">base</span> <span class="pre">repository</span></code> dropdown button (it should say
 <code class="docutils literal notranslate"><span class="pre">jonescompneurolab/hnn-core</span></code>) and don’t change <code class="docutils literal notranslate"><span class="pre">base</span></code> (it should say
 <code class="docutils literal notranslate"><span class="pre">master</span></code>). Instead, click on the <code class="docutils literal notranslate"><span class="pre">head</span> <span class="pre">repository</span></code> dropdown button and select your
@@ -744,7 +749,7 @@ is not yet over…keep reading below…</p></li>
 their own Pull Request, called <code class="docutils literal notranslate"><span class="pre">other-persons-feature</span></code>, also merged into <code class="docutils literal notranslate"><span class="pre">master</span></code>. Now,
 from your fork’s perspective, both <code class="docutils literal notranslate"><span class="pre">master</span></code> and <code class="docutils literal notranslate"><span class="pre">cool-feature-2</span></code> are “out of date” with
 respect to the <code class="docutils literal notranslate"><span class="pre">upstream</span></code> remote (a.k.a. the <code class="docutils literal notranslate"><span class="pre">master</span></code> version of the code at
-<a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core">jonescompneurolab/hnn-core</a> ). What do you do? Use the magic of <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">rebase</span></code> to rewrite history! Great Scott!</p>
+<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core">https://github.com/jonescompneurolab/hnn-core</a> ). What do you do? Use the magic of <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">rebase</span></code> to rewrite history! Great Scott!</p>
 <p>Usually,
 <a class="reference external" href="https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging">“merging”</a>
 means making <em>new</em> commits for the purpose of making two different branches compatible
@@ -993,13 +998,13 @@ they are incorporated automatically into webpages on the HNN Developer Portal
 docstrings</a>.</p></li>
 <li><p>The <a class="reference external" href="https://hnn.brown.edu/">HNN Frontpage website</a>. You probably do
 not have to worry about this. Changes to the Frontpage are handled by the source code
-at <a class="github reference external" href="https://github.com/GitHub-at-Brown/hnn-front-website">GitHub-at-Brown/hnn-front-website</a>, not on
-<a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core">jonescompneurolab/hnn-core</a>.</p></li>
+at <a class="reference external" href="https://github.com/GitHub-at-Brown/hnn-front-website">https://github.com/GitHub-at-Brown/hnn-front-website</a>, not on
+<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core">https://github.com/jonescompneurolab/hnn-core</a>.</p></li>
 <li><p>The <a class="reference external" href="https://jonescompneurolab.github.io/textbook/content/preface.html">HNN Textbook
 website</a>. Changes
 to the Textbook are handled by the source code at
-<a class="github reference external" href="https://github.com/jonescompneurolab/textbook">jonescompneurolab/textbook</a>, not on
-<a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core">jonescompneurolab/hnn-core</a>. The Textbook is the <strong>main guide to
+<a class="reference external" href="https://github.com/jonescompneurolab/textbook">https://github.com/jonescompneurolab/textbook</a>, not on
+<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core">https://github.com/jonescompneurolab/hnn-core</a>. The Textbook is the <strong>main guide to
 HNN for users</strong>, and includes both scientific explanations and <strong>example Jupyter
 notebook tutorials</strong>. If you are contributing a new public feature to HNN, then it
 needs to be explained in a tutorial Jupyter notebook on the Textbook.</p></li>
@@ -1007,7 +1012,7 @@ needs to be explained in a tutorial Jupyter notebook on the Textbook.</p></li>
 website</a>, where you
 currently are. Changes to the Developer Portal are handled by the source code at the
 <code class="docutils literal notranslate"><span class="pre">doc</span></code> subdirectory of <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> located here:
-<a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core/tree/master/doc">jonescompneurolab/hnn-core</a>. This includes
+<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/tree/master/doc">https://github.com/jonescompneurolab/hnn-core/tree/master/doc</a>. This includes
 written content helpful for developers, but also the “Public API Documentation”
 available here: <a class="reference external" href="https://jonescompneurolab.github.io/hnn-core/stable/api.html">https://jonescompneurolab.github.io/hnn-core/stable/api.html</a>. The
 API documentation is <em>automatically generated</em> from the <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html#docstring-standard">NumPy-style
@@ -1075,7 +1080,7 @@ example:</p>
 </ul>
 </li>
 <li><p>For convenience, to quickly insert a link to any specific GitHub issue at
-<a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core">jonescompneurolab/hnn-core</a>, like this: <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/705">#705</a>, then:</p>
+<a class="reference external" href="https://github.com/jonescompneurolab/hnn-core">https://github.com/jonescompneurolab/hnn-core</a>, like this: <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/issues/705">#705</a>, then:</p>
 <ul>
 <li><p>In RST, write:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>:gh:`705`
@@ -1380,8 +1385,8 @@ the tests are first failing.</p></li>
     class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-contribute-code">How to contribute code</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#making-your-first-pull-request-including-installing-for-development">Making your first Pull Request, including <em>installing for development</em></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#keeping-your-code-up-to-date-by-rebasing">Keeping your code up-to-date by rebasing</a></li>
@@ -1410,13 +1415,13 @@ the tests are first failing.</p></li>
   </nav></div>
 
   <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/contributing.md.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/contributing.md.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
 
 </div></div>
               
@@ -1431,8 +1436,8 @@ the tests are first failing.</p></li>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1466,7 +1471,7 @@ the tests are first failing.</p></li>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.0.
 </p></div>
       
     </div>

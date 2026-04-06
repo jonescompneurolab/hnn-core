@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -38,10 +38,10 @@
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
 
     <script src="_static/documentation_options.js?v=215e94d7"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
@@ -50,18 +50,25 @@
     <script src="_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'how_to_create_releases';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_version = '0.17.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.5.1.dev0" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
 <script>
@@ -74,13 +81,11 @@
 
 
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
@@ -112,7 +117,7 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -690,7 +695,7 @@
 <section id="push-a-git-tag-to-build-the-release">
 <h2>6. Push a git tag to build the release<a class="headerlink" href="#push-a-git-tag-to-build-the-release" title="Link to this heading">#</a></h2>
 <ol class="arabic simple">
-<li><p>Note that the steps in this section will only be possible for a Maintainer with full Admin permissions for the Github repository of <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core">jonescompneurolab/hnn-core</a>.</p></li>
+<li><p>Note that the steps in this section will only be possible for a Maintainer with full Admin permissions for the Github repository of <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core">https://github.com/jonescompneurolab/hnn-core</a>.</p></li>
 <li><p>Switch back to the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch.</p></li>
 <li><p>Update your <code class="docutils literal notranslate"><span class="pre">master</span></code> branch such that it is in sync with <code class="docutils literal notranslate"><span class="pre">upstream</span></code>, and that its current commit is the “release commit” you previously merged through your PR.</p></li>
 <li><p>Create a tag for this release commit, where the tag is <code class="docutils literal notranslate"><span class="pre">v&lt;new</span> <span class="pre">version&gt;</span></code>, including the <code class="docutils literal notranslate"><span class="pre">v</span></code>. For example, if the new version that you just updated to is <code class="docutils literal notranslate"><span class="pre">0.4.4</span></code>, then you could do the following to create the tag locally:</p></li>
@@ -700,9 +705,9 @@
 </div>
 <ol class="arabic simple" start="5">
 <li><p>As a warning, TestPyPI and PyPI ONLY care about the version in the actual code (i.e. in <code class="docutils literal notranslate"><span class="pre">hnn_core/__init__.py</span></code>), not the version you’re using in the <code class="docutils literal notranslate"><span class="pre">git</span></code> tag. Double-check that they’re both what you want!</p></li>
-<li><p><em>Important</em>: You must now go to the Github settings for the official HNN-Core repository here <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core/settings/">jonescompneurolab/hnn-core</a> and make some changes, so that the package can be be built and deployed directly to PyPI.</p>
+<li><p><em>Important</em>: You must now go to the Github settings for the official HNN-Core repository here <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/settings/">https://github.com/jonescompneurolab/hnn-core/settings/</a> and make some changes, so that the package can be be built and deployed directly to PyPI.</p>
 <ol class="arabic simple">
-<li><p>Go to <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core/settings/">jonescompneurolab/hnn-core</a>.</p></li>
+<li><p>Go to <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/settings/">https://github.com/jonescompneurolab/hnn-core/settings/</a>.</p></li>
 <li><p>Click on “Environments” on the left-hand side under the “Code and automation” section.</p></li>
 <li><p>Click on the <code class="docutils literal notranslate"><span class="pre">pypi</span></code> Environment (it should indicate it has “1 protection rule” nearby).</p></li>
 <li><p>Next to the “Deployment branches and tags” section, there is a dropdown that currently says “Protected branches only”. <strong>Change</strong> the value of that dropdown to “No restriction”.</p></li>
@@ -723,7 +728,7 @@
 </ul>
 </li>
 <li><p>Assuming nothing went wrong with the Github Actions “Publish (etc.)” workflow, your new version should now be live on both <a class="reference external" href="https://pypi.org/project/hnn-core/#history">PyPI</a> and <a class="reference external" href="https://test.pypi.org/project/hnn-core/#history">TestPyPI</a>.</p></li>
-<li><p><em>Important</em>: Make sure to go back to <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core/settings/">jonescompneurolab/hnn-core</a> and reverse the Environment changes you made before. Specifically, again go to “Environments”, click the <code class="docutils literal notranslate"><span class="pre">pypi</span></code> environment, and in the “Deployment branches and tags” section, click the dropdown which currently says “No restriction” and change it back to “Protected branches only”.</p></li>
+<li><p><em>Important</em>: Make sure to go back to <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/settings/">https://github.com/jonescompneurolab/hnn-core/settings/</a> and reverse the Environment changes you made before. Specifically, again go to “Environments”, click the <code class="docutils literal notranslate"><span class="pre">pypi</span></code> environment, and in the “Deployment branches and tags” section, click the dropdown which currently says “No restriction” and change it back to “Protected branches only”.</p></li>
 </ol>
 </section>
 <section id="post-publishing-tests">
@@ -768,7 +773,7 @@
 </li>
 <li><p>In your browser, make an official “Github Release”:</p>
 <ol class="arabic simple">
-<li><p>Go to <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core/releases">jonescompneurolab/hnn-core</a> and click “Draft a new release”.</p></li>
+<li><p>Go to <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core/releases">https://github.com/jonescompneurolab/hnn-core/releases</a> and click “Draft a new release”.</p></li>
 <li><p>Copy and re-format the new version’s release notes (which you added in <code class="docutils literal notranslate"><span class="pre">doc/whats_new.md</span></code> previously) into the release notes for this Github release. Doing this in a text editor with “find-replace” is recommended.</p></li>
 <li><p>Where it says “Attach binaries…”, upload the package file you manually downloaded from <a class="reference external" href="https://pypi.org/project/hnn-core/#files">https://pypi.org/project/hnn-core/#files</a>.</p></li>
 <li><p>Make sure <code class="docutils literal notranslate"><span class="pre">Set</span> <span class="pre">as</span> <span class="pre">the</span> <span class="pre">latest</span> <span class="pre">release</span></code> is checked if you are indeed pushing the latest release that people should be using.</p></li>
@@ -803,7 +808,7 @@
 <li><p>Originally, we released two Conda packages: <code class="docutils literal notranslate"><span class="pre">hnn-core-all</span></code> (all dependencies, including MPI) and <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> (only the API). However, in the interest of not confusing users, we dropped the <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code> Conda package, so now there is only a single one you need to build: <code class="docutils literal notranslate"><span class="pre">hnn-core-all</span></code>.</p></li>
 </ul>
 </li>
-<li><p>Elsewhere on your hard drive, clone our repo here <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core-conda-packaging">jonescompneurolab/hnn-core-conda-packaging</a>. We will NOT be using your local copy of <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>’s source code for this, but instead be using the PyPI package directly.</p></li>
+<li><p>Elsewhere on your hard drive, clone our repo here <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core-conda-packaging">https://github.com/jonescompneurolab/hnn-core-conda-packaging</a>. We will NOT be using your local copy of <code class="docutils literal notranslate"><span class="pre">hnn-core</span></code>’s source code for this, but instead be using the PyPI package directly.</p></li>
 <li><p>Read through the that repo’s <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core-conda-packaging?tab=readme-ov-file#how-to-use-this-repo-to-build-and-upload-the-packages">“How to use this repo to build and upload the packages” section</a>. You do <em>not</em> need to read the entire README.</p></li>
 <li><p>Follow the instructions until you are told to run <code class="docutils literal notranslate"><span class="pre">00-install-build-deps.sh</span></code> to install the conda building dependencies. Execute that script.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">cd</span></code> into <code class="docutils literal notranslate"><span class="pre">hnn-core-all/recipe</span></code>.</p></li>
@@ -823,7 +828,7 @@
 <li><p>Yes this is super annoying, but it is required for reasons described in our Conda package building repo’s README.</p></li>
 </ol>
 </li>
-<li><p>Before trying to build the package, save your work to <a class="github reference external" href="https://github.com/jonescompneurolab/hnn-core-conda-packaging">jonescompneurolab/hnn-core-conda-packaging</a>.</p></li>
+<li><p>Before trying to build the package, save your work to <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core-conda-packaging">https://github.com/jonescompneurolab/hnn-core-conda-packaging</a>.</p></li>
 <li><p>From here, you can continue where you left off from <a class="reference external" href="https://github.com/jonescompneurolab/hnn-core-conda-packaging?tab=readme-ov-file#how-to-use-this-repo-to-build-and-upload-the-packages">“How to use this repo to build and upload the packages” section</a>, which should be around step 5. Details are in that repo.</p></li>
 <li><p>Do something to celebrate, you’re done!</p></li>
 </ol>
@@ -857,8 +862,8 @@
     class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notes-before-starting">0. Notes before starting</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#before-making-a-release">1. Before making a release</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prepare-your-local-version-of-the-release">2. Prepare your local version of the release</a></li>
@@ -874,13 +879,13 @@
   </nav></div>
 
   <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/how_to_create_releases.md.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/how_to_create_releases.md.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
 
 </div></div>
               
@@ -895,8 +900,8 @@
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -930,7 +935,7 @@
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.0.
 </p></div>
       
     </div>

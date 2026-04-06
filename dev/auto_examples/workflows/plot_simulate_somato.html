@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -38,10 +38,10 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
 
     <script src="../../_static/documentation_options.js?v=215e94d7"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -50,12 +50,13 @@
     <script src="../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/workflows/plot_simulate_somato';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_version = '0.17.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="05. Simulate beta modulated ERP" href="plot_simulate_beta.html" />
@@ -64,6 +65,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.5.1.dev0" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
 <script>
@@ -76,13 +83,11 @@
 
 
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
@@ -114,7 +119,7 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -533,55 +538,56 @@ Creating /home/circleci/mne_data
 Downloading file &#39;MNE-somato-data.tar.gz&#39; from &#39;https://osf.io/download/tp4sg?version=7&#39; to &#39;/home/circleci/mne_data&#39;.
 
   0%|                                               | 0.00/611M [00:00&lt;?, ?B/s]
-  0%|▏                                     | 2.79M/611M [00:00&lt;00:21, 27.8MB/s]
-  2%|▉                                     | 15.1M/611M [00:00&lt;00:07, 83.7MB/s]
-  4%|█▍                                    | 23.5M/611M [00:00&lt;00:09, 64.3MB/s]
-  6%|██▏                                   | 36.1M/611M [00:00&lt;00:06, 85.0MB/s]
-  8%|███                                   | 49.0M/611M [00:00&lt;00:05, 99.4MB/s]
- 10%|███▉                                   | 62.1M/611M [00:00&lt;00:05, 109MB/s]
- 12%|████▊                                  | 75.1M/611M [00:00&lt;00:04, 116MB/s]
- 14%|█████▋                                 | 88.2M/611M [00:00&lt;00:04, 120MB/s]
- 17%|██████▋                                 | 101M/611M [00:00&lt;00:04, 124MB/s]
- 19%|███████▍                                | 114M/611M [00:01&lt;00:03, 125MB/s]
- 21%|████████▎                               | 127M/611M [00:01&lt;00:03, 127MB/s]
- 23%|█████████▏                              | 140M/611M [00:01&lt;00:03, 128MB/s]
- 25%|██████████                              | 154M/611M [00:01&lt;00:03, 129MB/s]
- 27%|██████████▉                             | 167M/611M [00:01&lt;00:03, 131MB/s]
- 29%|███████████▊                            | 180M/611M [00:01&lt;00:03, 131MB/s]
- 32%|████████████▋                           | 193M/611M [00:01&lt;00:03, 130MB/s]
- 34%|█████████████▌                          | 206M/611M [00:01&lt;00:03, 131MB/s]
- 36%|██████████████▍                         | 219M/611M [00:01&lt;00:02, 131MB/s]
- 38%|███████████████▏                        | 233M/611M [00:01&lt;00:02, 131MB/s]
- 40%|████████████████                        | 246M/611M [00:02&lt;00:02, 131MB/s]
- 42%|████████████████▉                       | 259M/611M [00:02&lt;00:02, 132MB/s]
- 45%|█████████████████▊                      | 272M/611M [00:02&lt;00:02, 132MB/s]
- 47%|██████████████████▋                     | 285M/611M [00:02&lt;00:02, 131MB/s]
- 49%|███████████████████▌                    | 299M/611M [00:02&lt;00:02, 131MB/s]
- 51%|████████████████████▍                   | 312M/611M [00:02&lt;00:02, 132MB/s]
- 53%|█████████████████████▎                  | 325M/611M [00:02&lt;00:02, 131MB/s]
- 55%|██████████████████████▏                 | 338M/611M [00:02&lt;00:02, 131MB/s]
- 58%|███████████████████████                 | 351M/611M [00:02&lt;00:01, 131MB/s]
- 60%|███████████████████████▊                | 364M/611M [00:02&lt;00:01, 130MB/s]
- 62%|████████████████████████▋               | 377M/611M [00:03&lt;00:01, 129MB/s]
- 64%|█████████████████████████▌              | 390M/611M [00:03&lt;00:01, 129MB/s]
- 66%|██████████████████████████▍             | 403M/611M [00:03&lt;00:01, 129MB/s]
- 68%|███████████████████████████▎            | 416M/611M [00:03&lt;00:01, 129MB/s]
- 70%|████████████████████████████▏           | 429M/611M [00:03&lt;00:01, 130MB/s]
- 72%|████████████████████████████▉           | 442M/611M [00:03&lt;00:01, 110MB/s]
- 75%|█████████████████████████████▊          | 455M/611M [00:03&lt;00:01, 115MB/s]
- 77%|██████████████████████████████▌         | 467M/611M [00:03&lt;00:01, 115MB/s]
- 79%|███████████████████████████████▍        | 480M/611M [00:03&lt;00:01, 120MB/s]
- 81%|████████████████████████████████▎       | 494M/611M [00:04&lt;00:00, 125MB/s]
- 83%|█████████████████████████████████▎      | 508M/611M [00:04&lt;00:00, 128MB/s]
- 85%|██████████████████████████████████      | 521M/611M [00:04&lt;00:00, 122MB/s]
- 87%|██████████████████████████████████▉     | 534M/611M [00:04&lt;00:00, 124MB/s]
- 89%|███████████████████████████████████▊    | 546M/611M [00:04&lt;00:00, 122MB/s]
- 92%|████████████████████████████████████▋   | 559M/611M [00:04&lt;00:00, 125MB/s]
- 94%|█████████████████████████████████████▍  | 572M/611M [00:04&lt;00:00, 121MB/s]
- 96%|██████████████████████████████████████▎ | 585M/611M [00:04&lt;00:00, 124MB/s]
- 98%|███████████████████████████████████████▏| 599M/611M [00:04&lt;00:00, 127MB/s]
+  0%|▏                                     | 2.97M/611M [00:00&lt;00:20, 29.7MB/s]
+  3%|▉                                     | 15.6M/611M [00:00&lt;00:06, 86.5MB/s]
+  4%|█▌                                    | 24.2M/611M [00:00&lt;00:08, 71.3MB/s]
+  6%|██▎                                   | 36.8M/611M [00:00&lt;00:06, 90.4MB/s]
+  8%|███                                   | 48.5M/611M [00:00&lt;00:05, 99.2MB/s]
+ 10%|███▉                                   | 61.5M/611M [00:00&lt;00:05, 109MB/s]
+ 12%|████▊                                  | 74.5M/611M [00:00&lt;00:04, 116MB/s]
+ 14%|█████▌                                 | 87.5M/611M [00:00&lt;00:04, 120MB/s]
+ 16%|██████▌                                 | 101M/611M [00:00&lt;00:04, 123MB/s]
+ 19%|███████▍                                | 113M/611M [00:01&lt;00:03, 125MB/s]
+ 21%|████████▎                               | 126M/611M [00:01&lt;00:03, 126MB/s]
+ 23%|████████▉                              | 139M/611M [00:01&lt;00:05, 92.4MB/s]
+ 25%|█████████▉                              | 151M/611M [00:01&lt;00:04, 100MB/s]
+ 27%|██████████▊                             | 164M/611M [00:01&lt;00:04, 108MB/s]
+ 29%|███████████▌                            | 177M/611M [00:01&lt;00:03, 113MB/s]
+ 31%|████████████▍                           | 190M/611M [00:01&lt;00:03, 117MB/s]
+ 33%|█████████████▎                          | 203M/611M [00:01&lt;00:03, 120MB/s]
+ 35%|██████████████▏                         | 216M/611M [00:01&lt;00:03, 123MB/s]
+ 37%|██████████████▉                         | 228M/611M [00:02&lt;00:03, 124MB/s]
+ 40%|███████████████▊                        | 241M/611M [00:02&lt;00:02, 126MB/s]
+ 42%|████████████████▋                       | 254M/611M [00:02&lt;00:02, 126MB/s]
+ 44%|█████████████████▍                      | 267M/611M [00:02&lt;00:02, 124MB/s]
+ 46%|██████████████████▎                     | 280M/611M [00:02&lt;00:02, 126MB/s]
+ 48%|███████████████████▏                    | 292M/611M [00:02&lt;00:02, 125MB/s]
+ 50%|████████████████████                    | 305M/611M [00:02&lt;00:02, 126MB/s]
+ 52%|████████████████████▊                   | 318M/611M [00:02&lt;00:02, 127MB/s]
+ 54%|█████████████████████▋                  | 331M/611M [00:02&lt;00:02, 128MB/s]
+ 56%|██████████████████████▌                 | 344M/611M [00:02&lt;00:02, 128MB/s]
+ 58%|███████████████████████▍                | 357M/611M [00:03&lt;00:01, 127MB/s]
+ 61%|████████████████████████▎               | 370M/611M [00:03&lt;00:01, 129MB/s]
+ 63%|█████████████████████████▏              | 384M/611M [00:03&lt;00:01, 130MB/s]
+ 65%|██████████████████████████              | 397M/611M [00:03&lt;00:01, 131MB/s]
+ 67%|██████████████████████████▊             | 410M/611M [00:03&lt;00:01, 119MB/s]
+ 69%|███████████████████████████▋            | 423M/611M [00:03&lt;00:01, 122MB/s]
+ 71%|████████████████████████████▌           | 435M/611M [00:03&lt;00:01, 120MB/s]
+ 73%|█████████████████████████████▎          | 447M/611M [00:03&lt;00:01, 120MB/s]
+ 75%|██████████████████████████████▏         | 461M/611M [00:03&lt;00:01, 125MB/s]
+ 78%|███████████████████████████████         | 473M/611M [00:04&lt;00:01, 111MB/s]
+ 80%|███████████████████████████████▉        | 487M/611M [00:04&lt;00:01, 117MB/s]
+ 82%|████████████████████████████████▊       | 500M/611M [00:04&lt;00:00, 121MB/s]
+ 84%|█████████████████████████████████▌      | 512M/611M [00:04&lt;00:00, 100MB/s]
+ 86%|██████████████████████████████████▍     | 526M/611M [00:04&lt;00:00, 109MB/s]
+ 88%|███████████████████████████████████▎    | 539M/611M [00:04&lt;00:00, 116MB/s]
+ 90%|████████████████████████████████████▏   | 552M/611M [00:04&lt;00:00, 120MB/s]
+ 93%|█████████████████████████████████████   | 566M/611M [00:04&lt;00:00, 124MB/s]
+ 95%|█████████████████████████████████████▉  | 578M/611M [00:04&lt;00:00, 114MB/s]
+ 97%|█████████████████████████████████████▋ | 590M/611M [00:05&lt;00:00, 99.2MB/s]
+ 99%|███████████████████████████████████████▌| 603M/611M [00:05&lt;00:00, 107MB/s]
   0%|                                               | 0.00/611M [00:00&lt;?, ?B/s]
-100%|███████████████████████████████████████| 611M/611M [00:00&lt;00:00, 2.76TB/s]
+100%|███████████████████████████████████████| 611M/611M [00:00&lt;00:00, 1.88TB/s]
 Untarring contents of &#39;/home/circleci/mne_data/MNE-somato-data.tar.gz&#39; to &#39;/home/circleci/mne_data&#39;
 Attempting to create new mne-python configuration file:
 /home/circleci/.mne/mne-python.json
@@ -913,7 +919,7 @@ network origin of human MEG/EEG data. eLife 9, e51214 (2020).
 <a class="reference external" href="https://doi.org/10.7554/eLife.51214">https://doi.org/10.7554/eLife.51214</a></p>
 </aside>
 </aside>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 47.844 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 50.966 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-workflows-plot-simulate-somato-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/workflows/plot_simulate_somato.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo1.svg" style="width: 150px;" />
@@ -978,20 +984,20 @@ network origin of human MEG/EEG data. eLife 9, e51214 (2020).
     class="page-toc tocsection onthispage">
     <i class="fa-solid fa-list"></i> On this page
   </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/auto_examples/workflows/plot_simulate_somato.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/auto_examples/workflows/plot_simulate_somato.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
 
 </div></div>
               
@@ -1006,8 +1012,8 @@ network origin of human MEG/EEG data. eLife 9, e51214 (2020).
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1041,7 +1047,7 @@ network origin of human MEG/EEG data. eLife 9, e51214 (2020).
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.0.
 </p></div>
       
     </div>

@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
@@ -38,10 +38,10 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
 
     <script src="../../_static/documentation_options.js?v=215e94d7"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
@@ -50,12 +50,13 @@
     <script src="../../_static/copybutton.js?v=fd10adb8"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/howto/plot_batch_simulate';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_version = '0.17.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://jonescompneurolab.github.io/hnn-core/dev/_static/versions.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
         </script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="08. Optimize simulated rhythmic responses" href="optimize_rhythmic.html" />
@@ -64,6 +65,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.5.1.dev0" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-199741045-1"></script>
 <script>
@@ -76,13 +83,11 @@
 
 
   </head>
-  
-  
-  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
-
+  <body data-default-mode="">
   
   
   <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
   
   <div id="pst-scroll-pixel-helper"></div>
   
@@ -114,7 +119,7 @@
 </div>
 
   
-    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
   <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
@@ -602,85 +607,85 @@ resulting in the complex waveforms observed.</p>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[Parallel(n_jobs=4)]: Using backend LokyBackend with 4 concurrent workers.
 [Parallel(n_jobs=4)]: Done   1 tasks      | elapsed:    3.3s
-[Parallel(n_jobs=4)]: Done   2 tasks      | elapsed:    3.4s
-[Parallel(n_jobs=4)]: Done   3 tasks      | elapsed:    3.4s
-[Parallel(n_jobs=4)]: Done   4 tasks      | elapsed:    3.4s
-[Parallel(n_jobs=4)]: Done   5 tasks      | elapsed:    6.1s
-[Parallel(n_jobs=4)]: Done   6 tasks      | elapsed:    6.1s
-[Parallel(n_jobs=4)]: Done   7 tasks      | elapsed:    6.3s
-[Parallel(n_jobs=4)]: Done   8 tasks      | elapsed:    6.3s
-[Parallel(n_jobs=4)]: Done   9 tasks      | elapsed:    8.9s
-[Parallel(n_jobs=4)]: Done  10 tasks      | elapsed:    8.9s
-[Parallel(n_jobs=4)]: Done  11 tasks      | elapsed:    9.2s
-[Parallel(n_jobs=4)]: Done  12 tasks      | elapsed:    9.2s
-[Parallel(n_jobs=4)]: Done  13 tasks      | elapsed:   11.7s
-[Parallel(n_jobs=4)]: Done  14 out of  20 | elapsed:   11.7s remaining:    5.0s
-[Parallel(n_jobs=4)]: Done  15 out of  20 | elapsed:   12.0s remaining:    4.0s
-[Parallel(n_jobs=4)]: Done  16 out of  20 | elapsed:   12.0s remaining:    3.0s
-[Parallel(n_jobs=4)]: Done  17 out of  20 | elapsed:   14.5s remaining:    2.6s
-[Parallel(n_jobs=4)]: Done  18 out of  20 | elapsed:   14.5s remaining:    1.6s
-[Parallel(n_jobs=4)]: Done  20 out of  20 | elapsed:   14.7s finished
+[Parallel(n_jobs=4)]: Done   2 tasks      | elapsed:    3.3s
+[Parallel(n_jobs=4)]: Done   3 tasks      | elapsed:    3.3s
+[Parallel(n_jobs=4)]: Done   4 tasks      | elapsed:    3.3s
+[Parallel(n_jobs=4)]: Done   5 tasks      | elapsed:    6.0s
+[Parallel(n_jobs=4)]: Done   6 tasks      | elapsed:    6.0s
+[Parallel(n_jobs=4)]: Done   7 tasks      | elapsed:    6.0s
+[Parallel(n_jobs=4)]: Done   8 tasks      | elapsed:    6.0s
+[Parallel(n_jobs=4)]: Done   9 tasks      | elapsed:    8.7s
+[Parallel(n_jobs=4)]: Done  10 tasks      | elapsed:    8.8s
+[Parallel(n_jobs=4)]: Done  11 tasks      | elapsed:    8.8s
+[Parallel(n_jobs=4)]: Done  12 tasks      | elapsed:    8.9s
+[Parallel(n_jobs=4)]: Done  13 tasks      | elapsed:   11.5s
+[Parallel(n_jobs=4)]: Done  14 out of  20 | elapsed:   11.5s remaining:    4.9s
+[Parallel(n_jobs=4)]: Done  15 out of  20 | elapsed:   11.5s remaining:    3.8s
+[Parallel(n_jobs=4)]: Done  16 out of  20 | elapsed:   11.6s remaining:    2.9s
+[Parallel(n_jobs=4)]: Done  17 out of  20 | elapsed:   14.2s remaining:    2.5s
+[Parallel(n_jobs=4)]: Done  18 out of  20 | elapsed:   14.2s remaining:    1.6s
+[Parallel(n_jobs=4)]: Done  20 out of  20 | elapsed:   14.3s finished
 Simulation results: {&#39;summary_statistics&#39;: [[{&#39;min_peak&#39;: np.float64(-1.9487233699162573e-05), &#39;max_peak&#39;: np.float64(2.438299811172486e-05)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162573e-05), &#39;max_peak&#39;: np.float64(3.5625970074068165e-05)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162573e-05), &#39;max_peak&#39;: np.float64(5.187123572695802e-05)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162573e-05), &#39;max_peak&#39;: np.float64(7.539737690213309e-05)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162573e-05), &#39;max_peak&#39;: np.float64(0.00010962271639761121)}, {&#39;min_peak&#39;: np.float64(-0.0008187098140745243), &#39;max_peak&#39;: np.float64(0.0011853731897260914)}, {&#39;min_peak&#39;: np.float64(-0.0006900911098816527), &#39;max_peak&#39;: np.float64(0.0014532366142034129)}, {&#39;min_peak&#39;: np.float64(-7.443630674152272e-05), &#39;max_peak&#39;: np.float64(0.0006303483688791759)}, {&#39;min_peak&#39;: np.float64(-0.00038312472505001556), &#39;max_peak&#39;: np.float64(0.0015588783545866054)}, {&#39;min_peak&#39;: np.float64(-0.0005827286517535943), &#39;max_peak&#39;: np.float64(0.0014794795458269719)}, {&#39;min_peak&#39;: np.float64(-0.0005759203533290843), &#39;max_peak&#39;: np.float64(0.0014539235295249033)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162573e-05), &#39;max_peak&#39;: np.float64(0.0013262182394243893)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162573e-05), &#39;max_peak&#39;: np.float64(0.001328331309960038)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162573e-05), &#39;max_peak&#39;: np.float64(0.0011853462053579675)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162573e-05), &#39;max_peak&#39;: np.float64(0.0011649633329457551)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162573e-05), &#39;max_peak&#39;: np.float64(0.001184585414815373)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162573e-05), &#39;max_peak&#39;: np.float64(0.0012311552850961124)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162573e-05), &#39;max_peak&#39;: np.float64(0.0013115554222262733)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162573e-05), &#39;max_peak&#39;: np.float64(0.0014314315232221788)}, {&#39;min_peak&#39;: np.float64(-1.9487233699162573e-05), &#39;max_peak&#39;: np.float64(0.0015123789975719434)}]], &#39;simulated_data&#39;: [[{&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0001), &#39;weight_pyr&#39;: np.float64(0.0001)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb2fbcc50&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0001), &#39;weight_pyr&#39;: np.float64(0.0001)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x79207c3cb410&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0001438449888287663), &#39;weight_pyr&#39;: np.float64(0.0001438449888287663)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb2f88e50&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0001438449888287663), &#39;weight_pyr&#39;: np.float64(0.0001438449888287663)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x792076f53cd0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.00020691380811147902), &#39;weight_pyr&#39;: np.float64(0.00020691380811147902)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb0e03d90&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.00020691380811147902), &#39;weight_pyr&#39;: np.float64(0.00020691380811147902)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x79207c3caa90&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.00029763514416313193), &#39;weight_pyr&#39;: np.float64(0.00029763514416313193)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb2fbca50&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.00029763514416313193), &#39;weight_pyr&#39;: np.float64(0.00029763514416313193)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x79207c3bbd90&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.00042813323987193956), &#39;weight_pyr&#39;: np.float64(0.00042813323987193956)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb2fbdf90&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.00042813323987193956), &#39;weight_pyr&#39;: np.float64(0.00042813323987193956)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x792074bffd10&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0006158482110660267), &#39;weight_pyr&#39;: np.float64(0.0006158482110660267)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb2f53ed0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0006158482110660267), &#39;weight_pyr&#39;: np.float64(0.0006158482110660267)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x79207624a510&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0008858667904100822), &#39;weight_pyr&#39;: np.float64(0.0008858667904100822)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb17fd150&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0008858667904100822), &#39;weight_pyr&#39;: np.float64(0.0008858667904100822)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x792074bfc650&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0012742749857031334), &#39;weight_pyr&#39;: np.float64(0.0012742749857031334)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb8586d50&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0012742749857031334), &#39;weight_pyr&#39;: np.float64(0.0012742749857031334)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x79207566c550&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0018329807108324356), &#39;weight_pyr&#39;: np.float64(0.0018329807108324356)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb1816690&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0018329807108324356), &#39;weight_pyr&#39;: np.float64(0.0018329807108324356)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x79206d1c7d10&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0026366508987303583), &#39;weight_pyr&#39;: np.float64(0.0026366508987303583)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb310a790&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.0026366508987303583), &#39;weight_pyr&#39;: np.float64(0.0026366508987303583)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x79207c3c8c50&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.00379269019073225), &#39;weight_pyr&#39;: np.float64(0.00379269019073225)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb85143d0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.00379269019073225), &#39;weight_pyr&#39;: np.float64(0.00379269019073225)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7920762a1350&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.005455594781168515), &#39;weight_pyr&#39;: np.float64(0.005455594781168515)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb310b6d0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.005455594781168515), &#39;weight_pyr&#39;: np.float64(0.005455594781168515)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x79207c3ba950&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.007847599703514606), &#39;weight_pyr&#39;: np.float64(0.007847599703514606)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb2f9bd90&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.007847599703514606), &#39;weight_pyr&#39;: np.float64(0.007847599703514606)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7920752c3090&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.011288378916846883), &#39;weight_pyr&#39;: np.float64(0.011288378916846883)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb17fd590&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.011288378916846883), &#39;weight_pyr&#39;: np.float64(0.011288378916846883)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x79207621d750&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.01623776739188721), &#39;weight_pyr&#39;: np.float64(0.01623776739188721)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb2f888d0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.01623776739188721), &#39;weight_pyr&#39;: np.float64(0.01623776739188721)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x79207c3c9f10&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.023357214690901212), &#39;weight_pyr&#39;: np.float64(0.023357214690901212)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb1836990&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.023357214690901212), &#39;weight_pyr&#39;: np.float64(0.023357214690901212)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x79207c2c44d0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.03359818286283781), &#39;weight_pyr&#39;: np.float64(0.03359818286283781)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb8520fd0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.03359818286283781), &#39;weight_pyr&#39;: np.float64(0.03359818286283781)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x79207523aad0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.04832930238571752), &#39;weight_pyr&#39;: np.float64(0.04832930238571752)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb8527150&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.04832930238571752), &#39;weight_pyr&#39;: np.float64(0.04832930238571752)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x79207c3e18d0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.06951927961775606), &#39;weight_pyr&#39;: np.float64(0.06951927961775606)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71beb17fe8d0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.06951927961775606), &#39;weight_pyr&#39;: np.float64(0.06951927961775606)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x7920762ba2d0&gt;]}, {&#39;net&#39;: &lt;Network | 3 L2_basket cells
 9 L2_pyramidal cells
 3 L5_basket cells
-9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.1), &#39;weight_pyr&#39;: np.float64(0.1)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x71bea91b0810&gt;]}]]}
+9 L5_pyramidal cells&gt;, &#39;param_values&#39;: {&#39;weight_basket&#39;: np.float64(0.1), &#39;weight_pyr&#39;: np.float64(0.1)}, &#39;dpl&#39;: [&lt;hnn_core.dipole.Dipole object at 0x79207c3b87d0&gt;]}]]}
 </pre></div>
 </div>
 <p>This plot shows an overlay of all smoothed dipole waveforms from the
@@ -747,7 +752,7 @@ dipole activity changes as we vary the synaptic strength parameter.</p>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_plot_batch_simulate_002.png" srcset="../../_images/sphx_glr_plot_batch_simulate_002.png" alt="Min and Max Dipole Peaks across Simulations" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 15.124 seconds)</p>
+<img src="../../_images/sphx_glr_plot_batch_simulate_002.png" srcset="../../_images/sphx_glr_plot_batch_simulate_002.png" alt="Min and Max Dipole Peaks across Simulations" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 14.778 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-howto-plot-batch-simulate-py">
 <div class="binder-badge docutils container">
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/jonescompneurolab/hnn-core/gh-pages?filepath=dev/notebooks/auto_examples/howto/plot_batch_simulate.ipynb"><img alt="Launch binder" src="../../_images/binder_badge_logo.svg" style="width: 150px;" />
@@ -806,13 +811,13 @@ dipole activity changes as we vary the synaptic strength parameter.</p>
 
 
   <div class="sidebar-secondary-item">
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="../../_sources/auto_examples/howto/plot_batch_simulate.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div></div>
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/auto_examples/howto/plot_batch_simulate.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
 
 </div></div>
               
@@ -827,8 +832,8 @@ dipole activity changes as we vary the synaptic strength parameter.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -862,7 +867,7 @@ dipole activity changes as we vary the synaptic strength parameter.</p>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.0.
 </p></div>
       
     </div>
