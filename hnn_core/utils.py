@@ -82,9 +82,11 @@ def _savgol_filter(data, h_freq, sfreq):
     from scipy.signal import savgol_filter
 
     _validate_type(sfreq, (float, int), "sfreq")
-    assert sfreq > 0.0
+    if sfreq <= 0.0:
+        raise ValueError("Sampling frequency must be positive")
     _validate_type(h_freq, (float, int), "h_freq")
-    assert h_freq > 0.0
+    if h_freq <= 0.0:
+        raise ValueError("High cutoff frequency must be positive")
 
     h_freq = float(h_freq)
     if h_freq >= sfreq / 2.0:
@@ -126,7 +128,8 @@ def smooth_waveform(data, window_len, sfreq):
         raise ValueError("Window length less than 1 ms is not supported")
 
     _validate_type(sfreq, (float, int), "sfreq")
-    assert sfreq > 0.0
+    if sfreq <= 0.0:
+        raise ValueError("Sampling frequency must be positive")
     # convolutional filter length is given in samples
     winsz = int(np.round(1e-3 * window_len * sfreq))
     if winsz < 1:
