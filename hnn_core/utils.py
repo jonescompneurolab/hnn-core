@@ -9,7 +9,16 @@ from .externals.mne import _validate_type
 
 
 def _hammfilt(x, winsz):
-    """Convolve with a hamming window."""
+    """Convolve with a hamming window.
+
+    Parameters
+    ----------
+    x : list | np.ndarray
+        The data to filter
+    winsz : int
+        The size (in samples) of a `~numpy.hamming` window to convolve the data with.
+        This must be an integer that is >= 1.
+    """
 
     win = np.hamming(winsz)
     win /= np.sum(win)
@@ -102,13 +111,19 @@ def _savgol_filter(data, h_freq, sfreq):
 def smooth_waveform(data, window_len, sfreq):
     """Smooth an arbitrary waveform using Hamming-windowed convolution
 
+    This takes ``window_len`` ("window length" in ms) and ``sfreq`` (sampling frequency
+    in Hz) to determine the ``winsz`` ("window size" in samples) of a Hamming window to
+    convolve with the data. The final "window size" must be >= 1 and is defined
+    by the following equation:
+
+        winsz = 1e-3 * window_len * sfreq
+
     Parameters
     ----------
     data : list | np.ndarray
         The data to filter
     window_len : float
-        The length (in ms) of a `~numpy.hamming` window to convolve the
-        data with.
+        The length (in ms) of a `~numpy.hamming` window to convolve the data with.
     sfreq : float
         The data sampling rate (in Hz).
 
@@ -120,7 +135,7 @@ def smooth_waveform(data, window_len, sfreq):
     if (isinstance(data, np.ndarray) and data.ndim > 1) or (
         isinstance(data, list) and isinstance(data[0], list)
     ):
-        raise RuntimeError("smoothing currently only supported for 1D-arrays")
+        raise RuntimeError("Smoothing currently only supported for 1D-arrays")
 
     if not isinstance(window_len, (float, int)) or window_len < 0:
         raise ValueError("Window length must be a non-negative number")
@@ -133,11 +148,18 @@ def smooth_waveform(data, window_len, sfreq):
     # convolutional filter length is given in samples
     winsz = int(np.round(1e-3 * window_len * sfreq))
     if winsz < 1:
-        raise ValueError("Window length too small")
+        # @ntolley TODO AES: I now believe this check is correct. Since winsz must be an
+        # integer and cannot be negative, it can either be 0 or positive. If 0, then in
+        # `_hammfilt`, the window will be an empty array and np.convolve fails since
+        # then its second argument is empty, which it cannot be. Therefore, winsz must
+        # be >= 1 always. This comment should be removed after review.
+        raise ValueError(
+            f"Window size is too small: {winsz} samples. Window size is given by "
+            "(1e-3 * window_len * sfreq) and must be >= 1."
+        )
     if winsz > len(data):
         raise ValueError(
-            f"Window length too long: {winsz} samples; data length is "
-            f"{len(data)} samples"
+            f"Window size is too long: {winsz} samples; data length is {len(data)} samples"
         )
 
     return _hammfilt(data, winsz)
