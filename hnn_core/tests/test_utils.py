@@ -26,7 +26,7 @@ def test_hamming_smoothing():
     # Tests of data argument
     # ---------------------------------------------------------------
     # Even one sample short should raise an error
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Window size is too long"):
         smooth_waveform(
             np.arange((1e-3 * default_window_len * default_sfreq) - 1),
             default_window_len,
@@ -37,24 +37,42 @@ def test_hamming_smoothing():
     test_window_len, test_sfreq = 1, 1
     # data must be 1D
     for data in [[[1, 2], [3, 4]], np.array([[1, 2], [3, 4]])]:
-        with pytest.raises(RuntimeError):
+        with pytest.raises(RuntimeError, match="Smoothing currently only sup"):
             smooth_waveform(data, test_window_len, test_sfreq)
 
     # Tests of window_len
     # ---------------------------------------------------------------
     data, test_sfreq = np.random.random((100,)), 1
     # window_len is positive number, longer than data, >1ms, and not a float
-    for test_window_len in [None, -1, 1e6, 1e-1, 2.5]:
-        with pytest.raises(ValueError):
-            smooth_waveform(data, test_window_len, test_sfreq)
+    with pytest.raises(ValueError, match="Window length must be a non-negative number"):
+        smooth_waveform(data, None, test_sfreq)
+    with pytest.raises(ValueError, match="Window length must be a non-negative number"):
+        smooth_waveform(data, -1, test_sfreq)
+    with pytest.raises(ValueError, match="Window length less than 1 ms is"):
+        smooth_waveform(data, 1e-1, test_sfreq)
+    with pytest.raises(ValueError, match="Window size is too long"):
+        smooth_waveform(data, 1e6, test_sfreq)
+    with pytest.raises(ValueError, match="Window size is too small"):
+        smooth_waveform(data, 500, test_sfreq)
+    # Goldlocks: Window size is just right:
+    #     np.round(1e-3 * 501 * 1) = rounded to 1 sample
+    smooth_waveform(data, 501, test_sfreq)
 
     # Tests of sfreq
     # ---------------------------------------------------------------
     # sfreq is positive number
     data, test_window_len = np.random.random((100,)), 1
-    for test_sfreq in [None, [1], -1]:
-        with pytest.raises((TypeError, AssertionError, ValueError)):
-            smooth_waveform(data, test_window_len, test_sfreq)
+    with pytest.raises(TypeError):
+        smooth_waveform(data, test_window_len, None)
+    with pytest.raises(TypeError):
+        smooth_waveform(data, test_window_len, [1])
+    with pytest.raises(ValueError, match="Sampling frequency must be positive"):
+        smooth_waveform(data, test_window_len, -1)
+    with pytest.raises(ValueError, match="Window size is too small"):
+        smooth_waveform(data, test_window_len, 500)
+    # Goldlocks: Window size is just right:
+    #     np.round(1e-3 * 1 * 501) = rounded to 1 sample
+    smooth_waveform(data, test_window_len, 501)
 
 
 def test_savgol_filter():
