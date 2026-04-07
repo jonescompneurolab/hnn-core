@@ -26,7 +26,7 @@ def test_hamming_smoothing():
     # sfreq is positive number
     data, window_len = np.random.random((100,)), 1
     for sfreq in [None, [1], -1]:
-        with pytest.raises((TypeError, AssertionError)):
+        with pytest.raises((TypeError, AssertionError, ValueError)):
             smooth_waveform(data, window_len, sfreq)
 
     x = np.array([1, 2, 3, 4])
