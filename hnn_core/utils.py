@@ -148,11 +148,6 @@ def smooth_waveform(data, window_len, sfreq):
     # convolutional filter length is given in samples
     winsz = int(np.round(1e-3 * window_len * sfreq))
     if winsz < 1:
-        # @ntolley TODO AES: I now believe this check is correct. Since winsz must be an
-        # integer and cannot be negative, it can either be 0 or positive. If 0, then in
-        # `_hammfilt`, the window will be an empty array and np.convolve fails since
-        # then its second argument is empty, which it cannot be. Therefore, winsz must
-        # be >= 1 always. This comment should be removed after review.
         raise ValueError(
             f"Window size is too small: {winsz} samples. Window size is given by "
             "(1e-3 * window_len * sfreq) and must be >= 1."

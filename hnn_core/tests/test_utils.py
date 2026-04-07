@@ -5,18 +5,13 @@ from hnn_core.utils import smooth_waveform, _savgol_filter
 
 def test_hamming_smoothing():
     """Test hamming window convolution smoothing"""
-    # This uses our true default simulation window length of 30 samples and sampling
+    # This uses our true default simulation window length of 30 ms and sampling
     # rate of 40 kHz
     default_window_len = 30
     default_sfreq = 40000
 
-    # Our minimum window is (1e-3 * window_len * sfreq) in samples. Length of data must
-    # be > window size (in samples).
-    #
-    # @ntolley TODO it turns out that our original tests did NOT actually include a test
-    # of successful `smooth_waveform` execution, and instead only tested failure modes.
-    # This adds a test of successful execution. This comment should be removed after
-    # review.
+    # Our minimum window size is (1e-3 * window_len * sfreq) in samples. The size of the
+    # data array must be > window size (in samples).
     smooth_waveform(
         np.arange(1e-3 * default_window_len * default_sfreq),
         default_window_len,
