@@ -1314,7 +1314,9 @@ class HNNGUI:
                 HTML(
                     "Simulation Parameters",
                     description="Simulation parameters heading",
-                ).add_class("sim-tab-titles").add_class("hide-label"),
+                )
+                .add_class("sim-tab-titles")
+                .add_class("hide-label"),
                 VBox(
                     [
                         self.widget_simulation_name,
@@ -1332,7 +1334,9 @@ class HNNGUI:
                 HTML(
                     "Default Visualization Parameters",
                     description="Default visualization parameters heading",
-                ).add_class("sim-tab-titles").add_class("hide-label"),
+                )
+                .add_class("sim-tab-titles")
+                .add_class("hide-label"),
                 VBox(
                     [
                         self.widget_default_smoothing,
@@ -2187,8 +2191,7 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
                 HTML(
                     value=f"""<p style='margin:5px;'><b>{html_tab}{html_tab}
             Receptor: {display_name}</b></p>""",
-                    description=f"Receptor: "
-                    f"{conn_data[receptor_name]['receptor']}",
+                    description=f"Receptor: {conn_data[receptor_name]['receptor']}",
                 ).add_class("hide-label"),
                 HBox(
                     [
@@ -2280,20 +2283,26 @@ def _get_drive_weight_widgets(layout, style, location, data=None):
         "delays": delays,
     }
     widgets_list = (
-        [HTML(
-            value="<b>AMPA weights</b>",
-            description="AMPA weights heading",
-        ).add_class("hide-label")]
+        [
+            HTML(
+                value="<b>AMPA weights</b>",
+                description="AMPA weights heading",
+            ).add_class("hide-label")
+        ]
         + list(weights_ampa.values())
-        + [HTML(
-            value="<b>NMDA weights</b>",
-            description="NMDA weights heading",
-        ).add_class("hide-label")]
+        + [
+            HTML(
+                value="<b>NMDA weights</b>",
+                description="NMDA weights heading",
+            ).add_class("hide-label")
+        ]
         + list(weights_nmda.values())
-        + [HTML(
-            value="<b>Synaptic delays</b>",
-            description="Synaptic delays heading",
-        ).add_class("hide-label")]
+        + [
+            HTML(
+                value="<b>Synaptic delays</b>",
+                description="Synaptic delays heading",
+            ).add_class("hide-label")
+        ]
         + list(delays.values())
     )
     return widgets_list, widgets_dict
@@ -2521,10 +2530,12 @@ def _get_poisson_widget(
     )
     widgets_dict.update({"rate_constant": rate_constant})
     widgets_list.extend(
-        [HTML(
-            value="<b>Rate constants</b>",
-            description="Rate constants heading",
-        ).add_class("hide-label")]
+        [
+            HTML(
+                value="<b>Rate constants</b>",
+                description="Rate constants heading",
+            ).add_class("hide-label")
+        ]
         + list(widgets_dict["rate_constant"].values())
     )
 
@@ -2680,15 +2691,19 @@ def _get_tonic_widget(name, tstop_widget, layout, style, data=None):
 
     widgets_dict = {"amplitude": amplitudes, "t0": start_times, "tstop": stop_times}
     widgets_list = (
-        [HTML(
-            value="<b>Times (ms):</b>",
-            description="Times heading",
-        ).add_class("hide-label")]
+        [
+            HTML(
+                value="<b>Times (ms):</b>",
+                description="Times heading",
+            ).add_class("hide-label")
+        ]
         + [start_times, stop_times]
-        + [HTML(
-            value="<b>Amplitude (nA):</b>",
-            description="Amplitude heading",
-        ).add_class("hide-label")]
+        + [
+            HTML(
+                value="<b>Amplitude (nA):</b>",
+                description="Amplitude heading",
+            ).add_class("hide-label")
+        ]
         + list(amplitudes.values())
     )
 
