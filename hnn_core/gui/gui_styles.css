@@ -352,6 +352,7 @@ padding-bottom: 10px !important;
     color: var(--textbook-light-purple);
     background: transparent !important;
     border: none !important;
+    font-size: 0 !important;
 }
 
 /*  remove focus effects on the icon  */

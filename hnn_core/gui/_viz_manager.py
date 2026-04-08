@@ -657,7 +657,10 @@ def _plot_on_axes(
 
     existing_plots.children = (
         *existing_plots.children,
-        Label(f"{sim_name}: {plot_type}"),
+        Label(
+            f"{sim_name}: {plot_type}",
+            description=f"{sim_name}: {plot_type}",
+        ).add_class("hide-label"),
     )
     if data["use_ipympl"] is False:
         _static_rerender(widgets, fig, fig_idx)
