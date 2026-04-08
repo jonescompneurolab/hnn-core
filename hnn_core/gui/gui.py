@@ -990,8 +990,10 @@ class HNNGUI:
         # static parts
         # Running status
         self._simulation_status_bar = HTML(
-            value=self._simulation_status_contents["not_running"]
+            value=self._simulation_status_contents["not_running"],
+            description="Simulation status",
         )
+        self._simulation_status_bar.add_class("hide-label")
 
         # log window with toggle
         # --------------------------------------------------
@@ -1093,7 +1095,9 @@ class HNNGUI:
                     </div>
                 </div>
             """,
+            description="AES TODO",
         )
+        self._header.add_class("hide-label")
 
     @property
     def analysis_config(self):
@@ -2071,8 +2075,10 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
                     1
                     + (global_gain_textfields[global_gain_type].value - 1)
                     + (single_gain_text_input.value - 1)
-                ):.2f}</b></p>"""
+                ):.2f}</b></p>""",
+            description="Total computed gain",
         )
+        combined_gain_indicator_output.add_class("hide-label")
 
         # Create closure to capture current widget references
         def make_update_gain_indicator(gain_output, gain_input, gain_type):
@@ -2108,8 +2114,10 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
                         + (global_gain_textfields[global_gain_type].value - 1)
                         + (single_gain_text_input.value - 1)
                     )
-                ):.4f}</b>"""
+                ):.4f}</b>""",
+            description="Final weight",
         )
+        final_weight_indicator_output.add_class("hide-label")
 
         # Create closure to capture current widget references
         def make_update_weight_indicator(
@@ -2802,8 +2810,10 @@ def add_network_connectivity_tab(
         ">
         Global Synaptic Gain Modifiers
         </div>
-        """
+        """,
+        description="Global synaptic gain modifiers",
     )
+    title_box.add_class("hide-label")
 
     left_box = VBox(
         [
@@ -2922,7 +2932,9 @@ def add_network_connectivity_tab(
         </style>
         """,
         layout=Layout(display="none"),
+        description="Connectivity styles",
     )
+    connectivity_out_style.add_class("hide-label")
 
     # Display the Accordion with styling
     with connectivity_out:

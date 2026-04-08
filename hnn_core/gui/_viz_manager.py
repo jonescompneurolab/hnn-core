@@ -34,8 +34,11 @@ _fig_placeholder = HTML(
     value="""
         Visualizations will become available in this window after a simulation has been
         run or data have been loaded
-    """
-).add_class("fig-placeholder")
+    """,
+    description="Visualization placeholder",
+)
+_fig_placeholder.add_class("fig-placeholder")
+_fig_placeholder.add_class("hide-label")
 
 _plot_types = [
     "current dipole",
