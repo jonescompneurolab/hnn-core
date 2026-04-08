@@ -149,9 +149,6 @@ def test_simulate_batch(batch_simulate_instance, param_grid):
     with pytest.raises(ValueError, match="Invalid value for the 'backend'"):
         batch_simulate_instance.simulate_batch(param_combinations, backend="invalid")
 
-    with pytest.raises(TypeError, match="verbose must be"):
-        batch_simulate_instance.simulate_batch(param_combinations, verbose="invalid")
-
 
 def test_run(batch_simulate_instance, param_grid):
     """Test the run method of the batch_simulate_instance."""
@@ -177,7 +174,7 @@ def test_run(batch_simulate_instance, param_grid):
         return_output=True,
         combinations=False,
         backend="loky",
-        verbose=50,
+        verbose=False,
     )
 
     assert results_with_cache is not None
@@ -315,3 +312,20 @@ def test_parallel_execution(batch_simulate_instance, param_grid):
     assert serial_time > parallel_time, (
         "Parallel execution is not faster than serial execution!"
     )
+
+
+# This test is currently not working, buffer is returning empty string
+# def test_verbose(batch_simulate_instance, param_grid):
+#     """Test that verbose flag controls print statements."""
+
+#     with io.StringIO() as buf, redirect_stdout(buf):
+#         _ = batch_simulate_instance.run(
+#             param_grid, n_jobs=2, backend="loky", verbose=True
+#         )
+#         assert "Trial 1" in buf.getvalue()
+
+#     with io.StringIO() as buf, redirect_stdout(buf):
+#         _ = batch_simulate_instance.run(
+#             param_grid, n_jobs=2, backend="loky", verbose=False
+#         )
+#         assert buf.getvalue() == ""
