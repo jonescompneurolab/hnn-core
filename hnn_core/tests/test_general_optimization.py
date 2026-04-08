@@ -537,3 +537,103 @@ def test_initial_params_validation(solver, initial_params, error_type):
             max_iter=2,
             initial_params=initial_params,
         )
+
+
+@pytest.mark.parametrize("solver", ["bayesian", "cobyla"])
+def test_custom_loss_fun(solver):
+    """Test optimization routines with a user-defined loss function."""
+
+    max_iter = 2
+    tstop = 10.0
+    n_trials = 1
+
+    # simulate a dipole to establish ground-truth drive parameters
+    net_orig = jones_2009_model(mesh_shape=(3, 3))
+
+    mu_orig = 2.0
+    weights_ampa = {
+        "L2_basket": 0.5,
+        "L2_pyramidal": 0.5,
+        "L5_basket": 0.5,
+        "L5_pyramidal": 0.5,
+    }
+    synaptic_delays = {
+        "L2_basket": 0.1,
+        "L2_pyramidal": 0.1,
+        "L5_basket": 1.0,
+        "L5_pyramidal": 1.0,
+    }
+    net_orig.add_evoked_drive(
+        "evprox",
+        mu=mu_orig,
+        sigma=1,
+        numspikes=1,
+        location="proximal",
+        weights_ampa=weights_ampa,
+        synaptic_delays=synaptic_delays,
+    )
+    dpl_orig = simulate_dipole(net_orig, tstop=tstop, n_trials=n_trials)[0]
+
+    # define set_params function and constraints
+    net_offset = jones_2009_model(mesh_shape=(3, 3))
+
+    def set_params(net_offset, params):
+        weights_ampa = {
+            "L2_basket": 0.5,
+            "L2_pyramidal": 0.5,
+            "L5_basket": 0.5,
+            "L5_pyramidal": 0.5,
+        }
+        synaptic_delays = {
+            "L2_basket": 0.1,
+            "L2_pyramidal": 0.1,
+            "L5_basket": 1.0,
+            "L5_pyramidal": 1.0,
+        }
+        net_offset.add_evoked_drive(
+            "evprox",
+            mu=params["mu"],
+            sigma=params["sigma"],
+            numspikes=1,
+            location="proximal",
+            weights_ampa=weights_ampa,
+            synaptic_delays=synaptic_delays,
+        )
+
+    # define constraints
+    constraints = dict()
+    constraints.update({"mu": (1, 6), "sigma": (1, 3)})
+
+    def custom_loss(dpls, obj_fun_kwargs):
+        from hnn_core.dipole import _rmse, average_dipoles
+        dpl = average_dipoles(dpls)
+        return _rmse(dpl, obj_fun_kwargs["target"], tstop=tstop)
+
+    optim = Optimizer(
+        net_offset,
+        tstop=tstop,
+        constraints=constraints,
+        set_params=set_params,
+        solver=solver,
+        obj_fun="custom",
+        max_iter=max_iter,
+    )
+
+    # test exception raised if missing loss_fun
+    with pytest.raises(Exception, match="loss_fun must be specified"):
+        optim.fit(target=dpl_orig)
+        
+    # test exception raised if loss_fun is not callable
+    with pytest.raises(Exception, match="loss_fun must be a callable"):
+        optim.fit(target=dpl_orig, loss_fun="not_callable")
+
+    optim.fit(target=dpl_orig, loss_fun=custom_loss, n_trials=1)
+
+    # the optimized parameter is in the range
+    for param_idx, param in enumerate(optim.opt_params_):
+        assert (
+            list(constraints.values())[param_idx][0]
+            <= param
+            <= list(constraints.values())[param_idx][1]
+        ), "Optimized parameter is not in user-defined range"
+
