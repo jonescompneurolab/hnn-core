@@ -21,7 +21,7 @@ NEURON {
         USEION na READ ena WRITE ina
         USEION k READ ek WRITE ik
         NONSPECIFIC_CURRENT il
-        RANGE gnabar, gkbar, gl, el, gna, gk
+        RANGE gnabar, gkbar, gl, el, gna, gk, ik, ina, il
         GLOBAL minf, hinf, ninf, mtau, htau, ntau, tshift, temp
 	THREADSAFE : assigned GLOBALs will be per thread
 }
