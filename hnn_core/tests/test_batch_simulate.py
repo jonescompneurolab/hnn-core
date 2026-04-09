@@ -312,20 +312,3 @@ def test_parallel_execution(batch_simulate_instance, param_grid):
     assert serial_time > parallel_time, (
         "Parallel execution is not faster than serial execution!"
     )
-
-
-# This test is currently not working, buffer is returning empty string
-# def test_verbose(batch_simulate_instance, param_grid):
-#     """Test that verbose flag controls print statements."""
-
-#     with io.StringIO() as buf, redirect_stdout(buf):
-#         _ = batch_simulate_instance.run(
-#             param_grid, n_jobs=2, backend="loky", verbose=True
-#         )
-#         assert "Trial 1" in buf.getvalue()
-
-#     with io.StringIO() as buf, redirect_stdout(buf):
-#         _ = batch_simulate_instance.run(
-#             param_grid, n_jobs=2, backend="loky", verbose=False
-#         )
-#         assert buf.getvalue() == ""
