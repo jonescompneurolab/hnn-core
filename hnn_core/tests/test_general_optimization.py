@@ -111,7 +111,8 @@ def test_optimize_evoked(solver, obj_fun):
 
 
 @pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
-def test_rhythmic(solver):
+@pytest.mark.parametrize("relative_bandpower", [[1, 2], 0.5])
+def test_rhythmic(solver, relative_bandpower):
     """Test optimization routines for rhythmic drives in a reduced network."""
 
     max_iter = 2
@@ -191,7 +192,10 @@ def test_rhythmic(solver):
     # test repr before fitting
     assert "fit=False" in repr(optim), "optimizer is already fit"
 
-    optim.fit(f_bands=[(8, 12), (18, 22)], relative_bandpower=[1, 2])
+    with pytest.raises(ValueError, match="Length of relative_bandpower"):
+        optim.fit(f_bands=[(8, 12), (18, 22)], relative_bandpower=[1, 2, 3])
+
+    optim.fit(f_bands=[(8, 12), (18, 22)], relative_bandpower=relative_bandpower)
 
     # test repr after fitting
     assert "fit=True" in repr(optim), "optimizer was not fit"
