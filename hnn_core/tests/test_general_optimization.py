@@ -7,6 +7,7 @@ import pytest
 
 from hnn_core import jones_2009_model, simulate_dipole
 from hnn_core.optimization import Optimizer
+from hnn_core.optimization.objective_functions import _anticorr_evoked
 import numpy as np
 
 
@@ -82,14 +83,14 @@ def test_optimize_evoked(solver, obj_fun):
         constraints=constraints,
         set_params=set_params,
         solver=solver,
-        obj_fun="dipole_rmse",
+        obj_fun=obj_fun,
         max_iter=max_iter,
     )
 
     # test repr before fitting
     assert "fit=False" in repr(optim), "optimizer is already fit"
 
-    optim.fit(target=dpl_orig, n_trials=3)
+    optim.fit(target=dpl_orig, n_trials=3, scale_factor=3000, smooth_window_len=1)
 
     # test repr after fitting
     assert "fit=True" in repr(optim), "optimizer was not fit"
