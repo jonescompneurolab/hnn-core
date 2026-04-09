@@ -7,7 +7,6 @@ import pytest
 
 from hnn_core import jones_2009_model, simulate_dipole
 from hnn_core.optimization import Optimizer
-from hnn_core.optimization.objective_functions import _anticorr_evoked
 import numpy as np
 
 
