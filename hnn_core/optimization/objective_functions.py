@@ -7,7 +7,7 @@
 
 import numpy as np
 from hnn_core import simulate_dipole
-from ..dipole import _rmse, _corr, average_dipoles
+from ..dipole import _rmse, _anticorr, average_dipoles
 from ..batch_simulate import BatchSimulate
 
 
@@ -280,7 +280,7 @@ def _maximize_psd(
     return obj
 
 
-def _corr_evoked(
+def _anticorr_evoked(
     initial_net,
     initial_params,
     set_params,
@@ -316,7 +316,7 @@ def _corr_evoked(
     Returns
     -------
     obj : float
-        Normalized RMSE between recorded and simulated dipole.
+        Anticorrelation between recorded and simulated dipole.
     """
     is_batch = _check_is_batch(predicted_params)
 
@@ -364,7 +364,7 @@ def _corr_evoked(
                 # average dipoles per population
                 dpls.append(average_dipoles(data["dpl"]))
 
-        obj = [_corr(dpl, obj_fun_kwargs["target"], tstop=tstop) for dpl in dpls]
+        obj = [_anticorr(dpl, obj_fun_kwargs["target"], tstop=tstop) for dpl in dpls]
 
     else:
         params = update_params(initial_params, predicted_params)
@@ -380,7 +380,7 @@ def _corr_evoked(
         # smooth & scale all dipoles
         _preprocess_dipole(dpls, obj_fun_kwargs)
         dpl = average_dipoles(dpls)
-        obj = _corr(dpl, obj_fun_kwargs["target"], tstop=tstop)
+        obj = _anticorr(dpl, obj_fun_kwargs["target"], tstop=tstop)
 
     print(f"Mean Loss: {np.mean(obj):.2f}; Min Loss: {np.min(obj):.2f}")
     obj_values.append(obj)
