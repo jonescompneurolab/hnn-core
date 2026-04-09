@@ -7,7 +7,7 @@
 
 import numpy as np
 
-from .objective_functions import _rmse_evoked, _maximize_psd
+from .objective_functions import _rmse_evoked, _anticorr_evoked, _maximize_psd
 from ..externals.mne import _validate_type
 
 
@@ -45,10 +45,10 @@ class Optimizer:
             names, values are initial parameters. The default is None.
             If None, the parameters will be set to the midpoints of parameter ranges.
         solver : str
-            The optimizer, 'bayesian' or 'cobyla'.
+            The optimizer, 'bayesian', 'cobyla', or 'cma'.
         obj_fun : str | func
             The objective function to be minimized. Can be 'dipole_rmse',
-            'maximize_psd', or a user-defined function. The default is
+            'maximize_psd', "dipole_corr", or a user-defined function. The default is
             'dipole_rmse'.
         max_iter : int, optional
             The max number of calls to the objective function. The default is
@@ -58,8 +58,9 @@ class Optimizer:
         ----------
         constraints : dict
             The user-defined constraints.
-        initial_params : dict
-            Initial parameters for the objective function.
+        initial_params : dict, None
+            Initial parameters for the objective function. If None, initial_params
+            is set to the midpoint of upper/lower bounds defined in constraints.
         max_iter : int
             The max number of calls to the objective function.
         solver : func
@@ -77,13 +78,6 @@ class Optimizer:
         opt_params_ : list
             The list of optimized parameter values.
         """
-
-        if initial_net.external_drives:
-            raise ValueError(
-                "The current Network instance has external "
-                + "drives, provide a Network object with no "
-                + "external drives."
-            )
         self._initial_net = initial_net
         self.constraints = constraints
         self._set_params = set_params
@@ -97,6 +91,10 @@ class Optimizer:
             self.solver = "cobyla"
             self._assemble_constraints = _assemble_constraints_cobyla
             self._run_opt = _run_opt_cobyla
+        elif solver == "cma":
+            self.solver = "cma"
+            self._assemble_constraints = _assemble_constraints_cma
+            self._run_opt = _run_opt_cma
         else:
             raise ValueError("solver must be 'bayesian' or 'cobyla'")
         # Response to be optimized
@@ -106,6 +104,9 @@ class Optimizer:
         elif obj_fun == "maximize_psd":
             self.obj_fun = _maximize_psd
             self.obj_fun_name = "maximize_psd"
+        elif obj_fun == "dipole_corr":
+            self.obj_fun = _anticorr_evoked
+            self.obj_fun_name = "dipole_corr"
         else:
             self.obj_fun = obj_fun  # user-defined function
             self.obj_fun_name = None
@@ -165,12 +166,41 @@ class Optimizer:
         relative_bandpower : list of float | float (Required if obj_fun='maximize_psd')
             Weight for each frequency band in f_bands. If a single float is provided,
             the same weight is applied to all frequency bands.
+        sigma0 : float| array-like (Only used if solver='cma')
+            Initial standard deviation of CME-ES algorithm. If float,
+            sigma0 is scaled by bounds defined in the constraints for each parameter.
+            If array-like, The length of sigma0 must equal the length of constraints.
+            Default: 0.25
+        popsize : int (Only used if solver='cma')
+            Number of parameter samples simulated per epoch. Default: 16
+        n_jobs : int (Only used if solver='cma')
+            The number of jobs to start in parallel. If None, then 1 trial will be
+            started without parallelism.
+        tolfun : float
+            Termination criteria. Stops if the range of the best objective function
+            values of the last 10 + ((30 * n_parameters) / popsize) generations and all
+            function values of the recent generation is below tolfun. Default 0.01.
+        dt : float
+            The integration time step of h.CVode (ms). Default: 0.025 ms
         scale_factor : float, optional
             The dipole scale factor.
         smooth_window_len : float, optional
             The smooth window length.
+        verbose : bool
+            If True, print build steps and simulation progress to console. Default: True.
+
+        Notes
+        -----
+        When defining sigma0 for CMA-ES as a float, the sigma0 applied to each parameter
+        is calculated as sigma0 * (upper_bound - lower_bound) based on the constraints.
+        It is recommended to choose a sigma0 such that the optimum is expected to lie within
+        about initial_params +- 3*sigma0. A smaller sigma0 searches closer to initial_params.
+
+        When defining popsize for CMA-ES, it is recommended to increase popsize relative to
+        the number of parameters being optimized (N). 4+3*log(N)
+
         """
-        if self.obj_fun_name == "dipole_rmse":
+        if self.obj_fun_name == "dipole_rmse" or self.obj_fun_name == "dipole_corr":
             if "target" not in obj_fun_kwargs:
                 raise Exception("target must be specified")
             elif "n_trials" not in obj_fun_kwargs:
@@ -306,6 +336,27 @@ def _assemble_constraints_cobyla(constraints):
     return cons_cobyla
 
 
+def _assemble_constraints_cma(constraints):
+    """Assembles constraints in format required by cma.
+
+    Parameters
+    ----------
+    constraints : dict
+        The user-defined constraints.
+
+    Returns
+    -------
+    cons_cma : list of lists
+        Lower and higher limit for each parameter.
+    """
+
+    # assemble constraints in solver-specific format
+    lower_bounds = [bound[0] for bound in constraints.values()]
+    upper_bounds = [bound[1] for bound in constraints.values()]
+    cons_cma = [lower_bounds, upper_bounds]
+    return cons_cma
+
+
 def _update_params(initial_params, predicted_params):
     """Update params with predicted parameters.
 
@@ -373,6 +424,8 @@ def _run_opt_bayesian(
 
     from ..externals.bayesopt import bayes_opt, expected_improvement
 
+    # `obj_values` tracks optimizer loss over all epochs
+    # the list is passed to `_obj_func()` and updated in place
     obj_values = list()
 
     def _obj_func(predicted_params):
@@ -407,6 +460,114 @@ def _run_opt_bayesian(
     set_params(net_, params)
 
     return opt_params, obj, net_
+
+
+def _run_opt_cma(
+    initial_net,
+    tstop,
+    constraints,
+    set_params,
+    initial_params,
+    obj_fun,
+    max_iter,
+    obj_fun_kwargs,
+):
+    """Runs optimization routine with CMA-ES
+
+    Parameters
+    ----------
+    initial_net : instance of Network
+        The network object.
+    tstop : float
+        The simulated dipole's duration.
+    constraints : list of tuples
+        Parameter constraints in solver-specific format.
+    set_params : func
+        User-defined function that sets parameters in network drives.
+    initial_params : dict
+        Keys are parameter names, values are initial parameters.
+    obj_fun : func
+        The objective function.
+    max_iter : int
+        Number of calls the optimizer makes.
+    obj_fun_kwargs : dict
+        Additional arguments along with their respective values to be passed
+        to the objective function.
+
+    Returns
+    -------
+    opt_params : list
+        Optimized parameters.
+    obj : list
+        Objective values.
+    net_ : instance of Network
+        Optimized network object.
+    """
+
+    import cma
+
+    # `obj_values` tracks optimizer loss over all epochs
+    # the list is passed to `_obj_func()` and updated in place
+    obj_values = list()
+
+    def _obj_func(predicted_params):
+        return obj_fun(
+            initial_net=initial_net,
+            initial_params=initial_params,
+            set_params=set_params,
+            predicted_params=predicted_params,
+            update_params=_update_params,
+            obj_values=obj_values,
+            tstop=tstop,
+            obj_fun_kwargs=obj_fun_kwargs,
+        )
+
+    default_sigma0 = 0.25
+    sigma0 = obj_fun_kwargs.get("sigma0", default_sigma0)
+    _validate_type(sigma0, (int, float, list, np.ndarray))
+    if isinstance(sigma0, (float, int)):
+        if sigma0 < 0:
+            raise ValueError("sigma0 must be greater than zero")
+        sigma0 = sigma0 * (np.array(constraints[1]) - np.array(constraints[0]))
+    elif isinstance(sigma0, (list, np.ndarray)):
+        if len(np.array(sigma0).shape) > 1:
+            raise ValueError(
+                f"When sigma0 is array-like, it must be shape (N,), got shape {np.array(sigma0).shape}"
+            )
+        if len(sigma0) != len(constraints):
+            raise ValueError(
+                "When sigma0 is array-like, the length must be the same as the constraints."
+                f"Expected {len(constraints)} elements, got {len(sigma0)} elements)"
+            )
+    es = cma.CMAEvolutionStrategy(
+        list(initial_params.values()),
+        1,
+        {
+            "bounds": constraints,
+            "tolfun": obj_fun_kwargs.get("tolfun", 0.01),
+            "maxiter": max_iter,
+            "popsize": obj_fun_kwargs.get("popsize", 16),
+            "CMA_stds": sigma0,
+            "verbose": 0,
+        },
+    )
+    while not es.stop():
+        solutions = es.ask()
+        es.tell(solutions, _obj_func(solutions))
+    es.result_pretty()
+
+    # get best params
+    best_params = es.result.xbest
+
+    # get objective values
+    obj = [np.min(obj_values[:idx]) for idx in range(1, max_iter + 1)]
+
+    # get optimized net
+    params = _update_params(initial_params, best_params)
+    net_ = initial_net.copy()
+    set_params(net_, params)
+
+    return best_params, obj, net_
 
 
 def _run_opt_cobyla(
@@ -453,6 +614,8 @@ def _run_opt_cobyla(
 
     from scipy.optimize import fmin_cobyla
 
+    # `obj_values` tracks optimizer loss over all epochs
+    # the list is passed to `_obj_func()` and updated in place
     obj_values = list()
 
     def _obj_func(predicted_params):

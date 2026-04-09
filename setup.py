@@ -76,7 +76,7 @@ class build_py_mod(build_py):
 
 if __name__ == "__main__":
     extras = {
-        'opt': ['scikit-learn'],
+        'opt': ['scikit-learn', 'cma'],
         'parallel': ['joblib', 'psutil'],
         'test': ['codespell', 'pytest', 'pytest-cov', 'pytest-xdist', 'ruff'],
         'docs': ['mne', 'myst-parser', 'nibabel', 'numpydoc', 'pillow',
