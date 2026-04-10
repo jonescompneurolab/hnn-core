@@ -563,7 +563,8 @@ def read_spikes(fname, gid_ranges=None):
             spike_gids += [list()]
             spike_types += [list()]
 
-    network_cell_names = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
+    from .network_models import default_cell_metadata
+    network_cell_names = list(default_cell_metadata.keys())
     cell_type_names = list(
         cell_name for cell_name in network_cell_names if cell_name in spike_types
     )
