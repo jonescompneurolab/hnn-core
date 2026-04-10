@@ -5,11 +5,10 @@
 
 # hnn-core
 
-[![tests](https://github.com/jonescompneurolab/hnn-core/actions/workflows/unix_unit_tests.yml/badge.svg?branch=master)](https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:master+event:push)
+[![tests](https://github.com/jonescompneurolab/hnn-core/actions/workflows/unix_unit_tests.yml/badge.svg?branch=master)](https://github.com/jonescompneurolab/hnn-core/actions/?query=branch:master)
 [![CircleCI](https://circleci.com/gh/jonescompneurolab/hnn-core.svg?style=svg)](https://circleci.com/gh/jonescompneurolab/hnn-core)
 [![Codecov](https://codecov.io/gh/jonescompneurolab/hnn-core/branch/master/graph/badge.svg)](https://codecov.io/gh/jonescompneurolab/hnn-core)
 [![PyPI](https://img.shields.io/pypi/dm/hnn-core.svg?label=PyPI%20downloads)](https://pypi.org/project/hnn-core/)
-[![Gitter](https://badges.gitter.im/jonescompneurolab/hnn_core.svg)](https://gitter.im/jonescompneurolab/hnn-core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![JOSS](https://joss.theoj.org/papers/10.21105/joss.05848/status.svg)](https://doi.org/10.21105/joss.05848)
 
 ![HNN-GUI](https://raw.githubusercontent.com/jonescompneurolab/hnn-core/acbcc4a598610dc3be5d4b0b7c59f98251ea7690/.github/images/hnn_gui.png)

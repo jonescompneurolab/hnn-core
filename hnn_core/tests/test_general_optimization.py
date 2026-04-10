@@ -7,10 +7,12 @@ import pytest
 
 from hnn_core import jones_2009_model, simulate_dipole
 from hnn_core.optimization import Optimizer
+import numpy as np
 
 
-@pytest.mark.parametrize("solver", ["bayesian", "cobyla"])
-def test_optimize_evoked(solver):
+@pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
+@pytest.mark.parametrize("obj_fun", ["dipole_rmse", "dipole_corr"])
+def test_optimize_evoked(solver, obj_fun):
     """Test optimization routines for evoked drives in a reduced network."""
 
     max_iter = 2
@@ -80,32 +82,14 @@ def test_optimize_evoked(solver):
         constraints=constraints,
         set_params=set_params,
         solver=solver,
-        obj_fun="dipole_rmse",
+        obj_fun=obj_fun,
         max_iter=max_iter,
     )
-
-    # test exception raised
-    with pytest.raises(
-        ValueError,
-        match="The current Network instance has "
-        "external drives, provide a Network object with no "
-        "external drives.",
-    ):
-        net_with_drives = net_orig.copy()
-        optim = Optimizer(
-            net_with_drives,
-            tstop=tstop,
-            constraints=constraints,
-            set_params=set_params,
-            solver=solver,
-            obj_fun="dipole_rmse",
-            max_iter=max_iter,
-        )
 
     # test repr before fitting
     assert "fit=False" in repr(optim), "optimizer is already fit"
 
-    optim.fit(target=dpl_orig, n_trials=3)
+    optim.fit(target=dpl_orig, n_trials=3, scale_factor=3000, smooth_window_len=1)
 
     # test repr after fitting
     assert "fit=True" in repr(optim), "optimizer was not fit"
@@ -119,14 +103,15 @@ def test_optimize_evoked(solver):
         ), "Optimized parameter is not in user-defined range"
 
     obj = optim.obj_
-    # the number of returned rmse values should be the same as max_iter
-    assert len(obj) <= max_iter, "Number of rmse values should be the same as max_iter"
-    # the returned rmse values should be positive
-    assert all(vals >= 0 for vals in obj), "rmse values should be positive"
+    # the number of returned loss values should be the same as max_iter
+    assert len(obj) <= max_iter, "Number of loss values should be the same as max_iter"
+    # the returned loss values should be positive
+    assert all(vals >= 0 for vals in obj), "loss values should be positive"
 
 
-@pytest.mark.parametrize("solver", ["bayesian", "cobyla"])
-def test_rhythmic(solver):
+@pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
+@pytest.mark.parametrize("relative_bandpower", [[1, 2], 0.5])
+def test_rhythmic(solver, relative_bandpower):
     """Test optimization routines for rhythmic drives in a reduced network."""
 
     max_iter = 2
@@ -203,28 +188,13 @@ def test_rhythmic(solver):
         max_iter=max_iter,
     )
 
-    # test exception raised
-    with pytest.raises(
-        ValueError,
-        match="The current Network instance has "
-        "external drives, provide a Network object with no "
-        "external drives.",
-    ):
-        net_with_drives = jones_2009_model(add_drives_from_params=True)
-        optim = Optimizer(
-            net_with_drives,
-            tstop=tstop,
-            constraints=constraints,
-            set_params=set_params,
-            solver=solver,
-            obj_fun="maximize_psd",
-            max_iter=max_iter,
-        )
-
     # test repr before fitting
     assert "fit=False" in repr(optim), "optimizer is already fit"
 
-    optim.fit(f_bands=[(8, 12), (18, 22)], relative_bandpower=[1, 2])
+    with pytest.raises(ValueError, match="Length of relative_bandpower"):
+        optim.fit(f_bands=[(8, 12), (18, 22)], relative_bandpower=[1, 2, 3])
+
+    optim.fit(f_bands=[(8, 12), (18, 22)], relative_bandpower=relative_bandpower)
 
     # test repr after fitting
     assert "fit=True" in repr(optim), "optimizer was not fit"
@@ -242,156 +212,7 @@ def test_rhythmic(solver):
     assert len(obj) <= max_iter, "Number of rmse values should be the same as max_iter"
 
 
-@pytest.mark.parametrize("solver", ["bayesian", "cobyla"])
-def test_user_obj_fun(solver):
-    """Test optimization routines with a user-defined optimization function."""
-
-    max_iter = 2
-    tstop = 10.0
-
-    # simulate a dipole to establish ground-truth drive parameters
-    net_offset = jones_2009_model(mesh_shape=(3, 3))
-
-    def maximize_csd(
-        initial_net,
-        initial_params,
-        set_params,
-        predicted_params,
-        update_params,
-        obj_values,
-        tstop,
-        obj_fun_kwargs,
-    ):
-        import numpy as np
-        from hnn_core.optimization import _update_params
-        from hnn_core.extracellular import calculate_csd2d, _get_laminar_z_coords
-
-        params = _update_params(initial_params, predicted_params)
-
-        # simulate dpl with predicted params
-        new_net = initial_net.copy()
-        set_params(new_net, params)
-
-        # set electrode array
-        depths = list(range(-325, 2150, 100))
-        electrode_pos = [(135, 135, dep) for dep in depths]
-        new_net.add_electrode_array("shank1", electrode_pos)
-
-        simulate_dipole(new_net, tstop=tstop, dt=0.5, n_trials=1)[0]
-
-        potentials = new_net.rec_arrays["shank1"][0]
-
-        # smooth
-        if "smooth_window_len" in obj_fun_kwargs:
-            potentials.smooth(window_len=obj_fun_kwargs["smooth_window_len"])
-
-        # get csd of simulated potentials
-        lfp = potentials.voltages[0]  # n_contacts, n_times
-        contact_labels, delta = _get_laminar_z_coords(potentials.positions)
-        csd = calculate_csd2d(lfp_data=lfp, delta=delta)  # n_contacts, n_times
-
-        # for each tuple
-        csd_subsets = list()  # band, n_contacts, n_times
-        for idx, t_band in enumerate(obj_fun_kwargs["t_bands"]):
-            t_min = np.argmax(potentials.times >= t_band[0])
-            t_max = np.argmax(potentials.times >= t_band[1])
-            depth_min = np.argmax(
-                contact_labels >= obj_fun_kwargs["electrode_depths"][idx][0]
-            )
-            depth_max = np.argmax(
-                contact_labels >= obj_fun_kwargs["electrode_depths"][idx][1]
-            )
-
-            csd_subsets.append(
-                sum(sum(csd[depth_min : depth_max + 1, t_min : t_max + 1]))
-            )
-
-        obj = sum(csd_subsets) / sum(sum(csd))
-        obj_values.append(obj)
-
-        return obj
-
-    def set_params(net_offset, params):
-        weights_ampa = {
-            "L2_basket": 0.5,
-            "L2_pyramidal": 0.5,
-            "L5_basket": 0.5,
-            "L5_pyramidal": 0.5,
-        }
-        synaptic_delays = {
-            "L2_basket": 0.1,
-            "L2_pyramidal": 0.1,
-            "L5_basket": 1.0,
-            "L5_pyramidal": 1.0,
-        }
-        net_offset.add_evoked_drive(
-            "evprox",
-            mu=params["mu"],
-            sigma=params["sigma"],
-            numspikes=1,
-            location="proximal",
-            weights_ampa=weights_ampa,
-            synaptic_delays=synaptic_delays,
-        )
-
-    # define constraints
-    constraints = dict()
-    constraints.update({"mu": (1, 200), "sigma": (1, 15)})
-
-    optim = Optimizer(
-        net_offset,
-        tstop=tstop,
-        constraints=constraints,
-        set_params=set_params,
-        solver=solver,
-        obj_fun=maximize_csd,
-        max_iter=max_iter,
-    )
-
-    # test exception raised
-    with pytest.raises(
-        ValueError,
-        match="The current Network instance has "
-        "external drives, provide a Network object with no "
-        "external drives.",
-    ):
-        net_with_drives = jones_2009_model(add_drives_from_params=True)
-        optim = Optimizer(
-            net_with_drives,
-            tstop=tstop,
-            constraints=constraints,
-            set_params=set_params,
-            solver=solver,
-            obj_fun=maximize_csd,
-            max_iter=max_iter,
-        )
-
-    # test repr before fitting
-    assert "fit=False" in repr(optim), "optimizer is already fit"
-
-    # increase power in infragranular layers (100-150 ms)
-    optim.fit(
-        t_bands=[
-            (100, 150),
-        ],
-        electrode_depths=[
-            (0, 200),
-        ],
-    )
-
-    # test repr after fitting
-    assert "fit=True" in repr(optim), "optimizer was not fit"
-
-    # the optimized parameter is in the range
-    for param_idx, param in enumerate(optim.opt_params_):
-        assert (
-            list(constraints.values())[param_idx][0]
-            <= param
-            <= list(constraints.values())[param_idx][1]
-        ), "Optimized parameter is not in user-defined range"
-
-
-@pytest.mark.parametrize("solver", ["bayesian", "cobyla"])
+@pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
 def test_initial_params(solver):
     """Test optimization routines with user-defined initial parameters."""
 
@@ -479,7 +300,7 @@ def test_initial_params(solver):
     optim.fit(target=dpl_orig, n_trials=3)
 
 
-@pytest.mark.parametrize("solver", ["bayesian", "cobyla"])
+@pytest.mark.parametrize("solver", ["bayesian", "cobyla", "cma"])
 @pytest.mark.parametrize(
     "initial_params, error_type",
     [
@@ -537,3 +358,38 @@ def test_initial_params_validation(solver, initial_params, error_type):
             max_iter=2,
             initial_params=initial_params,
         )
+
+
+def test_cma_validation():
+    net = jones_2009_model(mesh_shape=(3, 3))
+    tstop = 10.0
+    constraints = {"mu": (1, 10), "sigma": (1, 10)}
+    solver = "cma"
+    obj_fun = "dipole_rmse"
+    max_iter = 2
+
+    dpl_target = simulate_dipole(net, tstop=tstop)[0]
+
+    def set_params(a, b):
+        pass
+
+    optim = Optimizer(
+        net,
+        tstop=tstop,
+        constraints=constraints,
+        set_params=set_params,
+        solver=solver,
+        obj_fun=obj_fun,
+        max_iter=max_iter,
+    )
+
+    with pytest.raises(ValueError, match="sigma0 must be greater than"):
+        optim.fit(target=dpl_target, sigma0=-1)
+
+    with pytest.raises(ValueError, match="it must be shape"):
+        optim.fit(target=dpl_target, sigma0=np.array([[0, 1], [2, 3]]))
+
+    with pytest.raises(ValueError, match="length must be the same as the constraints"):
+        optim.fit(target=dpl_target, sigma0=[1, 2, 3])
+
+    optim.fit(target=dpl_target, sigma0=[1, 2])

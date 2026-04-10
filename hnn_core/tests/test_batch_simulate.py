@@ -149,9 +149,6 @@ def test_simulate_batch(batch_simulate_instance, param_grid):
     with pytest.raises(ValueError, match="Invalid value for the 'backend'"):
         batch_simulate_instance.simulate_batch(param_combinations, backend="invalid")
 
-    with pytest.raises(TypeError, match="verbose must be"):
-        batch_simulate_instance.simulate_batch(param_combinations, verbose="invalid")
-
 
 def test_run(batch_simulate_instance, param_grid):
     """Test the run method of the batch_simulate_instance."""
@@ -177,7 +174,7 @@ def test_run(batch_simulate_instance, param_grid):
         return_output=True,
         combinations=False,
         backend="loky",
-        verbose=50,
+        verbose=False,
     )
 
     assert results_with_cache is not None

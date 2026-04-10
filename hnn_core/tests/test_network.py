@@ -1268,7 +1268,7 @@ def test_network_mesh():
 
 @pytest.mark.parametrize(
     "network_model",
-    [jones_2009_model],  # TEMP JUST FOR DEBUGGING FOCUS ON JONES
+    [jones_2009_model, law_2021_model, calcium_model],
 )
 def test_network_models_mesh(network_model):
     mesh_shape = (2, 3)
@@ -1277,6 +1277,10 @@ def test_network_models_mesh(network_model):
     assert dp is not None
     assert len(dp[0].times) > 0
     assert np.all(np.isfinite(dp[0].data["agg"]))
+    assert net._N_pyr_x == mesh_shape[0]
+    assert net._N_pyr_y == mesh_shape[1]
+    assert len(net.pos_dict["L2_pyramidal"]) == mesh_shape[0] * mesh_shape[1]
+    assert len(net.pos_dict["L5_pyramidal"]) == mesh_shape[0] * mesh_shape[1]
     del net, dp
 
 
@@ -2073,3 +2077,17 @@ def test_check_global_synaptic_gains_uniformity():
     assert result is False
     assert "WARNING" in stdout
     assert "custom synaptic gain values" in stdout
+
+
+def test_verbose():
+    """Test that verbose flag controls print statements."""
+
+    net = jones_2009_model(mesh_shape=(3, 3))
+
+    with io.StringIO() as buf, redirect_stdout(buf):
+        simulate_dipole(net, dt=0.5, tstop=20.0, verbose=True)
+        assert "Trial 1" in buf.getvalue()
+
+    with io.StringIO() as buf, redirect_stdout(buf):
+        simulate_dipole(net, dt=0.5, tstop=20.0, verbose=False)
+        assert buf.getvalue() == ""
