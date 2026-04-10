@@ -352,6 +352,7 @@ padding-bottom: 10px !important;
     color: var(--textbook-light-purple);
     background: transparent !important;
     border: none !important;
+    font-size: 0 !important;
 }
 
 /*  remove focus effects on the icon  */
@@ -913,4 +914,24 @@ padding-bottom: 10px !important;
 */
 .dark-mode .visualization-window .lm-TabBar-content::after {
     border-bottom: 2px solid var(--dm-theme) !important;
+}
+
+/*
+Source - https://stackoverflow.com/a/71369523
+Posted by GrahamTheDev
+Retrieved 2026-04-08, License - CC BY-SA 4.0
+*/
+/* AES: This "hide-label" part was adapted to our needs with Claude */
+.hide-label > .widget-label {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    position: absolute !important;
+    height: 1px; 
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px 1px 1px 1px); /* IE6, IE7 - a 0 height clip, off to the bottom right of the visible 1px box */
+    clip: rect(1px, 1px, 1px, 1px); /*maybe deprecated but we need to support legacy browsers */
+    clip-path: inset(50%); /*modern browsers, clip-path works inwards from each corner*/
+    white-space: nowrap; /* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
 }

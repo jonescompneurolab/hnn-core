@@ -809,6 +809,7 @@ class HNNGUI:
         self.simulation_list_widget = Dropdown(
             options=["Simulation Output to Save"],
             value="Simulation Output to Save",
+            description="Simulation output:",
             disabled=True,
             layout=Layout(
                 width="50%",
@@ -816,6 +817,7 @@ class HNNGUI:
                 min_width="0",  # forces text to truncate
             ),
         ).add_class("simulation-list-widget")
+        self.simulation_list_widget.add_class("hide-label")
 
         # ==================================================
         # Network tab
@@ -948,7 +950,7 @@ class HNNGUI:
         </a>
         """
         # Create widget wrapper
-        return HTML(
+        html_widget = HTML(
             self.html_download_button.format(
                 payload=payload,
                 filename={""},
@@ -958,8 +960,11 @@ class HNNGUI:
                 color_theme=self.layout["theme_color"],
                 title=title,
                 mimetype=mimetype,
-            )
+            ),
+            description=title,
         )
+        html_widget.add_class("hide-label")
+        return html_widget
 
     def add_logging_window_logger(self):
         handler = _OutputWidgetHandler(self._log_out)
@@ -990,14 +995,17 @@ class HNNGUI:
         # static parts
         # Running status
         self._simulation_status_bar = HTML(
-            value=self._simulation_status_contents["not_running"]
+            value=self._simulation_status_contents["not_running"],
+            description="Simulation status",
         )
+        self._simulation_status_bar.add_class("hide-label")
 
         # log window with toggle
         # --------------------------------------------------
         # toggle button
         self._log_toggle_btn = Button(
             icon="chevron-down",
+            description="Toggle Log View",
             layout=Layout(width="30px", height="30px"),
             tooltip="Toggle Log View",
         ).add_class("log-toggle-icon")
@@ -1069,11 +1077,16 @@ class HNNGUI:
                         height: 20px;
                         display: flex;
                         align-items: center;
-                        cursor: pointer;
                     ">
-                        <div style="width: 20px; height: 20px; display: flex;"
-                            onclick="hnnToggleTheme()">
-                            <svg id="sun-svg" viewBox="0 0 512 512" style="
+                        <button style="
+                            width: 20px; height: 20px; display: flex;
+                            background: none; border: none; padding: 0;
+                            cursor: pointer;
+                            "
+                            onclick="hnnToggleTheme()"
+                            aria-label="Toggle dark mode">
+                            <svg id="sun-svg" viewBox="0 0 512 512"
+                                aria-hidden="true" style="
                                 fill: white;
                                 display: block;
                                 width: 100%;
@@ -1081,7 +1094,8 @@ class HNNGUI:
                             ">
                                 <path d="{sun_icon}"></path>
                             </svg>
-                            <svg id="moon-svg" viewBox="0 0 384 512" style="
+                            <svg id="moon-svg" viewBox="0 0 384 512"
+                                aria-hidden="true" style="
                                 fill: white;
                                 display: none;
                                 width: 100%;
@@ -1089,11 +1103,13 @@ class HNNGUI:
                             ">
                                 <path d="{moon_icon}"></path>
                             </svg>
-                        </div>
+                        </button>
                     </div>
                 </div>
             """,
+            description="AES TODO",
         )
+        self._header.add_class("hide-label")
 
     @property
     def analysis_config(self):
@@ -1295,7 +1311,12 @@ class HNNGUI:
 
         simulation_box = VBox(
             [
-                HTML("Simulation Parameters").add_class("sim-tab-titles"),
+                HTML(
+                    "Simulation Parameters",
+                    description="Simulation parameters heading",
+                )
+                .add_class("sim-tab-titles")
+                .add_class("hide-label"),
                 VBox(
                     [
                         self.widget_simulation_name,
@@ -1310,7 +1331,12 @@ class HNNGUI:
                 # help prevent any "smushing" or overlap that may appear on some
                 # OS/browser combinations but not others:
                 Box().add_class("dynamic-spacer"),
-                HTML("Default Visualization Parameters").add_class("sim-tab-titles"),
+                HTML(
+                    "Default Visualization Parameters",
+                    description="Default visualization parameters heading",
+                )
+                .add_class("sim-tab-titles")
+                .add_class("hide-label"),
                 VBox(
                     [
                         self.widget_default_smoothing,
@@ -1527,6 +1553,7 @@ class HNNGUI:
                 src="{minimal_img_src}"
                 onload="{gui_scripts}"
                 style="display:none;"
+                alt=""
             >
         """
 
@@ -1827,7 +1854,10 @@ class HNNGUI:
         ).add_class("red-button")
         delete_button.on_click(self._delete_single_drive)
         drive_box.children += (
-            HTML(value="<p> </p>"),  # Adds blank space
+            HTML(
+                value="<p> </p>",
+                description="Spacer",
+            ).add_class("hide-label"),  # Adds blank space
             delete_button,
         )
 
@@ -2071,8 +2101,10 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
                     1
                     + (global_gain_textfields[global_gain_type].value - 1)
                     + (single_gain_text_input.value - 1)
-                ):.2f}</b></p>"""
+                ):.2f}</b></p>""",
+            description="Total computed gain",
         )
+        combined_gain_indicator_output.add_class("hide-label")
 
         # Create closure to capture current widget references
         def make_update_gain_indicator(gain_output, gain_input, gain_type):
@@ -2108,8 +2140,10 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
                         + (global_gain_textfields[global_gain_type].value - 1)
                         + (single_gain_text_input.value - 1)
                     )
-                ):.4f}</b>"""
+                ):.4f}</b>""",
+            description="Final weight",
         )
+        final_weight_indicator_output.add_class("hide-label")
 
         # Create closure to capture current widget references
         def make_update_weight_indicator(
@@ -2156,8 +2190,9 @@ def _get_connectivity_widgets(conn_data, global_gain_textfields):
             [
                 HTML(
                     value=f"""<p style='margin:5px;'><b>{html_tab}{html_tab}
-            Receptor: {display_name}</b></p>"""
-                ),
+            Receptor: {display_name}</b></p>""",
+                    description=f"Receptor: {conn_data[receptor_name]['receptor']}",
+                ).add_class("hide-label"),
                 HBox(
                     [
                         weight_text_input,
@@ -2248,11 +2283,26 @@ def _get_drive_weight_widgets(layout, style, location, data=None):
         "delays": delays,
     }
     widgets_list = (
-        [HTML(value="<b>AMPA weights</b>")]
+        [
+            HTML(
+                value="<b>AMPA weights</b>",
+                description="AMPA weights heading",
+            ).add_class("hide-label")
+        ]
         + list(weights_ampa.values())
-        + [HTML(value="<b>NMDA weights</b>")]
+        + [
+            HTML(
+                value="<b>NMDA weights</b>",
+                description="NMDA weights heading",
+            ).add_class("hide-label")
+        ]
         + list(weights_nmda.values())
-        + [HTML(value="<b>Synaptic delays</b>")]
+        + [
+            HTML(
+                value="<b>Synaptic delays</b>",
+                description="Synaptic delays heading",
+            ).add_class("hide-label")
+        ]
         + list(delays.values())
     )
     return widgets_list, widgets_dict
@@ -2480,7 +2530,12 @@ def _get_poisson_widget(
     )
     widgets_dict.update({"rate_constant": rate_constant})
     widgets_list.extend(
-        [HTML(value="<b>Rate constants</b>")]
+        [
+            HTML(
+                value="<b>Rate constants</b>",
+                description="Rate constants heading",
+            ).add_class("hide-label")
+        ]
         + list(widgets_dict["rate_constant"].values())
     )
 
@@ -2636,9 +2691,19 @@ def _get_tonic_widget(name, tstop_widget, layout, style, data=None):
 
     widgets_dict = {"amplitude": amplitudes, "t0": start_times, "tstop": stop_times}
     widgets_list = (
-        [HTML(value="<b>Times (ms):</b>")]
+        [
+            HTML(
+                value="<b>Times (ms):</b>",
+                description="Times heading",
+            ).add_class("hide-label")
+        ]
         + [start_times, stop_times]
-        + [HTML(value="<b>Amplitude (nA):</b>")]
+        + [
+            HTML(
+                value="<b>Amplitude (nA):</b>",
+                description="Amplitude heading",
+            ).add_class("hide-label")
+        ]
         + list(amplitudes.values())
     )
 
@@ -2802,8 +2867,10 @@ def add_network_connectivity_tab(
         ">
         Global Synaptic Gain Modifiers
         </div>
-        """
+        """,
+        description="Global synaptic gain modifiers",
     )
+    title_box.add_class("hide-label")
 
     left_box = VBox(
         [
@@ -2922,7 +2989,9 @@ def add_network_connectivity_tab(
         </style>
         """,
         layout=Layout(display="none"),
+        description="Connectivity styles",
     )
+    connectivity_out_style.add_class("hide-label")
 
     # Display the Accordion with styling
     with connectivity_out:
