@@ -315,3 +315,33 @@ def test_parallel_execution(batch_simulate_instance, param_grid):
     assert serial_time > parallel_time, (
         "Parallel execution is not faster than serial execution!"
     )
+
+def test_dask_backend(batch_simulate_instance, param_grid):
+    """Test using the dask backend for parallel execution."""
+    pytest.importorskip("dask.distributed")
+    
+    from dask.distributed import Client, LocalCluster
+    
+    param_combinations = batch_simulate_instance._generate_param_combinations(
+        param_grid
+    )
+    
+    cluster = LocalCluster(processes=True, n_workers=2, threads_per_worker=1)
+    client = Client(cluster)
+    
+    try:
+        results = batch_simulate_instance.simulate_batch(
+            param_combinations, n_jobs=2, backend="dask"
+        )
+        
+        # Verify results structure and completeness
+        assert len(results) == len(param_combinations)
+        for result in results:
+            assert "net" in result
+            assert "dpl" in result
+            assert "param_values" in result
+            
+    finally:
+        # Clean up resources
+        client.close()
+        cluster.close()
