@@ -26,19 +26,30 @@ tags
 cover
 
 # IDE programs
-.cursor
+.cursor/
 .idea/
 .vscode/
 
 # AI and LLMs
+.claude/
+.codex/
 AGENTS.md
 CLAUDE.md
 GEMINI.md
 
-# Testing
+# Downloaded or created during testing
+.pytest_cache
 dpl.txt
 dpl2.txt
-.pytest_cache
+saved_network.json
+survey_seen.json
+yes_trial_S1_ERP_all_avg.txt
+hnn_core/param/base.json
+hnn_core/param/default.param
+hnn_core/param/empty.json
+hnn_core/param/ERPYes100Trials.json
+hnn_core/param/ERPYes100Trials.param
+
 
 # Caches, compilations, and other
 *.pyc
