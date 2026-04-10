@@ -1083,7 +1083,8 @@ class _VizManager:
         plt.close("all")
         self.viz_layout = viz_layout
         self.fig_default_params = fig_default_params
-        self.use_ipympl = "ipympl" in matplotlib.get_backend()
+        backend = matplotlib.get_backend().lower()
+        self.use_ipympl = any(name in backend for name in ("ipympl", "nbagg", "widget"))
 
         self.axes_config_output = Output()
         self.figs_output = Output()
