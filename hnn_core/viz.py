@@ -481,7 +481,8 @@ def plot_spikes_hist(
     spike_types_mask = {
         s_type: np.isin(spike_types_data, s_type) for s_type in unique_types
     }
-    cell_types = ["L5_pyramidal", "L5_basket", "L2_pyramidal", "L2_basket"]
+    from .network_models import default_cell_metadata
+    cell_types = list(default_cell_metadata.keys())
     input_types = np.setdiff1d(unique_types, cell_types)
 
     if isinstance(spike_types, str):
@@ -705,14 +706,21 @@ def plot_spikes_raster(
                 f"Got {cell_types}"
             )
     else:
-        # Use default cell types
-        cell_types = ["L2_basket", "L2_pyramidal", "L5_basket", "L5_pyramidal"]
+        # Use default cell types dynamically
+        cell_types = sorted(unique_spike_types)
 
     # Set default colors
-    default_colors = plt.rcParams["axes.prop_cycle"].by_key()["color"][
-        : len(cell_types)
-    ]
-    cell_colors = {cell: color for cell, color in zip(cell_types, default_colors)}
+    from .network_models import default_cell_metadata
+
+    color_cycle = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+    color_cycler = cycle(color_cycle)
+
+    cell_colors = dict()
+    for cell in cell_types:
+        if cell in default_cell_metadata and "color" in default_cell_metadata[cell]:
+            cell_colors[cell] = default_cell_metadata[cell]["color"]
+        else:
+            cell_colors[cell] = next(color_cycler)
 
     # validate colors argument
     _validate_type(colors, (list, dict, None), "color", "list of str, or dict")
@@ -917,27 +925,16 @@ def plot_cells(net, ax=None, show=True):
             f"Expected 'ax' to be an instance of Axes3D, but got {type(ax).__name__}"
         )
 
-    colors = {
-        "L5_pyramidal": "b",
-        "L2_pyramidal": "c",
-        "L5_basket": "r",
-        "L2_basket": "m",
-    }
-    markers = {
-        "L5_pyramidal": "^",
-        "L2_pyramidal": "^",
-        "L5_basket": "x",
-        "L2_basket": "x",
-    }
-
     for cell_type in net.cell_types:
         x = [pos[0] for pos in net.pos_dict[cell_type]]
         y = [pos[1] for pos in net.pos_dict[cell_type]]
         z = [pos[2] for pos in net.pos_dict[cell_type]]
-        if cell_type in colors:
-            color = colors[cell_type]
-            marker = markers[cell_type]
+        if "cell_metadata" in net.cell_types[cell_type]:
+            color = net.cell_types[cell_type]["cell_metadata"].get("color", "k")
+            marker = net.cell_types[cell_type]["cell_metadata"].get("marker", "o")
             ax.scatter(x, y, z, c=color, s=50, marker=marker, label=cell_type)
+        else:
+            ax.scatter(x, y, z, c="k", s=50, marker="o", label=cell_type)
 
     if net.rec_arrays:
         cols = plt.get_cmap("inferno", len(net.rec_arrays) + 2)
