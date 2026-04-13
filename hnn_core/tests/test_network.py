@@ -2091,3 +2091,53 @@ def test_verbose():
     with io.StringIO() as buf, redirect_stdout(buf):
         simulate_dipole(net, dt=0.5, tstop=20.0, verbose=False)
         assert buf.getvalue() == ""
+
+
+def test_network_diff():
+    """Test Network.diff returns correct dictionary describing differences."""
+    net1 = jones_2009_model(mesh_shape=(2, 2))
+    net2 = jones_2009_model(mesh_shape=(2, 2))
+
+    # They should be identical
+    diffs = net1.diff(net2)
+    assert diffs == {}
+
+    # Change a threshold in one and verify diff captures it
+    net1.threshold = -10.0
+    net2.threshold = -20.0
+    diffs = net1.diff(net2)
+    assert 'threshold' in diffs
+    assert diffs['threshold']['self'] == -10.0
+    assert diffs['threshold']['other'] == -20.0
+
+    # Test cell_object diffs
+    # We modify one synapse tau in L5_pyramidal for net1
+    net1.cell_types['L5_pyramidal']['cell_object'].synapses['ampa']['tau1'] += 10.0
+    
+    diffs = net1.diff(net2)
+    assert 'cell_types' in diffs
+    assert 'L5_pyramidal' in diffs['cell_types']
+    assert 'cell_object' in diffs['cell_types']['L5_pyramidal']
+    assert 'synapses' in diffs['cell_types']['L5_pyramidal']['cell_object']
+    assert 'ampa' in diffs['cell_types']['L5_pyramidal']['cell_object']['synapses']
+    assert 'tau1' in diffs['cell_types']['L5_pyramidal']['cell_object']['synapses']['ampa']
+    
+    # Revert to keep looking clean
+    net1.cell_types['L5_pyramidal']['cell_object'].synapses['ampa']['tau1'] -= 10.0
+
+    # Add external drive to net1 but not net2
+    net1.add_poisson_drive(
+        "test_poisson",
+        tstart=0,
+        tstop=40.0,
+        rate_constant=10.0,
+        location="proximal",
+        weights_ampa={"L2_pyramidal": 0.001, "L5_pyramidal": 0.001},
+        synaptic_delays=0.1,
+        event_seed=45,
+    )
+    diffs = net1.diff(net2)
+    # The external drive should be flagged
+    assert 'external_drives' in diffs
+    assert 'test_poisson' in diffs['external_drives']
+    assert diffs['external_drives']['test_poisson']['other'] is None
