@@ -611,13 +611,10 @@ def test_network_drives():
             ]:
                 assert kw in drive["dynamics"].keys()
             assert len(drive["events"][0]) == n_drive_cells
-            n_events = (
-                drive["dynamics"]["numspikes"]  # 2
-                * (
-                    1
-                    + (drive["dynamics"]["tstop"] - drive["dynamics"]["tstart"] - 1)
-                    // (1000.0 / drive["dynamics"]["burst_rate"])
-                )
+            n_events = drive["dynamics"]["numspikes"] * (  # 2
+                1
+                + (drive["dynamics"]["tstop"] - drive["dynamics"]["tstart"] - 1)
+                // (1000.0 / drive["dynamics"]["burst_rate"])
             )
             assert len(drive["events"][0][0]) == n_events  # 4
 
@@ -799,13 +796,10 @@ def test_network_drives_legacy():
             ]:
                 assert kw in drive["dynamics"].keys()
             assert len(drive["events"][0]) == n_drive_cells
-            n_events = (
-                drive["dynamics"]["numspikes"]  # 2
-                * (
-                    1
-                    + (drive["dynamics"]["tstop"] - drive["dynamics"]["tstart"] - 1)
-                    // (1000.0 / drive["dynamics"]["burst_rate"])
-                )
+            n_events = drive["dynamics"]["numspikes"] * (  # 2
+                1
+                + (drive["dynamics"]["tstop"] - drive["dynamics"]["tstart"] - 1)
+                // (1000.0 / drive["dynamics"]["burst_rate"])
             )
             assert len(drive["events"][0][0]) == n_events  # 4
 
@@ -900,14 +894,14 @@ def test_network_connectivity(base_network):
 
     # Check basket-basket connection where allow_autapses=False
     assert "L2Pyr_L2Pyr_nmda" in network_builder.ncs
-    n_connections = 3 * (n_pyr**2 - n_pyr)  # 3 synapses / cell
+    n_connections = 3 * (n_pyr ** 2 - n_pyr)  # 3 synapses / cell
     assert len(network_builder.ncs["L2Pyr_L2Pyr_nmda"]) == n_connections
     nc = network_builder.ncs["L2Pyr_L2Pyr_nmda"][0]
     assert nc.threshold == params["threshold"]
 
     # Check basket-basket connection where allow_autapses=True
     assert "L2Basket_L2Basket_gabaa" in network_builder.ncs
-    n_connections = n_basket**2  # 1 synapse / cell
+    n_connections = n_basket ** 2  # 1 synapse / cell
     assert len(network_builder.ncs["L2Basket_L2Basket_gabaa"]) == n_connections
     nc = network_builder.ncs["L2Basket_L2Basket_gabaa"][0]
     assert nc.threshold == params["threshold"]
@@ -1209,8 +1203,7 @@ def test_tonic_biases():
     assert net.external_biases["tonic"]["L2_pyramidal"]["t0"] == 0
     with pytest.raises(
         ValueError,
-        match=r"Bias named tonic already defined "
-        r"for.*$",
+        match=r"Bias named tonic already defined " r"for.*$",
     ):
         net.add_tonic_bias(amplitude=tonic_bias_2)
 
@@ -1224,10 +1217,7 @@ def test_tonic_biases():
 
     with pytest.raises(
         ValueError,
-        match=(
-            r"section must be one of .*"
-            " Got apical_4."
-        ),
+        match=(r"section must be one of .*" " Got apical_4."),
     ):
         net.add_tonic_bias(amplitude={"L2_pyramidal": 0.5}, section="apical_4")
 
@@ -2106,24 +2096,26 @@ def test_network_diff():
     net1.threshold = -10.0
     net2.threshold = -20.0
     diffs = net1.diff(net2)
-    assert 'threshold' in diffs
-    assert diffs['threshold']['self'] == -10.0
-    assert diffs['threshold']['other'] == -20.0
+    assert "threshold" in diffs
+    assert diffs["threshold"]["self"] == -10.0
+    assert diffs["threshold"]["other"] == -20.0
 
     # Test cell_object diffs
     # We modify one synapse tau in L5_pyramidal for net1
-    net1.cell_types['L5_pyramidal']['cell_object'].synapses['ampa']['tau1'] += 10.0
-    
+    net1.cell_types["L5_pyramidal"]["cell_object"].synapses["ampa"]["tau1"] += 10.0
+
     diffs = net1.diff(net2)
-    assert 'cell_types' in diffs
-    assert 'L5_pyramidal' in diffs['cell_types']
-    assert 'cell_object' in diffs['cell_types']['L5_pyramidal']
-    assert 'synapses' in diffs['cell_types']['L5_pyramidal']['cell_object']
-    assert 'ampa' in diffs['cell_types']['L5_pyramidal']['cell_object']['synapses']
-    assert 'tau1' in diffs['cell_types']['L5_pyramidal']['cell_object']['synapses']['ampa']
-    
+    assert "cell_types" in diffs
+    assert "L5_pyramidal" in diffs["cell_types"]
+    assert "cell_object" in diffs["cell_types"]["L5_pyramidal"]
+    assert "synapses" in diffs["cell_types"]["L5_pyramidal"]["cell_object"]
+    assert "ampa" in diffs["cell_types"]["L5_pyramidal"]["cell_object"]["synapses"]
+    assert (
+        "tau1" in diffs["cell_types"]["L5_pyramidal"]["cell_object"]["synapses"]["ampa"]
+    )
+
     # Revert to keep looking clean
-    net1.cell_types['L5_pyramidal']['cell_object'].synapses['ampa']['tau1'] -= 10.0
+    net1.cell_types["L5_pyramidal"]["cell_object"].synapses["ampa"]["tau1"] -= 10.0
 
     # Add external drive to net1 but not net2
     net1.add_poisson_drive(
@@ -2138,6 +2130,6 @@ def test_network_diff():
     )
     diffs = net1.diff(net2)
     # The external drive should be flagged
-    assert 'external_drives' in diffs
-    assert 'test_poisson' in diffs['external_drives']
-    assert diffs['external_drives']['test_poisson']['other'] is None
+    assert "external_drives" in diffs
+    assert "test_poisson" in diffs["external_drives"]
+    assert diffs["external_drives"]["test_poisson"]["other"] is None
