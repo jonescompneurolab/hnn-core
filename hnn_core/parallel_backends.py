@@ -305,7 +305,7 @@ def _get_data_from_child_err(err_q):
 
     while True:
         try:
-            err += err_q.get(timeout=0.01)
+            err += err_q.get(timeout=0.05)
         except Empty:
             break
 
