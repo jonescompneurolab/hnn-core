@@ -894,14 +894,14 @@ def test_network_connectivity(base_network):
 
     # Check basket-basket connection where allow_autapses=False
     assert "L2Pyr_L2Pyr_nmda" in network_builder.ncs
-    n_connections = 3 * (n_pyr ** 2 - n_pyr)  # 3 synapses / cell
+    n_connections = 3 * (n_pyr**2 - n_pyr)  # 3 synapses / cell
     assert len(network_builder.ncs["L2Pyr_L2Pyr_nmda"]) == n_connections
     nc = network_builder.ncs["L2Pyr_L2Pyr_nmda"][0]
     assert nc.threshold == params["threshold"]
 
     # Check basket-basket connection where allow_autapses=True
     assert "L2Basket_L2Basket_gabaa" in network_builder.ncs
-    n_connections = n_basket ** 2  # 1 synapse / cell
+    n_connections = n_basket**2  # 1 synapse / cell
     assert len(network_builder.ncs["L2Basket_L2Basket_gabaa"]) == n_connections
     nc = network_builder.ncs["L2Basket_L2Basket_gabaa"][0]
     assert nc.threshold == params["threshold"]

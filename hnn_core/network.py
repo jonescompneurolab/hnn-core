@@ -1343,9 +1343,9 @@ class Network:
         if source_to_gid_map is not None:
             drive["source_to_gid_map"] = source_to_gid_map
         drive["conn_seed"] = conn_seed
-        drive[
-            "event_seed"
-        ] = 0  # Not used for spike train, but included for consistency
+        drive["event_seed"] = (
+            0  # Not used for spike train, but included for consistency
+        )
 
         # Save connection parameters
         drive["weights_ampa"] = weights_ampa
@@ -2640,11 +2640,9 @@ def _check_global_synaptic_gains_uniformity(net):
                 )
             ):
                 output_indicator = False
-                print(
-                    """
+                print("""
                     WARNING: Your imported Network uses custom synaptic gain values. Global synaptic gain values such as "Excitatory-to-Inhibitory" etc. will NOT be read or displayed properly. This is because Global synaptic gain values assume that initially, all gains are the same. If you continue to modify your Global synaptic gain values, double-check each connection's final synaptic gain value. To stop this warning, change your synaptic weights instead of your synaptic gains.
-                    """
-                )
+                    """)
                 break
 
     return output_indicator
