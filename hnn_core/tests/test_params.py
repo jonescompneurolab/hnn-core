@@ -198,3 +198,22 @@ class TestConvertToJson:
             TypeError, match="out_fname must be an instance of str or Path"
         ):
             convert_to_json(good_path, bad_path)
+
+def test_any_positive_weights():
+    """Test detection of positive synaptic weights"""
+
+    from hnn_core.params import _any_positive_weights
+
+    drive = {
+        "weights_ampa": {"cell1": 0.0},
+        "weights_nmda": {"cell1": 0.0},
+    }
+
+    assert _any_positive_weights(drive) is False
+
+    drive_positive = {
+        "weights_ampa": {"cell1": 0.5},
+        "weights_nmda": {"cell1": 0.0},
+    }
+
+    assert _any_positive_weights(drive_positive) is True
