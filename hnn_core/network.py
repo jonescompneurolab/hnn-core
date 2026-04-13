@@ -138,6 +138,58 @@ def _compare_lists(s, t):
     return not t
 
 
+def _dict_diff(d1, d2):
+    """
+    Recursively compares two dictionaries and returns a dictionary of differences.
+    """
+    diffs = dict()
+    all_keys = set(d1.keys()).union(set(d2.keys()))
+    for k in all_keys:
+        if k in d1 and k not in d2:
+            diffs[k] = {"self": d1[k], "other": None}
+        elif k in d2 and k not in d1:
+            diffs[k] = {"self": None, "other": d2[k]}
+        else:
+            val1 = d1[k]
+            val2 = d2[k]
+
+            are_equal = False
+            try:
+                if isinstance(val1, dict) and isinstance(val2, dict):
+                    pass  # We will handle dict diffing recursively below
+                elif type(val1) is np.ndarray or type(val2) is np.ndarray:
+                    are_equal = np.array_equal(val1, val2)
+                else:
+                    are_equal = bool(val1 == val2)
+            except Exception:
+                are_equal = False
+
+            if not are_equal:
+                if isinstance(val1, dict) and isinstance(val2, dict):
+                    nested_diff = _dict_diff(val1, val2)
+                    if nested_diff:
+                        diffs[k] = nested_diff
+                else:
+                    diffs[k] = {"self": val1, "other": val2}
+    return diffs
+
+
+def _cell_types_to_dict(cell_types):
+    """
+    Converts Network.cell_types dictionaries containing Cell objects into regular dictionaries for diffing.
+    """
+    converted = dict()
+    for cell_name, cell_data in cell_types.items():
+        converted[cell_name] = dict()
+        if "cell_object" in cell_data and hasattr(cell_data["cell_object"], "to_dict"):
+            converted[cell_name]["cell_object"] = cell_data["cell_object"].to_dict()
+        else:
+            converted[cell_name]["cell_object"] = cell_data.get("cell_object")
+
+        converted[cell_name]["cell_metadata"] = cell_data.get("cell_metadata")
+    return converted
+
+
 def _connection_probability(conn, probability, conn_seed=None):
     """Remove/keep a random subset of connections.
 
@@ -622,6 +674,73 @@ class Network:
                 return False
 
         return True
+
+    def diff(self, other):
+        """Return a dictionary of differences between this Network and another.
+
+        Parameters
+        ----------
+        other : Network
+            The Network object to compare against.
+
+        Returns
+        -------
+        diffs : dict
+            A nested dictionary describing the differences. Keys are the names
+            of the varying attributes, and their values document the divergence
+            under 'self' and 'other'. Identical values are omitted.
+        """
+        if not isinstance(other, Network):
+            raise TypeError("Can only diff with another Network instance.")
+
+        diffs = dict()
+
+        # Check connectivity
+        if (len(self.connectivity) != len(other.connectivity)) or not (
+            _compare_lists(self.connectivity, other.connectivity)
+        ):
+            # Detailed connectivity diff is computationally heavy, simple representation is fine
+            diffs["connectivity"] = {
+                "self_length": len(self.connectivity),
+                "other_length": len(other.connectivity),
+            }
+
+        # Check all other attributes
+        attrs_to_ignore = ["connectivity"]
+        for attr in vars(self).keys():
+            if attr.startswith("_") or attr in attrs_to_ignore:
+                continue
+
+            if hasattr(other, attr):
+                self_attr = getattr(self, attr)
+                other_attr = getattr(other, attr)
+
+                if self_attr != other_attr:
+                    # Special handling for cell_types to show template differences elegantly
+                    if attr == "cell_types":
+                        nested_diff = _dict_diff(
+                            _cell_types_to_dict(self_attr),
+                            _cell_types_to_dict(other_attr),
+                        )
+                        if nested_diff:
+                            diffs[attr] = nested_diff
+                    elif isinstance(self_attr, dict) and isinstance(other_attr, dict):
+                        nested_diff = _dict_diff(self_attr, other_attr)
+                        if nested_diff:
+                            diffs[attr] = nested_diff
+                    else:
+                        diffs[attr] = {"self": self_attr, "other": other_attr}
+            else:
+                diffs[attr] = {"self": getattr(self, attr), "other": None}
+
+        # Check for attributes in other that are missing in self
+        for attr in vars(other).keys():
+            if attr.startswith("_") or attr in attrs_to_ignore:
+                continue
+            if not hasattr(self, attr):
+                diffs[attr] = {"self": None, "other": getattr(other, attr)}
+
+        return diffs
 
     def set_cell_positions(self, *, inplane_distance=None, layer_separation=None):
         """Set relative positions of cells arranged in a square grid
@@ -1212,9 +1331,11 @@ class Network:
         drive["events"] = list()  # Will be populated during instantiation
 
         # Process spike_data into a standardized format
-        standardized_data, n_drive_cells, source_to_gid_map = (
-            self._standardize_spike_data(spike_data)
-        )
+        (
+            standardized_data,
+            n_drive_cells,
+            source_to_gid_map,
+        ) = self._standardize_spike_data(spike_data)
 
         # Set drive properties
         drive["dynamics"] = standardized_data
@@ -1320,15 +1441,18 @@ class Network:
 
         _validate_type(probability, (float, dict), "probability", "float or dict")
         # allow passing weights as None, convert to dict here
-        (target_populations, weights_by_type, delays_by_type, probability_by_type) = (
-            _get_target_properties(
-                weights_ampa,
-                weights_nmda,
-                synaptic_delays,
-                location,
-                self.cell_types,
-                probability=probability,
-            )
+        (
+            target_populations,
+            weights_by_type,
+            delays_by_type,
+            probability_by_type,
+        ) = _get_target_properties(
+            weights_ampa,
+            weights_nmda,
+            synaptic_delays,
+            location,
+            self.cell_types,
+            probability=probability,
         )
 
         # weights passed must correspond to cells in the network
@@ -2516,11 +2640,9 @@ def _check_global_synaptic_gains_uniformity(net):
                 )
             ):
                 output_indicator = False
-                print(
-                    """
+                print("""
                     WARNING: Your imported Network uses custom synaptic gain values. Global synaptic gain values such as "Excitatory-to-Inhibitory" etc. will NOT be read or displayed properly. This is because Global synaptic gain values assume that initially, all gains are the same. If you continue to modify your Global synaptic gain values, double-check each connection's final synaptic gain value. To stop this warning, change your synaptic weights instead of your synaptic gains.
-                    """
-                )
+                    """)
                 break
 
     return output_indicator
