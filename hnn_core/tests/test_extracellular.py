@@ -1,7 +1,6 @@
 # Authors: Nick Tolley <nicholas_tolley@brown.edu>
 #          Christopher Bailey <cjb@cfin.au.dk>
 
-from copy import deepcopy
 import os.path as op
 import numpy as np
 from numpy.testing import assert_allclose, assert_array_equal
@@ -21,12 +20,12 @@ import matplotlib.pyplot as plt
 
 hnn_core_root = op.dirname(hnn_core.__file__)
 params_fname = op.join(hnn_core_root, "param", "default.json")
-params = read_params(params_fname)
 
 
 def test_extracellular_api():
     """Test extracellular recording API."""
-    net = jones_2009_model(deepcopy(params), add_drives_from_params=True)
+    params_local = read_params(params_fname)
+    net = jones_2009_model(params_local, add_drives_from_params=True)
 
     # Test LFP electrodes
     electrode_pos = (1, 2, 3)
@@ -131,7 +130,8 @@ def test_extracellular_api():
 
 def test_transmembrane_currents():
     """Test that net transmembrane current is zero at all times."""
-    params.update(
+    params_local = read_params(params_fname)
+    params_local.update(
         {
             "N_pyr_x": 3,
             "N_pyr_y": 3,
@@ -141,7 +141,7 @@ def test_transmembrane_currents():
             "N_trials": 1,
         }
     )
-    net = jones_2009_model(params, add_drives_from_params=True)
+    net = jones_2009_model(params_local, add_drives_from_params=True)
     electrode_pos = (0, 0, 0)  # irrelevant where electrode is
     # all transfer resistances set to unity
     net.add_electrode_array("net_Im", electrode_pos, method=None)
@@ -268,9 +268,9 @@ def test_rec_array_calculation():
     """Test LFP/CSD calculation."""
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, "param", "default.json")
-    params = read_params(params_fname)
-    params.update({"t_evprox_1": 7, "t_evdist_1": 17})
-    net = jones_2009_model(params, mesh_shape=(3, 3), add_drives_from_params=True)
+    params_local = read_params(params_fname)
+    params_local.update({"t_evprox_1": 7, "t_evdist_1": 17})
+    net = jones_2009_model(params_local, mesh_shape=(3, 3), add_drives_from_params=True)
 
     # one electrode inside, one above the active elements of the network,
     # and two more to allow calculation of CSD (2nd spatial derivative)
@@ -325,9 +325,9 @@ def test_extracellular_viz():
     """Test if deprecation warning is raised in plot_laminar_lfp."""
     hnn_core_root = op.dirname(hnn_core.__file__)
     params_fname = op.join(hnn_core_root, "param", "default.json")
-    params = read_params(params_fname)
-    params.update({"t_evprox_1": 7, "t_evdist_1": 17})
-    net = jones_2009_model(params, mesh_shape=(3, 3), add_drives_from_params=True)
+    params_local = read_params(params_fname)
+    params_local.update({"t_evprox_1": 7, "t_evdist_1": 17})
+    net = jones_2009_model(params_local, mesh_shape=(3, 3), add_drives_from_params=True)
 
     # one electrode inside, one above the active elements of the network,
     # and two more to allow calculation of CSD (2nd spatial derivative)
