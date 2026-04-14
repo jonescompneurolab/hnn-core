@@ -1716,3 +1716,55 @@ def test_diff_gui_vs_api_networks_simulations():
         dpls_gui[0].data["agg"],
         dpls_api[0].data["agg"],
     )
+
+    
+def test_traceback(caplog, setup_gui, monkeypatch):
+    import logging
+    logger = logging.getLogger("hnn_gui")
+    gui = setup_gui
+    tstop_trials_tstep = [(10, 1, 0.25), (10, 2, 0.5), (12, 1, 0.5)]
+    gui.widget_backend_selection.value = "Joblib"
+    gui.widget_default_smoothing.value = 0
+    sim_count = 0
+    sim__name = 0
+
+    with caplog.at_level(logging.INFO, logger = "hnn_gui"):
+        logger.info("Information")
+        logger.warning("This is a warning")
+        for val_tstop, val_ntrials, val_tstep in tstop_trials_tstep:
+            gui.widget_simulation_name.value = str(sim_count)
+            gui.widget_tstop.value = val_tstop
+            gui.widget_ntrials.value = val_ntrials
+            gui.widget_dt.value = val_tstep
+
+            gui.run_button.click()
+            sim_name = str(sim__name)
+            dpls = gui.simulation_data[sim_name]["dpls"]
+            sim__name += 1
+    logs = [record.message for record in caplog.records if record.name == "hnn_gui"]
+    log_text = "\n".join(logs)
+    if "Traceback" in log_text:
+        assert '[ERROR]' in log_text
+    else:
+        assert '[ERROR]' not in log_text
+    caplog.clear()
+
+    def raise_exception(*args, **kwargs):
+        raise ValueError("Test exception")
+    monkeypatch.setattr("hnn_core.gui.gui.simulate_dipole", raise_exception)
+
+    with caplog.at_level("INFO", logger="hnn_gui"):
+        for val_tstop, val_ntrials, val_tstep in tstop_trials_tstep:
+            gui.widget_simulation_name.value = str(sim_count)
+            gui.widget_tstop.value = val_tstop
+            gui.widget_ntrials.value = val_ntrials
+            gui.widget_dt.value = val_tstep
+
+            gui.run_button.click()
+            sim_name = gui.widget_simulation_name.value
+            sim_count += 1
+        if "Traceback" in caplog.text:
+            assert '[ERROR]' in caplog.text
+        else:
+            assert '[ERROR]' not in caplog.text
+        caplog.clear()

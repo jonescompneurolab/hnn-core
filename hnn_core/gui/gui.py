@@ -19,6 +19,7 @@ from functools import partial
 from pathlib import Path
 
 import numpy as np
+import traceback
 from IPython.display import IFrame, display
 from ipywidgets import (
     HTML,
@@ -3248,75 +3249,80 @@ def run_button_clicked(
     simulation_data = all_data["simulation_data"]
     with log_out:
         # clear empty trash simulations
-        for _name in tuple(simulation_data.keys()):
-            if len(simulation_data[_name]["dpls"]) == 0:
-                del simulation_data[_name]
+        try:
+            for _name in tuple(simulation_data.keys()):
+                if len(simulation_data[_name]["dpls"]) == 0:
+                    del simulation_data[_name]
 
-        _sim_name = widget_simulation_name.value
-        if (
-            _sim_name in simulation_data
-            and simulation_data[_sim_name]["net"] is not None
-        ):
-            parts = _sim_name.rsplit("-", 1)
+            _sim_name = widget_simulation_name.value
+            if (
+                _sim_name in simulation_data
+                and simulation_data[_sim_name]["net"] is not None
+            ):
+                parts = _sim_name.rsplit("-", 1)
 
-            if len(parts) == 2 and parts[1].isdigit():
-                base = parts[0]
-                idx = int(parts[1]) + 1
+                if len(parts) == 2 and parts[1].isdigit():
+                    base = parts[0]
+                    idx = int(parts[1]) + 1
+                else:
+                    base = _sim_name
+                    idx = 2
+
+                while f"{base}-{idx}" in simulation_data:
+                    idx += 1
+
+                _sim_name = f"{base}-{idx}"
+                widget_simulation_name.value = _sim_name
+
+            _init_network_from_widgets(
+                params,
+                dt,
+                tstop,
+                simulation_data[_sim_name],
+                drive_widgets,
+                connectivity_textfields,
+                cell_parameters_widgets,
+                global_gain_textfields,
+            )
+
+            print("start simulation")
+            if backend_selection.value == "MPI":
+                # 'use_hwthreading_if_found' and 'sensible_default_cores' have
+                # already been set elsewhere, and do not need to be re-set here.
+                # Hardware-threading and oversubscription will always be disabled
+                # to prevent edge cases in the GUI.
+                backend = MPIBackend(
+                    n_procs=n_jobs.value,
+                    mpi_cmd=mpi_cmd.value,
+                    override_hwthreading_option=False,
+                    override_oversubscribe_option=False,
+                )
             else:
-                base = _sim_name
-                idx = 2
+                backend = JoblibBackend(n_jobs=n_jobs.value)
+                print(f"Using Joblib with {n_jobs.value} core(s).")
+            with backend:
+                simulation_status_bar.value = simulation_status_contents["running"]
+                simulation_data[_sim_name]["dpls"] = simulate_dipole(
+                    simulation_data[_sim_name]["net"],
+                    tstop=tstop.value,
+                    dt=dt.value,
+                    n_trials=ntrials.value,
+                )
 
-            while f"{base}-{idx}" in simulation_data:
-                idx += 1
+                simulation_status_bar.value = simulation_status_contents["finished"]
+                sim_names = [
+                    sim_name
+                    for sim_name in simulation_data
+                    if simulation_data[sim_name]["net"] is not None
+                ]
 
-            _sim_name = f"{base}-{idx}"
-            widget_simulation_name.value = _sim_name
-
-        _init_network_from_widgets(
-            params,
-            dt,
-            tstop,
-            simulation_data[_sim_name],
-            drive_widgets,
-            connectivity_textfields,
-            cell_parameters_widgets,
-            global_gain_textfields,
-        )
-
-        print("start simulation")
-        if backend_selection.value == "MPI":
-            # 'use_hwthreading_if_found' and 'sensible_default_cores' have
-            # already been set elsewhere, and do not need to be re-set here.
-            # Hardware-threading and oversubscription will always be disabled
-            # to prevent edge cases in the GUI.
-            backend = MPIBackend(
-                n_procs=n_jobs.value,
-                mpi_cmd=mpi_cmd.value,
-                override_hwthreading_option=False,
-                override_oversubscribe_option=False,
-            )
-        else:
-            backend = JoblibBackend(n_jobs=n_jobs.value)
-            print(f"Using Joblib with {n_jobs.value} core(s).")
-        with backend:
-            simulation_status_bar.value = simulation_status_contents["running"]
-            simulation_data[_sim_name]["dpls"] = simulate_dipole(
-                simulation_data[_sim_name]["net"],
-                tstop=tstop.value,
-                dt=dt.value,
-                n_trials=ntrials.value,
-            )
-
-            simulation_status_bar.value = simulation_status_contents["finished"]
-
-            sim_names = [
-                sim_name
-                for sim_name in simulation_data
-                if simulation_data[sim_name]["net"] is not None
-            ]
-
-            simulations_list_widget.options = sim_names
-            simulations_list_widget.value = sim_names[0]
+                simulations_list_widget.options = sim_names
+                simulations_list_widget.value = sim_names[0]
+        except Exception:
+            simulation_status_bar.value = simulation_status_contents["failed"]
+            full_error = traceback.format_exc()
+            print(f'[ERROR]{full_error}')
+            return
 
     viz_manager.reset_fig_config_tabs()
 
