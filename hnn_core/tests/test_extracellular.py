@@ -40,7 +40,8 @@ def test_extracellular_api():
     assert (net.rec_arrays["arr1"] == "extArr") is False
 
     # ensure unique names
-    pytest.raises(ValueError, net.add_electrode_array, "arr1", [(6, 6, 800)])
+    with pytest.raises(ValueError, match="already exists, use another name"):
+        net.add_electrode_array("arr1", [(6, 6, 800)])
     # all remaining input arguments checked by ExtracellularArray
 
     rec_arr = ExtracellularArray(electrode_pos)
@@ -59,45 +60,29 @@ def test_extracellular_api():
     # positions are 3-tuples
     bad_positions = [[(1, 2), (1, 2, 3)], [42, (1, 2, 3)]]
     for bogus_pos in bad_positions:
-        pytest.raises((ValueError, TypeError), ExtracellularArray, bogus_pos)
+        with pytest.raises((ValueError, TypeError)):
+            ExtracellularArray(bogus_pos)
 
     good_positions = [(1, 2, 3), (100, 200, 300)]
     for cond in ["0.3", [0.3], -1]:  # conductivity is positive float
-        pytest.raises(
-            (TypeError, AssertionError),
-            ExtracellularArray,
-            good_positions,
-            conductivity=cond,
-        )
+        with pytest.raises((TypeError, AssertionError)):
+            ExtracellularArray(good_positions, conductivity=cond)
     for meth in ["foo", 0.3]:  # method is 'psa' or 'lsa' (or None for test)
-        pytest.raises(
-            (TypeError, AssertionError, ValueError),
-            ExtracellularArray,
-            good_positions,
-            method=meth,
-        )
+        with pytest.raises((TypeError, AssertionError, ValueError)):
+            ExtracellularArray(good_positions, method=meth)
     for mind in ["foo", -1, None]:  # minimum distance to segment boundary
-        pytest.raises(
-            (TypeError, AssertionError),
-            ExtracellularArray,
-            good_positions,
-            min_distance=mind,
-        )
+        with pytest.raises((TypeError, AssertionError)):
+            ExtracellularArray(good_positions, min_distance=mind)
 
-    pytest.raises(
-        ValueError,
-        ExtracellularArray,  # more chans than voltages
-        good_positions,
-        times=[1],
-        voltages=[[[42]]],
-    )
-    pytest.raises(
-        ValueError,
-        ExtracellularArray,  # less times than voltages
-        good_positions,
-        times=[1],
-        voltages=[[[42, 42], [84, 84]]],
-    )
+    with pytest.raises(
+        ValueError, match="number of voltage traces must match number"
+    ):  # more chans than voltages
+        ExtracellularArray(good_positions, times=[1], voltages=[[[42]]])
+
+    with pytest.raises(
+        ValueError, match="length of times and voltages must match"
+    ):  # less times than voltages
+        ExtracellularArray(good_positions, times=[1], voltages=[[[42, 42], [84, 84]]])
 
     rec_arr = ExtracellularArray(
         good_positions,
