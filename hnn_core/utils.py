@@ -5,6 +5,8 @@
 #          Christopher Bailey <cjb@cfin.au.dk>
 
 import numpy as np
+from scipy.signal import savgol_filter
+
 from .externals.mne import _validate_type
 
 
@@ -88,8 +90,6 @@ def _savgol_filter(data, h_freq, sfreq):
     filt_data : array-like
         The filtered data
     """  # noqa: E501
-    from scipy.signal import savgol_filter
-
     _validate_type(sfreq, (float, int), "sfreq")
     if sfreq <= 0.0:
         raise ValueError("Sampling frequency must be positive")

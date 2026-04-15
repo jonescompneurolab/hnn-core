@@ -10,8 +10,10 @@ from io import StringIO
 import numpy as np
 from copy import deepcopy
 from h5io import write_hdf5, read_hdf5
-from .externals.mne import _check_option
+from scipy import signal
 
+from .externals.mne import _check_option
+from .utils import _savgol_filter, smooth_waveform
 from .viz import plot_dipole, plot_psd, plot_tfr_morlet
 
 
@@ -276,8 +278,6 @@ def average_dipoles(dpls):
 def _resample_and_weight_dipole(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     """Resamples dpl and exp_dpl for to common sampling rate. Also scales time series
     by weights if provided"""
-    from scipy import signal
-
     exp_times = exp_dpl.times
     sim_times = dpl.times
 
@@ -502,8 +502,6 @@ class Dipole(object):
         dpl_copy : instance of Dipole
             A copy of the modified Dipole instance.
         """
-        from .utils import smooth_waveform
-
         for key in self.data.keys():
             self.data[key] = smooth_waveform(self.data[key], window_len, self.sfreq)
 
@@ -533,8 +531,6 @@ class Dipole(object):
         dpl_copy : instance of Dipole
             A copy of the modified Dipole instance.
         """
-        from .utils import _savgol_filter
-
         if h_freq < 0:
             raise ValueError("h_freq cannot be negative")
         elif h_freq > 0.5 * self.sfreq:
