@@ -8,26 +8,19 @@ import colorsys
 import warnings
 from itertools import cycle
 
-import matplotlib
-import matplotlib.animation
-import matplotlib.colors
-import matplotlib.pyplot as plt
-from matplotlib import colormaps, get_backend
-from matplotlib.colors import ListedColormap
-from matplotlib.ticker import ScalarFormatter
-from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
-from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 
 from .externals.mne import _validate_type
 
 
 def _lighten_color(color, amount=0.5):
+    import matplotlib.colors as mc
+
     try:
-        c = matplotlib.colors.cnames[color]
+        c = mc.cnames[color]
     except:
         c = color
-    c = colorsys.rgb_to_hls(*matplotlib.colors.to_rgb(c))
+    c = colorsys.rgb_to_hls(*mc.to_rgb(c))
     return colorsys.hls_to_rgb(c[0], 1 - amount * (1 - c[1]), c[2])
 
 
@@ -85,6 +78,9 @@ def plt_show(show=True, fig=None, **kwargs):
     **kwargs : dict
         Extra arguments for :func:`matplotlib.pyplot.show`.
     """
+    from matplotlib import get_backend
+    import matplotlib.pyplot as plt
+
     if show and get_backend() != "agg":
         (fig or plt).show(**kwargs)
 
@@ -140,6 +136,9 @@ def plot_laminar_lfp(
     fig : instance of plt.fig
         The matplotlib figure handle into which time series were plotted.
     """
+    import matplotlib.pyplot as plt
+    from matplotlib.colors import ListedColormap
+
     _validate_type(times, (list, np.ndarray), "times")
     _validate_type(data, (list, np.ndarray), "data")
     if isinstance(times, list):
@@ -236,7 +235,7 @@ def plot_laminar_lfp(
             voltage_scalebar = voltage_offset
 
     if voltage_scalebar is not None:
-
+        from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 
         scalebar = AnchoredSizeBar(
             ax.transData,
@@ -303,6 +302,8 @@ def plot_dipole(
     fig : instance of plt.fig
         The matplotlib figure handle.
     """
+
+    import matplotlib.pyplot as plt
 
     from .dipole import Dipole, average_dipoles
 
@@ -458,7 +459,7 @@ def plot_spikes_hist(
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
     """
-
+    import matplotlib.pyplot as plt
 
     n_trials = len(cell_response.spike_times)
     if trial_idx is None:
@@ -682,7 +683,7 @@ def plot_spikes_raster(
     fig : instance of matplotlib Figure
         The matplotlib figure object.
     """
-
+    import matplotlib.pyplot as plt
 
     from .dipole import Dipole, average_dipoles
 
@@ -908,6 +909,9 @@ def plot_cells(net, ax=None, show=True):
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
     """
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d import Axes3D
+
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection="3d")
@@ -1011,7 +1015,8 @@ def plot_tfr_morlet(
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
     """
-
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import ScalarFormatter
 
     from .externals.mne import tfr_array_morlet
     from .dipole import Dipole
@@ -1170,7 +1175,7 @@ def plot_psd(
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
     """
-
+    import matplotlib.pyplot as plt
 
     from scipy.signal import periodogram
 
@@ -1273,6 +1278,9 @@ def plot_cell_morphology(
     axes : list of instance of Axes3D
         The matplotlib 3D axis handle.
     """
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d import Axes3D  # noqa
+
     if ax is None:
         plt.figure()
         ax = plt.axes(projection="3d")
@@ -1347,7 +1355,8 @@ def plot_connectivity_matrix(
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
     """
-
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import ScalarFormatter
 
     from .network import Network
     from .cell import _get_gaussian_connection
@@ -1450,7 +1459,8 @@ def plot_drive_strength(
     fig : matplotlib.figure.Figure
         The figure handle.
     """
-    # Deferred import to avoid circular dependency
+    import matplotlib.pyplot as plt
+
     from .network import Network
     from .cell import _get_gaussian_connection
 
@@ -1655,9 +1665,10 @@ def plot_cell_connectivity(
     the connection corresponds to a drive, ex: poisson, bursty, etc.
 
     """
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import ScalarFormatter
 
     from .network import Network
-
 
     _validate_type(net, Network, "net", "Network")
     _validate_type(conn_idx, int, "conn_idx", "int")
@@ -1921,6 +1932,8 @@ class NetworkPlotter:
         trial_idx=0,
         time_idx=0,
     ):
+        from matplotlib import colormaps
+
         self._validate_parameters(
             vmin,
             vmax,
@@ -2009,6 +2022,8 @@ class NetworkPlotter:
         return times, vsec_recorded
 
     def _initialize_plots(self):
+        import matplotlib.pyplot as plt
+
         # Create figure
         if self.ax is None:
             self.fig = plt.figure()
@@ -2074,11 +2089,13 @@ class NetworkPlotter:
         self.ax.view_init(self._elev, self._azim)
 
     def _update_colorbar(self):
-    
+        import matplotlib.colors as mc
+        import matplotlib.pyplot as plt
+
         fig = self.ax.get_figure()
         sm = plt.cm.ScalarMappable(
             cmap=self.voltage_colormap,
-            norm=matplotlib.colors.Normalize(vmin=self.vmin, vmax=self.vmax),
+            norm=mc.Normalize(vmin=self.vmin, vmax=self.vmax),
         )
         self._cbar = fig.colorbar(sm, ax=self.ax)
 
@@ -2117,6 +2134,8 @@ class NetworkPlotter:
             Alternative movie writers can be found at
             https://matplotlib.org/stable/api/animation_api.html
         """
+        import matplotlib.animation as animation
+
         if not self._vsec_recorded:
             raise RuntimeError(
                 "Network must be simulated with"
@@ -2127,11 +2146,11 @@ class NetworkPlotter:
             frame_stop = len(self.times) - 1
 
         frames = np.arange(frame_start, frame_stop, decim)
-        ani = matplotlib.animation.FuncAnimation(
+        ani = animation.FuncAnimation(
             self.fig, self._set_time_idx, frames, interval=interval
         )
 
-        writer = matplotlib.animation.writers[writer](fps=fps)
+        writer = animation.writers[writer](fps=fps)
         ani.save(fname, writer=writer, dpi=dpi)
         return ani
 
