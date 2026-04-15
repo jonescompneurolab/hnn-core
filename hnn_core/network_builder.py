@@ -9,10 +9,12 @@ import os.path as op
 from copy import deepcopy
 
 import numpy as np
-from neuron import h
-
-# This is due to: https://github.com/neuronsimulator/nrn/pull/746
-from neuron import __version__
+try:
+    from neuron import h
+except ImportError:
+    h = None    
+    __version__ = [0]
+# This is due to:https://github.com/neuronsimulator/nrn/pull/746
 
 if int(__version__[0]) >= 8:
     h.nrnunit_use_legacy(1)

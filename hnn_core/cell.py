@@ -7,8 +7,11 @@ from copy import deepcopy
 
 import numpy as np
 from numpy.linalg import norm
-
-from neuron import h, nrn
+try:
+   from neuron import h, nrn
+except ImportError:
+    h = None
+    nrn = None   
 
 from .viz import plot_cell_morphology
 from .externals.mne import _validate_type, _check_option
