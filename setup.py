@@ -7,6 +7,8 @@ import shutil
 
 from setuptools import setup, find_packages, Command
 from setuptools.command.build_py import build_py
+from setuptools.command.install import install
+
 
 descr = """Code for biophysical simulation of a cortical column using Neuron"""
 
@@ -72,6 +74,16 @@ class build_py_mod(build_py):
         shutil.copytree(mod_path, build_dir)
 
         build_py.run(self)
+        
+        
+class PostInstallCommand(install):
+    """Post-installation message."""
+    def run(self):
+        install.run(self)
+        print("\nThank you for installing hnn-core! 🎉")
+        print("Please consider filling out our short user survey:")
+        print("👉 https://hnn.brown.edu/survey\n")
+
 
 
 if __name__ == "__main__":
@@ -129,6 +141,11 @@ if __name__ == "__main__":
           package_data={'hnn_core': [
               'param/*.json',
               'gui/*.ipynb']},
-          cmdclass={'build_py': build_py_mod, 'build_mod': BuildMod},
+          cmdclass={
+    'build_py': build_py_mod,
+    'build_mod': BuildMod,
+    'install': PostInstallCommand,
+},
+
           entry_points={'console_scripts': ['hnn-gui=hnn_core.gui.gui:launch']}
           )
