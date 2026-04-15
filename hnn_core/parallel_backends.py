@@ -33,11 +33,12 @@ def _thread_handler(event, out, queue):
 
 
 def _gather_trial_data(sim_data, net, n_trials, postproc):
-    """Arrange data by trial
+    """Arrange simulation data by trial.
 
-    To be called after simulate(). Returns list of Dipoles, one for each trial,
-    and saves spiking info in net (instance of Network).
-    """
+This function should be called after ``simulate()``.
+It returns a list of ``Dipole`` objects (one per trial) and
+stores spiking information in the ``Network`` instance.
+"""
     dpls = list()
 
     # Create array of equally sampled time points for simulating currents
@@ -95,7 +96,7 @@ def _get_mpi_env():
 
 
 def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
-    """Run process and communicate with it.
+    """Run a subprocess and communicate with it.
     Parameters
     ----------
     command : list of str | str
@@ -220,10 +221,8 @@ def run_subprocess(command, obj, timeout, proc_queue=None, *args, **kwargs):
     sys.stdout.write(errs)
 
     if proc.returncode is None:
-        # It's theoretically possible that we have received data
-        # and exited the loop above, but the child process has not
-        # yet terminated. This is unexpected unless KeyboarInterrupt
-        # is caught
+        # ... This is unexpected unless KeyboardInterrupt
+        # is caught.
         proc.terminate()
         try:
             proc.wait(1)  # wait maximum of 1s
@@ -328,7 +327,7 @@ def _get_data_from_child_err(err_q):
 
 
 def _has_mpi4py():
-    """Determine if mpi4py is present."""
+    """Return True if ``mpi4py`` is installed, otherwise False."""
     try:
         import mpi4py  # noqa
     except ImportError:
@@ -410,7 +409,7 @@ def _extract_data(data_str, object_name):
 
 # Next 3 functions are from HNN. Will move here. They require psutil
 def _kill_procs(procs):
-    """Tries to terminate processes in a list before sending kill signal"""
+    """Attempt to terminate processes before sending a kill signal."""
     from psutil import wait_procs, NoSuchProcess
 
     # try terminate first
@@ -430,7 +429,7 @@ def _kill_procs(procs):
 
 
 def _get_procs_running(proc_name):
-    """Return a list of processes currently running"""
+    """Return a list of currently running processes that match a name."""
     from psutil import process_iter
 
     process_list = []
@@ -448,7 +447,7 @@ def _get_procs_running(proc_name):
 
 
 def kill_proc_name(proc_name):
-    """Make best effort to kill processes
+    """Make a best effort to kill processes.
 
     Parameters
     ----------
