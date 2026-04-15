@@ -10,7 +10,6 @@ from io import StringIO
 import numpy as np
 from copy import deepcopy
 from h5io import write_hdf5, read_hdf5
-from scipy import signal
 
 from .externals.mne import _check_option
 from .utils import _savgol_filter, smooth_waveform
@@ -278,6 +277,8 @@ def average_dipoles(dpls):
 def _resample_and_weight_dipole(dpl, exp_dpl, tstart=0.0, tstop=0.0, weights=None):
     """Resamples dpl and exp_dpl for to common sampling rate. Also scales time series
     by weights if provided"""
+    from scipy import signal
+
     exp_times = exp_dpl.times
     sim_times = dpl.times
 

@@ -18,8 +18,6 @@ from matplotlib.ticker import ScalarFormatter
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
-from scipy.interpolate import RectBivariateSpline
-from scipy.signal import decimate, periodogram
 
 from .externals.mne import _validate_type
 
@@ -52,6 +50,8 @@ def _get_plot_data_trange(times, data, tmin=None, tmax=None):
 
 
 def _decimate_plot_data(decim, data, times, sfreq=None):
+    from scipy.signal import decimate
+
     if not isinstance(decim, list):
         decim = [decim]
 
@@ -1172,6 +1172,8 @@ def plot_psd(
     """
 
 
+    from scipy.signal import periodogram
+
     from .dipole import Dipole
 
     if ax is None:
@@ -1813,6 +1815,8 @@ def plot_laminar_csd(
     fig : instance of matplotlib Figure
         The matplotlib figure handle.
     """
+    from scipy.interpolate import RectBivariateSpline
+
     if ax is None:
         _, ax = plt.subplots(1, 1, constrained_layout=True)
 
