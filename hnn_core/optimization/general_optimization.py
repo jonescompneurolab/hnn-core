@@ -11,7 +11,6 @@ import numpy as np
 from scipy.optimize import fmin_cobyla
 
 from .objective_functions import _rmse_evoked, _anticorr_evoked, _maximize_psd
-from ..externals.bayesopt import bayes_opt, expected_improvement
 from ..externals.mne import _validate_type
 
 
@@ -422,6 +421,7 @@ def _run_opt_bayesian(
     net_ : instance of Network
         Optimized network object.
     """
+    from ..externals.bayesopt import bayes_opt, expected_improvement
 
     # `obj_values` tracks optimizer loss over all epochs
     # the list is passed to `_obj_func()` and updated in place
