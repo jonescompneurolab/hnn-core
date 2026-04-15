@@ -6,6 +6,8 @@
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
 import numpy as np
+from scipy.signal import periodogram
+
 from hnn_core import simulate_dipole
 from ..dipole import _rmse, _anticorr, average_dipoles
 from ..batch_simulate import BatchSimulate
@@ -33,8 +35,6 @@ def _preprocess_dipole(dpls, obj_fun_kwargs):
 
 
 def _get_relative_power(dpl, obj_fun_kwargs):
-    from scipy.signal import periodogram
-
     # get psd of simulated dpl
     freqs_simulated, psd_simulated = periodogram(
         dpl.data["agg"], dpl.sfreq, window="hamming"
@@ -215,8 +215,6 @@ def _maximize_psd(
     is the weight for each frequency band, PSD(i) is the PSD for each frequency
     band, and PSD(j) is the total PSD of the signal.
     """
-
-    import numpy as np
 
     is_batch = _check_is_batch(predicted_params)
 

@@ -5,7 +5,10 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
+import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
+from scipy.optimize import fmin_cobyla
 
 from .objective_functions import _rmse_evoked, _anticorr_evoked, _maximize_psd
 from ..externals.mne import _validate_type
@@ -245,13 +248,10 @@ class Optimizer:
             The matplotlib figure handle.
         """
 
-        import matplotlib as mpl
-        import matplotlib.pyplot as plt
-
         if ax is None:
             fig, ax = plt.subplots(constrained_layout=True)
 
-        axis = ax if isinstance(ax, mpl.axes._axes.Axes) else ax
+        axis = ax if isinstance(ax, matplotlib.axes._axes.Axes) else ax
 
         x = list(range(1, self.max_iter + 1))
         y_min = min(self.obj_) - 0.01
@@ -421,7 +421,6 @@ def _run_opt_bayesian(
     net_ : instance of Network
         Optimized network object.
     """
-
     from ..externals.bayesopt import bayes_opt, expected_improvement
 
     # `obj_values` tracks optimizer loss over all epochs
@@ -611,8 +610,6 @@ def _run_opt_cobyla(
     net_ : instance of Network
         Optimized network object.
     """
-
-    from scipy.optimize import fmin_cobyla
 
     # `obj_values` tracks optimizer loss over all epochs
     # the list is passed to `_obj_func()` and updated in place

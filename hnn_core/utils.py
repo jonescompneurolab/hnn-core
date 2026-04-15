@@ -5,6 +5,7 @@
 #          Christopher Bailey <cjb@cfin.au.dk>
 
 import numpy as np
+
 from .externals.mne import _validate_type
 
 

@@ -5,8 +5,10 @@
 #          Ryan Thorpe <ryan_thorpe@brown.edu>
 #          Mainak Jas <mjas@mgh.harvard.edu>
 
-import numpy as np
 import os
+from itertools import product
+
+import numpy as np
 from joblib import Parallel, delayed, parallel_config
 
 from .network import Network
@@ -376,7 +378,6 @@ class BatchSimulate(object):
         param_combinations: list
             List of parameter combinations.
         """
-        from itertools import product
 
         keys, values = zip(*param_grid.items())
         if combinations:

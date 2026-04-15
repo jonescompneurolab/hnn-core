@@ -10,8 +10,9 @@ from io import StringIO
 import numpy as np
 from copy import deepcopy
 from h5io import write_hdf5, read_hdf5
-from .externals.mne import _check_option
 
+from .externals.mne import _check_option
+from .utils import _savgol_filter, smooth_waveform
 from .viz import plot_dipole, plot_psd, plot_tfr_morlet
 
 
@@ -502,8 +503,6 @@ class Dipole(object):
         dpl_copy : instance of Dipole
             A copy of the modified Dipole instance.
         """
-        from .utils import smooth_waveform
-
         for key in self.data.keys():
             self.data[key] = smooth_waveform(self.data[key], window_len, self.sfreq)
 
@@ -533,8 +532,6 @@ class Dipole(object):
         dpl_copy : instance of Dipole
             A copy of the modified Dipole instance.
         """
-        from .utils import _savgol_filter
-
         if h_freq < 0:
             raise ValueError("h_freq cannot be negative")
         elif h_freq > 0.5 * self.sfreq:
