@@ -492,9 +492,9 @@ def test_cma_seed():
     )
 
     seed1, seed2 = 123, 456
-    optim_seed1.fit(target=dpl_target, seed=seed1)
-    optim_seed1_repeat.fit(target=dpl_target, seed=seed1)
-    optim_seed2.fit(target=dpl_target, seed=seed2)
+    optim_seed1.fit(target=dpl_target, seed=seed1, popsize=popsize)
+    optim_seed1_repeat.fit(target=dpl_target, seed=seed1, popsize=popsize)
+    optim_seed2.fit(target=dpl_target, seed=seed2, popsize=popsize)
 
     assert optim_seed1.obj_ == optim_seed1_repeat.obj_
     assert optim_seed1.opt_params_ == optim_seed1_repeat.opt_params_
