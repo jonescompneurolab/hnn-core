@@ -393,3 +393,100 @@ def test_cma_validation():
         optim.fit(target=dpl_target, sigma0=[1, 2, 3])
 
     optim.fit(target=dpl_target, sigma0=[1, 2])
+
+
+def test_cma_seed():
+    max_iter = 3
+    popsize = 4
+    tstop = 10.0
+    dt = 0.5
+    n_trials = 3
+    solver = "cma"
+    obj_fun = "dipole_corr"
+
+    # simulate a dipole to establish ground-truth drive parameters
+    net_orig = jones_2009_model(mesh_shape=(3, 3))
+
+    mu_orig = 2.0
+    weights_ampa = {
+        "L2_basket": 0.5,
+        "L2_pyramidal": 0.5,
+        "L5_basket": 0.5,
+        "L5_pyramidal": 0.5,
+    }
+    synaptic_delays = {
+        "L2_basket": 0.1,
+        "L2_pyramidal": 0.1,
+        "L5_basket": 1.0,
+        "L5_pyramidal": 1.0,
+    }
+    net_orig.add_evoked_drive(
+        "evprox",
+        mu=mu_orig,
+        sigma=1,
+        numspikes=1,
+        location="proximal",
+        weights_ampa=weights_ampa,
+        synaptic_delays=synaptic_delays,
+    )
+    dpl_target = simulate_dipole(net_orig, tstop=tstop, dt=dt, n_trials=n_trials)[0]
+
+    # define set_params function and constraints
+    net_opt = jones_2009_model(mesh_shape=(3, 3))
+
+    def set_params(net, params):
+        weights_ampa = {
+            "L2_basket": 0.5,
+            "L2_pyramidal": 0.5,
+            "L5_basket": 0.5,
+            "L5_pyramidal": 0.5,
+        }
+        synaptic_delays = {
+            "L2_basket": 0.1,
+            "L2_pyramidal": 0.1,
+            "L5_basket": 1.0,
+            "L5_pyramidal": 1.0,
+        }
+        net.add_evoked_drive(
+            "evprox",
+            mu=params["mu"],
+            sigma=params["sigma"],
+            numspikes=1,
+            location="proximal",
+            weights_ampa=weights_ampa,
+            synaptic_delays=synaptic_delays,
+        )
+
+    # define constraints
+    constraints = dict()
+    constraints.update({"mu": (0, tstop), "sigma": (0.1, 10)})
+
+    optim_seed1 = Optimizer(
+        net_opt,
+        tstop=tstop,
+        constraints=constraints,
+        set_params=set_params,
+        solver=solver,
+        obj_fun=obj_fun,
+        max_iter=max_iter,
+    )
+
+    optim_seed1_repeat = Optimizer(
+        net_opt,
+        tstop=tstop,
+        constraints=constraints,
+        set_params=set_params,
+        solver=solver,
+        obj_fun=obj_fun,
+        max_iter=max_iter,
+    )
+
+    optim_seed2 = Optimizer(
+        net_opt,
+        tstop=tstop,
+        constraints=constraints,
+        set_params=set_params,
+        solver=solver,
+        obj_fun=obj_fun,
+        max_iter=max_iter,
+    )
