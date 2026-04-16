@@ -361,6 +361,7 @@ def test_initial_params_validation(solver, initial_params, error_type):
 
 
 def test_cma_validation():
+    """Test validation of CMA specific parameters"""
     net = jones_2009_model(mesh_shape=(3, 3))
     tstop = 10.0
     constraints = {"mu": (1, 10), "sigma": (1, 10)}
@@ -393,3 +394,118 @@ def test_cma_validation():
         optim.fit(target=dpl_target, sigma0=[1, 2, 3])
 
     optim.fit(target=dpl_target, sigma0=[1, 2])
+
+
+def test_cma_seed():
+    """Test random seed control during CMA optimization"""
+    # Define parameters for a very short optimization run
+    max_iter = 3
+    popsize = 4
+    tstop = 10.0
+    dt = 0.5
+    n_trials = 3
+    solver = "cma"
+    obj_fun = "dipole_corr"
+
+    # Simulate a dipole to establish the target
+    net_orig = jones_2009_model(mesh_shape=(3, 3))
+
+    mu_orig = 2.0
+    weights_ampa = {
+        "L2_basket": 0.5,
+        "L2_pyramidal": 0.5,
+        "L5_basket": 0.5,
+        "L5_pyramidal": 0.5,
+    }
+    synaptic_delays = {
+        "L2_basket": 0.1,
+        "L2_pyramidal": 0.1,
+        "L5_basket": 1.0,
+        "L5_pyramidal": 1.0,
+    }
+    net_orig.add_evoked_drive(
+        "evprox",
+        mu=mu_orig,
+        sigma=1,
+        numspikes=1,
+        location="proximal",
+        weights_ampa=weights_ampa,
+        synaptic_delays=synaptic_delays,
+    )
+    dpl_target = simulate_dipole(net_orig, tstop=tstop, dt=dt, n_trials=n_trials)[0]
+
+    # define set_params function and constraints
+    net_opt = jones_2009_model(mesh_shape=(3, 3))
+
+    def set_params(net, params):
+        weights_ampa = {
+            "L2_basket": 0.5,
+            "L2_pyramidal": 0.5,
+            "L5_basket": 0.5,
+            "L5_pyramidal": 0.5,
+        }
+        synaptic_delays = {
+            "L2_basket": 0.1,
+            "L2_pyramidal": 0.1,
+            "L5_basket": 1.0,
+            "L5_pyramidal": 1.0,
+        }
+        net.add_evoked_drive(
+            "evprox",
+            mu=params["mu"],
+            sigma=params["sigma"],
+            numspikes=1,
+            location="proximal",
+            weights_ampa=weights_ampa,
+            synaptic_delays=synaptic_delays,
+        )
+
+    # define constraints
+    constraints = dict()
+    constraints.update({"mu": (0, tstop), "sigma": (0.1, 10)})
+
+    optim_seed1 = Optimizer(
+        net_opt,
+        tstop=tstop,
+        constraints=constraints,
+        set_params=set_params,
+        solver=solver,
+        obj_fun=obj_fun,
+        max_iter=max_iter,
+    )
+
+    optim_seed1_repeat = Optimizer(
+        net_opt,
+        tstop=tstop,
+        constraints=constraints,
+        set_params=set_params,
+        solver=solver,
+        obj_fun=obj_fun,
+        max_iter=max_iter,
+    )
+
+    optim_seed2 = Optimizer(
+        net_opt,
+        tstop=tstop,
+        constraints=constraints,
+        set_params=set_params,
+        solver=solver,
+        obj_fun=obj_fun,
+        max_iter=max_iter,
+    )
+
+    seed1, seed2 = 123, 456
+    # Run two different instances of an optimizer with the same seed
+    optim_seed1.fit(target=dpl_target, seed=seed1, popsize=popsize, dt=dt)
+    optim_seed1_repeat.fit(target=dpl_target, seed=seed1, popsize=popsize, dt=dt)
+
+    # Run one more instance of an optimizer with a different seed
+    optim_seed2.fit(target=dpl_target, seed=seed2, popsize=popsize, dt=dt)
+
+    # The optimization results with the same seed should match
+    assert optim_seed1.obj_ == optim_seed1_repeat.obj_
+    assert np.all(optim_seed1.opt_params_ == optim_seed1_repeat.opt_params_)
+
+    # The optimization results with different seeds should be different
+    assert optim_seed1.obj_ != optim_seed2.obj_
+    assert np.all(optim_seed1.opt_params_ != optim_seed2.opt_params_)

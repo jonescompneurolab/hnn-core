@@ -186,6 +186,8 @@ class Optimizer:
             The dipole scale factor.
         smooth_window_len : float, optional
             The smooth window length.
+        seed : int, optional (Only used if solver='cma')
+            Optional seed for random number generator of optimizer.
         verbose : bool
             If True, print build steps and simulation progress to console. Default: True.
 
@@ -549,6 +551,7 @@ def _run_opt_cma(
             "popsize": obj_fun_kwargs.get("popsize", 16),
             "CMA_stds": sigma0,
             "verbose": 0,
+            "seed": obj_fun_kwargs.get("seed", 123),
         },
     )
     while not es.stop():
