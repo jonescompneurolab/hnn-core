@@ -361,6 +361,7 @@ def test_initial_params_validation(solver, initial_params, error_type):
 
 
 def test_cma_validation():
+    """Test validation of CMA specific parameters"""
     net = jones_2009_model(mesh_shape=(3, 3))
     tstop = 10.0
     constraints = {"mu": (1, 10), "sigma": (1, 10)}
@@ -396,6 +397,8 @@ def test_cma_validation():
 
 
 def test_cma_seed():
+    """Test random seed control during CMA optimization"""
+    # Define parameters for a very short optimization run
     max_iter = 3
     popsize = 4
     tstop = 10.0
@@ -404,7 +407,7 @@ def test_cma_seed():
     solver = "cma"
     obj_fun = "dipole_corr"
 
-    # simulate a dipole to establish ground-truth drive parameters
+    # Simulate a dipole to establish the target
     net_orig = jones_2009_model(mesh_shape=(3, 3))
 
     mu_orig = 2.0
@@ -492,12 +495,17 @@ def test_cma_seed():
     )
 
     seed1, seed2 = 123, 456
+    # Run two different instances of an optimizer with the same seed
     optim_seed1.fit(target=dpl_target, seed=seed1, popsize=popsize, dt=dt)
     optim_seed1_repeat.fit(target=dpl_target, seed=seed1, popsize=popsize, dt=dt)
+
+    # Run one more instance of an optimizer with a different seed
     optim_seed2.fit(target=dpl_target, seed=seed2, popsize=popsize, dt=dt)
 
+    # The optimization results with the same seed should match
     assert optim_seed1.obj_ == optim_seed1_repeat.obj_
     assert np.all(optim_seed1.opt_params_ == optim_seed1_repeat.opt_params_)
 
+    # The optimization results with different seeds should be different
     assert optim_seed1.obj_ != optim_seed2.obj_
     assert np.all(optim_seed1.opt_params_ != optim_seed2.opt_params_)
