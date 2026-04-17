@@ -716,14 +716,14 @@ def pyramidal_l23(cell_name,pos=(0,0,0), gid=None):
     # build sections
     section_names = list(end_pts.keys())
 
-    v_init = {'soma': np.float64(-71.78874217085284), 
-              'basal_1': np.float64(-71.78937996213429), 
-              'basal_2': np.float64(-71.79124296245172), 
-              'basal_3': np.float64(-71.79124296245172), 
-              'apical_oblique': np.float64(-71.72499593245432), 
-              'apical_trunk': np.float64(-71.75508099484644), 
-              'apical_1': np.float64(-71.52576752573326), 
-              'apical_tuft': np.float64(-71.20459607525555)}
+    v_init = {'soma': np.float64(-73.39101055059983), 
+          'basal_1': np.float64(-73.39624055343998), 
+          'basal_2': np.float64(-73.41158189918325), 
+          'basal_3': np.float64(-73.41158189918325), 
+          'apical_oblique': np.float64(-73.35837204391859), 
+          'apical_trunk': np.float64(-73.366747618743), 
+          'apical_1': np.float64(-73.19824979269559), 
+          'apical_tuft': np.float64(-72.97653780031459)}
     
     sections = _get_dends(p_all, 'L2Pyr', section_names, v_init=v_init)
     sections['soma'] = _get_pyr_soma(p_all, 'L2Pyr', v_init=v_init['soma'])
@@ -807,7 +807,7 @@ def interneuron(cell_name,pos=(0,0,0), layer=2, gid=None):
 
     p_all = get_Int_params()
     sections = dict()
-    sections['soma'] = _get_interneuron_soma(cell_name, v_init=-68.98)
+    sections['soma'] = _get_interneuron_soma(cell_name, v_init=-69.5972)
     synapses = _get_syn_props(p_all, 'Int', syn_types=["ampa", "nmda", "gabaa", "gabab"])
     sections['soma'].syns = list(synapses.keys())
 

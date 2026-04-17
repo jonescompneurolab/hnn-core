@@ -676,8 +676,8 @@ class Network:
                 f"Layer separation must be positive, got: {layer_separation}"
             )
         
-        # if there is a pos_dict, adjust cell positions
-        if hasattr(self, "pos_dict"):
+        # if there is a pos_dict, adjust cell positions (if mesh_shape > (1,1))
+        if hasattr(self, "pos_dict") and not np.isnan(self._inplane_distance):
             scale = inplane_distance / self._inplane_distance
             for cell_type in self.cell_types:
                 zdist = self.cell_types[cell_type]['cell_metadata']['zdist_origin'] * layer_separation
@@ -694,7 +694,8 @@ class Network:
             self._layer_separation = layer_separation
         
         # If cell positions are set for the first time -> default model with default cell names
-        else:
+
+        elif not np.isnan(self._inplane_distance):      # ensure mesh_shape>(1,1)
 
             # Get layer positions using layer dict
             layer_dict = _create_cell_coords(

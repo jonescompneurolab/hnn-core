@@ -1881,7 +1881,7 @@ def plot_laminar_csd(
     im = ax.pcolormesh(
         times, new_depths, data, cmap=cmap, shading="auto", vmin=vmin, vmax=vmax, rasterized=True
     )
-    ax.set_xlabel("time (s)")
+    ax.set_xlabel("time (ms)")
     ax.set_ylabel("electrode depth")
     if colorbar:
         color_axis = ax.inset_axes([1.05, 0, 0.02, 1], transform=ax.transAxes)

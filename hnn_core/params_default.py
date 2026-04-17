@@ -371,7 +371,7 @@ def get_L2Pyrhuman_params():
         "L2Pyr_soma_gbar_SK_E2": 3.0e-05,
         "L2Pyr_soma_gbar_Ca_HVA": 9.92e-04,
         "L2Pyr_soma_gbar_Ca_LVAst": 34.3e-4,
-        "L2Pyr_soma_gbar_Ih": 0.00016,
+        "L2Pyr_soma_gbar_Ih": 2e-05,
         "L2Pyr_soma_gbar_Im": 0.0004,
         "L2Pyr_soma_g_pas": 2.7027027027027027e-05,
         "L2Pyr_soma_e_pas": -75,
@@ -380,7 +380,7 @@ def get_L2Pyrhuman_params():
         # Biophysics basal
         "L2Pyr_basal_gbar_NaTs2_t_32d": 0.008009,
         "L2Pyr_basal_gbar_SKv3_1": 0.000513,
-        "L2Pyr_basal_gbar_Ih": 0.00016,
+        "L2Pyr_basal_gbar_Ih": 2e-05,
         "L2Pyr_basal_g_pas": 2.7027027027027027e-05, 
         "L2Pyr_basal_e_pas": -75,
         "L2Pyr_basal_decay_CaDynamics_E2": 70,
@@ -390,7 +390,7 @@ def get_L2Pyrhuman_params():
         "L2Pyr_dend_gbar_SKv3_1": 0.012,
         "L2Pyr_dend_gbar_Ca_HVA": 0.00001,
         "L2Pyr_dend_gbar_Ca_LVAst": 0.0000001,
-        "L2Pyr_dend_gbar_Ih": 0.000080,
+        "L2Pyr_dend_gbar_Ih": 4e-5,
         "L2Pyr_dend_gbar_Im": 9e-08,
         "L2Pyr_dend_gbar_SK_E2": 3.0e-06,
         "L2Pyr_dend_g_pas": 2.7027027027027027e-05,
@@ -487,10 +487,10 @@ def get_L5PyrET_params():
 
 def get_Int_params():
     return {
-        "Int_gbar_nas": 0.1125,
-        "Int_gbar_kdr": 0.45,
-        "Int_gbar_kd": 0.00078,
-        "Int_gbar_Ih": 0.00018,
+        "Int_gbar_nas": 0.08335,
+        "Int_gbar_kdr": 0.225,
+        "Int_gbar_kd": 0.00039,
+        "Int_gbar_Ih": 2e-5,
         "Int_g_pas": 0.0001,
         "Int_e_pas": -70,
         # track calcium dynamics for new NMDA
