@@ -15,8 +15,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest,macos-latest]
+        os: [ubuntu-latest, macos-latest]
         python-version: [3.9, 3.11, 3.13]
+        include:
+          - os: macos-15-intel
+            python-version: 3.9
 
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +33,7 @@ jobs:
         shell: bash -el {0}
         run: |
           python -m pip install --upgrade pip
-          if [ ${{ matrix.os }} == "macos-latest" ]; then
+          if [[ "${{ matrix.os }}" == macos* ]]; then
               echo "DYLD_FALLBACK_LIBRARY_PATH=${CONDA_PREFIX}/lib:$DYLD_FALLBACK_LIBRARY_PATH" >> $GITHUB_ENV
           elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
               echo "LD_LIBRARY_PATH=${CONDA_PREFIX}/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
